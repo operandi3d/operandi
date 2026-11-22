@@ -4,9 +4,8 @@ User-initiated only: Operandi never sends anything by itself and holds no
 tokens. Every report is a GitHub issue form, pre-filled from the link, that
 opens in the user's browser; they read and edit it there and decide whether
 to submit. Code: `crates/operandi-app/src/bug_report.rs` (links, crash files,
-prompt) and `log_ring.rs` (recent log lines). Reports go to the public, issues-only repository
-manfriday/Operandi-BugReports (the one constant `REPORT_REPO_URL`), so people
-who can't see the private code repository can still file them.
+prompt) and `log_ring.rs` (recent log lines). Reports go to the public code repository,
+operandi3d/operandi (the one constant `REPORT_REPO_URL`).
 
 That repository has two issue forms in `.github/ISSUE_TEMPLATE`:
 `bug.yml` (label `bug`; fields `what`, `steps`, `expected`, `environment`)
@@ -67,7 +66,7 @@ Run the QA app's executable from Terminal with its own data folder, e.g.
 (add `OPERANDI_TEST_PANIC=1` in front for step 4).
 
 1. Choose Help > Report Bug or Idea…: the browser opens the Bug report
-   form on manfriday/Operandi-BugReports, titled "Bug: ", with What
+   form on operandi3d/operandi, titled "Bug: ", with What
    happened, Steps and Expected empty and Environment filled in. Nothing is
    submitted until you press Submit.
 2. The Environment field shows version 0.1.0 and this build's commit, your
