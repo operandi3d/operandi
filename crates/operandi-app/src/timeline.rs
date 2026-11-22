@@ -1673,7 +1673,13 @@ impl Operandi {
                 "Key Scale",
                 "operandi.key.transforms type:scale",
             );
-            self.tb(ui, "Graph", "Graph Editor", "", "operandi.graph.open");
+            self.tbi(
+                ui,
+                Icon::GraphEditor,
+                "Graph Editor",
+                "",
+                "operandi.graph.open",
+            );
         }
         // TK-41: Apply / Discard while edits are pending.
         let pending = animation::pending(&self.editor.scene).len();

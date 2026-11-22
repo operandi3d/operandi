@@ -278,3 +278,44 @@ fn graph_keys_go_through_the_routing_seam() {
     assert!(lines.contains(&"operandi.graph.view fit:all"));
     assert!(lines.contains(&"operandi.graph.view normalise:toggle"));
 }
+
+/// The graph editor window keeps its size frame after frame (it used to
+/// grow taller every frame), and opens at the size it was left at.
+#[test]
+fn graph_editor_window_keeps_its_size() {
+    let ctx = Context::default();
+    let (mut a, id) = items_app();
+    let y = format!("{id}:pos.Y");
+    for (f, v) in [(0, 2.), (12, 0.), (24, 2.)] {
+        a.execute(&format!("operandi.key.add channel:{y} frame:{f} value:{v}"));
+    }
+    a.execute("operandi.graph.open");
+    frames(&mut a, &ctx, 3);
+    let first = a.graph.graph_rect.expect("the graph drew");
+    frames(&mut a, &ctx, 20);
+    let later = a.graph.graph_rect.unwrap();
+    assert!(
+        (later.height() - first.height()).abs() < 0.5,
+        "grew from {first:?} to {later:?}"
+    );
+    // (Tests draw OS windows inside the main one, so the window's own
+    // shape, a wide short strip, is a GUI-checklist item.)
+    // Reopened at a remembered (resized) place, it keeps that size.
+    a.execute("operandi.graph.open open:false");
+    frames(&mut a, &ctx, 1);
+    a.palettes.places.insert(
+        "graphEditor".into(),
+        crate::palettes::Place {
+            size: [700., 300.],
+            position: Some([10., 10.]),
+        },
+    );
+    a.execute("operandi.graph.open open:true");
+    frames(&mut a, &ctx, 3);
+    let a1 = a.graph.graph_rect.unwrap();
+    frames(&mut a, &ctx, 10);
+    let a2 = a.graph.graph_rect.unwrap();
+    assert!((a1.height() - a2.height()).abs() < 0.5, "{a1:?} {a2:?}");
+    // Its place is remembered as the window reports it.
+    assert!(a.palettes.places.contains_key("graphEditor"));
+}

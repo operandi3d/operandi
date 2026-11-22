@@ -33,3 +33,4 @@ named "Operandi Animation". Each step also once typed in the command line.
 14. Post menu > Repeat: the curve repeats past the last key; Cycle: the last key snaps to the first, a ghost square shows its own value.
 15. Shadow Copy, edit, Swap, Swap: back where it started.
 16. A, Shift+A, F, N over the graph; wheel zoom, Alt+middle-drag pan.
+17. The Graph Editor opens as its own window (native title bar), a wide short strip over the lower part of the main window. Drag it onto another screen and resize it from any edge: it stays the size you give it (it used to grow taller by itself). Close and reopen: same place and size. Shortcuts (A, F, N over the graph, Cmd+Z) still work while it's in front.
