@@ -200,3 +200,42 @@ fn a_damaged_packed_array_is_refused_not_misread() {
     text.replace_range(start..end, &blob[..end - start]);
     assert!(persistence::decode(text.as_bytes()).is_err());
 }
+
+/// Hidden-limits A2: a scene file over the old 4 GiB Open limit opens. The
+/// file is a small scene padded with JSON whitespace to 4.5 GiB, so it
+/// needs disk and memory but no big mesh. Opt-in (about 5 GB of memory and
+/// disk, a minute in release):
+/// `cargo test --release -p operandi-core --test all big_scene_save::a_scene_over -- --ignored --nocapture`
+#[test]
+#[ignore]
+fn a_scene_over_four_gib_reopens() {
+    use std::io::Write;
+    let scene = grid_scene(10, 2);
+    let bytes = persistence::encode(&scene).unwrap();
+    assert_eq!(bytes[0], b'{');
+    let dir = temp_dir("over-4-gib");
+    let path = dir.join("padded.opscene");
+    let mut file = std::io::BufWriter::new(std::fs::File::create(&path).unwrap());
+    file.write_all(b"{").unwrap();
+    let spaces = vec![b' '; 64 << 20];
+    let target: u64 = (4 << 30) + (512 << 20);
+    let mut written = 0u64;
+    while written < target {
+        file.write_all(&spaces).unwrap();
+        written += spaces.len() as u64;
+    }
+    file.write_all(&bytes[1..]).unwrap();
+    file.flush().unwrap();
+    drop(file);
+    let size = std::fs::metadata(&path).unwrap().len();
+    assert!(size > 4 << 30, "{size}");
+    let start = Instant::now();
+    let reopened = persistence::load(&path).unwrap();
+    eprintln!(
+        "{size} bytes reopened in {:.1} s",
+        start.elapsed().as_secs_f64()
+    );
+    assert_eq!(reopened.items.len(), scene.items.len());
+    assert_eq!(faces(&reopened), faces(&scene));
+    std::fs::remove_dir_all(&dir).unwrap();
+}

@@ -96,6 +96,61 @@ fn sync_folder(path: &Path) {
     let _ = path;
 }
 
+/// Reads all of `path`, refusing a file over `limit` bytes before reading
+/// it, and a file the memory can't hold with an error instead of stopping
+/// the program (hidden-limits A2, B7: the old fixed 4 GiB cap refused real
+/// scenes; this limit only guards against a damaged size).
+pub fn read_whole(path: &Path, limit: u64) -> Result<Vec<u8>, String> {
+    use std::io::Read;
+    let file = File::open(path).map_err(|e| format!("Cannot read {}: {e}", path.display()))?;
+    let size = file
+        .metadata()
+        .map_err(|e| format!("Cannot read {}: {e}", path.display()))?
+        .len();
+    if size > limit {
+        return Err(format!(
+            "{} is {}, more than the {} Operandi reads in one file",
+            path.display(),
+            size_text(size),
+            size_text(limit)
+        ));
+    }
+    let mut data = Vec::new();
+    data.try_reserve_exact(size as usize).map_err(|_| {
+        format!(
+            "Reading {} needs about {} of memory, which isn't free",
+            path.display(),
+            size_text(size)
+        )
+    })?;
+    // `take` keeps a file that grows while it's read within the limit.
+    file.take(limit.saturating_add(1))
+        .read_to_end(&mut data)
+        .map_err(|e| format!("Cannot read {}: {e}", path.display()))?;
+    if data.len() as u64 > limit {
+        return Err(format!(
+            "{} grew past {} while it was read",
+            path.display(),
+            size_text(limit)
+        ));
+    }
+    Ok(data)
+}
+
+/// "12.3 GB" style sizes for messages.
+pub fn size_text(bytes: u64) -> String {
+    const GIB: f64 = (1u64 << 30) as f64;
+    const MIB: f64 = (1u64 << 20) as f64;
+    let b = bytes as f64;
+    if b >= GIB {
+        format!("{:.1} GB", b / GIB)
+    } else if b >= MIB {
+        format!("{:.1} MB", b / MIB)
+    } else {
+        format!("{bytes} bytes")
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -140,6 +195,17 @@ mod tests {
         assert_eq!(fs::read(&path).unwrap(), b"old");
         assert_eq!(fs::read(&theirs).unwrap(), b"theirs");
         assert_eq!(leftovers(&dir), vec![".a.png.operandi-tmp".to_string()]);
+    }
+
+    #[test]
+    fn read_whole_checks_its_limit_at_the_edges() {
+        let dir = folder("read");
+        let path = dir.join("scene.opscene");
+        fs::write(&path, vec![b' '; 100]).unwrap();
+        assert_eq!(read_whole(&path, 101).unwrap().len(), 100);
+        assert_eq!(read_whole(&path, 100).unwrap().len(), 100);
+        let e = read_whole(&path, 99).unwrap_err();
+        assert!(e.contains("more than the 99 bytes"), "{e}");
     }
 
     #[test]

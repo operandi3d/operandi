@@ -7,7 +7,11 @@ use std::{fs::File, io::Read, path::Path};
 /// (packed array lengths, string and point indices, `Scene::validate`),
 /// and this only stops a file far bigger than any real scene from being
 /// read into memory whole.
-const MAX_LOAD_BYTES: u64 = 4 * 1024 * 1024 * 1024;
+// Raised from 4 GiB (hidden-limits A2; Jason 2026-11-22: big scenes over
+// 4 GB are common): scenes save at any size, and Open, crash recovery and
+// the MCP bridge read whatever fits in memory. 256 GiB only stops a file
+// with a damaged size from being read whole.
+const MAX_LOAD_BYTES: u64 = 256 << 30;
 /// Newest native version this build reads and writes.
 // Version numbers: renumber here (and in the tests that name them) when
 // branches merge in another order.
@@ -992,21 +996,12 @@ pub fn load_for_bridge(path: &Path) -> Result<Scene> {
     load(path).or_else(|strict| load_keeping_broken_polygons(path).map_err(|_| strict))
 }
 fn read_limited(path: &Path) -> Result<Vec<u8>> {
-    let file = File::open(path).map_err(|e| e.to_string())?;
-    let size = file.metadata().map_err(|e| e.to_string())?.len();
-    if size > MAX_LOAD_BYTES {
-        return Err(too_big());
-    }
-    let mut data = Vec::with_capacity(size as usize);
-    file.take(MAX_LOAD_BYTES + 1)
-        .read_to_end(&mut data)
-        .map_err(|e| e.to_string())?;
-    Ok(data)
+    operandi_files::read_whole(path, MAX_LOAD_BYTES)
 }
 fn too_big() -> String {
     format!(
-        "The file is larger than {} GiB, more than any scene this build can open",
-        MAX_LOAD_BYTES >> 30
+        "The scene is larger than the {} any scene file may be",
+        operandi_files::size_text(MAX_LOAD_BYTES)
     )
 }
 /// How much of an existing destination `guard_destination` reads.

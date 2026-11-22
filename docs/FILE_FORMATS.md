@@ -13,7 +13,10 @@ more entries is written as a packed object of base64 little-endian numbers
 Smaller meshes stay plain arrays; readers take either form at any version.
 Writing has no size limit (it was 64 MiB); reading checks each packed
 array's length and string indices and runs `Scene::validate`, and refuses
-files over 4 GiB. OBJ/glTF import reads files up to 4 GiB (was 512 MiB).
+files over 256 GiB, a guard against a damaged size only (it was 4 GiB
+until 2026-11-22). OBJ/glTF import reads files up to 256 GiB too (was
+4 GiB, before that 512 MiB). Both read what fits in memory and say so when
+it doesn't.
 Each mesh still holds at most 5 million points and polygons.
 
 ## What works

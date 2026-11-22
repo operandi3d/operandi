@@ -10,7 +10,7 @@
 use crate::{Face, Item, Mesh, Result, Scene};
 use glam::{DMat4, DVec2, DVec3};
 use std::collections::{BTreeMap, BTreeSet};
-use std::fs::{self, OpenOptions};
+use std::fs::OpenOptions;
 use std::io::Write;
 use std::path::Path;
 
@@ -33,7 +33,9 @@ mod zip;
 /// A text OBJ of 5 million polygons is about 500 MB, so this was raised
 /// from 512 MiB; it only stops a file far bigger than any real model from
 /// being read into memory whole.
-const MAX_IMPORT_BYTES: u64 = 4 * 1024 * 1024 * 1024;
+/// Raised from 4 GiB with scene Open (hidden-limits B7): a 50M polygon OBJ
+/// is 3-5 GB. What fits in memory is read.
+const MAX_IMPORT_BYTES: u64 = 256 << 30;
 /// UV map that imported texture coordinates land in; the same name the
 /// primitives use, so tools that look for "Texture" find imported UVs.
 const UV_MAP: &str = crate::PRIMITIVE_UV_MAP;
@@ -305,13 +307,7 @@ pub fn import_with(path: &Path, usd: &UsdImportOptions) -> Result<Imported> {
         .and_then(|e| e.to_str())
         .map(str::to_ascii_lowercase)
         .unwrap_or_default();
-    let size = fs::metadata(path)
-        .map_err(|e| format!("Cannot read {}: {e}", path.display()))?
-        .len();
-    if size > MAX_IMPORT_BYTES {
-        return Err("File exceeds the 4 GiB import budget".into());
-    }
-    let bytes = fs::read(path).map_err(|e| format!("Cannot read {}: {e}", path.display()))?;
+    let bytes = operandi_files::read_whole(path, MAX_IMPORT_BYTES)?;
     let stem = path
         .file_stem()
         .map(|s| s.to_string_lossy().into_owned())
