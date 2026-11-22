@@ -665,6 +665,7 @@ used in the app; `primitive_add` always starts from the Reset values.
 - **`operandi.key.offset`** — Move the selected keys by frames in time and by value, one undo step (GE-40/45).
   - `frames` (number): Frames to move by (default 0).
   - `value` (number): Value to add (default 0).
+  - `link` (boolean): Related keys (X/Y/Z, R/G/B) at the same times move in time too (GE-42).
 - **`operandi.key.setValue`** — Sets, adds to or multiplies the selected keys' values (GE-71 Set Value).
   - `value` (number, required): The value.
   - `mode` (string): set (default), add or multiply.

@@ -49,6 +49,7 @@ const GRAPH_VIEW_ARGS: &[table::Arg] = &[
     table::opt("shadow", TOGGLE, table::Unit::None, None),
     table::opt("animatedOnly", TOGGLE, table::Unit::None, None),
     table::opt("lock", TOGGLE, table::Unit::None, None),
+    table::opt("link", TOGGLE, table::Unit::None, None),
 ];
 const DIALOG_ARGS: &[table::Arg] = &[table::opt(
     "kind",

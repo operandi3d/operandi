@@ -34,6 +34,23 @@ pub enum ShadowAction {
     Clear,
 }
 
+/// The channels related to `k` (GE-42): its X/Y/Z or R/G/B siblings.
+fn related(k: &ChannelKey) -> Vec<ChannelKey> {
+    let Some((base, part)) = k.channel.rsplit_once('.') else {
+        return Vec::new();
+    };
+    let parts: &[&str] = match part {
+        "X" | "Y" | "Z" => &["X", "Y", "Z"],
+        "r" | "g" | "b" => &["r", "g", "b"],
+        _ => return Vec::new(),
+    };
+    parts
+        .iter()
+        .filter(|p| **p != part)
+        .map(|p| ChannelKey::new(k.item, &format!("{base}.{p}")))
+        .collect()
+}
+
 impl Editor {
     /// The channels a curve-wide edit applies to: `given`, else the
     /// selected channels, else the channels of the selected keys.
@@ -98,19 +115,45 @@ impl Editor {
     /// once (a graph editor drag's result, one undo step, GE-45). Time
     /// Snap rounds the new times to frames (GE-41).
     pub fn offset_selected_keys(&mut self, dt: Tick, dv: f64) -> Result<()> {
+        self.offset_keys(dt, dv, false)
+    }
+
+    /// [`Self::offset_selected_keys`]; with `linked` (GE-42) the related
+    /// channels' keys (X/Y/Z, R/G/B) at the same times move in time too.
+    pub fn offset_keys(&mut self, dt: Tick, dv: f64, linked: bool) -> Result<()> {
         if !dv.is_finite() {
             return Err("Give a number".into());
         }
+        let own: std::collections::BTreeSet<(ChannelKey, Tick)> =
+            self.live_selected_keys().into_iter().collect();
+        if linked {
+            for (k, t) in &own {
+                for sib in related(k) {
+                    if self
+                        .scene
+                        .animation
+                        .channels
+                        .get(&sib)
+                        .is_some_and(|c| c.curve.key_at(*t).is_some())
+                    {
+                        self.anim.selected_keys.insert((sib, *t));
+                    }
+                }
+            }
+        }
         let snap = self.scene.animation.settings.snap;
         let rate = self.scene.time.rate;
-        self.edit_selected_keys("Move Keys", |_, key| {
+        self.edit_selected_keys("Move Keys", |k, key| {
+            let mine = own.contains(&(k.clone(), key.time));
             let t = key.time + dt;
             key.time = if snap {
                 animation::nearest_frame(rate, t)
             } else {
                 t
             };
-            key.value += dv;
+            if mine {
+                key.value += dv;
+            }
             Ok(())
         })
     }

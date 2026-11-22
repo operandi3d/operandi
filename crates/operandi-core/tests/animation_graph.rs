@@ -269,3 +269,20 @@ fn gex2_simplify_drops_keys_that_change_nothing() {
     assert_eq!(ch["post"], "constant");
     assert!(ch["keys"][0]["outSlope"].is_number());
 }
+
+#[test]
+fn ge42_linked_moves_take_the_related_keys_along_in_time() {
+    let (mut e, id) = ball();
+    ok(
+        &mut e,
+        &format!("operandi.key.add channel:{id}:pos.X frame:12 value:1"),
+    );
+    ok(&mut e, &format!("operandi.key.select keys:{id}:pos.Y@12"));
+    ok(&mut e, "operandi.key.offset frames:2 value:0.5 link:true");
+    let rate = e.scene.time.rate;
+    let x = &e.scene.animation.channels[&ChannelKey::new(id, "pos.X")].curve;
+    assert_eq!(rate.frame_at(x.keys[0].time), 14, "X moved in time");
+    near(x.keys[0].value, 1.);
+    let y = &e.scene.animation.channels[&ChannelKey::new(id, "pos.Y")].curve;
+    near(y.keys[1].value, 0.5);
+}

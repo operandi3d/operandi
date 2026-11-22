@@ -77,6 +77,8 @@ pub(crate) struct GraphEditor {
     pub(crate) isolate: bool,
     pub(crate) velocity: bool,
     pub(crate) show_shadow: bool,
+    /// GE-42: related keys move together in time.
+    pub(crate) link: bool,
     /// GE-11 filters.
     animated_only: bool,
     hide_transforms: bool,
@@ -286,6 +288,7 @@ impl Operandi {
                 "isolate" => self.graph.isolate = toggle(self.graph.isolate),
                 "velocity" => self.graph.velocity = toggle(self.graph.velocity),
                 "shadow" => self.graph.show_shadow = toggle(self.graph.show_shadow),
+                "link" => self.graph.link = toggle(self.graph.link),
                 "animatedOnly" => self.graph.animated_only = toggle(self.graph.animated_only),
                 "lock" => {
                     self.graph.locked = toggle(self.graph.locked.is_some())
@@ -927,8 +930,9 @@ impl Operandi {
                         0.
                     };
                     if df != 0. || dv.abs() > 1e-12 {
+                        let link = if self.graph.link { " link:true" } else { "" };
                         self.execute(&format!(
-                            "operandi.key.offset frames:{} value:{dv}",
+                            "operandi.key.offset frames:{} value:{dv}{link}",
                             fmt(df)
                         ));
                     }
@@ -1138,7 +1142,10 @@ impl Operandi {
                     &mut self.graph.value_text
                 };
                 let mut t = slot.clone().unwrap_or_else(|| shown(list));
-                let r = ui.add_enabled(has, egui::TextEdit::singleline(&mut t).desired_width(64.));
+                let r = ui.gated(
+                    crate::unavailable::unless(has, "Select keys first"),
+                    egui::TextEdit::singleline(&mut t).desired_width(64.),
+                );
                 self.text_editors.insert(r.id);
                 crate::numeric_tab::register(ui, &r, Some(&t));
                 let slot = if text == 0 {
@@ -1318,6 +1325,11 @@ impl Operandi {
                     "Lock List",
                     self.graph.locked.is_some(),
                     "operandi.graph.view lock:toggle",
+                ),
+                (
+                    "Link Related",
+                    self.graph.link,
+                    "operandi.graph.view link:toggle",
                 ),
             ] {
                 if ui.selectable_label(on, text).clicked() {

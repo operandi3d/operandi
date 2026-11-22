@@ -524,7 +524,8 @@ pub fn run(e: &mut Editor, name: &str, a: &Args) -> Out {
         // ---------------------------------------------------- graph editor
         "operandi.key.offset" => {
             let dt = frames_tick(rate, number(a, "frames")?.unwrap_or(0.));
-            e.offset_selected_keys(dt, number(a, "value")?.unwrap_or(0.))?;
+            let linked = flag(a, "link")?.unwrap_or(false);
+            e.offset_keys(dt, number(a, "value")?.unwrap_or(0.), linked)?;
         }
         "operandi.key.setValue" => {
             let v = number(a, "value")?.ok_or("Give value:")?;

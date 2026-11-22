@@ -3132,6 +3132,7 @@ pub static COMMANDS: &[Entry] = &[
             &[
             jopt("frames", "number", "Frames to move by (default 0)."),
             jopt("value", "number", "Value to add (default 0)."),
+            jopt("link", "boolean", "Related keys (X/Y/Z, R/G/B) at the same times move in time too (GE-42)."),
         ],
             crate::anim_commands::run,
         )
