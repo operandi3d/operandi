@@ -2580,13 +2580,16 @@ fn top_bar_collapses_to_a_thin_line() {
     idle(&mut a, &ctx);
     assert!(a.layouts.top_collapsed, "{}", a.status);
     let strip = a.layouts.strip_rect.expect("the collapsed line");
+    // On Windows and Linux the menu bar keeps its own row above the line
+    // (Jason, 2026-11-22); on macOS the line is the window's top edge.
+    let menu = a.layouts.menu_bar_rect.map_or(0., |r| r.bottom());
     assert!(
-        strip.height() <= crate::collapse_line::TOP_AREA + 0.5 && strip.top() <= 1.,
-        "a thin line at the top: {strip:?}"
+        strip.height() <= crate::collapse_line::TOP_AREA + 0.5 && strip.top() <= menu + 1.,
+        "a thin line at the top, under the menu row ({menu}): {strip:?}"
     );
     let tabs = dock_leaf(&a, Pane::ToolTabs);
     assert!(
-        tabs.top() <= crate::collapse_line::TOP_AREA + 2.,
+        tabs.top() <= strip.bottom() + 2.,
         "the Tool Tabs row sits right under the line: {tabs:?}"
     );
     a.execute("operandi.bar.collapse bar:top on:false");

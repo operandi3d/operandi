@@ -55,7 +55,9 @@ impl Rig {
         let mut rig = Self {
             a,
             ctx,
-            size: vec2(1440., 900.),
+            // Tall enough that the Create tab's last button stays above
+            // Tool Properties under the in-window menu row (2026-11-22).
+            size: vec2(1440., 960.),
         };
         rig.frame(vec![]);
         rig
