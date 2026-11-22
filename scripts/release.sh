@@ -78,7 +78,14 @@ done
 say "== Checks for $TAG"
 command -v gh >/dev/null 2>&1 || stop "The GitHub CLI isn't installed. Run: brew install gh   then: gh auth login"
 gh auth status >/dev/null 2>&1 || stop "The GitHub CLI isn't signed in. Run: gh auth login"
-REPO="$(gh repo view --json nameWithOwner -q .nameWithOwner)" || stop "Couldn't find this repo on GitHub."
+# Always the repo behind the "origin" remote. With more than one remote
+# (origin plus archive), gh commands like `gh run watch` otherwise stop
+# with "No default remote repository has been set"; GH_REPO pins every gh
+# call below to the same repo.
+ORIGIN_URL="$(git remote get-url origin 2>/dev/null)" || stop "This checkout has no \"origin\" remote."
+REPO="$(gh repo view "$ORIGIN_URL" --json nameWithOwner -q .nameWithOwner)" || stop "Couldn't find this repo on GitHub."
+GH_REPO="$REPO"
+export GH_REPO
 
 BRANCH="$(git rev-parse --abbrev-ref HEAD)"
 [ "$BRANCH" = main ] || stop "You're on \"$BRANCH\". Releases come from main: git checkout main"
