@@ -49,26 +49,21 @@ Where whole-scene work happens on a drag or frame step:
 None of this is wrong today. With rigs and deformers it becomes the
 bottleneck: a frame step would re-pose and re-check everything.
 
-A finding: `meshops::Runtime` sits on the `Editor`, but `exchange`
-(operandi-app scenes.rs) does not swap it between document tabs, and its
-cache is keyed by item id, which documents reuse. The recipe check keeps
-results correct, but a tab switch can throw away or thrash the other
-document's results. The DocumentSession work (below) is the natural
-place to fix this; the graph must live there from the start.
-
 ## Prerequisites (not part of this plan)
 
-From the approved audit remediation (`hardening` branch, batch 4, paused
-until Thursday):
+From the approved audit remediation (`hardening` branch, batch 4):
 
-- **1.3 DocumentSession**: the per-document Editor fields (scene, history,
-  live tool and its tweak history, pending records, multi-mesh Extrude,
-  paint baseline) move into one `DocumentSession` that `exchange` swaps
-  whole.
-- **Stage 2, undo reports success truthfully** (P2-001).
+- **Document state** (`operandi-core/src/document_state.rs`, Astra
+  P2-001): every `Editor` field is sorted into **Document** (this scene's
+  data, history, open tool, ids and caches of its items) or **Shared**
+  (app-wide settings and tool context), with an exhaustive list that
+  doesn't compile until a new field is sorted.
+  `Editor::swap_document_state` swaps the Document ones when scene tabs
+  switch; the MeshOps cache already travels with its tab this way.
+- **Undo reports success truthfully** (P2-001 stage 2).
 
-This proposal does not change the Editor field layout, `exchange` or undo.
-It adds one field to DocumentSession once it exists (step 5).
+This proposal does not change the Editor field layout beyond adding its
+own fields, `swap_document_state` beyond listing them, or undo.
 
 ## Design
 
@@ -103,16 +98,20 @@ MeshOps link reads another item's shown mesh; a time-using op reads
 
 ### Where it lives
 
+The engine's per-document state is new `Editor` fields, each listed under
+**Document** in `document_state.rs` (and swapped in
+`swap_document_state`), as that file's header asks:
+
 ```
-DocumentSession            (from batch 4)
-  scene: Scene             undo + files (unchanged)
-  history ...              (unchanged)
-  eval: EvalGraph          NEW: graph, dirty bits, caches. Not undo, not saved.
+Editor
+  scene: Scene              document data: undo + files (unchanged)
+  meshops: Runtime          Document already (MeshOps cache)
+  eval: EvalGraph           NEW, Document: graph, dirty bits, node caches
+  evaluated: EvalCache      NEW, Document: the last evaluated scene per Purpose
 ```
 
-One `EvalGraph` per document, nothing global per app. The MeshOps
-`Runtime` cache moves into it (or beside it, in the same session) so tabs
-stop sharing it.
+One graph per open scene, nothing global per app. None of it is undo
+data or saved.
 
 ### Out of undo (AR-04, AR-15)
 
@@ -162,7 +161,7 @@ frame on the 16k grid (`tool_frames_subdivided` probe), and the GE-X7 probe
 | 2 | `EvalGraph::build(&Scene)`: nodes and edges from items, channels, MeshOps links and time use. | build on fixtures; edges match `OpDef::links`; structure counter | **Yes** |
 | 3 | Channel nodes: `pose` and `repose` through the graph, so a key edit re-poses only the edited channel and a frame step only time-dependent channels. Same results as today. | every animation test unchanged; new test counts channel evaluations | **Yes**, as a pure function taking `&mut Scene` + `&mut EvalGraph` owned by the caller (a test or a temporary local), no Editor field |
 | 4 | `evaluate()` reads the graph: Display/Final skip items whose shown mesh is clean (no full scans). MeshOps chain lookup becomes a node pull; its recipe check stays as a safety net. | doors.rs, meshops tests; speed guard; 16 ms probe | Partly: the core function yes; wiring to `Editor::evaluated` waits |
-| 5 | `DocumentSession.eval` field; `Editor::evaluated` and edit paths mark dirty; MeshOps `Runtime` moves per document. | tab switch keeps each document's results; undo/redo marks dirty; contract + monkey tests | **No**: needs batch 4 (1.3) |
+| 5 | `Editor.eval` / `Editor.evaluated` fields, listed under Document in `document_state.rs`; `Editor::evaluated` and edit paths mark dirty. | tab switch keeps each scene's graph; undo/redo marks dirty; contract + monkey tests | **No**: needs batch 4 (document_state.rs) on main |
 | 6 | Evaluated values held by the graph, not written into item fields; pending = field vs node. Readers (viewport, Cycles preview, export, bridge) ask the graph. | command contract, save/reopen, USD animation export unchanged | **No**: needs step 5 and stage 2 |
 | 7 | Viewport and Cycles preview take a "changed items" list from the graph instead of comparing every item. | gpu_scene patch tests; preview sync tests; speed probes | **No** |
 | 8 | `nodes()` / `edges()` description and an MCP query (`operandi.eval.graph`), for tests now and the Schematic later. | bridge test | Description yes; bridge hookup after 5 |
@@ -184,8 +183,9 @@ skin) without touching the engine.
   same graph or the drag preview and the commit disagree.
 - **Background Display evaluation**: dirty marks must cancel or supersede
   running jobs (MeshOps already cancels with `Job::cancel`).
-- **Batch 4 timing**: steps 5+ wait on it; doing 1-4 first means a short
-  period where the graph is used by functions but not owned by the Editor.
+- **Batch 4 timing**: steps 5+ wait for document_state.rs on main; doing
+  1-4 first means a short period where the graph is used by functions but
+  not owned by the Editor.
 
 ## Codex candidates
 
