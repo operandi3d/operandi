@@ -314,6 +314,7 @@ impl Operandi {
             && self.dirty()
             && self.autosave.changed_since_backup(&self.editor.scene)
             && self.editor.backup_ready()
+            && !self.app_stroke_held()
             && !self.autosave.busy()
         {
             self.start_backup();

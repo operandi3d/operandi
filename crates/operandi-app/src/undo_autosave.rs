@@ -318,7 +318,9 @@ impl super::Operandi {
         }
         let now = Instant::now();
         let changed = self.dirty() && self.autosave.changed_since_backup(&self.editor.scene);
-        let ready = self.editor.backup_ready();
+        // A held sculpt or paint stroke has tentative points in the scene
+        // that the app, not core, owns (Astra P5-002).
+        let ready = self.editor.backup_ready() && !self.app_stroke_held();
         match self.autosave.tick(&self.undo_autosave, now, changed, ready) {
             Tick::Idle => {}
             Tick::Countdown(seconds) => {

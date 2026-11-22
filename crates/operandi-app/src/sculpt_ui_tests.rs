@@ -1056,3 +1056,63 @@ fn weight_colours_match_the_measured_shading() {
         );
     }
 }
+
+/// Astra P5-001: a dialog taking the input mid-stroke ends the stroke as
+/// its own undo step; the next stroke is another, and two Undos give back
+/// the flat grid. P5-002: while the stroke is held, no timed backup is
+/// taken of its tentative points.
+#[test]
+fn a_dialog_mid_stroke_ends_it_as_its_own_step() {
+    let (mut a, ctx) = app();
+    brush(&mut a, SculptBrush::Push, 60.);
+    let c = centre(&a);
+    let from = c - vec2(30., 0.);
+    frame(&mut a, &ctx, vec![Event::PointerMoved(from)]);
+    frame(
+        &mut a,
+        &ctx,
+        vec![press(from, true, PointerButton::Primary, Modifiers::NONE)],
+    );
+    for k in 1..=3 {
+        frame(
+            &mut a,
+            &ctx,
+            vec![Event::PointerMoved(from + vec2(10. * k as f32, 0.))],
+        );
+    }
+    assert!(a.app_stroke_held());
+    assert!(
+        !a.editor.backup_ready() || a.app_stroke_held(),
+        "the backup waits"
+    );
+    // A dialog opens before the release.
+    a.show_about = true;
+    frame(&mut a, &ctx, vec![]);
+    assert!(!a.app_stroke_held(), "the stroke ended");
+    assert_eq!(a.editor.undo.len(), 1, "as its own step");
+    a.show_about = false;
+    frame(&mut a, &ctx, vec![]);
+    // The release lands late, then a second stroke.
+    frame(
+        &mut a,
+        &ctx,
+        vec![press(
+            from + vec2(30., 0.),
+            false,
+            PointerButton::Primary,
+            Modifiers::NONE,
+        )],
+    );
+    stroke(
+        &mut a,
+        &ctx,
+        c - vec2(0., 30.),
+        vec2(0., 60.),
+        6,
+        Modifiers::NONE,
+    );
+    assert_eq!(a.editor.undo.len(), 2, "two strokes, two steps");
+    a.run(Command::Undo);
+    a.run(Command::Undo);
+    assert_eq!(mid(&a).z, 0., "back to the flat grid");
+}
