@@ -175,3 +175,34 @@ fn pending_edits_and_stepping_through_the_bridge() {
     assert_eq!(q["fps"], 24.);
     near(q["seconds"].as_f64().unwrap(), 10. / 24.);
 }
+
+/// Frame renders and playblasts need the running app's renderer and
+/// views; the headless bridge refuses them, the checks of their arguments
+/// first (TL-70/71).
+#[test]
+fn render_range_and_playblast_need_the_app() {
+    let mut b = Bridge::new();
+    for (command, args) in [
+        ("operandi.render.frameRange", json!({"start": 0, "end": 2})),
+        (
+            "operandi.view.playblast",
+            json!({"format": "movie", "scale": 0.5}),
+        ),
+        ("operandi.view.playblast", json!({"format": "images"})),
+    ] {
+        let e = call(
+            &mut b,
+            "command_run",
+            json!({"command": command, "args": args}),
+        )
+        .unwrap_err();
+        assert!(e.contains("running app"), "{command}: {e}");
+    }
+    let e = call(
+        &mut b,
+        "command_run",
+        json!({"command": "operandi.view.playblast", "args": {"format": "gif"}}),
+    )
+    .unwrap_err();
+    assert!(e.contains("movie or images"), "{e}");
+}

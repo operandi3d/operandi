@@ -660,7 +660,8 @@ used in the app; `primitive_add` always starts from the Reset values.
   - `scale` (number): 1, 0.5 or 0.25 of the view's size (default 1).
   - `folder` (string): Folder to write to.
   - `name` (string): File name before the frame number (default Playblast).
-  - `open` (boolean): Open the first frame in the system viewer after (default true).
+  - `open` (boolean): Open the result in the system player after (default true).
+  - `format` (string): movie (default: an .mp4, through ffmpeg when it is installed; else the images) or images (a PNG sequence).
 - **`operandi.time.set`** — Sets the current time (TK-01); not an undo step (TK-05). Snaps to a frame with Time Snap on.
   - `frame` (number): Time in frames.
   - `time` (number): Time in seconds (instead of frame).

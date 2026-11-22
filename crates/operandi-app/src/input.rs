@@ -1041,7 +1041,7 @@ pub fn available(action: &str, mode: operandi_core::Mode, live: bool) -> bool {
         ),
         "Drop" | "Drop Cube" => live,
         // TK-65 / UIC-201: the animation keys are Items-mode keys.
-        a if crate::anim_ui::is_items_action(a) => mode == operandi_core::Mode::Item,
+        a if crate::anim_keys::is_animation_action(a) => crate::anim_keys::available(a, mode, live),
         "Drop Selection" => !live,
         _ => true,
     }

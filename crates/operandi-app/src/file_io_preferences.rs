@@ -52,6 +52,8 @@ pub struct FileIoPreferences {
     /// a picture or IES file chosen from outside the active project is
     /// copied into it. On by default; files saved before it had no entry.
     pub copy_into_project: bool,
+    /// TL-83: what USD exports write of the animation.
+    pub usd_animation: operandi_core::interchange::UsdAnimation,
 }
 impl Default for FileIoPreferences {
     fn default() -> Self {
@@ -74,6 +76,7 @@ impl Default for FileIoPreferences {
             png_compression: 6,
             jpeg_quality: 90,
             copy_into_project: true,
+            usd_animation: o.usd_animation,
         }
     }
 }
@@ -94,8 +97,8 @@ impl FileIoPreferences {
             gltf_tangents: self.gltf_tangents,
             gltf_short_indices: self.gltf_short_indices,
             up_axis: crate::camera::up_axis(),
-            // TL-83: animation on; scene.saveAs animation: picks per export.
-            usd_animation: Default::default(),
+            // TL-83; scene.saveAs animation: overrides it per export.
+            usd_animation: self.usd_animation,
         });
     }
     pub fn image(&self) -> ImageOptions {
@@ -278,6 +281,21 @@ impl super::Operandi {
                         &d.gltf_short_indices,
                         &[(true, "Unsigned Short"), (false, "Unsigned Integer")],
                         "The number type polygon indices are written as",
+                    );
+                });
+                rows::section(ui, "USD", false, |ui| {
+                    use operandi_core::interchange::UsdAnimation as A;
+                    rows::choice_d(
+                        ui,
+                        "Animation",
+                        &mut f.usd_animation,
+                        &d.usd_animation,
+                        &[
+                            (A::On, "On"),
+                            (A::Off, "Off"),
+                            (A::CurrentFrame, "Current Frame Only"),
+                        ],
+                        "What USD exports write of the animation: time samples for every frame of the scene range, none, or the current frame only (TL-83)",
                     );
                 });
                 rows::section(ui, "Images", false, |ui| {

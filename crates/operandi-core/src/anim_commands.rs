@@ -510,6 +510,11 @@ pub fn run(e: &mut Editor, name: &str, a: &Args) -> Out {
                     folder,
                     name: text(a, "name").unwrap_or("Playblast").to_owned(),
                     open: flag(a, "open")?.unwrap_or(true),
+                    movie: match text(a, "format").unwrap_or("movie") {
+                        "movie" | "mp4" => true,
+                        "images" | "png" => false,
+                        other => return Err(format!("format is movie or images, not {other}")),
+                    },
                 });
             }
         }

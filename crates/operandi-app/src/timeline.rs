@@ -331,36 +331,8 @@ impl Operandi {
         if !hovered || self.text_editor_focused(ui.ctx()) {
             return;
         }
-        let mut lines = Vec::new();
-        ui.input_mut(|i| {
-            if i.consume_key(egui::Modifiers::SHIFT, Key::A) {
-                lines.push("operandi.time.fit all:true");
-            } else if i.consume_key(egui::Modifiers::NONE, Key::A) {
-                lines.push("operandi.time.fit");
-            }
-            if i.consume_key(egui::Modifiers::NONE, Key::M) {
-                lines.push("operandi.marker.add");
-            }
-            if i.consume_key(egui::Modifiers::NONE, Key::Delete)
-                || i.consume_key(egui::Modifiers::NONE, Key::Backspace)
-            {
-                lines.push("operandi.key.delete");
-            }
-            if i.consume_key(egui::Modifiers::COMMAND, Key::C) {
-                lines.push("operandi.key.copy");
-            }
-            if i.consume_key(egui::Modifiers::COMMAND, Key::X) {
-                lines.push("operandi.key.cut");
-            }
-            // SC-255: paste insert / replace; plain Cmd+V merges.
-            if i.consume_key(egui::Modifiers::COMMAND | egui::Modifiers::SHIFT, Key::V) {
-                lines.push("operandi.key.paste mode:insert");
-            } else if i.consume_key(egui::Modifiers::COMMAND | egui::Modifiers::ALT, Key::V) {
-                lines.push("operandi.key.paste mode:replace");
-            } else if i.consume_key(egui::Modifiers::COMMAND, Key::V) {
-                lines.push("operandi.key.paste");
-            }
-        });
+        // The keys come from the one routing seam (anim_keys.rs).
+        let lines = ui.input_mut(crate::anim_keys::take_timeline_keys);
         for line in lines {
             if line == "operandi.time.fit" || line == "operandi.time.fit all:true" {
                 self.timeline.view = None;

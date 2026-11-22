@@ -67,9 +67,18 @@ impl Operandi {
         let same = first.filter(|f| values.iter().all(|v| v == f));
         // UIC-110: filled once any selected item leaves the first option
         // (each list starts at its default); UIC-118: "(mixed)".
-        crate::form::rows::status(
-            same.is_none() || options.first().is_some_and(|(d, _)| same != Some(*d)),
-        );
+        let non_default = same.is_none() || options.first().is_some_and(|(d, _)| same != Some(*d));
+        crate::form::rows::status(non_default);
+        // UIC-112: a keyable item channel gets its key light.
+        if let (Some(v), Some(item)) = (first, self.editor.scene.selection.item) {
+            self.anim_row_for(
+                &Command::EditItemCommon {
+                    items: vec![item],
+                    edit: make(v),
+                },
+                non_default,
+            );
+        }
         let shown = same
             .and_then(|v| options.iter().find(|(o, _)| *o == v))
             .map_or(crate::form::rows::MIXED, |(_, name)| *name);

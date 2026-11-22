@@ -450,7 +450,7 @@ pub struct IoOptions {
 }
 
 /// TL-83: what a USD export writes of the scene's animation.
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum UsdAnimation {
     /// Time samples once a frame across the scene range (TL-80..82).
     #[default]

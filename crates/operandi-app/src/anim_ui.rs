@@ -14,67 +14,10 @@ use operandi_core::command_registry::{self as table, Area};
 use operandi_core::command_runtime::Call;
 use std::time::Instant;
 
-/// Input Map actions (shortcuts spec §14, SC-241..249): name, the line it
-/// runs, its default chord. Chords that already belong to other actions
-/// everywhere (`/` Turn, `,` / `.` Zoom, Shift+R Quick Align, Shift+Y
-/// Flex) are set by the Animate layout's own keys instead (UIC-201,
-/// TL-61): assets/layouts/animate.json's `keys`.
-pub(crate) const ACTIONS: &[(&str, &str, &str)] = &[
-    ("Play/Stop", "operandi.time.play", ""),
-    ("Play Backwards", "operandi.time.play backwards:true", ""),
-    (
-        "Back One Frame",
-        "operandi.time.step frames:-1",
-        "Shift+ArrowLeft",
-    ),
-    (
-        "Forward One Frame",
-        "operandi.time.step frames:1",
-        "Shift+ArrowRight",
-    ),
-    ("Step Back", "operandi.time.step frames:-1", ""),
-    ("Step Forward", "operandi.time.step frames:1", ""),
-    ("First Frame", "operandi.time.go to:first", "Shift+ArrowUp"),
-    ("Last Frame", "operandi.time.go to:last", "Shift+ArrowDown"),
-    (
-        "Previous Key",
-        "operandi.time.go to:prevKey",
-        "Ctrl+ArrowLeft",
-    ),
-    ("Next Key", "operandi.time.go to:nextKey", "Ctrl+ArrowRight"),
-    ("First Key", "operandi.time.go to:firstKey", "Ctrl+ArrowUp"),
-    ("Last Key", "operandi.time.go to:lastKey", "Ctrl+ArrowDown"),
-    ("Key Selected Channels", "operandi.key.set", "S"),
-    ("Key Selected Items", "operandi.key.items", "Shift+S"),
-    (
-        "Key Position",
-        "operandi.key.transforms type:position",
-        "Shift+W",
-    ),
-    (
-        "Key Rotation",
-        "operandi.key.transforms type:rotation",
-        "Shift+E",
-    ),
-    ("Key Scale", "operandi.key.transforms type:scale", ""),
-    ("Key Transforms", "operandi.key.transforms type:all", ""),
-];
-
-/// Whether `action` is one of the Items-mode animation keys (TK-65: in
-/// component modes the same keys keep their modelling meanings).
-pub(crate) fn is_items_action(action: &str) -> bool {
-    ACTIONS.iter().any(|(name, _, _)| *name == action)
-}
-
-fn action_line(name: &str) -> Option<&'static str> {
-    ACTIONS
-        .iter()
-        .find(|(n, _, _)| n.eq_ignore_ascii_case(name))
-        .map(|(_, line, _)| *line)
-}
+use crate::anim_keys::ACTIONS;
 
 fn run_action(a: &mut Operandi, c: &Call<'_>) {
-    if let Some(line) = action_line(c.entry.name) {
+    if let Some(line) = crate::anim_keys::action_line(c.entry.name) {
         a.execute_line(line);
     }
 }
@@ -159,6 +102,10 @@ pub(crate) struct Job {
     /// The time to go back to afterwards.
     restore: operandi_core::time_tick::Tick,
     written: Vec<PathBuf>,
+    /// Playblast: the movie the frames become (TL-71), the frames then
+    /// going in a hidden folder beside it.
+    movie: Option<PathBuf>,
+    fps: f64,
 }
 
 /// A playblast screenshot's tag.
@@ -172,6 +119,11 @@ pub(crate) struct AnimUi {
     owed: f64,
     pub(crate) job: Option<Job>,
     pub(crate) dialog: Option<AnimDialog>,
+    /// A playblast movie being encoded, and whether to open it.
+    encoding: Option<(
+        std::thread::JoinHandle<std::result::Result<PathBuf, String>>,
+        bool,
+    )>,
 }
 
 /// `name_0000.png` in `folder`.
@@ -308,6 +260,7 @@ impl Operandi {
             self.start_job(r);
         }
         self.run_job(ctx);
+        self.poll_encoding();
         self.anim_dialog(ctx);
     }
 
@@ -362,6 +315,7 @@ impl Operandi {
     }
 
     fn start_job(&mut self, request: AnimRequest) {
+        let wants_movie = matches!(request, AnimRequest::Playblast { movie: true, .. });
         let (playblast, start, end, folder, name) = match &request {
             AnimRequest::Cancel => {
                 if let Some(job) = self.anim_ui.job.take() {
@@ -418,11 +372,36 @@ impl Operandi {
         self.editor.anim.playing = None;
         self.editor.anim.progress =
             Some((0, (end - start + 1) as usize, folder.display().to_string()));
+        // TL-71: a movie, when asked for and ffmpeg is here; its frames go
+        // in a hidden folder that goes once the movie is written.
+        let movie = if wants_movie && start >= 0 {
+            match ffmpeg() {
+                Some(_) => Some(folder.join(format!("{name}.mp4"))),
+                None => {
+                    self.status = "No ffmpeg found: the playblast is a PNG sequence instead".into();
+                    None
+                }
+            }
+        } else {
+            None
+        };
+        let frames_folder = match &movie {
+            Some(_) => {
+                let f = folder.join(format!(".{name}-frames"));
+                let _ = std::fs::remove_dir_all(&f);
+                if let Err(e) = std::fs::create_dir_all(&f) {
+                    self.status = format!("{}: {e}", f.display());
+                    return;
+                }
+                f
+            }
+            None => folder,
+        };
         self.anim_ui.job = Some(Job {
             playblast,
             frames: (start..=end).collect(),
             next: 0,
-            folder,
+            folder: frames_folder,
             name,
             started: None,
             shot: None,
@@ -433,6 +412,8 @@ impl Operandi {
             camera,
             restore: self.editor.scene.time.current,
             written: Vec::new(),
+            movie,
+            fps: self.editor.scene.time.rate.as_f64(),
         });
     }
 
@@ -462,6 +443,21 @@ impl Operandi {
                 job.written.len(),
                 job.folder.display()
             );
+            if let (true, Some(movie), Some(first)) = (
+                job.playblast,
+                job.movie.clone(),
+                job.frames.first().copied(),
+            ) && !job.written.is_empty()
+            {
+                // Encode off the UI thread, then open (TL-71).
+                let (folder, name, fps) = (job.folder.clone(), job.name.clone(), job.fps);
+                self.status = format!("Playblast: writing {}…", movie.display());
+                self.anim_ui.encoding = Some((
+                    std::thread::spawn(move || encode_movie(&folder, &name, first, fps, &movie)),
+                    job.open,
+                ));
+                return;
+            }
             if job.playblast
                 && job.open
                 && let Some(first) = job.written.first()
@@ -471,6 +467,37 @@ impl Operandi {
             return;
         }
         self.anim_ui.job = Some(job);
+    }
+
+    /// TL-71: a playblast is drawing its frames (the view hides its
+    /// overlays meanwhile).
+    pub(crate) fn playblasting(&self) -> bool {
+        self.anim_ui.job.as_ref().is_some_and(|j| j.playblast)
+    }
+
+    /// The movie encode finished: report it and open it.
+    fn poll_encoding(&mut self) {
+        let done = self
+            .anim_ui
+            .encoding
+            .as_ref()
+            .is_some_and(|(h, _)| h.is_finished());
+        if !done {
+            return;
+        }
+        let Some((handle, open)) = self.anim_ui.encoding.take() else {
+            return;
+        };
+        match handle.join() {
+            Ok(Ok(movie)) => {
+                self.status = format!("Playblast: {}", movie.display());
+                if open {
+                    open_in_system(&movie);
+                }
+            }
+            Ok(Err(e)) => self.status = format!("Playblast: {e}"),
+            Err(_) => self.status = "Playblast: the movie encoder stopped".into(),
+        }
     }
 
     fn render_step(&mut self, job: &mut Job) {
@@ -565,8 +592,25 @@ impl Operandi {
     /// selected items (UIC-112) and makes it keyable (TK-20/24). With no
     /// keys anywhere, the plain None/Constant light by `non_default`.
     pub(crate) fn anim_row(&self, channel: &str, non_default: bool) {
+        self.anim_row_names(&[channel.to_owned()], non_default);
+    }
+
+    /// UIC-112 for any property row, from the edit it makes (`command` at
+    /// the shown value): every panel's shared row helpers call this, so a
+    /// keyable row (light, camera, item channels) gets its light, its
+    /// key click and its key menu. Rows that aren't keyable are left as
+    /// they are.
+    pub(crate) fn anim_row_for(&self, command: &Command, non_default: bool) {
+        if let Some((_, names)) = animation::channel_of_command(&self.editor.scene, command) {
+            self.anim_row_names(&names, non_default);
+        }
+    }
+
+    /// [`Self::anim_row`] for a row that is several channels (a colour's
+    /// components).
+    pub(crate) fn anim_row_names(&self, names: &[String], non_default: bool) {
         use crate::form::status::ChannelStatus;
-        let keys = self.row_channels(channel);
+        let keys: Vec<ChannelKey> = names.iter().flat_map(|n| self.row_channels(n)).collect();
         let s = &self.editor.scene;
         let now = s.time.current;
         let at = self.editor.key_time();
@@ -646,6 +690,59 @@ fn save_view(
     picture
         .save_with_format(path, image::ImageFormat::Png)
         .map_err(|e| format!("{}: {e}", path.display()))
+}
+
+/// ffmpeg, if installed (an outside program: Operandi doesn't link it).
+pub(crate) fn ffmpeg() -> Option<PathBuf> {
+    let mut dirs: Vec<PathBuf> = std::env::var_os("PATH")
+        .map(|p| std::env::split_paths(&p).collect())
+        .unwrap_or_default();
+    dirs.extend(["/opt/homebrew/bin", "/usr/local/bin", "/usr/bin"].map(PathBuf::from));
+    let exe = if cfg!(windows) {
+        "ffmpeg.exe"
+    } else {
+        "ffmpeg"
+    };
+    dirs.into_iter().map(|d| d.join(exe)).find(|p| p.is_file())
+}
+
+/// Encodes `<name>_0000.png`.. in `frames` (from frame `first`) into an
+/// H.264 .mp4 at `fps`, then removes the frames.
+pub(crate) fn encode_movie(
+    frames: &std::path::Path,
+    name: &str,
+    first: i64,
+    fps: f64,
+    movie: &std::path::Path,
+) -> std::result::Result<PathBuf, String> {
+    let ffmpeg = ffmpeg().ok_or("no ffmpeg")?;
+    let out = std::process::Command::new(ffmpeg)
+        .args(["-y", "-loglevel", "error", "-framerate"])
+        .arg(format!("{fps}"))
+        .arg("-start_number")
+        .arg(first.to_string())
+        .arg("-i")
+        .arg(frames.join(format!("{name}_%04d.png")))
+        .args([
+            "-vf",
+            "pad=ceil(iw/2)*2:ceil(ih/2)*2",
+            "-c:v",
+            "libx264",
+            "-pix_fmt",
+            "yuv420p",
+        ])
+        .arg(movie)
+        .output()
+        .map_err(|e| format!("ffmpeg: {e}"))?;
+    if !out.status.success() {
+        return Err(format!(
+            "ffmpeg: {} (the frames are kept in {})",
+            String::from_utf8_lossy(&out.stderr).trim(),
+            frames.display()
+        ));
+    }
+    let _ = std::fs::remove_dir_all(frames);
+    Ok(movie.to_path_buf())
 }
 
 /// TL-71: the system player opens the result.

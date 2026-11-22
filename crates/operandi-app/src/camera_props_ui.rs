@@ -114,6 +114,14 @@ impl Operandi {
         // UIC-110: filled when the channel differs from a new camera's.
         let default = get(&CameraSettings::default());
         crate::form::rows::status(mixed || (value - default).abs() > 1e-12);
+        // UIC-112: a keyable camera channel gets its key light.
+        self.anim_row_for(
+            &Command::EditCamera {
+                item: id,
+                edit: make(value),
+            },
+            mixed || (value - default).abs() > 1e-12,
+        );
         let response = ui
             .horizontal(|ui| {
                 crate::option_row::label(ui, label);
@@ -164,6 +172,13 @@ impl Operandi {
         };
         let mixed = values.iter().any(|v| *v != first);
         crate::form::rows::status(first != get(&CameraSettings::default()));
+        self.anim_row_for(
+            &Command::EditCamera {
+                item: id,
+                edit: make(first),
+            },
+            first != get(&CameraSettings::default()),
+        );
         crate::form::rows::mixed(mixed);
         let mut v = first;
         if crate::option_row::check(ui, label, &mut v).changed() {
@@ -187,6 +202,13 @@ impl Operandi {
         };
         let mixed = values.iter().any(|v| *v != first);
         crate::form::rows::status(first != get(&CameraSettings::default()));
+        self.anim_row_for(
+            &Command::EditCamera {
+                item: id,
+                edit: make(first),
+            },
+            first != get(&CameraSettings::default()),
+        );
         crate::form::rows::mixed(mixed);
         let mut v = first;
         if crate::option_row::choice(ui, &format!("camera-{label}-{id}"), label, &mut v, options)

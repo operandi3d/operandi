@@ -1534,6 +1534,8 @@ impl Operandi {
         let mixed = lights.iter().any(|(id, l)| id != item && changes(l));
         let fresh = LightSettings::new(primary.kind);
         crate::form::rows::status(changes(&fresh));
+        // UIC-112: a keyable light channel gets its key light.
+        self.anim_row_for(c, changes(&fresh));
         crate::form::rows::mixed(mixed);
     }
 

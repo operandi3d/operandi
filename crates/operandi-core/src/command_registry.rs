@@ -3107,7 +3107,7 @@ pub static COMMANDS: &[Entry] = &[
         .side_effect()
         .operandi()
         .example("operandi.render.cancelRange"),
-    script("operandi.view.playblast", Render, "Records the active 3D view over a frame range, HUD hidden, to an image sequence and opens it (TL-71); needs the running app.")
+    script("operandi.view.playblast", Render, "Records the active 3D view over a frame range, HUD hidden, to a movie or an image sequence and opens it (TL-71); needs the running app.")
         .on_editor(
             "Record the active 3D view for frames start..end (default the current range) at scale 1, 0.5 or 0.25 to an image sequence in folder (default the project's renders/), then open it unless open is false; needs the running app.",
             &[
@@ -3117,7 +3117,8 @@ pub static COMMANDS: &[Entry] = &[
             jopt("scale", "number", "1, 0.5 or 0.25 of the view's size (default 1)."),
             jopt("folder", "string", "Folder to write to."),
             jopt("name", "string", "File name before the frame number (default Playblast)."),
-            jopt("open", "boolean", "Open the first frame in the system viewer after (default true)."),
+            jopt("open", "boolean", "Open the result in the system player after (default true)."),
+            jopt("format", "string", "movie (default: an .mp4, through ffmpeg when it is installed; else the images) or images (a PNG sequence)."),
         ],
             crate::anim_commands::run,
         )

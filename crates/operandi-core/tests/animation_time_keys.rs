@@ -460,3 +460,58 @@ fn held_door_reports_keys() {
     assert_eq!(held.label(), "keys");
     let _ = Slope::SmoothFlat;
 }
+
+/// UIC-112 for every keyable row: the app asks which channel a row's
+/// edit sets; lights, cameras and item rows answer, colours by component.
+#[test]
+fn rows_find_their_channel_from_their_edit() {
+    use operandi_core::camera_light::{CameraEdit, LightEdit, LightKind};
+    let mut e = Editor::default();
+    e.dispatch(Command::NewCamera).unwrap();
+    let cam = e.scene.active().unwrap().id;
+    e.dispatch(Command::NewLight(LightKind::Point)).unwrap();
+    let light = e.scene.active().unwrap().id;
+    let of = |e: &Editor, c: Command| animation::channel_of_command(&e.scene, &c).map(|(_, n)| n);
+    assert_eq!(
+        of(
+            &e,
+            Command::EditLight {
+                item: light,
+                edit: LightEdit::Intensity(3.)
+            }
+        ),
+        Some(vec!["intensity".to_string()])
+    );
+    assert_eq!(
+        of(
+            &e,
+            Command::EditCamera {
+                item: cam,
+                edit: CameraEdit::FocalLength(0.05)
+            }
+        ),
+        Some(vec!["focalLength".to_string()])
+    );
+    let colour = of(
+        &e,
+        Command::EditLight {
+            item: light,
+            edit: LightEdit::Color([1., 0., 0.]),
+        },
+    );
+    assert_eq!(
+        colour.map(|v| v.len()),
+        Some(3),
+        "colour rows key r, g and b"
+    );
+    // A keyed light intensity follows its curve.
+    ok(
+        &mut e,
+        &format!("operandi.key.set channels:{light}:intensity"),
+    );
+    assert!(
+        e.scene
+            .animation
+            .is_animated(&ChannelKey::new(light, "intensity"))
+    );
+}
