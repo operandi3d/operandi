@@ -139,6 +139,9 @@ pub(crate) struct SceneState {
     field_errors: BTreeMap<String, String>,
     bridge_ui: bridge_panel::BridgeUi,
     bevel_ui: bevel_panel::BevelUi,
+    /// Image save queue and file times (painting.rs).
+    #[cfg(feature = "painting")]
+    images: crate::painting::DocImages,
 }
 
 impl SceneState {
@@ -173,6 +176,9 @@ impl Operandi {
         // The scene's tool stays live, waiting for the scene's return.
         swap(&mut e.live, &mut o.live);
         swap(&mut e.anim, &mut o.anim);
+        // The saved-pixel baseline: which images have unsaved paint
+        // (Astra P9-004).
+        swap(&mut e.paint, &mut o.paint);
         swap(&mut e.pen_draft, &mut o.pen_draft);
         swap(&mut e.solid_sketch, &mut o.solid_sketch);
         swap(&mut e.bridge, &mut o.bridge);
@@ -195,6 +201,8 @@ impl Operandi {
         swap(&mut self.field_errors, &mut s.field_errors);
         swap(&mut self.bridge_ui, &mut s.bridge_ui);
         swap(&mut self.bevel_ui, &mut s.bevel_ui);
+        #[cfg(feature = "painting")]
+        swap(&mut self.painting.doc, &mut s.images);
     }
 
     /// True while a tool, Pen draft or selection gesture holds the scene.

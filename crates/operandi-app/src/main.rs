@@ -309,6 +309,8 @@ mod painting_starter_tests;
 #[cfg(all(test, feature = "painting"))]
 mod painting_subd_tests;
 #[cfg(all(test, feature = "painting"))]
+mod painting_tabs_tests;
+#[cfg(all(test, feature = "painting"))]
 mod painting_tests;
 #[cfg(feature = "painting")]
 mod painting_uv;

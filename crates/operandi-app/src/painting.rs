@@ -34,6 +34,17 @@ pub(crate) enum NewFor {
     Texture(TextureKind),
 }
 
+/// One scene's image bookkeeping that isn't in the scene itself. Image ids
+/// are per scene, so two tabs can both have image 1: this has to travel
+/// with its tab.
+#[derive(Default)]
+pub(crate) struct DocImages {
+    /// Images still to save for Save All, one save panel at a time.
+    pub(crate) save_queue: Vec<u64>,
+    /// Each image file's modification time when last read or written.
+    pub(crate) file_times: BTreeMap<u64, std::time::SystemTime>,
+}
+
 /// Painting's state in the app: dialogs, the Images window, preferences.
 #[derive(Default)]
 pub(crate) struct Painting {
@@ -53,12 +64,11 @@ pub(crate) struct Painting {
     pub(crate) quit_prompt: bool,
     /// The user answered the changed-images question for this quit.
     pub(crate) quit_decided: bool,
-    /// Images still to save for Save All, one save panel at a time.
-    save_queue: Vec<u64>,
+    /// The open scene's own image state; each parked tab keeps its own
+    /// (`SceneState::images`, swapped by `exchange`; Astra P9-004/P9-005).
+    pub(crate) doc: DocImages,
     /// An image whose file changed on disk while it has unsaved paint.
     pub(crate) reload_ask: Option<u64>,
-    /// Each image file's modification time when last read or written.
-    file_times: BTreeMap<u64, std::time::SystemTime>,
     /// Frames since the last check for changed files.
     watch_tick: u32,
     pub(crate) prefs: PaintingPrefs,
@@ -688,7 +698,7 @@ fn run_reload(a: &mut Operandi, c: &Call<'_>) {
     };
     match a.editor.reload_image(image) {
         Ok(()) => {
-            a.painting.file_times.remove(&image);
+            a.painting.doc.file_times.remove(&image);
             a.note_file_time(image);
             a.status = "Image reloaded from disk".into();
         }
@@ -1288,13 +1298,13 @@ impl Operandi {
             }
         }
         self.status = format!("Saved {saved} image(s)");
-        self.painting.save_queue = queue;
+        self.painting.doc.save_queue = queue;
         self.next_queued_save();
     }
 
     fn next_queued_save(&mut self) {
-        if let Some(id) = self.painting.save_queue.first().copied() {
-            self.painting.save_queue.remove(0);
+        if let Some(id) = self.painting.doc.save_queue.first().copied() {
+            self.painting.doc.save_queue.remove(0);
             self.ask_image_file(id);
         }
     }
@@ -1378,7 +1388,7 @@ impl Operandi {
     /// The file's modification time is the one last read or written.
     fn note_file_time(&mut self, image: u64) {
         if let Some(t) = self.image_file_time(image) {
-            self.painting.file_times.insert(image, t);
+            self.painting.doc.file_times.insert(image, t);
         }
     }
 
@@ -1409,9 +1419,9 @@ impl Operandi {
             let Some(now) = self.image_file_time(id) else {
                 continue;
             };
-            match self.painting.file_times.get(&id) {
+            match self.painting.doc.file_times.get(&id) {
                 None => {
-                    self.painting.file_times.insert(id, now);
+                    self.painting.doc.file_times.insert(id, now);
                 }
                 Some(&then) if then != now => {
                     if self.editor.image_changed(id) {
