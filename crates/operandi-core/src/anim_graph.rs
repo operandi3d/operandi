@@ -595,3 +595,210 @@ impl Editor {
         })
     }
 }
+
+/// GE-83: a saved curve shape (`.openvelope`, JSON): one or more channels'
+/// curves, times relative to the first key.
+#[derive(Clone, Debug, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct Envelope {
+    pub format: String,
+    pub version: u32,
+    /// (channel name, curve).
+    pub channels: Vec<(String, Curve)>,
+}
+
+/// The envelope file extension.
+pub const ENVELOPE_EXTENSION: &str = "openvelope";
+
+impl Editor {
+    /// GE-44/40/43: the selected keys transformed at once, one undo step
+    /// (a Box Scale drag's result): times scaled by `time_factor` around
+    /// `time_pivot` then moved by `dt`; values scaled by `value_factor`
+    /// around `value_pivot` then moved by `dv`.
+    pub fn transform_selected_keys(
+        &mut self,
+        dt: Tick,
+        dv: f64,
+        (time_factor, time_pivot): (f64, Tick),
+        (value_factor, value_pivot): (f64, f64),
+    ) -> Result<()> {
+        if !(time_factor.is_finite() && time_factor > 0.)
+            || ![dv, value_factor, value_pivot].iter().all(|v| v.is_finite())
+        {
+            return Err("Give finite numbers, and a time factor above 0".into());
+        }
+        let snap = self.scene.animation.settings.snap;
+        let rate = self.scene.time.rate;
+        self.edit_selected_keys("Transform Keys", |_, key| {
+            let t = Tick::from_seconds(
+                time_pivot.seconds() + (key.time.seconds() - time_pivot.seconds()) * time_factor,
+            ) + dt;
+            key.time = if snap { animation::nearest_frame(rate, t) } else { t };
+            key.value = value_pivot + (key.value - value_pivot) * value_factor + dv;
+            Ok(())
+        })
+    }
+
+    /// GE-31 Ctrl+Shift+drag: copies of the selected keys at every frame
+    /// along `frames` (the last one where the drag ended), their values
+    /// moved evenly towards `dv`. The originals stay; one undo step.
+    pub fn drop_key_copies(&mut self, frames: i64, dv: f64) -> Result<()> {
+        if frames == 0 {
+            return Err("Drag at least one frame".into());
+        }
+        if frames.abs() > 10_000 || !dv.is_finite() {
+            return Err("That's too far".into());
+        }
+        let selected = self.live_selected_keys();
+        if selected.is_empty() {
+            return Err("Select keys first".into());
+        }
+        let rate = self.scene.time.rate;
+        let step = rate.frame_duration();
+        let n = frames.abs();
+        let mut made = Vec::new();
+        self.anim_step("Drop Key Copies", |e| {
+            for (k, t) in &selected {
+                let Some(c) = e.scene.animation.channels.get_mut(k) else {
+                    continue;
+                };
+                let Some(i) = c.curve.key_at(*t) else {
+                    continue;
+                };
+                let base = c.curve.keys[i].clone();
+                for s in 1..=n {
+                    let mut copy = base.clone();
+                    let by = Tick(step.0 * s * frames.signum());
+                    copy.time = animation::nearest_frame(rate, base.time + by);
+                    copy.value = base.value + dv * s as f64 / n as f64;
+                    made.push((k.clone(), copy.time));
+                    c.curve.put(copy);
+                }
+            }
+            animation::repose(&mut e.scene);
+            Ok(!made.is_empty())
+        })?;
+        self.anim.selected_keys = made.into_iter().collect();
+        Ok(())
+    }
+
+    /// GE-X5 retime: between `low` and `high` (which stay), the timing is
+    /// stretched so `from` lands on `to`; keys of `channels` between them
+    /// follow, piecewise linearly. One undo step.
+    pub fn retime(&mut self, channels: Vec<ChannelKey>, low: Tick, high: Tick, from: Tick, to: Tick) -> Result<()> {
+        if !(low < from && from < high && low < to && to < high) {
+            return Err("Retime needs low < from < high and low < to < high".into());
+        }
+        let map = move |t: Tick| -> Tick {
+            if t <= low || t >= high {
+                return t;
+            }
+            let s = |x: Tick| x.seconds();
+            Tick::from_seconds(if t <= from {
+                s(low) + (s(t) - s(low)) * (s(to) - s(low)) / (s(from) - s(low))
+            } else {
+                s(to) + (s(t) - s(from)) * (s(high) - s(to)) / (s(high) - s(from))
+            })
+        };
+        self.edit_curves("Retime", channels, |c| {
+            for k in &mut c.keys {
+                k.time = map(k.time);
+            }
+            c.sort();
+            Ok(())
+        })
+    }
+
+    /// GE-83: `channels`' curves as an envelope (times from 0).
+    pub fn envelope_of(&self, channels: &[ChannelKey]) -> Result<Envelope> {
+        let mut out = Vec::new();
+        for k in channels {
+            let c = self
+                .scene
+                .animation
+                .channels
+                .get(k)
+                .filter(|c| !c.curve.is_empty())
+                .ok_or_else(|| format!("{} has no keys", k.text()))?;
+            let mut curve = c.curve.clone();
+            let start = curve.keys[0].time;
+            for key in &mut curve.keys {
+                key.time = key.time - start;
+            }
+            out.push((k.channel.clone(), curve));
+        }
+        if out.is_empty() {
+            return Err("Select animated channels first".into());
+        }
+        Ok(Envelope {
+            format: "Operandi envelope".into(),
+            version: 1,
+            channels: out,
+        })
+    }
+
+    /// GE-83: puts an envelope's curves on `channels` from `at`: a
+    /// one-channel envelope goes on every given channel; a vector one
+    /// (pos.X/Y/Z…) on the given items' same-named channels. Keys inside
+    /// the envelope's span are replaced. One undo step.
+    pub fn apply_envelope(&mut self, env: &Envelope, channels: &[ChannelKey], at: Tick) -> Result<()> {
+        if env.channels.is_empty() {
+            return Err("The envelope is empty".into());
+        }
+        let targets: Vec<(ChannelKey, Curve)> = if env.channels.len() == 1 {
+            channels
+                .iter()
+                .map(|k| (k.clone(), env.channels[0].1.clone()))
+                .collect()
+        } else {
+            let items: std::collections::BTreeSet<u64> = channels.iter().map(|k| k.item).collect();
+            items
+                .into_iter()
+                .flat_map(|id| {
+                    env.channels
+                        .iter()
+                        .map(move |(name, c)| (ChannelKey::new(id, name), c.clone()))
+                })
+                .collect()
+        };
+        if targets.is_empty() {
+            return Err("Select channels to put the envelope on".into());
+        }
+        for (k, _) in &targets {
+            if animation::read(&self.scene, k).is_none() {
+                return Err(format!("{} has no channel {}", k.item, k.channel));
+            }
+        }
+        self.anim_step("Apply Envelope", |e| {
+            for (k, curve) in &targets {
+                let now = animation::read(&e.scene, k).unwrap_or(0.);
+                let stepped = animation::is_stepped(&e.scene, k);
+                let span = curve.keys.last().map_or(Tick::ZERO, |l| l.time);
+                let c = e
+                    .scene
+                    .animation
+                    .channels
+                    .entry(k.clone())
+                    .or_insert_with(|| AnimChannel {
+                        curve: Curve {
+                            keys: Vec::new(),
+                            stepped,
+                            ..Default::default()
+                        },
+                        rest: now,
+                    });
+                c.curve.keys.retain(|key| key.time < at || key.time > at + span);
+                for key in &curve.keys {
+                    let mut key = key.clone();
+                    key.time = at + key.time;
+                    c.curve.put(key);
+                }
+                c.curve.pre = curve.pre;
+                c.curve.post = curve.post;
+                c.curve.cycle = curve.cycle;
+            }
+            animation::repose(&mut e.scene);
+            Ok(true)
+        })
+    }
+}
