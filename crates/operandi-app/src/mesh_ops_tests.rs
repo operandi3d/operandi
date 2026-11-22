@@ -464,24 +464,43 @@ fn a_click_in_the_add_operator_browser_over_a_view_stays_in_the_browser() {
     crate::add_browser::RECTS.with(|r| r.borrow_mut().clear());
     draw(&mut a, &ctx, SIZE, vec![]);
     draw(&mut a, &ctx, SIZE, vec![]);
-    let field = crate::add_browser::RECTS.with(|r| {
-        r.borrow()
-            .iter()
-            .rev()
-            .find(|(t, _)| t == "search")
-            .map(|(_, r)| *r)
-            .expect("the browser drew its search field")
-    });
-    // The reporter clicked in the search field, over the 3D view.
-    let at = pos2(field.left() + 30., field.center().y);
-    assert!(a.viewport_rect.contains(at), "{at:?} {:?}", a.viewport_rect);
-    click(&mut a, &ctx, at);
-    assert!(
-        a.editor.scene.active().is_some_and(|i| i.id == id),
-        "the mesh under the browser stays selected"
-    );
-    assert!(
-        a.add_browsers[crate::mesh_ops_ui::ADD_OPERATOR].0.open,
-        "the browser stays open"
-    );
+    let drawn = |name: &str| {
+        crate::add_browser::RECTS.with(|r| {
+            r.borrow()
+                .iter()
+                .rev()
+                .find(|(t, _)| t.starts_with(name))
+                .map(|(_, r)| *r)
+                .unwrap_or_else(|| panic!("the browser drew {name}"))
+        })
+    };
+    let (window, field, row) = (drawn("window"), drawn("search"), drawn("dir:"));
+    // The reporter clicked in the search field, over the 3D view; then
+    // empty space low in the browser, and a folder row.
+    for (what, at) in [
+        (
+            "the search field",
+            pos2(field.left() + 30., field.center().y),
+        ),
+        (
+            "empty space",
+            pos2(window.left() + 20., window.bottom() - 12.),
+        ),
+        ("a folder row", pos2(row.left() + 20., row.center().y)),
+    ] {
+        assert!(
+            a.viewport_rect.contains(at),
+            "{what}: {at:?} {:?}",
+            a.viewport_rect
+        );
+        click(&mut a, &ctx, at);
+        assert!(
+            a.editor.scene.active().is_some_and(|i| i.id == id),
+            "{what}: the mesh under the browser stays selected"
+        );
+        assert!(
+            a.add_browsers[crate::mesh_ops_ui::ADD_OPERATOR].0.open,
+            "{what}: the browser stays open"
+        );
+    }
 }
