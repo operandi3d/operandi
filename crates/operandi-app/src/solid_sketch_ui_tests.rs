@@ -418,6 +418,10 @@ fn nodes_snap_on_create_and_move_and_reactivating_is_safe() {
     a.execute("Solid Sketch");
     draw(&mut a, &ctx, size, vec![]);
     draw(&mut a, &ctx, size, vec![super::tests::key(Key::Enter)]);
+    // The question's window was on screen in the Enter frame; a press
+    // comes after a frame without it (a press on a window above a view
+    // stays in that window, bug report #5).
+    draw(&mut a, &ctx, size, vec![]);
     assert!(a.editor.solid_sketch.is_some(), "{}", a.status);
     let at = screen(&a, DVec3::new(2., 0., 1.)) + vec2(6., -5.);
     click(&mut a, &ctx, size, at, Modifiers::NONE);
