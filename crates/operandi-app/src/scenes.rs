@@ -178,6 +178,7 @@ impl Operandi {
         swap(&mut e.anim, &mut o.anim);
         // The saved-pixel baseline: which images have unsaved paint
         // (Astra P9-004).
+        #[cfg(feature = "painting")]
         swap(&mut e.paint, &mut o.paint);
         swap(&mut e.pen_draft, &mut o.pen_draft);
         swap(&mut e.solid_sketch, &mut o.solid_sketch);
