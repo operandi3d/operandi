@@ -764,6 +764,9 @@ struct Operandi {
     menus_in_system_bar: bool,
     /// A native panel that is open, waiting for the user.
     choosing: Option<file_chooser::Pending>,
+    /// Tests: native-style panels held open (file_chooser.rs).
+    #[cfg(test)]
+    held_panel: Option<file_chooser::HeldAnswer>,
     pending: Option<FileAction>,
     allow_close: bool,
     ground_axes: bool,
@@ -1475,6 +1478,8 @@ impl Operandi {
             native_panels: false,
             menus_in_system_bar: false,
             choosing: None,
+            #[cfg(test)]
+            held_panel: None,
             pending: None,
             allow_close: false,
             ground_axes: true,
@@ -2352,6 +2357,12 @@ impl Operandi {
                 });
             }
             FileAction::SaveAs | FileAction::Export(_) => self.request_file(a),
+            // Closing waits while the scene's image save panels are open,
+            // so their answers write this scene's pixels (Astra P8-001).
+            #[cfg(feature = "painting")]
+            FileAction::Close | FileAction::CloseScene if self.image_saves_pending() => {
+                self.painting.after_images = Some(painting::AfterImages::File(a));
+            }
             FileAction::Close => self.continue_quit(),
             FileAction::CloseScene => {
                 self.close_active_scene();
@@ -3575,14 +3586,11 @@ impl eframe::App for Operandi {
             && !self.allow_close
         {
             ctx.send_viewport_cmd(ViewportCommand::CancelClose);
-            // Changed images are listed first (PNT-34).
+            // Changed images are listed first (PNT-34), in every scene.
             #[cfg(feature = "painting")]
-            let waits = self.quit_waits_for_images();
+            self.begin_quit();
             #[cfg(not(feature = "painting"))]
-            let waits = false;
-            if !waits {
-                self.request_file(FileAction::Close);
-            }
+            self.request_file(FileAction::Close);
         }
         if self.allow_close {
             ctx.send_viewport_cmd(ViewportCommand::Close);

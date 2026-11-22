@@ -34,6 +34,16 @@ pub(crate) enum NewFor {
     Texture(TextureKind),
 }
 
+/// What goes on once the open scene's queued image saves are done.
+#[derive(Clone, Copy, Debug)]
+pub(crate) enum AfterImages {
+    /// The quit's next step (the next scene with changed images, or the
+    /// scenes' own questions).
+    Quit,
+    /// A file action that was waiting, such as Close Scene.
+    File(crate::FileAction),
+}
+
 /// One scene's image bookkeeping that isn't in the scene itself. Image ids
 /// are per scene, so two tabs can both have image 1: this has to travel
 /// with its tab.
@@ -62,8 +72,13 @@ pub(crate) struct Painting {
     pub(crate) ask_add: bool,
     /// Quitting with changed images: the list question is open (PNT-34).
     pub(crate) quit_prompt: bool,
-    /// The user answered the changed-images question for this quit.
-    pub(crate) quit_decided: bool,
+    /// The scenes (tab ids) whose changed-images question was answered in
+    /// this quit attempt. A new attempt starts empty, so a "Don't Save"
+    /// never carries over to a later quit (Astra P8-004).
+    pub(crate) quit_decided: std::collections::BTreeSet<u64>,
+    /// What waits for the open scene's image save panels to finish: Close
+    /// Scene or the quit doesn't go on while one is open (Astra P8-001).
+    pub(crate) after_images: Option<AfterImages>,
     /// The open scene's own image state; each parked tab keeps its own
     /// (`SceneState::images`, swapped by `exchange`; Astra P9-004/P9-005).
     pub(crate) doc: DocImages,
@@ -1227,7 +1242,8 @@ impl Operandi {
             folder: self.image_folder(),
             name,
         };
-        if !self.choose(request, file_chooser::Purpose::PaintImage(image)) {
+        let tab = self.scenes.active_tab().id;
+        if !self.choose(request, file_chooser::Purpose::PaintImage(tab, image)) {
             self.status = format!(
                 "Save Image: no file panel here; type operandi.image.saveAs image:{image} filename:<file.{ext}>"
             );
@@ -1306,13 +1322,65 @@ impl Operandi {
         if let Some(id) = self.painting.doc.save_queue.first().copied() {
             self.painting.doc.save_queue.remove(0);
             self.ask_image_file(id);
+        } else if !self.image_saves_pending() {
+            self.finish_image_saves();
         }
     }
 
-    /// The save panel's answer for image `image`.
-    pub(crate) fn paint_image_chosen(&mut self, image: u64, path: PathBuf) {
-        self.save_image_to(image, &path);
-        self.next_queued_save();
+    /// An image save panel is open or more are queued for the open scene.
+    pub(crate) fn image_saves_pending(&self) -> bool {
+        !self.painting.doc.save_queue.is_empty()
+            || self
+                .choosing
+                .as_ref()
+                .is_some_and(|c| matches!(c.purpose, file_chooser::Purpose::PaintImage(..)))
+    }
+
+    /// Every queued image save finished: carry on with what waited.
+    fn finish_image_saves(&mut self) {
+        match self.painting.after_images.take() {
+            None => {}
+            Some(AfterImages::Quit) => {
+                if self.editor.changed_images().is_empty() {
+                    let tab = self.scenes.active_tab().id;
+                    self.painting.quit_decided.insert(tab);
+                    self.quit_step();
+                }
+            }
+            Some(AfterImages::File(action)) => self.do_file(action),
+        }
+    }
+
+    /// An image save panel was cancelled or a write failed: the rest of
+    /// the queue and whatever waited for it (Close Scene, the quit) stop,
+    /// and the scene and its images stay open as they were.
+    pub(crate) fn cancel_image_saves(&mut self) {
+        self.painting.doc.save_queue.clear();
+        if self.painting.after_images.take().is_some() {
+            self.painting.quit_decided.clear();
+            self.status = "Images not saved; the scene stays open".into();
+        }
+    }
+
+    /// The save panel's answer for image `image` of scene tab `tab`.
+    /// Answers carry their tab (Astra P8-001): if another scene is open
+    /// by now, its pixels must not be written under this name.
+    pub(crate) fn paint_image_chosen(&mut self, tab: u64, image: u64, path: PathBuf) {
+        if self.scenes.active_tab().id != tab {
+            match self.scenes.tabs.iter().position(|t| t.id == tab) {
+                Some(i) => self.switch_scene_now(i),
+                None => {
+                    self.status = "Image not saved: its scene was closed".into();
+                    self.cancel_image_saves();
+                    return;
+                }
+            }
+        }
+        if self.save_image_to(image, &path) {
+            self.next_queued_save();
+        } else {
+            self.cancel_image_saves();
+        }
     }
 
     /// After a scene save (PNT-33): also save changed images, when on.
@@ -1322,14 +1390,44 @@ impl Operandi {
         }
     }
 
-    /// Quitting: changed images are listed first (PNT-34). Returns true
-    /// while the question stands (the quit waits).
-    pub(crate) fn quit_waits_for_images(&mut self) -> bool {
-        if self.painting.quit_decided || self.editor.changed_images().is_empty() {
-            return false;
+    /// Quitting (the window's close button or Quit): a new quit attempt.
+    /// Changed images are asked about first, scene by scene (PNT-34), in
+    /// every open scene, not only the one in front (Astra P8-005).
+    pub(crate) fn begin_quit(&mut self) {
+        self.painting.quit_decided.clear();
+        self.quit_step();
+    }
+
+    /// The quit's next step: the changed-images question for the next
+    /// scene that has some, else the scenes' own questions.
+    pub(crate) fn quit_step(&mut self) {
+        if let Some(i) = self.scene_with_unsaved_images() {
+            if i != self.scenes.active {
+                self.switch_scene_now(i);
+            }
+            self.painting.quit_prompt = true;
+            return;
         }
-        self.painting.quit_prompt = true;
-        true
+        self.request_file(FileAction::Close);
+    }
+
+    /// The first open scene, the one in front first, with changed images
+    /// not yet answered for in this quit.
+    fn scene_with_unsaved_images(&self) -> Option<usize> {
+        let active = self.scenes.active;
+        let order =
+            std::iter::once(active).chain((0..self.scenes.tabs.len()).filter(|&i| i != active));
+        order.into_iter().find(|&i| {
+            let tab = &self.scenes.tabs[i];
+            if self.painting.quit_decided.contains(&tab.id) {
+                return false;
+            }
+            let editor = match &tab.parked {
+                Some(parked) => &parked.editor,
+                None => &self.editor,
+            };
+            !editor.changed_images().is_empty()
+        })
     }
 
     fn quit_images_prompt(&mut self, ctx: &Context) {
@@ -1339,29 +1437,49 @@ impl Operandi {
             .into_iter()
             .map(|id| format!("  {}", self.image_name(id)))
             .collect();
+        let scene = if self.scenes.tabs.len() > 1 {
+            format!(" in {}", self.scene_label())
+        } else {
+            String::new()
+        };
         let message = format!(
-            "These images have unsaved changes:\n\n{}\n\nSave them before quitting?",
+            "These images{scene} have unsaved changes:\n\n{}\n\nSave them before quitting?",
             names.join("\n")
         );
         match self.show_confirm(ctx, "Unsaved Images", &message, &["Don't Save"]) {
-            form::Outcome::Ok => {
-                self.painting.quit_prompt = false;
-                self.save_all_images();
-                // New images wait for their save panels; quit only when
-                // every image is saved.
-                if self.editor.changed_images().is_empty() {
-                    self.painting.quit_decided = true;
-                    self.request_file(FileAction::Close);
-                }
-            }
-            form::Outcome::Extra(_) => {
-                self.painting.quit_prompt = false;
-                self.painting.quit_decided = true;
-                self.request_file(FileAction::Close);
-            }
-            form::Outcome::Cancel | form::Outcome::No => self.painting.quit_prompt = false,
+            form::Outcome::Ok => self.quit_images_answer(true),
+            form::Outcome::Extra(_) => self.quit_images_answer(false),
+            form::Outcome::Cancel | form::Outcome::No => self.quit_images_cancel(),
             form::Outcome::Open => {}
         }
+    }
+
+    /// Save or Don't Save on the changed-images question.
+    pub(crate) fn quit_images_answer(&mut self, save: bool) {
+        self.painting.quit_prompt = false;
+        let tab = self.scenes.active_tab().id;
+        if !save {
+            self.painting.quit_decided.insert(tab);
+            self.quit_step();
+            return;
+        }
+        self.save_all_images();
+        if self.image_saves_pending() {
+            // New images wait for their save panels; the quit goes on
+            // once every one is saved.
+            self.painting.after_images = Some(AfterImages::Quit);
+        } else if self.editor.changed_images().is_empty() {
+            self.painting.quit_decided.insert(tab);
+            self.quit_step();
+        }
+        // Otherwise a save failed and said why; the quit stops.
+    }
+
+    /// Cancel on the changed-images question: the quit stops, and the next
+    /// one asks again.
+    pub(crate) fn quit_images_cancel(&mut self) {
+        self.painting.quit_prompt = false;
+        self.painting.quit_decided.clear();
     }
 
     /// Auto-save: changed images are backed up beside the scene's backup

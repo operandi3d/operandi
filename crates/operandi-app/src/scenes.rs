@@ -310,7 +310,7 @@ impl Operandi {
     }
 
     /// The swap itself (no tool checks).
-    fn switch_scene_now(&mut self, index: usize) {
+    pub(super) fn switch_scene_now(&mut self, index: usize) {
         self.flush_scene();
         self.cameras.insert(self.active_view, self.camera.clone());
         let mut incoming = self.scenes.tabs[index]
