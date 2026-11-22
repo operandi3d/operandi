@@ -163,31 +163,9 @@ impl Operandi {
     /// Swap the per-scene state between the app and `s`.
     fn exchange(&mut self, s: &mut SceneState) {
         use std::mem::swap;
-        let (e, o) = (&mut self.editor, &mut s.editor);
-        swap(&mut e.scene, &mut o.scene);
-        swap(&mut e.undo, &mut o.undo);
-        swap(&mut e.redo, &mut o.redo);
-        swap(&mut e.selection_run, &mut o.selection_run);
-        swap(&mut e.next_item_id, &mut o.next_item_id);
-        swap(&mut e.selection_start, &mut o.selection_start);
-        swap(&mut e.identities, &mut o.identities);
-        swap(&mut e.i2, &mut o.i2);
-        swap(&mut e.extrude_moved_caps, &mut o.extrude_moved_caps);
-        // The scene's tool stays live, waiting for the scene's return.
-        swap(&mut e.live, &mut o.live);
-        swap(&mut e.anim, &mut o.anim);
-        // The saved-pixel baseline: which images have unsaved paint
-        // (Astra P9-004).
-        #[cfg(feature = "painting")]
-        swap(&mut e.paint, &mut o.paint);
-        swap(&mut e.pen_draft, &mut o.pen_draft);
-        swap(&mut e.solid_sketch, &mut o.solid_sketch);
-        swap(&mut e.bridge, &mut o.bridge);
-        swap(&mut e.spike, &mut o.spike);
-        swap(&mut e.reduction, &mut o.reduction);
-        swap(&mut e.ellipsoid, &mut o.ellipsoid);
-        swap(&mut e.shape, &mut o.shape);
-        swap(&mut e.cone, &mut o.cone);
+        // Every editor field is sorted into document or shared state in
+        // core (document_state.rs, Astra P2-001).
+        self.editor.swap_document_state(&mut s.editor);
         swap(&mut self.saved, &mut s.saved);
         swap(&mut self.path, &mut s.path);
         swap(&mut self.name, &mut s.name);

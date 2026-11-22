@@ -73,6 +73,81 @@ fn a_live_tool_stays_with_its_scene() {
     assert_eq!(a.fields.get("cone_sides").map(String::as_str), Some("7"));
 }
 
+/// Astra P2-001: a scene's open tool keeps its own tweak history and step
+/// counts while another scene is edited; Undo and Redo after switching back
+/// act as if the switch never happened.
+#[test]
+fn a_live_tools_tweak_history_stays_with_its_scene() {
+    use operandi_core::{HistoryRequest, Parameters};
+    fn drag(a: &mut Operandi, delta: DVec3) {
+        let base = a.editor.live.as_ref().unwrap().params.clone();
+        a.editor.tweak_held = true;
+        for t in [0.5, 1.] {
+            a.editor
+                .dispatch(Command::Preview(Parameters {
+                    delta: delta * t,
+                    ..base.clone()
+                }))
+                .unwrap();
+        }
+        a.editor.end_tweak();
+        a.editor.dispatch(Command::CommitTransformStep).unwrap();
+    }
+    let mut a = app();
+    a.run(Command::NewMesh);
+    a.editor.scene.active_mut().unwrap().mesh =
+        operandi_core::Mesh::box_mesh(DVec3::ZERO, DVec3::ONE, 0)
+            .unwrap()
+            .into();
+    a.editor.scene.selection.mode = Mode::Polygon;
+    a.editor.scene.selection.faces = vec![0];
+    a.editor.synchronize_identities().unwrap();
+    let original = a.editor.scene.clone();
+    a.editor.dispatch(Command::Activate(Tool::Move)).unwrap();
+    drag(&mut a, DVec3::Y * 0.25);
+    let first = a.editor.scene.clone();
+    drag(&mut a, DVec3::Y * 0.5);
+    let second = a.editor.scene.clone();
+
+    // Another scene, with its own tool and tweaks.
+    a.request_file(FileAction::New);
+    a.run(Command::NewMesh);
+    a.editor.scene.active_mut().unwrap().mesh =
+        operandi_core::Mesh::box_mesh(DVec3::ZERO, DVec3::ONE, 0)
+            .unwrap()
+            .into();
+    a.editor.scene.selection.mode = Mode::Polygon;
+    a.editor.scene.selection.faces = vec![1];
+    a.editor.synchronize_identities().unwrap();
+    a.editor.dispatch(Command::Activate(Tool::Move)).unwrap();
+    drag(&mut a, DVec3::X);
+    assert!(a.switch_scene(0));
+
+    // Each Undo takes back one of this scene's drags, Move still open.
+    let undo = |a: &mut Operandi| {
+        a.editor
+            .dispatch_history_reported(HistoryRequest::Undo)
+            .unwrap()
+    };
+    undo(&mut a);
+    assert_eq!(a.editor.scene, first);
+    assert!(a.editor.live.as_ref().is_some_and(|l| l.tool == Tool::Move));
+    undo(&mut a);
+    assert_eq!(a.editor.scene, original);
+    a.editor
+        .dispatch_history_reported(HistoryRequest::Redo)
+        .unwrap();
+    a.editor
+        .dispatch_history_reported(HistoryRequest::Redo)
+        .unwrap();
+    assert_eq!(a.editor.scene, second);
+    // The other scene's drag is still its own to undo.
+    assert!(a.switch_scene(1));
+    let moved = a.editor.scene.clone();
+    undo(&mut a);
+    assert_ne!(a.editor.scene, moved, "the other scene's Undo still works");
+}
+
 #[test]
 fn open_fills_an_untouched_scene_and_switches_to_an_open_file() {
     let mut a = app();

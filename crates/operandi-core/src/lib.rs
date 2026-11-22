@@ -298,6 +298,7 @@ pub mod packed_mesh;
 pub use mesh_slot::{MeshSlot, MeshView};
 pub mod mesh_instance;
 pub use packed_mesh::{MeshRead, PackedMesh};
+mod document_state;
 pub mod persistence;
 pub mod preset;
 pub mod primitive;
