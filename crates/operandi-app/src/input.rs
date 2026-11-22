@@ -582,6 +582,25 @@ pub const ACTIONS: &[(&str, &str)] = &[
     // UI build mode (Jason, 2026-11-20): not in the shortcuts spec (v1.1),
     // where Ctrl+Shift+L is free; "Ctrl" is the real Control key on macOS.
     ("UI Build Mode", "Ctrl+Shift+L"),
+    // Animation keys (anim_ui.rs, SC-241..249), Items mode only.
+    ("Play/Stop", ""),
+    ("Play Backwards", ""),
+    ("Back One Frame", "Shift+ArrowLeft"),
+    ("Forward One Frame", "Shift+ArrowRight"),
+    ("Step Back", ""),
+    ("Step Forward", ""),
+    ("First Frame", "Shift+ArrowUp"),
+    ("Last Frame", "Shift+ArrowDown"),
+    ("Previous Key", "Ctrl+ArrowLeft"),
+    ("Next Key", "Ctrl+ArrowRight"),
+    ("First Key", "Ctrl+ArrowUp"),
+    ("Last Key", "Ctrl+ArrowDown"),
+    ("Key Selected Channels", "S"),
+    ("Key Selected Items", "Shift+S"),
+    ("Key Position", "Shift+W"),
+    ("Key Rotation", "Shift+E"),
+    ("Key Scale", ""),
+    ("Key Transforms", ""),
 ];
 pub fn default_bindings() -> std::collections::BTreeMap<String, String> {
     ACTIONS
@@ -1021,6 +1040,8 @@ pub fn available(action: &str, mode: operandi_core::Mode, live: bool) -> bool {
             operandi_core::Mode::Edge | operandi_core::Mode::Vertex
         ),
         "Drop" | "Drop Cube" => live,
+        // TK-65 / UIC-201: the animation keys are Items-mode keys.
+        a if crate::anim_ui::is_items_action(a) => mode == operandi_core::Mode::Item,
         "Drop Selection" => !live,
         _ => true,
     }

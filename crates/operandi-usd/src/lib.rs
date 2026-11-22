@@ -14,6 +14,9 @@ use operandi_core::interchange::{self, ExportFormat, ExportReport};
 use operandi_core::{Result, Scene};
 use std::path::{Path, PathBuf};
 
+pub mod anim_usd;
+#[cfg(all(test, feature = "usd"))]
+mod anim_usd_tests;
 pub mod curves;
 #[cfg(all(test, feature = "usd"))]
 mod curves_tests;

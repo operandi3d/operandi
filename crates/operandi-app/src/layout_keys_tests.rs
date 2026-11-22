@@ -343,9 +343,14 @@ fn switching_with_the_held_switcher_leaves_no_stuck_modifier() {
 
 #[test]
 fn model_and_uv_are_identical_with_an_empty_layout_context() {
-    // The shipped files have no keys and write none.
+    // The shipped files have no keys and write none, but Animate, whose
+    // keys make the animation chords live (UIC-201, TL-61).
     for (_, text) in SHIPPED {
         let doc = WindowLayout::from_json(text).unwrap();
+        if doc.name == "Animate" {
+            assert!(doc.keys.contains_key("Play/Stop"));
+            continue;
+        }
         assert!(doc.keys.is_empty(), "{}", doc.name);
         assert!(!doc.to_json().contains("\"keys\""), "{}", doc.name);
     }

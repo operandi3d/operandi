@@ -42,6 +42,10 @@ mod action_centers;
 mod active_task;
 #[path = "add_loop_slide_options.rs"]
 mod add_loop_slide_options;
+#[path = "animation_time_keys.rs"]
+mod animation_time_keys;
+#[path = "animation_timeline.rs"]
+mod animation_timeline;
 #[path = "axis_slice_cases.rs"]
 mod axis_slice_cases;
 #[path = "backdrop.rs"]

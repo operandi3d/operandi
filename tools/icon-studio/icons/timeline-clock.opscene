@@ -1,0 +1,3956 @@
+{
+  "format": "Operandi",
+  "version": 44,
+  "scene": {
+    "items": [
+      {
+        "id": 1,
+        "name": "Icon Camera",
+        "visible": true,
+        "transform": {
+          "translation": [
+            5.773502691896258,
+            5.773502691896258,
+            5.773502691896258
+          ],
+          "rotation": [
+            -0.6154797086703873,
+            0.7853981633974484,
+            -3.925231146709438e-17
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "zxy": false
+        },
+        "mesh": {
+          "attributes": {
+            "representations": [],
+            "creases": [],
+            "uv_records": {},
+            "corner_normals": {},
+            "point_weights": {},
+            "point_colors": {},
+            "degenerate_faces": []
+          },
+          "vertices": [],
+          "faces": [],
+          "uv_maps": {}
+        },
+        "parent": null,
+        "source_id": null,
+        "source_display_name": null,
+        "camera": {
+          "projection": "Orthographic",
+          "focal_length": 0.05,
+          "film_width": 0.036,
+          "film_height": 0.024,
+          "film_offset": [
+            0.0,
+            0.0
+          ],
+          "film_fit": "Fill",
+          "target_distance": 4.2195833333333335,
+          "focus_distance": 10.0,
+          "clipping": false,
+          "clip_near": 4.0,
+          "clip_far": 100000.0,
+          "stored": {
+            "lens_squeeze": 1.0,
+            "film_roll": 0.0,
+            "display_size": 0.0,
+            "overscan": 1.0
+          },
+          "lens_distortion": 0.0,
+          "dof": {
+            "enable": false,
+            "f_stop": 4.0,
+            "iris_blades": 0,
+            "iris_rotation": 0.0,
+            "edge_weighting": 0.5
+          },
+          "resolution": {
+            "enable": false,
+            "width": 1920,
+            "height": 1080
+          },
+          "background": {
+            "enable": true,
+            "image": null
+          },
+          "focus_from_target": false
+        }
+      },
+      {
+        "id": 2,
+        "name": "Key Light",
+        "visible": true,
+        "transform": {
+          "translation": [
+            -0.7822861984651435,
+            9.289648606773577,
+            3.618073667901288
+          ],
+          "rotation": [
+            -1.1916065542642842,
+            -0.21293834957939717,
+            0.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "zxy": false
+        },
+        "mesh": {
+          "attributes": {
+            "representations": [],
+            "creases": [],
+            "uv_records": {},
+            "corner_normals": {},
+            "point_weights": {},
+            "point_colors": {},
+            "degenerate_faces": []
+          },
+          "vertices": [],
+          "faces": [],
+          "uv_maps": {}
+        },
+        "parent": null,
+        "source_id": null,
+        "source_display_name": null,
+        "light": {
+          "kind": "Directional",
+          "render": "Default",
+          "dissolve": 0.0,
+          "intensity": 2.54,
+          "shadow": "RayTraced",
+          "visible_to_camera": false,
+          "spread_angle": 0.05235987755982989,
+          "color": [
+            1.0,
+            0.97,
+            0.86
+          ],
+          "affect_diffuse": 1.0,
+          "affect_specular": 1.0,
+          "radius": 0.0,
+          "falloff": "InverseDistanceSquared",
+          "cone_angle": 0.7853981633974483,
+          "soft_edge": 0.08726646259971647,
+          "shape": "Rectangular",
+          "width": 1.0,
+          "height": 1.0,
+          "environment_only": false,
+          "length": 1.0,
+          "use_prototype_transform": true,
+          "stored": {
+            "visible_to_reflection": false,
+            "visible_to_refraction": false,
+            "samples": 64,
+            "importance": 1.0,
+            "display_size": 1.0,
+            "shadow_map_size": 2.0,
+            "shadow_color": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "affect_caustics": 1.0,
+            "affect_subsurface": 1.0,
+            "material_enabled": true,
+            "opacity": 1.0
+          }
+        }
+      },
+      {
+        "id": 3,
+        "name": "Icon Sky",
+        "visible": true,
+        "transform": {
+          "translation": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "zxy": false
+        },
+        "mesh": {
+          "attributes": {
+            "representations": [],
+            "creases": [],
+            "uv_records": {},
+            "corner_normals": {},
+            "point_weights": {},
+            "point_colors": {},
+            "degenerate_faces": []
+          },
+          "vertices": [],
+          "faces": [],
+          "uv_maps": {}
+        },
+        "parent": null,
+        "source_id": null,
+        "source_display_name": null,
+        "environment": {
+          "intensity": 1.0,
+          "visible_to_camera": true,
+          "visible_to_indirect": true,
+          "visible_to_reflection": true,
+          "visible_to_refraction": true,
+          "material": {
+            "id": 4294967297,
+            "name": "Environment Material",
+            "layer": {
+              "enable": true,
+              "invert": false,
+              "blend": "Normal",
+              "opacity": 1.0
+            },
+            "settings": {
+              "kind": "FourColor",
+              "zenith": [
+                0.194,
+                0.225,
+                0.252
+              ],
+              "sky": [
+                0.167,
+                0.194,
+                0.239
+              ],
+              "ground": [
+                0.117,
+                0.14,
+                0.171
+              ],
+              "nadir": [
+                0.081,
+                0.095,
+                0.122
+              ],
+              "sky_exponent": 2.0,
+              "ground_exponent": 2.0,
+              "daylight": {
+                "disc_size": 1.0,
+                "haze": 2.0,
+                "clamp_sky_brightness": true,
+                "sky_gamma": 1.0,
+                "ground_albedo": [
+                  0.5,
+                  0.5,
+                  0.5
+                ],
+                "disc_color": [
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "disc_in_scatter": 0.0
+              },
+              "fog": {
+                "fog_type": "None",
+                "start": 0.0,
+                "end": 10.0,
+                "density": 0.1,
+                "base_altitude": 0.0,
+                "altitude_falloff": 0.5
+              }
+            }
+          }
+        }
+      },
+      {
+        "id": 4,
+        "name": "timeline-clock",
+        "visible": true,
+        "transform": {
+          "translation": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "zxy": false
+        },
+        "mesh": {
+          "attributes": {
+            "representations": [],
+            "creases": [],
+            "uv_records": {},
+            "corner_normals": {},
+            "point_weights": {},
+            "point_colors": {},
+            "degenerate_faces": []
+          },
+          "vertices": [
+            [
+              -0.01344959397663003,
+              -0.03139110478868202,
+              -0.04933261560073397
+            ],
+            [
+              0.4732571103164513,
+              0.10289306569623542,
+              -0.2674709789239804
+            ],
+            [
+              0.4984011691499546,
+              0.0431284416843811,
+              -0.23629687282703338
+            ],
+            [
+              0.5147873195145203,
+              -0.017911232428348856,
+              -0.2019237564526593
+            ],
+            [
+              0.5221351898343112,
+              -0.07918155089449089,
+              -0.16493976335205188
+            ],
+            [
+              0.5203190560109415,
+              -0.13963416157774755,
+              -0.12597769990106272
+            ],
+            [
+              0.5093699925976563,
+              -0.19823470354869838,
+              -0.0857042178076629
+            ],
+            [
+              0.4894753411051107,
+              -0.2539805052870805,
+              -0.04480840751638929
+            ],
+            [
+              0.4609755045361817,
+              -0.3059177406694943,
+              -0.003990007679786189
+            ],
+            [
+              0.42435812299621134,
+              -0.3531577491988243,
+              0.03605256756394348
+            ],
+            [
+              0.3802497300356043,
+              -0.39489224123172917,
+              0.07463417865048033
+            ],
+            [
+              0.32940503248707376,
+              -0.43040712803853864,
+              0.1110946835172903
+            ],
+            [
+              0.27269399722248844,
+              -0.45909474005940104,
+              0.14481023281734043
+            ],
+            [
+              0.21108696577849467,
+              -0.4804642242989312,
+              0.1752039441543908
+            ],
+            [
+              0.14563805154379525,
+              -0.4941499429570501,
+              0.20175577270073547
+            ],
+            [
+              0.07746710358681333,
+              -0.4999177295931195,
+              0.224011409308389
+            ],
+            [
+              0.00774054572765015,
+              -0.4976688957786634,
+              0.24159005386456622
+            ],
+            [
+              -0.062348581296870015,
+              -0.4874419196837419,
+              0.2541909308871899
+            ],
+            [
+              -0.13160103309098037,
+              -0.46941178770479236,
+              0.2615984358767798
+            ],
+            [
+              -0.1988318810040765,
+              -0.44388700039887174,
+              0.2636858243692156
+            ],
+            [
+              -0.2628907865884528,
+              -0.41130429395359236,
+              0.2604173805686584
+            ],
+            [
+              -0.322681684209077,
+              -0.3722211675098656,
+              0.2518490284547195
+            ],
+            [
+              -0.3771815350304909,
+              -0.32730634419703386,
+              0.23812737490766442
+            ],
+            [
+              -0.42545783149492733,
+              -0.27732832909472105,
+              0.21948720122404436
+            ],
+            [
+              -0.4666845527851615,
+              -0.22314225989785128,
+              0.19624744594361854
+            ],
+            [
+              -0.5001562982697114,
+              -0.16567527527359951,
+              0.16880574772251247
+            ],
+            [
+              -0.5253003571032147,
+              -0.10591065126174506,
+              0.1376316416255654
+            ],
+            [
+              -0.5416865074677804,
+              -0.04487097714901511,
+              0.10325852525119132
+            ],
+            [
+              -0.5490343777875714,
+              0.016399341317126837,
+              0.06627453215058397
+            ],
+            [
+              -0.5472182439642016,
+              0.0768519520003835,
+              0.027312468699594774
+            ],
+            [
+              -0.5362691805509163,
+              0.13545249397133435,
+              -0.012961013393805072
+            ],
+            [
+              -0.5163745290583708,
+              0.19119829570971625,
+              -0.05385682368507851
+            ],
+            [
+              -0.4878746924894418,
+              0.2431355310921301,
+              -0.09467522352168166
+            ],
+            [
+              -0.4512573109494714,
+              0.2903755396214601,
+              -0.1347177987654113
+            ],
+            [
+              -0.40714891798886427,
+              0.33211003165436526,
+              -0.17329940985194842
+            ],
+            [
+              -0.35630422044033383,
+              0.3676249184611746,
+              -0.2097599147187583
+            ],
+            [
+              -0.2995931851757484,
+              0.3963125304820371,
+              -0.2434754640188084
+            ],
+            [
+              -0.2379861537317548,
+              0.4176820147215672,
+              -0.2738691753558587
+            ],
+            [
+              -0.17253723949705552,
+              0.43136773337968615,
+              -0.3004210039022034
+            ],
+            [
+              -0.10436629154007354,
+              0.4371355200157554,
+              -0.32267664050985695
+            ],
+            [
+              -0.03463973368091036,
+              0.43488668620129933,
+              -0.3402552850660342
+            ],
+            [
+              0.035449393343610164,
+              0.42465971010637776,
+              -0.3528561620886579
+            ],
+            [
+              0.10470184513771988,
+              0.4066295781274284,
+              -0.36026366707824764
+            ],
+            [
+              0.1719326930508164,
+              0.3811047908215077,
+              -0.3623510555706836
+            ],
+            [
+              0.2359915986351927,
+              0.34852208437622834,
+              -0.35908261177012635
+            ],
+            [
+              0.29578249625581665,
+              0.30943895793250176,
+              -0.35051425965618743
+            ],
+            [
+              0.350282347077231,
+              0.2645241346196697,
+              -0.3367926061091323
+            ],
+            [
+              0.39855864354166703,
+              0.21454611951735722,
+              -0.3181524324255124
+            ],
+            [
+              0.43978536483190156,
+              0.1603600503204871,
+              -0.2949126771450864
+            ],
+            [
+              0.5001562982697114,
+              0.16567527527359946,
+              -0.16880574772251244
+            ],
+            [
+              0.5253003571032147,
+              0.10591065126174513,
+              -0.13763164162556543
+            ],
+            [
+              0.5416865074677804,
+              0.04487097714901517,
+              -0.10325852525119134
+            ],
+            [
+              0.5490343777875712,
+              -0.016399341317126864,
+              -0.0662745321505839
+            ],
+            [
+              0.5472182439642016,
+              -0.07685195200038356,
+              -0.027312468699594753
+            ],
+            [
+              0.5362691805509163,
+              -0.13545249397133435,
+              0.012961013393805072
+            ],
+            [
+              0.5163745290583708,
+              -0.19119829570971641,
+              0.053856823685078666
+            ],
+            [
+              0.48787469248944176,
+              -0.24313553109213032,
+              0.09467522352168177
+            ],
+            [
+              0.4512573109494713,
+              -0.2903755396214603,
+              0.13471779876541146
+            ],
+            [
+              0.4071489179888644,
+              -0.33211003165436515,
+              0.1732994098519483
+            ],
+            [
+              0.35630422044033383,
+              -0.3676249184611746,
+              0.20975991471875827
+            ],
+            [
+              0.29959318517574846,
+              -0.3963125304820371,
+              0.24347546401880837
+            ],
+            [
+              0.23798615373175475,
+              -0.4176820147215672,
+              0.27386917535585875
+            ],
+            [
+              0.1725372394970553,
+              -0.4313677333796861,
+              0.3004210039022034
+            ],
+            [
+              0.1043662915400734,
+              -0.43713552001575545,
+              0.32267664050985695
+            ],
+            [
+              0.03463973368091022,
+              -0.4348866862012994,
+              0.3402552850660342
+            ],
+            [
+              -0.03544939334360997,
+              -0.4246597101063779,
+              0.35285616208865783
+            ],
+            [
+              -0.10470184513772035,
+              -0.40662957812742834,
+              0.36026366707824775
+            ],
+            [
+              -0.1719326930508164,
+              -0.3811047908215077,
+              0.36235105557068353
+            ],
+            [
+              -0.23599159863519276,
+              -0.34852208437622834,
+              0.35908261177012635
+            ],
+            [
+              -0.2957824962558169,
+              -0.30943895793250165,
+              0.3505142596561875
+            ],
+            [
+              -0.35028234707723077,
+              -0.26452413461966984,
+              0.33679260610913236
+            ],
+            [
+              -0.39855864354166726,
+              -0.214546119517357,
+              0.31815243242551233
+            ],
+            [
+              -0.4397853648319015,
+              -0.16036005032048722,
+              0.2949126771450865
+            ],
+            [
+              -0.4732571103164513,
+              -0.10289306569623546,
+              0.2674709789239804
+            ],
+            [
+              -0.49840116914995464,
+              -0.043128441684381014,
+              0.23629687282703332
+            ],
+            [
+              -0.5147873195145203,
+              0.01791123242834891,
+              0.20192375645265928
+            ],
+            [
+              -0.5221351898343113,
+              0.07918155089449086,
+              0.16493976335205193
+            ],
+            [
+              -0.5203190560109415,
+              0.1396341615777475,
+              0.12597769990106272
+            ],
+            [
+              -0.5093699925976563,
+              0.19823470354869838,
+              0.0857042178076629
+            ],
+            [
+              -0.48947534110511076,
+              0.2539805052870802,
+              0.04480840751638944
+            ],
+            [
+              -0.46097550453618175,
+              0.3059177406694941,
+              0.0039900076797863004
+            ],
+            [
+              -0.42435812299621134,
+              0.35315774919882414,
+              -0.036052567563943316
+            ],
+            [
+              -0.38024973003560414,
+              0.3948922412317293,
+              -0.07463417865048046
+            ],
+            [
+              -0.3294050324870737,
+              0.43040712803853864,
+              -0.11109468351729034
+            ],
+            [
+              -0.2726939972224884,
+              0.4590947400594011,
+              -0.14481023281734046
+            ],
+            [
+              -0.21108696577849473,
+              0.4804642242989312,
+              -0.17520394415439075
+            ],
+            [
+              -0.14563805154379544,
+              0.49414994295705017,
+              -0.20175577270073541
+            ],
+            [
+              -0.07746710358681348,
+              0.4999177295931194,
+              -0.22401140930838898
+            ],
+            [
+              -0.007740545727650289,
+              0.49766889577866336,
+              -0.24159005386456622
+            ],
+            [
+              0.06234858129687021,
+              0.4874419196837418,
+              -0.2541909308871899
+            ],
+            [
+              0.13160103309097992,
+              0.4694117877047924,
+              -0.26159843587677967
+            ],
+            [
+              0.19883188100407648,
+              0.44388700039887174,
+              -0.2636858243692156
+            ],
+            [
+              0.2628907865884527,
+              0.41130429395359236,
+              -0.2604173805686584
+            ],
+            [
+              0.32268168420907667,
+              0.3722211675098658,
+              -0.2518490284547195
+            ],
+            [
+              0.377181535030491,
+              0.32730634419703375,
+              -0.23812737490766436
+            ],
+            [
+              0.4254578314949271,
+              0.27732832909472127,
+              -0.21948720122404447
+            ],
+            [
+              0.46668455278516163,
+              0.22314225989785114,
+              -0.19624744594361848
+            ],
+            [
+              0.01344959397663003,
+              0.03139110478868202,
+              0.04933261560073397
+            ],
+            [
+              0.044421838795280666,
+              0.039936461092267665,
+              0.035451083389254665
+            ],
+            [
+              -0.11071251158098727,
+              0.3502051618448035,
+              -0.11968326698701329
+            ],
+            [
+              -0.17265700121828853,
+              0.33311444923763217,
+              -0.09192020256405466
+            ],
+            [
+              -0.017522650842020603,
+              0.022845748485096355,
+              0.0632141478122133
+            ],
+            [
+              0.053388234779700686,
+              0.06086386428472235,
+              0.06833949378974398
+            ],
+            [
+              -0.10174611559656724,
+              0.37113256503725817,
+              -0.08679485658652396
+            ],
+            [
+              -0.16369060523386852,
+              0.3540418524300869,
+              -0.05903179216356533
+            ],
+            [
+              -0.00855625485760058,
+              0.04377315167755103,
+              0.09610255821270262
+            ],
+            [
+              0.013927744064313853,
+              0.0018061667105387057,
+              0.06802760988813815
+            ],
+            [
+              0.30184628466385377,
+              -0.0302521029445562,
+              0.00993129911238982
+            ],
+            [
+              0.3008899844884861,
+              0.028917773211730405,
+              -0.027458689462418504
+            ],
+            [
+              0.01297144388894621,
+              0.060976042866825314,
+              0.030637621313329814
+            ],
+            [
+              0.022894140048733868,
+              0.022733569902993384,
+              0.10091602028862746
+            ],
+            [
+              0.3108126806482737,
+              -0.009324699752101512,
+              0.042819709512879146
+            ],
+            [
+              0.3098563804729061,
+              0.04984517640418508,
+              0.005429720938070821
+            ],
+            [
+              0.021937839873366227,
+              0.08190344605927999,
+              0.06352603171381914
+            ]
+          ],
+          "faces": [
+            {
+              "vertices": [
+                0,
+                1,
+                2
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                0,
+                2,
+                3
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                0,
+                3,
+                4
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                0,
+                4,
+                5
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                0,
+                5,
+                6
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                0,
+                6,
+                7
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                0,
+                7,
+                8
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                0,
+                8,
+                9
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                0,
+                9,
+                10
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                0,
+                10,
+                11
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                0,
+                11,
+                12
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                0,
+                12,
+                13
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                0,
+                13,
+                14
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                0,
+                14,
+                15
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                0,
+                15,
+                16
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                0,
+                16,
+                17
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                0,
+                17,
+                18
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                0,
+                18,
+                19
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                0,
+                19,
+                20
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                0,
+                20,
+                21
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                0,
+                21,
+                22
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                0,
+                22,
+                23
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                0,
+                23,
+                24
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                0,
+                24,
+                25
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                0,
+                25,
+                26
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                0,
+                26,
+                27
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                0,
+                27,
+                28
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                0,
+                28,
+                29
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                0,
+                29,
+                30
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                0,
+                30,
+                31
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                0,
+                31,
+                32
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                0,
+                32,
+                33
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                0,
+                33,
+                34
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                0,
+                34,
+                35
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                0,
+                35,
+                36
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                0,
+                36,
+                37
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                0,
+                37,
+                38
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                0,
+                38,
+                39
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                0,
+                39,
+                40
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                0,
+                40,
+                41
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                0,
+                41,
+                42
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                0,
+                42,
+                43
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                0,
+                43,
+                44
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                0,
+                44,
+                45
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                0,
+                45,
+                46
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                0,
+                46,
+                47
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                0,
+                47,
+                48
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                0,
+                48,
+                1
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                1,
+                49,
+                50,
+                2
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                2,
+                50,
+                51,
+                3
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                3,
+                51,
+                52,
+                4
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                4,
+                52,
+                53,
+                5
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                5,
+                53,
+                54,
+                6
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                6,
+                54,
+                55,
+                7
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                7,
+                55,
+                56,
+                8
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                8,
+                56,
+                57,
+                9
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                9,
+                57,
+                58,
+                10
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                10,
+                58,
+                59,
+                11
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                11,
+                59,
+                60,
+                12
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                12,
+                60,
+                61,
+                13
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                13,
+                61,
+                62,
+                14
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                14,
+                62,
+                63,
+                15
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                15,
+                63,
+                64,
+                16
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                16,
+                64,
+                65,
+                17
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                17,
+                65,
+                66,
+                18
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                18,
+                66,
+                67,
+                19
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                19,
+                67,
+                68,
+                20
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                20,
+                68,
+                69,
+                21
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                21,
+                69,
+                70,
+                22
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                22,
+                70,
+                71,
+                23
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                23,
+                71,
+                72,
+                24
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                24,
+                72,
+                73,
+                25
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                25,
+                73,
+                74,
+                26
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                26,
+                74,
+                75,
+                27
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                27,
+                75,
+                76,
+                28
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                28,
+                76,
+                77,
+                29
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                29,
+                77,
+                78,
+                30
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                30,
+                78,
+                79,
+                31
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                31,
+                79,
+                80,
+                32
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                32,
+                80,
+                81,
+                33
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                33,
+                81,
+                82,
+                34
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                34,
+                82,
+                83,
+                35
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                35,
+                83,
+                84,
+                36
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                36,
+                84,
+                85,
+                37
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                37,
+                85,
+                86,
+                38
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                38,
+                86,
+                87,
+                39
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                39,
+                87,
+                88,
+                40
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                40,
+                88,
+                89,
+                41
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                41,
+                89,
+                90,
+                42
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                42,
+                90,
+                91,
+                43
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                43,
+                91,
+                92,
+                44
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                44,
+                92,
+                93,
+                45
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                45,
+                93,
+                94,
+                46
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                46,
+                94,
+                95,
+                47
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                47,
+                95,
+                96,
+                48
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                48,
+                96,
+                49,
+                1
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                49,
+                97,
+                50
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                50,
+                97,
+                51
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                51,
+                97,
+                52
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                52,
+                97,
+                53
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                53,
+                97,
+                54
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                54,
+                97,
+                55
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                55,
+                97,
+                56
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                56,
+                97,
+                57
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                57,
+                97,
+                58
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                58,
+                97,
+                59
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                59,
+                97,
+                60
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                60,
+                97,
+                61
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                61,
+                97,
+                62
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                62,
+                97,
+                63
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                63,
+                97,
+                64
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                64,
+                97,
+                65
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                65,
+                97,
+                66
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                66,
+                97,
+                67
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                67,
+                97,
+                68
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                68,
+                97,
+                69
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                69,
+                97,
+                70
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                70,
+                97,
+                71
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                71,
+                97,
+                72
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                72,
+                97,
+                73
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                73,
+                97,
+                74
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                74,
+                97,
+                75
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                75,
+                97,
+                76
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                76,
+                97,
+                77
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                77,
+                97,
+                78
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                78,
+                97,
+                79
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                79,
+                97,
+                80
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                80,
+                97,
+                81
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                81,
+                97,
+                82
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                82,
+                97,
+                83
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                83,
+                97,
+                84
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                84,
+                97,
+                85
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                85,
+                97,
+                86
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                86,
+                97,
+                87
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                87,
+                97,
+                88
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                88,
+                97,
+                89
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                89,
+                97,
+                90
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                90,
+                97,
+                91
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                91,
+                97,
+                92
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                92,
+                97,
+                93
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                93,
+                97,
+                94
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                94,
+                97,
+                95
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                95,
+                97,
+                96
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                96,
+                97,
+                49
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                101,
+                100,
+                99,
+                98
+              ],
+              "uv": null,
+              "material": "Ink",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                102,
+                103,
+                104,
+                105
+              ],
+              "uv": null,
+              "material": "Ink",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                98,
+                99,
+                103,
+                102
+              ],
+              "uv": null,
+              "material": "Ink",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                99,
+                100,
+                104,
+                103
+              ],
+              "uv": null,
+              "material": "Ink",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                100,
+                101,
+                105,
+                104
+              ],
+              "uv": null,
+              "material": "Ink",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                101,
+                98,
+                102,
+                105
+              ],
+              "uv": null,
+              "material": "Ink",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                109,
+                108,
+                107,
+                106
+              ],
+              "uv": null,
+              "material": "Ink",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                110,
+                111,
+                112,
+                113
+              ],
+              "uv": null,
+              "material": "Ink",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                106,
+                107,
+                111,
+                110
+              ],
+              "uv": null,
+              "material": "Ink",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                107,
+                108,
+                112,
+                111
+              ],
+              "uv": null,
+              "material": "Ink",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                108,
+                109,
+                113,
+                112
+              ],
+              "uv": null,
+              "material": "Ink",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                109,
+                106,
+                110,
+                113
+              ],
+              "uv": null,
+              "material": "Ink",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            }
+          ],
+          "uv_maps": {}
+        },
+        "parent": null,
+        "source_id": null,
+        "source_display_name": null
+      }
+    ],
+    "next_id": 5,
+    "selection": {
+      "item": 4,
+      "mode": "Polygon",
+      "vertices": [],
+      "edges": [],
+      "faces": []
+    },
+    "workplane": {
+      "fixed": false,
+      "plane": 0,
+      "center": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "import_source": null,
+    "render": {
+      "samples": 512,
+      "denoise": false,
+      "adaptive_threshold": 0.0,
+      "frame": [
+        32,
+        32
+      ],
+      "diffuse_depth": 7,
+      "reflection_depth": 7,
+      "refraction_depth": 7,
+      "max_radiance": 10.0,
+      "caustics": "Both",
+      "preview_convergence": 1.0,
+      "preview_time_limit": 0.0
+    },
+    "render_camera": 1,
+    "shader_tree": {
+      "nodes": [
+        {
+          "id": 1,
+          "parent": null,
+          "name": "Alpha Output",
+          "layer": {
+            "enable": true,
+            "invert": false,
+            "blend": "Normal",
+            "opacity": 1.0
+          },
+          "kind": {
+            "RenderOutput": "Alpha"
+          }
+        },
+        {
+          "id": 2,
+          "parent": null,
+          "name": "Final Color Output",
+          "layer": {
+            "enable": true,
+            "invert": false,
+            "blend": "Normal",
+            "opacity": 1.0
+          },
+          "kind": {
+            "RenderOutput": "FinalColor"
+          }
+        },
+        {
+          "id": 3,
+          "parent": null,
+          "name": "Base Shader",
+          "layer": {
+            "enable": true,
+            "invert": false,
+            "blend": "Normal",
+            "opacity": 1.0
+          },
+          "kind": {
+            "Shader": {
+              "effect": "FullShading",
+              "gl_display": true,
+              "cast_shadows": true,
+              "receive_shadows": true,
+              "visible_to_camera": true,
+              "visible_to_indirect": true,
+              "visible_to_reflection": true,
+              "visible_to_refraction": true,
+              "alpha_type": "Opacity",
+              "alpha_value": 1.0
+            }
+          }
+        },
+        {
+          "id": 17,
+          "parent": null,
+          "name": "Ink",
+          "layer": {
+            "enable": true,
+            "invert": false,
+            "blend": "Normal",
+            "opacity": 1.0
+          },
+          "kind": {
+            "Group": {
+              "item": "All",
+              "tag_type": "Material",
+              "tag": {
+                "Name": "Ink"
+              },
+              "scope": "Surface",
+              "apply_to_sub_group": false,
+              "apply_to_instances": true
+            }
+          }
+        },
+        {
+          "id": 18,
+          "parent": 17,
+          "name": "Ink Material",
+          "layer": {
+            "enable": true,
+            "invert": false,
+            "blend": "Normal",
+            "opacity": 1.0
+          },
+          "kind": {
+            "Material": {
+              "shading_model": "Principled",
+              "gl_display": true,
+              "diffuse_color": [
+                0.019382360956935723,
+                0.03433980680868217,
+                0.05448027644244237
+              ],
+              "diffuse_amount": 0.8,
+              "diffuse_roughness": 0.0,
+              "specular_color": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "specular_amount": 0.5,
+              "fresnel": 1.0,
+              "roughness": 0.7,
+              "anisotropy": 0.0,
+              "match_specular": true,
+              "reflection_color": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "reflection_amount": 0.0,
+              "reflection_fresnel": 0.0,
+              "clearcoat_amount": 0.0,
+              "clearcoat_roughness": 0.0,
+              "clearcoat_bump": 1.0,
+              "metallic": 0.0,
+              "sheen": 0.0,
+              "sheen_tint": 0.0,
+              "specular_tint": 0.0,
+              "flatness": 0.0,
+              "transparent_color": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "transparent_amount": 0.0,
+              "refractive_index": 1.0,
+              "refraction_roughness": 0.0,
+              "absorption_distance": 0.0,
+              "dissolve": 0.0,
+              "subsurface_color": [
+                0.8,
+                0.8,
+                0.8
+              ],
+              "subsurface_amount": 0.0,
+              "subsurface_distance": 0.005,
+              "luminous_color": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "luminous_intensity": 0.0,
+              "bump_amplitude": 0.0,
+              "displacement_distance": 0.0,
+              "smoothing": 1.0,
+              "smoothing_angle": 40.0,
+              "double_sided": false,
+              "openpbr": {
+                "coat_color": [
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "coat_ior": 1.6,
+                "coat_darkening": 1.0,
+                "coat_roughness_anisotropy": 0.0,
+                "fuzz_color": [
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "fuzz_roughness": 0.5,
+                "thin_film_weight": 0.0,
+                "thin_film_thickness": 0.5,
+                "thin_film_ior": 1.4,
+                "dispersion_abbe_number": 20.0,
+                "transmission_scatter": [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "transmission_scatter_anisotropy": 0.0,
+                "thin_walled": false,
+                "subsurface_albedo": [
+                  0.8,
+                  0.8,
+                  0.8
+                ],
+                "subsurface_uses_diffuse": false
+              }
+            }
+          }
+        },
+        {
+          "id": 15,
+          "parent": null,
+          "name": "Glow",
+          "layer": {
+            "enable": true,
+            "invert": false,
+            "blend": "Normal",
+            "opacity": 1.0
+          },
+          "kind": {
+            "Group": {
+              "item": "All",
+              "tag_type": "Material",
+              "tag": {
+                "Name": "Glow"
+              },
+              "scope": "Surface",
+              "apply_to_sub_group": false,
+              "apply_to_instances": true
+            }
+          }
+        },
+        {
+          "id": 16,
+          "parent": 15,
+          "name": "Glow Material",
+          "layer": {
+            "enable": true,
+            "invert": false,
+            "blend": "Normal",
+            "opacity": 1.0
+          },
+          "kind": {
+            "Material": {
+              "shading_model": "Principled",
+              "gl_display": true,
+              "diffuse_color": [
+                1.0,
+                0.7758222183174236,
+                0.35153259950043936
+              ],
+              "diffuse_amount": 0.8,
+              "diffuse_roughness": 0.0,
+              "specular_color": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "specular_amount": 0.5,
+              "fresnel": 1.0,
+              "roughness": 0.5,
+              "anisotropy": 0.0,
+              "match_specular": true,
+              "reflection_color": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "reflection_amount": 0.0,
+              "reflection_fresnel": 0.0,
+              "clearcoat_amount": 0.0,
+              "clearcoat_roughness": 0.0,
+              "clearcoat_bump": 1.0,
+              "metallic": 0.0,
+              "sheen": 0.0,
+              "sheen_tint": 0.0,
+              "specular_tint": 0.0,
+              "flatness": 0.0,
+              "transparent_color": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "transparent_amount": 0.0,
+              "refractive_index": 1.0,
+              "refraction_roughness": 0.0,
+              "absorption_distance": 0.0,
+              "dissolve": 0.0,
+              "subsurface_color": [
+                0.8,
+                0.8,
+                0.8
+              ],
+              "subsurface_amount": 0.0,
+              "subsurface_distance": 0.005,
+              "luminous_color": [
+                1.0,
+                0.7758222183174236,
+                0.35153259950043936
+              ],
+              "luminous_intensity": 0.45,
+              "bump_amplitude": 0.0,
+              "displacement_distance": 0.0,
+              "smoothing": 1.0,
+              "smoothing_angle": 40.0,
+              "double_sided": false,
+              "openpbr": {
+                "coat_color": [
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "coat_ior": 1.6,
+                "coat_darkening": 1.0,
+                "coat_roughness_anisotropy": 0.0,
+                "fuzz_color": [
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "fuzz_roughness": 0.5,
+                "thin_film_weight": 0.0,
+                "thin_film_thickness": 0.5,
+                "thin_film_ior": 1.4,
+                "dispersion_abbe_number": 20.0,
+                "transmission_scatter": [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "transmission_scatter_anisotropy": 0.0,
+                "thin_walled": false,
+                "subsurface_albedo": [
+                  0.8,
+                  0.8,
+                  0.8
+                ],
+                "subsurface_uses_diffuse": false
+              }
+            }
+          }
+        },
+        {
+          "id": 13,
+          "parent": null,
+          "name": "Axis Z",
+          "layer": {
+            "enable": true,
+            "invert": false,
+            "blend": "Normal",
+            "opacity": 1.0
+          },
+          "kind": {
+            "Group": {
+              "item": "All",
+              "tag_type": "Material",
+              "tag": {
+                "Name": "Axis Z"
+              },
+              "scope": "Surface",
+              "apply_to_sub_group": false,
+              "apply_to_instances": true
+            }
+          }
+        },
+        {
+          "id": 14,
+          "parent": 13,
+          "name": "Axis Z Material",
+          "layer": {
+            "enable": true,
+            "invert": false,
+            "blend": "Normal",
+            "opacity": 1.0
+          },
+          "kind": {
+            "Material": {
+              "shading_model": "Principled",
+              "gl_display": true,
+              "diffuse_color": [
+                0.07227185068231748,
+                0.26225065752969623,
+                0.6724431569576875
+              ],
+              "diffuse_amount": 0.8,
+              "diffuse_roughness": 0.0,
+              "specular_color": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "specular_amount": 0.5,
+              "fresnel": 1.0,
+              "roughness": 0.5,
+              "anisotropy": 0.0,
+              "match_specular": true,
+              "reflection_color": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "reflection_amount": 0.0,
+              "reflection_fresnel": 0.0,
+              "clearcoat_amount": 0.0,
+              "clearcoat_roughness": 0.0,
+              "clearcoat_bump": 1.0,
+              "metallic": 0.0,
+              "sheen": 0.0,
+              "sheen_tint": 0.0,
+              "specular_tint": 0.0,
+              "flatness": 0.0,
+              "transparent_color": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "transparent_amount": 0.0,
+              "refractive_index": 1.0,
+              "refraction_roughness": 0.0,
+              "absorption_distance": 0.0,
+              "dissolve": 0.0,
+              "subsurface_color": [
+                0.8,
+                0.8,
+                0.8
+              ],
+              "subsurface_amount": 0.0,
+              "subsurface_distance": 0.005,
+              "luminous_color": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "luminous_intensity": 0.0,
+              "bump_amplitude": 0.0,
+              "displacement_distance": 0.0,
+              "smoothing": 1.0,
+              "smoothing_angle": 40.0,
+              "double_sided": false,
+              "openpbr": {
+                "coat_color": [
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "coat_ior": 1.6,
+                "coat_darkening": 1.0,
+                "coat_roughness_anisotropy": 0.0,
+                "fuzz_color": [
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "fuzz_roughness": 0.5,
+                "thin_film_weight": 0.0,
+                "thin_film_thickness": 0.5,
+                "thin_film_ior": 1.4,
+                "dispersion_abbe_number": 20.0,
+                "transmission_scatter": [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "transmission_scatter_anisotropy": 0.0,
+                "thin_walled": false,
+                "subsurface_albedo": [
+                  0.8,
+                  0.8,
+                  0.8
+                ],
+                "subsurface_uses_diffuse": false
+              }
+            }
+          }
+        },
+        {
+          "id": 11,
+          "parent": null,
+          "name": "Axis Y",
+          "layer": {
+            "enable": true,
+            "invert": false,
+            "blend": "Normal",
+            "opacity": 1.0
+          },
+          "kind": {
+            "Group": {
+              "item": "All",
+              "tag_type": "Material",
+              "tag": {
+                "Name": "Axis Y"
+              },
+              "scope": "Surface",
+              "apply_to_sub_group": false,
+              "apply_to_instances": true
+            }
+          }
+        },
+        {
+          "id": 12,
+          "parent": 11,
+          "name": "Axis Y Material",
+          "layer": {
+            "enable": true,
+            "invert": false,
+            "blend": "Normal",
+            "opacity": 1.0
+          },
+          "kind": {
+            "Material": {
+              "shading_model": "Principled",
+              "gl_display": true,
+              "diffuse_color": [
+                0.07618538148130785,
+                0.4019777798321958,
+                0.1714411007328226
+              ],
+              "diffuse_amount": 0.8,
+              "diffuse_roughness": 0.0,
+              "specular_color": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "specular_amount": 0.5,
+              "fresnel": 1.0,
+              "roughness": 0.5,
+              "anisotropy": 0.0,
+              "match_specular": true,
+              "reflection_color": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "reflection_amount": 0.0,
+              "reflection_fresnel": 0.0,
+              "clearcoat_amount": 0.0,
+              "clearcoat_roughness": 0.0,
+              "clearcoat_bump": 1.0,
+              "metallic": 0.0,
+              "sheen": 0.0,
+              "sheen_tint": 0.0,
+              "specular_tint": 0.0,
+              "flatness": 0.0,
+              "transparent_color": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "transparent_amount": 0.0,
+              "refractive_index": 1.0,
+              "refraction_roughness": 0.0,
+              "absorption_distance": 0.0,
+              "dissolve": 0.0,
+              "subsurface_color": [
+                0.8,
+                0.8,
+                0.8
+              ],
+              "subsurface_amount": 0.0,
+              "subsurface_distance": 0.005,
+              "luminous_color": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "luminous_intensity": 0.0,
+              "bump_amplitude": 0.0,
+              "displacement_distance": 0.0,
+              "smoothing": 1.0,
+              "smoothing_angle": 40.0,
+              "double_sided": false,
+              "openpbr": {
+                "coat_color": [
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "coat_ior": 1.6,
+                "coat_darkening": 1.0,
+                "coat_roughness_anisotropy": 0.0,
+                "fuzz_color": [
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "fuzz_roughness": 0.5,
+                "thin_film_weight": 0.0,
+                "thin_film_thickness": 0.5,
+                "thin_film_ior": 1.4,
+                "dispersion_abbe_number": 20.0,
+                "transmission_scatter": [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "transmission_scatter_anisotropy": 0.0,
+                "thin_walled": false,
+                "subsurface_albedo": [
+                  0.8,
+                  0.8,
+                  0.8
+                ],
+                "subsurface_uses_diffuse": false
+              }
+            }
+          }
+        },
+        {
+          "id": 9,
+          "parent": null,
+          "name": "Axis X",
+          "layer": {
+            "enable": true,
+            "invert": false,
+            "blend": "Normal",
+            "opacity": 1.0
+          },
+          "kind": {
+            "Group": {
+              "item": "All",
+              "tag_type": "Material",
+              "tag": {
+                "Name": "Axis X"
+              },
+              "scope": "Surface",
+              "apply_to_sub_group": false,
+              "apply_to_instances": true
+            }
+          }
+        },
+        {
+          "id": 10,
+          "parent": 9,
+          "name": "Axis X Material",
+          "layer": {
+            "enable": true,
+            "invert": false,
+            "blend": "Normal",
+            "opacity": 1.0
+          },
+          "kind": {
+            "Material": {
+              "shading_model": "Principled",
+              "gl_display": true,
+              "diffuse_color": [
+                0.6866853124353135,
+                0.10702310297826761,
+                0.09758734714186246
+              ],
+              "diffuse_amount": 0.8,
+              "diffuse_roughness": 0.0,
+              "specular_color": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "specular_amount": 0.5,
+              "fresnel": 1.0,
+              "roughness": 0.5,
+              "anisotropy": 0.0,
+              "match_specular": true,
+              "reflection_color": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "reflection_amount": 0.0,
+              "reflection_fresnel": 0.0,
+              "clearcoat_amount": 0.0,
+              "clearcoat_roughness": 0.0,
+              "clearcoat_bump": 1.0,
+              "metallic": 0.0,
+              "sheen": 0.0,
+              "sheen_tint": 0.0,
+              "specular_tint": 0.0,
+              "flatness": 0.0,
+              "transparent_color": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "transparent_amount": 0.0,
+              "refractive_index": 1.0,
+              "refraction_roughness": 0.0,
+              "absorption_distance": 0.0,
+              "dissolve": 0.0,
+              "subsurface_color": [
+                0.8,
+                0.8,
+                0.8
+              ],
+              "subsurface_amount": 0.0,
+              "subsurface_distance": 0.005,
+              "luminous_color": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "luminous_intensity": 0.0,
+              "bump_amplitude": 0.0,
+              "displacement_distance": 0.0,
+              "smoothing": 1.0,
+              "smoothing_angle": 40.0,
+              "double_sided": false,
+              "openpbr": {
+                "coat_color": [
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "coat_ior": 1.6,
+                "coat_darkening": 1.0,
+                "coat_roughness_anisotropy": 0.0,
+                "fuzz_color": [
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "fuzz_roughness": 0.5,
+                "thin_film_weight": 0.0,
+                "thin_film_thickness": 0.5,
+                "thin_film_ior": 1.4,
+                "dispersion_abbe_number": 20.0,
+                "transmission_scatter": [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "transmission_scatter_anisotropy": 0.0,
+                "thin_walled": false,
+                "subsurface_albedo": [
+                  0.8,
+                  0.8,
+                  0.8
+                ],
+                "subsurface_uses_diffuse": false
+              }
+            }
+          }
+        },
+        {
+          "id": 7,
+          "parent": null,
+          "name": "New",
+          "layer": {
+            "enable": true,
+            "invert": false,
+            "blend": "Normal",
+            "opacity": 1.0
+          },
+          "kind": {
+            "Group": {
+              "item": "All",
+              "tag_type": "Material",
+              "tag": {
+                "Name": "New"
+              },
+              "scope": "Surface",
+              "apply_to_sub_group": false,
+              "apply_to_instances": true
+            }
+          }
+        },
+        {
+          "id": 8,
+          "parent": 7,
+          "name": "New Material",
+          "layer": {
+            "enable": true,
+            "invert": false,
+            "blend": "Normal",
+            "opacity": 1.0
+          },
+          "kind": {
+            "Material": {
+              "shading_model": "Principled",
+              "gl_display": true,
+              "diffuse_color": [
+                0.09305896284668745,
+                0.45641102318040466,
+                0.6514056374198242
+              ],
+              "diffuse_amount": 0.8,
+              "diffuse_roughness": 0.0,
+              "specular_color": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "specular_amount": 0.5,
+              "fresnel": 1.0,
+              "roughness": 0.5,
+              "anisotropy": 0.0,
+              "match_specular": true,
+              "reflection_color": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "reflection_amount": 0.0,
+              "reflection_fresnel": 0.0,
+              "clearcoat_amount": 0.0,
+              "clearcoat_roughness": 0.0,
+              "clearcoat_bump": 1.0,
+              "metallic": 0.0,
+              "sheen": 0.0,
+              "sheen_tint": 0.0,
+              "specular_tint": 0.0,
+              "flatness": 0.0,
+              "transparent_color": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "transparent_amount": 0.0,
+              "refractive_index": 1.0,
+              "refraction_roughness": 0.0,
+              "absorption_distance": 0.0,
+              "dissolve": 0.0,
+              "subsurface_color": [
+                0.8,
+                0.8,
+                0.8
+              ],
+              "subsurface_amount": 0.0,
+              "subsurface_distance": 0.005,
+              "luminous_color": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "luminous_intensity": 0.0,
+              "bump_amplitude": 0.0,
+              "displacement_distance": 0.0,
+              "smoothing": 1.0,
+              "smoothing_angle": 40.0,
+              "double_sided": false,
+              "openpbr": {
+                "coat_color": [
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "coat_ior": 1.6,
+                "coat_darkening": 1.0,
+                "coat_roughness_anisotropy": 0.0,
+                "fuzz_color": [
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "fuzz_roughness": 0.5,
+                "thin_film_weight": 0.0,
+                "thin_film_thickness": 0.5,
+                "thin_film_ior": 1.4,
+                "dispersion_abbe_number": 20.0,
+                "transmission_scatter": [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "transmission_scatter_anisotropy": 0.0,
+                "thin_walled": false,
+                "subsurface_albedo": [
+                  0.8,
+                  0.8,
+                  0.8
+                ],
+                "subsurface_uses_diffuse": false
+              }
+            }
+          }
+        },
+        {
+          "id": 5,
+          "parent": null,
+          "name": "Selected",
+          "layer": {
+            "enable": true,
+            "invert": false,
+            "blend": "Normal",
+            "opacity": 1.0
+          },
+          "kind": {
+            "Group": {
+              "item": "All",
+              "tag_type": "Material",
+              "tag": {
+                "Name": "Selected"
+              },
+              "scope": "Surface",
+              "apply_to_sub_group": false,
+              "apply_to_instances": true
+            }
+          }
+        },
+        {
+          "id": 6,
+          "parent": 5,
+          "name": "Selected Material",
+          "layer": {
+            "enable": true,
+            "invert": false,
+            "blend": "Normal",
+            "opacity": 1.0
+          },
+          "kind": {
+            "Material": {
+              "shading_model": "Principled",
+              "gl_display": true,
+              "diffuse_color": [
+                1.0,
+                0.6583748172794485,
+                0.162029375639111
+              ],
+              "diffuse_amount": 0.8,
+              "diffuse_roughness": 0.0,
+              "specular_color": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "specular_amount": 0.5,
+              "fresnel": 1.0,
+              "roughness": 0.5,
+              "anisotropy": 0.0,
+              "match_specular": true,
+              "reflection_color": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "reflection_amount": 0.0,
+              "reflection_fresnel": 0.0,
+              "clearcoat_amount": 0.0,
+              "clearcoat_roughness": 0.0,
+              "clearcoat_bump": 1.0,
+              "metallic": 0.0,
+              "sheen": 0.0,
+              "sheen_tint": 0.0,
+              "specular_tint": 0.0,
+              "flatness": 0.0,
+              "transparent_color": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "transparent_amount": 0.0,
+              "refractive_index": 1.0,
+              "refraction_roughness": 0.0,
+              "absorption_distance": 0.0,
+              "dissolve": 0.0,
+              "subsurface_color": [
+                0.8,
+                0.8,
+                0.8
+              ],
+              "subsurface_amount": 0.0,
+              "subsurface_distance": 0.005,
+              "luminous_color": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "luminous_intensity": 0.0,
+              "bump_amplitude": 0.0,
+              "displacement_distance": 0.0,
+              "smoothing": 1.0,
+              "smoothing_angle": 40.0,
+              "double_sided": false,
+              "openpbr": {
+                "coat_color": [
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "coat_ior": 1.6,
+                "coat_darkening": 1.0,
+                "coat_roughness_anisotropy": 0.0,
+                "fuzz_color": [
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "fuzz_roughness": 0.5,
+                "thin_film_weight": 0.0,
+                "thin_film_thickness": 0.5,
+                "thin_film_ior": 1.4,
+                "dispersion_abbe_number": 20.0,
+                "transmission_scatter": [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "transmission_scatter_anisotropy": 0.0,
+                "thin_walled": false,
+                "subsurface_albedo": [
+                  0.8,
+                  0.8,
+                  0.8
+                ],
+                "subsurface_uses_diffuse": false
+              }
+            }
+          }
+        },
+        {
+          "id": 4,
+          "parent": null,
+          "name": "Base Material",
+          "layer": {
+            "enable": true,
+            "invert": false,
+            "blend": "Normal",
+            "opacity": 1.0
+          },
+          "kind": {
+            "Material": {
+              "shading_model": "Principled",
+              "gl_display": true,
+              "diffuse_color": [
+                0.7758222183174236,
+                0.8148465722161012,
+                0.8549926081242338
+              ],
+              "diffuse_amount": 0.8,
+              "diffuse_roughness": 0.0,
+              "specular_color": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "specular_amount": 0.5,
+              "fresnel": 1.0,
+              "roughness": 0.6,
+              "anisotropy": 0.0,
+              "match_specular": true,
+              "reflection_color": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "reflection_amount": 0.0,
+              "reflection_fresnel": 0.0,
+              "clearcoat_amount": 0.0,
+              "clearcoat_roughness": 0.0,
+              "clearcoat_bump": 1.0,
+              "metallic": 0.0,
+              "sheen": 0.0,
+              "sheen_tint": 0.0,
+              "specular_tint": 0.0,
+              "flatness": 0.0,
+              "transparent_color": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "transparent_amount": 0.0,
+              "refractive_index": 1.0,
+              "refraction_roughness": 0.0,
+              "absorption_distance": 0.0,
+              "dissolve": 0.0,
+              "subsurface_color": [
+                0.8,
+                0.8,
+                0.8
+              ],
+              "subsurface_amount": 0.0,
+              "subsurface_distance": 0.005,
+              "luminous_color": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "luminous_intensity": 0.0,
+              "bump_amplitude": 0.005,
+              "displacement_distance": 0.02,
+              "smoothing": 1.0,
+              "smoothing_angle": 40.0,
+              "double_sided": false,
+              "openpbr": {
+                "coat_color": [
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "coat_ior": 1.6,
+                "coat_darkening": 1.0,
+                "coat_roughness_anisotropy": 0.0,
+                "fuzz_color": [
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "fuzz_roughness": 0.5,
+                "thin_film_weight": 0.0,
+                "thin_film_thickness": 0.5,
+                "thin_film_ior": 1.4,
+                "dispersion_abbe_number": 20.0,
+                "transmission_scatter": [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "transmission_scatter_anisotropy": 0.0,
+                "thin_walled": false,
+                "subsurface_albedo": [
+                  0.8,
+                  0.8,
+                  0.8
+                ],
+                "subsurface_uses_diffuse": false
+              }
+            }
+          }
+        }
+      ],
+      "next_id": 19
+    }
+  }
+}

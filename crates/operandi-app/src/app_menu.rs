@@ -270,7 +270,7 @@ mod tests {
                 .collect::<Vec<_>>(),
             [
                 "File", "Edit", "Select", "Item", "Geometry", "Texture", "Tools", "View", "Layout",
-                "Render", "Window", "System", "Help"
+                "Animate", "Render", "Window", "System", "Help"
             ]
         );
         assert_eq!(find(&a, &ctx, line_action("scene.save")).command_key, "s");

@@ -27,7 +27,7 @@ extern "C" {
  * or function signature below changes, and bump OU_ABI_VERSION in
  * src/ffi.rs to match. The Rust side compares it, and every struct's size,
  * with the library it loaded before the first call. */
-#define OU_ABI_VERSION 9
+#define OU_ABI_VERSION 10
 
 /* Rotation orders, named like USD's rotate ops: OU_ROTATE_ZYX turns about
  * Z first, then Y, then X. */
@@ -278,6 +278,17 @@ OU_API int ou_stage_set_metadata(OuStage *stage,
 
 /* Defines an Xform under `parent` (a prim path; "/" for the stage root) and
  * writes its path into `path_out`. */
+/* Animation (TL-80): framesPerSecond and timeCodesPerSecond = fps, and the
+ * start and end time codes (frames). */
+OU_API int ou_stage_set_time(OuStage *stage, double fps, double start, double end, char *error, size_t error_len);
+/* Animation (TL-81/82): time samples on the Xform at `path`, as JSON:
+ * {"times": [t...], "order": rotate order, "translate": [[x,y,z]...] or null,
+ *  "rotate": [...] (degrees) or null, "scale": [...] or null,
+ *  "attributes": [{"path": prim, "name": attr, "type": "float" | "color3f",
+ *                  "values": [...]}]}.
+ * An Xform written with no ops (the identity) gets translate, rotate and
+ * scale ops first. */
+OU_API int ou_set_samples(OuStage *stage, const char *path, const char *json, char *error, size_t error_len);
 OU_API int ou_define_xform(OuStage *stage,
                            const char *parent,
                            const OuXform *xform,

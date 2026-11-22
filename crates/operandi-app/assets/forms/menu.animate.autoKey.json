@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "id": "menu.animate.autoKey",
+  "label": "Auto Key",
+  "style": "menu",
+  "controls": [
+    { "command": "operandi.key.autoKey mode:off", "label": "Off" },
+    { "command": "operandi.key.autoKey mode:animated", "label": "Animated" },
+    { "command": "operandi.key.autoKey mode:all", "label": "All" }
+  ]
+}

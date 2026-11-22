@@ -3063,6 +3063,472 @@ pub static COMMANDS: &[Entry] = &[
         .args(&[arg("name", TEXT, N), arg("value", TEXT, N)])
         .query()
         .example("pref.value input.trackball ?"),
+    // Animation (BEHAVIOR-TIME-KEYS, BEHAVIOR-TIMELINE; anim_commands.rs).
+    // Operandi names (no reference names in the map; UIC-165 provisional).
+    script("operandi.anim.query", Items, "Reads the scene's time settings, playback, pending edits, markers and animated channels with their keys and values (UIC-163), as JSON.")
+        .on_editor(
+            "Read animation state as JSON: current frame, fps, scene and current range, time display, Auto Key, snap, real time, end behavior, key time, playing, pending edits, markers, and each animated channel's keys (frame, value, slopes), value now and values at frames.",
+            &[
+            jopt("channels", "string", "Only these channels, item:name,..."),
+            jopt("item", "integer", "Only this item's channels."),
+            jopt("frames", "string", "Frames to read each curve at, comma separated."),
+        ],
+            crate::anim_commands::run,
+        )
+        .query()
+        .quiet()
+        .operandi()
+        .example("operandi.anim.query frames:0,12,24"),
+    script("operandi.render.frameRange", Render, "Renders a frame range with Cycles, one numbered image per frame, into the project's renders folder (TL-70); needs the running app.")
+        .on_editor(
+            "Render frames start..end (default the current range) with Cycles into folder (default the project's renders/) as <name>_0000.png; needs the running app. operandi.anim.query reports progress (job).",
+            &[
+            jopt("start", "number", "First frame (default the current range's)."),
+            jopt("end", "number", "Last frame (default the current range's)."),
+            jopt("range", "string", "current (default) or scene: which range start and end default to."),
+            jopt("folder", "string", "Folder to write to."),
+            jopt("name", "string", "File name before the frame number (default Render)."),
+            jopt("samples", "integer", "Samples per pixel (default the render settings')."),
+            jopt("width", "integer", "Width in pixels (with height)."),
+            jopt("height", "integer", "Height in pixels (with width)."),
+            jopt("camera", "integer", "Camera item (default the render camera)."),
+        ],
+            crate::anim_commands::run,
+        )
+        .side_effect()
+        .operandi()
+        .example("operandi.render.frameRange start:0 end:24"),
+    script("operandi.render.cancelRange", Render, "Stops a running frame render or playblast (TL-70).")
+        .on_editor(
+            "Stop the running frame range render or playblast.",
+            &[],
+            crate::anim_commands::run,
+        )
+        .side_effect()
+        .operandi()
+        .example("operandi.render.cancelRange"),
+    script("operandi.view.playblast", Render, "Records the active 3D view over a frame range, HUD hidden, to an image sequence and opens it (TL-71); needs the running app.")
+        .on_editor(
+            "Record the active 3D view for frames start..end (default the current range) at scale 1, 0.5 or 0.25 to an image sequence in folder (default the project's renders/), then open it unless open is false; needs the running app.",
+            &[
+            jopt("start", "number", "First frame."),
+            jopt("end", "number", "Last frame."),
+            jopt("range", "string", "current (default) or scene."),
+            jopt("scale", "number", "1, 0.5 or 0.25 of the view's size (default 1)."),
+            jopt("folder", "string", "Folder to write to."),
+            jopt("name", "string", "File name before the frame number (default Playblast)."),
+            jopt("open", "boolean", "Open the first frame in the system viewer after (default true)."),
+        ],
+            crate::anim_commands::run,
+        )
+        .side_effect()
+        .operandi()
+        .example("operandi.view.playblast scale:0.5"),
+    script("operandi.time.set", Items, "Sets the current time (TK-01); not an undo step (TK-05). Snaps to a frame with Time Snap on.")
+        .on_editor(
+            "Sets the current time (TK-01); not an undo step (TK-05). Snaps to a frame with Time Snap on.",
+            &[
+            jopt("frame", "number", "Time in frames."),
+            jopt("time", "number", "Time in seconds (instead of frame)."),
+        ],
+            crate::anim_commands::run,
+        )
+        .ui()
+        .operandi()
+        .example("operandi.time.set frame:24"),
+    script("operandi.time.step", Items, "Steps the current time by frames (TK-63; Shift+Left/Right, comma/period).")
+        .on_editor(
+            "Steps the current time by frames (TK-63; Shift+Left/Right, comma/period).",
+            &[
+            jopt("frames", "number", "Frames to step (default 1; negative steps back)."),
+        ],
+            crate::anim_commands::run,
+        )
+        .ui()
+        .operandi()
+        .example("operandi.time.step frames:-1"),
+    script("operandi.time.go", Items, "Goes to the current range's first or last frame, or the previous, next, first or last key of the selected items or channels (TK-63).")
+        .on_editor(
+            "Goes to the current range's first or last frame, or the previous, next, first or last key of the selected items or channels (TK-63).",
+            &[
+            jopt("to", "string", "first, last, prevKey, nextKey, firstKey or lastKey (default first)."),
+        ],
+            crate::anim_commands::run,
+        )
+        .ui()
+        .operandi()
+        .example("operandi.time.go to:last"),
+    script("operandi.time.play", Items, "Plays or stops playback through the current range (TK-60; /).")
+        .on_editor(
+            "Plays or stops playback through the current range (TK-60; /).",
+            &[
+            jopt("backwards", "boolean", "Play backwards (default false)."),
+            jopt("stop", "boolean", "true stops, false starts; default toggles."),
+        ],
+            crate::anim_commands::run,
+        )
+        .ui()
+        .operandi()
+        .example("operandi.time.play stop:true"),
+    script("operandi.time.keyTime", Items, "Sets the key time alone, where new keys land (TL-20), or resets it to follow the current time.")
+        .on_editor(
+            "Sets the key time alone, where new keys land (TL-20), or resets it to follow the current time.",
+            &[
+            jopt("frame", "number", "Time in frames."),
+            jopt("time", "number", "Time in seconds (instead of frame)."),
+            jopt("reset", "boolean", "Follow the current time again."),
+        ],
+            crate::anim_commands::run,
+        )
+        .ui()
+        .operandi()
+        .example("operandi.time.keyTime reset:true"),
+    script("operandi.channel.select", Items, "Selects a channel for keying (UIC-119), or clears the channel selection.")
+        .on_editor(
+            "Selects a channel for keying (UIC-119), or clears the channel selection.",
+            &[
+            jopt("channel", "string", "item:name, or none."),
+            jopt("add", "boolean", "Toggle it in the selection (default false)."),
+        ],
+            crate::anim_commands::run,
+        )
+        .ui()
+        .operandi()
+        .example("operandi.channel.select channel:none"),
+    script("operandi.key.select", Items, "Selects keys in the track row (TL-41).")
+        .on_editor(
+            "Selects keys in the track row (TL-41).",
+            &[
+            jopt("keys", "string", "Keys as item:name@frame,...."),
+            jopt("mode", "string", "replace, add, remove, all or clear (default replace)."),
+        ],
+            crate::anim_commands::run,
+        )
+        .ui()
+        .operandi()
+        .example("operandi.key.select mode:clear"),
+    script("operandi.marker.select", Items, "Selects markers (TL-52).")
+        .on_editor(
+            "Selects markers (TL-52).",
+            &[
+            jopt("ids", "string", "Marker ids, comma separated."),
+            jopt("add", "boolean", "Add to the selection (default false)."),
+        ],
+            crate::anim_commands::run,
+        )
+        .ui()
+        .operandi()
+        .example("operandi.marker.select ids:1"),
+    script("operandi.key.copy", Items, "Copies the selected keys (or the selected items' keys at the key time) to the key clipboard (TL-45/47); not an undo step.")
+        .on_editor(
+            "Copies the selected keys (or the selected items' keys at the key time) to the key clipboard (TL-45/47); not an undo step.",
+            &[],
+            crate::anim_commands::run,
+        )
+        .ui()
+        .operandi()
+        .example("operandi.key.copy"),
+    script("operandi.key.set", Items, "Sets keys at the key time with the channels' current values (TK-20/21; S keys the selected channels).")
+        .on_editor(
+            "Sets keys at the key time with the channels' current values (TK-20/21; S keys the selected channels).",
+            &[
+            jopt("channels", "string", "Channels as item:name,... (pos.X, rot.Y, scl.Z or an item.channel name); default the selected channels."),
+        ],
+            crate::anim_commands::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.key.set channels:1:pos.Y"),
+    script("operandi.key.toggle", Items, "A status-light click: keys the channels, or removes their keys at the key time when every one has one (TK-20).")
+        .on_editor(
+            "A status-light click: keys the channels, or removes their keys at the key time when every one has one (TK-20).",
+            &[
+            jopt("channels", "string", "Channels as item:name,... (pos.X, rot.Y, scl.Z or an item.channel name); default the selected channels."),
+        ],
+            crate::anim_commands::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.key.toggle channels:1:pos.X"),
+    script("operandi.key.remove", Items, "Removes the channels' keys at the key time or the given time (TK-24 Remove Key).")
+        .on_editor(
+            "Removes the channels' keys at the key time or the given time (TK-24 Remove Key).",
+            &[
+            jopt("channels", "string", "Channels as item:name,... (pos.X, rot.Y, scl.Z or an item.channel name); default the selected channels."),
+            jopt("frame", "number", "Time in frames."),
+            jopt("time", "number", "Time in seconds (instead of frame)."),
+        ],
+            crate::anim_commands::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.key.remove channels:1:pos.Y"),
+    script("operandi.key.transforms", Items, "Keys position, rotation, scale or all three of the selected items (TK-22; Shift+W/E/R/Y).")
+        .on_editor(
+            "Keys position, rotation, scale or all three of the selected items (TK-22; Shift+W/E/R/Y).",
+            &[
+            jopt("type", "string", "position, rotation, scale or all (default all)."),
+        ],
+            crate::anim_commands::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.key.transforms type:position"),
+    script("operandi.key.items", Items, "Keys every animated channel of the selected items (TK-23; Shift+S).")
+        .on_editor(
+            "Keys every animated channel of the selected items (TK-23; Shift+S).",
+            &[],
+            crate::anim_commands::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.key.items"),
+    script("operandi.key.removeAnimation", Items, "Removes every key of the channels, keeping their current values (TK-24).")
+        .on_editor(
+            "Removes every key of the channels, keeping their current values (TK-24).",
+            &[
+            jopt("channels", "string", "Channels as item:name,... (pos.X, rot.Y, scl.Z or an item.channel name); default the selected channels."),
+        ],
+            crate::anim_commands::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.key.removeAnimation channels:1:pos.Y"),
+    script("operandi.key.reset", Items, "Removes every key of the channels and puts back their default values (TK-24).")
+        .on_editor(
+            "Removes every key of the channels and puts back their default values (TK-24).",
+            &[
+            jopt("channels", "string", "Channels as item:name,... (pos.X, rot.Y, scl.Z or an item.channel name); default the selected channels."),
+        ],
+            crate::anim_commands::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.key.reset channels:1:pos.Y"),
+    script("operandi.key.bake", Items, "Keys the channels on every frame of the current range (TK-24).")
+        .on_editor(
+            "Keys the channels on every frame of the current range (TK-24).",
+            &[
+            jopt("channels", "string", "Channels as item:name,... (pos.X, rot.Y, scl.Z or an item.channel name); default the selected channels."),
+        ],
+            crate::anim_commands::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.key.bake channels:1:pos.Y"),
+    script("operandi.key.apply", Items, "Keys every edited-but-not-keyed channel at the key time (TK-41 Apply).")
+        .on_editor(
+            "Keys every edited-but-not-keyed channel at the key time (TK-41 Apply).",
+            &[],
+            crate::anim_commands::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.key.apply"),
+    script("operandi.key.discard", Items, "Drops every edited-but-not-keyed value back to its curve (TK-41 Discard).")
+        .on_editor(
+            "Drops every edited-but-not-keyed value back to its curve (TK-41 Discard).",
+            &[],
+            crate::anim_commands::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.key.discard"),
+    script("operandi.key.autoKey", Items, "Sets Auto Key: off, animated or all (TK-30).")
+        .on_editor(
+            "Sets Auto Key: off, animated or all (TK-30).",
+            &[
+            jreq("mode", "string", "off, animated or all."),
+        ],
+            crate::anim_commands::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.key.autoKey mode:animated"),
+    script("operandi.key.move", Items, "Moves the selected keys by frames (TL-42, Shift...).")
+        .on_editor(
+            "Moves the selected keys by frames (TL-42, Shift...).",
+            &[
+            jreq("frames", "number", "Frames to move (negative moves earlier)."),
+        ],
+            crate::anim_commands::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.key.move frames:2"),
+    script("operandi.key.scale", Items, "Scales the selected keys' timing around a pivot (TL-43, Scale...).")
+        .on_editor(
+            "Scales the selected keys' timing around a pivot (TL-43, Scale...).",
+            &[
+            jreq("factor", "number", "Timing factor, above 0."),
+            jopt("frame", "number", "Pivot frame (default the key time)."),
+            jopt("time", "number", "Time in seconds (instead of frame)."),
+        ],
+            crate::anim_commands::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.key.scale factor:2"),
+    script("operandi.key.invert", Items, "Reverses the selected keys' timing within their span (TL-45 Invert...).")
+        .on_editor(
+            "Reverses the selected keys' timing within their span (TL-45 Invert...).",
+            &[],
+            crate::anim_commands::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.key.invert"),
+    script("operandi.key.delete", Items, "Deletes the selected keys (TL-45 Delete / Delete Related).")
+        .on_editor(
+            "Deletes the selected keys (TL-45 Delete / Delete Related).",
+            &[
+            jopt("related", "boolean", "Also the sibling X/Y/Z keys at the same times."),
+        ],
+            crate::anim_commands::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.key.delete related:true"),
+    script("operandi.key.slope", Items, "Sets the selected keys' slope type (TL-45/46).")
+        .on_editor(
+            "Sets the selected keys' slope type (TL-45/46).",
+            &[
+            jreq("type", "string", "auto, smoothFlat, autoFlat, flat, linear, linearIn, linearOut, stepped or manual."),
+            jopt("side", "string", "in, out or both (default both; linearIn/Out pick theirs)."),
+        ],
+            crate::anim_commands::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.key.slope type:linear"),
+    script("operandi.key.cut", Items, "Copies the selected keys to the key clipboard, then deletes them (TL-45).")
+        .on_editor(
+            "Copies the selected keys to the key clipboard, then deletes them (TL-45).",
+            &[],
+            crate::anim_commands::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.key.cut"),
+    script("operandi.key.paste", Items, "Pastes the key clipboard at the key time (TL-45): merge, insert (later keys move along) or replace (keys in the pasted span go).")
+        .on_editor(
+            "Pastes the key clipboard at the key time (TL-45): merge, insert (later keys move along) or replace (keys in the pasted span go).",
+            &[
+            jopt("mode", "string", "merge, insert or replace (default merge)."),
+        ],
+            crate::anim_commands::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.key.paste mode:replace"),
+    script("operandi.time.insertFrame", Items, "Moves the selected items' keys after the key time one frame later (TL-21).")
+        .on_editor(
+            "Moves the selected items' keys after the key time one frame later (TL-21).",
+            &[],
+            crate::anim_commands::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.time.insertFrame"),
+    script("operandi.time.removeFrame", Items, "Moves the selected items' keys after the key time one frame earlier, never deleting keys (TL-21).")
+        .on_editor(
+            "Moves the selected items' keys after the key time one frame earlier, never deleting keys (TL-21).",
+            &[],
+            crate::anim_commands::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.time.removeFrame"),
+    script("operandi.time.settings", Items, "Sets the scene's time settings (TK-03/04): frame rate, scene and current range (frames), time display, Auto Key, Time Snap, Play Real Time, End Behavior, Auto Update Existing Keys.")
+        .on_editor(
+            "Sets the scene's time settings (TK-03/04): frame rate, scene and current range (frames), time display, Auto Key, Time Snap, Play Real Time, End Behavior, Auto Update Existing Keys.",
+            &[
+            jopt("fps", "number", "Frames per second."),
+            jopt("start", "number", "Scene range start, frames."),
+            jopt("end", "number", "Scene range end, frames."),
+            jopt("rangeStart", "number", "Current range start, frames."),
+            jopt("rangeEnd", "number", "Current range end, frames."),
+            jopt("display", "string", "frames, seconds, smpte or film."),
+            jopt("autoKey", "string", "off, animated or all."),
+            jopt("snap", "boolean", "Time Snap."),
+            jopt("realTime", "boolean", "Play Real Time."),
+            jopt("endBehavior", "string", "hold, repeat or wrap."),
+            jopt("autoUpdate", "boolean", "Auto Update Existing Keys."),
+        ],
+            crate::anim_commands::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.time.settings fps:24 start:0 end:120"),
+    script("operandi.time.range", Items, "Sets the current range in frames (TL-13), or resets it to the scene range.")
+        .on_editor(
+            "Sets the current range in frames (TL-13), or resets it to the scene range.",
+            &[
+            jopt("start", "number", "Start frame."),
+            jopt("end", "number", "End frame."),
+            jopt("reset", "boolean", "Back to the scene range."),
+        ],
+            crate::anim_commands::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.time.range start:0 end:48"),
+    script("operandi.time.fit", Items, "Fits the current range to the selected items' or channels' keys, or every key (TL-14; A / Shift+A).")
+        .on_editor(
+            "Fits the current range to the selected items' or channels' keys, or every key (TL-14; A / Shift+A).",
+            &[
+            jopt("all", "boolean", "Every key in the scene."),
+        ],
+            crate::anim_commands::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.time.fit all:true"),
+    script("operandi.marker.add", Items, "Adds a time marker at the current or given time, owned by the selected item or the scene (TL-50/51; M).")
+        .on_editor(
+            "Adds a time marker at the current or given time, owned by the selected item or the scene (TL-50/51; M).",
+            &[
+            jopt("frame", "number", "Time in frames."),
+            jopt("time", "number", "Time in seconds (instead of frame)."),
+            jopt("scene", "boolean", "Owned by the scene even with items selected."),
+        ],
+            crate::anim_commands::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.marker.add frame:12"),
+    script("operandi.marker.edit", Items, "Changes markers (TL-52/53): time, shift, length, end, label, shape, colour, Show Label, Frame Limits, Snap to Frames.")
+        .on_editor(
+            "Changes markers (TL-52/53): time, shift, length, end, label, shape, colour, Show Label, Frame Limits, Snap to Frames.",
+            &[
+            jopt("ids", "string", "Marker ids; default the selected markers."),
+            jopt("frame", "number", "New start frame."),
+            jopt("shift", "number", "Frames to move by."),
+            jopt("length", "number", "Range length, frames (0: a plain marker)."),
+            jopt("endFrame", "number", "Range end frame."),
+            jopt("label", "string", "Label."),
+            jopt("shape", "string", "triangle, square, diamond or bar."),
+            jopt("color", "string", "r,g,b 0-1."),
+            jopt("showLabel", "boolean", "Show the label above the marker."),
+            jopt("frameLimits", "boolean", "Limit playback and stepping to the range."),
+            jopt("snapToFrames", "boolean", "Move start and end onto whole frames."),
+        ],
+            crate::anim_commands::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.marker.edit ids:1 label:Contact"),
+    script("operandi.marker.delete", Items, "Deletes markers (TL-52).")
+        .on_editor(
+            "Deletes markers (TL-52).",
+            &[
+            jopt("ids", "string", "Marker ids; default the selected markers."),
+        ],
+            crate::anim_commands::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.marker.delete ids:1"),
     // The map's Transform Channel (PD-Q12): on a live item tool's Texture
     // Locator it is one step inside the tool.
     script("transform.channel", Items, "Sets (or with ? reads) one transform channel: pos.X/Y/Z, rot.X/Y/Z, scl.X/Y/Z; one undo step.")
@@ -4157,12 +4623,18 @@ pub static COMMANDS: &[Entry] = &[
                 "boolean",
                 "Accepted; here scene.saveAs always exports.",
             ),
+            jopt(
+                "animation",
+                "string",
+                "USD: on (default; time samples once a frame over the scene range), off, or current (the current frame only).",
+            ),
         ],
         )
         .args(&[
             opt("filename", ArgType::Path, N, None),
             opt("format", EXPORT_FORMATS, N, None),
             opt("export", BOOL, N, Some("false")),
+            opt("animation", ArgType::Choice(&["on", "off", "current"]), N, None),
         ]).side_effect(),
     script("scene.close", Files, "Closes the current scene (asks first when it has unsaved changes).").side_effect(),
     script("scene.closeAll", Files, "Asks to close every open scene.").side_effect(),
@@ -5345,6 +5817,43 @@ pub static COMMANDS: &[Entry] = &[
     action("Layout Switcher", View, "The quick layout switcher while Ctrl+Shift are held: each Tab moves the outline on, releasing switches (Ctrl+Shift+Tab, UIC-18).")
         .operandi().ui(),
     // Layouts stage 6 (LAY-53, UIC-206): the backtick key.
+    // Animation keys (Items mode; the app's anim_ui.rs runs their lines).
+    action("Play/Stop", Items, "Plays or stops playback (TK-60; / in the Animate layout).")
+        .operandi().ui(),
+    action("Play Backwards", Items, "Plays backwards through the current range (TK-60).")
+        .operandi().ui(),
+    action("Back One Frame", Items, "Steps back one frame (TK-63, Shift+Left).")
+        .operandi().ui(),
+    action("Forward One Frame", Items, "Steps forward one frame (TK-63, Shift+Right).")
+        .operandi().ui(),
+    action("Step Back", Items, "Steps back one frame (TK-63; comma in the Animate layout).")
+        .operandi().ui(),
+    action("Step Forward", Items, "Steps forward one frame (TK-63; period in the Animate layout).")
+        .operandi().ui(),
+    action("First Frame", Items, "Goes to the current range's first frame (TK-63, Shift+Up).")
+        .operandi().ui(),
+    action("Last Frame", Items, "Goes to the current range's last frame (TK-63, Shift+Down).")
+        .operandi().ui(),
+    action("Previous Key", Items, "Goes to the previous key of the selected items or channels (TK-63, Ctrl+Left).")
+        .operandi().ui(),
+    action("Next Key", Items, "Goes to the next key of the selected items or channels (TK-63, Ctrl+Right).")
+        .operandi().ui(),
+    action("First Key", Items, "Goes to the first key of the selected items or channels (TK-63, Ctrl+Up).")
+        .operandi().ui(),
+    action("Last Key", Items, "Goes to the last key of the selected items or channels (TK-63, Ctrl+Down).")
+        .operandi().ui(),
+    action("Key Selected Channels", Items, "Keys the selected channels, or the live transform tool's (TK-21, S).")
+        .operandi().ui(),
+    action("Key Selected Items", Items, "Keys every animated channel of the selected items (TK-23, Shift+S).")
+        .operandi().ui(),
+    action("Key Position", Items, "Keys the selected items' position (TK-22, Shift+W).")
+        .operandi().ui(),
+    action("Key Rotation", Items, "Keys the selected items' rotation (TK-22, Shift+E).")
+        .operandi().ui(),
+    action("Key Scale", Items, "Keys the selected items' scale (TK-22; Shift+R in the Animate layout).")
+        .operandi().ui(),
+    action("Key Transforms", Items, "Keys the selected items' position, rotation and scale (TK-22; Shift+Y in the Animate layout).")
+        .operandi().ui(),
     action("Toggle Palettes", View, "Hides every open palette, or shows them all again (`, LAY-53).")
         .operandi().ui(),
     action("Node View", View, "Opens the node view of the selected Material Group, or the group the selected layer is in (Cmd+Shift+N).")
@@ -5716,7 +6225,7 @@ mod tests {
                 assert!(!json.about.is_empty(), "{}", e.name);
             }
         }
-        assert_eq!(crate::command_exec::specs().count(), 167);
+        assert_eq!(crate::command_exec::specs().count(), 206);
     }
 
     #[test]

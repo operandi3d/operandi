@@ -4369,3 +4369,9 @@ Design: docs/MATERIALX_GRAPHS.md (stages 1-5).
 ## 2026-11-21 — Q and Esc (branch claude/project-thread-s4394q)
 
 - Q drops any tool even while a Tool Properties number field holds typed text (it confirms the typing first; a refused value keeps the field). Esc over a view drops any tool, then the selection (`select.drop`); Esc in a field only cancels its edit. The exit hint shows "Q / Escape: drop tool" (Space opens Mini Properties). Provisional: SCQ-ESC-1/2.
+
+## 2026-11-22 — Animation phases 1 and 2 (branch animation-time-keys)
+
+- Time and keys: scene time settings, key curves with Smooth Flat (TK-13 values to 1e-4), slope types, keys on transforms and item channels, status lights, S / Shift+S / Shift+W/E/R/Y, right-click key menu, Auto Key Off/Animated/All, edited-not-keyed lights with Apply/Discard, playback and stepping, Cycles renders the current pose.
+- Timeline: ruler, range bar, key time, markers and range markers, track row with key select/move/scale/copy/paste/slopes, Animate layout and menu, Render Frame Range and Playblast, USD export of animated transforms, cameras and lights as time samples. Every action is a command the MCP bridge can run; `operandi.anim.query` reads everything back.
+- Provisional: see SPECIFICATION_QUESTIONS.md, "Animation phases 1-2". Graph editor, rigs and USD import of animation are later phases.

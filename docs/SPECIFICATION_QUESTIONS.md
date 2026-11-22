@@ -9574,3 +9574,22 @@ Built from BEHAVIOR-TOPOLOGY-PEN (2026-11-20) on branch topology-pen. These are 
 ## Soft Move's own falloff (TP-19, Mug tutorial) — 2026-11-21 (branch soft-move-falloff, provisional)
 - TP-19 (from Jason's tutorial walk-through, behaviour only): a tool row's falloff layer can say `at_tool = true` (factory-tool-presets.toml). The falloff keeps its fitted size (TP-17) but its centre goes to the tool's centre when the tool starts and on the first click (CS-10), so the falloff and the transform handle begin at one spot and are then edited apart. Radial and Cylinder only; Soft Move is the only row that uses it. Bulge (Radial, also waits for a click) keeps its fit to the selection's centre until Jason says otherwise.
 - TP-19 view (provisional): a Radial or Cylinder falloff's Size handles draw as filled boxes in their axis colour (the Scale handles' shape), on top of the tool's handles, and take the press where they overlap a tool handle. The falloff's Centre and its per-axis handles give way to the live tool's handle under the pointer (with no live tool they behave as before), since a tool that brings its own falloff puts both centres on one spot. Unclear: whether later clicks away from the handles (CS-20) should move the falloff with the tool; built: only the first click does.
+
+## Animation phases 1-2 (BEHAVIOR-TIME-KEYS, BEHAVIOR-TIMELINE) — 2026-11-22 (branch animation-time-keys, provisional)
+- TK-Q01 Smooth Flat rule: inner slope = 1.5 × the slope through both neighbours, zero at a peak or dip, capped at 3 × either side's slope, then Fritsch-Carlson scaled if both ends of a segment lean in. Matches every TK-13 value; near-equal neighbours unprobed.
+- TK-Q02 Auto / Auto Flat end keys point straight at their one neighbour (Smooth Flat ends stay flat).
+- TK-Q03 Time Snap also snaps typed and scripted times (`operandi.time.set time:0.51` lands on a frame); off, any time is kept.
+- TK-Q04 Auto Key Animated: an edit that the curve already gives at the key time adds no key (a transform tool's Drop after its drags were keyed). Auto Key All keys the selected items' changed channels only.
+- TK-Q05 Discard (TK-41) is an undo step; Apply keys at the key time.
+- TK-Q06 Reset puts transforms back to 0/1 and other channels to their rest value (the value before the first key).
+- TK-Q07 Keyable channels: transforms, and number / on-off / choice / colour-component channels whose setter is a light, camera, item-common or transform edit; camera focalLength, focusDistance, targetDistance and fStop channels added (names provisional). Shader-layer channels are not keyable yet.
+- TK-Q08 The Wrap end behaviour plays to the end, then stops back at the frame playback started on.
+- TK-Q09 Shortcuts: `/`, `,` `.`, Shift+R and Shift+Y already belong to Turn, Zoom In/Out, Quick Align and Flex globally, so they are animation keys only in the Animate layout's keys (UIC-201). Ctrl+arrows are macOS Mission Control keys by default and may never reach the app.
+- TL-Q01 The timeline is a bottom strip opened by the bottom bar's clock button and by the Animate layout, not yet a dockable panel kind (UIC-190..195).
+- TL-Q02 Timeline pan is Shift+middle-drag, zoom the wheel over the ruler, until the reference gestures are probed (TL-15).
+- TL-Q03 Paste of keys copied from one item into a scene where other items are selected goes to the first selected item's same channels; otherwise back to the same item ids. Paste Insert pushes later keys by the pasted span plus one frame.
+- TL-Q04 Remove Frame never deletes or merges keys: a channel whose next key would land on the one before it doesn't move.
+- TL-Q05 Playblast writes a PNG sequence (no movie encoder yet) and opens its first frame; the HUD isn't hidden yet. Render Frame Range writes `<name>_0000.png` into the project's renders/ folder, else ~/Pictures/Operandi Renders.
+- TL-Q06 USD: TL-83's Animation option is a `scene.saveAs animation:on|off|current` argument; the File > Export dialog has no control for it yet (always on). Lights export intensity and colour samples; cameras focal length, apertures, f-stop and focus distance.
+- TL-Q07 The Animate layout uses the Model toolbox set; an animation toolbox set (UIC-197) waits for its icons.
+- Command names are Operandi's own (`operandi.time.*`, `operandi.key.*`, `operandi.marker.*`, `operandi.channel.select`, `operandi.anim.*`, `operandi.render.frameRange`, `operandi.view.playblast`): the name map has none (UIC-165).
