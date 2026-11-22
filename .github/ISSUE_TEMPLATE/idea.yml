@@ -1,0 +1,30 @@
+name: Idea or feature request
+description: Something Operandi should do, or do better.
+title: "Idea: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Found a bug instead? [Report a bug](https://github.com/operandi3d/operandi/issues/new?template=bug.yml).
+  - type: textarea
+    id: idea
+    attributes:
+      label: The idea
+      description: What should Operandi do?
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why it would help
+      description: What are you trying to make or do? How do you do it today?
+    validations:
+      required: false
+  - type: textarea
+    id: environment
+    attributes:
+      label: Operandi version
+      render: text
+    validations:
+      required: false

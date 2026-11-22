@@ -30,7 +30,7 @@ import urllib.request
 import zipfile
 from pathlib import Path
 
-AGENT = "Operandi-library-builder (+https://github.com/manfriday/operandi)"
+AGENT = "Operandi-library-builder (+https://github.com/operandi3d/operandi)"
 PAUSE = 1.5  # seconds between requests
 PH_LICENCE = "https://polyhaven.com/license"
 ACG_LICENCE = "https://docs.ambientcg.com/license/"
