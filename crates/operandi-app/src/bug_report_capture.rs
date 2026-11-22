@@ -12,12 +12,10 @@ use std::path::{Path, PathBuf};
 
 /// Bug form field for the tool, selection and recent commands (BUG-10).
 pub const FIELD_ACTIVITY: &str = "activity";
-/// Whether the reports repository's bug form has the [`FIELD_ACTIVITY`]
-/// textarea yet. Until it does, GitHub would drop that field from the
-/// link, so the same text goes into the Environment field instead. Turn
-/// on once the form has the field (operandi3d/operandi#1 and its
-/// follow-up).
-pub const ACTIVITY_FIELD_ON_FORM: bool = false;
+/// Whether the bug form (`.github/ISSUE_TEMPLATE/bug.yml`) has the
+/// [`FIELD_ACTIVITY`] textarea. Off, the same text goes into the
+/// Environment field instead, since GitHub drops unknown fields.
+pub const ACTIVITY_FIELD_ON_FORM: bool = true;
 /// Commands a report lists (BUG-12).
 pub const COMMAND_LINES: usize = 20;
 /// Subfolder of the data folder that holds report screenshots (BUG-07).

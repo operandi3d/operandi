@@ -39,3 +39,11 @@ body:
       render: text
     validations:
       required: false
+  - type: textarea
+    id: activity
+    attributes:
+      label: Recent activity (filled in by Operandi)
+      description: Tool, selection and recent commands. Delete anything you'd rather not share.
+      render: text
+    validations:
+      required: false
