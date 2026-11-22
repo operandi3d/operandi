@@ -8713,6 +8713,9 @@ mod tests {
 }
 
 #[cfg(test)]
+mod anim_render_tests;
+
+#[cfg(test)]
 mod shader_settings_tests;
 
 #[cfg(test)]

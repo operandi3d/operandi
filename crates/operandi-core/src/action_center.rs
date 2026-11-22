@@ -546,7 +546,7 @@ pub fn local_piece_frames(
                         .then(a.z.total_cmp(&b.z))
                 });
                 let sum: DVec3 = list.iter().copied().sum();
-                (sum.is_finite() && sum.length() > list.len() as f64 * 1e-10)
+                (sum.is_finite() && sum.length() > list.len() as f64 * LOCAL_CANCELLED)
                     .then(|| sum.normalize())
             });
             let center = (lo + hi) / 2.;
@@ -650,6 +650,17 @@ impl LocalPiece {
         }
     }
 }
+
+/// FG-Q02 (Jason, 2026-11-22; forum report "funky gizmo"): a Local
+/// piece whose polygons' normals mostly cancel has no common normal, and
+/// its axes come from its shape (the least-spread direction: a ring's
+/// plane normal, the tunnel's direction). Mostly: their average is
+/// shorter than a third of a unit normal. Polygons spread over half a
+/// cylinder average 0.64 and keep their normal; around a hole they cancel
+/// to 0, but uneven segments (an arch ring with 12 segments bunched at the
+/// top: 0.30) left a small leftover that spun the gizmo by an arbitrary
+/// angle about the tunnel. Past about 260° of a cylinder counts as around.
+pub const LOCAL_CANCELLED: f64 = 1. / 3.;
 
 /// Relative size under which two spreads (or two closenesses to X) count
 /// as equal (ACL-03, ACL-Q3).

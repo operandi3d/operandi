@@ -1534,8 +1534,20 @@ fn export_scene(e: &Editor, a: &Map<String, Value>) -> Result<crate::interchange
         return Err("USD export needs the running app's exporter: start Operandi with Window > MCP Bridge on and connect with operandi-mcp --attach".into());
     }
     let path = std::path::Path::new(path);
-    interchange::export(path, &e.evaluated(crate::evaluate::Purpose::Final), format)
-        .map_err(|err| format!("Export {}: {err}", path.display()))
+    // TL-83: animation:on (default), off or current, for this export.
+    let before = interchange::io_options();
+    if let Some(word) = opt_str(a, "animation")? {
+        let mode = interchange::UsdAnimation::parse(word)
+            .ok_or_else(|| format!("animation is on, off or current, not \"{word}\""))?;
+        interchange::set_io_options(interchange::IoOptions {
+            usd_animation: mode,
+            ..before.clone()
+        });
+    }
+    let result = interchange::export(path, &e.evaluated(crate::evaluate::Purpose::Final), format)
+        .map_err(|err| format!("Export {}: {err}", path.display()));
+    interchange::set_io_options(before);
+    result
 }
 
 /// operandi.nodeMaterial.setDefault's graph, exposed input and value text,
@@ -1584,6 +1596,10 @@ pub fn answer(e: &Editor, given: &str, given_args: &Map<String, Value>) -> Optio
             let s = e.absolute_fields_after(scale.fields)?.size;
             Ok(format!("Grab Size: {} × {} × {} m", s.x, s.y, s.z))
         }));
+    }
+    // Animation state and curves (anim_commands.rs), read any time.
+    if let Some(answer) = crate::anim_commands::answer(e, &name, &a) {
+        return Some(answer);
     }
     if a.get("value").and_then(Value::as_str).map(str::trim) != Some("?") {
         return None;

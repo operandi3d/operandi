@@ -1,5 +1,5 @@
-//! Plane handles (plane-handle spec v1, PH-xx): world-aligned circles lying
-//! flat at the outer corner of two arrows on Move, Scale and Transform's
+//! Plane handles (plane-handle spec v1, PH-xx): circles lying flat in the
+//! plane of two arrows, at their outer corner, on Move, Scale and Transform's
 //! move part, plus Scale's center circle. Hover tooltip (UIC-05) and
 //! hauling (UIC-76) follow the arrows' rules.
 use super::tests::{draw, pointer};
@@ -244,11 +244,10 @@ fn ph07_circle_sits_at_the_outer_corner_of_its_arrows() {
     );
 }
 
-#[test]
-fn ph07a_ph21_circles_lie_flat_in_world_planes_under_a_turned_axis() {
+/// The grid tilted and the action axis set to the selection, so the
+/// arrows turn away from the world axes (the forum report's gizmo).
+fn turned(tool: Tool) -> Rig {
     let mut rig = Rig::new(true);
-    // Tilt the grid and orient the action axis to the selection, so the
-    // arrows turn away from the world axes.
     {
         let mesh = &mut rig.a.editor.scene.active_mut().unwrap().mesh;
         let turn = glam::DQuat::from_rotation_x(0.7) * glam::DQuat::from_rotation_y(0.4);
@@ -260,34 +259,65 @@ fn ph07a_ph21_circles_lie_flat_in_world_planes_under_a_turned_axis() {
     }
     rig.a.editor.action_context.axis = operandi_core::AxisOrientation::Selection;
     rig.frame(vec![]);
-    rig.activate(Tool::Move);
-    let r = rig.a.viewport_rect;
+    rig.activate(tool);
     assert!(
         rig.a.handle_axis(0).distance(DVec3::X) > 0.1,
         "the arrows really are turned"
     );
-    // The XY circle's ellipse axes are world X and Y as the camera sees them.
-    let e = rig.a.plane_ellipse(XY, r).unwrap();
+    rig
+}
+
+/// Whether ellipse half-axis `u` runs along `axis` from the gizmo on screen.
+fn along_on_screen(rig: &Rig, u: Vec2, axis: DVec3) -> bool {
+    let r = rig.a.viewport_rect;
     let center = rig.a.transform_handle_center();
     let (o, _) = rig.a.camera.project(center, r).unwrap();
-    let (x, _) = rig.a.camera.project(center + DVec3::X, r).unwrap();
-    let cross = e.u.x * (x - o).y - e.u.y * (x - o).x;
-    assert!(
-        cross.abs() / (e.u.length() * (x - o).length()) < 1e-3,
-        "u along world X"
-    );
-    // Dragging it moves the selection in the world XY plane only.
-    let z_before: Vec<f64> = {
+    let (x, _) = rig.a.camera.project(center + axis, r).unwrap();
+    let cross = u.x * (x - o).y - u.y * (x - o).x;
+    cross.abs() / (u.length() * (x - o).length()) < 1e-3
+}
+
+/// PH-21 (FG-Q01, Jason 2026-11-22; forum report "funky gizmo"): under a
+/// turned action axis the circles lie in their two arrows' plane, not in
+/// a world plane, on Move and Scale alike; a Move circle drag moves along
+/// those two arrows only.
+#[test]
+fn ph07a_ph21_circles_turn_with_their_arrows() {
+    for tool in [Tool::Move, Tool::Scale] {
+        let rig = turned(tool);
+        let r = rig.a.viewport_rect;
+        let e = rig.a.plane_ellipse(XY, r).unwrap();
+        assert!(
+            along_on_screen(&rig, e.u, rig.a.handle_axis(0)),
+            "{tool:?} u"
+        );
+        assert!(
+            along_on_screen(&rig, e.v, rig.a.handle_axis(1)),
+            "{tool:?} v"
+        );
+        assert!(
+            !along_on_screen(&rig, e.u, DVec3::X),
+            "{tool:?} not world X"
+        );
+    }
+    let mut rig = turned(Tool::Move);
+    let normal = rig.a.handle_axis(2);
+    let height = |rig: &Rig| -> Vec<f64> {
         let m = &rig.a.editor.scene.active().unwrap().mesh;
-        [5, 6, 9, 10].iter().map(|&i| m.vertices[i].z).collect()
+        [5, 6, 9, 10]
+            .iter()
+            .map(|&i| m.vertices[i].dot(normal))
+            .collect()
     };
+    let before = height(&rig);
     let at = rig.circle(XY);
     rig.drag(at, vec2(40., -25.), Modifiers::NONE);
-    let m = &rig.a.editor.scene.active().unwrap().mesh;
-    for (k, &i) in [5usize, 6, 9, 10].iter().enumerate() {
-        assert!((m.vertices[i].z - z_before[k]).abs() < 1e-9, "world Z kept");
+    let after = height(&rig);
+    for (b, a) in before.iter().zip(&after) {
+        assert!((a - b).abs() < 1e-9, "kept along the turned Z: {b} -> {a}");
     }
-    assert_ne!(rig.held().delta, DVec3::ZERO);
+    let d = rig.held().delta;
+    assert!(d.z == 0. && (d.x != 0. || d.y != 0.), "{d}");
 }
 
 #[test]

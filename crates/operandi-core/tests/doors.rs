@@ -180,10 +180,12 @@ fn scene_time_is_set_by_command_saved_and_undone() {
     let bytes = persistence::encode(&e.scene).unwrap();
     assert!(String::from_utf8_lossy(&bytes).contains("\"version\": 49"));
     assert_eq!(persistence::decode(&bytes).unwrap().time, e.scene.time);
-    // One undo step each.
+    // Rate and range are one undo step each; the current time is not an
+    // undo step at all (TK-05, animation phase 1), so Undo takes back the
+    // end and leaves the time.
     e.dispatch(Command::Undo).unwrap();
-    assert_eq!(e.scene.time.current, Tick::ZERO);
-    assert_eq!(e.scene.time.end, Tick::from_seconds(10.));
+    assert_eq!(e.scene.time.current, Tick::from_seconds(2.5));
+    assert_eq!(e.scene.time.end, Tick::from_seconds(5.));
 }
 
 #[test]

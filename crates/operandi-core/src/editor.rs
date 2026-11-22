@@ -702,6 +702,9 @@ pub struct Editor {
     /// Shared Symmetry setting (SYM-ST-01); tool context, not scene data.
     pub symmetry: crate::Symmetry,
     pub live: Option<Live>,
+    /// The document's key time, channel/key selections and playback
+    /// (animation.rs; per scene tab).
+    pub anim: crate::animation::AnimSession,
     /// Undo and redo steps, shared: the editor is copied for every command
     /// (identity_editor.rs stages each one), and copying each step's two
     /// scenes made a command in a 100,000-item scene take seconds. Change a
@@ -5017,6 +5020,8 @@ impl Editor {
                 };
             }
             let _undone = std::mem::replace(&mut self.scene, c.before.clone());
+            // TK-05: undo never changes the current time.
+            crate::animation::keep_time(&_undone, &mut self.scene);
             // Images aren't undone (PNT-11).
             #[cfg(feature = "painting")]
             crate::paint::carry_images(&_undone, &mut self.scene);
@@ -5076,6 +5081,7 @@ impl Editor {
                 };
             }
             let _redone = std::mem::replace(&mut self.scene, c.after.clone());
+            crate::animation::keep_time(&_redone, &mut self.scene);
             #[cfg(feature = "painting")]
             crate::paint::carry_images(&_redone, &mut self.scene);
             if let Some(ids) = &c.identity_after {
@@ -5233,6 +5239,9 @@ impl Editor {
         };
         next.params.tweak = None;
         next.params.tweak_plan = None;
+        // TK-30: the drag's edit keys when it ends, not only on Drop.
+        let base = std::mem::take(&mut next.base);
+        self.auto_key_from(&base);
         next.base = self.scene.clone();
         next.applied = false;
         // The drag stays a tweak of the session (Jason, 2026-11-04; this
@@ -5661,6 +5670,8 @@ impl Editor {
         field.weights(scene, id).map(Some)
     }
     pub(crate) fn record(&mut self, label: String, before: Scene) {
+        // TK-30/31: auto key, in the same step as the edit.
+        self.auto_key_from(&before);
         // Mesh Instances share their sources' meshes again (an edit made
         // on an instance reaches its source and the other instances).
         self.scene.sync_instances(Some(&before));

@@ -718,7 +718,12 @@ impl Operandi {
     /// CP-A04: Pick Walk with the arrow keys in Item mode, no tool active.
     /// Returns true when it selected an item.
     pub(super) fn pick_walk_key(&mut self, ctx: &egui::Context) -> bool {
-        if self.editor.scene.selection.mode != Mode::Item || self.editor.live.is_some() {
+        // Plain arrows only: Shift/Ctrl+arrows are the animation keys
+        // (TK-63; egui's consume_key would also take them with Shift).
+        if self.editor.scene.selection.mode != Mode::Item
+            || self.editor.live.is_some()
+            || ctx.input(|i| !i.modifiers.is_none())
+        {
             return false;
         }
         let Some(from) = self.editor.scene.selection.item else {

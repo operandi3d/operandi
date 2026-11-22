@@ -32,6 +32,29 @@ const NEAR_FLOOR: f64 = 1e-6;
 /// (0.1 mm): well clear of the near-clip floor and of the GPU's single
 /// precision, so the surface never flickers or vanishes.
 pub const MIN_SURFACE_DEPTH: f64 = 1e-4;
+/// Where a line running behind the near clip is cut, as a multiple of the
+/// near distance: a hair in front, so the cut end is still drawn (gpu.rs
+/// `edge_out_fading` uses the same value).
+pub const NEAR_KEEP: f64 = 1.01;
+/// The part of segment `a`–`b` at least `near * NEAR_KEEP` in front of
+/// `eye` along `forward`: an end behind is moved along the segment to that
+/// depth. `None` when both ends are behind.
+pub fn clip_to_near(
+    a: DVec3,
+    b: DVec3,
+    eye: DVec3,
+    forward: DVec3,
+    near: f64,
+) -> Option<(DVec3, DVec3)> {
+    let keep = near * NEAR_KEEP;
+    let (za, zb) = ((a - eye).dot(forward), (b - eye).dot(forward));
+    match (za >= keep, zb >= keep) {
+        (true, true) => Some((a, b)),
+        (false, false) => None,
+        (false, true) => Some((b + (a - b) * ((zb - keep) / (zb - za)), b)),
+        (true, false) => Some((a, a + (b - a) * ((za - keep) / (za - zb)))),
+    }
+}
 /// Orthographic views draw what lies within `ORTHO_REACH` of the orbit
 /// centre along the view, in front of it or behind (further when the view
 /// distance is larger). The range is fixed to the orbit centre, not the
@@ -140,6 +163,13 @@ pub struct Camera {
     /// sets the near clip (`near`). Infinite (the fixed 0.01 clip) until
     /// then and after Frame.
     pub near_depth: f64,
+    /// The view distance when `near_depth` was taken. The near clip scales
+    /// with the distance since then (`near_surface_depth`), so a view that
+    /// zoomed in to a surface and then moved well away by other means
+    /// (drag zoom, 3D mouse) doesn't keep a tiny near clip, which would
+    /// leave the depth buffer no precision for distant meshes: the wire
+    /// then sank into its own polygons. Infinite: no scaling.
+    pub near_distance: f64,
 }
 impl Default for Camera {
     fn default() -> Self {
@@ -159,6 +189,7 @@ impl Default for Camera {
             through_item: None,
             light: None,
             near_depth: f64::INFINITY,
+            near_distance: f64::INFINITY,
         }
     }
 }
@@ -180,11 +211,22 @@ impl Camera {
     /// The perspective near clip (see `NEAR_CLIP`); also where `project`
     /// stops drawing.
     pub fn near(&self) -> f64 {
-        if self.near_depth.is_finite() {
-            (self.near_depth * NEAR_PER_DEPTH).clamp(NEAR_FLOOR, NEAR_CLIP)
+        let depth = self.near_surface_depth();
+        if depth.is_finite() {
+            (depth * NEAR_PER_DEPTH).clamp(NEAR_FLOOR, NEAR_CLIP)
         } else {
             NEAR_CLIP
         }
+    }
+    /// `near_depth` moved with the view distance since it was taken
+    /// (`near_distance`); infinite with no zoom to surface since Frame.
+    pub fn near_surface_depth(&self) -> f64 {
+        let scale = if self.near_distance.is_finite() && self.near_distance > 0. {
+            self.distance / self.near_distance
+        } else {
+            1.
+        };
+        self.near_depth * scale
     }
     /// Orthographic depth: (`offset`, `range`). A point's depth from the
     /// eye plus `offset` over `range` runs 0..1 across the drawn slab,
@@ -408,6 +450,20 @@ impl Camera {
             z,
         ))
     }
+    /// A segment on screen: `project` of both ends, with an end behind the
+    /// near clip (perspective) first moved along the segment to just in
+    /// front of it (`clip_to_near`), as the GPU wire does, so a long line
+    /// running past the eye keeps its visible part. `None` when the whole
+    /// segment is behind.
+    pub fn project_segment(&self, a: DVec3, b: DVec3, r: Rect) -> Option<(Pos2, Pos2)> {
+        let (a, b) = if self.view == View::Perspective {
+            let (eye, _, _, forward) = self.basis();
+            clip_to_near(a, b, eye, forward, self.near())?
+        } else {
+            (a, b)
+        };
+        Some((self.project(a, r)?.0, self.project(b, r)?.0))
+    }
     /// Whether depth `z` from the eye is in front of the near clip:
     /// `near` in perspective, the front of the orbit-centre slab in
     /// orthographic (`ortho_depth`), so zoom never clips there.
@@ -486,6 +542,7 @@ impl Camera {
         self.target = hit + (self.target - hit) * factor;
         self.distance *= factor;
         self.near_depth = depth * factor;
+        self.near_distance = self.distance;
         true
     }
     /// The point under `p` on the plane through the orbit centre facing
@@ -687,6 +744,67 @@ mod tests {
         assert!((close.near() - 5e-5).abs() < 1e-12);
         assert_eq!(zoomed_distance(1., 0.01), MIN_DISTANCE);
         assert_eq!(zoomed_distance(1e7, 2.), MAX_DISTANCE);
+    }
+
+    /// Forum report (disappearing wireframe): after a wheel zoom close to
+    /// a surface, moving far away by drag zoom kept the tiny near clip,
+    /// which leaves a 32-bit depth buffer no precision for a wall tens of
+    /// metres off (its wire sank into its polygons). The near clip now
+    /// scales with the view distance since the zoom; wheel zooming itself
+    /// is unchanged.
+    #[test]
+    fn near_clip_follows_the_view_distance_after_a_close_zoom() {
+        let mut c = Camera::default();
+        let (eye, _, _, forward) = c.basis();
+        let hit = eye + forward * 0.01;
+        assert!(c.dolly_toward(hit, 0.1));
+        let close = c.near();
+        assert!(close < NEAR_CLIP * 0.01, "near {close}");
+        // Wheel zoom: the near clip still follows the surface's depth.
+        let depth = (hit - c.basis().0).dot(forward);
+        assert!((close - depth * NEAR_PER_DEPTH).abs() < 1e-12);
+        // Drag zoom out 100 times: the near clip grows with it.
+        c.distance *= 100.;
+        assert!((c.near() - close * 100.).abs() < 1e-12);
+        // Far enough, back to the fixed clip.
+        c.distance *= 1e6;
+        assert_eq!(c.near(), NEAR_CLIP);
+    }
+
+    /// Forum report (disappearing wireframe): a long edge running past
+    /// the eye (one end behind it) was dropped whole while its polygon
+    /// stayed drawn. It is cut at the near clip instead: the cut end lies
+    /// on the edge, just in front of the clip, and the part in front is
+    /// drawn; an edge wholly behind is still gone.
+    #[test]
+    fn a_long_edge_through_the_near_clip_keeps_its_visible_part() {
+        let r = view_rect();
+        let c = Camera::default();
+        let (eye, right, _, forward) = c.basis();
+        // 30 m long, from 2 m behind the eye to 28 m ahead, 1 m aside.
+        let a = eye - forward * 2. + right;
+        let b = eye + forward * 28. + right;
+        assert!(c.project(a, r).is_none());
+        let (ca, cb) = clip_to_near(a, b, eye, forward, c.near()).unwrap();
+        assert_eq!(cb, b);
+        let along = (ca - a).cross(b - a).length() / (b - a).length();
+        assert!(along < 1e-9, "cut point off the edge by {along}");
+        assert!(((ca - eye).dot(forward) - c.near() * NEAR_KEEP).abs() < 1e-12);
+        let (pa, pb) = c.project_segment(a, b, r).expect("visible part drawn");
+        assert_eq!(pb, c.project(b, r).unwrap().0);
+        assert_eq!(pa, c.project(ca, r).unwrap().0);
+        // The other way round, and wholly behind.
+        assert!(c.project_segment(b, a, r).is_some());
+        assert!(c.project_segment(a, eye - forward * 5., r).is_none());
+        // Orthographic views clip nothing here.
+        let top = Camera {
+            view: View::Top,
+            ..Camera::default()
+        };
+        assert_eq!(
+            top.project_segment(a, b, r),
+            Some((top.project(a, r).unwrap().0, top.project(b, r).unwrap().0))
+        );
     }
 
     /// Bug report #2: in Front view a mesh in front of the orbit centre

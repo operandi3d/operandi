@@ -266,6 +266,145 @@ int ou_stage_set_metadata(OuStage *stage,
   });
 }
 
+int ou_stage_set_time(OuStage *stage, double fps, double start, double end, char *error, size_t error_len)
+{
+  return guarded(error, error_len, "Couldn't set the stage's time", [&](std::string &message) {
+    if (stage == nullptr || !(fps > 0.0) || end < start) {
+      message = "no stage, or a bad frame rate or range";
+      return false;
+    }
+    stage->stage->SetFramesPerSecond(fps);
+    stage->stage->SetTimeCodesPerSecond(fps);
+    stage->stage->SetStartTimeCode(start);
+    stage->stage->SetEndTimeCode(end);
+    return true;
+  });
+}
+
+/* A JSON number, whole or not. */
+static double json_number(const pxr::JsValue &v)
+{
+  if (v.IsReal()) {
+    return v.GetReal();
+  }
+  if (v.IsInt()) {
+    return double(v.GetInt64());
+  }
+  return 0.0;
+}
+
+/* Animation time samples (TL-81/82); see operandi_usd.h. Operandi's own
+ * code (not adapted from Blender). */
+int ou_set_samples(OuStage *stage, const char *path, const char *json, char *error, size_t error_len)
+{
+  return guarded(error, error_len, "Couldn't write time samples", [&](std::string &message) {
+    if (stage == nullptr || path == nullptr || json == nullptr) {
+      message = "no stage, path or samples";
+      return false;
+    }
+    pxr::JsParseError parse;
+    const pxr::JsValue doc = pxr::JsParseString(json, &parse);
+    if (!doc.IsObject()) {
+      message = "bad samples JSON: " + parse.reason;
+      return false;
+    }
+    const pxr::JsObject &root = doc.GetJsObject();
+    const pxr::UsdPrim prim = stage->stage->GetPrimAtPath(pxr::SdfPath(path));
+    if (!prim) {
+      message = std::string("no prim at ") + path;
+      return false;
+    }
+    std::vector<double> times;
+    for (const pxr::JsValue &t : root.at("times").GetJsArray()) {
+      times.push_back(json_number(t));
+    }
+    pxr::UsdGeomXformable xf(prim);
+    bool resets = false;
+    std::vector<pxr::UsdGeomXformOp> ops = xf.GetOrderedXformOps(&resets);
+    auto find = [&](bool (*is)(pxr::UsdGeomXformOp::Type)) -> pxr::UsdGeomXformOp {
+      for (const auto &op : ops) {
+        if (is(op.GetOpType())) {
+          return op;
+        }
+      }
+      return pxr::UsdGeomXformOp();
+    };
+    auto has = [&](const char *key) {
+      return root.count(key) && root.at(key).IsArray();
+    };
+    if (ops.empty() && (has("translate") || has("rotate") || has("scale"))) {
+      /* The identity Xform: TRS ops as write_xform makes them. */
+      xf.AddTranslateOp().Set(pxr::GfVec3d(0.0));
+      const uint32_t order = root.count("order") ? uint32_t(root.at("order").GetInt()) : 0;
+      pxr::UsdGeomXformOp r;
+      switch (order) {
+        case OU_ROTATE_XZY: r = xf.AddRotateXZYOp(pxr::UsdGeomXformOp::PrecisionDouble); break;
+        case OU_ROTATE_YXZ: r = xf.AddRotateYXZOp(pxr::UsdGeomXformOp::PrecisionDouble); break;
+        case OU_ROTATE_YZX: r = xf.AddRotateYZXOp(pxr::UsdGeomXformOp::PrecisionDouble); break;
+        case OU_ROTATE_ZXY: r = xf.AddRotateZXYOp(pxr::UsdGeomXformOp::PrecisionDouble); break;
+        case OU_ROTATE_ZYX: r = xf.AddRotateZYXOp(pxr::UsdGeomXformOp::PrecisionDouble); break;
+        default: r = xf.AddRotateXYZOp(pxr::UsdGeomXformOp::PrecisionDouble); break;
+      }
+      r.Set(pxr::GfVec3d(0.0));
+      xf.AddScaleOp(pxr::UsdGeomXformOp::PrecisionDouble).Set(pxr::GfVec3d(1.0));
+      ops = xf.GetOrderedXformOps(&resets);
+    }
+    auto vec3s = [&](const char *key, pxr::UsdGeomXformOp op) {
+      if (!has(key) || !op) {
+        return true;
+      }
+      const pxr::JsArray &values = root.at(key).GetJsArray();
+      if (values.size() != times.size()) {
+        message = std::string("wrong number of ") + key + " samples";
+        return false;
+      }
+      for (size_t i = 0; i < times.size(); i++) {
+        const pxr::JsArray &v = values[i].GetJsArray();
+        op.Set(pxr::GfVec3d(json_number(v[0]), json_number(v[1]), json_number(v[2])),
+               pxr::UsdTimeCode(times[i]));
+      }
+      return true;
+    };
+    const bool ok =
+        vec3s("translate",
+              find([](pxr::UsdGeomXformOp::Type t) { return t == pxr::UsdGeomXformOp::TypeTranslate; })) &&
+        vec3s("rotate", find([](pxr::UsdGeomXformOp::Type t) {
+                return t >= pxr::UsdGeomXformOp::TypeRotateXYZ && t <= pxr::UsdGeomXformOp::TypeRotateZYX;
+              })) &&
+        vec3s("scale", find([](pxr::UsdGeomXformOp::Type t) { return t == pxr::UsdGeomXformOp::TypeScale; }));
+    if (!ok) {
+      return false;
+    }
+    if (root.count("attributes")) {
+      for (const pxr::JsValue &a : root.at("attributes").GetJsArray()) {
+        const pxr::JsObject &attr = a.GetJsObject();
+        const pxr::UsdPrim at = stage->stage->GetPrimAtPath(pxr::SdfPath(attr.at("path").GetString()));
+        if (!at) {
+          continue;
+        }
+        const pxr::TfToken name(attr.at("name").GetString());
+        const bool colour = attr.at("type").GetString() == "color3f";
+        pxr::UsdAttribute u = at.GetAttribute(name);
+        if (!u) {
+          u = at.CreateAttribute(name, colour ? pxr::SdfValueTypeNames->Color3f : pxr::SdfValueTypeNames->Float);
+        }
+        const pxr::JsArray &values = attr.at("values").GetJsArray();
+        for (size_t i = 0; i < times.size() && i < values.size(); i++) {
+          if (colour) {
+            const pxr::JsArray &v = values[i].GetJsArray();
+            u.Set(pxr::GfVec3f(float(json_number(v[0])), float(json_number(v[1])), float(json_number(v[2]))),
+                  pxr::UsdTimeCode(times[i]));
+          }
+          else {
+            u.Set(float(json_number(values[i])), pxr::UsdTimeCode(times[i]));
+          }
+        }
+      }
+    }
+    return true;
+  });
+}
+
 int ou_define_xform(OuStage *stage,
                     const char *parent,
                     const OuXform *xform,

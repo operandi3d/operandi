@@ -123,7 +123,7 @@ impl From<&Camera> for ViewCamera {
             pitch: camera.pitch,
             roll: camera.roll,
             lens: camera.lens,
-            near_depth: camera.near_depth.is_finite().then_some(camera.near_depth),
+            near_depth: Some(camera.near_surface_depth()).filter(|d| d.is_finite()),
             own_lens: true,
         }
     }
@@ -155,6 +155,12 @@ pub(super) fn camera_from_slot(slot: &Slot) -> Camera {
         roll: saved.roll,
         lens,
         near_depth: saved.near_depth.unwrap_or(f64::INFINITY),
+        // The saved depth is the one at the saved distance.
+        near_distance: if saved.near_depth.is_some() {
+            distance
+        } else {
+            f64::INFINITY
+        },
         ..Camera::default()
     }
 }

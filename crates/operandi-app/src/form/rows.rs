@@ -66,6 +66,101 @@ struct State {
     revert: Option<String>,
     /// `flipped` changed since the app last saved it.
     dirty: bool,
+    /// The next row's channels for keying (UIC-112/119, TK-20/24): its
+    /// light keys them, its label selects them, right-click has the key
+    /// commands. Each entry is `item:name`.
+    anim: Option<AnimRow>,
+    /// Command lines the rows asked for this frame (the app runs them).
+    requests: Vec<String>,
+}
+
+/// A row that is a keyable channel (anim_ui.rs builds it).
+#[derive(Clone, Debug, Default)]
+pub(crate) struct AnimRow {
+    /// `item:name` of each selected item's channel.
+    pub channels: Vec<String>,
+    /// Its label is selected for `S` (UIC-119).
+    pub selected: bool,
+}
+
+/// Marks the next row as keyable channels `row` (after `set_status`).
+pub(crate) fn anim_channel(row: AnimRow) {
+    STATE.with(|s| s.borrow_mut().anim = Some(row));
+}
+
+/// The lines rows asked for since the last call.
+pub(crate) fn take_anim_requests() -> Vec<String> {
+    STATE.with(|s| std::mem::take(&mut s.borrow_mut().requests))
+}
+
+fn take_anim() -> Option<AnimRow> {
+    STATE.with(|s| s.borrow_mut().anim.take())
+}
+
+fn request(line: String) {
+    STATE.with(|s| s.borrow_mut().requests.push(line));
+}
+
+/// TK-20/24, UIC-119: a keyable row's light, label and right-click menu.
+fn anim_controls(ui: &mut Ui, label: &Response, circle: Pos2, row: &AnimRow) {
+    if row.channels.is_empty() {
+        return;
+    }
+    let list = row.channels.join(",");
+    if row.selected {
+        ui.painter().rect_filled(
+            label.rect.expand2(vec2(2., 0.)),
+            CornerRadius::same(2),
+            theme::orange().gamma_multiply(0.25),
+        );
+    }
+    let light = ui.interact(
+        Rect::from_center_size(circle, vec2(CIRCLE + 4., ROW_HEIGHT)),
+        ui.id().with(("anim-light", circle.y as i32)),
+        Sense::click(),
+    );
+    if light.clicked() {
+        request(format!("operandi.key.toggle channels:{list}"));
+    }
+    let light = light.on_hover_text("Click to set a key here, or remove the key on this frame");
+    if label.clicked() {
+        let add = ui.input(|i| i.modifiers.shift || i.modifiers.command);
+        request(format!(
+            "operandi.channel.select channel:{} add:{add}",
+            row.channels[0]
+        ));
+    }
+    for r in [&light, label] {
+        r.context_menu(|ui| {
+            let entries: [(&str, String); 9] = [
+                ("Add Key", format!("operandi.key.set channels:{list}")),
+                ("Remove Key", format!("operandi.key.remove channels:{list}")),
+                ("Next Key", "operandi.time.go to:nextKey".into()),
+                ("Previous Key", "operandi.time.go to:prevKey".into()),
+                ("First Key", "operandi.time.go to:firstKey".into()),
+                ("Last Key", "operandi.time.go to:lastKey".into()),
+                (
+                    "Remove Animation",
+                    format!("operandi.key.removeAnimation channels:{list}"),
+                ),
+                ("Reset", format!("operandi.key.reset channels:{list}")),
+                ("Bake", format!("operandi.key.bake channels:{list}")),
+            ];
+            for (text, line) in entries {
+                if ui.button(text).clicked() {
+                    // Key jumps follow this channel (UIC-119 selects it).
+                    if text.ends_with("Key") && !text.contains("Add") && !text.contains("Remove") {
+                        request(format!(
+                            "operandi.channel.select channel:{}",
+                            row.channels[0]
+                        ));
+                    }
+                    request(line);
+                    ui.close();
+                }
+            }
+        });
+    }
 }
 
 // The UI runs on one thread per app (and one per test), so the row state
@@ -287,6 +382,11 @@ pub(crate) fn frame(ui: &mut Ui, label: Option<&str>, tooltip: &str) -> (RowRect
         ),
     };
     paint_status(ui, rects.circle, status);
+    if let Some(row) = take_anim() {
+        let response = response.interact(Sense::click());
+        anim_controls(ui, &response, rects.circle, &row);
+        return (rects, response);
+    }
     if let Some(status) = status {
         reset_menu(ui, rects, status);
     }
@@ -375,12 +475,16 @@ pub(crate) fn label_cell(ui: &mut Ui, label: &str) -> Response {
         pos2(cell.left() + cols.label_x, cell.top()),
         vec2(cols.label_width, ROW_HEIGHT),
     );
-    paint_status(
-        ui,
-        pos2(cell.left() + cols.circle_x, cell.center().y),
-        status,
-    );
-    widgets::label(ui, label_rect, label, "")
+    let circle = pos2(cell.left() + cols.circle_x, cell.center().y);
+    paint_status(ui, circle, status);
+    let anim = take_anim();
+    let response = widgets::label(ui, label_rect, label, "");
+    if let Some(row) = anim {
+        let response = response.interact(Sense::click());
+        anim_controls(ui, &response, circle, &row);
+        return response;
+    }
+    response
 }
 
 /// The width left for a field after `label_cell`, keeping the right

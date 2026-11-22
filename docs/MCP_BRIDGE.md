@@ -638,6 +638,127 @@ used in the app; `primitive_add` always starts from the Reset values.
   - `axis` (string): "off" (default), "x", "y" or "z".
   - `offset` (number): Symmetry plane offset along the axis, metres; default 0.
 - **`select.symmetrical`** — Add the symmetrical counterparts of the selection. No arguments.
+- **`operandi.anim.query`** — Read animation state as JSON: current frame, fps, scene and current range, time display, Auto Key, snap, real time, end behavior, key time, playing, pending edits, markers, and each animated channel's keys (frame, value, slopes), value now and values at frames.
+  - `channels` (string): Only these channels, item:name,...
+  - `item` (integer): Only this item's channels.
+  - `frames` (string): Frames to read each curve at, comma separated.
+- **`operandi.render.frameRange`** — Render frames start..end (default the current range) with Cycles into folder (default the project's renders/) as <name>_0000.png; needs the running app. operandi.anim.query reports progress (job).
+  - `start` (number): First frame (default the current range's).
+  - `end` (number): Last frame (default the current range's).
+  - `range` (string): current (default) or scene: which range start and end default to.
+  - `folder` (string): Folder to write to.
+  - `name` (string): File name before the frame number (default Render).
+  - `samples` (integer): Samples per pixel (default the render settings').
+  - `width` (integer): Width in pixels (with height).
+  - `height` (integer): Height in pixels (with width).
+  - `camera` (integer): Camera item (default the render camera).
+- **`operandi.render.cancelRange`** — Stop the running frame range render or playblast. No arguments.
+- **`operandi.view.playblast`** — Record the active 3D view for frames start..end (default the current range) at scale 1, 0.5 or 0.25 to an image sequence in folder (default the project's renders/), then open it unless open is false; needs the running app.
+  - `start` (number): First frame.
+  - `end` (number): Last frame.
+  - `range` (string): current (default) or scene.
+  - `scale` (number): 1, 0.5 or 0.25 of the view's size (default 1).
+  - `folder` (string): Folder to write to.
+  - `name` (string): File name before the frame number (default Playblast).
+  - `open` (boolean): Open the first frame in the system viewer after (default true).
+- **`operandi.time.set`** — Sets the current time (TK-01); not an undo step (TK-05). Snaps to a frame with Time Snap on.
+  - `frame` (number): Time in frames.
+  - `time` (number): Time in seconds (instead of frame).
+- **`operandi.time.step`** — Steps the current time by frames (TK-63; Shift+Left/Right, comma/period).
+  - `frames` (number): Frames to step (default 1; negative steps back).
+- **`operandi.time.go`** — Goes to the current range's first or last frame, or the previous, next, first or last key of the selected items or channels (TK-63).
+  - `to` (string): first, last, prevKey, nextKey, firstKey or lastKey (default first).
+- **`operandi.time.play`** — Plays or stops playback through the current range (TK-60; /).
+  - `backwards` (boolean): Play backwards (default false).
+  - `stop` (boolean): true stops, false starts; default toggles.
+- **`operandi.time.keyTime`** — Sets the key time alone, where new keys land (TL-20), or resets it to follow the current time.
+  - `frame` (number): Time in frames.
+  - `time` (number): Time in seconds (instead of frame).
+  - `reset` (boolean): Follow the current time again.
+- **`operandi.channel.select`** — Selects a channel for keying (UIC-119), or clears the channel selection.
+  - `channel` (string): item:name, or none.
+  - `add` (boolean): Toggle it in the selection (default false).
+- **`operandi.key.select`** — Selects keys in the track row (TL-41).
+  - `keys` (string): Keys as item:name@frame,....
+  - `mode` (string): replace, add, remove, all or clear (default replace).
+- **`operandi.marker.select`** — Selects markers (TL-52).
+  - `ids` (string): Marker ids, comma separated.
+  - `add` (boolean): Add to the selection (default false).
+- **`operandi.key.copy`** — Copies the selected keys (or the selected items' keys at the key time) to the key clipboard (TL-45/47); not an undo step. No arguments.
+- **`operandi.key.set`** — Sets keys at the key time with the channels' current values (TK-20/21; S keys the selected channels).
+  - `channels` (string): Channels as item:name,... (pos.X, rot.Y, scl.Z or an item.channel name); default the selected channels.
+- **`operandi.key.toggle`** — A status-light click: keys the channels, or removes their keys at the key time when every one has one (TK-20).
+  - `channels` (string): Channels as item:name,... (pos.X, rot.Y, scl.Z or an item.channel name); default the selected channels.
+- **`operandi.key.remove`** — Removes the channels' keys at the key time or the given time (TK-24 Remove Key).
+  - `channels` (string): Channels as item:name,... (pos.X, rot.Y, scl.Z or an item.channel name); default the selected channels.
+  - `frame` (number): Time in frames.
+  - `time` (number): Time in seconds (instead of frame).
+- **`operandi.key.transforms`** — Keys position, rotation, scale or all three of the selected items (TK-22; Shift+W/E/R/Y).
+  - `type` (string): position, rotation, scale or all (default all).
+- **`operandi.key.items`** — Keys every animated channel of the selected items (TK-23; Shift+S). No arguments.
+- **`operandi.key.removeAnimation`** — Removes every key of the channels, keeping their current values (TK-24).
+  - `channels` (string): Channels as item:name,... (pos.X, rot.Y, scl.Z or an item.channel name); default the selected channels.
+- **`operandi.key.reset`** — Removes every key of the channels and puts back their default values (TK-24).
+  - `channels` (string): Channels as item:name,... (pos.X, rot.Y, scl.Z or an item.channel name); default the selected channels.
+- **`operandi.key.bake`** — Keys the channels on every frame of the current range (TK-24).
+  - `channels` (string): Channels as item:name,... (pos.X, rot.Y, scl.Z or an item.channel name); default the selected channels.
+- **`operandi.key.apply`** — Keys every edited-but-not-keyed channel at the key time (TK-41 Apply). No arguments.
+- **`operandi.key.discard`** — Drops every edited-but-not-keyed value back to its curve (TK-41 Discard). No arguments.
+- **`operandi.key.autoKey`** — Sets Auto Key: off, animated or all (TK-30).
+  - `mode` (string, required): off, animated or all.
+- **`operandi.key.move`** — Moves the selected keys by frames (TL-42, Shift...).
+  - `frames` (number, required): Frames to move (negative moves earlier).
+- **`operandi.key.scale`** — Scales the selected keys' timing around a pivot (TL-43, Scale...).
+  - `factor` (number, required): Timing factor, above 0.
+  - `frame` (number): Pivot frame (default the key time).
+  - `time` (number): Time in seconds (instead of frame).
+- **`operandi.key.invert`** — Reverses the selected keys' timing within their span (TL-45 Invert...). No arguments.
+- **`operandi.key.delete`** — Deletes the selected keys (TL-45 Delete / Delete Related).
+  - `related` (boolean): Also the sibling X/Y/Z keys at the same times.
+- **`operandi.key.slope`** — Sets the selected keys' slope type (TL-45/46).
+  - `type` (string, required): auto, smoothFlat, autoFlat, flat, linear, linearIn, linearOut, stepped or manual.
+  - `side` (string): in, out or both (default both; linearIn/Out pick theirs).
+- **`operandi.key.cut`** — Copies the selected keys to the key clipboard, then deletes them (TL-45). No arguments.
+- **`operandi.key.paste`** — Pastes the key clipboard at the key time (TL-45): merge, insert (later keys move along) or replace (keys in the pasted span go).
+  - `mode` (string): merge, insert or replace (default merge).
+- **`operandi.time.insertFrame`** — Moves the selected items' keys after the key time one frame later (TL-21). No arguments.
+- **`operandi.time.removeFrame`** — Moves the selected items' keys after the key time one frame earlier, never deleting keys (TL-21). No arguments.
+- **`operandi.time.settings`** — Sets the scene's time settings (TK-03/04): frame rate, scene and current range (frames), time display, Auto Key, Time Snap, Play Real Time, End Behavior, Auto Update Existing Keys.
+  - `fps` (number): Frames per second.
+  - `start` (number): Scene range start, frames.
+  - `end` (number): Scene range end, frames.
+  - `rangeStart` (number): Current range start, frames.
+  - `rangeEnd` (number): Current range end, frames.
+  - `display` (string): frames, seconds, smpte or film.
+  - `autoKey` (string): off, animated or all.
+  - `snap` (boolean): Time Snap.
+  - `realTime` (boolean): Play Real Time.
+  - `endBehavior` (string): hold, repeat or wrap.
+  - `autoUpdate` (boolean): Auto Update Existing Keys.
+- **`operandi.time.range`** — Sets the current range in frames (TL-13), or resets it to the scene range.
+  - `start` (number): Start frame.
+  - `end` (number): End frame.
+  - `reset` (boolean): Back to the scene range.
+- **`operandi.time.fit`** — Fits the current range to the selected items' or channels' keys, or every key (TL-14; A / Shift+A).
+  - `all` (boolean): Every key in the scene.
+- **`operandi.marker.add`** — Adds a time marker at the current or given time, owned by the selected item or the scene (TL-50/51; M).
+  - `frame` (number): Time in frames.
+  - `time` (number): Time in seconds (instead of frame).
+  - `scene` (boolean): Owned by the scene even with items selected.
+- **`operandi.marker.edit`** — Changes markers (TL-52/53): time, shift, length, end, label, shape, colour, Show Label, Frame Limits, Snap to Frames.
+  - `ids` (string): Marker ids; default the selected markers.
+  - `frame` (number): New start frame.
+  - `shift` (number): Frames to move by.
+  - `length` (number): Range length, frames (0: a plain marker).
+  - `endFrame` (number): Range end frame.
+  - `label` (string): Label.
+  - `shape` (string): triangle, square, diamond or bar.
+  - `color` (string): r,g,b 0-1.
+  - `showLabel` (boolean): Show the label above the marker.
+  - `frameLimits` (boolean): Limit playback and stepping to the range.
+  - `snapToFrames` (boolean): Move start and end onto whole frames.
+- **`operandi.marker.delete`** — Deletes markers (TL-52).
+  - `ids` (string): Marker ids; default the selected markers.
 - **`transform.channel`** — Set one transform channel of an item (default the active item); value "?" answers the current value. One undo step; on the Texture Locator a live Move/Rotate/Scale/Transform holds, one step inside that tool, as a drag of its handle (PD-Q12).
   - `name` (string, required): pos.X/Y/Z (metres), rot.X/Y/Z (radians, or with deg) or scl.X/Y/Z (a Texture Locator's Size, at least 0.001).
   - `value` (any, required): The new value; "?" reads it.
@@ -762,6 +883,7 @@ used in the app; `primitive_add` always starts from the Reset values.
   - `filename` (string, required): The file to write.
   - `format` (string): obj, stl, stlAscii, gltf, glb, geo, svg, lxo, ply, plyAscii, abc, usd, usda, usdc, usdz, fbx or 3mf; default from the file's extension (.stl and .ply mean binary). USD needs the running app's exporter (operandi-mcp --attach).
   - `export` (boolean): Accepted; here scene.saveAs always exports.
+  - `animation` (string): USD: on (default; time samples once a frame over the scene range), off, or current (the current frame only).
 - **`hide.sel`** — Hide the selected elements of the active mesh (everything when nothing is selected), one undo step; hidden polygons drop out of the UV tools. No arguments.
 - **`hide.unsel`** — Hide the elements of the active mesh that aren't selected, one undo step. No arguments.
 - **`hide.invert`** — Swap which elements of the active mesh are hidden, one undo step. No arguments.

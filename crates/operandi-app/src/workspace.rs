@@ -644,8 +644,21 @@ impl Operandi {
                     ),
                     |ui| {
                         ui.horizontal(|ui| {
-                            // UIC-110: filled once a channel leaves its default.
-                            crate::form::rows::status(mixed || (current - default).abs() > 1e-12);
+                            // UIC-110/112: filled once a channel leaves its
+                            // default; keys show red, and the light keys
+                            // (TK-20).
+                            self.anim_row(
+                                &format!(
+                                    "{}.{}",
+                                    match prefix {
+                                        "translation" => "pos",
+                                        "rotation" => "rot",
+                                        _ => "scl",
+                                    },
+                                    ["X", "Y", "Z"][axis]
+                                ),
+                                mixed || (current - default).abs() > 1e-12,
+                            );
                             // UIC-114: "Position X", then "Y", "Z".
                             let shown = if axis == 0 {
                                 format!("{label} X")

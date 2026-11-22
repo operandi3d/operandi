@@ -93,6 +93,9 @@ pub struct Bridge {
     pub editor: Editor,
     /// The headless session's file and its last saved state.
     pub document: Document,
+    /// Inside the running app (attached): app-only jobs such as frame
+    /// renders and playblasts are left for the app to run.
+    pub attached: bool,
 }
 
 /// Which file the headless session is, and the scene as last saved.
@@ -123,6 +126,7 @@ impl Bridge {
         Self {
             editor,
             document: Document { path: None, saved },
+            attached: false,
         }
     }
 
@@ -633,6 +637,11 @@ impl Bridge {
     fn staged(&mut self, f: impl FnOnce(&mut Editor) -> Result<()>) -> Result<Value> {
         let mut staged = self.editor.clone();
         f(&mut staged)?;
+        // Frame renders and playblasts (TL-70/71) need the app's renderer
+        // and views.
+        if !self.attached && !staged.anim.requests.is_empty() {
+            return Err(APP_ONLY.into());
+        }
         self.editor = staged;
         Ok(self.summary())
     }

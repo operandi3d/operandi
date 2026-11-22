@@ -2644,6 +2644,9 @@ struct FillOut {
   @location(7) tint_w: vec4<f32>,
   @location(8) tint_d: vec4<f32>,
 };
+// Where an edge running behind the near clip is cut, as a multiple of the
+// near distance (camera.rs NEAR_KEEP).
+const NEAR_KEEP: f32 = 1.01;
 fn project(p: vec3<f32>) -> vec4<f32> {
   let d = p - cam.eye.xyz;
   let z = dot(d, cam.forward.xyz);
@@ -2980,9 +2983,21 @@ fn edge_out_fading(a: vec3<f32>, b: vec3<f32>, k: vec3<f32>, c: vec4<f32>, fades
     }
     out.color.a = out.color.a * look.mode.z;
   }
-  let ca = project(placed(a)); let cb = project(placed(b));
+  var ca = project(placed(a)); var cb = project(placed(b));
   let culled = vec4<f32>(0.0, 0.0, 2.0, 1.0);
-  if (cam.params.z > 0.5 && (ca.w < cam.params.w || cb.w < cam.params.w)) { out.position = culled; return out; }
+  // Perspective: an edge with one end behind the near clip is cut where
+  // it crosses it (a hair in front, so the 0.2% pull below stays inside
+  // the depth range) rather than dropped, so a long edge running past
+  // the eye keeps the part in view as its polygon does (camera.rs
+  // `clip_to_near`, the same cut on the CPU). Gone only when both ends
+  // are behind.
+  if (cam.params.z > 0.5) {
+    let keep = cam.params.w * NEAR_KEEP;
+    if (ca.w < keep && cb.w < keep) { out.position = culled; return out; }
+    // `project` is affine in the point, so clip coordinates interpolate.
+    if (ca.w < keep) { ca = mix(ca, cb, (keep - ca.w) / (cb.w - ca.w)); }
+    if (cb.w < keep) { cb = mix(cb, ca, (keep - cb.w) / (ca.w - cb.w)); }
+  }
   let half = cam.view.xy * 0.5;
   let pa = ca.xy / ca.w * half;
   let pb = cb.xy / cb.w * half;
@@ -3959,6 +3974,22 @@ mod tests {
         )
         .validate(&module)
         .unwrap_or_else(|e| panic!("{e:?}"));
+    }
+
+    /// Forum report (disappearing wireframe): the wire cuts an edge at the
+    /// near clip as `camera::clip_to_near` does (same NEAR_KEEP) and culls
+    /// only when both ends are behind, never when one is.
+    #[test]
+    fn edge_shader_cuts_edges_at_the_near_clip() {
+        let s = super::plain_world_shader();
+        assert!(s.contains(&format!(
+            "const NEAR_KEEP: f32 = {:?};",
+            crate::camera::NEAR_KEEP as f32
+        )));
+        assert!(
+            s.contains("if (ca.w < keep && cb.w < keep) { out.position = culled; return out; }")
+        );
+        assert!(!s.contains("ca.w < cam.params.w || cb.w < cam.params.w"));
     }
 
     #[test]

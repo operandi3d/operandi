@@ -523,10 +523,46 @@ pub enum Sample {
     SpinVertexIndices,
     /// Guides: light cyan guide lines across a plate, a point snapped to one.
     Guides,
+    /// Timeline: a clock face.
+    TimelineClock,
+    /// First Frame: a bar and a triangle pointing to it.
+    FirstFrame,
+    /// Last Frame: a triangle pointing to a bar.
+    LastFrame,
+    /// Previous Frame: a small triangle stepping left off a frame tile.
+    PreviousFrame,
+    /// Next Frame: a small triangle stepping right off a frame tile.
+    NextFrame,
+    /// Play: a triangle.
+    Play,
+    /// Stop: a square.
+    Stop,
+    /// Previous Key: a triangle pointing left to a cyan key.
+    PreviousKey,
+    /// Next Key: a triangle pointing right to a cyan key.
+    NextKey,
+    /// First Key: a bar beside a cyan key.
+    FirstKey,
+    /// Last Key: a cyan key beside a bar.
+    LastKey,
+    /// Key Selected Channels: a cyan key on three channel lines.
+    KeyChannels,
+    /// Key Selected Items: a cyan key over a cube.
+    KeyItems,
+    /// Insert Frame: a cyan plus over a frame tile.
+    InsertFrame,
+    /// Remove Frame: a dark minus over a frame tile.
+    RemoveFrame,
+    /// Apply: a cyan key with a cyan tick.
+    ApplyKeys,
+    /// Discard: a cyan key with a dark cross.
+    DiscardKeys,
+    /// Auto Key: a cyan key ringed by a turning arrow.
+    AutoKey,
 }
 
 impl Sample {
-    pub const ALL: [Sample; 117] = [
+    pub const ALL: [Sample; 135] = [
         Sample::Cube,
         Sample::SelectedFace,
         Sample::Sphere,
@@ -644,6 +680,24 @@ impl Sample {
         Sample::TransferNormals,
         Sample::SpinVertexIndices,
         Sample::Guides,
+        Sample::TimelineClock,
+        Sample::FirstFrame,
+        Sample::LastFrame,
+        Sample::PreviousFrame,
+        Sample::NextFrame,
+        Sample::Play,
+        Sample::Stop,
+        Sample::PreviousKey,
+        Sample::NextKey,
+        Sample::FirstKey,
+        Sample::LastKey,
+        Sample::KeyChannels,
+        Sample::KeyItems,
+        Sample::InsertFrame,
+        Sample::RemoveFrame,
+        Sample::ApplyKeys,
+        Sample::DiscardKeys,
+        Sample::AutoKey,
     ];
 
     /// File stem and icon slug.
@@ -766,6 +820,24 @@ impl Sample {
             Sample::TransferNormals => "transfer-normals",
             Sample::SpinVertexIndices => "spin-vertex-indices",
             Sample::Guides => "guides",
+            Sample::TimelineClock => "timeline-clock",
+            Sample::FirstFrame => "first-frame",
+            Sample::LastFrame => "last-frame",
+            Sample::PreviousFrame => "previous-frame",
+            Sample::NextFrame => "next-frame",
+            Sample::Play => "play",
+            Sample::Stop => "stop",
+            Sample::PreviousKey => "previous-key",
+            Sample::NextKey => "next-key",
+            Sample::FirstKey => "first-key",
+            Sample::LastKey => "last-key",
+            Sample::KeyChannels => "key-channels",
+            Sample::KeyItems => "key-items",
+            Sample::InsertFrame => "insert-frame",
+            Sample::RemoveFrame => "remove-frame",
+            Sample::ApplyKeys => "apply-keys",
+            Sample::DiscardKeys => "discard-keys",
+            Sample::AutoKey => "auto-key",
         }
     }
 
@@ -1599,6 +1671,106 @@ fn styled(family: Sample, style: CopyStyle) -> Result<Mesh> {
         parts.push(copy_in_style(&mesh, style, size)?);
     }
     Ok((layout.finish)(merge(parts)?))
+}
+
+/// A flat symbol's frame: local X right, Y up, Z out of the symbol,
+/// turned to face the camera at three quarters so its thickness shows.
+fn symbol_frame() -> glam::DQuat {
+    let toward = DVec3::ONE.normalize();
+    let (right, up) = screen_axes();
+    let out = (toward * 0.9 - right * 0.42).normalize();
+    let up = (up - out * up.dot(out)).normalize();
+    let right = up.cross(out);
+    glam::DQuat::from_mat3(&glam::DMat3::from_cols(right, up, out))
+}
+
+/// A symbol piece: the 2D polygon `outline` (counter-clockwise, convex)
+/// extruded `depth` deep, in the symbol plane.
+fn slab(outline: &[(f64, f64)], depth: f64, tag: &str) -> Result<Mesh> {
+    let n = outline.len() as u32;
+    let mut mesh = Mesh::default();
+    for z in [-depth * 0.5, depth * 0.5] {
+        for &(x, y) in outline {
+            mesh.vertices.push(DVec3::new(x, y, z));
+        }
+    }
+    mesh.faces.push(polygon((0..n).rev().collect(), tag));
+    mesh.faces.push(polygon((n..2 * n).collect(), tag));
+    for i in 0..n {
+        let j = (i + 1) % n;
+        mesh.faces.push(polygon(vec![i, j, j + n, i + n], tag));
+    }
+    mesh.validate()?;
+    Ok(mesh)
+}
+
+/// A bar from (x0, y0) to (x1, y1) and `width` across, as a slab.
+fn bar(x0: f64, y0: f64, x1: f64, y1: f64, width: f64, depth: f64, tag: &str) -> Result<Mesh> {
+    let d = DVec3::new(x1 - x0, y1 - y0, 0.).normalize();
+    let side = DVec3::new(-d.y, d.x, 0.) * (width * 0.5);
+    slab(
+        &[
+            (x0 - side.x, y0 - side.y),
+            (x1 - side.x, y1 - side.y),
+            (x1 + side.x, y1 + side.y),
+            (x0 + side.x, y0 + side.y),
+        ],
+        depth,
+        tag,
+    )
+}
+
+/// A triangle pointing right (`dir` 1) or left (-1), centred on (cx, cy).
+fn pointer(cx: f64, cy: f64, size: f64, dir: f64, tag: &str) -> Result<Mesh> {
+    let h = size * 0.5;
+    let pts = if dir > 0. {
+        vec![
+            (cx - h * 0.85, cy - h),
+            (cx + h * 0.85, cy),
+            (cx - h * 0.85, cy + h),
+        ]
+    } else {
+        vec![
+            (cx + h * 0.85, cy - h),
+            (cx + h * 0.85, cy + h),
+            (cx - h * 0.85, cy),
+        ]
+    };
+    slab(&pts, 0.14, tag)
+}
+
+/// A key: a cyan diamond centred on (cx, cy).
+fn key(cx: f64, cy: f64, size: f64) -> Result<Mesh> {
+    let h = size * 0.5;
+    slab(
+        &[(cx, cy - h), (cx + h, cy), (cx, cy + h), (cx - h, cy)],
+        0.16,
+        "New",
+    )
+}
+
+/// A frame tile: a thin Clay plate, one frame.
+fn frame_tile(cx: f64, cy: f64, w: f64, h: f64) -> Result<Mesh> {
+    let mut tile = slab(
+        &[
+            (cx - w, cy - h),
+            (cx + w, cy - h),
+            (cx + w, cy + h),
+            (cx - w, cy + h),
+        ],
+        0.06,
+        CLAY,
+    )?;
+    for v in &mut tile.vertices {
+        v.z -= 0.1;
+    }
+    Ok(tile)
+}
+
+/// `parts` turned into the symbol frame.
+fn symbol(parts: Vec<Mesh>) -> Result<Mesh> {
+    let q = symbol_frame();
+    Ok(deformed(merge(parts)?, |v| q * v))
 }
 
 /// The geometry of a sample, inside the icon box.
@@ -3026,6 +3198,119 @@ fn sample_mesh(sample: Sample) -> Result<Mesh> {
             }
             parts.push(ball(DVec3::new(0.25, 0., 0.15), 0.08, "Selected")?);
             tipped(merge(parts)?, 25.)
+        }
+        Sample::TimelineClock => {
+            let mut face = revolve(
+                &[(0., -0.06), (0.55, -0.06), (0.55, 0.06), (0., 0.06)],
+                48,
+                false,
+                CLAY,
+            )?;
+            // Turn the disc's axis (Y) out of the symbol plane (Z).
+            let lay = glam::DQuat::from_rotation_x(std::f64::consts::FRAC_PI_2);
+            face = deformed(face, |v| lay * v);
+            let mut hands = vec![
+                bar(0., 0., 0., 0.38, 0.07, 0.04, "Ink")?,
+                bar(0., 0., 0.27, -0.12, 0.07, 0.04, "Ink")?,
+            ];
+            for h in &mut hands {
+                for v in &mut h.vertices {
+                    v.z += 0.08;
+                }
+            }
+            let mut parts = vec![face];
+            parts.extend(hands);
+            symbol(parts)?
+        }
+        Sample::FirstFrame => symbol(vec![
+            bar(-0.4, -0.38, -0.4, 0.38, 0.14, 0.14, CLAY)?,
+            pointer(0.08, 0., 0.7, -1., CLAY)?,
+        ])?,
+        Sample::LastFrame => symbol(vec![
+            bar(0.4, -0.38, 0.4, 0.38, 0.14, 0.14, CLAY)?,
+            pointer(-0.08, 0., 0.7, 1., CLAY)?,
+        ])?,
+        Sample::PreviousFrame => symbol(vec![
+            frame_tile(0.33, 0., 0.16, 0.32)?,
+            pointer(-0.2, 0., 0.55, -1., CLAY)?,
+        ])?,
+        Sample::NextFrame => symbol(vec![
+            frame_tile(-0.33, 0., 0.16, 0.32)?,
+            pointer(0.2, 0., 0.55, 1., CLAY)?,
+        ])?,
+        Sample::Play => symbol(vec![pointer(0.05, 0., 0.9, 1., CLAY)?])?,
+        Sample::Stop => symbol(vec![slab(
+            &[(-0.36, -0.36), (0.36, -0.36), (0.36, 0.36), (-0.36, 0.36)],
+            0.14,
+            CLAY,
+        )?])?,
+        Sample::PreviousKey => symbol(vec![
+            pointer(-0.25, 0., 0.5, -1., CLAY)?,
+            key(0.25, 0., 0.55)?,
+        ])?,
+        Sample::NextKey => symbol(vec![
+            key(-0.25, 0., 0.55)?,
+            pointer(0.25, 0., 0.5, 1., CLAY)?,
+        ])?,
+        Sample::FirstKey => symbol(vec![
+            bar(-0.4, -0.36, -0.4, 0.36, 0.14, 0.14, CLAY)?,
+            key(0.12, 0., 0.62)?,
+        ])?,
+        Sample::LastKey => symbol(vec![
+            key(-0.12, 0., 0.62)?,
+            bar(0.4, -0.36, 0.4, 0.36, 0.14, 0.14, CLAY)?,
+        ])?,
+        Sample::KeyChannels => {
+            let mut parts = Vec::new();
+            for y in [-0.3, 0., 0.3] {
+                parts.push(bar(-0.5, y, 0.5, y, 0.07, 0.06, CLAY)?);
+            }
+            parts.push(key(0.1, 0., 0.5)?);
+            symbol(parts)?
+        }
+        Sample::KeyItems => merge(vec![
+            cube_at(DVec3::new(0., -0.22, 0.), 0.56, CLAY)?,
+            deformed(key(0., 0., 0.5)?, |v| {
+                symbol_frame() * v + DVec3::new(0., 0.36, 0.)
+            }),
+        ])?,
+        Sample::InsertFrame => symbol(vec![
+            frame_tile(0., 0., 0.38, 0.45)?,
+            bar(-0.28, 0., 0.28, 0., 0.13, 0.14, "New")?,
+            bar(0., -0.28, 0., 0.28, 0.13, 0.14, "New")?,
+        ])?,
+        Sample::RemoveFrame => symbol(vec![
+            frame_tile(0., 0., 0.38, 0.45)?,
+            bar(-0.28, 0., 0.28, 0., 0.13, 0.14, "Ink")?,
+        ])?,
+        Sample::ApplyKeys => symbol(vec![
+            key(-0.2, 0.12, 0.5)?,
+            bar(0.0, -0.2, 0.15, -0.38, 0.12, 0.14, "New")?,
+            bar(0.13, -0.37, 0.48, 0.1, 0.12, 0.14, "New")?,
+        ])?,
+        Sample::DiscardKeys => symbol(vec![
+            key(-0.2, 0.12, 0.5)?,
+            bar(0.06, -0.42, 0.44, -0.04, 0.12, 0.14, "Ink")?,
+            bar(0.06, -0.04, 0.44, -0.42, 0.12, 0.14, "Ink")?,
+        ])?,
+        Sample::AutoKey => {
+            let arc: Vec<DVec3> = (0..=30)
+                .map(|k| {
+                    let a = 0.4 + std::f64::consts::TAU * 0.78 * f64::from(k) / 30.;
+                    DVec3::new(0.45 * a.cos(), 0.45 * a.sin(), 0.)
+                })
+                .collect();
+            let n = arc.len();
+            symbol(vec![
+                key(0., 0., 0.42)?,
+                tube(&arc[..n - 2], 0.045, 10, CLAY)?,
+                arrow(
+                    arc[n - 3],
+                    arc[n - 1] + (arc[n - 1] - arc[n - 3]),
+                    0.045,
+                    CLAY,
+                )?,
+            ])?
         }
         Sample::LoopSlice => {
             let mut parts = vec![sample_mesh(Sample::Cube)?];

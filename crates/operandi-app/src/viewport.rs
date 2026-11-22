@@ -382,7 +382,8 @@ impl Operandi {
             let plane_center = self.workplane_center();
             let project = |p| self.camera.project(p, r).map(|p| p.0);
             let segment = |a, b, color: Color32, width: f32| {
-                if let (Some(a), Some(b)) = (project(a), project(b)) {
+                // Cut at the near clip, not dropped (as the GPU wire).
+                if let Some((a, b)) = self.camera.project_segment(a, b, r) {
                     painter.line_segment([a, b], Stroke::new(width, color));
                 }
             };

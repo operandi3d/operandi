@@ -42,6 +42,10 @@ mod action_centers;
 mod active_task;
 #[path = "add_loop_slide_options.rs"]
 mod add_loop_slide_options;
+#[path = "animation_time_keys.rs"]
+mod animation_time_keys;
+#[path = "animation_timeline.rs"]
+mod animation_timeline;
 #[path = "axis_slice_cases.rs"]
 mod axis_slice_cases;
 #[path = "backdrop.rs"]
@@ -260,6 +264,8 @@ mod light_properties_tier2;
 mod light_properties_tier3;
 #[path = "light_type_convert.rs"]
 mod light_type_convert;
+#[path = "local_tunnel_rings.rs"]
+mod local_tunnel_rings;
 #[path = "lock_hide.rs"]
 mod lock_hide;
 #[path = "loop_ngon_rim.rs"]

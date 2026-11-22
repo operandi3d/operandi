@@ -172,6 +172,7 @@ impl Operandi {
         swap(&mut e.extrude_moved_caps, &mut o.extrude_moved_caps);
         // The scene's tool stays live, waiting for the scene's return.
         swap(&mut e.live, &mut o.live);
+        swap(&mut e.anim, &mut o.anim);
         swap(&mut e.pen_draft, &mut o.pen_draft);
         swap(&mut e.solid_sketch, &mut o.solid_sketch);
         swap(&mut e.bridge, &mut o.bridge);
