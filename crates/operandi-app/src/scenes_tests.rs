@@ -663,3 +663,37 @@ fn delete_asks_about_child_items_only_when_there_are_some() {
             .all(|i| i.id != group && i.id != child)
     );
 }
+
+/// Astra P8-002: a parked scene whose Ellipsoid preview waits to be applied
+/// needs saving by the same rule as the open scene, so Quit asks about it.
+#[test]
+fn a_parked_numeric_preview_counts_as_unsaved() {
+    let mut a = super::tests::box_app();
+    let file = scratch(&a, "preview.opscene");
+    assert!(a.save(file));
+    assert!(!a.dirty());
+    let r = eframe::egui::Rect::from_min_size(eframe::egui::Pos2::ZERO, vec2(800., 600.));
+    a.run(Command::ArmEllipsoid);
+    let plane = a.actual_plane();
+    let center = a.camera.project(DVec3::new(2., 0., 0.), r).unwrap().0;
+    let edge = a.camera.project(DVec3::new(3., 0., 0.), r).unwrap().0;
+    let input::GestureKind::SolidDraw { anchor, .. } = a.begin_solid_draw(false, center, r) else {
+        panic!("no draw gesture: {}", a.status);
+    };
+    a.solid_draw(false, plane, anchor, edge, r, true);
+    assert!(a.editor.ellipsoid.as_ref().unwrap().preview.is_some());
+    assert!(a.dirty(), "the open scene counts its preview");
+    a.request_file(FileAction::New);
+    assert!(a.tab_dirty(0), "and so does the same scene parked");
+}
+
+/// Astra P8-003: the shader Delete question counts as an open dialog, so a
+/// queued Open or the MCP bridge waits for its answer.
+#[test]
+fn the_shader_delete_question_is_modal() {
+    let mut a = app();
+    assert!(!a.has_modal());
+    a.shading.confirm_delete = Some(Vec::new());
+    assert!(a.has_modal());
+    assert_eq!(a.open_dialog(), Some("shader Delete question"));
+}

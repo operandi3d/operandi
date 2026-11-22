@@ -146,7 +146,7 @@ pub(crate) struct SceneState {
 
 impl SceneState {
     pub(super) fn dirty(&self) -> bool {
-        !super::same_document(&self.editor.scene, &self.saved)
+        super::needs_saving(&self.editor, &self.saved, super::same_document)
     }
 }
 
@@ -228,7 +228,7 @@ impl Operandi {
             None => self.scene_label(),
         }
     }
-    fn tab_dirty(&self, i: usize) -> bool {
+    pub(super) fn tab_dirty(&self, i: usize) -> bool {
         match &self.scenes.tabs[i].parked {
             Some(s) => s.dirty(),
             None => self.dirty(),

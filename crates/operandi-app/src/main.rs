@@ -2179,17 +2179,7 @@ impl Operandi {
         self.dirty_by(|a, b| a == b)
     }
     fn dirty_by(&self, same: fn(&Scene, &Scene) -> bool) -> bool {
-        !same(&self.editor.scene, &self.saved)
-            || self
-                .editor
-                .ellipsoid
-                .as_ref()
-                .is_some_and(|s| s.preview.is_some())
-            || self
-                .editor
-                .shape
-                .as_ref()
-                .is_some_and(|s| s.preview.is_some())
+        needs_saving(&self.editor, &self.saved, same)
     }
     fn request_file(&mut self, a: FileAction) {
         if self.pending.is_some() || self.file_dialog.is_some() {
@@ -2701,6 +2691,12 @@ impl Operandi {
             (self.boolean.is_some(), "Boolean dialog"),
             (self.boolean_notice.is_some(), "Boolean notice"),
             (self.drill.is_some(), "Drill dialog"),
+            // Astra P8-003: it was missing, so a queued Open could run
+            // under it and the answer delete same-numbered layers there.
+            (
+                self.shading.confirm_delete.is_some(),
+                "shader Delete question",
+            ),
         ];
         open.into_iter().find(|(on, _)| *on).map(|(_, name)| name)
     }
@@ -3682,6 +3678,19 @@ mod viewport;
 mod viewport_buttons;
 mod viewport_properties;
 mod views;
+/// One "does this scene need saving?" rule for the open scene and the
+/// parked ones alike (Astra P8-002: a parked tab's numeric preview was
+/// skipped by Quit): the scene differs from the saved one, or an Ellipsoid
+/// or shape preview is waiting to be applied.
+fn needs_saving(editor: &Editor, saved: &Scene, same: fn(&Scene, &Scene) -> bool) -> bool {
+    !same(&editor.scene, saved)
+        || editor
+            .ellipsoid
+            .as_ref()
+            .is_some_and(|s| s.preview.is_some())
+        || editor.shape.as_ref().is_some_and(|s| s.preview.is_some())
+}
+
 /// The launch arguments as text, for the command-line modes below. A
 /// file name that isn't valid Unicode (possible on Linux) is kept as it is
 /// for opening (`AppEnvironment::document_argument`) and only shown lossily
