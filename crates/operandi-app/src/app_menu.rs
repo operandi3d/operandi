@@ -143,6 +143,10 @@ impl Operandi {
         };
         #[allow(unused_mut)]
         let mut menus = self.menus_from_forms(&item);
+        // The animation switch (anim_switch.rs): no Animate menu while off.
+        if !crate::anim_switch::enabled() {
+            menus.retain(|m| m.id != "menu.animate");
+        }
         #[cfg(feature = "painting")]
         self.painting_menus(&mut menus, &item);
         menus

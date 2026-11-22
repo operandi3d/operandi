@@ -181,6 +181,9 @@ fn fmt(f: f64) -> String {
 impl Operandi {
     /// The bottom bar's clock button (TK-70).
     pub(super) fn timeline_toggle_button(&mut self, ui: &mut Ui) {
+        if !crate::anim_switch::enabled() {
+            return;
+        }
         let r = ui
             .add(crate::icons::button(ui, Icon::TimelineClock, "").selected(self.timeline.open))
             .on_hover_text("Timeline: show or hide the time strip (operandi.anim.timeline)");
@@ -191,7 +194,7 @@ impl Operandi {
 
     /// The strip, as a bottom panel above the bottom bar.
     pub(super) fn timeline_panel(&mut self, ctx: &Context) {
-        if !self.timeline.open {
+        if !self.timeline.open || !crate::anim_switch::enabled() {
             self.timeline.rect = Rect::NOTHING;
             return;
         }

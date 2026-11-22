@@ -283,6 +283,9 @@ impl super::Operandi {
                         "The number type polygon indices are written as",
                     );
                 });
+                // The animation switch: the USD animation row shows with
+                // animation.
+                if crate::anim_switch::enabled() {
                 rows::section(ui, "USD", false, |ui| {
                     use operandi_core::interchange::UsdAnimation as A;
                     rows::choice_d(
@@ -298,6 +301,7 @@ impl super::Operandi {
                         "What USD exports write of the animation: time samples for every frame of the scene range, none, or the current frame only (TL-83)",
                     );
                 });
+                }
                 rows::section(ui, "Images", false, |ui| {
                     rows::choice_d(
                         ui,

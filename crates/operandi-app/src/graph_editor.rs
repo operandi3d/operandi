@@ -314,7 +314,7 @@ impl Operandi {
     /// open another window (tests, some Linux setups) egui draws it inside
     /// the main one.
     pub(super) fn graph_editor_window(&mut self, ctx: &Context) {
-        if !self.graph.open {
+        if !self.graph.open || !crate::anim_switch::enabled() {
             self.graph.graph_rect = None;
             return;
         }

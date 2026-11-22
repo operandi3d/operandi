@@ -666,6 +666,10 @@ impl Operandi {
     /// components).
     pub(crate) fn anim_row_names(&self, names: &[String], non_default: bool) {
         use crate::form::status::ChannelStatus;
+        // The animation switch: no keying on the rows while off.
+        if !crate::anim_switch::enabled() {
+            return;
+        }
         let keys: Vec<ChannelKey> = names.iter().flat_map(|n| self.row_channels(n)).collect();
         let s = &self.editor.scene;
         let now = s.time.current;
