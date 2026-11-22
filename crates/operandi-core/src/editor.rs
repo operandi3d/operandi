@@ -4039,6 +4039,10 @@ impl Editor {
             && t != Tool::Contour
             && !t.is_duplicate()
             && !loose_points
+            // Item-mode transforms move the item, not its geometry, so an
+            // empty mesh (or one shaped only by its Mesh Stack) transforms
+            // like any other item (GitHub issue #3).
+            && !item_transform
             && item.is_mesh()
             && item.mesh.faces.is_empty()
         {
