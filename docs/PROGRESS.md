@@ -1,5 +1,17 @@
 # Milestone progress ledger
 
+- **Loop Slice, Slice Selected follows the selection (2026-11-22, branch
+  forum-bevel-loopslice; ported from claude/project-thread-44lm6w):** with
+  Slice Selected each connected group of selected polygons is cut along its
+  middle (LS-75): pairs and strips as before, a lone polygon across its
+  first side, an L turns its corner (a triangle and a five-sided rest), a
+  2x2 block gets a closed loop round its centre; pick order doesn't matter.
+  Unselected polygons are never cut and take one point per cut side (LS-72,
+  LS-Q15). An L with Slice Selected off is cut the same, its ends running
+  on round the ring. Provisional: a branching group is left uncut (LS-Q18);
+  a 2x2 block with Slice Selected off is unchanged (LS-Q17, open). Current
+  stops at the last slice instead of refusing a nudge ("from 0 to 0").
+
 - **Colour numbers in display space (2026-11-21, branch
   colour-swatch-raw):** Display Color Values in Display Space is on by
   default, so colour numbers show and take display-encoded (sRGB) values,

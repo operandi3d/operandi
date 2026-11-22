@@ -96,7 +96,11 @@ fn loop_slice_form(p: &Parameters, f: &mut ToolForm<Parameters>) {
             |p| p.slice.loop_slice.current as f64,
             |p, v| {
                 let o = &mut p.slice.loop_slice;
-                o.current = whole(v, 0., (o.count() - 1) as f64, "Current")? as usize;
+                // A drag or step past the last slice stops there instead
+                // of refusing (with one slice every nudge showed "Current
+                // must be a whole number from 0 to 0", Jason 2026-11-20).
+                let last = (o.count() - 1) as f64;
+                o.current = whole(v.round().clamp(0., last), 0., last, "Current")? as usize;
                 Ok(())
             },
         )

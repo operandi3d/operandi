@@ -14,7 +14,7 @@ use crate::slice_cut::{Chord, EdgeCut, InnerPoint, Node, cut, faces_of_edge};
 use crate::topology::edge_key;
 use crate::{Mesh, Mode, Result, Scene, Tool};
 use glam::DVec3;
-use std::collections::BTreeSet;
+use std::collections::{BTreeMap, BTreeSet};
 
 /// A slice's result: the mesh, the new edges the cut made and the polygons
 /// it cut (their pieces).
@@ -533,6 +533,230 @@ fn walk_ring(
     })
 }
 
+/// Each selected polygon's sides shared with another selected polygon,
+/// with that polygon.
+type SharedSides = BTreeMap<usize, Vec<((u32, u32), usize)>>;
+
+/// Slice Selected's cut (LS-75, measured 2026-11-20): each connected group
+/// of selected polygons is cut on its own, along the middle of the group.
+/// A polygon is crossed between the sides it shares with other selected
+/// polygons: opposite sides give a straight cut, two sides meeting at a
+/// corner give a corner cut (a triangle at the corner and a five-sided
+/// rest), so an L turns its corner and a 2x2 block gets a closed loop round
+/// its centre. A polygon at the end of a run is crossed from its shared side
+/// to the opposite one, and a lone polygon from its first side (from its
+/// point 0 to point 1) to the opposite one. Unselected polygons are never
+/// cut; each one next to a cut end takes the new point (LS-72). A group with a polygon sharing
+/// three or more sides with the rest has no single middle line and is left
+/// uncut (provisional, LS-Q18).
+fn selection_rings(mesh: &Mesh, selected: &BTreeSet<usize>, ngon: bool) -> Vec<Ring> {
+    let point_faces = mesh.point_faces();
+    let usable: Vec<usize> = selected
+        .iter()
+        .copied()
+        .filter(|&f| f < mesh.faces.len() && !mesh.is_polyline(f))
+        .collect();
+    // Each polygon's sides shared with another selected polygon, with that
+    // polygon.
+    let inner: SharedSides = usable
+        .iter()
+        .map(|&f| {
+            let vs = &mesh.faces[f].vertices;
+            let n = vs.len();
+            let list = (0..n)
+                .filter_map(|i| {
+                    let (p, q) = (vs[i], vs[(i + 1) % n]);
+                    let others = faces_of_edge(mesh, &point_faces, p, q);
+                    if others.len() != 2 {
+                        return None;
+                    }
+                    others
+                        .into_iter()
+                        .find(|&g| g != f && selected.contains(&g) && !mesh.is_polyline(g))
+                        .map(|g| ((p, q), g))
+                })
+                .collect();
+            (f, list)
+        })
+        .collect();
+    let mut done: BTreeSet<usize> = BTreeSet::new();
+    let mut out = Vec::new();
+    for &seed in &usable {
+        if !done.insert(seed) {
+            continue;
+        }
+        // The connected group.
+        let mut group = vec![seed];
+        let mut k = 0;
+        while k < group.len() {
+            for &(_, g) in &inner[&group[k]] {
+                if done.insert(g) {
+                    group.push(g);
+                }
+            }
+            k += 1;
+        }
+        if group.iter().any(|f| inner[f].len() > 2) {
+            continue;
+        }
+        if let Some(ring) = group_ring(mesh, &group, &inner, ngon) {
+            out.push(ring);
+        }
+    }
+    out
+}
+
+/// The ring along one group of selected polygons (see [`selection_rings`]):
+/// a path from an end polygon, or a loop when every polygon has two shared
+/// sides.
+fn group_ring(mesh: &Mesh, group: &[usize], inner: &SharedSides, ngon: bool) -> Option<Ring> {
+    let vs = |f: usize| mesh.faces[f].vertices.as_slice();
+    let start = group
+        .iter()
+        .copied()
+        .find(|f| inner[f].len() < 2)
+        .unwrap_or(group[0]);
+    // The first edge, oriented, and the polygon it leads into.
+    let (first, mut face) = match inner[&start].as_slice() {
+        [] => {
+            // A lone polygon: across its first side and the opposite one.
+            let f = vs(start);
+            let (p, q) = (f[0], f[1]);
+            let opposite = across(f, p, q, ngon)?;
+            return Some(Ring {
+                edges: vec![(p, q), opposite],
+                splits: vec![(start, [0, 1])],
+                closed: false,
+            });
+        }
+        [(e, g)] => match across(vs(start), e.0, e.1, ngon) {
+            // An end: start on the side opposite the shared one.
+            Some(outer) => (outer, start),
+            // A triangle or odd n-gon end isn't cut; it only takes the
+            // shared side's point.
+            None => (*e, *g),
+        },
+        // A loop: start on any shared side, into the polygon beyond.
+        [(e, g), _] => (*e, *g),
+        _ => return None,
+    };
+    let mut edges = vec![first];
+    let mut splits: Vec<(usize, [usize; 2])> = Vec::new();
+    let mut closed = false;
+    let (mut p, mut q) = first;
+    let mut from = 0usize;
+    let mut seen: BTreeSet<usize> = BTreeSet::new();
+    while seen.insert(face) {
+        let f = vs(face);
+        // The way out: the shared side not yet used, else (an end) the
+        // side opposite the way in.
+        let entry = edge_key(p, q);
+        let exit = inner[&face]
+            .iter()
+            .find(|(e, _)| edge_key(e.0, e.1) != entry)
+            .map(|&(e, g)| (e, Some(g)));
+        let (exit_edge, next) = match exit {
+            Some(x) => x,
+            None => match across(f, p, q, ngon) {
+                Some(e) => (e, None),
+                None => break,
+            },
+        };
+        let oriented = orient_exit(f, p, q, exit_edge)?;
+        if edge_key(oriented.0, oriented.1) == edge_key(first.0, first.1) {
+            // Back to the start: a closed loop.
+            splits.push((face, [from, 0]));
+            closed = true;
+            break;
+        }
+        edges.push(oriented);
+        let to = edges.len() - 1;
+        splits.push((face, [from, to]));
+        from = to;
+        (p, q) = oriented;
+        match next {
+            Some(g) => face = g,
+            None => break,
+        }
+    }
+    (!splits.is_empty()).then_some(Ring {
+        edges,
+        splits,
+        closed,
+    })
+}
+
+/// Side `(x, y)` of polygon `f`, entered across side `p`–`q`, oriented so
+/// its first point is on `p`'s side: the first of its points met going
+/// round from `p` away from `q`. Opposite sides keep the cut parallel;
+/// sides meeting at a corner keep several slices nested round it.
+fn orient_exit(f: &[u32], p: u32, q: u32, (x, y): (u32, u32)) -> Option<(u32, u32)> {
+    let n = f.len();
+    let ip = f.iter().position(|&v| v == p)?;
+    let iq = f.iter().position(|&v| v == q)?;
+    let step = if (ip + 1) % n == iq { n - 1 } else { 1 };
+    let mut i = ip;
+    for _ in 0..n {
+        if f[i] == x {
+            return Some((x, y));
+        }
+        if f[i] == y {
+            return Some((y, x));
+        }
+        i = (i + step) % n;
+    }
+    None
+}
+
+/// Some polygon of `ring` is cut between two sides that meet at a corner.
+fn turns_a_corner(ring: &Ring) -> bool {
+    ring.splits.iter().any(|&(_, [i, j])| {
+        let ((a, b), (c, d)) = (ring.edges[i], ring.edges[j]);
+        a == c || a == d || b == c || b == d
+    })
+}
+
+/// Carry an open ring's two ends on past the polygons it cuts, round the
+/// ring as a plain Loop Slice would (quads, and even n-gons with Slice
+/// N-gon), until it meets a triangle, a border, a non-manifold edge or
+/// itself.
+fn run_on(mesh: &Mesh, ring: &mut Ring, ngon: bool) {
+    let point_faces = mesh.point_faces();
+    let mut seen: BTreeSet<usize> = ring.splits.iter().map(|&(f, _)| f).collect();
+    let mut used: BTreeSet<(u32, u32)> = ring.edges.iter().map(|&(a, b)| edge_key(a, b)).collect();
+    // The two end edges: used by one cut polygon each.
+    let mut count = vec![0usize; ring.edges.len()];
+    for &(_, [i, j]) in &ring.splits {
+        count[i] += 1;
+        count[j] += 1;
+    }
+    let ends: Vec<usize> = (0..ring.edges.len()).filter(|&e| count[e] == 1).collect();
+    for end in ends {
+        let mut from = end;
+        loop {
+            let (p, q) = ring.edges[from];
+            let faces = faces_of_edge(mesh, &point_faces, p, q);
+            if faces.len() != 2 {
+                break;
+            }
+            let Some(g) = faces.into_iter().find(|f| !seen.contains(f)) else {
+                break;
+            };
+            let Some((np, nq)) = across(&mesh.faces[g].vertices, p, q, ngon) else {
+                break;
+            };
+            if !used.insert(edge_key(np, nq)) {
+                break;
+            }
+            seen.insert(g);
+            ring.edges.push((np, nq));
+            let to = ring.edges.len() - 1;
+            ring.splits.push((g, [from, to]));
+            from = to;
+        }
+    }
+}
+
 /// One loop laid across a ring edge: `t` orders it on the edge (and
 /// interpolates corner data), `x` places it across the edge, `depth`
 /// pushes it into the surface (metres).
@@ -652,20 +876,42 @@ pub fn loop_slice_geometry(
     // Split with no Gap: where each cut point goes once the strip is gone.
     let mut snap: Vec<(usize, DVec3)> = Vec::new();
     let counts = mesh.edge_counts();
-    for &(a, b) in &o.rings {
-        if covered.contains(&edge_key(a, b)) {
-            continue;
+    let walked: Vec<Ring> = match &allowed {
+        // Slice Selected follows the selection itself, whichever ring was
+        // picked (LS-75: pick order doesn't matter).
+        Some(selected) => selection_rings(mesh, selected, o.slice_ngon),
+        None => {
+            let mut walked = Vec::new();
+            // LS-75: with Slice Selected off an L of selected polygons is
+            // cut the same way, its ends running on round the ring. (Plain
+            // runs walk their ring below as before; a 2x2 block with Slice
+            // Selected off is LS-Q17, left as it was.)
+            if !selected_faces.is_empty() {
+                let selected = selected_faces.iter().map(|&f| f as usize).collect();
+                for mut ring in selection_rings(mesh, &selected, o.slice_ngon) {
+                    if ring.closed || !turns_a_corner(&ring) {
+                        continue;
+                    }
+                    run_on(mesh, &mut ring, o.slice_ngon);
+                    covered.extend(ring.edges.iter().map(|&(x, y)| edge_key(x, y)));
+                    walked.push(ring);
+                }
+            }
+            for &(a, b) in &o.rings {
+                if covered.contains(&edge_key(a, b)) {
+                    continue;
+                }
+                if !counts.contains_key(&edge_key(a, b)) {
+                    return Err("A ring edge is no longer in the mesh".into());
+                }
+                let ring = walk_ring(mesh, a, b, None, o.slice_ngon)?;
+                covered.extend(ring.edges.iter().map(|&(x, y)| edge_key(x, y)));
+                walked.push(ring);
+            }
+            walked
         }
-        if !counts.contains_key(&edge_key(a, b)) {
-            return Err("A ring edge is no longer in the mesh".into());
-        }
-        let ring = match walk_ring(mesh, a, b, allowed.as_ref(), o.slice_ngon) {
-            Ok(ring) => ring,
-            // A ring outside Slice Selected's polygons is skipped.
-            Err(_) if allowed.is_some() => continue,
-            Err(e) => return Err(e),
-        };
-        covered.extend(ring.edges.iter().map(|&(x, y)| edge_key(x, y)));
+    };
+    for ring in walked {
         // How many of the ring's cut polygons use each ring edge: an edge
         // with another polygon beside it is where the cut stops inside the
         // mesh (a closed end).
@@ -1723,6 +1969,21 @@ pub(crate) fn start(tool: Tool, scene: &Scene, preset: &SliceParameters) -> Slic
     let mut p = preset.options_only();
     if tool == Tool::LoopSlice {
         p.loop_slice.rings = rings_from_selection(scene);
+        // Slice Selected cuts even a lone selected polygon (LS-75): name
+        // its first side so the tool starts with a ring.
+        if p.loop_slice.rings.is_empty()
+            && p.loop_slice.slice_selected
+            && scene.selection.mode == Mode::Polygon
+            && let Some(item) = scene.active()
+            && let Some(f) = scene
+                .selection
+                .faces
+                .first()
+                .and_then(|&f| item.mesh.faces.get(f as usize))
+            && f.vertices.len() >= 2
+        {
+            p.loop_slice.rings = vec![edge_key(f.vertices[0], f.vertices[1])];
+        }
     }
     p
 }

@@ -222,6 +222,28 @@ fn loop_slice_greyed(
 }
 
 #[test]
+fn loop_slice_current_stops_at_the_last_slice_instead_of_refusing() {
+    let ctx = Context::default();
+    let a = grid_app(&ctx);
+    let mut p = operandi_core::Parameters::default();
+    let mut f = crate::tool_form::ToolForm::new();
+    a.slice_form(Tool::LoopSlice, &p, &mut f);
+    let fields = f.fields();
+    let current = fields.iter().find(|f| f.row.label == "Current").unwrap();
+    let crate::tool_form::Bind::Number { set, .. } = &current.bind else {
+        panic!("Current is a number field");
+    };
+    // One slice: nudging Current up used to say "Current must be a whole
+    // number from 0 to 0" (Jason, 2026-11-20).
+    assert_eq!(set(&mut p, 1.), Ok(()));
+    assert_eq!(p.slice.loop_slice.current, 0);
+    p.slice.loop_slice.set_count(3);
+    assert_eq!(set(&mut p, 7.), Ok(()));
+    assert_eq!(p.slice.loop_slice.current, 2);
+    assert!(set(&mut p, f64::NAN).is_err());
+}
+
+#[test]
 fn loop_slice_options_grey_by_the_spec_table() {
     let ctx = Context::default();
     let a = grid_app(&ctx);

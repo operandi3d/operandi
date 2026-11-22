@@ -270,6 +270,8 @@ mod lock_hide;
 mod loop_ngon_rim;
 #[path = "loop_slice_options.rs"]
 mod loop_slice_options;
+#[path = "loop_slice_selection.rs"]
+mod loop_slice_selection;
 #[path = "loop_slice_surface_probe.rs"]
 mod loop_slice_surface_probe;
 #[path = "loop_symmetry.rs"]

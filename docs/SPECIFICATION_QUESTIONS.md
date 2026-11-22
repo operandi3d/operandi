@@ -6983,6 +6983,27 @@ Builder's provisional readings; the spec's own questions are in
   profile loop is split like a slice (so the groove comes apart along each
   loop, with Gap strips between). Is that what the reference does, or does
   Split separate only once across the whole profile?
+- **LS-Q15 Slice Selected with unselected polygons between selected
+  ones.** *Answered (measured 2026-11-20, spec section 8):* the polygon
+  between isn't cut; it takes one point on each side it shares with a cut
+  polygon. Each connected group of selected polygons is cut on its own; a
+  lone selected polygon is cut across its first side (point 0 to 1) and
+  the opposite one. Built.
+- **LS-Q16 Slice Selected turning at corners (LS-32).** *Answered
+  (measured 2026-11-20):* an L is cut down the middle of the strip, the
+  corner polygon from the middle of its entry side to the middle of its
+  exit side (a triangle and a five-sided rest), the same with Slice
+  Selected off (the ends then run on round the ring). A 2x2 block gets a
+  closed loop round its centre, each polygon cut corner to corner. Built
+  (`selection_rings` in slice.rs).
+- **LS-Q17 (open) 2x2 block with Slice Selected off.** The reference's cut
+  leaves the selection and depends on pick order; no rule yet. Unchanged:
+  the block's two directions cross and the tool waits for a click
+  (SL-Q14).
+- **LS-Q18 (new) Slice Selected on a group that branches.** A selected
+  polygon sharing three or more sides with the rest (a T, a 2x3 or 3x3
+  block) has no single middle line. Built *provisional:* that group is left
+  uncut. What does the reference do?
 - **LS-B09 Slices keep creation order (LS-71).** Free mode no longer sorts
   positions; Current, the bar's highlighted triangle and the middle-drag
   stepping follow the order the slices were added. Uniform and Symmetry
