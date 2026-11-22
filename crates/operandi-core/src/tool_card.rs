@@ -613,13 +613,15 @@ pub fn card(tool: Tool) -> ToolCard {
             .drag_anywhere(),
 
         // ---- Slice tools: the mirror ring, path or cut is cut too (class D).
-        Tool::LoopSlice | Tool::EdgeSlice => c(tool, F::Slice, Modes::ALL)
-            .layers(Unused, NO_FALLOFF, Built, Snap::None)
-            .handles(K::Axes, At::ActionCentre, Ax::Tool),
+        // They draw and drag their own handles (slice_view.rs), so their
+        // cards have none: only transform tools get the Move gizmo, and a
+        // highlighted handle must do what its tip says (UIC-05).
+        Tool::LoopSlice | Tool::EdgeSlice => {
+            c(tool, F::Slice, Modes::ALL).layers(Unused, NO_FALLOFF, Built, Snap::None)
+        }
         Tool::PolygonSlice | Tool::CurveSlice | Tool::PrimitiveSlice | Tool::AxisSlice => {
             c(tool, F::Slice, Modes::ALL)
                 .layers(Unused, NO_FALLOFF, Built, Snap::None)
-                .handles(K::Axes, At::ActionCentre, Ax::Tool)
                 .multi_mesh()
         }
         // Contour (missing-tools-g4): adds new curve polygons to the active
@@ -630,18 +632,17 @@ pub fn card(tool: Tool) -> ToolCard {
         // Its points snap like the Pen's (SN2-34..37).
         Tool::PenSlice => c(tool, F::Slice, Modes::ALL)
             .layers(Unused, NO_FALLOFF, Built, Snap::Placement)
-            .handles(K::Axes, At::ActionCentre, Ax::Tool)
             .multi_mesh(),
 
         // ---- Duplicate tools: the other side gets the mirrored placement
         // (class C); Mirror is its own tool and ignores the setting (class G).
+        // Like the Slice tools they draw their own handles
+        // (duplicate_view.rs), so the cards have none (UIC-05).
         Tool::Mirror | Tool::Array => c(tool, F::Duplicate, Modes::ALL)
             .layers(Unused, NO_FALLOFF, Built, Snap::None)
-            .handles(K::Axes, At::ActionCentre, Ax::Tool)
             .continues(),
         Tool::Lathe | Tool::Clone | Tool::RadialArray => c(tool, F::Duplicate, Modes::ALL)
             .layers(Unused, NO_FALLOFF, Built, Snap::Placement)
-            .handles(K::Axes, At::ActionCentre, Ax::Tool)
             .continues(),
         // Scatter Clone: copies in a box, no handles yet (GO-01..07).
         Tool::ScatterClone => c(tool, F::Duplicate, Modes::ALL)

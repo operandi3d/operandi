@@ -1656,13 +1656,12 @@ impl Operandi {
                     for (edge, segments) in &paths {
                         if selected.contains(edge) {
                             for &(pa, pb) in segments {
-                                crate::gpu_scene::stroke_width(
-                                    out,
-                                    pa,
-                                    pb,
-                                    4.,
-                                    palette::edge_backing(),
-                                );
+                                // No dark backing under selected edges
+                                // (Jason 2026-11-22: it read as a wireframe
+                                // outline around the selection). The 2 pt
+                                // line (2 device px standard, 4 on Retina)
+                                // fully covers the 1-device-pixel plain wire
+                                // (`plain_wire_width`).
                                 crate::gpu_scene::stroke_width(
                                     out,
                                     pa,
@@ -1707,13 +1706,6 @@ impl Operandi {
                     for (_, segments) in &paths {
                         for &(pa, pb) in segments {
                             let out = &mut draw.overlay.edges;
-                            crate::gpu_scene::stroke_width(
-                                out,
-                                pa,
-                                pb,
-                                4.,
-                                palette::edge_backing(),
-                            );
                             crate::gpu_scene::stroke_width(out, pa, pb, 2.5, palette::selection());
                             crate::gpu_scene::stroke_width(
                                 &mut draw.xray_edges,
@@ -1939,10 +1931,6 @@ impl Operandi {
                             if let (Some(pa), Some(pb)) = (project(wa), project(wb)) {
                                 painter.line_segment(
                                     [pa, pb],
-                                    Stroke::new(4_f32, palette::edge_backing()),
-                                );
-                                painter.line_segment(
-                                    [pa, pb],
                                     Stroke::new(2_f32, palette::rollover()),
                                 );
                             }
@@ -2036,18 +2024,11 @@ impl Operandi {
                                 let t = step as f64 / 32.;
                                 let u = (step + 1) as f64 / 32.;
                                 if surface().visible(&self.camera, va.lerp(vb, (t + u) * 0.5), r) {
-                                    segment(
-                                        va.lerp(vb, t),
-                                        va.lerp(vb, u),
-                                        palette::edge_backing(),
-                                        4.,
-                                    );
                                     segment(va.lerp(vb, t), va.lerp(vb, u), color, 2.);
                                 }
                             }
                         } else if shown(*edge) {
                             for &(va, vb) in segments {
-                                segment(va, vb, palette::edge_backing(), 4.);
                                 segment(va, vb, color, 2.);
                             }
                         }
