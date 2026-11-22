@@ -51,6 +51,7 @@ impl Editor {
             last.records
                 .extend_capped(pending, settings.max_sub_commands as usize);
             self.selection_run += 1;
+            self.history_mark += 1;
             return;
         }
         self.record(label, before);

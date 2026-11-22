@@ -547,6 +547,9 @@ pub struct Checkpoint {
     pub fold: Option<u64>,
     /// The command lines that made this step (UIC-226).
     pub records: crate::StepRecords,
+    /// `Editor::history_mark` right after this step was recorded: which
+    /// steps are newer than a mark, however trimming shifted the list.
+    pub mark: u64,
 }
 /// Most memory the undo history takes (`trim_undo_memory`), counting the
 /// mesh data each step alone keeps (undo_memory.rs).
@@ -732,6 +735,11 @@ pub struct Editor {
     pub tweak_held: bool,
     /// Counts recorded document steps, to tell a tweak from an Apply.
     pub history_serial: u64,
+    /// Counts every change recording makes to the undo history: a new
+    /// step, a later edit folded into the newest one, or a selection change
+    /// joining a selection group (`recorded_since`). Unlike `undo.len()`, it
+    /// still moves once Max Undo Level trims the oldest step.
+    pub history_mark: u64,
     /// Redo depth when the active tool started; leaving the tool drops the
     /// steps undone above it.
     pub tool_redo_floor: Option<usize>,
@@ -5702,9 +5710,11 @@ impl Editor {
             last.records
                 .extend_capped(pending, self.history.max_sub_commands as usize);
             self.history_serial = self.history_serial.wrapping_add(1);
+            self.history_mark += 1;
             return;
         }
         self.i2_branch();
+        self.history_mark += 1;
         self.undo.push(std::sync::Arc::new(Checkpoint {
             identity_before: self.identities.record_before.clone(),
             identity_after: None,
@@ -5713,6 +5723,7 @@ impl Editor {
             after: self.scene.clone(),
             fold: self.undo_fold,
             records: std::mem::take(&mut self.pending_records),
+            mark: self.history_mark,
         }));
         // Max Undo Level: the oldest steps go once a new one exceeds it.
         // A lowered limit trims here, on the next step (UND-Q2, provisional).
@@ -5762,6 +5773,22 @@ impl Editor {
             excess += 1;
         }
         self.undo.drain(..excess);
+    }
+    /// The history's mark now; pass it to `recorded_since` or
+    /// `steps_since` after running something (Astra P4-003: "did that
+    /// record?" was guessed from `undo.len()` growing, which stops working
+    /// once Max Undo Level trims a step for every new one).
+    pub fn history_mark(&self) -> u64 {
+        self.history_mark
+    }
+    /// Whether recording changed the undo history since `mark`: a new step,
+    /// an edit folded into the newest one, or a joined selection change.
+    pub fn recorded_since(&self, mark: u64) -> bool {
+        self.history_mark != mark
+    }
+    /// How many undo steps are newer than `mark` (still in the history).
+    pub fn steps_since(&self, mark: u64) -> usize {
+        self.undo.iter().rev().take_while(|c| c.mark > mark).count()
     }
     /// The bytes the undo history holds beyond the scene and redo list.
     pub fn undo_memory_bytes(&self) -> usize {

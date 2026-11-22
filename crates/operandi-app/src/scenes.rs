@@ -1002,13 +1002,15 @@ impl Operandi {
             return;
         }
         let count = branch.len();
-        let before = self.editor.undo.len();
+        // Recorded or refused, by mark: at Max Undo Level the length stays
+        // put, and a Move would leave its copy behind (Astra P4-004).
+        let mark = self.editor.history_mark();
         self.run(Command::InsertItems {
             items: branch,
             parent,
             images,
         });
-        if self.editor.undo.len() == before {
+        if !self.editor.recorded_since(mark) {
             return; // refused; the status line says why
         }
         let mut status = format!(

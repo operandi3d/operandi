@@ -210,9 +210,13 @@ pub fn markdown() -> String {
     out
 }
 
-/// Fold every history step from `from` on into one, named `label`. A call
-/// made of several editor commands stays one undo step.
-pub fn fold_steps(e: &mut Editor, from: usize, label: &str) {
+/// A call made of several editor commands stays one undo step: joins the
+/// undo steps recorded since `mark` (`Editor::history_mark`) into
+/// one step named `label`. Steps are found by their marks, not by a list
+/// index, so it still works when Max Undo Level trimmed the history while
+/// they were recorded (Astra P4-003).
+pub fn fold_steps(e: &mut Editor, mark: u64, label: &str) {
+    let from = e.undo.len() - e.steps_since(mark);
     if e.undo.len() <= from + 1 {
         if e.undo.len() == from + 1
             && let Some(last) = e.undo.last_mut().map(std::sync::Arc::make_mut)
@@ -321,7 +325,7 @@ pub fn built_in(e: &mut Editor, name: &str, a: &Map<String, Value>) -> Result<Op
     }
     let cmd = match name {
         "mesh.new" => {
-            let start = e.undo.len();
+            let start = e.history_mark();
             e.dispatch(Command::NewMesh)?;
             if let Some(name) = a.get("name").filter(|v| !v.is_null()) {
                 let name = name.as_str().ok_or("name is a string")?;

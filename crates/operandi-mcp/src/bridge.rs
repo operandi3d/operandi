@@ -1633,7 +1633,7 @@ fn bridge_run(e: &mut Editor, params: Option<&Value>) -> Result<()> {
         }
     }
     let remembered = e.bridge_preset;
-    let undo = e.undo.len();
+    let mark = e.history_mark();
     e.dispatch(Command::ArmBridge)?;
     e.dispatch(Command::ConfigureBridge(p))?;
     e.dispatch(Command::Apply)?;
@@ -1641,7 +1641,8 @@ fn bridge_run(e: &mut Editor, params: Option<&Value>) -> Result<()> {
     e.bridge_preset = remembered;
     // Nothing or one polygon selected applies nothing, silently in the
     // panel (BR18/BR19); the bridge says so.
-    if e.undo.len() == undo {
+    // By mark (Astra P9-008): a full history keeps the length the same.
+    if !e.recorded_since(mark) {
         return Err("Bridge needs two separate selected polygons or clusters".into());
     }
     Ok(())

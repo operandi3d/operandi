@@ -172,6 +172,7 @@ fn completed_history_anchor_and_capacity() {
                 identity_after: Some(e.identities.current.clone()),
                 fold: None,
                 records: Default::default(),
+                mark: 0,
             }));
         }
         arm(&mut e, 0.);
@@ -994,6 +995,7 @@ mod frozen_traces {
                     identity_after: Some(e.identities.current.clone()),
                     fold: None,
                     records: Default::default(),
+                    mark: 0,
                 })
             })
             .collect::<Vec<_>>();
@@ -1254,6 +1256,7 @@ fn malformed_101_completed_entries_refuse_without_eviction_or_partial_begin() {
         identity_after: Some(e.identities.current.clone()),
         fold: None,
         records: Default::default(),
+        mark: 0,
     };
     e.undo = (0..101).map(|_| std::sync::Arc::new(c.clone())).collect();
     let before = e.clone();

@@ -27,6 +27,7 @@ impl Editor {
         swap(&mut a.undo, &mut b.undo);
         swap(&mut a.redo, &mut b.redo);
         swap(&mut a.history_serial, &mut b.history_serial);
+        swap(&mut a.history_mark, &mut b.history_mark);
         swap(&mut a.pending_records, &mut b.pending_records);
         swap(&mut a.selection_run, &mut b.selection_run);
         swap(&mut a.selection_start, &mut b.selection_start);
@@ -80,6 +81,7 @@ fn every_field_is_sorted(e: Editor) {
         undo: _,
         redo: _,
         history_serial: _,
+        history_mark: _,
         pending_records: _,
         selection_run: _,
         selection_start: _,

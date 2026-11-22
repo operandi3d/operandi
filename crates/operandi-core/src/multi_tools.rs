@@ -247,6 +247,7 @@ impl Editor {
                 after: self.scene.clone(),
                 fold: self.undo_fold,
                 records,
+                mark: first.mark,
             }));
             let excess = self.undo.len().saturating_sub(max_undo.max(1));
             self.undo.drain(..excess);

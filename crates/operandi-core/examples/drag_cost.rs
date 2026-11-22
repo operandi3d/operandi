@@ -84,6 +84,7 @@ fn editor(grid_size: usize, history: usize, edit_grid: bool) -> Editor {
             after: s,
             fold: None,
             records: Default::default(),
+            mark: 0,
         }));
     }
     // One ordinary command assigns the synthetic checkpoints their identities.

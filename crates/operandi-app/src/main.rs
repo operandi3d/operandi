@@ -3876,6 +3876,8 @@ mod handle_tips_tests;
 #[cfg(test)]
 mod haul_tests;
 #[cfg(test)]
+mod history_limit_tests;
+#[cfg(test)]
 mod input_focus_tests;
 #[cfg(test)]
 mod inset_shift_tests;

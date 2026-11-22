@@ -58,7 +58,7 @@ pub fn add_per_light_outputs(e: &mut Editor) -> Result<usize> {
         })
         .map(|n| tree.output_settings(n.id).lpe)
         .collect();
-    let start = e.undo.len();
+    let start = e.history_mark();
     let mut added = 0;
     for (item, label, set_label) in lights {
         // A label holding a quote can't be written in an expression.

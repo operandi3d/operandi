@@ -447,8 +447,7 @@ impl Operandi {
         if lines.is_empty() {
             return self.history_fail("cmds.batch: give at least one line (c1:<line>)");
         }
-        let from = self.editor.undo.len();
-        let serial = self.editor.history_serial;
+        let mark = self.editor.history_mark();
         for line in &lines {
             self.last_failure = None;
             self.execute(line);
@@ -458,8 +457,10 @@ impl Operandi {
                 break;
             }
         }
-        if self.editor.history_serial != serial && self.editor.undo.len() > from {
-            operandi_core::command_exec::fold_steps(&mut self.editor, from, &label);
+        // By mark, not by list length: at Max Undo Level every new step
+        // trims an old one and the length doesn't grow (Astra P4-003).
+        if self.editor.steps_since(mark) > 0 {
+            operandi_core::command_exec::fold_steps(&mut self.editor, mark, &label);
         }
         if self.last_failure.is_none() {
             self.status = format!("{label}: {} lines", lines.len());
