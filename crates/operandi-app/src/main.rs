@@ -454,10 +454,8 @@ struct Operandi {
     camera: Camera,
     /// The pointer's last position, for keys that act at it (NAV-12).
     nav_pointer: Option<eframe::egui::Pos2>,
-    /// A turning or flicked view (view_nav.rs).
+    /// A turning view (view_nav.rs).
     view_motion: Option<view_nav::Motion>,
-    /// Flick drag speed and when it was measured (NAV-03).
-    flick_track: Option<(eframe::egui::Vec2, std::time::Instant)>,
     /// LCK-25 Show Locked Mesh Items: locked geometry in its own colour.
     show_locked: bool,
     /// View ▸ Show Falloffs: tint points by falloff weight (FO-06).
@@ -1283,7 +1281,6 @@ impl Operandi {
             camera: Camera::default(),
             nav_pointer: None,
             view_motion: None,
-            flick_track: None,
             show_locked: true,
             show_falloffs: true,
             falloff_draw_armed: false,
@@ -4030,6 +4027,8 @@ mod add_loop_slide_options_tests;
 mod group_eye_tests;
 #[cfg(test)]
 mod journal_tests;
+#[cfg(test)]
+mod look_around_tests;
 #[cfg(test)]
 mod material_editing_tests;
 #[cfg(test)]

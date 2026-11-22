@@ -175,7 +175,7 @@ impl Operandi {
                 step.zoom = 1.;
             }
         }
-        // The puck takes over from a turntable or flick.
+        // The puck takes over from a turntable.
         self.view_motion = None;
         let turns = step.yaw != 0. || step.pitch != 0. || step.roll != 0.;
         // Orbit Selected turns about the selection, as a mouse orbit does.

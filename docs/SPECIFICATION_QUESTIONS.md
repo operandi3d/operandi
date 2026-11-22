@@ -3464,8 +3464,8 @@ Built from the coordinator's NAV / LCK / HID brief; see
   toggle for now, not a per-view option.
 - **NLH-Q08 Locked colour default** is a grey-blue (0.45, 0.55, 0.72); the
   spec names the theme entry but not a value.
-- **NLH-Q09 Navigation numbers [OP].** Turntable 0.6 rad/s; flick slows
-  with e^(−3t) (rest in about 1.5 s); Zoom In/Out halve/double the
+- **NLH-Q09 Navigation numbers [OP].** Turntable 0.6 rad/s; (the flick,
+  which slowed with e^(−3t), became look around on 2026-11-22); Zoom In/Out halve/double the
   distance; Align Selected faces the selection's area-weighted average
   normal, world up kept at the top.
 - **NLH-Q10 Command names.** The name map has no entries for these actions,

@@ -21,8 +21,9 @@ pub enum NavigationKind {
     Zoom,
     /// NAV-02: bank about the viewing axis.
     Roll,
-    /// NAV-03: orbit that keeps spinning after release.
-    Flick,
+    /// NAV-03: look around: the eye stays put and the view turns about it
+    /// (Jason, 2026-11-22; was a flick orbit).
+    Look,
     /// NAV-05: pan up and down only.
     PanVertical,
     /// NAV-07: drag a rectangle to zoom to.

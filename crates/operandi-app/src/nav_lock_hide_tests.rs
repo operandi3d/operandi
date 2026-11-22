@@ -289,7 +289,7 @@ fn nav_mouse_gestures() {
     );
     assert_eq!(
         p.navigation(PointerButton::Secondary, alt),
-        Some(NavigationKind::Flick)
+        Some(NavigationKind::Look)
     );
     assert_eq!(
         p.navigation(PointerButton::Secondary, alt | Modifiers::SHIFT),

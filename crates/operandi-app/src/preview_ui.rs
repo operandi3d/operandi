@@ -270,10 +270,8 @@ fn navigate(camera: &mut Camera, kind: NavigationKind, delta: Vec2, height: f32,
                 / (height.max(1.0) as f64 * camera.lens);
         }
         NavigationKind::Zoom => camera.distance = (camera.distance * zoom).clamp(0.03, 1e7),
-        NavigationKind::Orbit | NavigationKind::Flick => {
-            camera.yaw -= delta.x as f64 * 0.008;
-            camera.pitch = (camera.pitch + delta.y as f64 * 0.008).clamp(-1.5, 1.5);
-        }
+        NavigationKind::Orbit => camera.orbit_by(delta.x as f64, delta.y as f64),
+        NavigationKind::Look => camera.look_around(delta.x as f64, delta.y as f64),
         // The Preview window keeps its three gestures.
         NavigationKind::Roll | NavigationKind::PanVertical | NavigationKind::BoxZoom => {}
     }

@@ -3331,8 +3331,8 @@ panel; its tab strip stays 22 points at either end. Tests: layout_tests.rs.
 
 ## Navigation, lock and hide — 2026-11-07 (branch nav-lock-hide)
 
-- **Navigation:** Alt+middle roll, Alt+right flick (spins on, slows to rest,
-  any click stops), Shift+Alt+right up/down pan, Ctrl/Cmd+Alt+left zoom about
+- **Navigation:** Alt+middle roll, Alt+right look around (the eye stays
+  put and the view turns; was a flick orbit until 2026-11-22), Shift+Alt+right up/down pan, Ctrl/Cmd+Alt+left zoom about
   the press point, Ctrl/Cmd+Alt+right box zoom. Keys `.` `,` zoom steps, `/`
   turntable, `Shift+/` upright, `Cmd+A` align, `Cmd+Shift+A` fit and align.
   View > Navigate lists them. Re-centre is a View menu command with no key

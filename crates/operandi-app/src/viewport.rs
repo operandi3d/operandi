@@ -4373,9 +4373,14 @@ impl Operandi {
         r: Rect,
     ) {
         let delta = to - from;
-        // NAV-03: a flick orbits like Alt+left while held.
         let kind = match kind {
-            input::NavigationKind::Flick => input::NavigationKind::Orbit,
+            // NAV-03 look around: the eye stays put, so Orbit Selected and
+            // Trackball Rotation don't apply. In Camera and Light view the
+            // item turns in place once the drag is written back.
+            input::NavigationKind::Look => {
+                self.camera.look_around(delta.x as f64, delta.y as f64);
+                return;
+            }
             input::NavigationKind::Roll => {
                 // NAV-02: the angle the pointer turns about the view centre.
                 let (a, b) = (from - r.center(), to - r.center());
@@ -4409,7 +4414,7 @@ impl Operandi {
             crate::orbit_selected::turn_about(&mut self.camera, before, pivot);
         }
     }
-    /// `navigate_from` once Flick, Roll, Pan Vertical and Box Zoom are dealt
+    /// `navigate_from` once Look, Roll, Pan Vertical and Box Zoom are dealt
     /// with: orbit, pan or zoom.
     fn orbit_or_move(
         &mut self,
@@ -4444,32 +4449,11 @@ impl Operandi {
                 )
             }
             input::NavigationKind::Orbit => {
-                match self.camera.view {
-                    View::Top => {
-                        self.camera.yaw = 0.;
-                        self.camera.pitch = 1.5;
-                        self.camera.roll = 0.;
-                        self.camera.view = View::Orthographic;
-                    }
-                    View::Front => {
-                        self.camera.yaw = 0.;
-                        self.camera.pitch = 0.;
-                        self.camera.roll = 0.;
-                        self.camera.view = View::Orthographic;
-                    }
-                    View::Right => {
-                        self.camera.yaw = std::f64::consts::FRAC_PI_2;
-                        self.camera.pitch = 0.;
-                        self.camera.roll = 0.;
-                        self.camera.view = View::Orthographic;
-                    }
-                    _ => {}
-                }
-                self.camera.yaw -= delta.x as f64 * 0.008;
-                self.camera.pitch = (self.camera.pitch + delta.y as f64 * 0.008).clamp(-1.5, 1.5);
+                self.camera.unfix_for_orbit();
+                self.camera.orbit_by(delta.x as f64, delta.y as f64);
             }
             // Handled above.
-            input::NavigationKind::Flick
+            input::NavigationKind::Look
             | input::NavigationKind::Roll
             | input::NavigationKind::PanVertical
             | input::NavigationKind::BoxZoom => {}
@@ -6054,9 +6038,9 @@ impl Operandi {
                             self.navigation = Some(g);
                             continue;
                         }
-                        // NAV-03 flick and NAV-07 box zoom finish on release.
+                        // NAV-07 box zoom finishes on release.
                         if let input::GestureKind::Navigate(kind) = g.kind {
-                            self.navigation_release(kind, g.start, pos, r, ui.ctx());
+                            self.navigation_release(kind, g.start, pos, r);
                         }
                         if let input::GestureKind::SolidSketch(d) = &mut g.kind {
                             let start = g.start;
