@@ -806,6 +806,102 @@ fn scene_changes_under_a_resting_pointer_keep_the_picking_surface() {
     assert_eq!(a.surface_cache.builds(), before + 1);
 }
 
+/// Bug report "Lag after modeling operation on a large model": after each
+/// Transform drag in a scene of many meshes, the first still frame rebuilt
+/// the picking surface of every mesh (1-2 s on a 400-mesh import). Only
+/// the edited mesh's part may rebuild; the rest are reused, and picking
+/// still matches a surface built from scratch.
+#[test]
+fn a_drag_release_rebuilds_picking_for_the_edited_mesh_only() {
+    let ctx = Context::default();
+    theme::install(&ctx);
+    let size = vec2(800., 600.);
+    let mut a = Operandi::empty();
+    for k in 0..12 {
+        a.run(Command::NewMesh);
+        let mut mesh = grid(6);
+        for v in &mut mesh.vertices {
+            v.x += (k % 4) as f64 * 1.5;
+            v.y += (k / 4) as f64 * 1.5;
+        }
+        a.editor.scene.active_mut().unwrap().mesh = mesh.into();
+    }
+    // Draw as with a graphics card (overlays don't read the surface).
+    a.force_resident = true;
+    let edited = a.editor.scene.items[5].id;
+    a.editor.scene.selection.item = Some(edited);
+    a.editor.scene.selection.also.clear();
+    a.camera.view = crate::camera::View::Top;
+    a.frame(false);
+    a.run(Command::Mode(Mode::Polygon));
+    a.editor.scene.selection.faces = (10..14).collect();
+    a.activate(Tool::Transform);
+    super::tests::draw(&mut a, &ctx, size, vec![]);
+    let r = a.viewport_rect;
+    let start = (0..150)
+        .flat_map(|y| (0..200).map(move |x| (x, y)))
+        .map(|(x, y)| r.left_top() + vec2(x as f32 * 4. + 10., y as f32 * 4. + 10.))
+        .find(|&p| a.handle_hit(p, r).is_some())
+        .expect("a Transform handle on screen");
+    let over = start + vec2(1., 1.);
+    // The rollover has a surface before the drag.
+    super::tests::draw(&mut a, &ctx, size, vec![Event::PointerMoved(start)]);
+    let _ = a.pick_surface();
+    let (builds, parts) = (a.surface_cache.builds(), a.surface_cache.part_builds());
+    let before = a.editor.scene.item(edited).unwrap().mesh.clone();
+    super::tests::draw(
+        &mut a,
+        &ctx,
+        size,
+        vec![super::tests::pointer(start, true, Modifiers::NONE)],
+    );
+    let mut end = start;
+    for k in 1..6 {
+        end = start + vec2(k as f32 * 3., k as f32 * -2.);
+        super::tests::draw(&mut a, &ctx, size, vec![Event::PointerMoved(end)]);
+    }
+    super::tests::draw(
+        &mut a,
+        &ctx,
+        size,
+        vec![super::tests::pointer(end, false, Modifiers::NONE)],
+    );
+    for _ in 0..3 {
+        super::tests::draw(&mut a, &ctx, size, vec![Event::PointerMoved(over)]);
+    }
+    let surface = a.pick_surface();
+    assert_ne!(
+        a.editor.scene.item(edited).unwrap().mesh,
+        before,
+        "the drag moved the polygons"
+    );
+    assert!(
+        a.surface_cache.builds() > builds,
+        "picking follows the edit"
+    );
+    assert_eq!(
+        a.surface_cache.part_builds() - parts,
+        1,
+        "only the edited mesh's picking part rebuilds"
+    );
+    // Reused parts pick exactly as a fresh surface does.
+    let scene = a
+        .editor
+        .evaluated(operandi_core::evaluate::Purpose::Pick)
+        .into_owned();
+    let fresh = crate::picking::Surface::with_smooth(&scene, Some(&a.subdivision_cache));
+    for y in (0..600).step_by(37) {
+        for x in (0..800).step_by(41) {
+            let p = r.left_top() + vec2(x as f32, y as f32);
+            assert_eq!(
+                surface.pick(&a.camera, p, r),
+                fresh.pick(&a.camera, p, r),
+                "at {p:?}"
+            );
+        }
+    }
+}
+
 #[test]
 fn many_pointer_moves_in_a_frame_run_one_tool_update() {
     // A real mouse reports several moves per frame; a handle drag updates

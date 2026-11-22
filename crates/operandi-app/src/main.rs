@@ -3747,6 +3747,8 @@ mod drop_files_tests;
 #[cfg(test)]
 mod drop_keys_tests;
 #[cfg(test)]
+mod drop_lag_tests;
+#[cfg(test)]
 mod duplicate_tools_tests;
 #[cfg(test)]
 mod edge_tab_tests;

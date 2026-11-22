@@ -52,8 +52,9 @@ impl Bounds {
 struct Triangle {
     points: [DVec3; 3],
     bounds: Bounds,
-    item: u64,
     face: u32,
+    /// Position within its item's part, in build order: ties between
+    /// equally near hits go to the earlier triangle (scene order).
     order: usize,
 }
 enum Children {
@@ -64,12 +65,40 @@ struct Node {
     bounds: Bounds,
     children: Children,
 }
+/// One item's share of the picking surface, in world space, with its own
+/// bounds tree. Kept per item so that editing one mesh rebuilds only that
+/// mesh's part, not every mesh in the scene (bug report "Lag after
+/// modeling operation on a large model": a 1-2 s pause after each tool
+/// drag in a 400-mesh scene).
+#[derive(Default)]
+struct Part {
+    item: u64,
+    corners: BTreeMap<usize, Vec<[usize; 3]>>,
+    triangles: Vec<Triangle>,
+    lines: Vec<(u32, [DVec3; 2])>,
+    nodes: Vec<Node>,
+}
+/// Where a hit sits in scene order: (part, triangle), for stable ties.
+type Rank = (usize, usize);
+
 #[derive(Default)]
 pub(super) struct Surface {
-    corners: BTreeMap<(u64, usize), Vec<[usize; 3]>>,
-    triangles: Vec<Triangle>,
-    lines: Vec<(u64, u32, [DVec3; 2])>,
+    /// Visible items' parts in scene order.
+    parts: Vec<std::sync::Arc<Part>>,
+    /// Item id -> index in `parts`.
+    index: std::collections::HashMap<u64, usize>,
+    /// A bounds tree over the parts (indices into `order`).
     nodes: Vec<Node>,
+    /// Part indices, arranged for `nodes`' leaves.
+    order: Vec<usize>,
+    bounds: Vec<Bounds>,
+}
+/// What one item's part was built from: the item itself (mesh, hidden
+/// polygons, subdivision) and its world placement, which also carries its
+/// parents' and any aim target's effect.
+struct PartKey {
+    item: operandi_core::Item,
+    matrix: glam::DMat4,
 }
 /// Reuse while the scene's items are equal: the surface depends only on
 /// their meshes, placements and visibility, never on the selection, so
@@ -78,25 +107,36 @@ pub(super) struct Surface {
 /// cheap; copy-on-write keeps the stored snapshot immutable. Only items
 /// with geometry and their parents count (`picked_items`): moving a camera
 /// or light with nothing under it (Camera view navigation) keeps it.
+/// When the items do change, each item's part is reused while that item
+/// and its world placement are unchanged, so only edited meshes rebuild.
 #[derive(Default)]
 pub(super) struct SurfaceCache {
     // Interior mutability so click handlers (which borrow the app
     // immutably) share it instead of building a fresh surface per click.
     entry: std::cell::RefCell<Option<(Vec<operandi_core::Item>, std::sync::Arc<Surface>)>>,
+    /// Each item's last part, by item id.
+    parts: std::cell::RefCell<std::collections::HashMap<u64, (PartKey, std::sync::Arc<Part>)>>,
     /// The items the rollover last saw (`settled`).
     rollover_seen: std::cell::RefCell<Option<Vec<operandi_core::Item>>>,
     /// Surfaces built so far (speed guards, Window > Frame Time).
     builds: std::cell::Cell<u64>,
+    /// Item parts built so far (each surface build reuses the others).
+    part_builds: std::cell::Cell<u64>,
 }
 impl SurfaceCache {
     pub fn builds(&self) -> u64 {
         self.builds.get()
     }
+    /// Item parts built so far: one per changed item, not one per item.
+    #[cfg(test)]
+    pub fn part_builds(&self) -> u64 {
+        self.part_builds.get()
+    }
     /// Whether the rollover may pick this frame: the surface is current,
     /// or the scene's items are the same as on the rollover's last frame.
     /// While something changes the scene every frame without a pointer
     /// drag (a numeric scrub, typed values, the MCP bridge), the rollover
-    /// waits instead of rebuilding the whole surface each frame; it picks
+    /// waits instead of rebuilding the surface each frame; it picks
     /// again on the first frame the scene holds still.
     pub fn settled(&self, scene: &Scene) -> bool {
         let current = self
@@ -124,7 +164,25 @@ impl SurfaceCache {
             return surface.clone();
         }
         self.builds.set(self.builds.get() + 1);
-        let surface = std::sync::Arc::new(Surface::with_smooth(scene, Some(smooth)));
+        let mut parts = self.parts.borrow_mut();
+        let mut kept = std::collections::HashMap::with_capacity(parts.len());
+        let surface = std::sync::Arc::new(Surface::assemble(scene, |item, matrix| {
+            let part = match parts.remove(&item.id) {
+                Some((key, part)) if key.matrix == matrix && key.item == *item => part,
+                _ => {
+                    self.part_builds.set(self.part_builds.get() + 1);
+                    std::sync::Arc::new(Part::build(item, matrix, Some(smooth)))
+                }
+            };
+            let key = PartKey {
+                item: item.clone(),
+                matrix,
+            };
+            kept.insert(item.id, (key, part.clone()));
+            part
+        }));
+        // Items gone or hidden drop their parts.
+        *parts = kept;
         *self.entry.borrow_mut() = Some((picked_items(scene), surface.clone()));
         surface
     }
@@ -209,9 +267,207 @@ pub(super) fn span_world_parameter(camera: &Camera, t: f32, za: f64, zb: f64) ->
 }
 impl std::fmt::Debug for Surface {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "Surface({} triangles)", self.triangles.len())
+        write!(f, "Surface({} triangles)", self.triangle_count())
     }
 }
+
+/// The axis of `bounds`' longest side.
+fn longest_axis(bounds: Bounds) -> usize {
+    let extent = bounds.max - bounds.min;
+    if extent.x >= extent.y && extent.x >= extent.z {
+        0
+    } else if extent.y >= extent.z {
+        1
+    } else {
+        2
+    }
+}
+
+impl Part {
+    /// `item`'s triangles and polylines in world space (`matrix`).
+    fn build(
+        item: &operandi_core::Item,
+        matrix: glam::DMat4,
+        smooth: Option<&crate::subdivision_view::SubdivisionCache>,
+    ) -> Self {
+        let mut out = Self {
+            item: item.id,
+            ..Default::default()
+        };
+        let world: Vec<_> = item
+            .mesh
+            .vertices
+            .iter()
+            .map(|&v| matrix.transform_point3(v))
+            .collect();
+        // Cage polygons drawn as smooth surface: their triangles come
+        // from the evaluated pieces (a fan per piece), so picking and
+        // hiding follow what is drawn, not the invisible cage.
+        let evaluated = smooth.and_then(|cache| cache.smooth(item));
+        // HID-03: hidden polygons aren't drawn, so they don't pick or
+        // hide what is behind them. Marking them covered skips both
+        // loops below.
+        let mut covered = (!item.elements.hidden.is_empty())
+            .then(|| operandi_core::Protection::of(&item.mesh, &item.elements))
+            .flatten()
+            .map(|p| p.face_hidden)
+            .unwrap_or_else(|| vec![false; item.mesh.faces.len()]);
+        let hidden = covered.clone();
+        if let Some(surface) = &evaluated {
+            let piece_world: Vec<_> = surface
+                .mesh
+                .vertices
+                .iter()
+                .map(|&v| matrix.transform_point3(v))
+                .collect();
+            for (piece, face) in surface.mesh.faces.iter().enumerate() {
+                let Some(&source) = surface.sources.get(piece) else {
+                    continue;
+                };
+                if source >= covered.len()
+                    || hidden[source]
+                    || !operandi_core::subdivision::is_smooth_polygon(&item.mesh, source)
+                {
+                    continue;
+                }
+                covered[source] = true;
+                for i in 1..face.vertices.len().saturating_sub(1) {
+                    let points = [0, i, i + 1].map(|k| piece_world[face.vertices[k] as usize]);
+                    out.push(points, source as u32);
+                }
+            }
+        }
+        for (fi, face) in item.mesh.faces.iter().enumerate() {
+            if hidden[fi] {
+                continue;
+            }
+            if item.mesh.is_polyline(fi) {
+                out.lines.extend(
+                    item.mesh
+                        .element_spans(fi)
+                        .map(|(a, b)| (fi as u32, [world[a as usize], world[b as usize]])),
+                );
+                continue;
+            }
+            // A polygon the ear clipper refuses (a self-crossing outline
+            // kept from an import) still draws and picks, as a fan.
+            let corners = item.mesh.surface_triangles(fi).unwrap_or_else(|_| {
+                (1..face.vertices.len().saturating_sub(1))
+                    .map(|i| [0, i, i + 1])
+                    .collect()
+            });
+            if !covered[fi] {
+                for triangle in &corners {
+                    out.push(
+                        triangle.map(|i| world[face.vertices[i] as usize]),
+                        fi as u32,
+                    );
+                }
+            }
+            out.corners.insert(fi, corners);
+        }
+        if !out.triangles.is_empty() {
+            out.build_tree(0, out.triangles.len());
+        }
+        out
+    }
+    fn push(&mut self, points: [DVec3; 3], face: u32) {
+        let bounds = points.iter().fold(Bounds::empty(), |b, &p| {
+            b.include(Bounds { min: p, max: p })
+        });
+        self.triangles.push(Triangle {
+            points,
+            bounds,
+            face,
+            order: self.triangles.len(),
+        });
+    }
+    fn bounds(&self) -> Bounds {
+        let lines = self
+            .lines
+            .iter()
+            .flat_map(|(_, s)| s)
+            .fold(Bounds::empty(), |b, &p| {
+                b.include(Bounds { min: p, max: p })
+            });
+        self.nodes
+            .first()
+            .map_or(lines, |root| root.bounds.include(lines))
+    }
+    fn build_tree(&mut self, start: usize, end: usize) -> usize {
+        let bounds = self.triangles[start..end]
+            .iter()
+            .fold(Bounds::empty(), |b, t| b.include(t.bounds));
+        let node = self.nodes.len();
+        self.nodes.push(Node {
+            bounds,
+            children: Children::Leaf(start..end),
+        });
+        if end - start > 8 {
+            let axis = longest_axis(bounds);
+            let mid = start + (end - start) / 2;
+            self.triangles[start..end].select_nth_unstable_by(mid - start, |a, b| {
+                (a.bounds.min[axis] + a.bounds.max[axis])
+                    .total_cmp(&(b.bounds.min[axis] + b.bounds.max[axis]))
+                    .then(a.order.cmp(&b.order))
+            });
+            let left = self.build_tree(start, mid);
+            let right = self.build_tree(mid, end);
+            self.nodes[node].children = Children::Branch(left, right);
+        }
+        node
+    }
+    #[allow(clippy::too_many_arguments)] // recursive walk state
+    fn visit(
+        &self,
+        rank: usize,
+        node: usize,
+        entry: f64,
+        o: DVec3,
+        d: DVec3,
+        hit: &mut Option<(Hit, Rank)>,
+        tests: &mut usize,
+    ) {
+        let limit = hit.map_or(f64::INFINITY, |((_, _, t), _)| t);
+        // The parent already intersected this bound to order its children.
+        // Reuse that entry distance; only the nearest-hit limit can shrink
+        // while visiting the first sibling. Equality still admits stable ties.
+        if entry > limit {
+            return;
+        }
+        match &self.nodes[node].children {
+            Children::Leaf(range) => {
+                for triangle in &self.triangles[range.clone()] {
+                    *tests += 1;
+                    let [a, b, c] = triangle.points;
+                    let at = (rank, triangle.order);
+                    if let Some(t) = camera::triangle_hit(o, d, a, b, c)
+                        && hit
+                            .is_none_or(|((_, _, old), order)| t < old || (t == old && at < order))
+                    {
+                        *hit = Some(((self.item, triangle.face, t), at));
+                    }
+                }
+            }
+            Children::Branch(a, b) => {
+                let first = self.nodes[*a].bounds.entry(o, d, limit);
+                let second = self.nodes[*b].bounds.entry(o, d, limit);
+                let children = if first.unwrap_or(f64::INFINITY) <= second.unwrap_or(f64::INFINITY)
+                {
+                    [(*a, first), (*b, second)]
+                } else {
+                    [(*b, second), (*a, first)]
+                };
+                for (child, entry) in children {
+                    if let Some(entry) = entry {
+                        self.visit(rank, child, entry, o, d, hit, tests);
+                    }
+                }
+            }
+        }
+    }
+}
+
 impl Surface {
     #[cfg(test)]
     pub fn new(scene: &Scene) -> Self {
@@ -220,6 +476,16 @@ impl Surface {
     pub fn with_smooth(
         scene: &Scene,
         smooth: Option<&crate::subdivision_view::SubdivisionCache>,
+    ) -> Self {
+        Self::assemble(scene, |item, matrix| {
+            std::sync::Arc::new(Part::build(item, matrix, smooth))
+        })
+    }
+    /// The surface of `scene`'s drawn items, each item's part from `part`
+    /// (built fresh, or reused by `SurfaceCache`).
+    fn assemble(
+        scene: &Scene,
+        mut part: impl FnMut(&operandi_core::Item, glam::DMat4) -> std::sync::Arc<Part>,
     ) -> Self {
         let mut out = Self::default();
         // CP-D01: items Display Visible hides aren't drawn, so they neither
@@ -233,128 +499,56 @@ impl Surface {
             let Ok(matrix) = scene.world_matrix(item.id) else {
                 continue;
             };
-            let world: Vec<_> = item
-                .mesh
-                .vertices
-                .iter()
-                .map(|&v| matrix.transform_point3(v))
-                .collect();
-            // Cage polygons drawn as smooth surface: their triangles come
-            // from the evaluated pieces (a fan per piece), so picking and
-            // hiding follow what is drawn, not the invisible cage.
-            let evaluated = smooth.and_then(|cache| cache.smooth(item));
-            // HID-03: hidden polygons aren't drawn, so they don't pick or
-            // hide what is behind them. Marking them covered skips both
-            // loops below.
-            let mut covered = (!item.elements.hidden.is_empty())
-                .then(|| operandi_core::Protection::of(&item.mesh, &item.elements))
-                .flatten()
-                .map(|p| p.face_hidden)
-                .unwrap_or_else(|| vec![false; item.mesh.faces.len()]);
-            let hidden = covered.clone();
-            if let Some(surface) = &evaluated {
-                let piece_world: Vec<_> = surface
-                    .mesh
-                    .vertices
-                    .iter()
-                    .map(|&v| matrix.transform_point3(v))
-                    .collect();
-                for (piece, face) in surface.mesh.faces.iter().enumerate() {
-                    let Some(&source) = surface.sources.get(piece) else {
-                        continue;
-                    };
-                    if source >= covered.len()
-                        || hidden[source]
-                        || !operandi_core::subdivision::is_smooth_polygon(&item.mesh, source)
-                    {
-                        continue;
-                    }
-                    covered[source] = true;
-                    for i in 1..face.vertices.len().saturating_sub(1) {
-                        let points = [0, i, i + 1].map(|k| piece_world[face.vertices[k] as usize]);
-                        let bounds = points.iter().fold(Bounds::empty(), |b, &p| {
-                            b.include(Bounds { min: p, max: p })
-                        });
-                        out.triangles.push(Triangle {
-                            points,
-                            bounds,
-                            item: item.id,
-                            face: source as u32,
-                            order: out.triangles.len(),
-                        });
-                    }
-                }
+            let part = part(item, matrix);
+            if part.triangles.is_empty() && part.lines.is_empty() && part.corners.is_empty() {
+                continue;
             }
-            for (fi, face) in item.mesh.faces.iter().enumerate() {
-                if hidden[fi] {
-                    continue;
-                }
-                if item.mesh.is_polyline(fi) {
-                    out.lines.extend(item.mesh.element_spans(fi).map(|(a, b)| {
-                        (item.id, fi as u32, [world[a as usize], world[b as usize]])
-                    }));
-                    continue;
-                }
-                // A polygon the ear clipper refuses (a self-crossing outline
-                // kept from an import) still draws and picks, as a fan.
-                let corners = item.mesh.surface_triangles(fi).unwrap_or_else(|_| {
-                    (1..face.vertices.len().saturating_sub(1))
-                        .map(|i| [0, i, i + 1])
-                        .collect()
-                });
-                for triangle in corners.iter().filter(|_| !covered[fi]) {
-                    let points = triangle.map(|i| world[face.vertices[i] as usize]);
-                    let bounds = points.iter().fold(Bounds::empty(), |b, &p| {
-                        b.include(Bounds { min: p, max: p })
-                    });
-                    out.triangles.push(Triangle {
-                        points,
-                        bounds,
-                        item: item.id,
-                        face: fi as u32,
-                        order: out.triangles.len(),
-                    });
-                }
-                out.corners.insert((item.id, fi), corners);
-            }
+            out.index.insert(item.id, out.parts.len());
+            out.bounds.push(part.bounds());
+            out.parts.push(part);
         }
-        if !out.triangles.is_empty() {
-            out.build(0, out.triangles.len());
+        // Only parts with triangles go in the tree; lines are read by
+        // `pick_in` directly.
+        out.order = (0..out.parts.len())
+            .filter(|&k| !out.parts[k].triangles.is_empty())
+            .collect();
+        if !out.order.is_empty() {
+            out.build_tree(0, out.order.len());
         }
         out
     }
-    pub fn corners(&self, item: u64, face: usize) -> &[[usize; 3]] {
-        self.corners.get(&(item, face)).map_or(&[], Vec::as_slice)
-    }
-    fn build(&mut self, start: usize, end: usize) -> usize {
-        let bounds = self.triangles[start..end]
+    fn build_tree(&mut self, start: usize, end: usize) -> usize {
+        let bounds = self.order[start..end]
             .iter()
-            .fold(Bounds::empty(), |b, t| b.include(t.bounds));
+            .fold(Bounds::empty(), |b, &k| b.include(self.bounds[k]));
         let node = self.nodes.len();
         self.nodes.push(Node {
             bounds,
             children: Children::Leaf(start..end),
         });
-        if end - start > 8 {
-            let extent = bounds.max - bounds.min;
-            let axis = if extent.x >= extent.y && extent.x >= extent.z {
-                0
-            } else if extent.y >= extent.z {
-                1
-            } else {
-                2
-            };
+        if end - start > 2 {
+            let axis = longest_axis(bounds);
             let mid = start + (end - start) / 2;
-            self.triangles[start..end].select_nth_unstable_by(mid - start, |a, b| {
-                (a.bounds.min[axis] + a.bounds.max[axis])
-                    .total_cmp(&(b.bounds.min[axis] + b.bounds.max[axis]))
-                    .then(a.order.cmp(&b.order))
+            let all = &self.bounds;
+            self.order[start..end].select_nth_unstable_by(mid - start, |&a, &b| {
+                (all[a].min[axis] + all[a].max[axis])
+                    .total_cmp(&(all[b].min[axis] + all[b].max[axis]))
+                    .then(a.cmp(&b))
             });
-            let left = self.build(start, mid);
-            let right = self.build(mid, end);
+            let left = self.build_tree(start, mid);
+            let right = self.build_tree(mid, end);
             self.nodes[node].children = Children::Branch(left, right);
         }
         node
+    }
+    pub fn corners(&self, item: u64, face: usize) -> &[[usize; 3]] {
+        self.index
+            .get(&item)
+            .and_then(|&k| self.parts[k].corners.get(&face))
+            .map_or(&[], Vec::as_slice)
+    }
+    fn triangle_count(&self) -> usize {
+        self.parts.iter().map(|p| p.triangles.len()).sum()
     }
     #[allow(clippy::too_many_arguments)] // recursive walk state
     fn visit(
@@ -363,34 +557,26 @@ impl Surface {
         entry: f64,
         o: DVec3,
         d: DVec3,
-        hit: &mut Option<(Hit, usize)>,
+        hit: &mut Option<(Hit, Rank)>,
         tests: &mut usize,
         only: Option<&[u64]>,
     ) {
         let limit = hit.map_or(f64::INFINITY, |((_, _, t), _)| t);
-        // The parent already intersected this bound to order its children.
-        // Reuse that entry distance; only the nearest-hit limit can shrink
-        // while visiting the first sibling. Equality still admits stable ties.
         if entry > limit {
             return;
         }
         match &self.nodes[node].children {
             Children::Leaf(range) => {
-                for triangle in &self.triangles[range.clone()] {
-                    // An item filter skips other items' triangles: the ray
-                    // passes through them. The BVH is shared, so filtering
-                    // costs nothing but those skipped tests.
-                    if only.is_some_and(|only| !only.contains(&triangle.item)) {
+                for &k in &self.order[range.clone()] {
+                    let part = &self.parts[k];
+                    // An item filter skips other items: the ray passes
+                    // through them.
+                    if only.is_some_and(|only| !only.contains(&part.item)) {
                         continue;
                     }
-                    *tests += 1;
-                    let [a, b, c] = triangle.points;
-                    if let Some(t) = camera::triangle_hit(o, d, a, b, c)
-                        && hit.is_none_or(|((_, _, old), order)| {
-                            t < old || (t == old && triangle.order < order)
-                        })
-                    {
-                        *hit = Some(((triangle.item, triangle.face, t), triangle.order));
+                    let limit = hit.map_or(f64::INFINITY, |((_, _, t), _)| t);
+                    if let Some(entry) = part.nodes[0].bounds.entry(o, d, limit) {
+                        part.visit(k, 0, entry, o, d, hit, tests);
                     }
                 }
             }
@@ -439,32 +625,34 @@ impl Surface {
             return out;
         }
         let d = (b - a) / length;
-        let mut stack = vec![0usize];
-        while let Some(node) = stack.pop() {
-            let Some(n) = self.nodes.get(node) else {
-                continue;
-            };
-            if n.bounds.entry(a, d, length).is_none() {
-                continue;
-            }
-            match &n.children {
-                Children::Leaf(range) => {
-                    for t in &self.triangles[range.clone()] {
-                        let [p, q, r] = t.points;
-                        // Either side: an edge may pass through from behind.
-                        let hit = camera::triangle_hit(a, d, p, q, r)
-                            .or_else(|| camera::triangle_hit(a, d, p, r, q));
-                        if let Some(at) = hit
-                            && at > length * 1e-6
-                            && at < length * (1. - 1e-6)
-                        {
-                            out.push((t.item, t.face, at / length));
+        for part in &self.parts {
+            let mut stack = vec![0usize];
+            while let Some(node) = stack.pop() {
+                let Some(n) = part.nodes.get(node) else {
+                    continue;
+                };
+                if n.bounds.entry(a, d, length).is_none() {
+                    continue;
+                }
+                match &n.children {
+                    Children::Leaf(range) => {
+                        for t in &part.triangles[range.clone()] {
+                            let [p, q, r] = t.points;
+                            // Either side: an edge may pass through from behind.
+                            let hit = camera::triangle_hit(a, d, p, q, r)
+                                .or_else(|| camera::triangle_hit(a, d, p, r, q));
+                            if let Some(at) = hit
+                                && at > length * 1e-6
+                                && at < length * (1. - 1e-6)
+                            {
+                                out.push((part.item, t.face, at / length));
+                            }
                         }
                     }
-                }
-                Children::Branch(x, y) => {
-                    stack.push(*x);
-                    stack.push(*y);
+                    Children::Branch(x, y) => {
+                        stack.push(*x);
+                        stack.push(*y);
+                    }
                 }
             }
         }
@@ -484,30 +672,36 @@ impl Surface {
         let (o, d) = camera.ray(p, r);
         let hit = self.query_in(o, d, only).0;
         let mut line: Option<(f32, Hit)> = None;
-        for &(item, element, [a, b]) in &self.lines {
-            if only.is_some_and(|only| !only.contains(&item)) {
+        for part in &self.parts {
+            let item = part.item;
+            if part.lines.is_empty() || only.is_some_and(|only| !only.contains(&item)) {
                 continue;
             }
-            if let (Some((qa, za)), Some((qb, zb))) = (camera.project(a, r), camera.project(b, r)) {
-                let delta = qb - qa;
-                let t = ((p - qa).dot(delta) / delta.length_sq().max(1e-8)).clamp(0., 1.);
-                // Screen interpolation is perspective divided. Recover the
-                // geometric span parameter before comparing against surface depth.
-                let t = span_world_parameter(camera, t, za, zb);
-                let world = a.lerp(b, t);
-                let depth = (world - o).dot(d);
-                let distance = crate::input::segment_distance(p, qa, qb);
-                if distance < 12.
-                    && depth > 0.
-                    && self.visible_in(camera, world, r, only)
-                    && hit.is_none_or(|h| depth <= h.2 + 1e-5)
-                    && line
-                        .is_none_or(|(old, h)| distance < old || (distance == old && depth < h.2))
+            for &(element, [a, b]) in &part.lines {
+                if let (Some((qa, za)), Some((qb, zb))) =
+                    (camera.project(a, r), camera.project(b, r))
                 {
-                    // Match direct edge picking: nearest screen span first,
-                    // then depth. A neighboring span near a corner must not
-                    // replace the exact projected hit with a shallower endpoint.
-                    line = Some((distance, (item, element, depth)));
+                    let delta = qb - qa;
+                    let t = ((p - qa).dot(delta) / delta.length_sq().max(1e-8)).clamp(0., 1.);
+                    // Screen interpolation is perspective divided. Recover the
+                    // geometric span parameter before comparing against surface depth.
+                    let t = span_world_parameter(camera, t, za, zb);
+                    let world = a.lerp(b, t);
+                    let depth = (world - o).dot(d);
+                    let distance = crate::input::segment_distance(p, qa, qb);
+                    if distance < 12.
+                        && depth > 0.
+                        && self.visible_in(camera, world, r, only)
+                        && hit.is_none_or(|h| depth <= h.2 + 1e-5)
+                        && line.is_none_or(|(old, h)| {
+                            distance < old || (distance == old && depth < h.2)
+                        })
+                    {
+                        // Match direct edge picking: nearest screen span first,
+                        // then depth. A neighboring span near a corner must not
+                        // replace the exact projected hit with a shallower endpoint.
+                        line = Some((distance, (item, element, depth)));
+                    }
                 }
             }
         }
@@ -543,6 +737,30 @@ impl Surface {
         self.query_in(o, d, only)
             .0
             .is_none_or(|(_, _, t)| t + tolerance >= depth)
+    }
+    /// Every triangle as (scene-order rank, item, face, corners).
+    #[cfg(test)]
+    fn triangle_list(&self) -> Vec<(Rank, u64, u32, [DVec3; 3])> {
+        let mut out: Vec<_> = self
+            .parts
+            .iter()
+            .enumerate()
+            .flat_map(|(k, p)| {
+                p.triangles
+                    .iter()
+                    .map(move |t| ((k, t.order), p.item, t.face, t.points))
+            })
+            .collect();
+        out.sort_by_key(|x| x.0);
+        out
+    }
+    /// Every polyline span as (item, element, ends), in scene order.
+    #[cfg(test)]
+    fn line_list(&self) -> Vec<(u64, u32, [DVec3; 2])> {
+        self.parts
+            .iter()
+            .flat_map(|p| p.lines.iter().map(move |&(e, s)| (p.item, e, s)))
+            .collect()
     }
 }
 
@@ -612,18 +830,15 @@ mod tests {
     fn assert_cached_matches_fresh(cache: &mut SurfaceCache, scene: &Scene) {
         let actual = cache.get(scene, &Default::default());
         let fresh = Surface::new(scene);
-        assert_eq!(actual.corners, fresh.corners);
-        let triangles = |s: &Surface| {
-            let mut out: Vec<_> = s
-                .triangles
+        let corners = |s: &Surface| {
+            s.parts
                 .iter()
-                .map(|t| (t.order, t.item, t.face, t.points))
-                .collect();
-            out.sort_by_key(|x| x.0);
-            out
+                .map(|p| (p.item, p.corners.clone()))
+                .collect::<Vec<_>>()
         };
-        assert_eq!(triangles(&actual), triangles(&fresh));
-        assert_eq!(actual.lines, fresh.lines);
+        assert_eq!(corners(&actual), corners(&fresh));
+        assert_eq!(actual.triangle_list(), fresh.triangle_list());
+        assert_eq!(actual.line_list(), fresh.line_list());
         let rect = Rect::from_min_size(Pos2::ZERO, vec2(700., 700.));
         for view in [View::Perspective, View::Front, View::Top] {
             let camera = Camera {
@@ -643,6 +858,40 @@ mod tests {
                 );
             }
         }
+    }
+
+    #[test]
+    fn editing_one_item_rebuilds_only_its_part() {
+        let mut scene = sphere(8, 4);
+        for k in 1..5 {
+            scene.new_mesh().unwrap();
+            scene.items[k].mesh = scene.items[0].mesh.clone();
+            scene.items[k].transform.translation.x = 3. * k as f64;
+        }
+        let cache = SurfaceCache::default();
+        let _ = cache.get(&scene, &Default::default());
+        let parts = cache.part_builds();
+        scene.items[2].mesh.vertices[0].z += 0.3;
+        let _ = cache.get(&scene, &Default::default());
+        assert_eq!(cache.part_builds(), parts + 1, "one mesh edited");
+        // Moving a parent moves its children too: both rebuild.
+        scene.items[4].parent = Some(scene.items[3].id);
+        scene.items[3].transform.translation.y = 1.;
+        let _ = cache.get(&scene, &Default::default());
+        assert_eq!(
+            cache.part_builds(),
+            parts + 3,
+            "a parent and its child moved"
+        );
+        // Hiding one drops its part; showing it again builds it once.
+        scene.items[1].visible = false;
+        let _ = cache.get(&scene, &Default::default());
+        assert_eq!(cache.part_builds(), parts + 3);
+        scene.items[1].visible = true;
+        let _ = cache.get(&scene, &Default::default());
+        assert_eq!(cache.part_builds(), parts + 4);
+        let mut cache = cache;
+        assert_cached_matches_fresh(&mut cache, &scene);
     }
 
     #[test]
@@ -756,7 +1005,7 @@ mod tests {
             &first,
             &cache.get(&separate, &Default::default())
         ));
-        assert_eq!(first.lines.len(), 2);
+        assert_eq!(first.line_list().len(), 2);
         let fresh = Surface::new(&separate);
         for view in [View::Front, View::Perspective] {
             let camera = Camera {
@@ -975,7 +1224,7 @@ mod tests {
         }
         assert!(hits > queries / 2);
         assert!(
-            tests < queries * surface.triangles.len() / 20,
+            tests < queries * surface.triangle_count() / 20,
             "{tests} triangle tests for {queries} rays"
         );
         assert_eq!(scene, before, "picking must not mutate mesh or attributes");
