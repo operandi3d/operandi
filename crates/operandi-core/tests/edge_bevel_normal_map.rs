@@ -11,10 +11,12 @@ fn key(a: u32, b: u32) -> (u32, u32) {
     (a.min(b), a.max(b))
 }
 
+type Edges = Vec<(u32, u32)>;
+
 /// A 3x3x3 box bridged through its ±X centre polygons with Bridge's
 /// defaults, then the tunnel's rims hardened (which makes the normal map).
 /// Returns the mesh, the +X rim loop and the tunnel's ring of edges.
-fn hardened_tunnel() -> (Mesh, Vec<(u32, u32)>, Vec<(u32, u32)>) {
+fn hardened_tunnel() -> (Mesh, Edges, Edges) {
     let m = primitive::segmented_cube(DVec3::ZERO, DVec3::splat(1.), [3, 3, 3]).unwrap();
     let centre_of = |f: &Face| {
         f.vertices
