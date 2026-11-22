@@ -427,26 +427,6 @@ pub(super) const KNOWN: &[(&str, Broken, &str)] = &[
         "changes the selection with no undo step when there are no points to merge",
     ),
     (
-        "edge.subdivide edges",
-        Broken::Redo,
-        "redo restores the geometry but not the selection the first run left",
-    ),
-    (
-        "Edge Subdivide edges",
-        Broken::Redo,
-        "redo restores the geometry but not the selection the first run left",
-    ),
-    (
-        "poly.make points",
-        Broken::Redo,
-        "redo restores the geometry but not the selection the first run left",
-    ),
-    (
-        "Make points",
-        Broken::Redo,
-        "redo restores the geometry but not the selection the first run left",
-    ),
-    (
         "edge.split points",
         Broken::ChangeWithoutStep,
         "changes the selection with no undo step when the points split nothing",

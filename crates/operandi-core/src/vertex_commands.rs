@@ -2423,6 +2423,7 @@ impl crate::Editor {
         let mut faces = self.scene.selection.faces.clone();
         let edges = self.scene.selection.edges.clone();
         let vertex_mode = self.scene.selection.mode == crate::Mode::Vertex;
+        let mark = self.history_mark();
         self.publish_vertex_edit(item, out, "Make Polygon", Vec::new())?;
         faces.extend(made);
         let selection = &mut self.scene.selection;
@@ -2430,6 +2431,7 @@ impl crate::Editor {
         if !vertex_mode {
             selection.edges = edges;
         }
+        self.amend_step_selection(mark);
         Ok(())
     }
 

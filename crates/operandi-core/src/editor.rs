@@ -5790,6 +5790,16 @@ impl Editor {
     pub fn steps_since(&self, mark: u64) -> usize {
         self.undo.iter().rev().take_while(|c| c.mark > mark).count()
     }
+    /// For a command that sets its result selection after recording its
+    /// step: the step recorded since `mark` ends with that selection, so
+    /// Redo gives it back (Astra P4-002).
+    pub(crate) fn amend_step_selection(&mut self, mark: u64) {
+        if self.steps_since(mark) > 0
+            && let Some(step) = self.undo.last_mut().map(std::sync::Arc::make_mut)
+        {
+            step.after.selection = self.scene.selection.clone();
+        }
+    }
     /// The bytes the undo history holds beyond the scene and redo list.
     pub fn undo_memory_bytes(&self) -> usize {
         crate::undo_memory::step_costs(&self.scene, &self.undo, &self.redo)
