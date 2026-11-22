@@ -5,7 +5,7 @@
 # Release itself. See docs/RELEASING.md, "Releasing all three".
 #
 # Runs only when started by hand (scripts/release.sh does it with
-# `gh workflow run`), and only for the repo owner, so nobody else's code
+# `gh workflow run`), and only for the maintainer (manfriday), so nobody else's code
 # runs on Jason's machines.
 #
 # Machines (self-hosted runners, docs/CI.md):
@@ -44,7 +44,7 @@ env:
 jobs:
   linux:
     name: Linux
-    if: inputs.linux && github.actor == github.repository_owner
+    if: inputs.linux && github.actor == 'manfriday'
     runs-on: [self-hosted, Linux, X64]
     # The first build on a machine downloads Cycles' libraries and builds
     # Cycles (about an hour); later ones take minutes.
@@ -102,7 +102,7 @@ jobs:
 
   windows:
     name: Windows
-    if: inputs.windows && github.actor == github.repository_owner
+    if: inputs.windows && github.actor == 'manfriday'
     runs-on: [self-hosted, Windows, X64]
     timeout-minutes: 240
     steps:
