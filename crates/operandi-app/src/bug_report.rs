@@ -27,11 +27,10 @@ use std::path::{Path, PathBuf};
 use std::sync::{Mutex, OnceLock};
 use std::time::{SystemTime, UNIX_EPOCH};
 
-/// The repository issues are filed against: a public, issues-only repo, so
-/// people who can't see the (private) code repo can still report. The one
-/// place to change it.
-pub const REPORT_REPO_URL: &str = "https://github.com/manfriday/Operandi-BugReports";
-/// The issue form every report opens, in the reports repository's
+/// The repository issues are filed against: the public code repository.
+/// The one place to change it.
+pub const REPORT_REPO_URL: &str = "https://github.com/operandi3d/operandi";
+/// The issue form every report opens, in the repository's
 /// `.github/ISSUE_TEMPLATE` (label `bug`). Its field ids are the query keys
 /// below; the idea form (`idea.yml`) is linked from its top.
 pub const BUG_FORM: &str = "bug.yml";
@@ -1096,7 +1095,7 @@ mod tests {
         assert_eq!(percent_encode("a b&c=d/é#"), "a%20b%26c%3Dd%2F%C3%A9%23");
         let url = issue_url("Bug: x & y", &[("what", "line 1\nline #2"), ("steps", "")]);
         assert!(url.starts_with(
-            "https://github.com/manfriday/Operandi-BugReports/issues/new?template=bug.yml&title="
+            "https://github.com/operandi3d/operandi/issues/new?template=bug.yml&title="
         ));
         assert!(!url[url.find('?').unwrap()..].contains(' '));
         assert_eq!(query(&url, "title"), "Bug: x & y");

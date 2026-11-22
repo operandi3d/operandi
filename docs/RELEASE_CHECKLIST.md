@@ -103,7 +103,7 @@ to report it. Nothing is sent without the user pressing Submit.
 | | Item | Status |
 |---|---|---|
 | [x] | Report Bug button, crash files, next-launch prompt, native (Cycles) crash pick-up on macOS. | Done |
-| [ ] | `REPORT_REPO_URL` in `crates/operandi-app/src/bug_report.rs` is `https://github.com/manfriday/Operandi-BugReports` (public, issues only). Keep it, or point it at the public code repo once that exists. | Decide |
+| [x] | `REPORT_REPO_URL` in `crates/operandi-app/src/bug_report.rs` points at the public code repo, `https://github.com/operandi3d/operandi` (2026-11-22). | Done |
 | [ ] | Issues must be switched on in the GitHub repo settings. | To do |
 | [ ] | Add `.github/ISSUE_TEMPLATE/` for bug reports and crash reports, plus `bug` and `crash` labels, so reports from the app land tidily. Keep the fields matching what the app fills in. | To do |
 | [ ] | Run the 7-step GUI checklist in `docs/BUG_REPORTS.md` against a signed, release-mode build (stage 7), not just a QA app. | To do |

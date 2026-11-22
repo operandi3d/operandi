@@ -164,9 +164,8 @@ secrets.
 
 ## Reporting bugs
 
-Use **Help > Report Bug or Idea…** in the app. It opens a filled-in form on the
-public [Operandi-BugReports](https://github.com/manfriday/Operandi-BugReports)
-repository for you to check and submit. Crash reports work the same way.
-Contributors can also use the bug form in this repository's issues.
+Use **Help > Report Bug or Idea…** in the app. It opens a filled-in bug form in
+this repository's [issues](https://github.com/operandi3d/operandi/issues)
+for you to check and submit. Crash reports work the same way.
 
 Security problems: see [SECURITY.md](SECURITY.md), not a public issue.
