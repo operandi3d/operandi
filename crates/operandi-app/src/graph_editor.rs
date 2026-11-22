@@ -23,6 +23,10 @@ use operandi_core::time_tick::Tick;
 
 const LIST_W: f32 = 190.;
 const STRIP_H: f32 = 22.;
+/// The bottom bar's fixed row.
+const BOTTOM_H: f32 = 26.;
+/// The graph editor window's remembered place (palettes' places).
+const GRAPH_PLACE: &str = "graphEditor";
 const KEY_R: f32 = 3.5;
 
 /// GE-51 [OP]: the broken-handles key colour, a theme token so colour
@@ -300,44 +304,128 @@ impl Operandi {
         }
     }
 
-    /// The graph editor window (GE-01).
+    /// The graph editor window (GE-01): its own OS window (Jason,
+    /// 2026-11-22: a true floating window, draggable onto another screen,
+    /// resized from its edges), through the app's one floating-window path
+    /// (`os_window`, floating.rs), so shortcuts, undo and the MCP bridge
+    /// work as in the main window. It opens as a wide, short strip over the
+    /// lower part of the main window and then keeps where it was put
+    /// (remembered with the palettes' places). Where the platform can't
+    /// open another window (tests, some Linux setups) egui draws it inside
+    /// the main one.
     pub(super) fn graph_editor_window(&mut self, ctx: &Context) {
         if !self.graph.open {
             self.graph.graph_rect = None;
             return;
         }
-        let mut open = true;
-        egui::Window::new("Graph Editor")
-            .id(Id::new("graph-editor"))
-            .open(&mut open)
-            .default_size(vec2(900., 420.))
-            .resizable(true)
-            .show(ctx, |ui| self.graph_editor_ui(ui));
-        if !open {
+        let place = self.palettes.places.get(GRAPH_PLACE).copied();
+        let main = ctx.input(|i| i.viewport().inner_rect);
+        let monitor = ctx.input(|i| i.viewport().monitor_size);
+        let size = place.map_or_else(
+            || {
+                // ~3.5:1, clamped to the screen.
+                let max = monitor.unwrap_or(vec2(1600., 1000.));
+                [
+                    1200f32.min(max.x - 40.).max(400.),
+                    340f32.min(max.y - 80.).max(200.),
+                ]
+            },
+            |p| p.size,
+        );
+        let position = place.and_then(|p| p.position).or_else(|| {
+            main.map(|r| {
+                [
+                    r.left() + ((r.width() - size[0]) / 2.).max(0.),
+                    (r.bottom() - size[1] - 40.).max(r.top()),
+                ]
+            })
+        });
+        let spec = crate::floating::OsWindow {
+            id: egui::ViewportId::from_hash_of("operandi-graph-editor"),
+            title: "Graph Editor".into(),
+            size,
+            position,
+            min_size: [420., 200.],
+            on_top: false,
+        };
+        let shown = self.os_window(ctx, spec, |app, ctx| {
+            egui::CentralPanel::default()
+                .frame(
+                    egui::Frame::side_top_panel(&ctx.style())
+                        .fill(ctx.style().visuals.panel_fill)
+                        .inner_margin(6.),
+                )
+                .show(ctx, |ui| app.graph_editor_ui(ui));
+        });
+        let mut place = place.unwrap_or(crate::palettes::Place {
+            size,
+            position: None,
+        });
+        if let Some(s) = shown.size
+            && s.iter().all(|v| *v >= 100.)
+        {
+            place.size = s;
+        }
+        if let Some(at) = shown.position {
+            place.position = Some(at);
+        }
+        self.palettes.places.insert(GRAPH_PLACE.into(), place);
+        if !shown.open {
             self.graph.open = false;
         }
     }
 
+    /// The window's contents, laid out inside exactly the space it was
+    /// given: the toolbar on top, the bottom bar a fixed row at the
+    /// bottom, and the list, graph and strip in what's left. Nothing asks
+    /// for more than it was given, so the window never grows by itself and
+    /// a resize sticks.
     fn graph_editor_ui(&mut self, ui: &mut Ui) {
-        self.graph_toolbar(ui);
-        ui.separator();
-        let avail = ui.available_size();
-        let body = ui
-            .allocate_space(vec2(avail.x.max(300.), (avail.y - 30.).max(160.)))
-            .1;
-        let list = Rect::from_min_size(body.min, vec2(LIST_W, body.height()));
+        let full = ui.available_rect_before_wrap();
+        let toolbar = ui
+            .scope(|ui| {
+                ui.set_max_width(full.width());
+                self.graph_toolbar(ui);
+            })
+            .response
+            .rect;
+        let bottom = Rect::from_min_max(
+            pos2(
+                full.left(),
+                (full.bottom() - BOTTOM_H).max(toolbar.bottom()),
+            ),
+            full.max,
+        );
+        let body = Rect::from_min_max(
+            pos2(full.left(), toolbar.bottom() + 4.),
+            pos2(full.right(), (bottom.top() - 4.).max(toolbar.bottom() + 4.)),
+        );
+        let list = Rect::from_min_size(
+            body.min,
+            vec2(LIST_W.min(body.width() * 0.3), body.height()),
+        );
         let graph = Rect::from_min_max(
             pos2(list.right() + 6., body.top()),
-            pos2(body.right(), body.bottom() - STRIP_H),
+            pos2(body.right(), (body.bottom() - STRIP_H).max(body.top())),
         );
-        let strip = Rect::from_min_max(pos2(graph.left(), graph.bottom()), body.max);
+        let strip = Rect::from_min_max(
+            pos2(graph.left(), graph.bottom()),
+            pos2(body.right(), body.bottom()),
+        );
         self.graph_channel_list(ui, list);
         let shown = self.graph_shown();
         let map = self.graph_map(graph, &shown);
         self.graph_area(ui, map, &shown);
         self.graph_strip(ui, strip, map);
-        ui.separator();
-        self.graph_bottom_bar(ui);
+        let mut row = ui.new_child(
+            egui::UiBuilder::new()
+                .max_rect(bottom)
+                .layout(Layout::left_to_right(Align::Center)),
+        );
+        row.set_clip_rect(bottom.intersect(ui.clip_rect()));
+        self.graph_bottom_bar(&mut row);
+        // Claim exactly the space given, no more.
+        ui.allocate_rect(full, Sense::hover());
     }
 
     fn graph_map(&mut self, rect: Rect, shown: &[Shown]) -> Map {
@@ -1291,7 +1379,7 @@ impl Operandi {
 
     fn graph_bottom_bar(&mut self, ui: &mut Ui) {
         let mut lines: Vec<&str> = Vec::new();
-        ui.horizontal_wrapped(|ui| {
+        ui.horizontal(|ui| {
             // Icon toggles (lit when on, UIC-23); tooltips name their keys.
             for (icon, on, tip, line) in [
                 (
