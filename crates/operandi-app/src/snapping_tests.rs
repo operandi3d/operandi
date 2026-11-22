@@ -438,3 +438,86 @@ fn n06_the_opening_click_does_not_close_the_popover() {
     assert!(run(true).is_some(), "the opening click keeps it open");
     assert!(run(false).is_none(), "a later click outside closes it");
 }
+
+/// A quad whose edge 0-1 is slanted 30 degrees in the Front view, and a
+/// second quad whose corner (3, 1.2, 0) is a vertex target. Edge mode with
+/// that edge selected, a real Local action center, Move active.
+fn slanted_edge(targets: Targets) -> (Operandi, Rect) {
+    let (c, s) = (30_f64.to_radians().cos(), 30_f64.to_radians().sin());
+    let quad = |v: [u32; 4]| Face {
+        vertices: v.to_vec(),
+        uv: None,
+        material: String::new(),
+        smooth: false,
+        part: None,
+        material_label: None,
+    };
+    let mut app = Operandi::empty();
+    app.run(Command::NewMesh);
+    app.editor.scene.active_mut().unwrap().mesh = Mesh {
+        vertices: vec![
+            DVec3::ZERO,
+            DVec3::new(c, s, 0.),
+            DVec3::new(c, s + 1., 0.),
+            DVec3::new(0., 1., 0.),
+            DVec3::new(3., 1.2, 0.),
+            DVec3::new(4., 1.2, 0.),
+            DVec3::new(4., 2.2, 0.),
+            DVec3::new(3., 2.2, 0.),
+        ],
+        faces: vec![quad([0, 1, 2, 3]), quad([4, 5, 6, 7])].into(),
+        ..Default::default()
+    }
+    .into();
+    let rect = Rect::from_min_size(pos2(0., 0.), vec2(1600., 900.));
+    app.camera.view = View::Front;
+    app.camera.target = DVec3::new(2., 1., 0.);
+    app.camera.distance = rect.height() as f64 * app.camera.lens / 288.3;
+    app.run(Command::Mode(Mode::Edge));
+    app.editor.scene.selection.edges = vec![(0, 1)];
+    app.run(Command::ActionContext(ActionContext {
+        center: CenterMode::Local,
+        ..app.editor.action_context
+    }));
+    app.snapping = SnappingPreferences {
+        enabled: true,
+        global: Targets::default(),
+        component: targets,
+        ..Default::default()
+    };
+    app.activate(Tool::Move);
+    (app, rect)
+}
+
+/// Drag the slanted edge's X arrow (tilted along the edge by the Local
+/// action center) with the pointer on `to`; the handle's new position.
+fn drag_tilted_arrow(app: &mut Operandi, to: DVec3, rect: Rect) -> DVec3 {
+    let start = screen(app, app.transform_handle_center(), rect);
+    let base = app.editor.live.as_ref().unwrap().params.clone();
+    let target = screen(app, to, rect);
+    app.update_handle(0, base, start, target, Tool::Move, rect);
+    app.transform_handle_center()
+}
+
+/// Jason's QA report (2026-11-22): on a Local action center the arrow
+/// follows the edge, and a vertex target pulled the edge past the target
+/// along it. The handle must stop at the target's nearest point on the
+/// arrow's line, and the edge must travel exactly that far.
+#[test]
+fn a_tilted_local_arrow_lands_on_the_vertex_without_overshoot() {
+    let (mut app, rect) = slanted_edge(VERTEX);
+    let start = app.transform_handle_center();
+    let axis = app.handle_axis(0);
+    // The arrow really is tilted along the edge (not a world axis).
+    let edge = DVec3::new(30_f64.to_radians().cos(), 0.5, 0.);
+    assert!(axis.dot(edge).abs() > 1. - 1e-9, "arrow {axis}");
+    let vertex = DVec3::new(3., 1.2, 0.);
+    let want = start + axis * (vertex - start).dot(axis);
+    let landed = drag_tilted_arrow(&mut app, vertex, rect);
+    assert!((landed - want).length() < 1e-6, "{landed} want {want}");
+    let moved = points(&app)[0];
+    assert!(
+        (moved - axis * (vertex - start).dot(axis)).length() < 1e-6,
+        "{moved}"
+    );
+}

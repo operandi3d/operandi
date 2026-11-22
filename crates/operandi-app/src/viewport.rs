@@ -3552,31 +3552,42 @@ impl Operandi {
     pub(super) fn handle_scale_at(&self, center: DVec3) -> f32 {
         self.handle_preferences.scale * self.handle_zoom_at(center)
     }
+    /// The live transform handle's frame before the drag's delta: where
+    /// the handle sits at `delta = 0` and the axes a unit of `delta` moves
+    /// it along. Under Local (AC-75) that's the last selected element's
+    /// cluster frame, which is also what the core moves that cluster by;
+    /// otherwise the action frame, with the polygon stage's Symmetry
+    /// centre for component tools. Snapping measures in this same frame.
+    pub(super) fn transform_handle_frame(&self) -> Option<operandi_core::ActionFrame> {
+        let l = self.editor.live.as_ref()?;
+        let frame = l.action_frame?;
+        // The pivot service places the frame (ACS-01/07); the polygon
+        // stage's handle follows its live caps.
+        if let Some(local) = self.local_handle_frame() {
+            return Some(local);
+        }
+        let center = if l.tool.transforms_items() {
+            frame.center
+        } else {
+            self.editor.symmetry_handle_centre().unwrap_or(frame.center)
+        };
+        Some(operandi_core::ActionFrame {
+            center,
+            basis: frame.basis,
+        })
+    }
     pub(super) fn transform_handle_center(&self) -> DVec3 {
-        self.editor
-            .live
-            .as_ref()
-            .and_then(|l| {
-                l.action_frame.map(|frame| {
-                    // The pivot service places the frame (ACS-01/07); the
-                    // polygon stage's handle follows its live caps.
-                    let local = self.local_handle_frame();
-                    let center = if let Some(local) = local {
-                        // AC-75: on the last selected element's cluster.
-                        local.center
-                    } else if l.tool.transforms_items() {
-                        frame.center
+        let Some(l) = self.editor.live.as_ref() else {
+            return DVec3::ZERO;
+        };
+        self.transform_handle_frame()
+            .map(|frame| {
+                frame.center
+                    + if matches!(l.tool, Tool::Move | Tool::Transform | Tool::EdgeExtend) {
+                        frame.basis * l.params.delta
                     } else {
-                        self.editor.symmetry_handle_centre().unwrap_or(frame.center)
-                    };
-                    let basis = local.map_or(frame.basis, |f| f.basis);
-                    center
-                        + if matches!(l.tool, Tool::Move | Tool::Transform | Tool::EdgeExtend) {
-                            basis * l.params.delta
-                        } else {
-                            DVec3::ZERO
-                        }
-                })
+                        DVec3::ZERO
+                    }
             })
             .unwrap_or(DVec3::ZERO)
     }

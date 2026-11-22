@@ -1037,7 +1037,10 @@ impl super::Operandi {
             self.snap_reticle = None;
             return params;
         }
-        let Some(frame) = self.editor.live.as_ref().and_then(|l| l.action_frame) else {
+        // The handle's own frame, so a unit of `delta` here is a unit of
+        // travel along the drawn arrow: under Local that's the cluster's
+        // frame, not the whole selection's action frame (AC-75).
+        let Some(frame) = self.transform_handle_frame() else {
             self.snap_marker = None;
             self.snap_reticle = None;
             return params;

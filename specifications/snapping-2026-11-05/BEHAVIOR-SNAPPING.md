@@ -64,6 +64,9 @@ pixels.
   the selection moves by the same offset.
 - Leaving the Inner Range releases it (**Operandi choice**: no extra
   stickiness).
+- On an axis arrow (SN2-30b) the handle lands at the target's nearest
+  point on the arrow's own line, also when a Local action centre turns
+  the arrow (Operandi fix, 2026-11-22).
 
 Ranges are screen pixels, so they cover less world distance when zoomed in.
 
