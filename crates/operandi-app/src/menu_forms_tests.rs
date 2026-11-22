@@ -413,6 +413,7 @@ snapshot_test!(snapshot_texture, "menu.texture");
 snapshot_test!(snapshot_tools, "menu.tools");
 snapshot_test!(snapshot_view, "menu.view");
 snapshot_test!(snapshot_layout, "menu.layout");
+snapshot_test!(snapshot_animate, "menu.animate");
 snapshot_test!(snapshot_render, "menu.render");
 snapshot_test!(snapshot_window, "menu.window");
 snapshot_test!(snapshot_system, "menu.system");

@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "id": "menu.animate",
+  "label": "Animate",
+  "style": "menu",
+  "controls": [
+    { "command": "Play/Stop", "label": "Play", "shortcut": "Play/Stop" },
+    { "command": "Play Backwards", "label": "Play Backwards" },
+    { "form": "menu.animate.autoKey" },
+    { "form": "menu.animate.key" },
+    { "divider": "" },
+    { "command": "operandi.anim.timeline", "label": "Timeline" },
+    { "command": "operandi.anim.dialog kind:ranges", "label": "Time Ranges…" },
+    { "command": "operandi.anim.dialog kind:settings", "label": "Settings…" },
+    { "divider": "" },
+    { "command": "operandi.anim.dialog kind:render", "label": "Render Frame Range…" },
+    { "command": "operandi.anim.dialog kind:playblast", "label": "Playblast…" },
+    { "command": "scene.saveAs format:usda export:true", "label": "Export USD Animation…" }
+  ]
+}

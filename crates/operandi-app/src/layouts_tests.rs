@@ -226,7 +226,7 @@ fn shipped_layouts_are_files_model_and_uv() {
         "{names:?}"
     );
     let layouts = Layouts::read(SHIPPED, None);
-    assert_eq!(layouts.names(), ["Model", "UV"]);
+    assert_eq!(layouts.names(), ["Model", "UV", "Animate"]);
     for entry in &layouts.list {
         let doc = entry.doc();
         assert!(doc.starred, "LAY-21: {} is starred", doc.name);
@@ -347,7 +347,7 @@ fn every_way_in_runs_layout_restore() {
         .find(|m| m.title == "Layout")
         .expect("a Layout menu");
     let leaves = layouts_submenu(layout).leaves();
-    assert_eq!(leaves.len(), 2);
+    assert_eq!(leaves.len(), 3);
     a.menu_action(
         &ctx,
         app_menu::line_action(&Operandi::restore_line(&a.layouts.names()[1])),
@@ -407,7 +407,7 @@ fn lay70_a_third_layout_is_added_by_adding_a_file() {
     files.push(("third.json", THIRD));
     a.layouts = Layouts::read(&files, None);
     frames(&mut a, &ctx, 2);
-    assert_eq!(a.layouts.names(), ["Model", "UV", "Third"]);
+    assert_eq!(a.layouts.names(), ["Model", "UV", "Animate", "Third"]);
     assert!(
         a.layouts_pie()
             .entries
@@ -420,7 +420,7 @@ fn lay70_a_third_layout_is_added_by_adding_a_file() {
     let layout = menus.iter().find(|m| m.title == "Layout").unwrap();
     assert_eq!(
         layouts_submenu(layout).leaves().len(),
-        3,
+        4,
         "and a menu entry"
     );
     a.execute("layout.restore Third");
@@ -445,7 +445,7 @@ fn lay70_a_third_layout_is_added_by_adding_a_file() {
     std::fs::write(root.join("Layouts/Third.json"), THIRD).unwrap();
     let ctx2 = Context::default();
     let b = launch(&root, &ctx2);
-    assert_eq!(b.layouts.names(), ["Model", "UV", "Third"]);
+    assert_eq!(b.layouts.names(), ["Model", "UV", "Animate", "Third"]);
 }
 
 #[test]

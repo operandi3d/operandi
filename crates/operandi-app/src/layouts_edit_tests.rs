@@ -50,7 +50,7 @@ fn lay43_new_layout_is_blank_or_a_copy_at_the_right_hand_end() {
     a.answer_layout_dialog();
     frames(&mut a, &ctx, 2);
     assert_eq!(a.layouts.current, "Sketch", "{}", a.status);
-    assert_eq!(a.layouts.names(), ["Model", "UV", "Sketch"]);
+    assert_eq!(a.layouts.names(), ["Model", "UV", "Animate", "Sketch"]);
     // One empty panel to build from (LAY-74); the scene is untouched.
     let panes = view_slots(&a);
     assert!(matches!(panes.as_slice(), [Pane::Missing(_)]), "{panes:?}");
@@ -121,7 +121,7 @@ fn lay45_lay46_rename_and_delete_user_layouts_only() {
     assert!(a.layouts.stars.contains("Ours"), "the star follows");
     // Shipped layouts keep their names and can't be deleted.
     a.execute("operandi.layout.rename Mine layout:Model");
-    assert_eq!(a.layouts.names(), ["Model", "UV", "Ours"]);
+    assert_eq!(a.layouts.names(), ["Model", "UV", "Animate", "Ours"]);
     assert!(a.status.contains("shipped"), "{}", a.status);
     a.execute("operandi.layout.delete layout:UV");
     assert!(a.layouts.find("UV").is_some());
@@ -200,7 +200,7 @@ fn uic13_reorder_by_command_persists_and_updates_the_layouts_pie() {
     let root = data_root();
     let (mut a, _) = app(&root);
     a.execute("operandi.layout.move UV 0");
-    assert_eq!(a.layouts.names(), ["UV", "Model"]);
+    assert_eq!(a.layouts.names(), ["UV", "Model", "Animate"]);
     assert_eq!(
         a.layouts.current, "Model",
         "reordering keeps the current layout"
@@ -217,7 +217,7 @@ fn uic13_reorder_by_command_persists_and_updates_the_layouts_pie() {
     let (b, _) = app(&root);
     assert_eq!(
         b.layouts.names(),
-        ["UV", "Model"],
+        ["UV", "Model", "Animate"],
         "the order survives a restart"
     );
 }
@@ -235,10 +235,14 @@ fn uic14_uic16_stars_starred_only_and_collapse() {
     a.execute("operandi.layout.starredOnly on:true");
     frames(&mut a, &ctx, 2);
     let shown = a.layouts.shown_names();
-    assert_eq!(shown, ["Model", "UV"], "starred, and the current one");
+    assert_eq!(
+        shown,
+        ["Model", "UV", "Animate"],
+        "starred, and the current one"
+    );
     a.execute("operandi.layout.starredOnly");
     frames(&mut a, &ctx, 1);
-    assert_eq!(a.layouts.shown_names().len(), 3);
+    assert_eq!(a.layouts.shown_names().len(), 4);
     // The top bar collapsed: no tool sets, a thin line.
     a.execute("operandi.bar.collapse");
     frames(&mut a, &ctx, 1);
@@ -252,7 +256,7 @@ fn uic14_uic16_stars_starred_only_and_collapse() {
     assert!(b.layouts.top_collapsed);
     a.execute("operandi.bar.collapse on:false");
     frames(&mut a, &ctx, 1);
-    assert_eq!(a.layouts.shown_names().len(), 2);
+    assert_eq!(a.layouts.shown_names().len(), 3);
     assert!(!a.layouts.tool_set_rects.is_empty());
 }
 
@@ -315,7 +319,7 @@ fn uic18_quick_switcher_lists_by_recent_use_and_switches_on_release() {
     a.execute("layout.restore UV");
     a.execute("layout.restore Model");
     frames(&mut a, &ctx, 1);
-    assert_eq!(a.layouts.mru_order(), ["Model", "UV", "Third"]);
+    assert_eq!(a.layouts.mru_order(), ["Model", "UV", "Third", "Animate"]);
     // Ctrl+Shift+Tab is its default key (real Ctrl on a Mac, LAY-32).
     assert_eq!(a.bindings["Layout Switcher"], "Ctrl+Shift+Tab");
     let held = Modifiers {
@@ -332,7 +336,7 @@ fn uic18_quick_switcher_lists_by_recent_use_and_switches_on_release() {
     };
     draw_held(&mut a, &ctx, SIZE, vec![tab.clone()], held);
     let sw = a.layouts.switcher.clone().expect("the switcher opened");
-    assert_eq!(sw.list, ["Model", "UV", "Third"]);
+    assert_eq!(sw.list, ["Model", "UV", "Third", "Animate"]);
     assert_eq!(sw.at, 1, "the next one outlined");
     // A further Tab, keys still held, moves the outline on.
     draw_held(&mut a, &ctx, SIZE, vec![tab], held);
@@ -352,7 +356,7 @@ fn uic18_quick_switcher_lists_by_recent_use_and_switches_on_release() {
     assert_eq!(a.layouts.current, "Third");
     // The MRU list survives a restart.
     let (b, _) = app(&root);
-    assert_eq!(b.layouts.mru_order(), ["Third", "Model", "UV"]);
+    assert_eq!(b.layouts.mru_order(), ["Third", "Model", "UV", "Animate"]);
 }
 
 #[test]
@@ -367,7 +371,14 @@ fn uic18_the_layouts_pie_runs_layout_restore() {
         .flatten()
         .map(|e| e.command.as_str())
         .collect();
-    assert_eq!(commands, ["layout.restore Model", "layout.restore UV"]);
+    assert_eq!(
+        commands,
+        [
+            "layout.restore Model",
+            "layout.restore UV",
+            "layout.restore Animate"
+        ]
+    );
     // Ctrl+` opens it (held), the same as the other pies.
     let held = Modifiers {
         ctrl: true,
@@ -561,7 +572,7 @@ fn lay48_lay60_locks_are_per_layout_and_everything_survives_a_restart() {
     let (b, _) = app(&root);
     assert_eq!(b.layouts.current, "Model");
     assert!(b.dots.locks.thumbs && !b.dots.locks.dividers);
-    assert_eq!(b.layouts.names(), ["UV", "Model"]);
+    assert_eq!(b.layouts.names(), ["UV", "Model", "Animate"]);
     assert!(!b.layouts.stars.contains("Model") && b.layouts.stars.contains("UV"));
     assert!(b.layouts.locks["UV"].dividers);
 }
@@ -601,7 +612,7 @@ fn every_stage2_command_line_runs_without_a_window() {
             a.status
         );
     }
-    assert_eq!(a.layouts.names(), ["Model", "UV", "A"]);
+    assert_eq!(a.layouts.names(), ["Model", "UV", "Animate", "A"]);
 }
 
 /// Press and release at `at`, hovering first, as a hand would.

@@ -1,0 +1,132 @@
+{
+  "version": 1,
+  "name": "Animate",
+  "order": 2,
+  "starred": true,
+  "open_command": "operandi.anim.timeline open:tall",
+  "keys": {
+    "Key Scale": "Shift+R",
+    "Key Transforms": "Shift+Y",
+    "Play/Stop": "Slash",
+    "Step Back": "Comma",
+    "Step Forward": "Period"
+  },
+  "mode_bar_bottom": true,
+  "frame": {
+    "type": "split",
+    "dir": "column",
+    "children": [
+      {
+        "fraction": 0.05,
+        "frame": {
+          "type": "dock_panel",
+          "pane": "tool_tabs",
+          "frame": {
+            "type": "panel",
+            "kind": "Tool Tabs",
+            "settings": {
+              "horizontal": true
+            }
+          }
+        }
+      },
+      {
+        "fraction": 0.95,
+        "frame": {
+          "type": "split",
+          "dir": "row",
+          "children": [
+            {
+              "fraction": 0.1694444,
+              "frame": {
+                "type": "split",
+                "dir": "column",
+                "children": [
+                  {
+                    "fraction": 0.6,
+                    "frame": {
+                      "type": "dock_panel",
+                      "pane": "toolbox",
+                      "frame": {
+                        "type": "panel",
+                        "kind": "Toolbox"
+                      }
+                    }
+                  },
+                  {
+                    "fraction": 0.4,
+                    "frame": {
+                      "type": "dock_panel",
+                      "pane": "tool_properties",
+                      "frame": {
+                        "type": "panel",
+                        "kind": "Tool Properties"
+                      }
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "fraction": 0.6222223,
+              "frame": {
+                "type": "panel",
+                "kind": "3D View"
+              }
+            },
+            {
+              "fraction": 0.2083333,
+              "frame": {
+                "type": "split",
+                "dir": "column",
+                "children": [
+                  {
+                    "fraction": 0.5,
+                    "frame": {
+                      "type": "dock_panel",
+                      "pane": "items",
+                      "frame": {
+                        "type": "tabs",
+                        "tabs": [
+                          {
+                            "kind": "Items"
+                          },
+                          {
+                            "kind": "Shader Tree"
+                          },
+                          {
+                            "kind": "Groups"
+                          },
+                          {
+                            "kind": "Mesh Stack"
+                          }
+                        ],
+                        "active": 0
+                      }
+                    }
+                  },
+                  {
+                    "fraction": 0.5,
+                    "frame": {
+                      "type": "dock_panel",
+                      "pane": "properties",
+                      "frame": {
+                        "type": "tabs",
+                        "tabs": [
+                          {
+                            "kind": "Properties"
+                          }
+                        ],
+                        "active": 0
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
+}
