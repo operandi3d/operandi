@@ -1,5 +1,31 @@
 # Milestone progress ledger
 
+- **Edge Bevel with hard edges (2026-11-22, branch forum-bevel-loopslice;
+  forum report):** Edge Bevel and Edge Chamfer refused every edge of a mesh
+  with a vertex normal map ("cannot yet remap ... normals"), and hardening
+  an edge always makes one, so they did nothing after Harden. They now
+  carry the map: rebuilt polygons keep their corners' normals, new
+  polygons' corners are unassigned (provisional, EBC-Q13). Bridge with its
+  defaults leaves no open edges or loose points (checked over segments,
+  modes and Remove). Still refused: border edges (EBC-Q14, no spec), corner
+  weights/colours.
+
+- **Loop Slice, Slice Selected follows the selection (2026-11-22, branch
+  forum-bevel-loopslice; ported from claude/project-thread-44lm6w):** with
+  Slice Selected each connected group of selected polygons is cut along its
+  middle (LS-75): pairs and strips as before, a lone polygon across its
+  first side, an L turns its corner (a triangle and a five-sided rest), a
+  2x2 block gets a closed loop round its centre; pick order doesn't matter.
+  Unselected polygons are never cut and take one point per cut side (LS-72,
+  LS-Q15). An L with Slice Selected off is cut the same, its ends running
+  on round the ring. Provisional: a branching group is left uncut (LS-Q18);
+  a 2x2 block with Slice Selected off is unchanged (LS-Q17, open). Current
+  stops at the last slice instead of refusing a nudge ("from 0 to 0").
+  Forum report: with Slice Selected off (the default) a lone selected
+  polygon now cuts round the ring through its first side (provisional,
+  LS-Q19). Rings still stop at triangles, odd n-gons and (Slice N-gon off)
+  n-gons, so a lone n-gon or a pair beside one can still give no cut.
+
 - **Colour numbers in display space (2026-11-21, branch
   colour-swatch-raw):** Display Color Values in Display Space is on by
   default, so colour numbers show and take display-encoded (sRGB) values,

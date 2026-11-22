@@ -824,6 +824,20 @@ Provisional, for Jason to take back:
   Boundary Extend, Boundary Coplanar and Reverse X/Y are shown greyed out at
   their Reset values. Each needs at least one measured case where it
   changes the result.
+- EBC-Q13 (new, forum report 2026-11-22): Edge Bevel / Edge Chamfer on a
+  mesh with a vertex normal map (any mesh with hard edges has one) used to
+  refuse every edge. *Provisional:* it now carries the map: a rebuilt
+  polygon's corners keep the normal of the corner they came from, the new
+  strip and end polygons' corners stay unassigned (as Add Loop leaves its
+  new corners). HardEdges entries for edges the bevel removes or splits are
+  dropped on Drop, so a later Recalculate treats the strip as soft. What
+  does the reference do with the normal map and with HardEdges on a
+  bevelled hard edge?
+- EBC-Q14 (new, forum report 2026-11-22): Edge Bevel of a border edge (an
+  edge with one polygon, e.g. a seam of unwelded points) is refused ("supports
+  edges between two polygons"); EBC-B3-06 covers edges that *end* on a
+  border, not border edges themselves. What does the reference make when a
+  selected edge is a border edge (strip on one side only? refused?)?
 
 ## Undo and Auto-Save preferences — 2026-11-04 (provisional readings)
 
@@ -6983,6 +6997,37 @@ Builder's provisional readings; the spec's own questions are in
   profile loop is split like a slice (so the groove comes apart along each
   loop, with Gap strips between). Is that what the reference does, or does
   Split separate only once across the whole profile?
+- **LS-Q15 Slice Selected with unselected polygons between selected
+  ones.** *Answered (measured 2026-11-20, spec section 8):* the polygon
+  between isn't cut; it takes one point on each side it shares with a cut
+  polygon. Each connected group of selected polygons is cut on its own; a
+  lone selected polygon is cut across its first side (point 0 to 1) and
+  the opposite one. Built.
+- **LS-Q16 Slice Selected turning at corners (LS-32).** *Answered
+  (measured 2026-11-20):* an L is cut down the middle of the strip, the
+  corner polygon from the middle of its entry side to the middle of its
+  exit side (a triangle and a five-sided rest), the same with Slice
+  Selected off (the ends then run on round the ring). A 2x2 block gets a
+  closed loop round its centre, each polygon cut corner to corner. Built
+  (`selection_rings` in slice.rs).
+- **LS-Q17 (open) 2x2 block with Slice Selected off.** The reference's cut
+  leaves the selection and depends on pick order; no rule yet. Unchanged:
+  the block's two directions cross and the tool waits for a click
+  (SL-Q14).
+- **LS-Q18 (new) Slice Selected on a group that branches.** A selected
+  polygon sharing three or more sides with the rest (a T, a 2x3 or 3x3
+  block) has no single middle line. Built *provisional:* that group is left
+  uncut. What does the reference do?
+- **LS-Q19 (new, forum report 2026-11-22) A lone polygon with Slice
+  Selected off.** LS-01 needs two neighbouring polygons; a lone selected
+  polygon (the default, Slice Selected off) gave no cut, which read as
+  "Loop Slice refuses to cut on faces". Built *provisional:* each selected
+  polygon that shares no side with another names the ring through its
+  first side (point 0 to 1, as LS-75 does with Slice Selected on), and the
+  cut runs on round that ring. Does the reference cut there, and across
+  which side? Also open: a click on a polygon's middle (not near an edge)
+  while Loop Slice is live only says "click an edge" (LS-03 covers edge
+  clicks only).
 - **LS-B09 Slices keep creation order (LS-71).** Free mode no longer sorts
   positions; Current, the bar's highlighted triangle and the middle-drag
   stepping follow the order the slices were added. Uniform and Symmetry
