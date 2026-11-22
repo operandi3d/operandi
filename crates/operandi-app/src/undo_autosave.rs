@@ -37,6 +37,10 @@ pub struct UndoAutosavePreferences {
     /// `None` uses the default folder in the app's data folder.
     pub backup_dir: Option<PathBuf>,
     pub revisions: u32,
+    /// Experimental: Animation (preview), the animation switch's
+    /// preference (anim_switch.rs).
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub animation_preview: bool,
 }
 impl Default for UndoAutosavePreferences {
     fn default() -> Self {
@@ -55,6 +59,7 @@ impl Default for UndoAutosavePreferences {
             backup_dir: None,
             // Provisional (AS-Q1).
             revisions: 5,
+            animation_preview: false,
         }
     }
 }
@@ -462,7 +467,18 @@ impl super::Operandi {
             ui,
             "A lower Max Undo Level drops the oldest steps when the next step is recorded.",
         );
+        rows::section(ui, "Experimental", false, |ui| {
+            rows::check_d(
+                ui,
+                "Animation (preview)",
+                &mut p.animation_preview,
+                d.animation_preview,
+                "Show the animation tools: the Animate layout and menu, the timeline, the \
+                 graph editor and keying. OPERANDI_ANIMATION=1 or 0 in the environment wins",
+            );
+        });
         if self.undo_autosave != before {
+            crate::anim_switch::set_preference(self.undo_autosave.animation_preview);
             self.save_undo_autosave();
         }
         ui.add_space(8.);

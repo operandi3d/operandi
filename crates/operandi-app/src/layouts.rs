@@ -58,6 +58,10 @@ pub(super) const SHIPPED: &[(&str, &str)] =
 pub(super) fn shipped() -> Vec<(&'static str, &'static str)> {
     #[allow(unused_mut)]
     let mut all = SHIPPED.to_vec();
+    // The animation switch (anim_switch.rs): no Animate layout while off.
+    if !crate::anim_switch::enabled() {
+        all.retain(|(file, _)| *file != "animate.json");
+    }
     #[cfg(feature = "painting")]
     if paint_layout_shipped() {
         all.push((

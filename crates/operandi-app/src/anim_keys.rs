@@ -64,7 +64,7 @@ pub(crate) fn is_animation_action(action: &str) -> bool {
 /// Whether animation action `action` applies in `mode` (TK-65): Items
 /// mode, with or without a tool live.
 pub(crate) fn available(_action: &str, mode: Mode, _live: bool) -> bool {
-    mode == Mode::Item
+    crate::anim_switch::enabled() && mode == Mode::Item
 }
 
 /// The line an animation action runs.
@@ -78,7 +78,7 @@ pub(crate) fn action_line(name: &str) -> Option<&'static str> {
 /// An arrow key with these modifiers is an animation key, so the item
 /// arrow walk (CP-A04) leaves it alone.
 pub(crate) fn owns_arrow(modifiers: Modifiers) -> bool {
-    !modifiers.is_none()
+    crate::anim_switch::enabled() && !modifiers.is_none()
 }
 
 /// Keys over the timeline strip (TL-14 fit, TL-50 marker, TL-45 delete,
