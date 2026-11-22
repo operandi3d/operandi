@@ -14,19 +14,12 @@ use std::time::Instant;
 const ZOOM_STEP: f64 = 2.;
 /// NAV-13: turntable speed, radians per second [OP].
 const TURN_SPEED: f64 = 0.6;
-/// NAV-03: how fast a flick slows down (per second); it comes to rest in
-/// about 1.5 s [OP].
-const FLICK_DECAY: f64 = 3.;
-/// A flick slower than this (points per second) stops.
-const FLICK_REST: f32 = 8.;
 
 /// A view that keeps moving on its own.
 #[derive(Clone, Copy, Debug)]
 pub enum Motion {
     /// NAV-13 turntable.
     Turn { last: Instant },
-    /// NAV-03 flick, in points per second of orbit drag.
-    Flick { velocity: Vec2, last: Instant },
 }
 
 impl Operandi {
@@ -208,8 +201,7 @@ impl Operandi {
         sum.try_normalize()
     }
 
-    /// A navigation drag step. NAV-06 zooms about where the drag started;
-    /// NAV-03 also measures the drag speed for the release.
+    /// A navigation drag step. NAV-06 zooms about where the drag started.
     pub(super) fn navigate_gesture(
         &mut self,
         kind: NavigationKind,
@@ -232,44 +224,20 @@ impl Operandi {
                     self.camera.target += a - b;
                 }
             }
-            NavigationKind::Flick => {
-                let now = Instant::now();
-                if let Some((_, at)) = self.flick_track {
-                    let dt = now.duration_since(at).as_secs_f32().max(1e-3);
-                    self.flick_track = Some(((pos - last) / dt, now));
-                } else {
-                    self.flick_track = Some((Vec2::ZERO, now));
-                }
-                self.navigate_from(kind, last, pos, r);
-            }
             _ => self.navigate_from(kind, last, pos, r),
         }
     }
 
-    /// Release of a navigation drag.
+    /// Release of a navigation drag: NAV-07 box zoom acts now.
     pub(super) fn navigation_release(
         &mut self,
         kind: NavigationKind,
         start: Pos2,
         pos: Pos2,
         r: Rect,
-        ctx: &Context,
     ) {
-        match kind {
-            NavigationKind::Flick => {
-                if let Some((velocity, at)) = self.flick_track.take()
-                    && at.elapsed().as_secs_f32() < 0.1
-                    && velocity.length() > FLICK_REST * 4.
-                {
-                    self.view_motion = Some(Motion::Flick {
-                        velocity,
-                        last: Instant::now(),
-                    });
-                    ctx.request_repaint();
-                }
-            }
-            NavigationKind::BoxZoom => self.box_zoom(Rect::from_two_pos(start, pos), r),
-            _ => {}
+        if kind == NavigationKind::BoxZoom {
+            self.box_zoom(Rect::from_two_pos(start, pos), r);
         }
     }
 
@@ -289,8 +257,7 @@ impl Operandi {
         self.camera.distance = (self.camera.distance * scale).clamp(0.03, 1e7);
     }
 
-    /// Advance a turning or flicked view; any click (and Esc for the
-    /// turntable) stops it [OP].
+    /// Advance a turning view; any click or Esc stops it [OP].
     pub(super) fn tick_view_motion(&mut self, ctx: &Context) {
         self.nav_pointer = ctx.pointer_hover_pos().or(self.nav_pointer);
         let Some(motion) = self.view_motion else {
@@ -302,34 +269,16 @@ impl Operandi {
                 i.key_pressed(Key::Escape) && i.modifiers == Modifiers::NONE,
             )
         });
-        if clicked || (escape && matches!(motion, Motion::Turn { .. })) {
+        if clicked || escape {
             self.view_motion = None;
             return;
         }
         let now = Instant::now();
-        let r = self.nav_rect();
-        match motion {
-            Motion::Turn { last } => {
-                let dt = now.duration_since(last).as_secs_f64().min(0.1);
-                self.camera.free();
-                self.camera.yaw -= TURN_SPEED * dt;
-                self.view_motion = Some(Motion::Turn { last: now });
-            }
-            Motion::Flick { velocity, last } => {
-                let dt = now.duration_since(last).as_secs_f64().min(0.1);
-                self.navigate_from(
-                    NavigationKind::Orbit,
-                    r.center(),
-                    r.center() + velocity * dt as f32,
-                    r,
-                );
-                let velocity = velocity * (-FLICK_DECAY * dt).exp() as f32;
-                self.view_motion = (velocity.length() >= FLICK_REST).then_some(Motion::Flick {
-                    velocity,
-                    last: now,
-                });
-            }
-        }
+        let Motion::Turn { last } = motion;
+        let dt = now.duration_since(last).as_secs_f64().min(0.1);
+        self.camera.free();
+        self.camera.yaw -= TURN_SPEED * dt;
+        self.view_motion = Some(Motion::Turn { last: now });
         ctx.request_repaint();
     }
 }
