@@ -36,9 +36,10 @@ Animation phases 1-2 (all approved by Jason, 2026-11-22):
 - **UIC-190/194 (shipped layouts).** Animate is a third shipped layout,
   beside Model and UV.
 
-Animation phase 3 (provisional, needs Jason's OK):
+Animation phase 3 (approved by Jason, 2026-11-22, "OK for now"):
 
 - **UIC-190..195 / UIC-184 (GE-01).** The Graph Editor opens as a
   floating window (Animate > Graph Editor, the timeline's Graph button,
   `operandi.graph.open`), not yet a dockable panel kind or the Animation
-  Editors preset.
+  Editors preset. Temporary: until the timeline and graph editor become
+  dockable panels.
