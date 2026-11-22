@@ -1547,8 +1547,14 @@ impl Operandi {
                         return;
                     }
                     let name = self.image_name(id);
-                    self.execute(&format!("operandi.image.reload image:{id}"));
-                    self.status = format!("{name} changed on disk and was reloaded");
+                    // Only say "reloaded" when it was (Astra P9-002); a
+                    // file that doesn't read keeps the pixels as they were
+                    // and isn't tried again until it changes once more.
+                    self.painting.doc.file_times.insert(id, now);
+                    self.status = match self.editor.reload_image(id) {
+                        Ok(()) => format!("{name} changed on disk and was reloaded"),
+                        Err(e) => format!("{name} changed on disk but couldn't be read: {e}"),
+                    };
                 }
                 Some(_) => {}
             }
