@@ -15,6 +15,7 @@
 //! (GE-01, UIC-190..195; FLAGS).
 use super::*;
 use crate::form::status::key_red;
+use crate::icons::Icon;
 use crate::unavailable::Gate;
 use operandi_core::anim_curve::{Behavior, Curve};
 use operandi_core::animation::{self, ChannelKey};
@@ -1177,8 +1178,8 @@ impl Operandi {
                 lines.push(format!("operandi.key.set channels:{list}"));
             }
             if ui
-                .button("Key Keeping Shape")
-                .on_hover_text("Key the shown channels without changing their curves (GE-32)")
+                .add(crate::icons::button(ui, Icon::KeyKeepingShape, ""))
+                .on_hover_text("Key Keeping Shape: key the shown channels without changing their curves (GE-32)\noperandi.key.keepShape")
                 .clicked()
                 && !list.is_empty()
             {
@@ -1234,39 +1235,40 @@ impl Operandi {
                 }
             }
             ui.separator();
-            for (text, line) in [
-                ("Break", "operandi.key.break"),
-                ("Unify", "operandi.key.unify"),
+            for (icon, tip, line) in [
+                (Icon::BreakTangents, "Break Handles: each side moves alone (GE-51)", "operandi.key.break"),
+                (Icon::UnifyTangents, "Unify Handles: one straight line (GE-51)", "operandi.key.unify"),
             ] {
                 if ui
                     .gated(
                         crate::unavailable::unless(has, "Select keys first"),
-                        egui::Button::new(text),
+                        crate::icons::button(ui, icon, ""),
                     )
+                    .on_hover_text(format!("{tip}\n{line}"))
                     .clicked()
                 {
                     lines.push(line.into());
                 }
             }
             ui.separator();
-            for (side, text) in [("pre", "Pre ▾"), ("post", "Post ▾")] {
-                ui.menu_button(text, |ui| {
+            for (side, icon) in [("pre", Icon::PreBehaviour), ("post", Icon::PostBehaviour)] {
+                let r = ui.add(crate::icons::button(ui, icon, "")).on_hover_text(format!(
+                    "{} Behaviour: what the curve does {} the keys (GE-61)\noperandi.curve.behavior {side}:…",
+                    if side == "pre" { "Pre" } else { "Post" },
+                    if side == "pre" { "before" } else { "after" }
+                ));
+                egui::Popup::menu(&r).show(|ui| {
                     for (name, b) in Behavior::NAMES {
                         if ui.button(b.label()).clicked() {
                             lines.push(format!("operandi.curve.behavior {side}:{name}"));
                             ui.close();
                         }
                     }
-                })
-                .response
-                .on_hover_text(format!(
-                    "Behaviour {} the keys (GE-61)",
-                    if side == "pre" { "before" } else { "after" }
-                ));
+                });
             }
             if ui
-                .button("Cycle")
-                .on_hover_text("The last key matches the first (GE-62)")
+                .add(crate::icons::button(ui, Icon::CycleCurve, ""))
+                .on_hover_text("Cycle: the last key matches the first (GE-62)\noperandi.curve.cycle")
                 .clicked()
             {
                 lines.push("operandi.curve.cycle on:true".into());
@@ -1290,27 +1292,48 @@ impl Operandi {
     fn graph_bottom_bar(&mut self, ui: &mut Ui) {
         let mut lines: Vec<&str> = Vec::new();
         ui.horizontal_wrapped(|ui| {
-            for (text, on, line) in [
+            // Icon toggles (lit when on, UIC-23); tooltips name their keys.
+            for (icon, on, tip, line) in [
                 (
-                    "Normalised",
+                    Icon::Normalised,
                     self.graph.normalised,
+                    "Normalised: every curve in one -1..1 band (N, GE-82)",
                     "operandi.graph.view normalise:toggle",
                 ),
                 (
-                    "Stacked",
+                    Icon::Stacked,
                     self.graph.stacked,
+                    "Stacked: each curve in its own row (GE-82)",
                     "operandi.graph.view stacked:toggle",
                 ),
                 (
-                    "Isolate",
+                    Icon::IsolateCurve,
                     self.graph.isolate,
+                    "Isolate: only the selected curve (GE-X6)",
                     "operandi.graph.view isolate:toggle",
                 ),
                 (
-                    "Velocity",
+                    Icon::Velocity,
                     self.graph.velocity,
+                    "Velocity: the curve's rate of change (GE-81)",
                     "operandi.graph.view velocity:toggle",
                 ),
+                (
+                    Icon::LinkRelated,
+                    self.graph.link,
+                    "Link Related: X/Y/Z keys move together in time (GE-42)",
+                    "operandi.graph.view link:toggle",
+                ),
+            ] {
+                if ui
+                    .add(crate::icons::button(ui, icon, "").selected(on))
+                    .on_hover_text(format!("{tip}\n{line}"))
+                    .clicked()
+                {
+                    lines.push(line);
+                }
+            }
+            for (text, on, line) in [
                 (
                     "Show Shadow",
                     self.graph.show_shadow,
@@ -1326,11 +1349,6 @@ impl Operandi {
                     self.graph.locked.is_some(),
                     "operandi.graph.view lock:toggle",
                 ),
-                (
-                    "Link Related",
-                    self.graph.link,
-                    "operandi.graph.view link:toggle",
-                ),
             ] {
                 if ui.selectable_label(on, text).clicked() {
                     lines.push(line);
@@ -1338,9 +1356,27 @@ impl Operandi {
             }
             ui.separator();
             ui.label("Shadow:");
+            for (icon, tip, line) in [
+                (
+                    Icon::ShadowCopy,
+                    "Copy to Shadow (GE-80)",
+                    "operandi.curve.shadow action:copy",
+                ),
+                (
+                    Icon::ShadowSwap,
+                    "Swap with Shadow (GE-80)",
+                    "operandi.curve.shadow action:swap",
+                ),
+            ] {
+                if ui
+                    .add(crate::icons::button(ui, icon, ""))
+                    .on_hover_text(format!("{tip}\n{line}"))
+                    .clicked()
+                {
+                    lines.push(line);
+                }
+            }
             for (text, line) in [
-                ("Copy", "operandi.curve.shadow action:copy"),
-                ("Swap", "operandi.curve.shadow action:swap"),
                 ("Replace", "operandi.curve.shadow action:replace"),
                 ("Clear", "operandi.curve.shadow action:clear"),
             ] {
