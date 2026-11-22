@@ -379,6 +379,13 @@ pub struct Scene {
         skip_serializing_if = "crate::scene_time::SceneTime::is_default"
     )]
     pub time: crate::scene_time::SceneTime,
+    /// Key curves, time settings and markers (animation.rs, TK/TL specs).
+    /// Saved only when there is any; native version 60.
+    #[serde(
+        default,
+        skip_serializing_if = "crate::animation::Animation::is_default"
+    )]
+    pub animation: crate::animation::Animation,
     /// G9 GD-3: the scene's guides (guides.rs). Saved only when changed;
     /// native version 59.
     #[serde(default, skip_serializing_if = "crate::guides::Guides::is_default")]
@@ -421,6 +428,7 @@ impl Default for Scene {
             groups: Vec::new(),
             item_draw_size: 1.,
             time: Default::default(),
+            animation: Default::default(),
             guides: Default::default(),
             last_mesh: Default::default(),
             index: Default::default(),
@@ -528,6 +536,7 @@ impl Scene {
     }
     pub fn validate(&self) -> Result<()> {
         self.guides.validate()?;
+        self.animation.validate()?;
         self.validate_with_range_marker(&mut false)
     }
     /// Every selected item, first-selected first, skipping stale ids.

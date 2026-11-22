@@ -1585,6 +1585,10 @@ pub fn answer(e: &Editor, given: &str, given_args: &Map<String, Value>) -> Optio
             Ok(format!("Grab Size: {} × {} × {} m", s.x, s.y, s.z))
         }));
     }
+    // Animation state and curves (anim_commands.rs), read any time.
+    if let Some(answer) = crate::anim_commands::answer(e, &name, &a) {
+        return Some(answer);
+    }
     if a.get("value").and_then(Value::as_str).map(str::trim) != Some("?") {
         return None;
     }

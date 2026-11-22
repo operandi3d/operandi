@@ -74,16 +74,28 @@ impl SceneTime {
 }
 
 impl crate::Editor {
-    /// `Command::SetSceneTime`: one "Scene Time" undo step.
+    /// `Command::SetSceneTime`: rate and range are one "Scene Time" undo
+    /// step; the current time alone is not an undo step (TK-05, UIC-225)
+    /// and poses the scene there (anim_edit.rs).
     pub(crate) fn set_scene_time(&mut self, time: SceneTime) -> crate::Result<()> {
         time.validate()?;
         if self.scene.time == time {
             return Ok(());
         }
-        let mut candidate = self.scene.clone();
-        candidate.time = time;
-        let before = std::mem::replace(&mut self.scene, candidate);
-        self.record("Scene Time".into(), before);
+        let now = self.scene.time.current;
+        let settings = SceneTime {
+            current: now,
+            ..time
+        };
+        if settings != self.scene.time {
+            let mut candidate = self.scene.clone();
+            candidate.time = settings;
+            let before = std::mem::replace(&mut self.scene, candidate);
+            self.record("Scene Time".into(), before);
+        }
+        if time.current != now {
+            self.set_current_time(time.current, false)?;
+        }
         Ok(())
     }
 }

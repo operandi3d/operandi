@@ -75,19 +75,23 @@ pub enum Target {
 pub enum Held {
     /// One value at every time.
     Constant(ChannelValue),
+    /// Key curve (animation.rs): its value at a time.
+    Keys(crate::anim_curve::Curve),
 }
 
 impl Held {
     /// The value at `time`.
-    pub fn value_at(&self, _time: crate::time_tick::Tick) -> ChannelValue {
+    pub fn value_at(&self, time: crate::time_tick::Tick) -> ChannelValue {
         match self {
             Held::Constant(v) => v.clone(),
+            Held::Keys(c) => ChannelValue::Float(c.value_at(time)),
         }
     }
     /// "constant" (later "keys", "link", "sim").
     pub fn label(&self) -> &'static str {
         match self {
             Held::Constant(_) => "constant",
+            Held::Keys(_) => "keys",
         }
     }
 }
@@ -95,6 +99,15 @@ impl Held {
 /// How channel `name` of `target` gets its value (AR-08).
 pub fn held(scene: &Scene, target: Target, name: &str) -> Result<Held> {
     let channel = find(scene, target, name).ok_or_else(|| unknown(scene, target, name))?;
+    if let Target::Item(id) = target
+        && let Some(c) = scene
+            .animation
+            .channels
+            .get(&crate::animation::ChannelKey::new(id, channel.name))
+            .filter(|c| !c.curve.is_empty())
+    {
+        return Ok(Held::Keys(c.curve.clone()));
+    }
     let value = (channel.get)(scene, target).ok_or_else(|| format!("{name} has no value here"))?;
     Ok(Held::Constant(value))
 }
@@ -120,6 +133,7 @@ pub static TABLES: &[&[Channel]] = &[
     crate::environment_channels::MATERIAL,
     crate::environment_channels::LAYER,
     crate::scene_time::CHANNELS,
+    crate::anim_camera_channels::CAMERA,
 ];
 
 // ------------------------------------------------------------ lookup
@@ -269,7 +283,9 @@ pub fn get(scene: &Scene, target: Target, name: &str) -> Result<String> {
     // Read through how the channel is held, at the scene's current time
     // (AR-08): a constant today, keys or links later.
     let channel = find(scene, target, base).ok_or_else(|| unknown(scene, target, name))?;
-    let value = held(scene, target, channel.name)?.value_at(scene.time.current);
+    // TK-51: the value now, as the field holds it (an animated channel's
+    // pose, plus any pending edit); `held` says how it is held.
+    let value = (channel.get)(scene, target).ok_or_else(|| format!("{name} has no value here"))?;
     Ok(match (part, &value) {
         (Some(i), ChannelValue::Colour(c)) => c[i].to_string(),
         (Some(_), _) => return Err(format!("{base} isn't a colour")),

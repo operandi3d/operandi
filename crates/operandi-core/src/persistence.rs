@@ -15,7 +15,14 @@ const MAX_LOAD_BYTES: u64 = 4 * 1024 * 1024 * 1024;
 /// Newest native version this build reads and writes.
 // Version numbers: renumber here (and in the tests that name them) when
 // branches merge in another order.
-const CURRENT_VERSION: u32 = GUIDES_VERSION;
+const CURRENT_VERSION: u32 = ANIMATION_VERSION;
+/// Version 60: animation (`Scene::animation`: key curves, time settings,
+/// markers). An older build would refuse the unknown field; a scene with
+/// no animation keeps its older number.
+const ANIMATION_VERSION: u32 = 60;
+fn has_v60_animation(scene: &Scene) -> bool {
+    !scene.animation.is_default()
+}
 /// Version 59: the scene's Guides (G9 GD-3, `Scene::guides`). An older
 /// build would refuse the unknown field; a scene with default guides keeps
 /// its older number.
@@ -557,7 +564,9 @@ fn encode_document(scene: &Scene, preset: Option<&crate::preset::PresetHeader>) 
     let data = serde_json::to_vec_pretty(&Document {
         format: "Operandi".into(),
         preset: preset.cloned(),
-        version: if has_v59_guides(scene) {
+        version: if has_v60_animation(scene) {
+            ANIMATION_VERSION
+        } else if has_v59_guides(scene) {
             GUIDES_VERSION
         } else if has_v58_replicators(scene) {
             REPLICATOR_VERSION
@@ -714,6 +723,9 @@ fn decode_document(
     }
     if doc.version < RENDER_OUTPUTS_D_VERSION && has_v55_outputs(&doc.scene) {
         return Err("These Render Outputs require native version 55".into());
+    }
+    if doc.version < ANIMATION_VERSION && has_v60_animation(&doc.scene) {
+        return Err("Animation requires native version 60".into());
     }
     if doc.version < GUIDES_VERSION && has_v59_guides(&doc.scene) {
         return Err("Guides require native version 59".into());
@@ -941,6 +953,10 @@ fn decode_document(
     // (SAFE-07).
     crate::meshops::break_loops(&mut scene);
     scene.validate()?;
+    // TK-42: a reopened scene shows its curves at the saved time; edits
+    // that were never keyed don't survive closing it.
+    let now = scene.time.current;
+    crate::animation::pose(&mut scene, now);
     Ok((scene, doc.preset))
 }
 /// Read a scene file. `project:` references are resolved against the
