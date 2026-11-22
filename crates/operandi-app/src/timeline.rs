@@ -1683,6 +1683,13 @@ impl Operandi {
                 "",
                 "operandi.graph.open",
             );
+            self.tbi(
+                ui,
+                Icon::AnimationEditors,
+                "Animation Editors: the tall timeline and the Graph Editor together",
+                "",
+                "operandi.anim.editors",
+            );
         }
         // TK-41: Apply / Discard while edits are pending.
         let pending = animation::pending(&self.editor.scene).len();

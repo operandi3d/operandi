@@ -1660,7 +1660,7 @@ impl Operandi {
                     .and_then(|c| c.curve.key_at(*t).map(|i| !c.curve.keys[i].broken))
                     .unwrap_or(true)
             });
-            for (side, label) in [("in", "In ▾"), ("out", "Out ▾")] {
+            for (side, icon) in [("in", Icon::InSlope), ("out", Icon::OutSlope)] {
                 let why = if !has {
                     Some("Select keys first")
                 } else if side == "out" && unified {
@@ -1669,7 +1669,7 @@ impl Operandi {
                     None
                 };
                 let r = ui
-                    .gated(why, egui::Button::new(label))
+                    .gated(why, crate::icons::button(ui, icon, ""))
                     .on_hover_text(format!("The selected keys' {side} slope (GE-53)"));
                 egui::Popup::menu(&r).show(|ui| {
                     for (name, slope) in operandi_core::anim_curve::Slope::NAMES {
@@ -1705,16 +1705,16 @@ impl Operandi {
                 lines.push("operandi.curve.cycle on:true".into());
             }
             ui.separator();
-            for (text, on, line, tip) in [
-                ("Box Scale", self.graph.box_scale, "operandi.graph.view boxScale:toggle", "Box Scale: a box around the selected keys to move and scale them (GE-44)"),
-                ("Retime", self.graph.retime, "operandi.graph.view retime:toggle", "Retime: click the time strip for markers, drag one to stretch the timing (GE-X5)"),
+            for (icon, on, line, tip) in [
+                (Icon::BoxScale, self.graph.box_scale, "operandi.graph.view boxScale:toggle", "Box Scale: a box around the selected keys to move and scale them (GE-44)"),
+                (Icon::Retime, self.graph.retime, "operandi.graph.view retime:toggle", "Retime: click the time strip for markers, drag one to stretch the timing (GE-X5)"),
             ] {
-                if ui.selectable_label(on, text).on_hover_text(format!("{tip}\n{line}")).clicked() {
+                if ui.add(crate::icons::button(ui, icon, "").selected(on)).on_hover_text(format!("{tip}\n{line}")).clicked() {
                     lines.push(line.into());
                 }
             }
             // GE-83: envelope presets.
-            let presets = ui.button("Presets ▾").on_hover_text("Envelope presets: save the shown channels' curves, or put one on them (GE-83)");
+            let presets = ui.add(crate::icons::button(ui, Icon::CurvePresets, "")).on_hover_text("Envelope presets: save the shown channels' curves, or put one on them (GE-83)");
             let folder = self.envelope_folder();
             egui::Popup::menu(&presets).show(|ui| {
                 if ui.button("Save Envelope…").clicked() {
@@ -1828,12 +1828,16 @@ impl Operandi {
                     lines.push(line);
                 }
             }
+            if ui
+                .add(crate::icons::button(ui, Icon::CurveSpeed, "").selected(self.graph.speed))
+                .on_hover_text(
+                    "Speed: each curve's rate of change (GE-81)\noperandi.graph.view speed:toggle",
+                )
+                .clicked()
+            {
+                lines.push("operandi.graph.view speed:toggle");
+            }
             for (text, on, line) in [
-                (
-                    "Speed",
-                    self.graph.speed,
-                    "operandi.graph.view speed:toggle",
-                ),
                 (
                     "Show Shadow",
                     self.graph.show_shadow,
