@@ -629,3 +629,24 @@ fn every_rotation_order_exports_as_the_same_orientation() {
         assert_eq!(write_ok(&back), bytes, "{order:?}");
     }
 }
+
+/// Hidden-limits A5: layer numbers are 16-bit, so 65,536 mesh layers fit
+/// and one more is refused instead of wrapping around into a broken file.
+#[test]
+fn more_mesh_layers_than_the_format_holds_are_refused() {
+    let mut scene = scene_of(vec![("Bolt", triangle())]);
+    let base = scene.items[0].clone();
+    let mut add = |scene: &mut Scene, count: usize| {
+        for _ in 0..count {
+            let mut item = base.clone();
+            item.id = scene.next_id;
+            scene.next_id += 1;
+            scene.items.push(item);
+        }
+    };
+    add(&mut scene, MAX_LAYERS - 1);
+    assert!(write(&scene, &mut Vec::new()).is_ok());
+    add(&mut scene, 1);
+    let e = write(&scene, &mut Vec::new()).unwrap_err();
+    assert!(e.contains("at most 65536 mesh layers"), "{e}");
+}
