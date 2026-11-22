@@ -1,12 +1,13 @@
 //! The channel status light: the small circle between a channel row's
 //! label and its field (UIC-112).
 //!
-//! It shows where a channel's value comes from. Operandi has no animation,
-//! keys, links or drivers yet, so only `None` (at the default) and
-//! `Constant` (a set, non-default value) can occur today; the other states
-//! are listed so those systems can set them without changing the rows.
-//! Right-click the light or the row's label: Reset to Default (CH-Q1);
-//! left-click does nothing yet (later: set or remove a key).
+//! It shows where a channel's value comes from: `None` (at the default),
+//! `Constant` (a set, non-default value), and since animation phase 1
+//! `Animated`, `Key` (a key on this frame) and `Edited` (TK-41: edited but
+//! not keyed; the next time change drops it). Keyable rows (anim_ui.rs):
+//! left-click sets or removes a key, right-click has the key commands.
+//! Other rows: right-click the light or the label for Reset to Default
+//! (CH-Q1).
 use super::layout::panel::CIRCLE;
 use crate::theme;
 use eframe::egui::{Painter, Pos2, Stroke};
@@ -21,13 +22,12 @@ pub(crate) enum ChannelStatus {
     /// dot. A multi-selection whose values differ shows this when any
     /// selected value is non-default (a true `Mixed` light comes later).
     Constant,
-    // The states below can't occur until animation, links and drivers
-    // exist; they're drawn as `None` until then.
-    #[allow(dead_code)]
+    /// Animated, no key on this frame: a red ring.
     Animated,
-    /// A key on the current frame (red).
-    #[allow(dead_code)]
+    /// A key on the current frame: a filled red dot.
     Key,
+    /// TK-41 [OP]: edited, not keyed (pending): a yellow dot in a red ring.
+    Edited,
     /// Driven by another channel (a link or driver), or by a free node's
     /// wire in the node view (node editing, NE-04).
     Driven,
@@ -35,7 +35,6 @@ pub(crate) enum ChannelStatus {
     #[allow(dead_code)]
     Driver,
     /// Selected items' channels disagree in where their values come from.
-    #[allow(dead_code)]
     Mixed,
     #[allow(dead_code)]
     Undefined,
@@ -82,11 +81,62 @@ pub(crate) fn paint(painter: &Painter, at: Pos2, status: ChannelStatus, enabled:
             };
             painter.circle_filled(at, r * 0.55, core);
         }
-        // Only None, Constant and Driven can occur today (see the module notes).
+        ChannelStatus::Animated | ChannelStatus::Key | ChannelStatus::Edited => {
+            let red = if enabled {
+                key_red()
+            } else {
+                theme::disabled_text()
+            };
+            painter.circle_stroke(at, r, Stroke::new(1.5f32, red));
+            match status {
+                ChannelStatus::Key => {
+                    painter.circle_filled(at, r - 0.5, red);
+                }
+                ChannelStatus::Edited => {
+                    let fill = if enabled {
+                        edited_yellow()
+                    } else {
+                        theme::disabled_text()
+                    };
+                    painter.circle_filled(at, r * 0.6, fill);
+                }
+                _ => {}
+            }
+        }
+        // Half filled: the selected items differ.
+        ChannelStatus::Mixed => {
+            painter.circle_stroke(at, r, Stroke::new(1.0f32, color));
+            let fill = if enabled {
+                theme::channel_changed()
+            } else {
+                theme::disabled_text()
+            };
+            let points: Vec<Pos2> = (0..=12)
+                .map(|i| {
+                    let a = std::f32::consts::PI * (0.5 + i as f32 / 12.);
+                    at + eframe::egui::vec2(a.cos(), a.sin()) * r
+                })
+                .collect();
+            painter.add(eframe::egui::Shape::convex_polygon(
+                points,
+                fill,
+                Stroke::NONE,
+            ));
+        }
         _ => {
             painter.circle_stroke(at, r, Stroke::new(1.0f32, color));
         }
     }
+}
+
+/// The key colour (UIC-112's red).
+pub(crate) fn key_red() -> eframe::egui::Color32 {
+    eframe::egui::Color32::from_rgb(222, 64, 56)
+}
+
+/// TK-41's "edited, not keyed" colour.
+pub(crate) fn edited_yellow() -> eframe::egui::Color32 {
+    eframe::egui::Color32::from_rgb(240, 200, 60)
 }
 
 #[cfg(test)]

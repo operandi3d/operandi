@@ -1855,6 +1855,7 @@ fn phrases(r: &mut Commands) {
         a.status = format!("Replicators: {}", d.replicators.label());
     });
     crate::vertex_normal_ui::register(r);
+    crate::anim_ui::register(r);
     on_words(r, &["view.topologyMode"], |a, c| {
         a.set_topology_mode(c.rest)
     });

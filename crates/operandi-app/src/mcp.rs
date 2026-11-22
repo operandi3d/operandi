@@ -475,6 +475,7 @@ impl Operandi {
         }
         let mut bridge = operandi_mcp::Bridge {
             editor: std::mem::take(&mut self.editor),
+            attached: true,
             ..Default::default()
         };
         let response = protocol::handle(&mut bridge, &message);

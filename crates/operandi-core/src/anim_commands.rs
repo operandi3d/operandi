@@ -462,6 +462,58 @@ pub fn run(e: &mut Editor, name: &str, a: &Args) -> Out {
             let ids = ids_arg(e, a)?;
             e.delete_markers(&ids)?;
         }
+        "operandi.render.frameRange" | "operandi.view.playblast" => {
+            let (r0, r1) = animation::current_range(&e.scene);
+            let whole = |t: Tick| animation::frames(rate, t).round() as i64;
+            let scene_range = text(a, "range") == Some("scene");
+            let (d0, d1) = if scene_range {
+                (whole(e.scene.time.start), whole(e.scene.time.end))
+            } else {
+                (whole(r0), whole(r1))
+            };
+            let start = number(a, "start")?.map_or(d0, |f| f.round() as i64);
+            let end = number(a, "end")?.map_or(d1, |f| f.round() as i64);
+            if start > end {
+                return Err("The range's start is after its end".into());
+            }
+            if end - start > 100_000 {
+                return Err("That range is too long".into());
+            }
+            let folder = text(a, "folder").map(str::to_owned);
+            if name == "operandi.render.frameRange" {
+                let whole_arg = |k: &str| -> Result<Option<u32>, String> {
+                    Ok(number(a, k)?.map(|f| f.round().clamp(1., 1e6) as u32))
+                };
+                let size = match (whole_arg("width")?, whole_arg("height")?) {
+                    (Some(w), Some(h)) => Some([w, h]),
+                    (None, None) => None,
+                    _ => return Err("Give both width and height, or neither".into()),
+                };
+                e.anim.requests.push(animation::AnimRequest::RenderRange {
+                    start,
+                    end,
+                    folder,
+                    name: text(a, "name").unwrap_or("Render").to_owned(),
+                    samples: whole_arg("samples")?,
+                    size,
+                    camera: number(a, "camera")?.map(|f| f as u64),
+                });
+            } else {
+                let scale = number(a, "scale")?.unwrap_or(1.);
+                if ![1., 0.5, 0.25].contains(&scale) {
+                    return Err("scale is 1, 0.5 or 0.25".into());
+                }
+                e.anim.requests.push(animation::AnimRequest::Playblast {
+                    start,
+                    end,
+                    scale: scale as f32,
+                    folder,
+                    name: text(a, "name").unwrap_or("Playblast").to_owned(),
+                    open: flag(a, "open")?.unwrap_or(true),
+                });
+            }
+        }
+        "operandi.render.cancelRange" => e.anim.requests.push(animation::AnimRequest::Cancel),
         // Answered by `answer` (a query changes nothing).
         "operandi.anim.query" => {}
         other => return Err(format!("Unknown animation command {other}")),
@@ -586,6 +638,7 @@ fn query(e: &Editor, a: &Args) -> Result<String, String> {
         "selectedKeys": e.live_selected_keys().iter().map(|(k, t)| format!("{}@{}", k.text(), fr(*t))).collect::<Vec<_>>(),
         "markers": markers,
         "channels": channels,
+        "job": e.anim.progress.as_ref().map(|(done, all, folder)| json!({"done": done, "frames": all, "folder": folder})),
     });
     Ok(out.to_string())
 }
@@ -618,6 +671,8 @@ pub const NAMES: &[&str] = &[
     "operandi.marker.delete",
     "operandi.marker.edit",
     "operandi.marker.select",
+    "operandi.render.cancelRange",
+    "operandi.render.frameRange",
     "operandi.time.fit",
     "operandi.time.go",
     "operandi.time.insertFrame",
@@ -628,4 +683,5 @@ pub const NAMES: &[&str] = &[
     "operandi.time.set",
     "operandi.time.settings",
     "operandi.time.step",
+    "operandi.view.playblast",
 ];

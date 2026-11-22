@@ -1,0 +1,662 @@
+//! The app's side of animation (BEHAVIOR-TIME-KEYS TK-60..66,
+//! BEHAVIOR-TIMELINE TL-70/71): the Input Map actions for the animation
+//! keys, playback each frame, the status-light requests from property
+//! rows, and the jobs only the app can run: Render Frame Range with
+//! Cycles and the viewport Playblast.
+//!
+//! Every action runs one of core's `operandi.time.*` / `operandi.key.*`
+//! lines (UIC-160), so a key, a button, a menu entry and a typed line do
+//! the same thing.
+use super::*;
+use crate::command_handlers::Commands;
+use operandi_core::animation::{self, AnimRequest, ChannelKey};
+use operandi_core::command_registry::{self as table, Area};
+use operandi_core::command_runtime::Call;
+use std::time::Instant;
+
+/// Input Map actions (shortcuts spec §14, SC-241..249): name, the line it
+/// runs, its default chord. Chords that already belong to other actions
+/// everywhere (`/` Turn, `,` / `.` Zoom, Shift+R Quick Align, Shift+Y
+/// Flex) are set by the Animate layout's own keys instead (UIC-201,
+/// TL-61): assets/layouts/animate.json's `keys`.
+pub(crate) const ACTIONS: &[(&str, &str, &str)] = &[
+    ("Play/Stop", "operandi.time.play", ""),
+    ("Play Backwards", "operandi.time.play backwards:true", ""),
+    (
+        "Back One Frame",
+        "operandi.time.step frames:-1",
+        "Shift+ArrowLeft",
+    ),
+    (
+        "Forward One Frame",
+        "operandi.time.step frames:1",
+        "Shift+ArrowRight",
+    ),
+    ("Step Back", "operandi.time.step frames:-1", ""),
+    ("Step Forward", "operandi.time.step frames:1", ""),
+    ("First Frame", "operandi.time.go to:first", "Shift+ArrowUp"),
+    ("Last Frame", "operandi.time.go to:last", "Shift+ArrowDown"),
+    (
+        "Previous Key",
+        "operandi.time.go to:prevKey",
+        "Ctrl+ArrowLeft",
+    ),
+    ("Next Key", "operandi.time.go to:nextKey", "Ctrl+ArrowRight"),
+    ("First Key", "operandi.time.go to:firstKey", "Ctrl+ArrowUp"),
+    ("Last Key", "operandi.time.go to:lastKey", "Ctrl+ArrowDown"),
+    ("Key Selected Channels", "operandi.key.set", "S"),
+    ("Key Selected Items", "operandi.key.items", "Shift+S"),
+    (
+        "Key Position",
+        "operandi.key.transforms type:position",
+        "Shift+W",
+    ),
+    (
+        "Key Rotation",
+        "operandi.key.transforms type:rotation",
+        "Shift+E",
+    ),
+    ("Key Scale", "operandi.key.transforms type:scale", ""),
+    ("Key Transforms", "operandi.key.transforms type:all", ""),
+];
+
+/// Whether `action` is one of the Items-mode animation keys (TK-65: in
+/// component modes the same keys keep their modelling meanings).
+pub(crate) fn is_items_action(action: &str) -> bool {
+    ACTIONS.iter().any(|(name, _, _)| *name == action)
+}
+
+fn action_line(name: &str) -> Option<&'static str> {
+    ACTIONS
+        .iter()
+        .find(|(n, _, _)| n.eq_ignore_ascii_case(name))
+        .map(|(_, line, _)| *line)
+}
+
+fn run_action(a: &mut Operandi, c: &Call<'_>) {
+    if let Some(line) = action_line(c.entry.name) {
+        a.execute_line(line);
+    }
+}
+
+const TIMELINE_ARGS: &[table::Arg] = &[table::opt(
+    "open",
+    table::ArgType::Choice(&["tall", "true", "false"]),
+    table::Unit::None,
+    None,
+)];
+const DIALOG_ARGS: &[table::Arg] = &[table::opt(
+    "kind",
+    table::ArgType::Choice(&["ranges", "settings", "render", "playblast"]),
+    table::Unit::None,
+    None,
+)];
+
+/// App commands: the key actions above, the Animate menu's dialogs.
+pub(crate) fn register(r: &mut Commands) {
+    let names: Vec<&str> = ACTIONS.iter().map(|(name, _, _)| *name).collect();
+    crate::command_handlers::on_words(r, &names, run_action);
+    r.add_host_command(
+        table::script(
+            "operandi.anim.timeline",
+            Area::View,
+            "Shows or hides the timeline strip (TK-70); open:tall shows it tall with markers and tracks, as the Animate layout does (TL-01).",
+        )
+        .args(TIMELINE_ARGS)
+        .operandi()
+        .ui(),
+        |a, c| match c.rest.trim() {
+            "open:tall" => a.timeline.open_tall(),
+            "open:true" => a.timeline.open = true,
+            "open:false" => a.timeline.open = false,
+            _ => a.timeline.open = !a.timeline.open,
+        },
+    )
+    .unwrap_or_else(|e| panic!("{e}"));
+    r.add_host_command(
+        table::script(
+            "operandi.anim.dialog",
+            Area::View,
+            "Opens an Animate menu dialog: kind:ranges (Time Ranges…), settings, render (Render Frame Range…) or playblast (Playblast…); OK runs one command (UIC-80, UIC-162).",
+        )
+        .args(DIALOG_ARGS)
+        .operandi()
+        .ui(),
+        |a, c| {
+            let kind = c.rest.trim().trim_start_matches("kind:");
+            a.open_anim_dialog(kind);
+        },
+    )
+    .unwrap_or_else(|e| panic!("{e}"));
+}
+
+/// An Animate menu dialog (UIC-80..97): its fields, and how OK builds its
+/// one command line.
+#[derive(Clone, Debug)]
+pub(crate) struct AnimDialog {
+    kind: String,
+    title: &'static str,
+    /// (label, argument, value).
+    fields: Vec<(&'static str, &'static str, String)>,
+}
+
+/// A running frame render or playblast.
+pub(crate) struct Job {
+    playblast: bool,
+    frames: Vec<i64>,
+    next: usize,
+    folder: PathBuf,
+    name: String,
+    /// Render: what `render.finished` was when this frame's render began.
+    started: Option<u64>,
+    /// Playblast: the frame whose screenshot is on its way.
+    shot: Option<i64>,
+    scale: f32,
+    open: bool,
+    samples: Option<u32>,
+    size: Option<[u32; 2]>,
+    camera: Option<u64>,
+    /// The time to go back to afterwards.
+    restore: operandi_core::time_tick::Tick,
+    written: Vec<PathBuf>,
+}
+
+/// A playblast screenshot's tag.
+struct PlayblastShot(i64);
+
+/// Per-app animation UI state.
+#[derive(Default)]
+pub(crate) struct AnimUi {
+    /// Playback's last tick and the frames owed since (TK-61).
+    last_tick: Option<Instant>,
+    owed: f64,
+    pub(crate) job: Option<Job>,
+    pub(crate) dialog: Option<AnimDialog>,
+}
+
+/// `name_0000.png` in `folder`.
+pub(crate) fn frame_path(folder: &std::path::Path, name: &str, frame: i64) -> PathBuf {
+    let sign = if frame < 0 { "-" } else { "" };
+    folder.join(format!("{name}_{sign}{:04}.png", frame.abs()))
+}
+
+impl Operandi {
+    fn open_anim_dialog(&mut self, kind: &str) {
+        let s = &self.editor.scene;
+        let rate = s.time.rate;
+        let f = |t: operandi_core::time_tick::Tick| {
+            format!("{}", animation::frames(rate, t).round() as i64)
+        };
+        let (r0, r1) = animation::current_range(s);
+        let folder = self
+            .job_folder(None)
+            .map(|p| p.display().to_string())
+            .unwrap_or_default();
+        let (title, fields) = match kind {
+            "ranges" => (
+                "Time Ranges",
+                vec![
+                    ("Scene Start", "start", f(s.time.start)),
+                    ("Scene End", "end", f(s.time.end)),
+                    ("Current Start", "rangeStart", f(r0)),
+                    ("Current End", "rangeEnd", f(r1)),
+                ],
+            ),
+            "settings" => ("Time Settings", Vec::new()),
+            "render" => (
+                "Render Frame Range",
+                vec![
+                    ("First Frame", "start", f(r0)),
+                    ("Last Frame", "end", f(r1)),
+                    ("Folder", "folder", folder),
+                    ("File Name", "name", "Render".into()),
+                ],
+            ),
+            "playblast" => (
+                "Playblast",
+                vec![
+                    ("First Frame", "start", f(r0)),
+                    ("Last Frame", "end", f(r1)),
+                    ("Size (1, 0.5, 0.25)", "scale", "1".into()),
+                    ("Folder", "folder", folder),
+                    ("File Name", "name", "Playblast".into()),
+                ],
+            ),
+            other => {
+                self.status = format!("No animation dialog {other}");
+                return;
+            }
+        };
+        self.anim_ui.dialog = Some(AnimDialog {
+            kind: kind.to_owned(),
+            title,
+            fields,
+        });
+    }
+
+    fn anim_dialog(&mut self, ctx: &Context) {
+        let Some(mut d) = self.anim_ui.dialog.take() else {
+            return;
+        };
+        let mut done: Option<bool> = None;
+        let mut open = true;
+        egui::Window::new(d.title)
+            .collapsible(false)
+            .resizable(false)
+            .open(&mut open)
+            .show(ctx, |ui| {
+                if d.kind == "settings" {
+                    self.time_settings(ui);
+                    return;
+                }
+                egui::Grid::new("anim-dialog")
+                    .num_columns(2)
+                    .show(ui, |ui| {
+                        for (label, _, value) in d.fields.iter_mut() {
+                            ui.label(*label);
+                            let r = ui.text_edit_singleline(value);
+                            self.text_editors.insert(r.id);
+                            ui.end_row();
+                        }
+                    });
+                ui.horizontal(|ui| {
+                    if ui.button("OK").clicked() || ui.input(|i| i.key_pressed(Key::Enter)) {
+                        done = Some(true);
+                    }
+                    if ui.button("Cancel").clicked() {
+                        done = Some(false);
+                    }
+                });
+            });
+        if !open {
+            done = Some(false);
+        }
+        match done {
+            Some(true) => {
+                let command = match d.kind.as_str() {
+                    "ranges" => "operandi.time.settings",
+                    "render" => "operandi.render.frameRange",
+                    _ => "operandi.view.playblast",
+                };
+                let mut line = command.to_owned();
+                for (_, arg, value) in &d.fields {
+                    let v = value.trim();
+                    if v.is_empty() {
+                        continue;
+                    }
+                    if v.contains(' ') {
+                        line.push_str(&format!(" {arg}:{{{v}}}"));
+                    } else {
+                        line.push_str(&format!(" {arg}:{v}"));
+                    }
+                }
+                self.execute(&line);
+            }
+            Some(false) => {}
+            None => self.anim_ui.dialog = Some(d),
+        }
+    }
+
+    /// Once a frame, before drawing: playback, row-light requests, jobs.
+    pub(super) fn anim_frame(&mut self, ctx: &Context) {
+        for request in crate::form::rows::take_anim_requests() {
+            self.execute(&request);
+        }
+        self.tick_playback(ctx);
+        let requests = std::mem::take(&mut self.editor.anim.requests);
+        for r in requests {
+            self.start_job(r);
+        }
+        self.run_job(ctx);
+        self.anim_dialog(ctx);
+    }
+
+    /// TK-60/61/64: advance playback; no undo steps, and only the final
+    /// time goes into the history when it stops.
+    fn tick_playback(&mut self, ctx: &Context) {
+        let Some(backwards) = self.editor.anim.playing else {
+            if self.anim_ui.last_tick.take().is_some() {
+                let frame = self.editor.scene.time.current_frame();
+                self.execute(&format!("operandi.time.set frame:{frame}"));
+            }
+            return;
+        };
+        let now = Instant::now();
+        let s = &self.editor.scene;
+        let fps = s.time.rate.as_f64();
+        let settings = s.animation.settings.clone();
+        let due = match self.anim_ui.last_tick.replace(now) {
+            None => 0.,
+            Some(last) if settings.real_time => now.duration_since(last).as_secs_f64() * fps,
+            Some(_) => 1.,
+        };
+        self.anim_ui.owed += due;
+        let step = if settings.snap || !settings.real_time {
+            self.anim_ui.owed.floor()
+        } else {
+            self.anim_ui.owed
+        };
+        if step > 0. {
+            self.anim_ui.owed -= step;
+            let s = &self.editor.scene;
+            let start = self.editor.anim.play_start.unwrap_or(s.time.current);
+            let (t, stop) = animation::playback_step(s, s.time.current, start, step, backwards);
+            let _ = self.editor.set_current_time(t, true);
+            if stop {
+                self.editor.anim.playing = None;
+            }
+        }
+        if self.editor.anim.playing.is_some() {
+            ctx.request_repaint();
+        }
+    }
+
+    fn job_folder(&self, folder: Option<String>) -> std::result::Result<PathBuf, String> {
+        if let Some(f) = folder {
+            return Ok(PathBuf::from(f));
+        }
+        if let Some(f) = self.project_folder(crate::project_files::RENDERS) {
+            return Ok(f);
+        }
+        crate::render_ui::render_folder()
+    }
+
+    fn start_job(&mut self, request: AnimRequest) {
+        let (playblast, start, end, folder, name) = match &request {
+            AnimRequest::Cancel => {
+                if let Some(job) = self.anim_ui.job.take() {
+                    let _ = self.editor.set_current_time(job.restore, false);
+                    self.editor.anim.progress = None;
+                    self.status = format!("Stopped after {} frames", job.next);
+                }
+                return;
+            }
+            AnimRequest::RenderRange {
+                start,
+                end,
+                folder,
+                name,
+                ..
+            } => (false, *start, *end, folder.clone(), name.clone()),
+            AnimRequest::Playblast {
+                start,
+                end,
+                folder,
+                name,
+                ..
+            } => (true, *start, *end, folder.clone(), name.clone()),
+        };
+        if self.anim_ui.job.is_some() {
+            self.status = "A frame render or playblast is already running".into();
+            return;
+        }
+        if !playblast && self.render.busy() {
+            self.status = "A render is already running".into();
+            return;
+        }
+        let folder = match self.job_folder(folder) {
+            Ok(f) => f,
+            Err(e) => {
+                self.status = e;
+                return;
+            }
+        };
+        if let Err(e) = std::fs::create_dir_all(&folder) {
+            self.status = format!("{}: {e}", folder.display());
+            return;
+        }
+        let (scale, open, samples, size, camera) = match request {
+            AnimRequest::Playblast { scale, open, .. } => (scale, open, None, None, None),
+            AnimRequest::RenderRange {
+                samples,
+                size,
+                camera,
+                ..
+            } => (1., false, samples, size, camera),
+            AnimRequest::Cancel => unreachable!(),
+        };
+        self.editor.anim.playing = None;
+        self.editor.anim.progress =
+            Some((0, (end - start + 1) as usize, folder.display().to_string()));
+        self.anim_ui.job = Some(Job {
+            playblast,
+            frames: (start..=end).collect(),
+            next: 0,
+            folder,
+            name,
+            started: None,
+            shot: None,
+            scale,
+            open,
+            samples,
+            size,
+            camera,
+            restore: self.editor.scene.time.current,
+            written: Vec::new(),
+        });
+    }
+
+    /// TL-70/71: one step of the running job each frame.
+    fn run_job(&mut self, ctx: &Context) {
+        let Some(mut job) = self.anim_ui.job.take() else {
+            return;
+        };
+        ctx.request_repaint();
+        if job.playblast {
+            self.playblast_step(ctx, &mut job);
+        } else {
+            self.render_step(&mut job);
+        }
+        self.editor.anim.progress =
+            Some((job.next, job.frames.len(), job.folder.display().to_string()));
+        if job.next >= job.frames.len() {
+            let _ = self.editor.set_current_time(job.restore, false);
+            self.editor.anim.progress = None;
+            self.status = format!(
+                "{} {} frames to {}",
+                if job.playblast {
+                    "Playblast:"
+                } else {
+                    "Rendered"
+                },
+                job.written.len(),
+                job.folder.display()
+            );
+            if job.playblast
+                && job.open
+                && let Some(first) = job.written.first()
+            {
+                open_in_system(first);
+            }
+            return;
+        }
+        self.anim_ui.job = Some(job);
+    }
+
+    fn render_step(&mut self, job: &mut Job) {
+        if self.render.busy() {
+            return;
+        }
+        if let Some(started) = job.started.take() {
+            if self.render.finished > started {
+                if let Some(Err(e)) = &self.render.last {
+                    self.status = format!("Frame {}: {e}", job.frames[job.next]);
+                    job.next = job.frames.len();
+                    return;
+                }
+                job.written
+                    .push(frame_path(&job.folder, &job.name, job.frames[job.next]));
+                job.next += 1;
+            }
+            if job.next >= job.frames.len() {
+                return;
+            }
+        }
+        let frame = job.frames[job.next];
+        let t = self.editor.scene.time.rate.tick_of(frame);
+        let _ = self.editor.set_current_time(t, true);
+        self.render.overrides = Some(crate::render_ui::RenderOverrides {
+            size: job.size,
+            samples: job.samples,
+            path: Some(frame_path(&job.folder, &job.name, frame)),
+            camera: job.camera,
+        });
+        let before = self.render.finished;
+        self.begin_render(self.render.pixels_per_point, false);
+        self.render.overrides = None;
+        if !self.render.busy() {
+            self.status = format!("Frame {frame}: {}", self.status);
+            job.next = job.frames.len();
+            return;
+        }
+        job.started = Some(before);
+    }
+
+    fn playblast_step(&mut self, ctx: &Context, job: &mut Job) {
+        // The screenshot of the frame drawn last time.
+        let shot: Option<std::sync::Arc<egui::ColorImage>> = ctx.input(|i| {
+            i.raw.events.iter().find_map(|e| match e {
+                Event::Screenshot {
+                    user_data, image, ..
+                } => user_data
+                    .data
+                    .as_ref()
+                    .and_then(|d| d.downcast_ref::<PlayblastShot>())
+                    .filter(|s| Some(s.0) == job.shot)
+                    .map(|_| image.clone()),
+                _ => None,
+            })
+        });
+        if let Some(image) = shot {
+            let frame = job.shot.take().unwrap_or_default();
+            let path = frame_path(&job.folder, &job.name, frame);
+            match save_view(
+                &image,
+                self.viewport_rect,
+                ctx.pixels_per_point(),
+                job.scale,
+                &path,
+            ) {
+                Ok(()) => job.written.push(path),
+                Err(e) => {
+                    self.status = format!("Playblast: {e}");
+                    job.next = job.frames.len();
+                    return;
+                }
+            }
+            job.next += 1;
+            return;
+        }
+        if job.shot.is_some() || job.next >= job.frames.len() {
+            return;
+        }
+        // Pose this frame; the screenshot is taken of the next drawn frame.
+        let frame = job.frames[job.next];
+        let t = self.editor.scene.time.rate.tick_of(frame);
+        let _ = self.editor.set_current_time(t, true);
+        job.shot = Some(frame);
+        ctx.send_viewport_cmd_to(
+            egui::ViewportId::ROOT,
+            ViewportCommand::Screenshot(egui::UserData::new(PlayblastShot(frame))),
+        );
+    }
+
+    /// Gives the next property row the status light of `channel` on the
+    /// selected items (UIC-112) and makes it keyable (TK-20/24). With no
+    /// keys anywhere, the plain None/Constant light by `non_default`.
+    pub(crate) fn anim_row(&self, channel: &str, non_default: bool) {
+        use crate::form::status::ChannelStatus;
+        let keys = self.row_channels(channel);
+        let s = &self.editor.scene;
+        let now = s.time.current;
+        let at = self.editor.key_time();
+        let state = |k: &ChannelKey| match s.animation.channels.get(k) {
+            Some(c) if !c.curve.is_empty() => {
+                if animation::is_pending(s, k) {
+                    ChannelStatus::Edited
+                } else if c.curve.key_at(at).is_some() || c.curve.key_at(now).is_some() {
+                    ChannelStatus::Key
+                } else {
+                    ChannelStatus::Animated
+                }
+            }
+            _ => ChannelStatus::from_non_default(non_default),
+        };
+        let states: Vec<ChannelStatus> = keys.iter().map(state).collect();
+        let status = match states.first() {
+            None => ChannelStatus::from_non_default(non_default),
+            Some(first) if states.iter().all(|x| x == first) => *first,
+            Some(_) => ChannelStatus::Mixed,
+        };
+        crate::form::rows::set_status(status);
+        crate::form::rows::anim_channel(crate::form::rows::AnimRow {
+            selected: keys
+                .iter()
+                .any(|k| self.editor.anim.selected_channels.contains(k)),
+            channels: keys.iter().map(ChannelKey::text).collect(),
+        });
+    }
+
+    /// The channels a property row's status light stands for: `channel` of
+    /// every selected item that has it (UIC-112, several items selected).
+    pub(crate) fn row_channels(&self, channel: &str) -> Vec<ChannelKey> {
+        self.editor
+            .scene
+            .selected_items()
+            .into_iter()
+            .map(|id| ChannelKey::new(id, channel))
+            .filter(|k| animation::read(&self.editor.scene, k).is_some())
+            .collect()
+    }
+}
+
+/// The view's pixels from a window screenshot, scaled, as a PNG.
+fn save_view(
+    image: &egui::ColorImage,
+    rect: Rect,
+    ppp: f32,
+    scale: f32,
+    path: &std::path::Path,
+) -> std::result::Result<(), String> {
+    let [iw, ih] = image.size;
+    let x0 = ((rect.min.x * ppp).round().max(0.) as usize).min(iw);
+    let y0 = ((rect.min.y * ppp).round().max(0.) as usize).min(ih);
+    let x1 = ((rect.max.x * ppp).round().max(0.) as usize).min(iw);
+    let y1 = ((rect.max.y * ppp).round().max(0.) as usize).min(ih);
+    let (w, h) = (x1.saturating_sub(x0), y1.saturating_sub(y0));
+    if w < 2 || h < 2 {
+        return Err("The view has no visible area".into());
+    }
+    let mut rgba = Vec::with_capacity(w * h * 4);
+    for y in y0..y1 {
+        for p in &image.pixels[y * iw + x0..y * iw + x1] {
+            rgba.extend_from_slice(&[p.r(), p.g(), p.b(), 255]);
+        }
+    }
+    let picture = image::RgbaImage::from_raw(w as u32, h as u32, rgba).ok_or("Wrong size")?;
+    let picture = if scale < 1. {
+        let (sw, sh) = (
+            ((w as f32 * scale).round() as u32).max(1),
+            ((h as f32 * scale).round() as u32).max(1),
+        );
+        image::imageops::resize(&picture, sw, sh, image::imageops::FilterType::Triangle)
+    } else {
+        picture
+    };
+    picture
+        .save_with_format(path, image::ImageFormat::Png)
+        .map_err(|e| format!("{}: {e}", path.display()))
+}
+
+/// TL-71: the system player opens the result.
+fn open_in_system(path: &std::path::Path) {
+    #[cfg(target_os = "macos")]
+    let _ = std::process::Command::new("open").arg(path).spawn();
+    #[cfg(target_os = "windows")]
+    let _ = std::process::Command::new("cmd")
+        .args(["/C", "start", ""])
+        .arg(path)
+        .spawn();
+    #[cfg(all(unix, not(target_os = "macos")))]
+    let _ = std::process::Command::new("xdg-open").arg(path).spawn();
+}

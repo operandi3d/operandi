@@ -14,8 +14,8 @@ use crate::animation::{
 use crate::scene_time::SceneTime;
 use crate::time_tick::Tick;
 use crate::{Command, Editor, Result, Tool};
+use std::cell::RefCell;
 use std::collections::BTreeSet;
-use std::sync::Mutex;
 
 /// Which key a key jump goes to (TK-63).
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -52,16 +52,18 @@ pub struct KeyClip {
     pub channels: Vec<(ChannelKey, Vec<Key>)>,
 }
 
-static CLIPBOARD: Mutex<Option<KeyClip>> = Mutex::new(None);
+// The app edits every scene tab on its one UI thread (and the MCP bridge
+// calls arrive there too), so one clipboard per thread is one per app.
+thread_local! {
+    static CLIPBOARD: RefCell<Option<KeyClip>> = const { RefCell::new(None) };
+}
 
 /// The key clipboard's contents.
 pub fn clipboard() -> Option<KeyClip> {
-    CLIPBOARD.lock().ok().and_then(|c| c.clone())
+    CLIPBOARD.with(|c| c.borrow().clone())
 }
 fn set_clipboard(clip: KeyClip) {
-    if let Ok(mut c) = CLIPBOARD.lock() {
-        *c = Some(clip);
-    }
+    CLIPBOARD.with(|c| *c.borrow_mut() = Some(clip));
 }
 
 /// The channels a transform tool keys (TK-21/25).

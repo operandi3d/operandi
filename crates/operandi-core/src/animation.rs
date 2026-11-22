@@ -900,6 +900,42 @@ pub struct AnimSession {
     /// Set while an animation command edits the scene, so its own record
     /// isn't auto-keyed again.
     pub(crate) quiet: bool,
+    /// Frame renders and playblasts asked for (TL-70/71); the app runs
+    /// them (they need Cycles and the viewport), a headless bridge
+    /// refuses them.
+    pub requests: Vec<AnimRequest>,
+    /// The running frame render or playblast: frames done, frames in all,
+    /// the folder it writes to. The app keeps it current.
+    pub progress: Option<(usize, usize, String)>,
+}
+
+/// A side-effect job only the app can run (TL-70/71).
+#[derive(Clone, Debug, PartialEq)]
+pub enum AnimRequest {
+    /// Render frames `start..=end` with Cycles, one image each.
+    RenderRange {
+        start: i64,
+        end: i64,
+        /// Folder; `None`: the project's `renders/` (UIC-242).
+        folder: Option<String>,
+        /// File name before the frame number.
+        name: String,
+        samples: Option<u32>,
+        size: Option<[u32; 2]>,
+        camera: Option<u64>,
+    },
+    /// Record the active 3D view, HUD hidden, at `scale` of its size.
+    Playblast {
+        start: i64,
+        end: i64,
+        scale: f32,
+        folder: Option<String>,
+        name: String,
+        /// Open the result in the system player.
+        open: bool,
+    },
+    /// Stop the running job.
+    Cancel,
 }
 
 // ------------------------------------------------------------ auto key

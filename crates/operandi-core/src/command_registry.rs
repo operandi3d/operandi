@@ -3079,6 +3079,51 @@ pub static COMMANDS: &[Entry] = &[
         .quiet()
         .operandi()
         .example("operandi.anim.query frames:0,12,24"),
+    script("operandi.render.frameRange", Render, "Renders a frame range with Cycles, one numbered image per frame, into the project's renders folder (TL-70); needs the running app.")
+        .on_editor(
+            "Render frames start..end (default the current range) with Cycles into folder (default the project's renders/) as <name>_0000.png; needs the running app. operandi.anim.query reports progress (job).",
+            &[
+            jopt("start", "number", "First frame (default the current range's)."),
+            jopt("end", "number", "Last frame (default the current range's)."),
+            jopt("range", "string", "current (default) or scene: which range start and end default to."),
+            jopt("folder", "string", "Folder to write to."),
+            jopt("name", "string", "File name before the frame number (default Render)."),
+            jopt("samples", "integer", "Samples per pixel (default the render settings')."),
+            jopt("width", "integer", "Width in pixels (with height)."),
+            jopt("height", "integer", "Height in pixels (with width)."),
+            jopt("camera", "integer", "Camera item (default the render camera)."),
+        ],
+            crate::anim_commands::run,
+        )
+        .side_effect()
+        .operandi()
+        .example("operandi.render.frameRange start:0 end:24"),
+    script("operandi.render.cancelRange", Render, "Stops a running frame render or playblast (TL-70).")
+        .on_editor(
+            "Stop the running frame range render or playblast.",
+            &[],
+            crate::anim_commands::run,
+        )
+        .side_effect()
+        .operandi()
+        .example("operandi.render.cancelRange"),
+    script("operandi.view.playblast", Render, "Records the active 3D view over a frame range, HUD hidden, to an image sequence and opens it (TL-71); needs the running app.")
+        .on_editor(
+            "Record the active 3D view for frames start..end (default the current range) at scale 1, 0.5 or 0.25 to an image sequence in folder (default the project's renders/), then open it unless open is false; needs the running app.",
+            &[
+            jopt("start", "number", "First frame."),
+            jopt("end", "number", "Last frame."),
+            jopt("range", "string", "current (default) or scene."),
+            jopt("scale", "number", "1, 0.5 or 0.25 of the view's size (default 1)."),
+            jopt("folder", "string", "Folder to write to."),
+            jopt("name", "string", "File name before the frame number (default Playblast)."),
+            jopt("open", "boolean", "Open the first frame in the system viewer after (default true)."),
+        ],
+            crate::anim_commands::run,
+        )
+        .side_effect()
+        .operandi()
+        .example("operandi.view.playblast scale:0.5"),
     script("operandi.time.set", Items, "Sets the current time (TK-01); not an undo step (TK-05). Snaps to a frame with Time Snap on.")
         .on_editor(
             "Sets the current time (TK-01); not an undo step (TK-05). Snaps to a frame with Time Snap on.",
@@ -5757,6 +5802,43 @@ pub static COMMANDS: &[Entry] = &[
     action("Layout Switcher", View, "The quick layout switcher while Ctrl+Shift are held: each Tab moves the outline on, releasing switches (Ctrl+Shift+Tab, UIC-18).")
         .operandi().ui(),
     // Layouts stage 6 (LAY-53, UIC-206): the backtick key.
+    // Animation keys (Items mode; the app's anim_ui.rs runs their lines).
+    action("Play/Stop", Items, "Plays or stops playback (TK-60; / in the Animate layout).")
+        .operandi().ui(),
+    action("Play Backwards", Items, "Plays backwards through the current range (TK-60).")
+        .operandi().ui(),
+    action("Back One Frame", Items, "Steps back one frame (TK-63, Shift+Left).")
+        .operandi().ui(),
+    action("Forward One Frame", Items, "Steps forward one frame (TK-63, Shift+Right).")
+        .operandi().ui(),
+    action("Step Back", Items, "Steps back one frame (TK-63; comma in the Animate layout).")
+        .operandi().ui(),
+    action("Step Forward", Items, "Steps forward one frame (TK-63; period in the Animate layout).")
+        .operandi().ui(),
+    action("First Frame", Items, "Goes to the current range's first frame (TK-63, Shift+Up).")
+        .operandi().ui(),
+    action("Last Frame", Items, "Goes to the current range's last frame (TK-63, Shift+Down).")
+        .operandi().ui(),
+    action("Previous Key", Items, "Goes to the previous key of the selected items or channels (TK-63, Ctrl+Left).")
+        .operandi().ui(),
+    action("Next Key", Items, "Goes to the next key of the selected items or channels (TK-63, Ctrl+Right).")
+        .operandi().ui(),
+    action("First Key", Items, "Goes to the first key of the selected items or channels (TK-63, Ctrl+Up).")
+        .operandi().ui(),
+    action("Last Key", Items, "Goes to the last key of the selected items or channels (TK-63, Ctrl+Down).")
+        .operandi().ui(),
+    action("Key Selected Channels", Items, "Keys the selected channels, or the live transform tool's (TK-21, S).")
+        .operandi().ui(),
+    action("Key Selected Items", Items, "Keys every animated channel of the selected items (TK-23, Shift+S).")
+        .operandi().ui(),
+    action("Key Position", Items, "Keys the selected items' position (TK-22, Shift+W).")
+        .operandi().ui(),
+    action("Key Rotation", Items, "Keys the selected items' rotation (TK-22, Shift+E).")
+        .operandi().ui(),
+    action("Key Scale", Items, "Keys the selected items' scale (TK-22; Shift+R in the Animate layout).")
+        .operandi().ui(),
+    action("Key Transforms", Items, "Keys the selected items' position, rotation and scale (TK-22; Shift+Y in the Animate layout).")
+        .operandi().ui(),
     action("Toggle Palettes", View, "Hides every open palette, or shows them all again (`, LAY-53).")
         .operandi().ui(),
     action("Node View", View, "Opens the node view of the selected Material Group, or the group the selected layer is in (Cmd+Shift+N).")
@@ -6128,7 +6210,7 @@ mod tests {
                 assert!(!json.about.is_empty(), "{}", e.name);
             }
         }
-        assert_eq!(crate::command_exec::specs().count(), 203);
+        assert_eq!(crate::command_exec::specs().count(), 206);
     }
 
     #[test]
