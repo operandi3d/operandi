@@ -13,6 +13,7 @@
 //! (UIC-190..195): see SPECIFICATION_QUESTIONS TL-Q01.
 use super::*;
 use crate::form::status::key_red;
+use crate::icons::Icon;
 use crate::unavailable::Gate;
 use operandi_core::animation::{self, AutoKey, ChannelKey, EndBehavior, MarkerShape, TimeDisplay};
 use operandi_core::time_tick::Tick;
@@ -181,7 +182,7 @@ impl Operandi {
     /// The bottom bar's clock button (TK-70).
     pub(super) fn timeline_toggle_button(&mut self, ui: &mut Ui) {
         let r = ui
-            .selectable_label(self.timeline.open, "🕘")
+            .add(crate::icons::button(ui, Icon::TimelineClock, "").selected(self.timeline.open))
             .on_hover_text("Timeline: show or hide the time strip (operandi.anim.timeline)");
         if r.clicked() {
             self.execute("operandi.anim.timeline");
@@ -1479,6 +1480,17 @@ impl Operandi {
         r
     }
 
+    /// [`Self::tb`] wearing a rendered icon instead of a text glyph.
+    fn tbi(&mut self, ui: &mut Ui, icon: Icon, name: &str, action: &str, line: &str) -> Response {
+        let tip = format!("{name}{}\n{line}", self.shortcut(action));
+        let button = crate::icons::button(ui, icon, "").min_size(vec2(22., 20.));
+        let r = ui.add(button).on_hover_text(tip);
+        if r.clicked() {
+            self.execute(line);
+        }
+        r
+    }
+
     fn timeline_buttons(&mut self, ui: &mut Ui, rect: Rect) {
         let mut child = ui.new_child(
             egui::UiBuilder::new()
@@ -1505,11 +1517,13 @@ impl Operandi {
         } else {
             label.color(theme::on_orange())
         };
-        let button = egui::Button::new(label).fill(if auto == AutoKey::Off {
-            theme::control()
-        } else {
-            theme::orange()
-        });
+        let button = crate::icons::button_with(ui, Icon::AutoKey, label.into()).fill(
+            if auto == AutoKey::Off {
+                theme::control()
+            } else {
+                theme::orange()
+            },
+        );
         let r = ui.add(button).on_hover_text("Auto Key: Off, Animated (edits key channels that have keys) or All (operandi.key.autoKey)");
         let mut picked = None;
         egui::Popup::menu(&r).show(|ui| {
@@ -1525,24 +1539,24 @@ impl Operandi {
         }
         ui.separator();
         if self.timeline.extended {
-            self.tb(
+            self.tbi(
                 ui,
-                "⇤◆",
+                Icon::FirstKey,
                 "First Key",
                 "First Key",
                 "operandi.time.go to:firstKey",
             );
         }
-        self.tb(
+        self.tbi(
             ui,
-            "⏮",
+            Icon::FirstFrame,
             "First Frame",
             "First Frame",
             "operandi.time.go to:first",
         );
-        self.tb(
+        self.tbi(
             ui,
-            "◀",
+            Icon::PreviousFrame,
             "Previous Frame",
             "Back One Frame",
             "operandi.time.step frames:-1",
@@ -1573,24 +1587,24 @@ impl Operandi {
             }
         }
         r.on_hover_text("Current time: type a frame, seconds (1.5s) or SMPTE (00:00:01:00)");
-        self.tb(
+        self.tbi(
             ui,
-            "▶",
+            Icon::NextFrame,
             "Next Frame",
             "Forward One Frame",
             "operandi.time.step frames:1",
         );
-        self.tb(
+        self.tbi(
             ui,
-            "⏭",
+            Icon::LastFrame,
             "Last Frame",
             "Last Frame",
             "operandi.time.go to:last",
         );
         let playing = self.editor.anim.playing.is_some();
-        let play = self.tb(
+        let play = self.tbi(
             ui,
-            if playing { "⏸" } else { "⏵" },
+            if playing { Icon::Stop } else { Icon::Play },
             "Play / Stop (right-click: Play Backwards)",
             "Play/Stop",
             "operandi.time.play",
@@ -1599,55 +1613,55 @@ impl Operandi {
             self.execute("operandi.time.play backwards:true");
         }
         if self.timeline.extended {
-            self.tb(
+            self.tbi(
                 ui,
-                "◆⇥",
+                Icon::LastKey,
                 "Last Key",
                 "Last Key",
                 "operandi.time.go to:lastKey",
             );
         }
         ui.separator();
-        self.tb(
+        self.tbi(
             ui,
-            "◁◆",
+            Icon::PreviousKey,
             "Previous Key",
             "Previous Key",
             "operandi.time.go to:prevKey",
         );
-        self.tb(
+        self.tbi(
             ui,
-            "Key",
+            Icon::KeyChannels,
             "Key Selected Channels",
             "Key Selected Channels",
             "operandi.key.set",
         );
-        self.tb(
+        self.tbi(
             ui,
-            "Key Items",
+            Icon::KeyItems,
             "Key Selected Items",
             "Key Selected Items",
             "operandi.key.items",
         );
-        self.tb(
+        self.tbi(
             ui,
-            "◆▷",
+            Icon::NextKey,
             "Next Key",
             "Next Key",
             "operandi.time.go to:nextKey",
         );
         if self.timeline.extended {
             ui.separator();
-            self.tb(
+            self.tbi(
                 ui,
-                "−Frame",
+                Icon::RemoveFrame,
                 "Remove Frame",
                 "",
                 "operandi.time.removeFrame",
             );
-            self.tb(
+            self.tbi(
                 ui,
-                "+Frame",
+                Icon::InsertFrame,
                 "Insert Frame",
                 "",
                 "operandi.time.insertFrame",
@@ -1682,16 +1696,16 @@ impl Operandi {
                 crate::form::status::edited_yellow(),
                 format!("{pending} edited, not keyed"),
             );
-            self.tb(
+            self.tbi(
                 ui,
-                "Apply",
+                Icon::ApplyKeys,
                 "Apply: key the edited channels",
                 "",
                 "operandi.key.apply",
             );
-            self.tb(
+            self.tbi(
                 ui,
-                "Discard",
+                Icon::DiscardKeys,
                 "Discard the edits",
                 "",
                 "operandi.key.discard",
