@@ -494,6 +494,8 @@ mod replicator;
 mod scene_budget;
 #[path = "scene_transfer.rs"]
 mod scene_transfer;
+#[path = "scripts_gate.rs"]
+mod scripts_gate;
 #[path = "sculpt_brush_engine.rs"]
 mod sculpt_brush_engine;
 #[path = "select_tools.rs"]
