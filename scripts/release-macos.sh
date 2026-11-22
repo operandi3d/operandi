@@ -165,9 +165,20 @@ if [ "${OPERANDI_SKIP_NOTARIZE:-0}" != 1 ]; then
     MOUNT="$STAGE/mount"
     mkdir -p "$MOUNT"
     hdiutil attach -nobrowse -readonly -mountpoint "$MOUNT" "$STAGED_DMG" >/dev/null
-    spctl -a -vv "$MOUNT/Operandi.app" || { hdiutil detach "$MOUNT" >/dev/null; exit 1; }
-    xcrun stapler validate "$MOUNT/Operandi.app"
-    hdiutil detach "$MOUNT" >/dev/null
+    # Right after the checks, macOS (Gatekeeper, Spotlight) can still have
+    # files open on the image, so a plain detach fails with "Resource busy".
+    # Try a few times, then force it: the image is read-only and only
+    # inspected here.
+    detach_mount() {
+        for _ in 1 2 3 4 5; do
+            hdiutil detach "$MOUNT" >/dev/null 2>&1 && return 0
+            sleep 3
+        done
+        hdiutil detach -force "$MOUNT" >/dev/null
+    }
+    spctl -a -vv "$MOUNT/Operandi.app" || { detach_mount; exit 1; }
+    xcrun stapler validate "$MOUNT/Operandi.app" || { detach_mount; exit 1; }
+    detach_mount
 fi
 mkdir -p "$OUTPUT"
 DMG="$OUTPUT/$DMG_NAME"
