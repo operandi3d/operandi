@@ -1,0 +1,23 @@
+[package]
+name = "operandi-usd"
+version = "0.1.0"
+edition = "2024"
+# The Rust side is Operandi's own; bridge/blender/ is adapted from Blender
+# (GPL-2.0-or-later). See README.md in this crate.
+license = "GPL-3.0-or-later AND GPL-2.0-or-later"
+description = "USD export and import through OpenUSD"
+links = "operandi_usd"
+build = "build.rs"
+
+[dependencies]
+operandi-core = { path = "../operandi-core" }
+glam.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+# Picture sizes for imported materials; the same pin and features as the app.
+image = { version = "=0.25.10", default-features = false, features = ["png", "jpeg", "exr", "tiff", "hdr", "bmp", "tga"] }
+
+[features]
+# Link liboperandi_usd (built by scripts/build-usd.sh). Without it the crate
+# still builds and `export` reports that USD isn't included.
+usd = []

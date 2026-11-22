@@ -1,0 +1,121 @@
+# Sculpt toolbox: registry addendum (interface names only)
+# Same source and format as the command-name registry: tool name, then the
+# form fields in form order as name:type=start  # UI label.
+# Choice fields are integers in the order the spec lists the choices (0 = first;
+# checked against the two documented Normal Mode defaults, Flatten and Spin).
+# Percent values are 0..1. Distances in metres. REA-assisted: no.
+# Activation: tool.set <name> on
+
+Fold => sculpt.fold
+    paint:integer=0  # Sculpt Mode
+    omod:integer=0  # Offset Mode
+    offset:distance=0.1  # Offset Distance
+    oval:percent=0.25  # Offset Amount
+    sval:percent=0.5  # Smooth Amount
+    smod:integer=0  # Smooth Mode
+    strokeStep:percent=0.05  # Interpolation Step
+    strokeContinuous:boolean=0  # Continuous Stroke
+    curveConstraint:integer=0  # Curve Constraint
+
+Clay => sculpt.clay
+    oval:percent=0.5  # Offset Amount
+    level:percent=0.1  # Level
+    sval:percent=0.5  # Smooth Amount
+    smod:integer=0  # Smooth Mode
+    nmod:integer=2  # Normal Mode
+    dmod:integer=1  # Density Mode
+    strokeStep:percent=0.05  # Interpolation Step
+    strokeContinuous:boolean=0  # Continuous Stroke
+    curveConstraint:integer=0  # Curve Constraint
+
+Smudge => sculpt.smudge
+    paint:integer=0  # Sculpt Mode
+    oval:percent=0.5  # Offset Amount
+    sval:percent=0.5  # Smooth Amount
+    smod:integer=0  # Smooth Mode
+
+Carve => sculpt.carve
+    paint:integer=0  # Sculpt Mode
+    omod:integer=0  # Offset Mode
+    offset:distance=0.1  # Offset Distance
+    oval:percent=0.5  # Offset Amount
+    sval:percent=0.5  # Smooth Amount
+    smod:integer=0  # Smooth Mode
+    nmod:integer=2  # Normal Mode
+    dmod:integer=1  # Density Mode
+    strokeStep:percent=0.05  # Interpolation Step
+    strokeContinuous:boolean=0  # Continuous Stroke
+    curveConstraint:integer=0  # Curve Constraint
+    setColor:boolean=0  # Set Color
+    color:color=1 0 0  # Color
+    alpha:percent=1.0  # Alpha
+
+Scar => sculpt.scar
+    oval:percent=0.25  # Offset Amount
+    sval:percent=0.5  # Smooth Amount
+    smod:integer=0  # Smooth Mode
+
+Flatten => sculpt.flatten
+    paint:integer=0  # Sculpt Mode
+    flat:boolean=0  # Inverted Flatten
+    omod:integer=0  # Offset Mode
+    offset:distance=0.1  # Offset Distance
+    oval:percent=0.5  # Offset Amount
+    sval:percent=0.5  # Smooth Amount
+    smod:integer=0  # Smooth Mode
+    nmod:integer=0  # Normal Mode
+    strokeStep:percent=0.05  # Interpolation Step
+    strokeContinuous:boolean=0  # Continuous Stroke
+    curveConstraint:integer=0  # Curve Constraint
+
+Tangent Pinch => sculpt.tangentPinch
+    paint:integer=0  # Sculpt Mode
+    omod:integer=0  # Offset Mode
+    offset:distance=0.1  # Offset Distance
+    oval:percent=0.25  # Offset Amount
+    sval:percent=0.5  # Smooth Amount
+    curveConstraint:integer=0  # Curve Constraint
+
+Center Pinch => sculpt.centerPinch
+    paint:integer=0  # Sculpt Mode
+    omod:integer=0  # Offset Mode
+    offset:distance=0.1  # Offset Distance
+    oval:percent=0.25  # Offset Amount
+    sval:percent=0.5  # Smooth Amount
+    curveConstraint:integer=0  # Curve Constraint
+
+Emboss => sculpt.emboss
+    paint:integer=0  # Sculpt Mode
+    oval:percent=0.25  # Offset Amount
+
+Attenuate => sculpt.shrink
+    paint:integer=0  # Sculpt Mode
+    oval:percent=0.25  # Amount
+    sval:percent=0.5  # Smooth
+    smod:integer=0  # Smooth Mode
+
+Spin => sculpt.spin
+    paint:integer=0  # Sculpt Mode
+    omod:integer=0  # Offset Mode
+    offset:distance=0.1  # Offset Distance
+    oval:percent=0.25  # Offset Amount
+    sval:percent=0.5  # Smooth Amount
+    nmod:integer=0  # Normal Mode
+
+Move (Move Mode row only) => sculpt.move
+    moveMode:integer=0  # Move Mode
+
+Mask: Paint => sculpt.maskPaint
+    oval:percent=1.0  # Value
+
+Mask: Smooth => sculpt.maskSmooth
+    oval:percent=1.0  # Smooth Amount
+
+Mask: Scale Down => sculpt.maskScale
+    oval:percent=1.0  # Scale Amount
+
+Mask: Erase => sculpt.maskErase
+
+Mask: Set Value => sculpt.maskSetVal
+    oval:percent=1.0  # Value
+

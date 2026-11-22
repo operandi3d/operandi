@@ -1,0 +1,1327 @@
+{
+ "spec": "set-part-observed-2026-11-05",
+ "comparison_rule": "Build the input (parts as listed, materials Default), select as listed, run Set Part. Match part tags exactly; materials, points and selection unchanged; no shader items created.",
+ "cases": [
+  {
+   "id": "PT01",
+   "description": "2x2 grid, polygons 0,1 selected; name A",
+   "input": {
+    "points": [
+     [
+      -1.0,
+      -1.0,
+      0.0
+     ],
+     [
+      0.0,
+      -1.0,
+      0.0
+     ],
+     [
+      1.0,
+      -1.0,
+      0.0
+     ],
+     [
+      -1.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      -1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      4,
+      3
+     ],
+     [
+      1,
+      2,
+      5,
+      4
+     ],
+     [
+      3,
+      4,
+      7,
+      6
+     ],
+     [
+      4,
+      5,
+      8,
+      7
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": [
+     0,
+     1
+    ]
+   },
+   "selection_mode": "polygon",
+   "option": {
+    "name": "A"
+   },
+   "expected": {
+    "polygon_parts": [
+     "A",
+     "A",
+     "Default",
+     "Default"
+    ],
+    "polygon_materials": [
+     "Default",
+     "Default",
+     "Default",
+     "Default"
+    ],
+    "new_shader_items": 0,
+    "points_unchanged": true,
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": [
+      0,
+      1
+     ]
+    },
+    "selection_mode_after": "polygon"
+   },
+   "input_polygon_parts": [
+    "Default",
+    "Default",
+    "Default",
+    "Default"
+   ]
+  },
+  {
+   "id": "PT02",
+   "description": "Polygon mode, nothing selected; name B",
+   "input": {
+    "points": [
+     [
+      -1.0,
+      -1.0,
+      0.0
+     ],
+     [
+      0.0,
+      -1.0,
+      0.0
+     ],
+     [
+      1.0,
+      -1.0,
+      0.0
+     ],
+     [
+      -1.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      -1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      4,
+      3
+     ],
+     [
+      1,
+      2,
+      5,
+      4
+     ],
+     [
+      3,
+      4,
+      7,
+      6
+     ],
+     [
+      4,
+      5,
+      8,
+      7
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": []
+   },
+   "selection_mode": "polygon",
+   "option": {
+    "name": "B"
+   },
+   "expected": {
+    "polygon_parts": [
+     "B",
+     "B",
+     "B",
+     "B"
+    ],
+    "polygon_materials": [
+     "Default",
+     "Default",
+     "Default",
+     "Default"
+    ],
+    "new_shader_items": 0,
+    "points_unchanged": true,
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": []
+    },
+    "selection_mode_after": "polygon"
+   },
+   "input_polygon_parts": [
+    "Default",
+    "Default",
+    "Default",
+    "Default"
+   ]
+  },
+  {
+   "id": "PT03",
+   "description": "Polygons 0,1 already part A; polygon 1,2 selected; name C",
+   "input": {
+    "points": [
+     [
+      -1.0,
+      -1.0,
+      0.0
+     ],
+     [
+      0.0,
+      -1.0,
+      0.0
+     ],
+     [
+      1.0,
+      -1.0,
+      0.0
+     ],
+     [
+      -1.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      -1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      4,
+      3
+     ],
+     [
+      1,
+      2,
+      5,
+      4
+     ],
+     [
+      3,
+      4,
+      7,
+      6
+     ],
+     [
+      4,
+      5,
+      8,
+      7
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": [
+     1,
+     2
+    ]
+   },
+   "selection_mode": "polygon",
+   "option": {
+    "name": "C"
+   },
+   "expected": {
+    "polygon_parts": [
+     "A",
+     "C",
+     "C",
+     "Default"
+    ],
+    "polygon_materials": [
+     "Default",
+     "Default",
+     "Default",
+     "Default"
+    ],
+    "new_shader_items": 0,
+    "points_unchanged": true,
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": [
+      1,
+      2
+     ]
+    },
+    "selection_mode_after": "polygon"
+   },
+   "input_polygon_parts": [
+    "A",
+    "A",
+    "Default",
+    "Default"
+   ]
+  },
+  {
+   "id": "PT04",
+   "description": "Polygons 0,1 already part A; polygons 2,3 selected; name A",
+   "input": {
+    "points": [
+     [
+      -1.0,
+      -1.0,
+      0.0
+     ],
+     [
+      0.0,
+      -1.0,
+      0.0
+     ],
+     [
+      1.0,
+      -1.0,
+      0.0
+     ],
+     [
+      -1.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      -1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      4,
+      3
+     ],
+     [
+      1,
+      2,
+      5,
+      4
+     ],
+     [
+      3,
+      4,
+      7,
+      6
+     ],
+     [
+      4,
+      5,
+      8,
+      7
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": [
+     2,
+     3
+    ]
+   },
+   "selection_mode": "polygon",
+   "option": {
+    "name": "A"
+   },
+   "expected": {
+    "polygon_parts": [
+     "A",
+     "A",
+     "A",
+     "A"
+    ],
+    "polygon_materials": [
+     "Default",
+     "Default",
+     "Default",
+     "Default"
+    ],
+    "new_shader_items": 0,
+    "points_unchanged": true,
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": [
+      2,
+      3
+     ]
+    },
+    "selection_mode_after": "polygon"
+   },
+   "input_polygon_parts": [
+    "A",
+    "A",
+    "Default",
+    "Default"
+   ]
+  },
+  {
+   "id": "PT05",
+   "description": "Polygon 0 selected; name with a space: Left Wing",
+   "input": {
+    "points": [
+     [
+      -1.0,
+      -1.0,
+      0.0
+     ],
+     [
+      0.0,
+      -1.0,
+      0.0
+     ],
+     [
+      1.0,
+      -1.0,
+      0.0
+     ],
+     [
+      -1.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      -1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      4,
+      3
+     ],
+     [
+      1,
+      2,
+      5,
+      4
+     ],
+     [
+      3,
+      4,
+      7,
+      6
+     ],
+     [
+      4,
+      5,
+      8,
+      7
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": [
+     0
+    ]
+   },
+   "selection_mode": "polygon",
+   "option": {
+    "name": "Left"
+   },
+   "expected": {
+    "polygon_parts": [
+     "Left Wing",
+     "Default",
+     "Default",
+     "Default"
+    ],
+    "polygon_materials": [
+     "Default",
+     "Default",
+     "Default",
+     "Default"
+    ],
+    "new_shader_items": 0,
+    "points_unchanged": true,
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": [
+      0
+     ]
+    },
+    "selection_mode_after": "polygon"
+   },
+   "input_polygon_parts": [
+    "Default",
+    "Default",
+    "Default",
+    "Default"
+   ]
+  },
+  {
+   "id": "PT06",
+   "description": "Polygons 0,1 already part A; polygon 0 selected; empty name",
+   "input": {
+    "points": [
+     [
+      -1.0,
+      -1.0,
+      0.0
+     ],
+     [
+      0.0,
+      -1.0,
+      0.0
+     ],
+     [
+      1.0,
+      -1.0,
+      0.0
+     ],
+     [
+      -1.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      -1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      4,
+      3
+     ],
+     [
+      1,
+      2,
+      5,
+      4
+     ],
+     [
+      3,
+      4,
+      7,
+      6
+     ],
+     [
+      4,
+      5,
+      8,
+      7
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": [
+     0
+    ]
+   },
+   "selection_mode": "polygon",
+   "option": {
+    "name": ""
+   },
+   "expected": {
+    "polygon_parts": [
+     "",
+     "A",
+     "Default",
+     "Default"
+    ],
+    "polygon_materials": [
+     "Default",
+     "Default",
+     "Default",
+     "Default"
+    ],
+    "new_shader_items": 0,
+    "points_unchanged": true,
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": [
+      0
+     ]
+    },
+    "selection_mode_after": "polygon"
+   },
+   "input_polygon_parts": [
+    "A",
+    "A",
+    "Default",
+    "Default"
+   ],
+   "operandi_note": "Modo reference only; decided: Operandi refuses a blank name (Q-PT-01)"
+  },
+  {
+   "id": "PT07",
+   "description": "Vertex mode, point 4 selected; name V",
+   "input": {
+    "points": [
+     [
+      -1.0,
+      -1.0,
+      0.0
+     ],
+     [
+      0.0,
+      -1.0,
+      0.0
+     ],
+     [
+      1.0,
+      -1.0,
+      0.0
+     ],
+     [
+      -1.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      -1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      4,
+      3
+     ],
+     [
+      1,
+      2,
+      5,
+      4
+     ],
+     [
+      3,
+      4,
+      7,
+      6
+     ],
+     [
+      4,
+      5,
+      8,
+      7
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [
+     4
+    ],
+    "sel_edges": [],
+    "sel_polygons": []
+   },
+   "selection_mode": "vertex",
+   "option": {
+    "name": "V"
+   },
+   "expected": {
+    "polygon_parts": [
+     "Default",
+     "Default",
+     "Default",
+     "Default"
+    ],
+    "polygon_materials": [
+     "Default",
+     "Default",
+     "Default",
+     "Default"
+    ],
+    "new_shader_items": 0,
+    "points_unchanged": true,
+    "selection_after": {
+     "sel_vertices": [
+      4
+     ],
+     "sel_edges": [],
+     "sel_polygons": []
+    },
+    "selection_mode_after": "vertex"
+   },
+   "input_polygon_parts": [
+    "Default",
+    "Default",
+    "Default",
+    "Default"
+   ]
+  },
+  {
+   "id": "PT08",
+   "description": "Vertex mode, nothing selected; name V2",
+   "input": {
+    "points": [
+     [
+      -1.0,
+      -1.0,
+      0.0
+     ],
+     [
+      0.0,
+      -1.0,
+      0.0
+     ],
+     [
+      1.0,
+      -1.0,
+      0.0
+     ],
+     [
+      -1.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      -1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      4,
+      3
+     ],
+     [
+      1,
+      2,
+      5,
+      4
+     ],
+     [
+      3,
+      4,
+      7,
+      6
+     ],
+     [
+      4,
+      5,
+      8,
+      7
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": []
+   },
+   "selection_mode": "vertex",
+   "option": {
+    "name": "V2"
+   },
+   "expected": {
+    "polygon_parts": [
+     "V2",
+     "V2",
+     "V2",
+     "V2"
+    ],
+    "polygon_materials": [
+     "Default",
+     "Default",
+     "Default",
+     "Default"
+    ],
+    "new_shader_items": 0,
+    "points_unchanged": true,
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": []
+    },
+    "selection_mode_after": "vertex"
+   },
+   "input_polygon_parts": [
+    "Default",
+    "Default",
+    "Default",
+    "Default"
+   ]
+  },
+  {
+   "id": "PT09",
+   "description": "Edge mode, edge 0-1 selected; name E",
+   "input": {
+    "points": [
+     [
+      -1.0,
+      -1.0,
+      0.0
+     ],
+     [
+      0.0,
+      -1.0,
+      0.0
+     ],
+     [
+      1.0,
+      -1.0,
+      0.0
+     ],
+     [
+      -1.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      -1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      4,
+      3
+     ],
+     [
+      1,
+      2,
+      5,
+      4
+     ],
+     [
+      3,
+      4,
+      7,
+      6
+     ],
+     [
+      4,
+      5,
+      8,
+      7
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [
+     [
+      0,
+      1
+     ]
+    ],
+    "sel_polygons": []
+   },
+   "selection_mode": "edge",
+   "option": {
+    "name": "E"
+   },
+   "expected": {
+    "polygon_parts": [
+     "Default",
+     "Default",
+     "Default",
+     "Default"
+    ],
+    "polygon_materials": [
+     "Default",
+     "Default",
+     "Default",
+     "Default"
+    ],
+    "new_shader_items": 0,
+    "points_unchanged": true,
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [
+      [
+       0,
+       1
+      ]
+     ],
+     "sel_polygons": []
+    },
+    "selection_mode_after": "edge"
+   },
+   "input_polygon_parts": [
+    "Default",
+    "Default",
+    "Default",
+    "Default"
+   ]
+  },
+  {
+   "id": "PT10",
+   "description": "Item mode; name I",
+   "input": {
+    "points": [
+     [
+      -1.0,
+      -1.0,
+      0.0
+     ],
+     [
+      0.0,
+      -1.0,
+      0.0
+     ],
+     [
+      1.0,
+      -1.0,
+      0.0
+     ],
+     [
+      -1.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      -1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      4,
+      3
+     ],
+     [
+      1,
+      2,
+      5,
+      4
+     ],
+     [
+      3,
+      4,
+      7,
+      6
+     ],
+     [
+      4,
+      5,
+      8,
+      7
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": []
+   },
+   "selection_mode": "item",
+   "option": {
+    "name": "I"
+   },
+   "expected": {
+    "polygon_parts": [
+     "I",
+     "I",
+     "I",
+     "I"
+    ],
+    "polygon_materials": [
+     "Default",
+     "Default",
+     "Default",
+     "Default"
+    ],
+    "new_shader_items": 0,
+    "points_unchanged": true,
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": []
+    },
+    "selection_mode_after": "item"
+   },
+   "input_polygon_parts": [
+    "Default",
+    "Default",
+    "Default",
+    "Default"
+   ]
+  },
+  {
+   "id": "PT11",
+   "description": "Polygon 0 selected; name Default",
+   "input": {
+    "points": [
+     [
+      -1.0,
+      -1.0,
+      0.0
+     ],
+     [
+      0.0,
+      -1.0,
+      0.0
+     ],
+     [
+      1.0,
+      -1.0,
+      0.0
+     ],
+     [
+      -1.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      -1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      4,
+      3
+     ],
+     [
+      1,
+      2,
+      5,
+      4
+     ],
+     [
+      3,
+      4,
+      7,
+      6
+     ],
+     [
+      4,
+      5,
+      8,
+      7
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": [
+     0
+    ]
+   },
+   "selection_mode": "polygon",
+   "option": {
+    "name": "Default"
+   },
+   "expected": {
+    "polygon_parts": [
+     "Default",
+     "Default",
+     "Default",
+     "Default"
+    ],
+    "polygon_materials": [
+     "Default",
+     "Default",
+     "Default",
+     "Default"
+    ],
+    "new_shader_items": 0,
+    "points_unchanged": true,
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": [
+      0
+     ]
+    },
+    "selection_mode_after": "polygon"
+   },
+   "input_polygon_parts": [
+    "Default",
+    "Default",
+    "Default",
+    "Default"
+   ]
+  }
+ ]
+}

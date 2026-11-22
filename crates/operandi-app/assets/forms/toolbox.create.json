@@ -1,0 +1,414 @@
+{
+  "version": 1,
+  "id": "toolbox.create",
+  "label": "Create",
+  "exported": true,
+  "controls": [
+    {
+      "divider": "Primitives",
+      "id": "primitives"
+    },
+    {
+      "form": {
+        "style": "horizontal",
+        "icons": "icon",
+        "controls": [
+          {
+            "command": "Cube",
+            "label": "Cube",
+            "icon": "cube",
+            "tooltip": "Cube{binding} · draw it in the viewport; click again to drop\n{variants} · Draw a live Cube · Ctrl before drawing: start is center, cursor is outer extent (1 m drag = 2 m size)",
+            "variants": {
+              "shift": {
+                "line": "Cube New Unit",
+                "label": "Cube Item",
+                "tag": "Item",
+                "tooltip": "Cube Item{binding:Cube} · add a 1 m primitive as a new mesh item at the scene origin, no drag\n{variants} · Draw a live Cube · Ctrl before drawing: start is center, cursor is outer extent (1 m drag = 2 m size)"
+              },
+              "ctrl": {
+                "line": "Cube Unit",
+                "label": "Unit Cube",
+                "tag": "Unit",
+                "tooltip": "Unit Cube{binding:Cube} · add a 1 m primitive to the current mesh at its origin, no drag\n{variants} · Draw a live Cube · Ctrl before drawing: start is center, cursor is outer extent (1 m drag = 2 m size)"
+              }
+            }
+          },
+          {
+            "command": "Sphere",
+            "label": "Sphere",
+            "icon": "sphere",
+            "tooltip": "Sphere{binding} · draw it in the viewport; click again to drop\n{variants} · Face Globe · ordinary draw: flat draft; Ctrl before drawing: start is center, cursor sets equal radii (1 m drag = 2 m diameter)",
+            "variants": {
+              "shift": {
+                "line": "Sphere New Unit",
+                "label": "Sphere Item",
+                "tag": "Item",
+                "tooltip": "Sphere Item{binding:Sphere} · add a 1 m primitive as a new mesh item at the scene origin, no drag\n{variants} · Face Globe · ordinary draw: flat draft; Ctrl before drawing: start is center, cursor sets equal radii (1 m drag = 2 m diameter)"
+              },
+              "ctrl": {
+                "line": "Sphere Unit",
+                "label": "Unit Sphere",
+                "tag": "Unit",
+                "tooltip": "Unit Sphere{binding:Sphere} · add a 1 m primitive to the current mesh at its origin, no drag\n{variants} · Face Globe · ordinary draw: flat draft; Ctrl before drawing: start is center, cursor sets equal radii (1 m drag = 2 m diameter)"
+              }
+            }
+          },
+          {
+            "command": "Ellipsoid",
+            "label": "Ellipsoid",
+            "icon": "ellipsoid",
+            "tooltip": "Ellipsoid{binding} · draw it in the viewport; click again to drop\n{variants}",
+            "variants": {
+              "shift": {
+                "line": "Ellipsoid New Unit",
+                "label": "Ellipsoid Item",
+                "tag": "Item",
+                "tooltip": "Ellipsoid Item{binding:Ellipsoid} · add a 1 m primitive as a new mesh item at the scene origin, no drag\n{variants}"
+              },
+              "ctrl": {
+                "line": "Ellipsoid Unit",
+                "label": "Unit Ellipsoid",
+                "tag": "Unit",
+                "tooltip": "Unit Ellipsoid{binding:Ellipsoid} · add a 1 m primitive to the current mesh at its origin, no drag\n{variants}"
+              }
+            }
+          },
+          {
+            "command": "Cone",
+            "label": "Cone",
+            "icon": "cone",
+            "tooltip": "Cone{binding} · draw it in the viewport; click again to drop\n{variants}",
+            "variants": {
+              "shift": {
+                "line": "Cone New Unit",
+                "label": "Cone Item",
+                "tag": "Item",
+                "tooltip": "Cone Item{binding:Cone} · add a 1 m primitive as a new mesh item at the scene origin, no drag\n{variants}"
+              },
+              "ctrl": {
+                "line": "Cone Unit",
+                "label": "Unit Cone",
+                "tag": "Unit",
+                "tooltip": "Unit Cone{binding:Cone} · add a 1 m primitive to the current mesh at its origin, no drag\n{variants}"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "form": {
+        "style": "horizontal",
+        "icons": "icon",
+        "controls": [
+          {
+            "command": "Cylinder",
+            "label": "Cylinder",
+            "icon": "cylinder",
+            "tooltip": "Cylinder{binding} · draw it in the viewport; click again to drop\n{variants} · Face Cylinder · Ctrl before drawing: start is center, cursor sets radius; diameter and height = twice drag",
+            "variants": {
+              "shift": {
+                "line": "Cylinder New Unit",
+                "label": "Cylinder Item",
+                "tag": "Item",
+                "tooltip": "Cylinder Item{binding:Cylinder} · add a 1 m primitive as a new mesh item at the scene origin, no drag\n{variants} · Face Cylinder · Ctrl before drawing: start is center, cursor sets radius; diameter and height = twice drag"
+              },
+              "ctrl": {
+                "line": "Cylinder Unit",
+                "label": "Unit Cylinder",
+                "tag": "Unit",
+                "tooltip": "Unit Cylinder{binding:Cylinder} · add a 1 m primitive to the current mesh at its origin, no drag\n{variants} · Face Cylinder · Ctrl before drawing: start is center, cursor sets radius; diameter and height = twice drag"
+              }
+            }
+          },
+          {
+            "command": "Torus",
+            "label": "Torus",
+            "icon": "torus",
+            "tooltip": "Torus{binding} · draw it in the viewport; click again to drop\n{variants}",
+            "variants": {
+              "shift": {
+                "line": "Torus New Unit",
+                "label": "Torus Item",
+                "tag": "Item",
+                "tooltip": "Torus Item{binding:Torus} · add a 1 m primitive as a new mesh item at the scene origin, no drag\n{variants}"
+              },
+              "ctrl": {
+                "line": "Torus Unit",
+                "label": "Unit Torus",
+                "tag": "Unit",
+                "tooltip": "Unit Torus{binding:Torus} · add a 1 m primitive to the current mesh at its origin, no drag\n{variants}"
+              }
+            }
+          },
+          {
+            "command": "Capsule",
+            "label": "Capsule",
+            "icon": "capsule",
+            "tooltip": "Capsule{binding} · draw it in the viewport; click again to drop\n{variants}",
+            "variants": {
+              "shift": {
+                "line": "Capsule New Unit",
+                "label": "Capsule Item",
+                "tag": "Item",
+                "tooltip": "Capsule Item{binding:Capsule} · add a 1 m primitive as a new mesh item at the scene origin, no drag\n{variants}"
+              },
+              "ctrl": {
+                "line": "Capsule Unit",
+                "label": "Unit Capsule",
+                "tag": "Unit",
+                "tooltip": "Unit Capsule{binding:Capsule} · add a 1 m primitive to the current mesh at its origin, no drag\n{variants}"
+              }
+            }
+          },
+          {
+            "command": "Text",
+            "label": "Text",
+            "icon": "text",
+            "tooltip": "Text · numeric construction · {binding}\n{variants}",
+            "variants": {
+              "shift": {
+                "line": "Plane Item",
+                "label": "Plane Item",
+                "tag": "Item",
+                "tooltip": "Plane Item · add a 1 m square plane facing up as a new mesh item at the scene origin, no drag\n{variants}"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "divider": "Draw",
+      "id": "draw-tools"
+    },
+    {
+      "form": {
+        "style": "horizontal",
+        "icons": "icon",
+        "controls": [
+          {
+            "command": "Arc",
+            "label": "Arc",
+            "icon": "arc",
+            "tooltip": "Arc · numeric construction · {binding}"
+          },
+          {
+            "form": {
+              "style": "hold",
+              "controls": [
+                {
+                  "command": "Tube",
+                  "label": "Tube",
+                  "icon": "tube"
+                },
+                {
+                  "command": "Solid Sketch",
+                  "label": "Solid Sketch",
+                  "icon": "solid-sketch"
+                }
+              ]
+            },
+            "tooltip": "Tube · numeric construction · {binding}\nRight-click or hold: Tube or Solid Sketch (click nodes to rough out a blobby shape) · {binding:Solid Sketch}"
+          },
+          {
+            "command": "Topology Pen",
+            "label": "Topology Pen",
+            "icon": "topology-pen",
+            "tooltip": "Topology Pen · drag an element to move it · Shift+drag an edge to pull out a new strip · {binding}"
+          },
+          {
+            "command": "Polygon Pen",
+            "label": "Pen",
+            "icon": "pen",
+            "tooltip": "Pen · click points to make a polygon · Shift-click starts the next one · {chord}",
+            "noShortcut": true
+          }
+        ],
+        "columns": 4
+      }
+    },
+    {
+      "form": {
+        "style": "horizontal",
+        "icons": "icon",
+        "controls": [
+          {
+            "command": "Curve",
+            "label": "Curve",
+            "icon": "curve",
+            "tooltip": "Curve · click points in the viewport{andBinding}"
+          },
+          {
+            "command": "Bezier Curve",
+            "label": "Bezier",
+            "icon": "bezier-curve",
+            "tooltip": "Bezier Curve · click points in the viewport{andBinding}"
+          },
+          {
+            "command": "B-Spline",
+            "label": "B-Spline",
+            "icon": "b-spline",
+            "tooltip": "B-Spline · click points in the viewport{andBinding}"
+          },
+          {
+            "command": "Sketch",
+            "label": "Sketch",
+            "icon": "sketch",
+            "tooltip": "Sketch · click points in the viewport{andBinding}"
+          },
+          {
+            "command": "Draw Patch",
+            "label": "Patch",
+            "icon": "draw-patch",
+            "tooltip": "Draw Patch · click points in the viewport{andBinding}"
+          }
+        ]
+      }
+    },
+    {
+      "divider": "Edit",
+      "id": "create-edit"
+    },
+    {
+      "form": {
+        "style": "horizontal",
+        "icons": "icon",
+        "controls": [
+          {
+            "command": "Cut Selection",
+            "label": "Cut",
+            "icon": "cut",
+            "tooltip": "Cut Selection · take the selection into the clipboard{andBinding}",
+            "noShortcut": true
+          },
+          {
+            "command": "Copy Selection",
+            "label": "Copy",
+            "icon": "copy",
+            "tooltip": "Copy Selection · copy the selection to the clipboard{andBinding}",
+            "noShortcut": true
+          },
+          {
+            "command": "Paste Selection",
+            "label": "Paste",
+            "icon": "paste",
+            "tooltip": "Paste Selection · add the clipboard where it was copied, selected{andBinding}",
+            "noShortcut": true
+          },
+          {
+            "command": "Paste Tool",
+            "label": "Paste Tool",
+            "icon": "paste-tool",
+            "tooltip": "Paste Tool · each viewport click adds a copy of the clipboard there{andBinding}",
+            "noShortcut": true
+          }
+        ]
+      }
+    },
+    {
+      "divider": "Merge",
+      "id": "create-merge"
+    },
+    {
+      "form": {
+        "style": "horizontal",
+        "icons": "both",
+        "controls": [
+          {
+            "command": "Item Unmerge",
+            "label": "Unmerge",
+            "icon": "unmerge",
+            "tooltip": "Unmerge · split the selected mesh into one mesh per connected piece"
+          },
+          {
+            "command": "Item Merge",
+            "label": "Merge",
+            "icon": "merge",
+            "tooltip": "Merge · join the selected meshes into the first one selected (Ctrl/Shift-click meshes in the Scenes list to select several)"
+          }
+        ]
+      }
+    },
+    {
+      "divider": "Align",
+      "id": "create-align"
+    },
+    {
+      "form": {
+        "style": "horizontal",
+        "icons": "both",
+        "controls": [
+          {
+            "command": "Quick Align",
+            "label": "Quick Align",
+            "icon": "quick-align",
+            "tooltip": "Quick Align · line the selection up with a target element{andBinding}",
+            "noShortcut": true
+          },
+          {
+            "command": "Ground Align",
+            "label": "Ground Align",
+            "icon": "ground-align",
+            "tooltip": "Ground Align · click in the viewport to drop the geometry onto the ground{andBinding}",
+            "noShortcut": true
+          }
+        ]
+      }
+    },
+    {
+      "divider": "Measure",
+      "id": "create-measure"
+    },
+    {
+      "form": {
+        "style": "horizontal",
+        "icons": "icon",
+        "controls": [
+          {
+            "command": "Ruler",
+            "label": "Ruler",
+            "icon": "ruler",
+            "tooltip": "Ruler · measure a distance; ends snap to points{andBinding}",
+            "noShortcut": true
+          },
+          {
+            "command": "Protractor",
+            "label": "Protractor",
+            "icon": "protractor",
+            "tooltip": "Protractor · measure an angle{andBinding}",
+            "noShortcut": true
+          },
+          {
+            "command": "Dimensions",
+            "label": "Dimensions",
+            "icon": "dimensions",
+            "tooltip": "Dimensions · show the selection's size{andBinding}",
+            "noShortcut": true
+          }
+        ]
+      }
+    },
+    {
+      "command": "Snaps and Precision",
+      "label": "Snaps and Precision",
+      "look": "tall",
+      "noShortcut": true,
+      "tooltip": "Snaps and Precision · snapping presets, Advanced Handles and Absolute Scaling (opens or closes its panel){andBinding}"
+    },
+    {
+      "command": "Mesh Paint",
+      "label": "Mesh Paint",
+      "icon": "mesh-paint",
+      "tooltip": "Mesh Paint{binding} · paint copies of a background mesh onto the selected mesh: click, stroke, line, grid or ring\n{variants}",
+      "variants": {
+        "alt": {
+          "line": "Mesh Paint Instance",
+          "label": "Mesh Paint Instance",
+          "icon": "mesh-paint-instance",
+          "tooltip": "Mesh Paint Instance{binding} · the same, making instance items of the background mesh\n{variants}"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,54 @@
+{
+  "visible": {
+    "graph": "G0",
+    "identity": "I0",
+    "session": null
+  },
+  "document": "H3c3",
+  "selected_stage": "Cpark",
+  "saved_single_prior_parked": null,
+  "selected_anchor": {
+    "scope": "D0/item1/generation1",
+    "cursor": 3,
+    "base": {
+      "graph": "G0",
+      "identity": "I0",
+      "session": null
+    },
+    "completed_boundary": "H3"
+  },
+  "prior_anchor": null,
+  "tool_owner": null,
+  "geometry_next_id": 147,
+  "stage_next_id": 4,
+  "preset_world_z": 0,
+  "ordered_selected_face_ids": [
+    10
+  ],
+  "document_scope": "D0/item1/generation1",
+  "publication_and_request": "Per trace deltas;never restored",
+  "gesture_capture": null,
+  "session_eligibility": "Fresh current checked publication/request+stage key on every activation/resume;old gesture not restored",
+  "readers": [
+    "RA"
+  ],
+  "expected_counts": {
+    "completed_entries": 3,
+    "completed_applied": 3,
+    "completed_redo": 0,
+    "selected_stage_objects": 1,
+    "saved_prior_stage_objects": 0,
+    "external_reader_stage_objects": 1,
+    "retained_stage_objects_total": 2,
+    "selected_local_entries": 1,
+    "selected_local_cursor": 0,
+    "prior_local_entries": 0,
+    "document_snapshot_pairs": 6,
+    "current_visible_snapshot_pairs": 1,
+    "selected_stage_snapshot_pairs": 2,
+    "prior_stage_snapshot_pairs": 0,
+    "legacy_live_base_pairs": 0,
+    "external_reader_snapshot_pairs": 4,
+    "full_snapshot_control_pairs_total": 13
+  }
+}

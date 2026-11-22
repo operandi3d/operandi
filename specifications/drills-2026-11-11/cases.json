@@ -1,0 +1,389 @@
+[
+ {
+  "id": "DR-D0",
+  "source": "observed 2026-11-07",
+  "tool": "solid_drill",
+  "description": "Solid Drill core on grid",
+  "input": {
+   "target": {
+    "note": "4x4 grid of unit quads, X,Y in -2..2, Z=0, one material matG"
+   },
+   "driver": {
+    "note": "closed cube half-size 1.0 at (0, 0, 0)"
+   }
+  },
+  "settings": {
+   "mode": "core",
+   "material": "",
+   "cutmesh": "background"
+  },
+  "expected": {
+   "polygons": 4,
+   "points": 9,
+   "all_quads": true,
+   "selected_polygons": 0
+  },
+  "tolerance": 1e-05
+ },
+ {
+  "id": "DR-D1",
+  "source": "observed 2026-11-07",
+  "tool": "solid_drill",
+  "description": "Solid Drill tunnel on grid",
+  "input": {
+   "target": {
+    "note": "4x4 grid of unit quads, X,Y in -2..2, Z=0, one material matG"
+   },
+   "driver": {
+    "note": "closed cube half-size 1.0 at (0, 0, 0)"
+   }
+  },
+  "settings": {
+   "mode": "tunnel",
+   "material": "",
+   "cutmesh": "background"
+  },
+  "expected": {
+   "polygons": 12,
+   "points": 24,
+   "all_quads": true,
+   "selected_polygons": 0
+  },
+  "tolerance": 1e-05
+ },
+ {
+  "id": "DR-D2",
+  "source": "observed 2026-11-07",
+  "tool": "solid_drill",
+  "description": "Solid Drill stencil on grid",
+  "input": {
+   "target": {
+    "note": "4x4 grid of unit quads, X,Y in -2..2, Z=0, one material matG"
+   },
+   "driver": {
+    "note": "closed cube half-size 1.0 at (0, 0, 0)"
+   }
+  },
+  "settings": {
+   "mode": "stencil",
+   "material": "stencilMat",
+   "cutmesh": "background"
+  },
+  "expected": {
+   "polygons": 16,
+   "points": 25,
+   "all_quads": true,
+   "selected_polygons": 0,
+   "polygons_with_stencil_material": 4
+  },
+  "tolerance": 1e-05
+ },
+ {
+  "id": "DR-D3",
+  "source": "observed 2026-11-07",
+  "tool": "solid_drill",
+  "description": "Solid Drill slice on grid",
+  "input": {
+   "target": {
+    "note": "4x4 grid of unit quads, X,Y in -2..2, Z=0, one material matG"
+   },
+   "driver": {
+    "note": "closed cube half-size 1.0 at (0, 0, 0)"
+   }
+  },
+  "settings": {
+   "mode": "slice",
+   "material": "",
+   "cutmesh": "background"
+  },
+  "expected": {
+   "polygons": 16,
+   "points": 25,
+   "all_quads": true,
+   "selected_polygons": 0
+  },
+  "tolerance": 1e-05
+ },
+ {
+  "id": "DR-S1",
+  "source": "our rule",
+  "tool": "solid_drill",
+  "description": "Solid Drill core, hole inside one polygon",
+  "input": {
+   "target": {
+    "note": "single quad, X,Y in -2..2, Z=0 (area 16)"
+   },
+   "driver": {
+    "note": "closed cube half-size 1.0 at (0, 0, 0)"
+   }
+  },
+  "settings": {
+   "mode": "core",
+   "cutmesh": "background"
+  },
+  "expected": {
+   "polygons": 1,
+   "area": 4.0
+  },
+  "tolerance": 1e-06
+ },
+ {
+  "id": "DR-S2",
+  "source": "our rule",
+  "tool": "solid_drill",
+  "description": "Solid Drill tunnel, hole inside one polygon",
+  "input": {
+   "target": {
+    "note": "single quad, X,Y in -2..2, Z=0 (area 16)"
+   },
+   "driver": {
+    "note": "closed cube half-size 1.0 at (0, 0, 0)"
+   }
+  },
+  "settings": {
+   "mode": "tunnel",
+   "cutmesh": "background"
+  },
+  "expected": {
+   "area": 12.0,
+   "polygons": "2 (Q1)",
+   "has_hole_free_polygons": true
+  },
+  "tolerance": 1e-06
+ },
+ {
+  "id": "DR-S3",
+  "source": "our rule",
+  "tool": "solid_drill",
+  "description": "Solid Drill stencil, hole inside one polygon",
+  "input": {
+   "target": {
+    "note": "single quad, X,Y in -2..2, Z=0 (area 16)"
+   },
+   "driver": {
+    "note": "closed cube half-size 1.0 at (0, 0, 0)"
+   }
+  },
+  "settings": {
+   "mode": "stencil",
+   "cutmesh": "background"
+  },
+  "expected": {
+   "area": 16.0,
+   "area_with_stencil_material": 4.0
+  },
+  "tolerance": 1e-06
+ },
+ {
+  "id": "DR-S4",
+  "source": "our rule",
+  "tool": "solid_drill",
+  "description": "Solid Drill slice, hole inside one polygon",
+  "input": {
+   "target": {
+    "note": "single quad, X,Y in -2..2, Z=0 (area 16)"
+   },
+   "driver": {
+    "note": "closed cube half-size 1.0 at (0, 0, 0)"
+   }
+  },
+  "settings": {
+   "mode": "slice",
+   "cutmesh": "background"
+  },
+  "expected": {
+   "area": 16.0,
+   "polygons": "3 (1 inside + 2 outside, Q1)"
+  },
+  "tolerance": 1e-06
+ },
+ {
+  "id": "DR-S5",
+  "source": "our rule",
+  "tool": "solid_drill",
+  "description": "Tunnel through a closed cube: holes, no walls",
+  "input": {
+   "target": {
+    "note": "closed cube half-size 1.0 at (0, 0, 0)"
+   },
+   "driver": {
+    "note": "box X,Z in -0.5..0.5, Y in -2..2"
+   }
+  },
+  "settings": {
+   "mode": "tunnel"
+  },
+  "expected": {
+   "area": 22.0,
+   "open": true,
+   "boundary_loops": 2,
+   "no_driver_faces_added": true
+  },
+  "tolerance": 1e-06
+ },
+ {
+  "id": "DR-A1",
+  "source": "our rule",
+  "tool": "axis_drill",
+  "description": "Axis Drill core along Y on cube -1..1",
+  "input": {
+   "target": {
+    "note": "closed cube half-size 1.0 at (0, 0, 0)"
+   },
+   "driver": {
+    "note": "one flat quad X,Z in -0.5..0.5 at Y=5"
+   }
+  },
+  "settings": {
+   "mode": "core",
+   "axis": "y"
+  },
+  "expected": {
+   "area": 2.0,
+   "polygons": 2,
+   "note": "top and bottom 1x1 squares; side faces are outside the prism"
+  },
+  "tolerance": 1e-06
+ },
+ {
+  "id": "DR-A2",
+  "source": "our rule",
+  "tool": "axis_drill",
+  "description": "Axis Drill tunnel along Y on cube -1..1",
+  "input": {
+   "target": {
+    "note": "closed cube half-size 1.0 at (0, 0, 0)"
+   },
+   "driver": {
+    "note": "one flat quad X,Z in -0.5..0.5 at Y=5"
+   }
+  },
+  "settings": {
+   "mode": "tunnel",
+   "axis": "y"
+  },
+  "expected": {
+   "area": 22.0,
+   "boundary_loops": 2,
+   "note": "bottom (back-facing) face cut too"
+  },
+  "tolerance": 1e-06
+ },
+ {
+  "id": "DR-A3",
+  "source": "our rule",
+  "tool": "axis_drill",
+  "description": "Axis Drill stencil along Y on cube -1..1",
+  "input": {
+   "target": {
+    "note": "closed cube half-size 1.0 at (0, 0, 0)"
+   },
+   "driver": {
+    "note": "one flat quad X,Z in -0.5..0.5 at Y=5"
+   }
+  },
+  "settings": {
+   "mode": "stencil",
+   "axis": "y"
+  },
+  "expected": {
+   "area": 24.0,
+   "area_with_stencil_material": 2.0
+  },
+  "tolerance": 1e-06
+ },
+ {
+  "id": "DR-A4",
+  "source": "our rule",
+  "tool": "axis_drill",
+  "description": "Axis Drill slice along Y on cube -1..1",
+  "input": {
+   "target": {
+    "note": "closed cube half-size 1.0 at (0, 0, 0)"
+   },
+   "driver": {
+    "note": "one flat quad X,Z in -0.5..0.5 at Y=5"
+   }
+  },
+  "settings": {
+   "mode": "slice",
+   "axis": "y"
+  },
+  "expected": {
+   "area": 24.0
+  },
+  "tolerance": 1e-06
+ },
+ {
+  "id": "DR-A5",
+  "source": "our rule",
+  "tool": "axis_drill",
+  "description": "two overlapping driver quads act as one outline",
+  "input": {
+   "target": {
+    "note": "single quad X,Z in -2..2, Y=0"
+   },
+   "driver": {
+    "note": "quads X in -1..0.5 and -0.5..1, Z in -0.5..0.5, Y=3"
+   }
+  },
+  "settings": {
+   "mode": "slice",
+   "axis": "y"
+  },
+  "expected": {
+   "area": 16.0,
+   "inside_area": 2.0,
+   "no_edge_at_overlap": true
+  },
+  "tolerance": 1e-06
+ },
+ {
+  "id": "DR-F1",
+  "source": "our rule",
+  "tool": "solid_drill",
+  "description": "refusal: no background driver",
+  "settings": {
+   "mode": "tunnel",
+   "axis": "y"
+  },
+  "expected": {
+   "scene_unchanged": true,
+   "undo_steps_added": 0,
+   "notice": true
+  },
+  "tolerance": 0
+ },
+ {
+  "id": "DR-F2",
+  "source": "our rule",
+  "tool": "solid_drill",
+  "description": "refusal: open driver (cube missing a face)",
+  "settings": {
+   "mode": "tunnel",
+   "axis": "y"
+  },
+  "expected": {
+   "scene_unchanged": true,
+   "undo_steps_added": 0,
+   "notice": true
+  },
+  "tolerance": 0
+ },
+ {
+  "id": "DR-F3",
+  "source": "our rule",
+  "tool": "axis_drill",
+  "description": "refusal: driver quad edge-on to axis (lies in XY plane, axis Y)",
+  "settings": {
+   "mode": "tunnel",
+   "axis": "y"
+  },
+  "expected": {
+   "scene_unchanged": true,
+   "undo_steps_added": 0,
+   "notice": true
+  },
+  "tolerance": 0
+ }
+]

@@ -1,0 +1,582 @@
+{
+  "items": [
+    {
+      "id": 1,
+      "name": "I1 cube",
+      "visible": true,
+      "transform": {
+        "translation": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "zxy": false
+      },
+      "mesh": {
+        "attributes": {
+          "typed_maps": {},
+          "vertex_sets": {},
+          "polygon_sets": {
+            "bottom": [
+              8
+            ],
+            "top": [],
+            "front": [
+              7,
+              3
+            ],
+            "right": [
+              6,
+              2
+            ],
+            "back": [
+              5,
+              1
+            ],
+            "left": [
+              4,
+              0
+            ]
+          },
+          "point_uvs": {},
+          "corner_weights": {},
+          "corner_colors": {},
+          "extrude_edge_uses": {},
+          "relative_morphs": {},
+          "smoothing_labels": [],
+          "representations": [],
+          "creases": [],
+          "uv_records": {
+            "Texture": [
+              [
+                null,
+                223,
+                222,
+                null
+              ],
+              [
+                null,
+                219,
+                218,
+                null
+              ],
+              [
+                null,
+                215,
+                214,
+                null
+              ],
+              [
+                null,
+                211,
+                210,
+                null
+              ],
+              [
+                220,
+                221,
+                222,
+                223
+              ],
+              [
+                216,
+                217,
+                218,
+                219
+              ],
+              [
+                212,
+                213,
+                214,
+                215
+              ],
+              [
+                208,
+                209,
+                210,
+                211
+              ],
+              [
+                200,
+                201,
+                202,
+                203
+              ]
+            ],
+            "Empty": [
+              [
+                null,
+                null,
+                null,
+                null
+              ],
+              [
+                null,
+                null,
+                null,
+                null
+              ],
+              [
+                null,
+                null,
+                null,
+                null
+              ],
+              [
+                null,
+                null,
+                null,
+                null
+              ],
+              [
+                null,
+                null,
+                null,
+                null
+              ],
+              [
+                null,
+                null,
+                null,
+                null
+              ],
+              [
+                null,
+                null,
+                null,
+                null
+              ],
+              [
+                null,
+                null,
+                null,
+                null
+              ],
+              [
+                null,
+                null,
+                null,
+                null
+              ]
+            ]
+          },
+          "normal_map_order": [],
+          "corner_normals": {},
+          "point_weights": {},
+          "point_colors": {},
+          "degenerate_faces": []
+        },
+        "vertices": [
+          [
+            -1,
+            -1,
+            -1
+          ],
+          [
+            1,
+            -1,
+            -1
+          ],
+          [
+            1,
+            1,
+            -1
+          ],
+          [
+            -1,
+            1,
+            -1
+          ],
+          [
+            -1,
+            -1,
+            1
+          ],
+          [
+            1,
+            -1,
+            1
+          ],
+          [
+            1,
+            1,
+            1
+          ],
+          [
+            -1,
+            1,
+            1
+          ],
+          [
+            -1,
+            -1,
+            1.5
+          ],
+          [
+            1,
+            -1,
+            1.5
+          ],
+          [
+            1,
+            1,
+            1.5
+          ],
+          [
+            -1,
+            1,
+            1.5
+          ]
+        ],
+        "faces": [
+          {
+            "vertices": [
+              11,
+              7,
+              4,
+              8
+            ],
+            "uv": null,
+            "material": "left",
+            "smooth": false,
+            "part": null,
+            "material_label": "left"
+          },
+          {
+            "vertices": [
+              10,
+              6,
+              7,
+              11
+            ],
+            "uv": null,
+            "material": "back",
+            "smooth": false,
+            "part": null,
+            "material_label": "back"
+          },
+          {
+            "vertices": [
+              9,
+              5,
+              6,
+              10
+            ],
+            "uv": null,
+            "material": "right",
+            "smooth": false,
+            "part": null,
+            "material_label": "right"
+          },
+          {
+            "vertices": [
+              8,
+              4,
+              5,
+              9
+            ],
+            "uv": null,
+            "material": "front",
+            "smooth": false,
+            "part": null,
+            "material_label": "front"
+          },
+          {
+            "vertices": [
+              3,
+              0,
+              4,
+              7
+            ],
+            "uv": null,
+            "material": "left",
+            "smooth": false,
+            "part": null,
+            "material_label": "left"
+          },
+          {
+            "vertices": [
+              2,
+              3,
+              7,
+              6
+            ],
+            "uv": null,
+            "material": "back",
+            "smooth": false,
+            "part": null,
+            "material_label": "back"
+          },
+          {
+            "vertices": [
+              1,
+              2,
+              6,
+              5
+            ],
+            "uv": null,
+            "material": "right",
+            "smooth": false,
+            "part": null,
+            "material_label": "right"
+          },
+          {
+            "vertices": [
+              0,
+              1,
+              5,
+              4
+            ],
+            "uv": null,
+            "material": "front",
+            "smooth": false,
+            "part": null,
+            "material_label": "front"
+          },
+          {
+            "vertices": [
+              0,
+              3,
+              2,
+              1
+            ],
+            "uv": null,
+            "material": "bottom",
+            "smooth": false,
+            "part": null,
+            "material_label": "bottom"
+          }
+        ],
+        "uv_maps": {
+          "Texture": [
+            [
+              null,
+              [
+                0,
+                1
+              ],
+              [
+                1,
+                1
+              ],
+              null
+            ],
+            [
+              null,
+              [
+                0,
+                1
+              ],
+              [
+                1,
+                1
+              ],
+              null
+            ],
+            [
+              null,
+              [
+                0,
+                1
+              ],
+              [
+                1,
+                1
+              ],
+              null
+            ],
+            [
+              null,
+              [
+                0,
+                1
+              ],
+              [
+                1,
+                1
+              ],
+              null
+            ],
+            [
+              [
+                0,
+                0
+              ],
+              [
+                1,
+                0
+              ],
+              [
+                1,
+                1
+              ],
+              [
+                0,
+                1
+              ]
+            ],
+            [
+              [
+                0,
+                0
+              ],
+              [
+                1,
+                0
+              ],
+              [
+                1,
+                1
+              ],
+              [
+                0,
+                1
+              ]
+            ],
+            [
+              [
+                0,
+                0
+              ],
+              [
+                1,
+                0
+              ],
+              [
+                1,
+                1
+              ],
+              [
+                0,
+                1
+              ]
+            ],
+            [
+              [
+                0,
+                0
+              ],
+              [
+                1,
+                0
+              ],
+              [
+                1,
+                1
+              ],
+              [
+                0,
+                1
+              ]
+            ],
+            [
+              [
+                0,
+                0
+              ],
+              [
+                1,
+                0
+              ],
+              [
+                1,
+                1
+              ],
+              [
+                0,
+                1
+              ]
+            ]
+          ],
+          "Empty": [
+            [
+              null,
+              null,
+              null,
+              null
+            ],
+            [
+              null,
+              null,
+              null,
+              null
+            ],
+            [
+              null,
+              null,
+              null,
+              null
+            ],
+            [
+              null,
+              null,
+              null,
+              null
+            ],
+            [
+              null,
+              null,
+              null,
+              null
+            ],
+            [
+              null,
+              null,
+              null,
+              null
+            ],
+            [
+              null,
+              null,
+              null,
+              null
+            ],
+            [
+              null,
+              null,
+              null,
+              null
+            ],
+            [
+              null,
+              null,
+              null,
+              null
+            ]
+          ]
+        }
+      },
+      "parent": null,
+      "source_id": null,
+      "source_display_name": null
+    }
+  ],
+  "next_id": 2,
+  "selection": {
+    "item": 1,
+    "mode": "Polygon",
+    "vertices": [],
+    "edges": [],
+    "faces": []
+  },
+  "workplane": {
+    "fixed": false,
+    "plane": 0,
+    "center": [
+      0,
+      0,
+      0
+    ]
+  },
+  "import_source": null
+}

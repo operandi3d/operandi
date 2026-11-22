@@ -1,0 +1,43 @@
+{
+  "version": 1,
+  "id": "menu.view.navigate",
+  "label": "Navigate",
+  "style": "menu",
+  "controls": [
+    {
+      "command": "Zoom In",
+      "label": "Zoom In",
+      "shortcut": "Zoom In"
+    },
+    {
+      "command": "Zoom Out",
+      "label": "Zoom Out",
+      "shortcut": "Zoom Out"
+    },
+    {
+      "command": "Re-centre",
+      "label": "Re-centre",
+      "shortcut": "Re-centre"
+    },
+    {
+      "command": "Turn",
+      "label": "Turn",
+      "shortcut": "Turn"
+    },
+    {
+      "command": "Turn Upright",
+      "label": "Turn Upright",
+      "shortcut": "Turn Upright"
+    },
+    {
+      "command": "Align Selected",
+      "label": "Align Selected",
+      "shortcut": "Align Selected"
+    },
+    {
+      "command": "Fit and Align Selected",
+      "label": "Fit and Align Selected",
+      "shortcut": "Fit and Align Selected"
+    }
+  ]
+}

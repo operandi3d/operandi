@@ -1,0 +1,30 @@
+{
+  "permissions": {
+    "deny": [
+      "Read(~/Research/**)",
+      "Read(~/Documents/Modo Rebuild/**)",
+      "Read(//Applications/Modo*/**)",
+      "Read(~/Library/Application Support/Luxology/**)",
+      "Read(~/.modo_mcp/**)",
+      "Read(~/.codex/**)",
+      "Read(**/Modo17-html-docs/**)",
+      "Read(**/*UserGuide*.pdf)",
+      "Edit(~/Research/**)",
+      "Edit(~/Documents/Modo Rebuild/**)",
+      "mcp__modo"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/clean-room-guard.sh"
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,74 @@
+{
+  "version": 1,
+  "id": "menu.edit",
+  "label": "Edit",
+  "style": "menu",
+  "controls": [
+    {
+      "command": "app.undo",
+      "label": "{title}",
+      "shortcut": "Undo"
+    },
+    {
+      "command": "app.redo",
+      "label": "{title}",
+      "shortcut": "Redo"
+    },
+    {
+      "command": "Reset Tool Attributes",
+      "label": "Reset Tool Attributes",
+      "shortcut": "Reset Tool Attributes"
+    },
+    {
+      "divider": ""
+    },
+    {
+      "form": "menu.edit.snapping"
+    },
+    {
+      "divider": ""
+    },
+    {
+      "form": "menu.edit.centerSelected"
+    },
+    {
+      "divider": ""
+    },
+    {
+      "command": "Lock Selected",
+      "label": "Lock Selected",
+      "shortcut": "Lock Selected"
+    },
+    {
+      "command": "Lock Unselected",
+      "label": "Lock Unselected",
+      "shortcut": "Lock Unselected"
+    },
+    {
+      "command": "Lock Invert",
+      "label": "Lock Invert",
+      "shortcut": "Lock Invert"
+    },
+    {
+      "command": "Unlock",
+      "label": "Unlock",
+      "shortcut": "Unlock"
+    },
+    {
+      "divider": ""
+    },
+    {
+      "command": "operandi.inputMap",
+      "label": "Input Map…"
+    },
+    {
+      "command": "Preferences",
+      "label": "Preferences…",
+      "shortcut": "Preferences"
+    },
+    {
+      "command": "Reset Preferences",
+      "label": "Reset Preferences…"
+    }
+  ]
+}

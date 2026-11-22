@@ -1,0 +1,76 @@
+{
+  "format": "operandi-node-graph",
+  "format_version": 1,
+  "source": { "app": "hand-written", "file": "noise_ramp.json" },
+  "licence": null,
+  "materials": [
+    {
+      "name": "Noise Ramp",
+      "output": "Material Output",
+      "nodes": [
+        {
+          "name": "Noise Texture",
+          "type": "ShaderNodeTexNoise",
+          "props": { "noise_dimensions": "3D", "noise_type": "FBM", "normalize": true },
+          "inputs": {
+            "Scale": { "type": "VALUE", "value": 4.0 },
+            "Detail": { "type": "VALUE", "value": 3.0 },
+            "Roughness": { "type": "VALUE", "value": 0.5 },
+            "Lacunarity": { "type": "VALUE", "value": 2.0 },
+            "Distortion": { "type": "VALUE", "value": 0.0 }
+          },
+          "location": [-600, 0]
+        },
+        {
+          "name": "Color Ramp",
+          "type": "ShaderNodeValToRGB",
+          "props": { "ramp": { "interpolation": "LINEAR",
+            "elements": [[0.3, [0.05, 0.1, 0.6, 1.0]], [0.7, [0.9, 0.6, 0.1, 1.0]]] } },
+          "inputs": {},
+          "location": [-350, 0]
+        },
+        {
+          "name": "Mix",
+          "type": "ShaderNodeMix",
+          "props": { "data_type": "RGBA", "blend_type": "MULTIPLY", "clamp_factor": true, "clamp_result": false },
+          "inputs": {
+            "Factor_Float": { "type": "VALUE", "value": 1.0 },
+            "B_Color": { "type": "RGBA", "value": [1.0, 1.0, 1.0, 1.0] }
+          },
+          "location": [-150, 0]
+        },
+        {
+          "name": "Principled BSDF",
+          "type": "ShaderNodeBsdfPrincipled",
+          "props": { "distribution": "MULTI_GGX", "subsurface_method": "RANDOM_WALK" },
+          "inputs": {
+            "Roughness": { "type": "VALUE", "value": 0.45 },
+            "Metallic": { "type": "VALUE", "value": 0.0 },
+            "IOR": { "type": "VALUE", "value": 1.5 }
+          },
+          "location": [100, 0]
+        },
+        {
+          "name": "Material Output",
+          "type": "ShaderNodeOutputMaterial",
+          "props": { "target": "ALL" },
+          "inputs": {},
+          "location": [400, 0]
+        }
+      ],
+      "links": [
+        { "from": ["Noise Texture", "Fac"], "to": ["Color Ramp", "Fac"] },
+        { "from": ["Color Ramp", "Color"], "to": ["Mix", "A", "A_Color"] },
+        { "from": ["Mix", "Result", "Result_Color"], "to": ["Principled BSDF", "Base Color"] },
+        { "from": ["Principled BSDF", "BSDF"], "to": ["Material Output", "Surface"] }
+      ],
+      "exposed": [
+        { "name": "Tint", "to": ["Mix", "B", "B_Color"], "type": "RGBA",
+          "default": [1, 1, 1, 1], "min": null, "max": null },
+        { "name": "Roughness", "to": ["Principled BSDF", "Roughness"], "type": "VALUE",
+          "default": 0.45, "min": 0, "max": 1 }
+      ]
+    }
+  ],
+  "groups": []
+}

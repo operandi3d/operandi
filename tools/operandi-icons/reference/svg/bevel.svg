@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='utf-8'?>
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 64 64" role="img" aria-labelledby="bevel-title bevel-description">
+  <title id="bevel-title">Operandi — Bevel</title>
+  <desc id="bevel-description">Standalone editable vector extracted from approved prototype 04. Transparent background; square canvas; fixed isometric projection.</desc>
+  <g id="icon-bevel" aria-label="Bevel" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" transform="translate(32 31.5) scale(1.2) translate(-32 -31.5)">
+    <title>Bevel</title>
+    <polygon id="bevel-top" points="32.0000,10.0000 46.3371,18.2775 27.7175,29.0275 13.3805,20.7500" fill="#DCE3E9" />
+    <polygon id="bevel-left" points="13.3805,20.7500 27.7175,29.0275 32.0000,36.4450 32.0000,53.0000 13.3805,42.2500" fill="#AAB4C0" />
+    <polygon id="bevel-right" points="50.6195,25.6950 32.0000,36.4450 32.0000,53.0000 50.6195,42.2500" fill="#8795A5" />
+    <polygon id="bevel-new-strip" points="46.3371,18.2775 50.6195,25.6950 32.0000,36.4450 27.7175,29.0275" fill="#56B4D3" />
+    <path id="bevel-outline" d="M 32.0000,10.0000 L 46.3371,18.2775 L 50.6195,25.6950 L 50.6195,42.2500 L 32.0000,53.0000 L 13.3805,42.2500 L 13.3805,20.7500 Z" fill="none" stroke="#263442" />
+    <path id="bevel-front-seam" d="M 13.3805,20.7500 L 27.7175,29.0275 L 32.0000,36.4450 L 32.0000,53.0000" fill="none" stroke="#263442" />
+    <path id="bevel-strip-upper" d="M 46.3371,18.2775 L 27.7175,29.0275" fill="none" stroke="#263442" />
+    <path id="bevel-strip-lower" d="M 50.6195,25.6950 L 32.0000,36.4450" fill="none" stroke="#263442" />
+  </g>
+</svg>

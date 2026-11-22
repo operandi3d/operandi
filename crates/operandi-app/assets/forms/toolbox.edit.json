@@ -1,0 +1,304 @@
+{
+  "version": 1,
+  "id": "toolbox.edit",
+  "label": "Edit",
+  "exported": true,
+  "controls": [
+    {
+      "divider": "Edit Tools",
+      "id": "edit-tools"
+    },
+    {
+      "form": {
+        "showWhen": "operandi.mode.is vertex",
+        "controls": [
+          {
+            "command": "Edit Slide",
+            "label": "Slide",
+            "icon": "vertex-slide",
+            "look": "flat",
+            "shortcut": "Vertex Slide",
+            "tooltip": "Slide{binding} · Edge Slide in Edge mode, Vertex Slide in Vertex mode (Polygon Slide isn't built yet) · tool.set *.Slide on"
+          }
+        ]
+      }
+    },
+    {
+      "form": {
+        "showWhen": "operandi.mode.is item edge polygon",
+        "controls": [
+          {
+            "command": "Edit Slide",
+            "label": "Slide",
+            "icon": "edge-slide",
+            "look": "flat",
+            "shortcut": "Slide",
+            "tooltip": "Slide{binding} · Edge Slide in Edge mode, Vertex Slide in Vertex mode (Polygon Slide isn't built yet) · tool.set *.Slide on"
+          }
+        ]
+      }
+    },
+    {
+      "space": 4
+    },
+    {
+      "heading": "Slice",
+      "id": "Edit Slice"
+    },
+    {
+      "command": "Polygon Slice",
+      "look": "flat"
+    },
+    {
+      "command": "Curve Slice",
+      "look": "flat"
+    },
+    {
+      "command": "Edge Slice",
+      "look": "flat"
+    },
+    {
+      "command": "Pen Slice",
+      "look": "flat"
+    },
+    {
+      "command": "Loop Slice",
+      "look": "flat"
+    },
+    {
+      "command": "Primitive Slice",
+      "look": "flat"
+    },
+    {
+      "heading": "Axis Slice",
+      "id": "Edit Axis Slice"
+    },
+    {
+      "form": {
+        "style": "flyout",
+        "controls": [
+          {
+            "command": "Polygon Slice",
+            "look": "flat"
+          },
+          {
+            "command": "Polygon Axis Slice",
+            "look": "flat"
+          },
+          {
+            "command": "Pen Slice",
+            "look": "flat"
+          },
+          {
+            "command": "Primitive Slice",
+            "look": "flat"
+          },
+          {
+            "command": "operandi.dicer",
+            "label": "Dicer…",
+            "tooltip": "Dicer… · smash the mesh into closed chunks with random planes · operandi.dicer",
+            "icon": "dicer",
+            "noShortcut": true
+          }
+        ]
+      },
+      "id": "Axis Slice",
+      "face": 1
+    },
+    {
+      "heading": "Center",
+      "id": "Edit Center"
+    },
+    {
+      "form": {
+        "style": "horizontal",
+        "controls": [
+          {
+            "command": "Center X",
+            "label": "X",
+            "look": "centered",
+            "tooltip": "X{binding} · move the selection so its bounding-box centre sits at 0 on these world axes (the whole mesh when nothing is selected) · vert.center\n{variants}",
+            "variants": {
+              "alt": {
+                "line": "vert.center xy",
+                "label": "XY",
+                "tooltip": "XY{binding} · move the selection so its bounding-box centre sits at 0 on these world axes (the whole mesh when nothing is selected) · vert.center\n{variants}"
+              }
+            }
+          },
+          {
+            "command": "Center Y",
+            "label": "Y",
+            "look": "centered",
+            "tooltip": "Y{binding} · move the selection so its bounding-box centre sits at 0 on these world axes (the whole mesh when nothing is selected) · vert.center\n{variants}",
+            "variants": {
+              "alt": {
+                "line": "vert.center yz",
+                "label": "YZ",
+                "tooltip": "YZ{binding} · move the selection so its bounding-box centre sits at 0 on these world axes (the whole mesh when nothing is selected) · vert.center\n{variants}"
+              }
+            }
+          },
+          {
+            "command": "Center Z",
+            "label": "Z",
+            "look": "centered",
+            "tooltip": "Z{binding} · move the selection so its bounding-box centre sits at 0 on these world axes (the whole mesh when nothing is selected) · vert.center\n{variants}",
+            "variants": {
+              "alt": {
+                "line": "vert.center zx",
+                "label": "ZX",
+                "tooltip": "ZX{binding} · move the selection so its bounding-box centre sits at 0 on these world axes (the whole mesh when nothing is selected) · vert.center\n{variants}"
+              }
+            }
+          },
+          {
+            "command": "Center All",
+            "label": "All",
+            "look": "centered",
+            "tooltip": "All{binding} · move the selection so its bounding-box centre sits at 0 on these world axes (the whole mesh when nothing is selected) · vert.center\n{variants}"
+          }
+        ]
+      }
+    },
+    {
+      "heading": "Subdivide",
+      "id": "Edit Subdivide"
+    },
+    {
+      "command": "SDS Subdivide",
+      "label": "SDS Subdivide",
+      "icon": "sds-subdivide",
+      "tooltip": "SDS Subdivide{binding} · subdivide the selected polygons once and smooth them (Catmull-Clark) · poly.subdivide ccsds\n{variants}",
+      "variants": {
+        "alt": {
+          "line": "SDS Subdivide 2X",
+          "label": "SDS Subdivide 2X",
+          "tooltip": "SDS Subdivide 2X{binding} · subdivide the selected polygons twice and smooth them, as one undo step\n{variants}"
+        }
+      }
+    },
+    {
+      "command": "Faceted Subdivide",
+      "label": "Faceted",
+      "icon": "subdivide-faceted",
+      "tooltip": "Faceted{binding} · split the selected polygons without changing the shape · poly.subdivide flat\n{variants}"
+    },
+    {
+      "command": "Smooth Subdivide",
+      "label": "Smooth",
+      "icon": "subdivide-smooth",
+      "tooltip": "Smooth{binding} · split the selected polygons and round them off, keeping sharp edges · poly.subdivide smooth\n{variants}"
+    },
+    {
+      "command": "Subdivide Options",
+      "label": "Options...",
+      "icon": "subdivide-options",
+      "tooltip": "Options...{binding} · subdivide with all options · poly.subdivide\n{variants}"
+    },
+    {
+      "command": "UnSubdivide",
+      "label": "UnSubdivide...",
+      "icon": "unsubdivide",
+      "tooltip": "UnSubdivide...{binding} · undo a Catmull-Clark subdivision by merging quads back · poly.unsubdiv\n{variants}"
+    },
+    {
+      "divider": ""
+    },
+    {
+      "command": "poly.freeze",
+      "label": "Freeze...",
+      "icon": "freeze",
+      "shortcut": "Freeze",
+      "tooltip": "Freeze...{binding} · turn the curves and subdivision-surface polygons into plain geometry (the selected ones in Polygon mode) · poly.freeze"
+    },
+    {
+      "heading": "Booleans & Drill",
+      "id": "Edit Booleans & Drill"
+    },
+    {
+      "command": "Boolean",
+      "label": "Boolean...",
+      "icon": "boolean",
+      "tooltip": "Boolean...{binding} · Union, Intersect, Subtract or Add the active mesh with driver meshes (visible unselected meshes by default) · poly.boolean"
+    },
+    {
+      "command": "Solid Drill",
+      "label": "Solid Drill...",
+      "tooltip": "Solid Drill...{binding} · Cut the active mesh's polygons where a closed driver passes through them: keep the inside (Core) or outside (Tunnel), or keep both (Stencil, Slice) · poly.solidDrill"
+    },
+    {
+      "command": "Axis Drill",
+      "label": "Axis Drill...",
+      "tooltip": "Axis Drill...{binding} · Cut the active mesh's polygons with the driver's outline pushed straight along X, Y or Z · poly.drill"
+    },
+    {
+      "command": "curve.boolean",
+      "label": "Curve Boolean...",
+      "tooltip": "Curve Boolean... · slice, unite, intersect or subtract the selected closed curves with the other curves · curve.boolean"
+    },
+    {
+      "divider": ""
+    },
+    {
+      "command": "Topology Pen",
+      "label": "Topology Pen",
+      "icon": "element-move",
+      "tooltip": "Topology Pen{binding} · Drag an element to move it; Shift+drag an edge to pull out a new strip onto the background mesh · tool.set mesh.topology on"
+    },
+    {
+      "command": "Retopo Sketch",
+      "label": "Retopo Sketch",
+      "tooltip": "Retopo Sketch{binding} · Drag across a background mesh to draw a guide curve on it"
+    },
+    {
+      "command": "Automatic Retopology",
+      "label": "Automatic Retopology...",
+      "tooltip": "Automatic Retopology...{binding} · Rebuild the whole active mesh as even quads that follow its shape · mesh.retopo"
+    },
+    {
+      "command": "Remesh",
+      "label": "Remesh...",
+      "tooltip": "Remesh...{binding} · Rebuild the whole active mesh: Voxel (sculpt.remesh), or Blocks, Smooth and Sharp on an octree (operandi.remesh)"
+    },
+    {
+      "heading": "Commands",
+      "id": "Edit Commands"
+    },
+    {
+      "command": "operandi.mesh.fixBlackDots",
+      "label": "Fix Black Dots",
+      "tooltip": "Fix Black Dots · merge polygon pairs that share a run of edges (pinches that shade as dark dots), on the whole active mesh · operandi.mesh.fixBlackDots",
+      "icon": "fix-black-dots"
+    },
+    {
+      "command": "operandi.edge.zip",
+      "label": "Edge Zip",
+      "tooltip": "Edge Zip · needs a selection: edges with a quad on each side; welds the rows either side onto them · operandi.edge.zip",
+      "icon": "edge-zip"
+    },
+    {
+      "command": "operandi.poly.diagonalRedirect",
+      "label": "Diagonal Re-Direct",
+      "tooltip": "Diagonal Re-Direct · needs a selection: two quads touching at one corner; turns the edge flow 45° · operandi.poly.diagonalRedirect",
+      "icon": "diagonal-redirect"
+    },
+    {
+      "command": "Retopo Edge Lock",
+      "label": "Retopo Edge Lock",
+      "tooltip": "Retopo Edge Lock{binding} · Add the selected guide curves to the RetopoEdgeLock selection set"
+    },
+    {
+      "command": "Retopo Edge Flow",
+      "label": "Retopo Edge Flow",
+      "tooltip": "Retopo Edge Flow{binding} · Add the selected guide curves to the RetopoFlow selection set"
+    },
+    {
+      "heading": "UV",
+      "id": "Edit UV"
+    },
+    {
+      "form": "toolbox.uv.ops"
+    }
+  ]
+}

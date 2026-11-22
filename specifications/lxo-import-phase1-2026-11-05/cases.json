@@ -1,0 +1,1342 @@
+{
+ "spec": "lxo-import-phase1-2026-11-05",
+ "coordinates": "Expected points are in Modo scene coordinates (file Z negated); polygons in Modo corner order (file order with the first corner kept and the rest reversed).",
+ "cases": [
+  {
+   "id": "LF01",
+   "fixture": "LF01: Modo-saved test file, kept on the research side (fixture hand-off undecided)",
+   "description": "New scene with nothing added (Modo's default scene items only, including its empty mesh 'Mesh')",
+   "expected_meshes": [
+    {
+     "name": "Mesh",
+     "parent": null,
+     "position": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "visible_channel": "default",
+     "layer_visibility_flags": 5,
+     "points": [],
+     "polygons": [],
+     "polygon_type": null,
+     "polygon_materials": []
+    }
+   ],
+   "other_items_present": [
+    "advancedMaterial",
+    "camera",
+    "defaultShader",
+    "envMaterial",
+    "environment",
+    "lightMaterial",
+    "polyRender",
+    "renderOutput",
+    "scene",
+    "shaderFolder",
+    "sunLight"
+   ]
+  },
+  {
+   "id": "LF02",
+   "fixture": "LF02: Modo-saved test file, kept on the research side (fixture hand-off undecided)",
+   "description": "One mesh 'Box': unit cube (6 outward quads), default material",
+   "expected_meshes": [
+    {
+     "name": "Box",
+     "parent": null,
+     "position": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "visible_channel": "default",
+     "layer_visibility_flags": 5,
+     "points": [
+      [
+       -0.5,
+       -0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       -0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       -0.5,
+       0.5
+      ],
+      [
+       -0.5,
+       -0.5,
+       0.5
+      ],
+      [
+       -0.5,
+       0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       -0.5,
+       0.5,
+       0.5
+      ]
+     ],
+     "polygons": [
+      [
+       0,
+       1,
+       2,
+       3
+      ],
+      [
+       7,
+       6,
+       5,
+       4
+      ],
+      [
+       0,
+       4,
+       5,
+       1
+      ],
+      [
+       1,
+       5,
+       6,
+       2
+      ],
+      [
+       2,
+       6,
+       7,
+       3
+      ],
+      [
+       3,
+       7,
+       4,
+       0
+      ]
+     ],
+     "polygon_type": "face",
+     "polygon_materials": [
+      "Default",
+      "Default",
+      "Default",
+      "Default",
+      "Default",
+      "Default"
+     ],
+     "checked_against_manifest": {
+      "points": true,
+      "polygons": true,
+      "types": true,
+      "materials": true
+     }
+    }
+   ],
+   "other_items_present": [
+    "advancedMaterial",
+    "camera",
+    "defaultShader",
+    "envMaterial",
+    "environment",
+    "lightMaterial",
+    "polyRender",
+    "renderOutput",
+    "scene",
+    "shaderFolder",
+    "sunLight"
+   ]
+  },
+  {
+   "id": "LF03",
+   "fixture": "LF03: Modo-saved test file, kept on the research side (fixture hand-off undecided)",
+   "description": "Mesh 'Child' parented to mesh 'Parent'; Child position (1,2,3); both unit cubes",
+   "expected_meshes": [
+    {
+     "name": "Parent",
+     "parent": null,
+     "position": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "visible_channel": "default",
+     "layer_visibility_flags": 9,
+     "points": [
+      [
+       -0.5,
+       -0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       -0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       -0.5,
+       0.5
+      ],
+      [
+       -0.5,
+       -0.5,
+       0.5
+      ],
+      [
+       -0.5,
+       0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       -0.5,
+       0.5,
+       0.5
+      ]
+     ],
+     "polygons": [
+      [
+       0,
+       1,
+       2,
+       3
+      ],
+      [
+       7,
+       6,
+       5,
+       4
+      ],
+      [
+       0,
+       4,
+       5,
+       1
+      ],
+      [
+       1,
+       5,
+       6,
+       2
+      ],
+      [
+       2,
+       6,
+       7,
+       3
+      ],
+      [
+       3,
+       7,
+       4,
+       0
+      ]
+     ],
+     "polygon_type": "face",
+     "polygon_materials": [
+      "Default",
+      "Default",
+      "Default",
+      "Default",
+      "Default",
+      "Default"
+     ],
+     "checked_against_manifest": {
+      "points": true,
+      "polygons": true,
+      "types": true,
+      "materials": true
+     }
+    },
+    {
+     "name": "Child",
+     "parent": "Parent",
+     "position": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "visible_channel": "default",
+     "layer_visibility_flags": 5,
+     "points": [
+      [
+       -0.5,
+       -0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       -0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       -0.5,
+       0.5
+      ],
+      [
+       -0.5,
+       -0.5,
+       0.5
+      ],
+      [
+       -0.5,
+       0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       -0.5,
+       0.5,
+       0.5
+      ]
+     ],
+     "polygons": [
+      [
+       0,
+       1,
+       2,
+       3
+      ],
+      [
+       7,
+       6,
+       5,
+       4
+      ],
+      [
+       0,
+       4,
+       5,
+       1
+      ],
+      [
+       1,
+       5,
+       6,
+       2
+      ],
+      [
+       2,
+       6,
+       7,
+       3
+      ],
+      [
+       3,
+       7,
+       4,
+       0
+      ]
+     ],
+     "polygon_type": "face",
+     "polygon_materials": [
+      "Default",
+      "Default",
+      "Default",
+      "Default",
+      "Default",
+      "Default"
+     ],
+     "checked_against_manifest": {
+      "points": true,
+      "polygons": true,
+      "types": true,
+      "materials": true
+     }
+    }
+   ],
+   "other_items_present": [
+    "advancedMaterial",
+    "camera",
+    "defaultShader",
+    "envMaterial",
+    "environment",
+    "lightMaterial",
+    "polyRender",
+    "renderOutput",
+    "scene",
+    "shaderFolder",
+    "sunLight"
+   ]
+  },
+  {
+   "id": "LF04",
+   "fixture": "LF04: Modo-saved test file, kept on the research side (fixture hand-off undecided)",
+   "description": "Unit cube 'Box'; polygons 1 (+Y) and 4 (+Z) tagged material 'Red', others 'Default'",
+   "expected_meshes": [
+    {
+     "name": "Box",
+     "parent": null,
+     "position": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "visible_channel": "default",
+     "layer_visibility_flags": 5,
+     "points": [
+      [
+       -0.5,
+       -0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       -0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       -0.5,
+       0.5
+      ],
+      [
+       -0.5,
+       -0.5,
+       0.5
+      ],
+      [
+       -0.5,
+       0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       -0.5,
+       0.5,
+       0.5
+      ]
+     ],
+     "polygons": [
+      [
+       0,
+       1,
+       2,
+       3
+      ],
+      [
+       7,
+       6,
+       5,
+       4
+      ],
+      [
+       0,
+       4,
+       5,
+       1
+      ],
+      [
+       1,
+       5,
+       6,
+       2
+      ],
+      [
+       2,
+       6,
+       7,
+       3
+      ],
+      [
+       3,
+       7,
+       4,
+       0
+      ]
+     ],
+     "polygon_type": "face",
+     "polygon_materials": [
+      "Default",
+      "Red",
+      "Default",
+      "Default",
+      "Red",
+      "Default"
+     ],
+     "checked_against_manifest": {
+      "points": true,
+      "polygons": true,
+      "types": true,
+      "materials": true
+     }
+    }
+   ],
+   "other_items_present": [
+    "advancedMaterial",
+    "camera",
+    "defaultShader",
+    "envMaterial",
+    "environment",
+    "lightMaterial",
+    "mask",
+    "polyRender",
+    "renderOutput",
+    "scene",
+    "shaderFolder",
+    "sunLight"
+   ]
+  },
+  {
+   "id": "LF05",
+   "fixture": "LF05: Modo-saved test file, kept on the research side (fixture hand-off undecided)",
+   "description": "Unit cube from the Cube primitive with Make UVs on (UV map 'Texture')",
+   "expected_meshes": [
+    {
+     "name": "Box",
+     "parent": null,
+     "position": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "visible_channel": "default",
+     "layer_visibility_flags": 5,
+     "points": [
+      [
+       -0.5,
+       -0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       -0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       -0.5,
+       0.5
+      ],
+      [
+       -0.5,
+       -0.5,
+       0.5
+      ],
+      [
+       -0.5,
+       0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       -0.5,
+       0.5,
+       0.5
+      ]
+     ],
+     "polygons": [
+      [
+       0,
+       1,
+       2,
+       3
+      ],
+      [
+       4,
+       5,
+       1,
+       0
+      ],
+      [
+       5,
+       6,
+       2,
+       1
+      ],
+      [
+       6,
+       7,
+       3,
+       2
+      ],
+      [
+       7,
+       4,
+       0,
+       3
+      ],
+      [
+       4,
+       7,
+       6,
+       5
+      ]
+     ],
+     "polygon_type": "face",
+     "polygon_materials": [
+      "Default",
+      "Default",
+      "Default",
+      "Default",
+      "Default",
+      "Default"
+     ],
+     "uv_map": "Texture",
+     "uv_per_corner": [
+      [
+       [
+        0.25,
+        0.0
+       ],
+       [
+        0.5,
+        0.0
+       ],
+       [
+        0.5,
+        0.333333
+       ],
+       [
+        0.25,
+        0.333333
+       ]
+      ],
+      [
+       [
+        1.0,
+        0.666667
+       ],
+       [
+        0.75,
+        0.666667
+       ],
+       [
+        0.75,
+        0.333333
+       ],
+       [
+        1.0,
+        0.333333
+       ]
+      ],
+      [
+       [
+        0.75,
+        0.666667
+       ],
+       [
+        0.5,
+        0.666667
+       ],
+       [
+        0.5,
+        0.333333
+       ],
+       [
+        0.75,
+        0.333333
+       ]
+      ],
+      [
+       [
+        0.5,
+        0.666667
+       ],
+       [
+        0.25,
+        0.666667
+       ],
+       [
+        0.25,
+        0.333333
+       ],
+       [
+        0.5,
+        0.333333
+       ]
+      ],
+      [
+       [
+        0.25,
+        0.666667
+       ],
+       [
+        0.0,
+        0.666667
+       ],
+       [
+        0.0,
+        0.333333
+       ],
+       [
+        0.25,
+        0.333333
+       ]
+      ],
+      [
+       [
+        0.25,
+        1.0
+       ],
+       [
+        0.25,
+        0.666667
+       ],
+       [
+        0.5,
+        0.666667
+       ],
+       [
+        0.5,
+        1.0
+       ]
+      ]
+     ],
+     "checked_against_manifest": {
+      "points": true,
+      "polygons": true,
+      "types": true,
+      "materials": true,
+      "uv": true
+     }
+    }
+   ],
+   "other_items_present": [
+    "advancedMaterial",
+    "camera",
+    "defaultShader",
+    "envMaterial",
+    "environment",
+    "lightMaterial",
+    "polyRender",
+    "renderOutput",
+    "scene",
+    "shaderFolder",
+    "sunLight"
+   ]
+  },
+  {
+   "id": "LF06",
+   "fixture": "LF06: Modo-saved test file, kept on the research side (fixture hand-off undecided)",
+   "description": "Unit cube, all 6 polygons Subdivs (subpatch); edge weights 4-5 0.5, 5-6 0.5, 6-7 1.0, 7-4 0.25",
+   "expected_meshes": [
+    {
+     "name": "Box",
+     "parent": null,
+     "position": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "visible_channel": "default",
+     "layer_visibility_flags": 5,
+     "points": [
+      [
+       -0.5,
+       -0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       -0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       -0.5,
+       0.5
+      ],
+      [
+       -0.5,
+       -0.5,
+       0.5
+      ],
+      [
+       -0.5,
+       0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       -0.5,
+       0.5,
+       0.5
+      ]
+     ],
+     "polygons": [
+      [
+       0,
+       1,
+       2,
+       3
+      ],
+      [
+       7,
+       6,
+       5,
+       4
+      ],
+      [
+       0,
+       4,
+       5,
+       1
+      ],
+      [
+       1,
+       5,
+       6,
+       2
+      ],
+      [
+       2,
+       6,
+       7,
+       3
+      ],
+      [
+       3,
+       7,
+       4,
+       0
+      ]
+     ],
+     "polygon_type": "subdiv",
+     "polygon_materials": [
+      "Default",
+      "Default",
+      "Default",
+      "Default",
+      "Default",
+      "Default"
+     ],
+     "edge_weights": {
+      "6-7": 1.0,
+      "4-7": 0.25,
+      "5-6": 0.5,
+      "4-5": 0.5
+     },
+     "checked_against_manifest": {
+      "points": true,
+      "polygons": true,
+      "types": true,
+      "materials": true,
+      "edge_weights": true
+     }
+    }
+   ],
+   "other_items_present": [
+    "advancedMaterial",
+    "camera",
+    "defaultShader",
+    "envMaterial",
+    "environment",
+    "lightMaterial",
+    "polyRender",
+    "renderOutput",
+    "scene",
+    "shaderFolder",
+    "sunLight"
+   ]
+  },
+  {
+   "id": "LF07",
+   "fixture": "LF07: Modo-saved test file, kept on the research side (fixture hand-off undecided)",
+   "description": "One mesh 'Mixed': a triangle, a quad and a 5-gon (separate, all facing +Z)",
+   "expected_meshes": [
+    {
+     "name": "Mixed",
+     "parent": null,
+     "position": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "visible_channel": "default",
+     "layer_visibility_flags": 5,
+     "points": [
+      [
+       0.0,
+       0.0,
+       0.0
+      ],
+      [
+       1.0,
+       0.0,
+       0.0
+      ],
+      [
+       0.5,
+       1.0,
+       0.0
+      ],
+      [
+       2.0,
+       0.0,
+       0.0
+      ],
+      [
+       3.0,
+       0.0,
+       0.0
+      ],
+      [
+       3.0,
+       1.0,
+       0.0
+      ],
+      [
+       2.0,
+       1.0,
+       0.0
+      ],
+      [
+       4.0,
+       0.0,
+       0.0
+      ],
+      [
+       5.0,
+       0.0,
+       0.0
+      ],
+      [
+       5.3,
+       0.8,
+       0.0
+      ],
+      [
+       4.5,
+       1.4,
+       0.0
+      ],
+      [
+       3.7,
+       0.8,
+       0.0
+      ]
+     ],
+     "polygons": [
+      [
+       0,
+       1,
+       2
+      ],
+      [
+       3,
+       4,
+       5,
+       6
+      ],
+      [
+       7,
+       8,
+       9,
+       10,
+       11
+      ]
+     ],
+     "polygon_type": "face",
+     "polygon_materials": [
+      "Default",
+      "Default",
+      "Default"
+     ],
+     "checked_against_manifest": {
+      "points": true,
+      "polygons": true,
+      "types": true,
+      "materials": true
+     }
+    }
+   ],
+   "other_items_present": [
+    "advancedMaterial",
+    "camera",
+    "defaultShader",
+    "envMaterial",
+    "environment",
+    "lightMaterial",
+    "polyRender",
+    "renderOutput",
+    "scene",
+    "shaderFolder",
+    "sunLight"
+   ]
+  },
+  {
+   "id": "LF08",
+   "fixture": "LF08: Modo-saved test file, kept on the research side (fixture hand-off undecided)",
+   "description": "Three mesh layers: 'Main' (cube at origin), 'Second' (cube at x+2), 'Hidden' (cube at x-2, Visible channel set to off)",
+   "expected_meshes": [
+    {
+     "name": "Main",
+     "parent": null,
+     "position": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "visible_channel": "default",
+     "layer_visibility_flags": 9,
+     "points": [
+      [
+       -0.5,
+       -0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       -0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       -0.5,
+       0.5
+      ],
+      [
+       -0.5,
+       -0.5,
+       0.5
+      ],
+      [
+       -0.5,
+       0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       -0.5,
+       0.5,
+       0.5
+      ]
+     ],
+     "polygons": [
+      [
+       0,
+       1,
+       2,
+       3
+      ],
+      [
+       7,
+       6,
+       5,
+       4
+      ],
+      [
+       0,
+       4,
+       5,
+       1
+      ],
+      [
+       1,
+       5,
+       6,
+       2
+      ],
+      [
+       2,
+       6,
+       7,
+       3
+      ],
+      [
+       3,
+       7,
+       4,
+       0
+      ]
+     ],
+     "polygon_type": "face",
+     "polygon_materials": [
+      "Default",
+      "Default",
+      "Default",
+      "Default",
+      "Default",
+      "Default"
+     ]
+    },
+    {
+     "name": "Second",
+     "parent": null,
+     "position": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "visible_channel": "default",
+     "layer_visibility_flags": 9,
+     "points": [
+      [
+       1.5,
+       -0.5,
+       -0.5
+      ],
+      [
+       2.5,
+       -0.5,
+       -0.5
+      ],
+      [
+       2.5,
+       -0.5,
+       0.5
+      ],
+      [
+       1.5,
+       -0.5,
+       0.5
+      ],
+      [
+       1.5,
+       0.5,
+       -0.5
+      ],
+      [
+       2.5,
+       0.5,
+       -0.5
+      ],
+      [
+       2.5,
+       0.5,
+       0.5
+      ],
+      [
+       1.5,
+       0.5,
+       0.5
+      ]
+     ],
+     "polygons": [
+      [
+       0,
+       1,
+       2,
+       3
+      ],
+      [
+       7,
+       6,
+       5,
+       4
+      ],
+      [
+       0,
+       4,
+       5,
+       1
+      ],
+      [
+       1,
+       5,
+       6,
+       2
+      ],
+      [
+       2,
+       6,
+       7,
+       3
+      ],
+      [
+       3,
+       7,
+       4,
+       0
+      ]
+     ],
+     "polygon_type": "face",
+     "polygon_materials": [
+      "Default",
+      "Default",
+      "Default",
+      "Default",
+      "Default",
+      "Default"
+     ]
+    },
+    {
+     "name": "Hidden",
+     "parent": null,
+     "position": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "visible_channel": "off",
+     "layer_visibility_flags": 6,
+     "points": [
+      [
+       -2.5,
+       -0.5,
+       -0.5
+      ],
+      [
+       -1.5,
+       -0.5,
+       -0.5
+      ],
+      [
+       -1.5,
+       -0.5,
+       0.5
+      ],
+      [
+       -2.5,
+       -0.5,
+       0.5
+      ],
+      [
+       -2.5,
+       0.5,
+       -0.5
+      ],
+      [
+       -1.5,
+       0.5,
+       -0.5
+      ],
+      [
+       -1.5,
+       0.5,
+       0.5
+      ],
+      [
+       -2.5,
+       0.5,
+       0.5
+      ]
+     ],
+     "polygons": [
+      [
+       0,
+       1,
+       2,
+       3
+      ],
+      [
+       7,
+       6,
+       5,
+       4
+      ],
+      [
+       0,
+       4,
+       5,
+       1
+      ],
+      [
+       1,
+       5,
+       6,
+       2
+      ],
+      [
+       2,
+       6,
+       7,
+       3
+      ],
+      [
+       3,
+       7,
+       4,
+       0
+      ]
+     ],
+     "polygon_type": "face",
+     "polygon_materials": [
+      "Default",
+      "Default",
+      "Default",
+      "Default",
+      "Default",
+      "Default"
+     ]
+    }
+   ],
+   "other_items_present": [
+    "advancedMaterial",
+    "camera",
+    "defaultShader",
+    "envMaterial",
+    "environment",
+    "lightMaterial",
+    "polyRender",
+    "renderOutput",
+    "scene",
+    "shaderFolder",
+    "sunLight"
+   ]
+  }
+ ]
+}

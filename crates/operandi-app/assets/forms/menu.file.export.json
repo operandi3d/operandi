@@ -1,0 +1,76 @@
+{
+  "version": 1,
+  "id": "menu.file.export",
+  "label": "Export",
+  "style": "menu",
+  "controls": [
+    {
+      "command": "scene.saveAs format:obj export:true",
+      "label": "Wavefront OBJ…"
+    },
+    {
+      "command": "scene.saveAs format:stl export:true",
+      "label": "STL (Binary)…"
+    },
+    {
+      "command": "scene.saveAs format:stlAscii export:true",
+      "label": "STL (ASCII)…"
+    },
+    {
+      "command": "scene.saveAs format:gltf export:true",
+      "label": "glTF (.gltf)…"
+    },
+    {
+      "command": "scene.saveAs format:glb export:true",
+      "label": "glTF Binary (.glb)…"
+    },
+    {
+      "command": "scene.saveAs format:geo export:true",
+      "label": "VideoScape GEO…"
+    },
+    {
+      "command": "scene.saveAs format:svg export:true",
+      "label": "SVG Drawing (Front View)…"
+    },
+    {
+      "command": "scene.saveAs format:lxo export:true",
+      "label": "Modo Scene (LXO)…"
+    },
+    {
+      "command": "scene.saveAs format:ply export:true",
+      "label": "PLY (Binary)…"
+    },
+    {
+      "command": "scene.saveAs format:plyAscii export:true",
+      "label": "PLY (ASCII)…"
+    },
+    {
+      "command": "scene.saveAs format:abc export:true",
+      "label": "Alembic (.abc)…"
+    },
+    {
+      "command": "scene.saveAs format:usd export:true",
+      "label": "USD (.usd)…"
+    },
+    {
+      "command": "scene.saveAs format:usda export:true",
+      "label": "USD ASCII (.usda)…"
+    },
+    {
+      "command": "scene.saveAs format:usdc export:true",
+      "label": "USD Binary (.usdc)…"
+    },
+    {
+      "command": "scene.saveAs format:usdz export:true",
+      "label": "USDZ (.usdz)…"
+    },
+    {
+      "command": "scene.saveAs format:fbx export:true",
+      "label": "FBX (.fbx)…"
+    },
+    {
+      "command": "scene.saveAs format:3mf export:true",
+      "label": "3D Manufacturing (.3mf)…"
+    }
+  ]
+}

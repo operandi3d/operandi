@@ -1,0 +1,51 @@
+{
+  "version": 1,
+  "id": "toolbox.vertexmaps",
+  "label": "Vertex Map Tools",
+  "exported": true,
+  "controls": [
+    {
+      "divider": "Vertex Map Tools",
+      "id": "vmap-tools"
+    },
+    {
+      "command": "Vertex Map Paint",
+      "label": "Paint",
+      "icon": "vmap-paint",
+      "tooltip": "Paint \u00b7 sculpt.vmapPaint \u00b7 {chord}\nRaises the selected weight map toward 100 %.\nCtrl: lower toward 0 \u00b7 Shift: smooth"
+    },
+    {
+      "command": "Vertex Map Smooth",
+      "label": "Smooth",
+      "icon": "vmap-smooth",
+      "tooltip": "Smooth \u00b7 sculpt.vmapSmooth \u00b7 {chord}\nBlurs the selected weight map's values.\nCtrl: sharpen \u00b7 Shift: smooth"
+    },
+    {
+      "command": "Vertex Map Scale Down",
+      "label": "Scale Down",
+      "icon": "vmap-scale-down",
+      "tooltip": "Scale Down \u00b7 sculpt.vmapScale \u00b7 {chord}\nPulls the selected weight map's values toward 0.\nCtrl: scale up \u00b7 Shift: smooth"
+    },
+    {
+      "divider": ""
+    },
+    {
+      "command": "Vertex Map Erase",
+      "label": "Erase",
+      "icon": "vmap-erase",
+      "tooltip": "Erase \u00b7 sculpt.vmapErase \u00b7 {chord}\nRemoves the selected weight map's values.\nCtrl: erase \u00b7 Shift: smooth"
+    },
+    {
+      "command": "Vertex Map Set Value",
+      "label": "Set Value",
+      "icon": "vmap-set-value",
+      "tooltip": "Set Value \u00b7 sculpt.vmapSetVal \u00b7 {chord}\nWrites exactly Value into the selected weight map.\nCtrl: erase \u00b7 Shift: smooth"
+    },
+    {
+      "command": "sculpt.liveWeightEdit",
+      "label": "Live Deformers",
+      "look": "check",
+      "tooltip": "sculpt.liveWeightEdit \u00b7 update what the map drives during a stroke; off updates on release"
+    }
+  ]
+}

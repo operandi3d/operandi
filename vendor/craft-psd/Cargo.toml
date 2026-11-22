@@ -1,0 +1,33 @@
+# craft-libs crates/psd at d6b5b16bbb1448193e246ff640adf7ab7ae45037
+# (github.com/storytold/craft-libs), unchanged sources; this manifest
+# spells out what the craft-libs workspace manifest gave it. See
+# OPERANDI.md.
+[package]
+name = "craft-psd"
+description = "Faithful, lossless reader and writer for Adobe Photoshop PSD and PSB files"
+version = "0.1.0"
+edition = "2024"
+license = "MIT OR Apache-2.0"
+rust-version = "1.95"
+repository = "https://github.com/storytold/craft-libs"
+
+[features]
+default = []
+serde = ["dep:serde"]
+test-support = []
+testgen = ["test-support"]
+
+[dependencies]
+thiserror = "2"
+# craft-libs uses the zlib-rs backend; Operandi keeps flate2's default
+# (miniz_oxide), as core's 3MF writer has it, so this crate doesn't change
+# how other crates compress. Output is valid deflate either way.
+flate2 = "1.1.10"
+encoding_rs = "0.8"
+serde = { version = "1", features = ["derive"], optional = true }
+
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+rayon = "1"
+
+[lints.rust]
+unsafe_code = "forbid"

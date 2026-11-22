@@ -1,0 +1,73 @@
+[package]
+name = "operandi-app"
+version = "0.1.0"
+edition = "2024"
+license = "GPL-3.0-or-later"
+
+[dependencies]
+operandi-core = { path = "../operandi-core" }
+operandi-layout = { path = "../operandi-layout" }
+# MCP bridge (Window > MCP Bridge); only JSON in and out, no new third-party deps.
+operandi-mcp = { path = "../operandi-mcp" }
+# File > Render Viewport (Cycles); links Cycles only with the `cycles` feature.
+operandi-cycles = { path = "../operandi-cycles" }
+# File > Export ▸ USD; links OpenUSD only with the `usd` feature.
+operandi-usd = { path = "../operandi-usd" }
+egui_tiles = { version = "=0.14.1", default-features = false, features = ["serde"] }
+glam.workspace = true
+eframe = { version = "0.33", default-features = false, features = ["accesskit", "default_fonts", "wgpu", "x11", "wayland"] }
+serde.workspace = true
+serde_json.workspace = true
+
+egui-wgpu = "0.33"
+# Already locked through egui; inspect installed face identity, never rasterize here.
+ttf-parser = "=0.25.1"
+resvg = { version = "=0.48.1", default-features = false }
+rfd = "0.17.2"
+# Half floats for the environment picture texture (Rgba16Float); already
+# in the tree through exr.
+half = "=2.7.1"
+# Labels on the icon studio's contact sheet; already locked through egui.
+ab_glyph = "=0.2.32"
+image = { version = "=0.25.10", default-features = false, features = ["png", "jpeg", "exr", "tiff", "hdr", "bmp", "tga"] }
+# OpenEXR multilayer render saves (Cryptomatte); the version `image` uses.
+exr = { version = "=1.74.2", default-features = false }
+sysinfo = { version = "0.40.3", default-features = false, features = ["system"] }
+
+# Our patched copy (vendor/egui-winit): tells keypad digits from the main
+# row on Linux and Windows. eframe already uses it; this only names it.
+[target.'cfg(not(target_os = "macos"))'.dependencies]
+egui-winit = { version = "=0.33.3", default-features = false }
+
+# Listing monitors for the main window's saved place (window_state.rs).
+# Already in the build through winit, with these features.
+[target.'cfg(target_os = "windows")'.dependencies]
+windows-sys = { version = "0.52", features = ["Win32_Foundation", "Win32_Graphics_Gdi"] }
+
+[target.'cfg(target_os = "macos")'.dependencies]
+objc2 = "=0.5.3"
+objc2-app-kit = { version = "=0.2.2", default-features = false, features = ["NSApplication", "NSEvent", "NSMenu", "NSMenuItem", "NSCell", "NSColor", "NSColorPanel", "NSColorSpace", "NSPanel", "NSWindow", "NSResponder", "NSScreen"] }
+objc2-foundation = { version = "=0.2.2", default-features = false, features = ["NSThread", "NSArray", "NSGeometry", "NSAppleEventDescriptor", "NSAppleEventManager", "NSNotification", "NSString", "NSURL"] }
+
+# 3D mice (space_mouse/): raw HID, read on a background thread. macOS and
+# Windows for now; Linux needs libudev and comes with a later stage.
+[target.'cfg(any(target_os = "macos", target_os = "windows"))'.dependencies]
+hidapi = { version = "=2.6.7", default-features = false, features = ["macos-shared-device"] }
+
+# 3DxWare's client framework, loaded at run time when installed
+# (space_mouse/framework.rs). Already in the tree through wgpu.
+[target.'cfg(target_os = "macos")'.dependencies.libloading]
+version = "=0.8.9"
+
+[features]
+qa = []
+# Include the Cycles renderer (run scripts/build-cycles.sh first).
+cycles = ["operandi-cycles/cycles"]
+# Include USD export (run scripts/build-usd.sh first).
+usd = ["operandi-usd/usd"]
+# 3D painting (PNT): New Image, paint textures, image commands, PSD/PSB.
+# On by default (the maintainer, 2026-11-19), so dev, release and CI builds
+# carry it. `--no-default-features` builds without it;
+# scripts/check-no-painting.sh checks that build has none of it.
+default = ["painting"]
+painting = ["operandi-core/painting"]

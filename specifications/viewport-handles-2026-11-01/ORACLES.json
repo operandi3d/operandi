@@ -1,0 +1,1963 @@
+{
+  "modo_version": "17.1v1",
+  "observed": "2026-11-02",
+  "oracles": [
+    {
+      "id": "HND-O-MOVE-01",
+      "description": "X arrow, 100 px right, projected 0.160256 m; measured +0.160000 m.",
+      "input": {
+        "points": [
+          [
+            -0.5,
+            -0.5,
+            -0.5
+          ],
+          [
+            0.5,
+            -0.5,
+            -0.5
+          ],
+          [
+            0.5,
+            0.5,
+            -0.5
+          ],
+          [
+            -0.5,
+            0.5,
+            -0.5
+          ],
+          [
+            -0.5,
+            -0.5,
+            0.5
+          ],
+          [
+            0.5,
+            -0.5,
+            0.5
+          ],
+          [
+            0.5,
+            0.5,
+            0.5
+          ],
+          [
+            -0.5,
+            0.5,
+            0.5
+          ]
+        ],
+        "polygons": [
+          [
+            0,
+            3,
+            2,
+            1
+          ],
+          [
+            4,
+            5,
+            6,
+            7
+          ],
+          [
+            0,
+            1,
+            5,
+            4
+          ],
+          [
+            3,
+            7,
+            6,
+            2
+          ],
+          [
+            0,
+            4,
+            7,
+            3
+          ],
+          [
+            1,
+            2,
+            6,
+            5
+          ]
+        ]
+      },
+      "settings": {
+        "tool": "Move",
+        "selection_mode": "Polygon",
+        "action_center": "None",
+        "snapping": false
+      },
+      "selection": {
+        "sel_vertices": [],
+        "sel_edges": [],
+        "sel_polygons": [
+          1
+        ]
+      },
+      "gesture": {
+        "view": "Front orthographic",
+        "button": "left",
+        "modifiers": [],
+        "notes": "X arrow, 100 px right, projected 0.160256 m; measured +0.160000 m.",
+        "from_px": [
+          1695,
+          614
+        ],
+        "to_px": [
+          1795,
+          614
+        ],
+        "px_per_m": 624
+      },
+      "expected": {
+        "points": [
+          [
+            -0.5,
+            -0.5,
+            -0.5
+          ],
+          [
+            0.5,
+            -0.5,
+            -0.5
+          ],
+          [
+            0.5,
+            0.5,
+            -0.5
+          ],
+          [
+            -0.5,
+            0.5,
+            -0.5
+          ],
+          [
+            -0.34,
+            -0.5,
+            0.5
+          ],
+          [
+            0.66,
+            -0.5,
+            0.5
+          ],
+          [
+            0.66,
+            0.5,
+            0.5
+          ],
+          [
+            -0.34,
+            0.5,
+            0.5
+          ]
+        ],
+        "polygons": [
+          [
+            0,
+            3,
+            2,
+            1
+          ],
+          [
+            4,
+            5,
+            6,
+            7
+          ],
+          [
+            0,
+            1,
+            5,
+            4
+          ],
+          [
+            3,
+            7,
+            6,
+            2
+          ],
+          [
+            0,
+            4,
+            7,
+            3
+          ],
+          [
+            1,
+            2,
+            6,
+            5
+          ]
+        ],
+        "n_points": 8,
+        "n_polygons": 6,
+        "selection": {
+          "sel_vertices": [],
+          "sel_edges": [],
+          "sel_polygons": [
+            1
+          ]
+        },
+        "tool_values": {
+          "Position X (m)": 0.16,
+          "Position Y (m)": 0.0,
+          "Position Z (m)": 0.0,
+          "Rotation X (degrees)": 0.0,
+          "Rotation Y (degrees)": 0.0,
+          "Rotation Z (degrees)": 0.0,
+          "Scale X": 1.0,
+          "Scale Y": 1.0,
+          "Scale Z": 1.0
+        }
+      },
+      "tolerance": 1e-05
+    },
+    {
+      "id": "HND-O-MOVE-02",
+      "description": "X arrow, 50 px right, projected 0.080128 m; measured +0.080000 m.",
+      "input": {
+        "points": [
+          [
+            -0.5,
+            -0.5,
+            -0.5
+          ],
+          [
+            0.5,
+            -0.5,
+            -0.5
+          ],
+          [
+            0.5,
+            0.5,
+            -0.5
+          ],
+          [
+            -0.5,
+            0.5,
+            -0.5
+          ],
+          [
+            -0.5,
+            -0.5,
+            0.5
+          ],
+          [
+            0.5,
+            -0.5,
+            0.5
+          ],
+          [
+            0.5,
+            0.5,
+            0.5
+          ],
+          [
+            -0.5,
+            0.5,
+            0.5
+          ]
+        ],
+        "polygons": [
+          [
+            0,
+            3,
+            2,
+            1
+          ],
+          [
+            4,
+            5,
+            6,
+            7
+          ],
+          [
+            0,
+            1,
+            5,
+            4
+          ],
+          [
+            3,
+            7,
+            6,
+            2
+          ],
+          [
+            0,
+            4,
+            7,
+            3
+          ],
+          [
+            1,
+            2,
+            6,
+            5
+          ]
+        ]
+      },
+      "settings": {
+        "tool": "Move",
+        "selection_mode": "Polygon",
+        "action_center": "None",
+        "snapping": false
+      },
+      "selection": {
+        "sel_vertices": [],
+        "sel_edges": [],
+        "sel_polygons": [
+          1
+        ]
+      },
+      "gesture": {
+        "view": "Front orthographic",
+        "button": "left",
+        "modifiers": [],
+        "notes": "X arrow, 50 px right, projected 0.080128 m; measured +0.080000 m.",
+        "from_px": [
+          1695,
+          614
+        ],
+        "to_px": [
+          1745,
+          614
+        ],
+        "px_per_m": 624
+      },
+      "expected": {
+        "points": [
+          [
+            -0.5,
+            -0.5,
+            -0.5
+          ],
+          [
+            0.5,
+            -0.5,
+            -0.5
+          ],
+          [
+            0.5,
+            0.5,
+            -0.5
+          ],
+          [
+            -0.5,
+            0.5,
+            -0.5
+          ],
+          [
+            -0.42,
+            -0.5,
+            0.5
+          ],
+          [
+            0.58,
+            -0.5,
+            0.5
+          ],
+          [
+            0.58,
+            0.5,
+            0.5
+          ],
+          [
+            -0.42,
+            0.5,
+            0.5
+          ]
+        ],
+        "polygons": [
+          [
+            0,
+            3,
+            2,
+            1
+          ],
+          [
+            4,
+            5,
+            6,
+            7
+          ],
+          [
+            0,
+            1,
+            5,
+            4
+          ],
+          [
+            3,
+            7,
+            6,
+            2
+          ],
+          [
+            0,
+            4,
+            7,
+            3
+          ],
+          [
+            1,
+            2,
+            6,
+            5
+          ]
+        ],
+        "n_points": 8,
+        "n_polygons": 6,
+        "selection": {
+          "sel_vertices": [],
+          "sel_edges": [],
+          "sel_polygons": [
+            1
+          ]
+        },
+        "tool_values": {
+          "Position X (m)": 0.08,
+          "Position Y (m)": 0.0,
+          "Position Z (m)": 0.0,
+          "Rotation X (degrees)": 0.0,
+          "Rotation Y (degrees)": 0.0,
+          "Rotation Z (degrees)": 0.0,
+          "Scale X": 1.0,
+          "Scale Y": 1.0,
+          "Scale Z": 1.0
+        }
+      },
+      "tolerance": 1e-05
+    },
+    {
+      "id": "HND-O-MOVE-04",
+      "description": "X arrow, 100 px right, projected 0.226244 m; measured +0.225000 m.",
+      "input": {
+        "points": [
+          [
+            -0.5,
+            -0.5,
+            -0.5
+          ],
+          [
+            0.5,
+            -0.5,
+            -0.5
+          ],
+          [
+            0.5,
+            0.5,
+            -0.5
+          ],
+          [
+            -0.5,
+            0.5,
+            -0.5
+          ],
+          [
+            -0.5,
+            -0.5,
+            0.5
+          ],
+          [
+            0.5,
+            -0.5,
+            0.5
+          ],
+          [
+            0.5,
+            0.5,
+            0.5
+          ],
+          [
+            -0.5,
+            0.5,
+            0.5
+          ]
+        ],
+        "polygons": [
+          [
+            0,
+            3,
+            2,
+            1
+          ],
+          [
+            4,
+            5,
+            6,
+            7
+          ],
+          [
+            0,
+            1,
+            5,
+            4
+          ],
+          [
+            3,
+            7,
+            6,
+            2
+          ],
+          [
+            0,
+            4,
+            7,
+            3
+          ],
+          [
+            1,
+            2,
+            6,
+            5
+          ]
+        ]
+      },
+      "settings": {
+        "tool": "Move",
+        "selection_mode": "Polygon",
+        "action_center": "None",
+        "snapping": false
+      },
+      "selection": {
+        "sel_vertices": [],
+        "sel_edges": [],
+        "sel_polygons": [
+          1
+        ]
+      },
+      "gesture": {
+        "view": "Front orthographic",
+        "button": "left",
+        "modifiers": [],
+        "notes": "X arrow, 100 px right, projected 0.226244 m; measured +0.225000 m.",
+        "from_px": [
+          1550,
+          606
+        ],
+        "to_px": [
+          1650,
+          606
+        ],
+        "px_per_m": 442
+      },
+      "expected": {
+        "points": [
+          [
+            -0.5,
+            -0.5,
+            -0.5
+          ],
+          [
+            0.5,
+            -0.5,
+            -0.5
+          ],
+          [
+            0.5,
+            0.5,
+            -0.5
+          ],
+          [
+            -0.5,
+            0.5,
+            -0.5
+          ],
+          [
+            -0.275,
+            -0.5,
+            0.5
+          ],
+          [
+            0.725,
+            -0.5,
+            0.5
+          ],
+          [
+            0.725,
+            0.5,
+            0.5
+          ],
+          [
+            -0.275,
+            0.5,
+            0.5
+          ]
+        ],
+        "polygons": [
+          [
+            0,
+            3,
+            2,
+            1
+          ],
+          [
+            4,
+            5,
+            6,
+            7
+          ],
+          [
+            0,
+            1,
+            5,
+            4
+          ],
+          [
+            3,
+            7,
+            6,
+            2
+          ],
+          [
+            0,
+            4,
+            7,
+            3
+          ],
+          [
+            1,
+            2,
+            6,
+            5
+          ]
+        ],
+        "n_points": 8,
+        "n_polygons": 6,
+        "selection": {
+          "sel_vertices": [],
+          "sel_edges": [],
+          "sel_polygons": [
+            1
+          ]
+        },
+        "tool_values": {
+          "Position X (m)": 0.225,
+          "Position Y (m)": 0.0,
+          "Position Z (m)": 0.0,
+          "Rotation X (degrees)": 0.0,
+          "Rotation Y (degrees)": 0.0,
+          "Rotation Z (degrees)": 0.0,
+          "Scale X": 1.0,
+          "Scale Y": 1.0,
+          "Scale Z": 1.0
+        }
+      },
+      "tolerance": 1e-05
+    },
+    {
+      "id": "HND-O-ROTATE-01",
+      "description": "Straight chord from right to top of 120 px radius blue ring, measured +89.5 degrees.",
+      "input": {
+        "points": [
+          [
+            -0.5,
+            -0.5,
+            -0.5
+          ],
+          [
+            0.5,
+            -0.5,
+            -0.5
+          ],
+          [
+            0.5,
+            0.5,
+            -0.5
+          ],
+          [
+            -0.5,
+            0.5,
+            -0.5
+          ],
+          [
+            -0.5,
+            -0.5,
+            0.5
+          ],
+          [
+            0.5,
+            -0.5,
+            0.5
+          ],
+          [
+            0.5,
+            0.5,
+            0.5
+          ],
+          [
+            -0.5,
+            0.5,
+            0.5
+          ]
+        ],
+        "polygons": [
+          [
+            0,
+            3,
+            2,
+            1
+          ],
+          [
+            4,
+            5,
+            6,
+            7
+          ],
+          [
+            0,
+            1,
+            5,
+            4
+          ],
+          [
+            3,
+            7,
+            6,
+            2
+          ],
+          [
+            0,
+            4,
+            7,
+            3
+          ],
+          [
+            1,
+            2,
+            6,
+            5
+          ]
+        ]
+      },
+      "settings": {
+        "tool": "Rotate",
+        "selection_mode": "Polygon",
+        "action_center": "None",
+        "snapping": false
+      },
+      "selection": {
+        "sel_vertices": [],
+        "sel_edges": [],
+        "sel_polygons": [
+          1
+        ]
+      },
+      "gesture": {
+        "view": "Front orthographic",
+        "button": "left",
+        "modifiers": [],
+        "notes": "Straight chord from right to top of 120 px radius blue ring, measured +89.5 degrees.",
+        "from_px": [
+          1578,
+          606
+        ],
+        "to_px": [
+          1458,
+          486
+        ],
+        "px_per_m": 442
+      },
+      "expected": {
+        "points": [
+          [
+            -0.5,
+            -0.5,
+            -0.5
+          ],
+          [
+            0.5,
+            -0.5,
+            -0.5
+          ],
+          [
+            0.5,
+            0.5,
+            -0.5
+          ],
+          [
+            -0.5,
+            0.5,
+            -0.5
+          ],
+          [
+            0.495618,
+            -0.504344,
+            0.5
+          ],
+          [
+            0.504344,
+            0.495618,
+            0.5
+          ],
+          [
+            -0.495618,
+            0.504344,
+            0.5
+          ],
+          [
+            -0.504344,
+            -0.495618,
+            0.5
+          ]
+        ],
+        "polygons": [
+          [
+            0,
+            3,
+            2,
+            1
+          ],
+          [
+            4,
+            5,
+            6,
+            7
+          ],
+          [
+            0,
+            1,
+            5,
+            4
+          ],
+          [
+            3,
+            7,
+            6,
+            2
+          ],
+          [
+            0,
+            4,
+            7,
+            3
+          ],
+          [
+            1,
+            2,
+            6,
+            5
+          ]
+        ],
+        "n_points": 8,
+        "n_polygons": 6,
+        "selection": {
+          "sel_vertices": [],
+          "sel_edges": [],
+          "sel_polygons": [
+            1
+          ]
+        },
+        "tool_values": {
+          "Position X (m)": 0.0,
+          "Position Y (m)": 0.0,
+          "Position Z (m)": 0.0,
+          "Rotation X (degrees)": 0.0,
+          "Rotation Y (degrees)": -0.0,
+          "Rotation Z (degrees)": 89.5,
+          "Scale X": 1.0,
+          "Scale Y": 1.0,
+          "Scale Z": 1.0
+        }
+      },
+      "tolerance": 1e-05
+    },
+    {
+      "id": "HND-O-ROTATE-02",
+      "description": "Straight chord toward upper-right ring, measured +45 degrees.",
+      "input": {
+        "points": [
+          [
+            -0.5,
+            -0.5,
+            -0.5
+          ],
+          [
+            0.5,
+            -0.5,
+            -0.5
+          ],
+          [
+            0.5,
+            0.5,
+            -0.5
+          ],
+          [
+            -0.5,
+            0.5,
+            -0.5
+          ],
+          [
+            -0.5,
+            -0.5,
+            0.5
+          ],
+          [
+            0.5,
+            -0.5,
+            0.5
+          ],
+          [
+            0.5,
+            0.5,
+            0.5
+          ],
+          [
+            -0.5,
+            0.5,
+            0.5
+          ]
+        ],
+        "polygons": [
+          [
+            0,
+            3,
+            2,
+            1
+          ],
+          [
+            4,
+            5,
+            6,
+            7
+          ],
+          [
+            0,
+            1,
+            5,
+            4
+          ],
+          [
+            3,
+            7,
+            6,
+            2
+          ],
+          [
+            0,
+            4,
+            7,
+            3
+          ],
+          [
+            1,
+            2,
+            6,
+            5
+          ]
+        ]
+      },
+      "settings": {
+        "tool": "Rotate",
+        "selection_mode": "Polygon",
+        "action_center": "None",
+        "snapping": false
+      },
+      "selection": {
+        "sel_vertices": [],
+        "sel_edges": [],
+        "sel_polygons": [
+          1
+        ]
+      },
+      "gesture": {
+        "view": "Front orthographic",
+        "button": "left",
+        "modifiers": [],
+        "notes": "Straight chord toward upper-right ring, measured +45 degrees.",
+        "from_px": [
+          1578,
+          606
+        ],
+        "to_px": [
+          1542,
+          522
+        ],
+        "px_per_m": 442
+      },
+      "expected": {
+        "points": [
+          [
+            -0.5,
+            -0.5,
+            -0.5
+          ],
+          [
+            0.5,
+            -0.5,
+            -0.5
+          ],
+          [
+            0.5,
+            0.5,
+            -0.5
+          ],
+          [
+            -0.5,
+            0.5,
+            -0.5
+          ],
+          [
+            0.0,
+            -0.707107,
+            0.5
+          ],
+          [
+            0.707107,
+            0.0,
+            0.5
+          ],
+          [
+            0.0,
+            0.707107,
+            0.5
+          ],
+          [
+            -0.707107,
+            0.0,
+            0.5
+          ]
+        ],
+        "polygons": [
+          [
+            0,
+            3,
+            2,
+            1
+          ],
+          [
+            4,
+            5,
+            6,
+            7
+          ],
+          [
+            0,
+            1,
+            5,
+            4
+          ],
+          [
+            3,
+            7,
+            6,
+            2
+          ],
+          [
+            0,
+            4,
+            7,
+            3
+          ],
+          [
+            1,
+            2,
+            6,
+            5
+          ]
+        ],
+        "n_points": 8,
+        "n_polygons": 6,
+        "selection": {
+          "sel_vertices": [],
+          "sel_edges": [],
+          "sel_polygons": [
+            1
+          ]
+        },
+        "tool_values": {
+          "Position X (m)": 0.0,
+          "Position Y (m)": 0.0,
+          "Position Z (m)": 0.0,
+          "Rotation X (degrees)": 0.0,
+          "Rotation Y (degrees)": -0.0,
+          "Rotation Z (degrees)": 45.0,
+          "Scale X": 1.0,
+          "Scale Y": 1.0,
+          "Scale Z": 1.0
+        }
+      },
+      "tolerance": 1e-05
+    },
+    {
+      "id": "HND-O-SCALE-01",
+      "description": "X endpoint, 100 px right; scale X 1.69.",
+      "input": {
+        "points": [
+          [
+            -0.5,
+            -0.5,
+            -0.5
+          ],
+          [
+            0.5,
+            -0.5,
+            -0.5
+          ],
+          [
+            0.5,
+            0.5,
+            -0.5
+          ],
+          [
+            -0.5,
+            0.5,
+            -0.5
+          ],
+          [
+            -0.5,
+            -0.5,
+            0.5
+          ],
+          [
+            0.5,
+            -0.5,
+            0.5
+          ],
+          [
+            0.5,
+            0.5,
+            0.5
+          ],
+          [
+            -0.5,
+            0.5,
+            0.5
+          ]
+        ],
+        "polygons": [
+          [
+            0,
+            3,
+            2,
+            1
+          ],
+          [
+            4,
+            5,
+            6,
+            7
+          ],
+          [
+            0,
+            1,
+            5,
+            4
+          ],
+          [
+            3,
+            7,
+            6,
+            2
+          ],
+          [
+            0,
+            4,
+            7,
+            3
+          ],
+          [
+            1,
+            2,
+            6,
+            5
+          ]
+        ]
+      },
+      "settings": {
+        "tool": "Scale",
+        "selection_mode": "Polygon",
+        "action_center": "None",
+        "snapping": false,
+        "Negative Scale": true,
+        "Absolute Handle": false
+      },
+      "selection": {
+        "sel_vertices": [],
+        "sel_edges": [],
+        "sel_polygons": [
+          1
+        ]
+      },
+      "gesture": {
+        "view": "Front orthographic",
+        "button": "left",
+        "modifiers": [],
+        "notes": "X endpoint, 100 px right; scale X 1.69.",
+        "from_px": [
+          1572,
+          606
+        ],
+        "to_px": [
+          1672,
+          606
+        ],
+        "px_per_m": 442
+      },
+      "expected": {
+        "points": [
+          [
+            -0.5,
+            -0.5,
+            -0.5
+          ],
+          [
+            0.5,
+            -0.5,
+            -0.5
+          ],
+          [
+            0.5,
+            0.5,
+            -0.5
+          ],
+          [
+            -0.5,
+            0.5,
+            -0.5
+          ],
+          [
+            -0.845,
+            -0.5,
+            0.5
+          ],
+          [
+            0.845,
+            -0.5,
+            0.5
+          ],
+          [
+            0.845,
+            0.5,
+            0.5
+          ],
+          [
+            -0.845,
+            0.5,
+            0.5
+          ]
+        ],
+        "polygons": [
+          [
+            0,
+            3,
+            2,
+            1
+          ],
+          [
+            4,
+            5,
+            6,
+            7
+          ],
+          [
+            0,
+            1,
+            5,
+            4
+          ],
+          [
+            3,
+            7,
+            6,
+            2
+          ],
+          [
+            0,
+            4,
+            7,
+            3
+          ],
+          [
+            1,
+            2,
+            6,
+            5
+          ]
+        ],
+        "n_points": 8,
+        "n_polygons": 6,
+        "selection": {
+          "sel_vertices": [],
+          "sel_edges": [],
+          "sel_polygons": [
+            1
+          ]
+        },
+        "tool_values": {
+          "Position X (m)": 0.0,
+          "Position Y (m)": 0.0,
+          "Position Z (m)": 0.0,
+          "Rotation X (degrees)": 0.0,
+          "Rotation Y (degrees)": 0.0,
+          "Rotation Z (degrees)": 0.0,
+          "Scale X": 1.69,
+          "Scale Y": 1.0,
+          "Scale Z": 1.0
+        }
+      },
+      "tolerance": 1e-05
+    },
+    {
+      "id": "HND-O-SCALE-02",
+      "description": "X endpoint, 50 px right; scale X 1.345.",
+      "input": {
+        "points": [
+          [
+            -0.5,
+            -0.5,
+            -0.5
+          ],
+          [
+            0.5,
+            -0.5,
+            -0.5
+          ],
+          [
+            0.5,
+            0.5,
+            -0.5
+          ],
+          [
+            -0.5,
+            0.5,
+            -0.5
+          ],
+          [
+            -0.5,
+            -0.5,
+            0.5
+          ],
+          [
+            0.5,
+            -0.5,
+            0.5
+          ],
+          [
+            0.5,
+            0.5,
+            0.5
+          ],
+          [
+            -0.5,
+            0.5,
+            0.5
+          ]
+        ],
+        "polygons": [
+          [
+            0,
+            3,
+            2,
+            1
+          ],
+          [
+            4,
+            5,
+            6,
+            7
+          ],
+          [
+            0,
+            1,
+            5,
+            4
+          ],
+          [
+            3,
+            7,
+            6,
+            2
+          ],
+          [
+            0,
+            4,
+            7,
+            3
+          ],
+          [
+            1,
+            2,
+            6,
+            5
+          ]
+        ]
+      },
+      "settings": {
+        "tool": "Scale",
+        "selection_mode": "Polygon",
+        "action_center": "None",
+        "snapping": false,
+        "Negative Scale": true,
+        "Absolute Handle": false
+      },
+      "selection": {
+        "sel_vertices": [],
+        "sel_edges": [],
+        "sel_polygons": [
+          1
+        ]
+      },
+      "gesture": {
+        "view": "Front orthographic",
+        "button": "left",
+        "modifiers": [],
+        "notes": "X endpoint, 50 px right; scale X 1.345.",
+        "from_px": [
+          1572,
+          606
+        ],
+        "to_px": [
+          1622,
+          606
+        ],
+        "px_per_m": 442
+      },
+      "expected": {
+        "points": [
+          [
+            -0.5,
+            -0.5,
+            -0.5
+          ],
+          [
+            0.5,
+            -0.5,
+            -0.5
+          ],
+          [
+            0.5,
+            0.5,
+            -0.5
+          ],
+          [
+            -0.5,
+            0.5,
+            -0.5
+          ],
+          [
+            -0.6725,
+            -0.5,
+            0.5
+          ],
+          [
+            0.6725,
+            -0.5,
+            0.5
+          ],
+          [
+            0.6725,
+            0.5,
+            0.5
+          ],
+          [
+            -0.6725,
+            0.5,
+            0.5
+          ]
+        ],
+        "polygons": [
+          [
+            0,
+            3,
+            2,
+            1
+          ],
+          [
+            4,
+            5,
+            6,
+            7
+          ],
+          [
+            0,
+            1,
+            5,
+            4
+          ],
+          [
+            3,
+            7,
+            6,
+            2
+          ],
+          [
+            0,
+            4,
+            7,
+            3
+          ],
+          [
+            1,
+            2,
+            6,
+            5
+          ]
+        ],
+        "n_points": 8,
+        "n_polygons": 6,
+        "selection": {
+          "sel_vertices": [],
+          "sel_edges": [],
+          "sel_polygons": [
+            1
+          ]
+        },
+        "tool_values": {
+          "Position X (m)": 0.0,
+          "Position Y (m)": 0.0,
+          "Position Z (m)": 0.0,
+          "Rotation X (degrees)": 0.0,
+          "Rotation Y (degrees)": 0.0,
+          "Rotation Z (degrees)": 0.0,
+          "Scale X": 1.345,
+          "Scale Y": 1.0,
+          "Scale Z": 1.0
+        }
+      },
+      "tolerance": 1e-05
+    },
+    {
+      "id": "HND-O-TRANSFORM-01",
+      "description": "X translation arrow, 100 px right; measured +0.225000 m.",
+      "input": {
+        "points": [
+          [
+            -0.5,
+            -0.5,
+            -0.5
+          ],
+          [
+            0.5,
+            -0.5,
+            -0.5
+          ],
+          [
+            0.5,
+            0.5,
+            -0.5
+          ],
+          [
+            -0.5,
+            0.5,
+            -0.5
+          ],
+          [
+            -0.5,
+            -0.5,
+            0.5
+          ],
+          [
+            0.5,
+            -0.5,
+            0.5
+          ],
+          [
+            0.5,
+            0.5,
+            0.5
+          ],
+          [
+            -0.5,
+            0.5,
+            0.5
+          ]
+        ],
+        "polygons": [
+          [
+            0,
+            3,
+            2,
+            1
+          ],
+          [
+            4,
+            5,
+            6,
+            7
+          ],
+          [
+            0,
+            1,
+            5,
+            4
+          ],
+          [
+            3,
+            7,
+            6,
+            2
+          ],
+          [
+            0,
+            4,
+            7,
+            3
+          ],
+          [
+            1,
+            2,
+            6,
+            5
+          ]
+        ]
+      },
+      "settings": {
+        "tool": "Transform",
+        "selection_mode": "Polygon",
+        "action_center": "None",
+        "snapping": false
+      },
+      "selection": {
+        "sel_vertices": [],
+        "sel_edges": [],
+        "sel_polygons": [
+          1
+        ]
+      },
+      "gesture": {
+        "view": "Front orthographic",
+        "button": "left",
+        "modifiers": [],
+        "notes": "X translation arrow, 100 px right; measured +0.225000 m.",
+        "from_px": [
+          1538,
+          606
+        ],
+        "to_px": [
+          1638,
+          606
+        ],
+        "px_per_m": 442
+      },
+      "expected": {
+        "points": [
+          [
+            -0.5,
+            -0.5,
+            -0.5
+          ],
+          [
+            0.5,
+            -0.5,
+            -0.5
+          ],
+          [
+            0.5,
+            0.5,
+            -0.5
+          ],
+          [
+            -0.5,
+            0.5,
+            -0.5
+          ],
+          [
+            -0.275,
+            -0.5,
+            0.5
+          ],
+          [
+            0.725,
+            -0.5,
+            0.5
+          ],
+          [
+            0.725,
+            0.5,
+            0.5
+          ],
+          [
+            -0.275,
+            0.5,
+            0.5
+          ]
+        ],
+        "polygons": [
+          [
+            0,
+            3,
+            2,
+            1
+          ],
+          [
+            4,
+            5,
+            6,
+            7
+          ],
+          [
+            0,
+            1,
+            5,
+            4
+          ],
+          [
+            3,
+            7,
+            6,
+            2
+          ],
+          [
+            0,
+            4,
+            7,
+            3
+          ],
+          [
+            1,
+            2,
+            6,
+            5
+          ]
+        ],
+        "n_points": 8,
+        "n_polygons": 6,
+        "selection": {
+          "sel_vertices": [],
+          "sel_edges": [],
+          "sel_polygons": [
+            1
+          ]
+        },
+        "tool_values": {
+          "Position X (m)": 0.225,
+          "Position Y (m)": 0.0,
+          "Position Z (m)": 0.0,
+          "Rotation X (degrees)": 0.0,
+          "Rotation Y (degrees)": 0.0,
+          "Rotation Z (degrees)": 0.0,
+          "Scale X": 1.0,
+          "Scale Y": 1.0,
+          "Scale Z": 1.0
+        }
+      },
+      "tolerance": 1e-05
+    },
+    {
+      "id": "HND-O-TRANSFORM-02",
+      "description": "X translation arrow, 50 px right; measured +0.115000 m.",
+      "input": {
+        "points": [
+          [
+            -0.5,
+            -0.5,
+            -0.5
+          ],
+          [
+            0.5,
+            -0.5,
+            -0.5
+          ],
+          [
+            0.5,
+            0.5,
+            -0.5
+          ],
+          [
+            -0.5,
+            0.5,
+            -0.5
+          ],
+          [
+            -0.5,
+            -0.5,
+            0.5
+          ],
+          [
+            0.5,
+            -0.5,
+            0.5
+          ],
+          [
+            0.5,
+            0.5,
+            0.5
+          ],
+          [
+            -0.5,
+            0.5,
+            0.5
+          ]
+        ],
+        "polygons": [
+          [
+            0,
+            3,
+            2,
+            1
+          ],
+          [
+            4,
+            5,
+            6,
+            7
+          ],
+          [
+            0,
+            1,
+            5,
+            4
+          ],
+          [
+            3,
+            7,
+            6,
+            2
+          ],
+          [
+            0,
+            4,
+            7,
+            3
+          ],
+          [
+            1,
+            2,
+            6,
+            5
+          ]
+        ]
+      },
+      "settings": {
+        "tool": "Transform",
+        "selection_mode": "Polygon",
+        "action_center": "None",
+        "snapping": false
+      },
+      "selection": {
+        "sel_vertices": [],
+        "sel_edges": [],
+        "sel_polygons": [
+          1
+        ]
+      },
+      "gesture": {
+        "view": "Front orthographic",
+        "button": "left",
+        "modifiers": [],
+        "notes": "X translation arrow, 50 px right; measured +0.115000 m.",
+        "from_px": [
+          1538,
+          606
+        ],
+        "to_px": [
+          1588,
+          606
+        ],
+        "px_per_m": 442
+      },
+      "expected": {
+        "points": [
+          [
+            -0.5,
+            -0.5,
+            -0.5
+          ],
+          [
+            0.5,
+            -0.5,
+            -0.5
+          ],
+          [
+            0.5,
+            0.5,
+            -0.5
+          ],
+          [
+            -0.5,
+            0.5,
+            -0.5
+          ],
+          [
+            -0.385,
+            -0.5,
+            0.5
+          ],
+          [
+            0.615,
+            -0.5,
+            0.5
+          ],
+          [
+            0.615,
+            0.5,
+            0.5
+          ],
+          [
+            -0.385,
+            0.5,
+            0.5
+          ]
+        ],
+        "polygons": [
+          [
+            0,
+            3,
+            2,
+            1
+          ],
+          [
+            4,
+            5,
+            6,
+            7
+          ],
+          [
+            0,
+            1,
+            5,
+            4
+          ],
+          [
+            3,
+            7,
+            6,
+            2
+          ],
+          [
+            0,
+            4,
+            7,
+            3
+          ],
+          [
+            1,
+            2,
+            6,
+            5
+          ]
+        ],
+        "n_points": 8,
+        "n_polygons": 6,
+        "selection": {
+          "sel_vertices": [],
+          "sel_edges": [],
+          "sel_polygons": [
+            1
+          ]
+        },
+        "tool_values": {
+          "Position X (m)": 0.115,
+          "Position Y (m)": 0.0,
+          "Position Z (m)": 0.0,
+          "Rotation X (degrees)": 0.0,
+          "Rotation Y (degrees)": 0.0,
+          "Rotation Z (degrees)": 0.0,
+          "Scale X": 1.0,
+          "Scale Y": 1.0,
+          "Scale Z": 1.0
+        }
+      },
+      "tolerance": 1e-05
+    }
+  ]
+}

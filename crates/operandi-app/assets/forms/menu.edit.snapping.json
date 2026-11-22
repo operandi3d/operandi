@@ -1,0 +1,36 @@
+{
+  "version": 1,
+  "id": "menu.edit.snapping",
+  "label": "Snapping",
+  "style": "menu",
+  "controls": [
+    {
+      "command": "Snaps and Precision",
+      "label": "Snaps and Precision",
+      "shortcut": "Snaps and Precision"
+    },
+    {
+      "command": "Snapping Options",
+      "label": "Snapping Options…",
+      "shortcut": "Snapping Options"
+    },
+    {
+      "divider": ""
+    },
+    {
+      "command": "Snapping Toggle",
+      "label": "Snapping",
+      "shortcut": "Snapping Toggle"
+    },
+    {
+      "command": "Mesh Constraints",
+      "label": "Mesh Constraints…",
+      "shortcut": "Mesh Constraints"
+    },
+    {
+      "command": "Guides",
+      "label": "Guides",
+      "tooltip": "Guides · construction lines that draw in the views and that points snap to"
+    }
+  ]
+}

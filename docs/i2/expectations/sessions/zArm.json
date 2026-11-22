@@ -1,0 +1,70 @@
+{
+  "phase": "Armed",
+  "params": {
+    "tool": "Extrude",
+    "extent_world_m": [
+      0,
+      0,
+      0
+    ],
+    "mode": "Shift",
+    "sides": 1,
+    "make_uvs": "None",
+    "uv_map": "Texture",
+    "uv_selected": true,
+    "group_polygons": true
+  },
+  "pre_begin_config": {
+    "tool": "Extrude",
+    "extent_world_m": [
+      0,
+      0,
+      0
+    ],
+    "mode": "Shift",
+    "sides": 1,
+    "make_uvs": "None",
+    "uv_map": "Texture",
+    "uv_selected": true,
+    "group_polygons": true
+  },
+  "stage_key": null,
+  "source_graph": "G1",
+  "source_identity": "I1",
+  "begun_graph": null,
+  "begun_identity": null,
+  "roles": null,
+  "ordered_targets": [
+    10
+  ],
+  "action_context": {
+    "center": "None",
+    "axis": "World"
+  },
+  "frame": {
+    "center": [
+      0.0,
+      0.0,
+      1.0
+    ],
+    "basis": [
+      [
+        1,
+        0,
+        0
+      ],
+      [
+        0,
+        1,
+        0
+      ],
+      [
+        0,
+        0,
+        1
+      ]
+    ]
+  },
+  "os_capture": null,
+  "scope": "D0/item1/generation1"
+}

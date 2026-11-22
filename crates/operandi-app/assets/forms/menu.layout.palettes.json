@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "id": "menu.layout.palettes",
+  "label": "Windows/Palettes",
+  "style": "menu",
+  "controls": [
+    {
+      "list": "palettes"
+    },
+    {
+      "command": "operandi.window.nodeView",
+      "label": "Node View",
+      "shortcut": "Node View"
+    },
+    {
+      "divider": ""
+    },
+    {
+      "command": "operandi.layout.togglePalettes",
+      "label": "Toggle Palettes",
+      "shortcut": "Toggle Palettes"
+    }
+  ]
+}

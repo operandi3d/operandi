@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "id": "menu.bar",
+  "label": "Menu Bar",
+  "style": "menu",
+  "controls": [
+    { "form": "menu.file" },
+    { "form": "menu.edit" },
+    { "form": "menu.select" },
+    { "form": "menu.item" },
+    { "form": "menu.geometry" },
+    { "form": "menu.texture" },
+    { "form": "menu.tools" },
+    { "form": "menu.view" },
+    { "form": "menu.layout" },
+    { "form": "menu.render" },
+    { "form": "menu.window" },
+    { "form": "menu.system" },
+    { "form": "menu.help" }
+  ]
+}

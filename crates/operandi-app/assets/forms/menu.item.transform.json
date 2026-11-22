@@ -1,0 +1,43 @@
+{
+  "version": 1,
+  "id": "menu.item.transform",
+  "label": "Transform",
+  "style": "menu",
+  "controls": [
+    {
+      "command": "transform.reset translation",
+      "label": "Reset Position"
+    },
+    {
+      "command": "transform.reset rotation",
+      "label": "Reset Rotation"
+    },
+    {
+      "command": "transform.reset scale",
+      "label": "Reset Scale"
+    },
+    {
+      "command": "transform.reset all",
+      "label": "Reset All"
+    },
+    {
+      "divider": ""
+    },
+    {
+      "command": "transform.freeze translation",
+      "label": "Freeze Position"
+    },
+    {
+      "command": "transform.freeze rotation",
+      "label": "Freeze Rotation"
+    },
+    {
+      "command": "transform.freeze scale",
+      "label": "Freeze Scale"
+    },
+    {
+      "command": "transform.freeze all",
+      "label": "Freeze All"
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='utf-8'?>
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 64 64" role="img" aria-labelledby="extrude-title extrude-description">
+  <title id="extrude-title">Operandi — Extrude</title>
+  <desc id="extrude-description">Standalone editable vector extracted from approved prototype 04. Transparent background; square canvas; fixed isometric projection.</desc>
+  <g id="icon-extrude" aria-label="Extrude" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" transform="translate(32 31.5) scale(1.08) translate(-32 -31.5) translate(-5.120375 -2.95625)">
+    <title>Extrude</title>
+    <polygon id="extrude-base-top" points="32.0000,10.0000 50.6195,20.7500 32.0000,31.5000 13.3805,20.7500" fill="#DCE3E9" />
+    <polygon id="extrude-base-left" points="13.3805,20.7500 32.0000,31.5000 32.0000,53.0000 13.3805,42.2500" fill="#AAB4C0" />
+    <polygon id="extrude-bridge-top" points="50.6195,20.7500 60.8603,26.6625 42.2408,37.4125 32.0000,31.5000" fill="#DCE3E9" />
+    <polygon id="extrude-bridge-left" points="32.0000,31.5000 42.2408,37.4125 42.2408,58.9125 32.0000,53.0000" fill="#AAB4C0" />
+    <polygon id="extrude-selected-face" points="60.8603,26.6625 42.2408,37.4125 42.2408,58.9125 60.8603,48.1625" fill="#F2A34A" />
+    <path id="extrude-outline" d="M 32.0000,10.0000 L 60.8603,26.6625 L 60.8603,48.1625 L 42.2408,58.9125 L 13.3805,42.2500 L 13.3805,20.7500 Z" fill="none" stroke="#263442" />
+    <path id="extrude-visible-seams" d="M 13.3805,20.7500 L 42.2408,37.4125 L 60.8603,26.6625" fill="none" stroke="#263442" />
+    <path id="extrude-front-edge" d="M 42.2408,37.4125 L 42.2408,58.9125" fill="none" stroke="#263442" />
+    <path id="extrude-original-face-position" d="M 50.6195,20.7500 L 32.0000,31.5000 L 32.0000,53.0000" fill="none" stroke="#263442" />
+  </g>
+</svg>

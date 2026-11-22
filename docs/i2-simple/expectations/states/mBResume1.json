@@ -1,0 +1,51 @@
+{
+  "visible": {
+    "graph": "AM_B1",
+    "identity": "AM_B2I",
+    "session": null
+  },
+  "document": "mAfterA",
+  "selected_stage": "mBResume1",
+  "saved_single_prior_parked": null,
+  "selected_anchor": {
+    "scope": "D0/item1/generation1",
+    "cursor": 1,
+    "base": {
+      "graph": "G2",
+      "identity": "I1"
+    },
+    "completed_boundary": "FinishA5"
+  },
+  "prior_anchor": null,
+  "tool_owner": "ExtrudeBegun",
+  "geometry_next_id": 115,
+  "stage_next_id": 3,
+  "preset_world_z": 0.5,
+  "ordered_selected_face_ids": [
+    10
+  ],
+  "document_scope": "D0/item1/generation1",
+  "publication_and_request": "Per trace deltas;never restored",
+  "gesture_capture": null,
+  "session_eligibility": "Fresh current checked publication/request+stage key on every activation/resume;old gesture not restored",
+  "readers": [],
+  "expected_counts": {
+    "completed_entries": 1,
+    "completed_applied": 1,
+    "completed_redo": 0,
+    "selected_stage_objects": 1,
+    "saved_prior_stage_objects": 0,
+    "external_reader_stage_objects": 0,
+    "retained_stage_objects_total": 1,
+    "selected_local_entries": 2,
+    "selected_local_cursor": 1,
+    "prior_local_entries": 0,
+    "document_snapshot_pairs": 2,
+    "current_visible_snapshot_pairs": 1,
+    "selected_stage_snapshot_pairs": 3,
+    "prior_stage_snapshot_pairs": 0,
+    "legacy_live_base_pairs": 1,
+    "external_reader_snapshot_pairs": 0,
+    "full_snapshot_control_pairs_total": 7
+  }
+}

@@ -1,0 +1,639 @@
+{
+ "spec": "command-conventions-2026-11-05",
+ "comparison_rule": "Each case types the listed lines into the command line on a 1x1 quad (points 0,1 selected unless the description says otherwise). SETPOS = Set Position (args axis, value, workPlane, worldSpace), SETPART = Set Part (name), FLIP = Flip Polygons, SETTING = set or query (?) one tool setting, SELMODE = selection-mode toggle. Compare results and points. SETPOS-MISSPELLED = the Set Position name with one letter added.",
+ "cases": [
+  {
+   "id": "CV01",
+   "description": "Named arguments (axis:y value:0.5 \u2026)",
+   "steps": [
+    {
+     "typed": "SETPOS axis:y value:0.5 workPlane:false worldSpace:false",
+     "result": "ok"
+    }
+   ],
+   "expected": {
+    "points_after": [
+     [
+      -0.5,
+      0.5,
+      0.0
+     ],
+     [
+      0.5,
+      0.5,
+      0.0
+     ],
+     [
+      -0.5,
+      0.5,
+      0.0
+     ],
+     [
+      0.5,
+      0.5,
+      0.0
+     ]
+    ]
+   }
+  },
+  {
+   "id": "CV02",
+   "description": "Positional arguments in declared order (y 0.5 false false)",
+   "steps": [
+    {
+     "typed": "SETPOS y 0.5 false false",
+     "result": "ok"
+    }
+   ],
+   "expected": {
+    "points_after": [
+     [
+      -0.5,
+      0.5,
+      0.0
+     ],
+     [
+      0.5,
+      0.5,
+      0.0
+     ],
+     [
+      -0.5,
+      0.5,
+      0.0
+     ],
+     [
+      0.5,
+      0.5,
+      0.0
+     ]
+    ]
+   }
+  },
+  {
+   "id": "CV03",
+   "description": "Named arguments in a different order",
+   "steps": [
+    {
+     "typed": "SETPOS worldSpace:false value:0.5 axis:y workPlane:false",
+     "result": "ok"
+    }
+   ],
+   "expected": {
+    "points_after": [
+     [
+      -0.5,
+      0.5,
+      0.0
+     ],
+     [
+      0.5,
+      0.5,
+      0.0
+     ],
+     [
+      -0.5,
+      0.5,
+      0.0
+     ],
+     [
+      0.5,
+      0.5,
+      0.0
+     ]
+    ]
+   }
+  },
+  {
+   "id": "CV04",
+   "description": "Choice by index (axis:1 means y?)",
+   "steps": [
+    {
+     "typed": "SETPOS axis:1 value:0.5 workPlane:false worldSpace:false",
+     "result": "ok"
+    }
+   ],
+   "expected": {
+    "points_after": [
+     [
+      -0.5,
+      0.5,
+      0.0
+     ],
+     [
+      0.5,
+      0.5,
+      0.0
+     ],
+     [
+      -0.5,
+      0.5,
+      0.0
+     ],
+     [
+      0.5,
+      0.5,
+      0.0
+     ]
+    ]
+   }
+  },
+  {
+   "id": "CV05",
+   "description": "Unknown choice value (axis:w)",
+   "steps": [
+    {
+     "typed": "SETPOS axis:w value:0.5 workPlane:false worldSpace:false",
+     "result": "ok"
+    }
+   ],
+   "expected": {
+    "points_after": [
+     [
+      -0.5,
+      -0.5,
+      0.0
+     ],
+     [
+      0.5,
+      -0.5,
+      0.0
+     ],
+     [
+      -0.5,
+      0.5,
+      0.0
+     ],
+     [
+      0.5,
+      0.5,
+      0.0
+     ]
+    ]
+   },
+   "operandi_note": "Modo reference only; decided: Operandi refuses with an error listing valid choices (Q-CV-01)"
+  },
+  {
+   "id": "CV06",
+   "description": "Distance with a unit suffix (value:50cm)",
+   "steps": [
+    {
+     "typed": "SETPOS axis:y value:50cm workPlane:false worldSpace:false",
+     "result": "ok"
+    }
+   ],
+   "expected": {
+    "points_after": [
+     [
+      -0.5,
+      50.0,
+      0.0
+     ],
+     [
+      0.5,
+      50.0,
+      0.0
+     ],
+     [
+      -0.5,
+      0.5,
+      0.0
+     ],
+     [
+      0.5,
+      0.5,
+      0.0
+     ]
+    ]
+   },
+   "operandi_note": "Modo reference only; decided: Operandi parses units and % properly or refuses (Q-CV-02)"
+  },
+  {
+   "id": "CV07",
+   "description": "Distance with a millimetre suffix (value:250mm)",
+   "steps": [
+    {
+     "typed": "SETPOS axis:y value:250mm workPlane:false worldSpace:false",
+     "result": "ok"
+    }
+   ],
+   "expected": {
+    "points_after": [
+     [
+      -0.5,
+      250.0,
+      0.0
+     ],
+     [
+      0.5,
+      250.0,
+      0.0
+     ],
+     [
+      -0.5,
+      0.5,
+      0.0
+     ],
+     [
+      0.5,
+      0.5,
+      0.0
+     ]
+    ]
+   },
+   "operandi_note": "Modo reference only; decided: Operandi parses units and % properly or refuses (Q-CV-02)"
+  },
+  {
+   "id": "CV08",
+   "description": "Boolean as on/off (worldSpace:on), item moved +1 in X, set world X 0",
+   "steps": [
+    {
+     "typed": "SETPOS axis:x value:0 workPlane:off worldSpace:on",
+     "result": "ok"
+    }
+   ],
+   "expected": {
+    "points_after": [
+     [
+      -1.0,
+      -0.5,
+      0.0
+     ],
+     [
+      -1.0,
+      -0.5,
+      0.0
+     ],
+     [
+      -0.5,
+      0.5,
+      0.0
+     ],
+     [
+      0.5,
+      0.5,
+      0.0
+     ]
+    ]
+   }
+  },
+  {
+   "id": "CV09",
+   "description": "Boolean as 1/0 (worldSpace:1), item moved +1 in X",
+   "steps": [
+    {
+     "typed": "SETPOS axis:x value:0 workPlane:0 worldSpace:1",
+     "result": "ok"
+    }
+   ],
+   "expected": {
+    "points_after": [
+     [
+      -1.0,
+      -0.5,
+      0.0
+     ],
+     [
+      -1.0,
+      -0.5,
+      0.0
+     ],
+     [
+      -0.5,
+      0.5,
+      0.0
+     ],
+     [
+      0.5,
+      0.5,
+      0.0
+     ]
+    ]
+   }
+  },
+  {
+   "id": "CV10",
+   "description": "Boolean as true (worldSpace:true), item moved +1 in X",
+   "steps": [
+    {
+     "typed": "SETPOS axis:x value:0 workPlane:false worldSpace:true",
+     "result": "ok"
+    }
+   ],
+   "expected": {
+    "points_after": [
+     [
+      -1.0,
+      -0.5,
+      0.0
+     ],
+     [
+      -1.0,
+      -0.5,
+      0.0
+     ],
+     [
+      -0.5,
+      0.5,
+      0.0
+     ],
+     [
+      0.5,
+      0.5,
+      0.0
+     ]
+    ]
+   }
+  },
+  {
+   "id": "CV11",
+   "description": "Text with spaces in braces {Left Wing}",
+   "steps": [
+    {
+     "typed": "SETPART name:{Left Wing}",
+     "result": "ok"
+    }
+   ],
+   "expected": {
+    "points_after": [
+     [
+      -0.5,
+      -0.5,
+      0.0
+     ],
+     [
+      0.5,
+      -0.5,
+      0.0
+     ],
+     [
+      -0.5,
+      0.5,
+      0.0
+     ],
+     [
+      0.5,
+      0.5,
+      0.0
+     ]
+    ],
+    "part_after": "Left Wing"
+   }
+  },
+  {
+   "id": "CV12",
+   "description": "Text with spaces in double quotes \"Left Wing\"",
+   "steps": [
+    {
+     "typed": "SETPART name:\"Left Wing\"",
+     "result": "ok"
+    }
+   ],
+   "expected": {
+    "points_after": [
+     [
+      -0.5,
+      -0.5,
+      0.0
+     ],
+     [
+      0.5,
+      -0.5,
+      0.0
+     ],
+     [
+      -0.5,
+      0.5,
+      0.0
+     ],
+     [
+      0.5,
+      0.5,
+      0.0
+     ]
+    ],
+    "part_after": "Left Wing"
+   }
+  },
+  {
+   "id": "CV13",
+   "description": "Text with spaces, no quotes (name:Left Wing)",
+   "steps": [
+    {
+     "typed": "SETPART name:Left Wing",
+     "result": "ok"
+    }
+   ],
+   "expected": {
+    "points_after": [
+     [
+      -0.5,
+      -0.5,
+      0.0
+     ],
+     [
+      0.5,
+      -0.5,
+      0.0
+     ],
+     [
+      -0.5,
+      0.5,
+      0.0
+     ],
+     [
+      0.5,
+      0.5,
+      0.0
+     ]
+    ],
+    "part_after": "Left"
+   }
+  },
+  {
+   "id": "CV14",
+   "description": "Query a tool setting with ? (bevel on, inset 0.25, then query)",
+   "steps": [
+    {
+     "typed": "TOOL-ON bevel",
+     "result": "ok"
+    },
+    {
+     "typed": "SETTING inset 0.25",
+     "result": "ok"
+    },
+    {
+     "typed": "SETTING inset ?",
+     "result": 0.25
+    },
+    {
+     "typed": "RESET bevel",
+     "result": "ok"
+    },
+    {
+     "typed": "SETTING inset ?",
+     "result": 0.0
+    }
+   ],
+   "expected": {
+    "points_after": [
+     [
+      -0.5,
+      -0.5,
+      0.0
+     ],
+     [
+      0.5,
+      -0.5,
+      0.0
+     ],
+     [
+      -0.5,
+      0.5,
+      0.0
+     ],
+     [
+      0.5,
+      0.5,
+      0.0
+     ]
+    ]
+   }
+  },
+  {
+   "id": "CV15",
+   "description": "Percent setting written as 50% vs 0.5",
+   "steps": [
+    {
+     "typed": "TOOL-ON bevel",
+     "result": "ok"
+    },
+    {
+     "typed": "SETTING inset 0",
+     "result": "ok"
+    },
+    {
+     "typed": "TOOL-ON chamfer-edit",
+     "result": "ok"
+    },
+    {
+     "typed": "SETTING depth 50%",
+     "result": "ok"
+    },
+    {
+     "typed": "SETTING depth ?",
+     "result": 50.0
+    },
+    {
+     "typed": "SETTING depth 0.5",
+     "result": "ok"
+    },
+    {
+     "typed": "SETTING depth ?",
+     "result": 0.5
+    },
+    {
+     "typed": "RESET chamfer-edit",
+     "result": "ok"
+    }
+   ],
+   "expected": {
+    "points_after": [
+     [
+      -0.5,
+      -0.5,
+      0.0
+     ],
+     [
+      0.5,
+      -0.5,
+      0.0
+     ],
+     [
+      -0.5,
+      0.5,
+      0.0
+     ],
+     [
+      0.5,
+      0.5,
+      0.0
+     ]
+    ]
+   },
+   "operandi_note": "Modo reference only; decided: Operandi parses units and % properly or refuses (Q-CV-02)"
+  },
+  {
+   "id": "CV16",
+   "description": "Query a toggle state (selection mode polygon?)",
+   "steps": [
+    {
+     "typed": "SELMODE polygon;vertex;edge;item ?",
+     "result": 1
+    },
+    {
+     "typed": "SELMODE vertex;edge;polygon;item ?",
+     "result": 0
+    }
+   ],
+   "expected": {
+    "points_after": [
+     [
+      -0.5,
+      -0.5,
+      0.0
+     ],
+     [
+      0.5,
+      -0.5,
+      0.0
+     ],
+     [
+      -0.5,
+      0.5,
+      0.0
+     ],
+     [
+      0.5,
+      0.5,
+      0.0
+     ]
+    ]
+   }
+  },
+  {
+   "id": "CV17",
+   "description": "Unknown command name",
+   "steps": [
+    {
+     "typed": "SETPOS-MISSPELLED axis:y value:0.5 workPlane:false worldSpace:false",
+     "result": "command could not be found"
+    }
+   ],
+   "expected": {
+    "points_after": [
+     [
+      -0.5,
+      -0.5,
+      0.0
+     ],
+     [
+      0.5,
+      -0.5,
+      0.0
+     ],
+     [
+      -0.5,
+      0.5,
+      0.0
+     ],
+     [
+      0.5,
+      0.5,
+      0.0
+     ]
+    ]
+   }
+  }
+ ]
+}

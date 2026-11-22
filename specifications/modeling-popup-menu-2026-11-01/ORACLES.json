@@ -1,0 +1,2725 @@
+{
+ "modo_version": "17.1v1",
+ "observed": "2026-11-02\u20132026-11-03",
+ "oracles": [
+  {
+   "id": "POP-O-H1-root",
+   "description": "Physical Command-left popup over selected Polygon face",
+   "input": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      0.5
+     ],
+     [
+      0.5,
+      0.5,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      2,
+      3,
+      1
+     ],
+     [
+      4,
+      5,
+      7,
+      6
+     ],
+     [
+      0,
+      1,
+      5,
+      4
+     ],
+     [
+      2,
+      6,
+      7,
+      3
+     ],
+     [
+      0,
+      4,
+      6,
+      2
+     ],
+     [
+      1,
+      3,
+      7,
+      5
+     ]
+    ]
+   },
+   "settings": {
+    "mode": "Polygon",
+    "configuration": "current active configuration, no factory reset",
+    "view": "Perspective"
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": [
+     1
+    ]
+   },
+   "expected": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      0.5
+     ],
+     [
+      0.5,
+      0.5,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      2,
+      3,
+      1
+     ],
+     [
+      4,
+      5,
+      7,
+      6
+     ],
+     [
+      0,
+      1,
+      5,
+      4
+     ],
+     [
+      2,
+      6,
+      7,
+      3
+     ],
+     [
+      0,
+      4,
+      6,
+      2
+     ],
+     [
+      1,
+      3,
+      7,
+      5
+     ]
+    ],
+    "n_points": 8,
+    "n_polygons": 6,
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": [
+     1
+    ],
+    "popup_opened": true,
+    "root_menu": [
+     {
+      "label": "Modeling Operations",
+      "submenu": true,
+      "enabled": true
+     },
+     {
+      "label": "Procedural Modeling Operations",
+      "submenu": true,
+      "enabled": true
+     },
+     {
+      "separator": true
+     },
+     {
+      "label": "Set Material\u2026",
+      "enabled": true
+     },
+     {
+      "label": "Shaders",
+      "submenu": true,
+      "enabled": true
+     },
+     {
+      "separator": true
+     },
+     {
+      "label": "Add to Selection Set",
+      "enabled": true
+     },
+     {
+      "label": "Recall Selection Set",
+      "enabled": false
+     },
+     {
+      "separator": true
+     },
+     {
+      "label": "Lasso Style",
+      "submenu": true,
+      "enabled": true
+     },
+     {
+      "separator": true
+     },
+     {
+      "label": "Record OpenGL to Movie",
+      "enabled": true
+     },
+     {
+      "label": "Record OpenGL to Image Sequence",
+      "enabled": true
+     },
+     {
+      "label": "Record Playback",
+      "submenu": true,
+      "enabled": true
+     }
+    ]
+   },
+   "tolerance": 1e-05
+  },
+  {
+   "id": "POP-O-H1-submenu",
+   "description": "Polygon Modeling Operations submenu in the physical popup",
+   "input": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      0.5
+     ],
+     [
+      0.5,
+      0.5,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      2,
+      3,
+      1
+     ],
+     [
+      4,
+      5,
+      7,
+      6
+     ],
+     [
+      0,
+      1,
+      5,
+      4
+     ],
+     [
+      2,
+      6,
+      7,
+      3
+     ],
+     [
+      0,
+      4,
+      6,
+      2
+     ],
+     [
+      1,
+      3,
+      7,
+      5
+     ]
+    ]
+   },
+   "settings": {
+    "mode": "Polygon",
+    "selection": "one cube face",
+    "hover": "selected face",
+    "root_gesture": "Command+left-click",
+    "submenu": "Modeling Operations"
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": [
+     1
+    ]
+   },
+   "expected": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      0.5
+     ],
+     [
+      0.5,
+      0.5,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      2,
+      3,
+      1
+     ],
+     [
+      4,
+      5,
+      7,
+      6
+     ],
+     [
+      0,
+      1,
+      5,
+      4
+     ],
+     [
+      2,
+      6,
+      7,
+      3
+     ],
+     [
+      0,
+      4,
+      6,
+      2
+     ],
+     [
+      1,
+      3,
+      7,
+      5
+     ]
+    ],
+    "n_points": 8,
+    "n_polygons": 6,
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": [
+     1
+    ],
+    "menu_path": [
+     "Modeling Operations"
+    ],
+    "items": [
+     {
+      "label": "Bevel",
+      "enabled": true,
+      "submenu": false
+     },
+     {
+      "label": "Extrude",
+      "enabled": true,
+      "submenu": false
+     },
+     {
+      "label": "Sketch Extrude",
+      "enabled": true,
+      "submenu": false
+     },
+     {
+      "label": "Slide",
+      "enabled": false,
+      "submenu": false
+     },
+     {
+      "label": "Bridge",
+      "enabled": true,
+      "submenu": false
+     },
+     {
+      "label": "Add Loop",
+      "enabled": true,
+      "submenu": false
+     },
+     {
+      "label": "Smooth Shift",
+      "enabled": true,
+      "submenu": false
+     },
+     {
+      "label": "Shift",
+      "enabled": true,
+      "submenu": false
+     },
+     {
+      "label": "Inset",
+      "enabled": true,
+      "submenu": false
+     },
+     {
+      "label": "Chamfer Edit",
+      "enabled": true,
+      "submenu": false
+     },
+     {
+      "separator": true
+     },
+     {
+      "label": "Remove",
+      "enabled": true,
+      "submenu": false
+     },
+     {
+      "label": "Collapse",
+      "enabled": true,
+      "submenu": false
+     },
+     {
+      "label": "Unify",
+      "enabled": true,
+      "submenu": false
+     },
+     {
+      "label": "Merge",
+      "enabled": true,
+      "submenu": false
+     },
+     {
+      "label": "Flip",
+      "enabled": true,
+      "submenu": false
+     },
+     {
+      "label": "Spin",
+      "enabled": true,
+      "submenu": false
+     },
+     {
+      "label": "Triple",
+      "enabled": true,
+      "submenu": false
+     }
+    ]
+   },
+   "tolerance": 1e-05
+  },
+  {
+   "id": "POP-O-H1-triple",
+   "description": "Choosing Triple from the physical Polygon popup",
+   "input": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      0.5
+     ],
+     [
+      0.5,
+      0.5,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      2,
+      3,
+      1
+     ],
+     [
+      4,
+      5,
+      7,
+      6
+     ],
+     [
+      0,
+      1,
+      5,
+      4
+     ],
+     [
+      2,
+      6,
+      7,
+      3
+     ],
+     [
+      0,
+      4,
+      6,
+      2
+     ],
+     [
+      1,
+      3,
+      7,
+      5
+     ]
+    ]
+   },
+   "settings": {
+    "mode": "Polygon",
+    "menu_path": [
+     "Modeling Operations",
+     "Triple"
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": [
+     1
+    ]
+   },
+   "expected": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      0.5
+     ],
+     [
+      0.5,
+      0.5,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      2,
+      3,
+      1
+     ],
+     [
+      0,
+      1,
+      5,
+      4
+     ],
+     [
+      2,
+      6,
+      7,
+      3
+     ],
+     [
+      0,
+      4,
+      6,
+      2
+     ],
+     [
+      1,
+      3,
+      7,
+      5
+     ],
+     [
+      4,
+      5,
+      6
+     ],
+     [
+      7,
+      6,
+      5
+     ]
+    ],
+    "n_points": 8,
+    "n_polygons": 7,
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": [
+     5,
+     6
+    ]
+   },
+   "tolerance": 1e-05
+  },
+  {
+   "id": "POP-O-H1-vertex-menu",
+   "description": "Physical Vertex popup root and Modeling Operations contents",
+   "input": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      0.5
+     ],
+     [
+      0.5,
+      0.5,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      2,
+      3,
+      1
+     ],
+     [
+      4,
+      5,
+      7,
+      6
+     ],
+     [
+      0,
+      1,
+      5,
+      4
+     ],
+     [
+      2,
+      6,
+      7,
+      3
+     ],
+     [
+      0,
+      4,
+      6,
+      2
+     ],
+     [
+      1,
+      3,
+      7,
+      5
+     ]
+    ]
+   },
+   "settings": {
+    "mode": "Vertex",
+    "view": "Perspective",
+    "configuration": "current active configuration, no factory reset"
+   },
+   "selection": {
+    "sel_vertices": [
+     7
+    ],
+    "sel_edges": [],
+    "sel_polygons": []
+   },
+   "expected": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      0.5
+     ],
+     [
+      0.5,
+      0.5,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      2,
+      3,
+      1
+     ],
+     [
+      4,
+      5,
+      7,
+      6
+     ],
+     [
+      0,
+      1,
+      5,
+      4
+     ],
+     [
+      2,
+      6,
+      7,
+      3
+     ],
+     [
+      0,
+      4,
+      6,
+      2
+     ],
+     [
+      1,
+      3,
+      7,
+      5
+     ]
+    ],
+    "n_points": 8,
+    "n_polygons": 6,
+    "sel_vertices": [
+     7
+    ],
+    "sel_edges": [],
+    "sel_polygons": [],
+    "popup_opened": true,
+    "root_menu_labels_in_order": [
+     "Modeling Operations",
+     "Procedural Modeling Operations",
+     null,
+     "Shaders",
+     null,
+     "Add to Selection Set",
+     "Recall Selection Set",
+     null,
+     "Lasso Style",
+     null,
+     "Record OpenGL to Movie",
+     "Record OpenGL to Image Sequence",
+     "Record Playback"
+    ],
+    "root_disabled_labels": [
+     "Recall Selection Set"
+    ],
+    "submenu_path": [
+     "Modeling Operations"
+    ],
+    "items": [
+     {
+      "label": "Bevel",
+      "enabled": true,
+      "submenu": false
+     },
+     {
+      "label": "Extrude",
+      "enabled": true,
+      "submenu": false
+     },
+     {
+      "label": "Slide",
+      "enabled": true,
+      "submenu": false
+     },
+     {
+      "separator": true
+     },
+     {
+      "label": "Remove",
+      "enabled": true,
+      "submenu": false
+     },
+     {
+      "label": "Collapse",
+      "enabled": true,
+      "submenu": false
+     },
+     {
+      "label": "Split Vertex",
+      "enabled": true,
+      "submenu": false
+     },
+     {
+      "label": "Split Polygon",
+      "enabled": true,
+      "submenu": false
+     },
+     {
+      "label": "Merge",
+      "enabled": true,
+      "submenu": false
+     },
+     {
+      "label": "Join",
+      "enabled": false,
+      "submenu": false
+     },
+     {
+      "label": "Center",
+      "enabled": true,
+      "submenu": false
+     },
+     {
+      "label": "Align",
+      "enabled": false,
+      "submenu": false
+     }
+    ]
+   },
+   "tolerance": 1e-05
+  },
+  {
+   "id": "POP-O-H1-vertex-split",
+   "description": "Physical Vertex popup action: Split Vertex",
+   "input": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      0.5
+     ],
+     [
+      0.5,
+      0.5,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      2,
+      3,
+      1
+     ],
+     [
+      4,
+      5,
+      7,
+      6
+     ],
+     [
+      0,
+      1,
+      5,
+      4
+     ],
+     [
+      2,
+      6,
+      7,
+      3
+     ],
+     [
+      0,
+      4,
+      6,
+      2
+     ],
+     [
+      1,
+      3,
+      7,
+      5
+     ]
+    ]
+   },
+   "settings": {
+    "mode": "Vertex",
+    "menu_path": [
+     "Modeling Operations",
+     "Split Vertex"
+    ]
+   },
+   "selection": {
+    "sel_vertices": [
+     7
+    ],
+    "sel_edges": [],
+    "sel_polygons": []
+   },
+   "expected": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      0.5
+     ],
+     [
+      0.5,
+      0.5,
+      0.5
+     ],
+     [
+      0.5,
+      0.5,
+      0.5
+     ],
+     [
+      0.5,
+      0.5,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      2,
+      3,
+      1
+     ],
+     [
+      0,
+      1,
+      5,
+      4
+     ],
+     [
+      0,
+      4,
+      6,
+      2
+     ],
+     [
+      4,
+      5,
+      7,
+      6
+     ],
+     [
+      2,
+      6,
+      8,
+      3
+     ],
+     [
+      1,
+      3,
+      9,
+      5
+     ]
+    ],
+    "n_points": 10,
+    "n_polygons": 6,
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": []
+   },
+   "tolerance": 1e-05
+  },
+  {
+   "id": "POP-O-H1-edge-menu",
+   "description": "Physical selected-Edge popup root and Modeling Operations contents",
+   "input": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      0.5
+     ],
+     [
+      0.5,
+      0.5,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      2,
+      3,
+      1
+     ],
+     [
+      4,
+      5,
+      7,
+      6
+     ],
+     [
+      0,
+      1,
+      5,
+      4
+     ],
+     [
+      2,
+      6,
+      7,
+      3
+     ],
+     [
+      0,
+      4,
+      6,
+      2
+     ],
+     [
+      1,
+      3,
+      7,
+      5
+     ]
+    ]
+   },
+   "settings": {
+    "mode": "Edge",
+    "view": "Perspective",
+    "configuration": "current active configuration, no factory reset"
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [
+     [
+      5,
+      7
+     ]
+    ],
+    "sel_polygons": []
+   },
+   "expected": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      0.5
+     ],
+     [
+      0.5,
+      0.5,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      2,
+      3,
+      1
+     ],
+     [
+      4,
+      5,
+      7,
+      6
+     ],
+     [
+      0,
+      1,
+      5,
+      4
+     ],
+     [
+      2,
+      6,
+      7,
+      3
+     ],
+     [
+      0,
+      4,
+      6,
+      2
+     ],
+     [
+      1,
+      3,
+      7,
+      5
+     ]
+    ],
+    "n_points": 8,
+    "n_polygons": 6,
+    "sel_vertices": [],
+    "sel_edges": [
+     [
+      5,
+      7
+     ]
+    ],
+    "sel_polygons": [],
+    "popup_opened": true,
+    "root_menu_labels_in_order": [
+     "Modeling Operations",
+     "Procedural Modeling Operations",
+     null,
+     "Shaders",
+     null,
+     "Add to Selection Set",
+     "Recall Selection Set",
+     null,
+     "Lasso Style",
+     null,
+     "Record OpenGL to Movie",
+     "Record OpenGL to Image Sequence",
+     "Record Playback"
+    ],
+    "root_disabled_labels": [
+     "Recall Selection Set"
+    ],
+    "submenu_path": [
+     "Modeling Operations"
+    ],
+    "items": [
+     {
+      "label": "Bevel",
+      "enabled": true,
+      "submenu": false
+     },
+     {
+      "label": "Chamfer",
+      "enabled": true,
+      "submenu": false
+     },
+     {
+      "label": "Extrude",
+      "enabled": true,
+      "submenu": false
+     },
+     {
+      "label": "Extend",
+      "enabled": true,
+      "submenu": false
+     },
+     {
+      "label": "Slide",
+      "enabled": true,
+      "submenu": false
+     },
+     {
+      "label": "Bridge",
+      "enabled": true,
+      "submenu": false
+     },
+     {
+      "label": "Add Loop",
+      "enabled": true,
+      "submenu": false
+     },
+     {
+      "label": "Edge Weight",
+      "enabled": true,
+      "submenu": false
+     },
+     {
+      "separator": true
+     },
+     {
+      "label": "Spin",
+      "enabled": true,
+      "submenu": false
+     },
+     {
+      "label": "Remove",
+      "enabled": true,
+      "submenu": false
+     },
+     {
+      "label": "Collapse",
+      "enabled": true,
+      "submenu": false
+     },
+     {
+      "label": "Join",
+      "enabled": false,
+      "submenu": false
+     },
+     {
+      "label": "Split",
+      "enabled": true,
+      "submenu": false
+     },
+     {
+      "label": "Grow Quads",
+      "enabled": true,
+      "submenu": false
+     },
+     {
+      "label": "Fill Quads",
+      "enabled": true,
+      "submenu": false
+     },
+     {
+      "label": "Split Normals",
+      "enabled": true,
+      "submenu": false
+     },
+     {
+      "label": "Edges to Curves",
+      "enabled": true,
+      "submenu": false
+     },
+     {
+      "label": "Unbevel",
+      "enabled": false,
+      "submenu": false
+     }
+    ]
+   },
+   "tolerance": 1e-05
+  },
+  {
+   "id": "POP-O-H1-edge-collapse",
+   "description": "Physical Edge popup action: Collapse",
+   "input": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      0.5
+     ],
+     [
+      0.5,
+      0.5,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      2,
+      3,
+      1
+     ],
+     [
+      4,
+      5,
+      7,
+      6
+     ],
+     [
+      0,
+      1,
+      5,
+      4
+     ],
+     [
+      2,
+      6,
+      7,
+      3
+     ],
+     [
+      0,
+      4,
+      6,
+      2
+     ],
+     [
+      1,
+      3,
+      7,
+      5
+     ]
+    ]
+   },
+   "settings": {
+    "mode": "Edge",
+    "menu_path": [
+     "Modeling Operations",
+     "Collapse"
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [
+     [
+      5,
+      7
+     ]
+    ],
+    "sel_polygons": []
+   },
+   "expected": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      0.5
+     ],
+     [
+      0.5,
+      0.0,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      2,
+      3,
+      1
+     ],
+     [
+      4,
+      6,
+      5
+     ],
+     [
+      0,
+      1,
+      6,
+      4
+     ],
+     [
+      2,
+      5,
+      6,
+      3
+     ],
+     [
+      0,
+      4,
+      5,
+      2
+     ],
+     [
+      1,
+      3,
+      6
+     ]
+    ],
+    "n_points": 7,
+    "n_polygons": 6,
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": []
+   },
+   "tolerance": 1e-05
+  },
+  {
+   "id": "POP-O-H1-item-root",
+   "description": "Physical selected-Items popup: root contents",
+   "input": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      0.5
+     ],
+     [
+      0.5,
+      0.5,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      2,
+      3,
+      1
+     ],
+     [
+      4,
+      5,
+      7,
+      6
+     ],
+     [
+      0,
+      1,
+      5,
+      4
+     ],
+     [
+      2,
+      6,
+      7,
+      3
+     ],
+     [
+      0,
+      4,
+      6,
+      2
+     ],
+     [
+      1,
+      3,
+      7,
+      5
+     ]
+    ]
+   },
+   "settings": {
+    "mode": "Items",
+    "view": "Perspective",
+    "configuration": "current active configuration, no factory reset"
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": [],
+    "selected_items": [
+     "cube"
+    ]
+   },
+   "expected": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      0.5
+     ],
+     [
+      0.5,
+      0.5,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      2,
+      3,
+      1
+     ],
+     [
+      4,
+      5,
+      7,
+      6
+     ],
+     [
+      0,
+      1,
+      5,
+      4
+     ],
+     [
+      2,
+      6,
+      7,
+      3
+     ],
+     [
+      0,
+      4,
+      6,
+      2
+     ],
+     [
+      1,
+      3,
+      7,
+      5
+     ]
+    ],
+    "n_points": 8,
+    "n_polygons": 6,
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": [],
+    "popup_opened": true,
+    "root_menu": [
+     {
+      "label": "Item Operations",
+      "enabled": true,
+      "submenu_indicator_visible": true
+     },
+     {
+      "label": "Properties\u2026",
+      "enabled": true,
+      "submenu_indicator_visible": false
+     },
+     {
+      "separator": true
+     },
+     {
+      "label": "Draw Style",
+      "enabled": true,
+      "submenu_indicator_visible": true
+     },
+     {
+      "label": "Wireframe Color",
+      "enabled": true,
+      "submenu_indicator_visible": false
+     },
+     {
+      "label": "Fill Color",
+      "enabled": true,
+      "submenu_indicator_visible": false
+     },
+     {
+      "separator": true
+     },
+     {
+      "label": "Set Work Plane",
+      "enabled": true,
+      "submenu_indicator_visible": false
+     },
+     {
+      "separator": true
+     },
+     {
+      "label": "Create Item Mask",
+      "enabled": true,
+      "submenu_indicator_visible": false
+     },
+     {
+      "label": "Create Item Shader",
+      "enabled": true,
+      "submenu_indicator_visible": false
+     },
+     {
+      "label": "Shaders",
+      "enabled": true,
+      "submenu_indicator_visible": true
+     },
+     {
+      "separator": true
+     },
+     {
+      "label": "Add to Selection Set",
+      "enabled": true,
+      "submenu_indicator_visible": false
+     },
+     {
+      "label": "Recall Selection Set",
+      "enabled": false,
+      "submenu_indicator_visible": false
+     },
+     {
+      "separator": true
+     },
+     {
+      "label": "Lasso Style",
+      "enabled": true,
+      "submenu_indicator_visible": true
+     },
+     {
+      "separator": true
+     },
+     {
+      "label": "Record OpenGL to Movie",
+      "enabled": true,
+      "submenu_indicator_visible": false
+     },
+     {
+      "label": "Record OpenGL to Image Sequence",
+      "enabled": true,
+      "submenu_indicator_visible": false
+     },
+     {
+      "label": "Record Playback",
+      "enabled": true,
+      "submenu_indicator_visible": false
+     },
+     {
+      "label": "Fusion Strips",
+      "enabled": true,
+      "submenu_indicator_visible": true
+     }
+    ],
+    "selected_items": [
+     "cube"
+    ],
+    "item_channels": {
+     "position": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "rotation_radians": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "scale": [
+      1.0,
+      1.0,
+      1.0
+     ]
+    }
+   },
+   "tolerance": 1e-05
+  },
+  {
+   "id": "POP-O-H1-item-menu",
+   "description": "Physical selected-Items popup: Item Operations submenu",
+   "input": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      0.5
+     ],
+     [
+      0.5,
+      0.5,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      2,
+      3,
+      1
+     ],
+     [
+      4,
+      5,
+      7,
+      6
+     ],
+     [
+      0,
+      1,
+      5,
+      4
+     ],
+     [
+      2,
+      6,
+      7,
+      3
+     ],
+     [
+      0,
+      4,
+      6,
+      2
+     ],
+     [
+      1,
+      3,
+      7,
+      5
+     ]
+    ]
+   },
+   "settings": {
+    "mode": "Items",
+    "view": "Perspective",
+    "configuration": "current active configuration, no factory reset"
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": [],
+    "selected_items": [
+     "cube"
+    ]
+   },
+   "expected": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      0.5
+     ],
+     [
+      0.5,
+      0.5,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      2,
+      3,
+      1
+     ],
+     [
+      4,
+      5,
+      7,
+      6
+     ],
+     [
+      0,
+      1,
+      5,
+      4
+     ],
+     [
+      2,
+      6,
+      7,
+      3
+     ],
+     [
+      0,
+      4,
+      6,
+      2
+     ],
+     [
+      1,
+      3,
+      7,
+      5
+     ]
+    ],
+    "n_points": 8,
+    "n_polygons": 6,
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": [],
+    "submenu_path": [
+     "Item Operations"
+    ],
+    "items": [
+     {
+      "label": "Find in Item List",
+      "enabled": true,
+      "submenu_indicator_visible": false
+     },
+     {
+      "separator": true
+     },
+     {
+      "label": "Delete",
+      "enabled": true,
+      "submenu_indicator_visible": false
+     },
+     {
+      "separator": true
+     },
+     {
+      "label": "Duplicate\u2026",
+      "enabled": true,
+      "submenu_indicator_visible": false
+     },
+     {
+      "label": "Duplicate",
+      "enabled": true,
+      "submenu_indicator_visible": false
+     },
+     {
+      "label": "Duplicate Hierarchy",
+      "enabled": true,
+      "submenu_indicator_visible": false
+     },
+     {
+      "label": "Instance",
+      "enabled": true,
+      "submenu_indicator_visible": false
+     },
+     {
+      "label": "Instance Hierarchy",
+      "enabled": true,
+      "submenu_indicator_visible": false
+     },
+     {
+      "separator": true
+     },
+     {
+      "label": "Change Type",
+      "enabled": true,
+      "submenu_indicator_visible": true
+     },
+     {
+      "label": "Presets",
+      "enabled": true,
+      "submenu_indicator_visible": true
+     },
+     {
+      "label": "Add Mesh Operation",
+      "enabled": true,
+      "submenu_indicator_visible": false
+     },
+     {
+      "label": "Merge Meshes \u2013 Selected",
+      "enabled": true,
+      "submenu_indicator_visible": false
+     },
+     {
+      "separator": true
+     },
+     {
+      "label": "Parent",
+      "enabled": false,
+      "submenu_indicator_visible": false
+     },
+     {
+      "label": "Parent in Place",
+      "enabled": false,
+      "submenu_indicator_visible": false
+     },
+     {
+      "label": "Parent to Group Locator",
+      "enabled": true,
+      "submenu_indicator_visible": false
+     },
+     {
+      "label": "Unparent",
+      "enabled": false,
+      "submenu_indicator_visible": false
+     },
+     {
+      "label": "Unparent in Place",
+      "enabled": false,
+      "submenu_indicator_visible": false
+     },
+     {
+      "separator": true
+     },
+     {
+      "label": "Create Assembly Group",
+      "enabled": true,
+      "submenu_indicator_visible": false
+     },
+     {
+      "separator": true
+     },
+     {
+      "label": "Select Item Hierarchy",
+      "enabled": true,
+      "submenu_indicator_visible": false
+     },
+     {
+      "label": "Pick Walk",
+      "enabled": true,
+      "submenu_indicator_visible": true
+     },
+     {
+      "label": "Clear Selection Redirect",
+      "enabled": true,
+      "submenu_indicator_visible": false
+     },
+     {
+      "separator": true
+     },
+     {
+      "label": "Apply to Setup/Rest",
+      "enabled": true,
+      "submenu_indicator_visible": false
+     },
+     {
+      "label": "Restore Setup/Rest",
+      "enabled": true,
+      "submenu_indicator_visible": false
+     },
+     {
+      "label": "Restore Setup/Rest (Transforms Only)",
+      "enabled": true,
+      "submenu_indicator_visible": false
+     },
+     {
+      "separator": true
+     },
+     {
+      "label": "Select Source of Instance",
+      "enabled": false,
+      "submenu_indicator_visible": false
+     },
+     {
+      "label": "Select Instances",
+      "enabled": false,
+      "submenu_indicator_visible": false
+     },
+     {
+      "label": "Select Input Items",
+      "enabled": false,
+      "submenu_indicator_visible": false
+     },
+     {
+      "label": "Select Output Items",
+      "enabled": false,
+      "submenu_indicator_visible": false
+     }
+    ],
+    "selected_items": [
+     "cube"
+    ],
+    "item_channels": {
+     "position": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "rotation_radians": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "scale": [
+      1.0,
+      1.0,
+      1.0
+     ]
+    }
+   },
+   "tolerance": 1e-05
+  },
+  {
+   "id": "POP-O-H1-item-duplicate",
+   "description": "Choosing plain Duplicate creates a coincident Mesh item and selects only the copy",
+   "input": {
+    "mesh_items": [
+     {
+      "label": "cube",
+      "name": "HandsOnCube",
+      "type": "Mesh",
+      "position": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "rotation_radians": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "scale": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "geometry": {
+       "points": [
+        [
+         -0.5,
+         -0.5,
+         -0.5
+        ],
+        [
+         0.5,
+         -0.5,
+         -0.5
+        ],
+        [
+         -0.5,
+         0.5,
+         -0.5
+        ],
+        [
+         0.5,
+         0.5,
+         -0.5
+        ],
+        [
+         -0.5,
+         -0.5,
+         0.5
+        ],
+        [
+         0.5,
+         -0.5,
+         0.5
+        ],
+        [
+         -0.5,
+         0.5,
+         0.5
+        ],
+        [
+         0.5,
+         0.5,
+         0.5
+        ]
+       ],
+       "polygons": [
+        [
+         0,
+         2,
+         3,
+         1
+        ],
+        [
+         4,
+         5,
+         7,
+         6
+        ],
+        [
+         0,
+         1,
+         5,
+         4
+        ],
+        [
+         2,
+         6,
+         7,
+         3
+        ],
+        [
+         0,
+         4,
+         6,
+         2
+        ],
+        [
+         1,
+         3,
+         7,
+         5
+        ]
+       ],
+       "n_points": 8,
+       "n_polygons": 6,
+       "sel_vertices": [],
+       "sel_edges": [],
+       "sel_polygons": []
+      }
+     }
+    ]
+   },
+   "settings": {
+    "mode": "Items",
+    "menu_path": [
+     "Item Operations",
+     "Duplicate"
+    ],
+    "dialog_variant": false
+   },
+   "selection": {
+    "selected_items": [
+     "cube"
+    ]
+   },
+   "expected": {
+    "mesh_items": [
+     {
+      "label": "cube",
+      "name": "HandsOnCube",
+      "type": "Mesh",
+      "position": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "rotation_radians": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "scale": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "geometry": {
+       "points": [
+        [
+         -0.5,
+         -0.5,
+         -0.5
+        ],
+        [
+         0.5,
+         -0.5,
+         -0.5
+        ],
+        [
+         -0.5,
+         0.5,
+         -0.5
+        ],
+        [
+         0.5,
+         0.5,
+         -0.5
+        ],
+        [
+         -0.5,
+         -0.5,
+         0.5
+        ],
+        [
+         0.5,
+         -0.5,
+         0.5
+        ],
+        [
+         -0.5,
+         0.5,
+         0.5
+        ],
+        [
+         0.5,
+         0.5,
+         0.5
+        ]
+       ],
+       "polygons": [
+        [
+         0,
+         2,
+         3,
+         1
+        ],
+        [
+         4,
+         5,
+         7,
+         6
+        ],
+        [
+         0,
+         1,
+         5,
+         4
+        ],
+        [
+         2,
+         6,
+         7,
+         3
+        ],
+        [
+         0,
+         4,
+         6,
+         2
+        ],
+        [
+         1,
+         3,
+         7,
+         5
+        ]
+       ],
+       "n_points": 8,
+       "n_polygons": 6,
+       "sel_vertices": [],
+       "sel_edges": [],
+       "sel_polygons": []
+      }
+     },
+     {
+      "label": "copy",
+      "name": "HandsOnCube (2)",
+      "type": "Mesh",
+      "position": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "rotation_radians": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "scale": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "geometry": {
+       "points": [
+        [
+         -0.5,
+         -0.5,
+         -0.5
+        ],
+        [
+         0.5,
+         -0.5,
+         -0.5
+        ],
+        [
+         -0.5,
+         0.5,
+         -0.5
+        ],
+        [
+         0.5,
+         0.5,
+         -0.5
+        ],
+        [
+         -0.5,
+         -0.5,
+         0.5
+        ],
+        [
+         0.5,
+         -0.5,
+         0.5
+        ],
+        [
+         -0.5,
+         0.5,
+         0.5
+        ],
+        [
+         0.5,
+         0.5,
+         0.5
+        ]
+       ],
+       "polygons": [
+        [
+         0,
+         2,
+         3,
+         1
+        ],
+        [
+         4,
+         5,
+         7,
+         6
+        ],
+        [
+         0,
+         1,
+         5,
+         4
+        ],
+        [
+         2,
+         6,
+         7,
+         3
+        ],
+        [
+         0,
+         4,
+         6,
+         2
+        ],
+        [
+         1,
+         3,
+         7,
+         5
+        ]
+       ],
+       "n_points": 8,
+       "n_polygons": 6,
+       "sel_vertices": [],
+       "sel_edges": [],
+       "sel_polygons": []
+      }
+     }
+    ],
+    "selected_items": [
+     "copy"
+    ],
+    "mesh_item_count": 2
+   },
+   "tolerance": 1e-05
+  }
+ ]
+}

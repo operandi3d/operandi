@@ -1,0 +1,11 @@
+[package]
+name = "operandi-uv"
+version = "0.1.0"
+edition = "2024"
+# Adapted from Blender (GPL-2.0-or-later); the SLIM solver files keep
+# Blender's MPL-2.0 licence. See README.md in this crate.
+license = "GPL-2.0-or-later AND MPL-2.0"
+
+[dependencies]
+glam.workspace = true
+faer = { version = "0.24", default-features = false, features = ["std"] }

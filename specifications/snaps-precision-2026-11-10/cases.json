@@ -1,0 +1,7941 @@
+[
+ {
+  "id": "AS-01_grab_all",
+  "tool": "Absolute Scaling",
+  "description": "What does Grab Size fill in for the whole box selected?",
+  "input": {
+   "points": [
+    [
+     1.0,
+     0.0,
+     0.0
+    ],
+    [
+     3.0,
+     0.0,
+     0.0
+    ],
+    [
+     3.0,
+     1.0,
+     0.0
+    ],
+    [
+     1.0,
+     1.0,
+     0.0
+    ],
+    [
+     1.0,
+     0.0,
+     0.5
+    ],
+    [
+     3.0,
+     0.0,
+     0.5
+    ],
+    [
+     3.0,
+     1.0,
+     0.5
+    ],
+    [
+     1.0,
+     1.0,
+     0.5
+    ]
+   ],
+   "polygons": [
+    [
+     0,
+     3,
+     2,
+     1
+    ],
+    [
+     4,
+     5,
+     6,
+     7
+    ],
+    [
+     0,
+     1,
+     5,
+     4
+    ],
+    [
+     2,
+     3,
+     7,
+     6
+    ],
+    [
+     1,
+     2,
+     6,
+     5
+    ],
+    [
+     0,
+     4,
+     7,
+     3
+    ]
+   ],
+   "selection": {
+    "mode": "polygon",
+    "polygons": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5
+    ]
+   }
+  },
+  "settings": {
+   "button": "Grab Size",
+   "fields": {
+    "Uniform": 0.0,
+    "Axis": "Longest Axis",
+    "Orient To Selection": false,
+    "X": 0.0,
+    "Y": 0.0,
+    "Z": 0.0,
+    "X Center": "Center",
+    "Y Center": "Center",
+    "Z Center": "Center"
+   }
+  },
+  "expected": {
+   "points": [
+    [
+     1.0,
+     0.0,
+     0.0
+    ],
+    [
+     3.0,
+     0.0,
+     0.0
+    ],
+    [
+     3.0,
+     1.0,
+     0.0
+    ],
+    [
+     1.0,
+     1.0,
+     0.0
+    ],
+    [
+     1.0,
+     0.0,
+     0.5
+    ],
+    [
+     3.0,
+     0.0,
+     0.5
+    ],
+    [
+     3.0,
+     1.0,
+     0.5
+    ],
+    [
+     1.0,
+     1.0,
+     0.5
+    ]
+   ],
+   "polygons_unchanged": true,
+   "fields_after": {
+    "Uniform": 2.0,
+    "Axis": "Longest Axis",
+    "Orient To Selection": false,
+    "X": 2.0,
+    "Y": 1.0,
+    "Z": 0.5,
+    "X Center": "Center",
+    "Y Center": "Center",
+    "Z Center": "Center"
+   }
+  },
+  "tolerance": 1e-05
+ },
+ {
+  "id": "AS-02_grab_topface",
+  "tool": "Absolute Scaling",
+  "description": "Grab Size with only the top (+Y) face selected.",
+  "input": {
+   "points": [
+    [
+     1.0,
+     0.0,
+     0.0
+    ],
+    [
+     3.0,
+     0.0,
+     0.0
+    ],
+    [
+     3.0,
+     1.0,
+     0.0
+    ],
+    [
+     1.0,
+     1.0,
+     0.0
+    ],
+    [
+     1.0,
+     0.0,
+     0.5
+    ],
+    [
+     3.0,
+     0.0,
+     0.5
+    ],
+    [
+     3.0,
+     1.0,
+     0.5
+    ],
+    [
+     1.0,
+     1.0,
+     0.5
+    ]
+   ],
+   "polygons": [
+    [
+     0,
+     3,
+     2,
+     1
+    ],
+    [
+     4,
+     5,
+     6,
+     7
+    ],
+    [
+     0,
+     1,
+     5,
+     4
+    ],
+    [
+     2,
+     3,
+     7,
+     6
+    ],
+    [
+     1,
+     2,
+     6,
+     5
+    ],
+    [
+     0,
+     4,
+     7,
+     3
+    ]
+   ],
+   "selection": {
+    "mode": "polygon",
+    "polygons": [
+     3
+    ]
+   }
+  },
+  "settings": {
+   "button": "Grab Size",
+   "fields": {
+    "Uniform": 0.0,
+    "Axis": "Longest Axis",
+    "Orient To Selection": false,
+    "X": 0.0,
+    "Y": 0.0,
+    "Z": 0.0,
+    "X Center": "Center",
+    "Y Center": "Center",
+    "Z Center": "Center"
+   }
+  },
+  "expected": {
+   "points": [
+    [
+     1.0,
+     0.0,
+     0.0
+    ],
+    [
+     3.0,
+     0.0,
+     0.0
+    ],
+    [
+     3.0,
+     1.0,
+     0.0
+    ],
+    [
+     1.0,
+     1.0,
+     0.0
+    ],
+    [
+     1.0,
+     0.0,
+     0.5
+    ],
+    [
+     3.0,
+     0.0,
+     0.5
+    ],
+    [
+     3.0,
+     1.0,
+     0.5
+    ],
+    [
+     1.0,
+     1.0,
+     0.5
+    ]
+   ],
+   "polygons_unchanged": true,
+   "fields_after": {
+    "Uniform": 2.0,
+    "Axis": "Longest Axis",
+    "Orient To Selection": false,
+    "X": 2.0,
+    "Y": 0.0,
+    "Z": 0.5,
+    "X Center": "Center",
+    "Y Center": "Center",
+    "Z Center": "Center"
+   }
+  },
+  "tolerance": 1e-05
+ },
+ {
+  "id": "AS-03_grab_nosel",
+  "tool": "Absolute Scaling",
+  "description": "Grab Size in polygon mode with nothing selected.",
+  "input": {
+   "points": [
+    [
+     1.0,
+     0.0,
+     0.0
+    ],
+    [
+     3.0,
+     0.0,
+     0.0
+    ],
+    [
+     3.0,
+     1.0,
+     0.0
+    ],
+    [
+     1.0,
+     1.0,
+     0.0
+    ],
+    [
+     1.0,
+     0.0,
+     0.5
+    ],
+    [
+     3.0,
+     0.0,
+     0.5
+    ],
+    [
+     3.0,
+     1.0,
+     0.5
+    ],
+    [
+     1.0,
+     1.0,
+     0.5
+    ]
+   ],
+   "polygons": [
+    [
+     0,
+     3,
+     2,
+     1
+    ],
+    [
+     4,
+     5,
+     6,
+     7
+    ],
+    [
+     0,
+     1,
+     5,
+     4
+    ],
+    [
+     2,
+     3,
+     7,
+     6
+    ],
+    [
+     1,
+     2,
+     6,
+     5
+    ],
+    [
+     0,
+     4,
+     7,
+     3
+    ]
+   ],
+   "selection": {
+    "mode": "polygon",
+    "polygons": []
+   }
+  },
+  "settings": {
+   "button": "Grab Size",
+   "fields": {
+    "Uniform": 0.0,
+    "Axis": "Longest Axis",
+    "Orient To Selection": false,
+    "X": 0.0,
+    "Y": 0.0,
+    "Z": 0.0,
+    "X Center": "Center",
+    "Y Center": "Center",
+    "Z Center": "Center"
+   }
+  },
+  "expected": {
+   "points": [
+    [
+     1.0,
+     0.0,
+     0.0
+    ],
+    [
+     3.0,
+     0.0,
+     0.0
+    ],
+    [
+     3.0,
+     1.0,
+     0.0
+    ],
+    [
+     1.0,
+     1.0,
+     0.0
+    ],
+    [
+     1.0,
+     0.0,
+     0.5
+    ],
+    [
+     3.0,
+     0.0,
+     0.5
+    ],
+    [
+     3.0,
+     1.0,
+     0.5
+    ],
+    [
+     1.0,
+     1.0,
+     0.5
+    ]
+   ],
+   "polygons_unchanged": true,
+   "fields_after": {
+    "Uniform": 2.0,
+    "Axis": "Longest Axis",
+    "Orient To Selection": false,
+    "X": 2.0,
+    "Y": 1.0,
+    "Z": 0.5,
+    "X Center": "Center",
+    "Y Center": "Center",
+    "Z Center": "Center"
+   }
+  },
+  "tolerance": 1e-05
+ },
+ {
+  "id": "AS-04_uniform_longest_4",
+  "tool": "Absolute Scaling",
+  "description": "Uniform 4, axis Longest, centers Center.",
+  "input": {
+   "points": [
+    [
+     1.0,
+     0.0,
+     0.0
+    ],
+    [
+     3.0,
+     0.0,
+     0.0
+    ],
+    [
+     3.0,
+     1.0,
+     0.0
+    ],
+    [
+     1.0,
+     1.0,
+     0.0
+    ],
+    [
+     1.0,
+     0.0,
+     0.5
+    ],
+    [
+     3.0,
+     0.0,
+     0.5
+    ],
+    [
+     3.0,
+     1.0,
+     0.5
+    ],
+    [
+     1.0,
+     1.0,
+     0.5
+    ]
+   ],
+   "polygons": [
+    [
+     0,
+     3,
+     2,
+     1
+    ],
+    [
+     4,
+     5,
+     6,
+     7
+    ],
+    [
+     0,
+     1,
+     5,
+     4
+    ],
+    [
+     2,
+     3,
+     7,
+     6
+    ],
+    [
+     1,
+     2,
+     6,
+     5
+    ],
+    [
+     0,
+     4,
+     7,
+     3
+    ]
+   ],
+   "selection": {
+    "mode": "polygon",
+    "polygons": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5
+    ]
+   }
+  },
+  "settings": {
+   "button": "Uniform Scale",
+   "fields": {
+    "Uniform": 4.0,
+    "Axis": "Longest Axis",
+    "Orient To Selection": false,
+    "X": 0.0,
+    "Y": 0.0,
+    "Z": 0.0,
+    "X Center": "Center",
+    "Y Center": "Center",
+    "Z Center": "Center"
+   }
+  },
+  "expected": {
+   "points": [
+    [
+     0.0,
+     -0.5,
+     -0.25
+    ],
+    [
+     4.0,
+     -0.5,
+     -0.25
+    ],
+    [
+     4.0,
+     1.5,
+     -0.25
+    ],
+    [
+     0.0,
+     1.5,
+     -0.25
+    ],
+    [
+     0.0,
+     -0.5,
+     0.75
+    ],
+    [
+     4.0,
+     -0.5,
+     0.75
+    ],
+    [
+     4.0,
+     1.5,
+     0.75
+    ],
+    [
+     0.0,
+     1.5,
+     0.75
+    ]
+   ],
+   "polygons_unchanged": true,
+   "fields_after": {
+    "Uniform": 4.0,
+    "Axis": "Longest Axis",
+    "Orient To Selection": false,
+    "X": 4.0,
+    "Y": 2.0,
+    "Z": 1.0,
+    "X Center": "Center",
+    "Y Center": "Center",
+    "Z Center": "Center"
+   }
+  },
+  "tolerance": 1e-05
+ },
+ {
+  "id": "AS-05_uniform_y_3",
+  "tool": "Absolute Scaling",
+  "description": "Uniform 3, axis Y.",
+  "input": {
+   "points": [
+    [
+     1.0,
+     0.0,
+     0.0
+    ],
+    [
+     3.0,
+     0.0,
+     0.0
+    ],
+    [
+     3.0,
+     1.0,
+     0.0
+    ],
+    [
+     1.0,
+     1.0,
+     0.0
+    ],
+    [
+     1.0,
+     0.0,
+     0.5
+    ],
+    [
+     3.0,
+     0.0,
+     0.5
+    ],
+    [
+     3.0,
+     1.0,
+     0.5
+    ],
+    [
+     1.0,
+     1.0,
+     0.5
+    ]
+   ],
+   "polygons": [
+    [
+     0,
+     3,
+     2,
+     1
+    ],
+    [
+     4,
+     5,
+     6,
+     7
+    ],
+    [
+     0,
+     1,
+     5,
+     4
+    ],
+    [
+     2,
+     3,
+     7,
+     6
+    ],
+    [
+     1,
+     2,
+     6,
+     5
+    ],
+    [
+     0,
+     4,
+     7,
+     3
+    ]
+   ],
+   "selection": {
+    "mode": "polygon",
+    "polygons": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5
+    ]
+   }
+  },
+  "settings": {
+   "button": "Uniform Scale",
+   "fields": {
+    "Uniform": 3.0,
+    "Axis": "Y Axis",
+    "Orient To Selection": false,
+    "X": 0.0,
+    "Y": 0.0,
+    "Z": 0.0,
+    "X Center": "Center",
+    "Y Center": "Center",
+    "Z Center": "Center"
+   }
+  },
+  "expected": {
+   "points": [
+    [
+     -1.0,
+     -1.0,
+     -0.5
+    ],
+    [
+     5.0,
+     -1.0,
+     -0.5
+    ],
+    [
+     5.0,
+     2.0,
+     -0.5
+    ],
+    [
+     -1.0,
+     2.0,
+     -0.5
+    ],
+    [
+     -1.0,
+     -1.0,
+     1.0
+    ],
+    [
+     5.0,
+     -1.0,
+     1.0
+    ],
+    [
+     5.0,
+     2.0,
+     1.0
+    ],
+    [
+     -1.0,
+     2.0,
+     1.0
+    ]
+   ],
+   "polygons_unchanged": true,
+   "fields_after": {
+    "Uniform": 3.0,
+    "Axis": "Y Axis",
+    "Orient To Selection": false,
+    "X": 6.0,
+    "Y": 3.0,
+    "Z": 1.5,
+    "X Center": "Center",
+    "Y Center": "Center",
+    "Z Center": "Center"
+   }
+  },
+  "tolerance": 1e-05
+ },
+ {
+  "id": "AS-06_uniform_z_1_low",
+  "tool": "Absolute Scaling",
+  "description": "Uniform 1 on Z with all centers Low.",
+  "input": {
+   "points": [
+    [
+     1.0,
+     0.0,
+     0.0
+    ],
+    [
+     3.0,
+     0.0,
+     0.0
+    ],
+    [
+     3.0,
+     1.0,
+     0.0
+    ],
+    [
+     1.0,
+     1.0,
+     0.0
+    ],
+    [
+     1.0,
+     0.0,
+     0.5
+    ],
+    [
+     3.0,
+     0.0,
+     0.5
+    ],
+    [
+     3.0,
+     1.0,
+     0.5
+    ],
+    [
+     1.0,
+     1.0,
+     0.5
+    ]
+   ],
+   "polygons": [
+    [
+     0,
+     3,
+     2,
+     1
+    ],
+    [
+     4,
+     5,
+     6,
+     7
+    ],
+    [
+     0,
+     1,
+     5,
+     4
+    ],
+    [
+     2,
+     3,
+     7,
+     6
+    ],
+    [
+     1,
+     2,
+     6,
+     5
+    ],
+    [
+     0,
+     4,
+     7,
+     3
+    ]
+   ],
+   "selection": {
+    "mode": "polygon",
+    "polygons": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5
+    ]
+   }
+  },
+  "settings": {
+   "button": "Uniform Scale",
+   "fields": {
+    "Uniform": 1.0,
+    "Axis": "Z Axis",
+    "Orient To Selection": false,
+    "X": 0.0,
+    "Y": 0.0,
+    "Z": 0.0,
+    "X Center": "Low",
+    "Y Center": "Low",
+    "Z Center": "Low"
+   }
+  },
+  "expected": {
+   "points": [
+    [
+     1.0,
+     0.0,
+     0.0
+    ],
+    [
+     5.0,
+     0.0,
+     0.0
+    ],
+    [
+     5.0,
+     2.0,
+     0.0
+    ],
+    [
+     1.0,
+     2.0,
+     0.0
+    ],
+    [
+     1.0,
+     0.0,
+     1.0
+    ],
+    [
+     5.0,
+     0.0,
+     1.0
+    ],
+    [
+     5.0,
+     2.0,
+     1.0
+    ],
+    [
+     1.0,
+     2.0,
+     1.0
+    ]
+   ],
+   "polygons_unchanged": true,
+   "fields_after": {
+    "Uniform": 1.0,
+    "Axis": "Z Axis",
+    "Orient To Selection": false,
+    "X": 4.0,
+    "Y": 2.0,
+    "Z": 1.0,
+    "X Center": "Low",
+    "Y Center": "Low",
+    "Z Center": "Low"
+   }
+  },
+  "tolerance": 1e-05
+ },
+ {
+  "id": "AS-07_uniform_mixed_centers",
+  "tool": "Absolute Scaling",
+  "description": "Uniform 4 longest, centers High X / Center Y / Low Z.",
+  "input": {
+   "points": [
+    [
+     1.0,
+     0.0,
+     0.0
+    ],
+    [
+     3.0,
+     0.0,
+     0.0
+    ],
+    [
+     3.0,
+     1.0,
+     0.0
+    ],
+    [
+     1.0,
+     1.0,
+     0.0
+    ],
+    [
+     1.0,
+     0.0,
+     0.5
+    ],
+    [
+     3.0,
+     0.0,
+     0.5
+    ],
+    [
+     3.0,
+     1.0,
+     0.5
+    ],
+    [
+     1.0,
+     1.0,
+     0.5
+    ]
+   ],
+   "polygons": [
+    [
+     0,
+     3,
+     2,
+     1
+    ],
+    [
+     4,
+     5,
+     6,
+     7
+    ],
+    [
+     0,
+     1,
+     5,
+     4
+    ],
+    [
+     2,
+     3,
+     7,
+     6
+    ],
+    [
+     1,
+     2,
+     6,
+     5
+    ],
+    [
+     0,
+     4,
+     7,
+     3
+    ]
+   ],
+   "selection": {
+    "mode": "polygon",
+    "polygons": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5
+    ]
+   }
+  },
+  "settings": {
+   "button": "Uniform Scale",
+   "fields": {
+    "Uniform": 4.0,
+    "Axis": "Longest Axis",
+    "Orient To Selection": false,
+    "X": 0.0,
+    "Y": 0.0,
+    "Z": 0.0,
+    "X Center": "High",
+    "Y Center": "Center",
+    "Z Center": "Low"
+   }
+  },
+  "expected": {
+   "points": [
+    [
+     -1.0,
+     -0.5,
+     0.0
+    ],
+    [
+     3.0,
+     -0.5,
+     0.0
+    ],
+    [
+     3.0,
+     1.5,
+     0.0
+    ],
+    [
+     -1.0,
+     1.5,
+     0.0
+    ],
+    [
+     -1.0,
+     -0.5,
+     1.0
+    ],
+    [
+     3.0,
+     -0.5,
+     1.0
+    ],
+    [
+     3.0,
+     1.5,
+     1.0
+    ],
+    [
+     -1.0,
+     1.5,
+     1.0
+    ]
+   ],
+   "polygons_unchanged": true,
+   "fields_after": {
+    "Uniform": 4.0,
+    "Axis": "Longest Axis",
+    "Orient To Selection": false,
+    "X": 4.0,
+    "Y": 2.0,
+    "Z": 1.0,
+    "X Center": "High",
+    "Y Center": "Center",
+    "Z Center": "Low"
+   }
+  },
+  "tolerance": 1e-05
+ },
+ {
+  "id": "AS-08_explicit_123",
+  "tool": "Absolute Scaling",
+  "description": "Explicit 1,2,3, centers Center.",
+  "input": {
+   "points": [
+    [
+     1.0,
+     0.0,
+     0.0
+    ],
+    [
+     3.0,
+     0.0,
+     0.0
+    ],
+    [
+     3.0,
+     1.0,
+     0.0
+    ],
+    [
+     1.0,
+     1.0,
+     0.0
+    ],
+    [
+     1.0,
+     0.0,
+     0.5
+    ],
+    [
+     3.0,
+     0.0,
+     0.5
+    ],
+    [
+     3.0,
+     1.0,
+     0.5
+    ],
+    [
+     1.0,
+     1.0,
+     0.5
+    ]
+   ],
+   "polygons": [
+    [
+     0,
+     3,
+     2,
+     1
+    ],
+    [
+     4,
+     5,
+     6,
+     7
+    ],
+    [
+     0,
+     1,
+     5,
+     4
+    ],
+    [
+     2,
+     3,
+     7,
+     6
+    ],
+    [
+     1,
+     2,
+     6,
+     5
+    ],
+    [
+     0,
+     4,
+     7,
+     3
+    ]
+   ],
+   "selection": {
+    "mode": "polygon",
+    "polygons": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5
+    ]
+   }
+  },
+  "settings": {
+   "button": "Explicit Scale",
+   "fields": {
+    "Uniform": 0.0,
+    "Axis": "Longest Axis",
+    "Orient To Selection": false,
+    "X": 1.0,
+    "Y": 2.0,
+    "Z": 3.0,
+    "X Center": "Center",
+    "Y Center": "Center",
+    "Z Center": "Center"
+   }
+  },
+  "expected": {
+   "points": [
+    [
+     1.5,
+     -0.5,
+     -1.25
+    ],
+    [
+     2.5,
+     -0.5,
+     -1.25
+    ],
+    [
+     2.5,
+     1.5,
+     -1.25
+    ],
+    [
+     1.5,
+     1.5,
+     -1.25
+    ],
+    [
+     1.5,
+     -0.5,
+     1.75
+    ],
+    [
+     2.5,
+     -0.5,
+     1.75
+    ],
+    [
+     2.5,
+     1.5,
+     1.75
+    ],
+    [
+     1.5,
+     1.5,
+     1.75
+    ]
+   ],
+   "polygons_unchanged": true,
+   "fields_after": {
+    "Uniform": 3.0,
+    "Axis": "Longest Axis",
+    "Orient To Selection": false,
+    "X": 1.0,
+    "Y": 2.0,
+    "Z": 3.0,
+    "X Center": "Center",
+    "Y Center": "Center",
+    "Z Center": "Center"
+   }
+  },
+  "tolerance": 1e-05
+ },
+ {
+  "id": "AS-09_explicit_low",
+  "tool": "Absolute Scaling",
+  "description": "Explicit 4,2,1 with Low centers.",
+  "input": {
+   "points": [
+    [
+     1.0,
+     0.0,
+     0.0
+    ],
+    [
+     3.0,
+     0.0,
+     0.0
+    ],
+    [
+     3.0,
+     1.0,
+     0.0
+    ],
+    [
+     1.0,
+     1.0,
+     0.0
+    ],
+    [
+     1.0,
+     0.0,
+     0.5
+    ],
+    [
+     3.0,
+     0.0,
+     0.5
+    ],
+    [
+     3.0,
+     1.0,
+     0.5
+    ],
+    [
+     1.0,
+     1.0,
+     0.5
+    ]
+   ],
+   "polygons": [
+    [
+     0,
+     3,
+     2,
+     1
+    ],
+    [
+     4,
+     5,
+     6,
+     7
+    ],
+    [
+     0,
+     1,
+     5,
+     4
+    ],
+    [
+     2,
+     3,
+     7,
+     6
+    ],
+    [
+     1,
+     2,
+     6,
+     5
+    ],
+    [
+     0,
+     4,
+     7,
+     3
+    ]
+   ],
+   "selection": {
+    "mode": "polygon",
+    "polygons": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5
+    ]
+   }
+  },
+  "settings": {
+   "button": "Explicit Scale",
+   "fields": {
+    "Uniform": 0.0,
+    "Axis": "Longest Axis",
+    "Orient To Selection": false,
+    "X": 4.0,
+    "Y": 2.0,
+    "Z": 1.0,
+    "X Center": "Low",
+    "Y Center": "Low",
+    "Z Center": "Low"
+   }
+  },
+  "expected": {
+   "points": [
+    [
+     1.0,
+     0.0,
+     0.0
+    ],
+    [
+     5.0,
+     0.0,
+     0.0
+    ],
+    [
+     5.0,
+     2.0,
+     0.0
+    ],
+    [
+     1.0,
+     2.0,
+     0.0
+    ],
+    [
+     1.0,
+     0.0,
+     1.0
+    ],
+    [
+     5.0,
+     0.0,
+     1.0
+    ],
+    [
+     5.0,
+     2.0,
+     1.0
+    ],
+    [
+     1.0,
+     2.0,
+     1.0
+    ]
+   ],
+   "polygons_unchanged": true,
+   "fields_after": {
+    "Uniform": 4.0,
+    "Axis": "Longest Axis",
+    "Orient To Selection": false,
+    "X": 4.0,
+    "Y": 2.0,
+    "Z": 1.0,
+    "X Center": "Low",
+    "Y Center": "Low",
+    "Z Center": "Low"
+   }
+  },
+  "tolerance": 1e-05
+ },
+ {
+  "id": "AS-10_explicit_high",
+  "tool": "Absolute Scaling",
+  "description": "Explicit 4,2,1 with High centers.",
+  "input": {
+   "points": [
+    [
+     1.0,
+     0.0,
+     0.0
+    ],
+    [
+     3.0,
+     0.0,
+     0.0
+    ],
+    [
+     3.0,
+     1.0,
+     0.0
+    ],
+    [
+     1.0,
+     1.0,
+     0.0
+    ],
+    [
+     1.0,
+     0.0,
+     0.5
+    ],
+    [
+     3.0,
+     0.0,
+     0.5
+    ],
+    [
+     3.0,
+     1.0,
+     0.5
+    ],
+    [
+     1.0,
+     1.0,
+     0.5
+    ]
+   ],
+   "polygons": [
+    [
+     0,
+     3,
+     2,
+     1
+    ],
+    [
+     4,
+     5,
+     6,
+     7
+    ],
+    [
+     0,
+     1,
+     5,
+     4
+    ],
+    [
+     2,
+     3,
+     7,
+     6
+    ],
+    [
+     1,
+     2,
+     6,
+     5
+    ],
+    [
+     0,
+     4,
+     7,
+     3
+    ]
+   ],
+   "selection": {
+    "mode": "polygon",
+    "polygons": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5
+    ]
+   }
+  },
+  "settings": {
+   "button": "Explicit Scale",
+   "fields": {
+    "Uniform": 0.0,
+    "Axis": "Longest Axis",
+    "Orient To Selection": false,
+    "X": 4.0,
+    "Y": 2.0,
+    "Z": 1.0,
+    "X Center": "High",
+    "Y Center": "High",
+    "Z Center": "High"
+   }
+  },
+  "expected": {
+   "points": [
+    [
+     -1.0,
+     -1.0,
+     -0.5
+    ],
+    [
+     3.0,
+     -1.0,
+     -0.5
+    ],
+    [
+     3.0,
+     1.0,
+     -0.5
+    ],
+    [
+     -1.0,
+     1.0,
+     -0.5
+    ],
+    [
+     -1.0,
+     -1.0,
+     0.5
+    ],
+    [
+     3.0,
+     -1.0,
+     0.5
+    ],
+    [
+     3.0,
+     1.0,
+     0.5
+    ],
+    [
+     -1.0,
+     1.0,
+     0.5
+    ]
+   ],
+   "polygons_unchanged": true,
+   "fields_after": {
+    "Uniform": 4.0,
+    "Axis": "Longest Axis",
+    "Orient To Selection": false,
+    "X": 4.0,
+    "Y": 2.0,
+    "Z": 1.0,
+    "X Center": "High",
+    "Y Center": "High",
+    "Z Center": "High"
+   }
+  },
+  "tolerance": 1e-05
+ },
+ {
+  "id": "AS-11_center_is_bbox_or_average",
+  "tool": "Absolute Scaling",
+  "description": "Uniform 4 on an unevenly spaced strip: is Center the bbox middle or the vertex average?",
+  "input": {
+   "points": [
+    [
+     0.0,
+     0.0,
+     0.0
+    ],
+    [
+     0.1,
+     0.0,
+     0.0
+    ],
+    [
+     0.2,
+     0.0,
+     0.0
+    ],
+    [
+     2.0,
+     0.0,
+     0.0
+    ],
+    [
+     2.0,
+     1.0,
+     0.0
+    ],
+    [
+     0.2,
+     1.0,
+     0.0
+    ],
+    [
+     0.1,
+     1.0,
+     0.0
+    ],
+    [
+     0.0,
+     1.0,
+     0.0
+    ]
+   ],
+   "polygons": [
+    [
+     0,
+     1,
+     6,
+     7
+    ],
+    [
+     1,
+     2,
+     5,
+     6
+    ],
+    [
+     2,
+     3,
+     4,
+     5
+    ]
+   ],
+   "selection": {
+    "mode": "polygon",
+    "polygons": [
+     0,
+     1,
+     2
+    ]
+   }
+  },
+  "settings": {
+   "button": "Uniform Scale",
+   "fields": {
+    "Uniform": 4.0,
+    "Axis": "Longest Axis",
+    "Orient To Selection": false,
+    "X": 0.0,
+    "Y": 0.0,
+    "Z": 0.0,
+    "X Center": "Center",
+    "Y Center": "Center",
+    "Z Center": "Center"
+   }
+  },
+  "expected": {
+   "points": [
+    [
+     1.0,
+     0.5,
+     0.0
+    ],
+    [
+     1.0,
+     0.5,
+     0.0
+    ],
+    [
+     1.0,
+     0.5,
+     0.0
+    ],
+    [
+     1.0,
+     0.5,
+     0.0
+    ],
+    [
+     1.0,
+     0.5,
+     0.0
+    ],
+    [
+     1.0,
+     0.5,
+     0.0
+    ],
+    [
+     1.0,
+     0.5,
+     0.0
+    ],
+    [
+     1.0,
+     0.5,
+     0.0
+    ]
+   ],
+   "polygons_unchanged": true,
+   "fields_after": {
+    "Uniform": 0.0,
+    "Axis": "Longest Axis",
+    "Orient To Selection": false,
+    "X": 0.0,
+    "Y": 0.0,
+    "Z": 0.0,
+    "X Center": "Center",
+    "Y Center": "Center",
+    "Z Center": "Center"
+   }
+  },
+  "tolerance": 1e-05
+ },
+ {
+  "id": "AS-12_explicit_topface_only",
+  "tool": "Absolute Scaling",
+  "description": "Explicit 4,5,1 with only the top face selected: what moves, and what happens on the zero-size axis?",
+  "input": {
+   "points": [
+    [
+     1.0,
+     0.0,
+     0.0
+    ],
+    [
+     3.0,
+     0.0,
+     0.0
+    ],
+    [
+     3.0,
+     1.0,
+     0.0
+    ],
+    [
+     1.0,
+     1.0,
+     0.0
+    ],
+    [
+     1.0,
+     0.0,
+     0.5
+    ],
+    [
+     3.0,
+     0.0,
+     0.5
+    ],
+    [
+     3.0,
+     1.0,
+     0.5
+    ],
+    [
+     1.0,
+     1.0,
+     0.5
+    ]
+   ],
+   "polygons": [
+    [
+     0,
+     3,
+     2,
+     1
+    ],
+    [
+     4,
+     5,
+     6,
+     7
+    ],
+    [
+     0,
+     1,
+     5,
+     4
+    ],
+    [
+     2,
+     3,
+     7,
+     6
+    ],
+    [
+     1,
+     2,
+     6,
+     5
+    ],
+    [
+     0,
+     4,
+     7,
+     3
+    ]
+   ],
+   "selection": {
+    "mode": "polygon",
+    "polygons": [
+     3
+    ]
+   }
+  },
+  "settings": {
+   "button": "Explicit Scale",
+   "fields": {
+    "Uniform": 0.0,
+    "Axis": "Longest Axis",
+    "Orient To Selection": false,
+    "X": 4.0,
+    "Y": 5.0,
+    "Z": 1.0,
+    "X Center": "Center",
+    "Y Center": "Center",
+    "Z Center": "Center"
+   }
+  },
+  "expected": {
+   "points": [
+    [
+     1.0,
+     0.0,
+     0.0
+    ],
+    [
+     3.0,
+     0.0,
+     0.0
+    ],
+    [
+     4.0,
+     1.0,
+     -0.25
+    ],
+    [
+     0.0,
+     1.0,
+     -0.25
+    ],
+    [
+     1.0,
+     0.0,
+     0.5
+    ],
+    [
+     3.0,
+     0.0,
+     0.5
+    ],
+    [
+     4.0,
+     1.0,
+     0.75
+    ],
+    [
+     0.0,
+     1.0,
+     0.75
+    ]
+   ],
+   "polygons_unchanged": true,
+   "fields_after": {
+    "Uniform": 4.0,
+    "Axis": "Longest Axis",
+    "Orient To Selection": false,
+    "X": 4.0,
+    "Y": 0.0,
+    "Z": 1.0,
+    "X Center": "Center",
+    "Y Center": "Center",
+    "Z Center": "Center"
+   }
+  },
+  "tolerance": 1e-05
+ },
+ {
+  "id": "AS-13_reference_topface",
+  "tool": "Absolute Scaling",
+  "description": "Reference with A's top face selected (2 x 0 x 0.5 -> 4 x 0 x 1); B is a separate box in the same mesh.",
+  "input": {
+   "points": [
+    [
+     0.0,
+     0.0,
+     0.0
+    ],
+    [
+     2.0,
+     0.0,
+     0.0
+    ],
+    [
+     2.0,
+     1.0,
+     0.0
+    ],
+    [
+     0.0,
+     1.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.5
+    ],
+    [
+     2.0,
+     0.0,
+     0.5
+    ],
+    [
+     2.0,
+     1.0,
+     0.5
+    ],
+    [
+     0.0,
+     1.0,
+     0.5
+    ],
+    [
+     5.0,
+     0.0,
+     0.0
+    ],
+    [
+     6.0,
+     0.0,
+     0.0
+    ],
+    [
+     6.0,
+     1.0,
+     0.0
+    ],
+    [
+     5.0,
+     1.0,
+     0.0
+    ],
+    [
+     5.0,
+     0.0,
+     1.0
+    ],
+    [
+     6.0,
+     0.0,
+     1.0
+    ],
+    [
+     6.0,
+     1.0,
+     1.0
+    ],
+    [
+     5.0,
+     1.0,
+     1.0
+    ]
+   ],
+   "polygons": [
+    [
+     0,
+     3,
+     2,
+     1
+    ],
+    [
+     4,
+     5,
+     6,
+     7
+    ],
+    [
+     0,
+     1,
+     5,
+     4
+    ],
+    [
+     2,
+     3,
+     7,
+     6
+    ],
+    [
+     1,
+     2,
+     6,
+     5
+    ],
+    [
+     0,
+     4,
+     7,
+     3
+    ],
+    [
+     8,
+     11,
+     10,
+     9
+    ],
+    [
+     12,
+     13,
+     14,
+     15
+    ],
+    [
+     8,
+     9,
+     13,
+     12
+    ],
+    [
+     10,
+     11,
+     15,
+     14
+    ],
+    [
+     9,
+     10,
+     14,
+     13
+    ],
+    [
+     8,
+     12,
+     15,
+     11
+    ]
+   ],
+   "selection": {
+    "mode": "polygon",
+    "polygons": [
+     3
+    ]
+   }
+  },
+  "settings": {
+   "button": "Reference Scale",
+   "fields": {
+    "Uniform": 0.0,
+    "Axis": "Longest Axis",
+    "Orient To Selection": false,
+    "X": 4.0,
+    "Y": 0.0,
+    "Z": 1.0,
+    "X Center": "Center",
+    "Y Center": "Center",
+    "Z Center": "Center"
+   }
+  },
+  "expected": {
+   "points": [
+    [
+     -3.0,
+     0.5,
+     -0.5
+    ],
+    [
+     1.0,
+     0.5,
+     -0.5
+    ],
+    [
+     1.0,
+     0.5,
+     -0.5
+    ],
+    [
+     -3.0,
+     0.5,
+     -0.5
+    ],
+    [
+     -3.0,
+     0.5,
+     0.5
+    ],
+    [
+     1.0,
+     0.5,
+     0.5
+    ],
+    [
+     1.0,
+     0.5,
+     0.5
+    ],
+    [
+     -3.0,
+     0.5,
+     0.5
+    ],
+    [
+     7.0,
+     0.5,
+     -0.5
+    ],
+    [
+     9.0,
+     0.5,
+     -0.5
+    ],
+    [
+     9.0,
+     0.5,
+     -0.5
+    ],
+    [
+     7.0,
+     0.5,
+     -0.5
+    ],
+    [
+     7.0,
+     0.5,
+     1.5
+    ],
+    [
+     9.0,
+     0.5,
+     1.5
+    ],
+    [
+     9.0,
+     0.5,
+     1.5
+    ],
+    [
+     7.0,
+     0.5,
+     1.5
+    ]
+   ],
+   "polygons_unchanged": true,
+   "fields_after": {
+    "Uniform": 4.0,
+    "Axis": "Longest Axis",
+    "Orient To Selection": false,
+    "X": 4.0,
+    "Y": 0.0,
+    "Z": 1.0,
+    "X Center": "Center",
+    "Y Center": "Center",
+    "Z Center": "Center"
+   }
+  },
+  "tolerance": 1e-05
+ },
+ {
+  "id": "AS-14_explicit_topface_twoparts",
+  "tool": "Absolute Scaling",
+  "description": "Explicit (not Reference) with the same selection as case 13, for contrast.",
+  "input": {
+   "points": [
+    [
+     0.0,
+     0.0,
+     0.0
+    ],
+    [
+     2.0,
+     0.0,
+     0.0
+    ],
+    [
+     2.0,
+     1.0,
+     0.0
+    ],
+    [
+     0.0,
+     1.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.5
+    ],
+    [
+     2.0,
+     0.0,
+     0.5
+    ],
+    [
+     2.0,
+     1.0,
+     0.5
+    ],
+    [
+     0.0,
+     1.0,
+     0.5
+    ],
+    [
+     5.0,
+     0.0,
+     0.0
+    ],
+    [
+     6.0,
+     0.0,
+     0.0
+    ],
+    [
+     6.0,
+     1.0,
+     0.0
+    ],
+    [
+     5.0,
+     1.0,
+     0.0
+    ],
+    [
+     5.0,
+     0.0,
+     1.0
+    ],
+    [
+     6.0,
+     0.0,
+     1.0
+    ],
+    [
+     6.0,
+     1.0,
+     1.0
+    ],
+    [
+     5.0,
+     1.0,
+     1.0
+    ]
+   ],
+   "polygons": [
+    [
+     0,
+     3,
+     2,
+     1
+    ],
+    [
+     4,
+     5,
+     6,
+     7
+    ],
+    [
+     0,
+     1,
+     5,
+     4
+    ],
+    [
+     2,
+     3,
+     7,
+     6
+    ],
+    [
+     1,
+     2,
+     6,
+     5
+    ],
+    [
+     0,
+     4,
+     7,
+     3
+    ],
+    [
+     8,
+     11,
+     10,
+     9
+    ],
+    [
+     12,
+     13,
+     14,
+     15
+    ],
+    [
+     8,
+     9,
+     13,
+     12
+    ],
+    [
+     10,
+     11,
+     15,
+     14
+    ],
+    [
+     9,
+     10,
+     14,
+     13
+    ],
+    [
+     8,
+     12,
+     15,
+     11
+    ]
+   ],
+   "selection": {
+    "mode": "polygon",
+    "polygons": [
+     3
+    ]
+   }
+  },
+  "settings": {
+   "button": "Explicit Scale",
+   "fields": {
+    "Uniform": 0.0,
+    "Axis": "Longest Axis",
+    "Orient To Selection": false,
+    "X": 4.0,
+    "Y": 0.0,
+    "Z": 1.0,
+    "X Center": "Center",
+    "Y Center": "Center",
+    "Z Center": "Center"
+   }
+  },
+  "expected": {
+   "points": [
+    [
+     0.0,
+     0.0,
+     0.0
+    ],
+    [
+     2.0,
+     0.0,
+     0.0
+    ],
+    [
+     3.0,
+     1.0,
+     -0.25
+    ],
+    [
+     -1.0,
+     1.0,
+     -0.25
+    ],
+    [
+     0.0,
+     0.0,
+     0.5
+    ],
+    [
+     2.0,
+     0.0,
+     0.5
+    ],
+    [
+     3.0,
+     1.0,
+     0.75
+    ],
+    [
+     -1.0,
+     1.0,
+     0.75
+    ],
+    [
+     5.0,
+     0.0,
+     0.0
+    ],
+    [
+     6.0,
+     0.0,
+     0.0
+    ],
+    [
+     6.0,
+     1.0,
+     0.0
+    ],
+    [
+     5.0,
+     1.0,
+     0.0
+    ],
+    [
+     5.0,
+     0.0,
+     1.0
+    ],
+    [
+     6.0,
+     0.0,
+     1.0
+    ],
+    [
+     6.0,
+     1.0,
+     1.0
+    ],
+    [
+     5.0,
+     1.0,
+     1.0
+    ]
+   ],
+   "polygons_unchanged": true,
+   "fields_after": {
+    "Uniform": 4.0,
+    "Axis": "Longest Axis",
+    "Orient To Selection": false,
+    "X": 4.0,
+    "Y": 0.0,
+    "Z": 1.0,
+    "X Center": "Center",
+    "Y Center": "Center",
+    "Z Center": "Center"
+   }
+  },
+  "tolerance": 1e-05
+ },
+ {
+  "id": "AS-15_explicit_zero_x",
+  "tool": "Absolute Scaling",
+  "description": "Explicit 0,1,0.5 on the whole box: flatten or refuse?",
+  "input": {
+   "points": [
+    [
+     1.0,
+     0.0,
+     0.0
+    ],
+    [
+     3.0,
+     0.0,
+     0.0
+    ],
+    [
+     3.0,
+     1.0,
+     0.0
+    ],
+    [
+     1.0,
+     1.0,
+     0.0
+    ],
+    [
+     1.0,
+     0.0,
+     0.5
+    ],
+    [
+     3.0,
+     0.0,
+     0.5
+    ],
+    [
+     3.0,
+     1.0,
+     0.5
+    ],
+    [
+     1.0,
+     1.0,
+     0.5
+    ]
+   ],
+   "polygons": [
+    [
+     0,
+     3,
+     2,
+     1
+    ],
+    [
+     4,
+     5,
+     6,
+     7
+    ],
+    [
+     0,
+     1,
+     5,
+     4
+    ],
+    [
+     2,
+     3,
+     7,
+     6
+    ],
+    [
+     1,
+     2,
+     6,
+     5
+    ],
+    [
+     0,
+     4,
+     7,
+     3
+    ]
+   ],
+   "selection": {
+    "mode": "polygon",
+    "polygons": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5
+    ]
+   }
+  },
+  "settings": {
+   "button": "Explicit Scale",
+   "fields": {
+    "Uniform": 0.0,
+    "Axis": "Longest Axis",
+    "Orient To Selection": false,
+    "X": 0.0,
+    "Y": 1.0,
+    "Z": 0.5,
+    "X Center": "Center",
+    "Y Center": "Center",
+    "Z Center": "Center"
+   }
+  },
+  "expected": {
+   "points": [
+    [
+     1.0,
+     0.0,
+     0.0
+    ],
+    [
+     3.0,
+     0.0,
+     0.0
+    ],
+    [
+     3.0,
+     1.0,
+     0.0
+    ],
+    [
+     1.0,
+     1.0,
+     0.0
+    ],
+    [
+     1.0,
+     0.0,
+     0.5
+    ],
+    [
+     3.0,
+     0.0,
+     0.5
+    ],
+    [
+     3.0,
+     1.0,
+     0.5
+    ],
+    [
+     1.0,
+     1.0,
+     0.5
+    ]
+   ],
+   "polygons_unchanged": true,
+   "fields_after": {
+    "Uniform": 2.0,
+    "Axis": "Longest Axis",
+    "Orient To Selection": false,
+    "X": 2.0,
+    "Y": 1.0,
+    "Z": 0.5,
+    "X Center": "Center",
+    "Y Center": "Center",
+    "Z Center": "Center"
+   }
+  },
+  "tolerance": 1e-05
+ },
+ {
+  "id": "AS-16_explicit_vertex_mode",
+  "tool": "Absolute Scaling",
+  "description": "Vertex mode, two opposite corners selected, Explicit 4,2,1.",
+  "input": {
+   "points": [
+    [
+     1.0,
+     0.0,
+     0.0
+    ],
+    [
+     3.0,
+     0.0,
+     0.0
+    ],
+    [
+     3.0,
+     1.0,
+     0.0
+    ],
+    [
+     1.0,
+     1.0,
+     0.0
+    ],
+    [
+     1.0,
+     0.0,
+     0.5
+    ],
+    [
+     3.0,
+     0.0,
+     0.5
+    ],
+    [
+     3.0,
+     1.0,
+     0.5
+    ],
+    [
+     1.0,
+     1.0,
+     0.5
+    ]
+   ],
+   "polygons": [
+    [
+     0,
+     3,
+     2,
+     1
+    ],
+    [
+     4,
+     5,
+     6,
+     7
+    ],
+    [
+     0,
+     1,
+     5,
+     4
+    ],
+    [
+     2,
+     3,
+     7,
+     6
+    ],
+    [
+     1,
+     2,
+     6,
+     5
+    ],
+    [
+     0,
+     4,
+     7,
+     3
+    ]
+   ],
+   "selection": {
+    "mode": "vertex",
+    "vertices": [
+     0,
+     6
+    ]
+   }
+  },
+  "settings": {
+   "button": "Explicit Scale",
+   "fields": {
+    "Uniform": 0.0,
+    "Axis": "Longest Axis",
+    "Orient To Selection": false,
+    "X": 4.0,
+    "Y": 2.0,
+    "Z": 1.0,
+    "X Center": "Center",
+    "Y Center": "Center",
+    "Z Center": "Center"
+   }
+  },
+  "expected": {
+   "points": [
+    [
+     0.0,
+     -0.5,
+     -0.25
+    ],
+    [
+     3.0,
+     0.0,
+     0.0
+    ],
+    [
+     3.0,
+     1.0,
+     0.0
+    ],
+    [
+     1.0,
+     1.0,
+     0.0
+    ],
+    [
+     1.0,
+     0.0,
+     0.5
+    ],
+    [
+     3.0,
+     0.0,
+     0.5
+    ],
+    [
+     4.0,
+     1.5,
+     0.75
+    ],
+    [
+     1.0,
+     1.0,
+     0.5
+    ]
+   ],
+   "polygons_unchanged": true,
+   "fields_after": {
+    "Uniform": 4.0,
+    "Axis": "Longest Axis",
+    "Orient To Selection": false,
+    "X": 4.0,
+    "Y": 2.0,
+    "Z": 1.0,
+    "X Center": "Center",
+    "Y Center": "Center",
+    "Z Center": "Center"
+   }
+  },
+  "tolerance": 1e-05
+ },
+ {
+  "id": "AS-17_uniform_diamond_noorient",
+  "tool": "Absolute Scaling",
+  "description": "Diamond (square rotated 45 deg, side 1), Uniform 2, Orient off.",
+  "input": {
+   "points": [
+    [
+     0.707107,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.707107,
+     0.0
+    ],
+    [
+     -0.707107,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     -0.707107,
+     0.0
+    ]
+   ],
+   "polygons": [
+    [
+     0,
+     1,
+     2,
+     3
+    ]
+   ],
+   "selection": {
+    "mode": "polygon",
+    "polygons": [
+     0
+    ]
+   }
+  },
+  "settings": {
+   "button": "Uniform Scale",
+   "fields": {
+    "Uniform": 2.0,
+    "Axis": "Longest Axis",
+    "Orient To Selection": false,
+    "X": 0.0,
+    "Y": 0.0,
+    "Z": 0.0,
+    "X Center": "Center",
+    "Y Center": "Center",
+    "Z Center": "Center"
+   }
+  },
+  "expected": {
+   "points": [
+    [
+     0.0,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0
+    ]
+   ],
+   "polygons_unchanged": true,
+   "fields_after": {
+    "Uniform": 0.0,
+    "Axis": "Longest Axis",
+    "Orient To Selection": false,
+    "X": 0.0,
+    "Y": 0.0,
+    "Z": 0.0,
+    "X Center": "Center",
+    "Y Center": "Center",
+    "Z Center": "Center"
+   }
+  },
+  "tolerance": 1e-05
+ },
+ {
+  "id": "AS-18_uniform_diamond_orient",
+  "tool": "Absolute Scaling",
+  "description": "Same with Orient to Selection on.",
+  "input": {
+   "points": [
+    [
+     0.707107,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.707107,
+     0.0
+    ],
+    [
+     -0.707107,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     -0.707107,
+     0.0
+    ]
+   ],
+   "polygons": [
+    [
+     0,
+     1,
+     2,
+     3
+    ]
+   ],
+   "selection": {
+    "mode": "polygon",
+    "polygons": [
+     0
+    ]
+   }
+  },
+  "settings": {
+   "button": "Uniform Scale",
+   "fields": {
+    "Uniform": 2.0,
+    "Axis": "Longest Axis",
+    "Orient To Selection": true,
+    "X": 0.0,
+    "Y": 0.0,
+    "Z": 0.0,
+    "X Center": "Center",
+    "Y Center": "Center",
+    "Z Center": "Center"
+   }
+  },
+  "expected": {
+   "points": [
+    [
+     0.707107,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.707107,
+     0.0
+    ],
+    [
+     -0.707107,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     -0.707107,
+     0.0
+    ]
+   ],
+   "polygons_unchanged": true,
+   "fields_after": {
+    "Uniform": 1.41421,
+    "Axis": "Longest Axis",
+    "Orient To Selection": true,
+    "X": 1.41421,
+    "Y": 1.41421,
+    "Z": 0.0,
+    "X Center": "Center",
+    "Y Center": "Center",
+    "Z Center": "Center"
+   }
+  },
+  "tolerance": 1e-05
+ },
+ {
+  "id": "AS-19_grab_item_transformed",
+  "tool": "Absolute Scaling",
+  "description": "Grab Size on a box whose item is moved to x=5 and scaled 2: local or world sizes?",
+  "input": {
+   "points": [
+    [
+     1.0,
+     0.0,
+     0.0
+    ],
+    [
+     3.0,
+     0.0,
+     0.0
+    ],
+    [
+     3.0,
+     1.0,
+     0.0
+    ],
+    [
+     1.0,
+     1.0,
+     0.0
+    ],
+    [
+     1.0,
+     0.0,
+     0.5
+    ],
+    [
+     3.0,
+     0.0,
+     0.5
+    ],
+    [
+     3.0,
+     1.0,
+     0.5
+    ],
+    [
+     1.0,
+     1.0,
+     0.5
+    ]
+   ],
+   "polygons": [
+    [
+     0,
+     3,
+     2,
+     1
+    ],
+    [
+     4,
+     5,
+     6,
+     7
+    ],
+    [
+     0,
+     1,
+     5,
+     4
+    ],
+    [
+     2,
+     3,
+     7,
+     6
+    ],
+    [
+     1,
+     2,
+     6,
+     5
+    ],
+    [
+     0,
+     4,
+     7,
+     3
+    ]
+   ],
+   "selection": {
+    "mode": "polygon",
+    "polygons": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5
+    ]
+   },
+   "item_transform": {
+    "position": [
+     5,
+     0,
+     0
+    ],
+    "scale": [
+     2,
+     2,
+     2
+    ]
+   }
+  },
+  "settings": {
+   "button": "Grab Size",
+   "fields": {
+    "Uniform": 0.0,
+    "Axis": "Longest Axis",
+    "Orient To Selection": false,
+    "X": 0.0,
+    "Y": 0.0,
+    "Z": 0.0,
+    "X Center": "Center",
+    "Y Center": "Center",
+    "Z Center": "Center"
+   }
+  },
+  "expected": {
+   "points": [
+    [
+     1.0,
+     0.0,
+     0.0
+    ],
+    [
+     3.0,
+     0.0,
+     0.0
+    ],
+    [
+     3.0,
+     1.0,
+     0.0
+    ],
+    [
+     1.0,
+     1.0,
+     0.0
+    ],
+    [
+     1.0,
+     0.0,
+     0.5
+    ],
+    [
+     3.0,
+     0.0,
+     0.5
+    ],
+    [
+     3.0,
+     1.0,
+     0.5
+    ],
+    [
+     1.0,
+     1.0,
+     0.5
+    ]
+   ],
+   "polygons_unchanged": true,
+   "fields_after": {
+    "Uniform": 2.0,
+    "Axis": "Longest Axis",
+    "Orient To Selection": false,
+    "X": 2.0,
+    "Y": 1.0,
+    "Z": 0.5,
+    "X Center": "Center",
+    "Y Center": "Center",
+    "Z Center": "Center"
+   }
+  },
+  "tolerance": 1e-05
+ },
+ {
+  "id": "AS-20_explicit_item_transformed",
+  "tool": "Absolute Scaling",
+  "description": "Explicit 4,2,1 on the same transformed item.",
+  "input": {
+   "points": [
+    [
+     1.0,
+     0.0,
+     0.0
+    ],
+    [
+     3.0,
+     0.0,
+     0.0
+    ],
+    [
+     3.0,
+     1.0,
+     0.0
+    ],
+    [
+     1.0,
+     1.0,
+     0.0
+    ],
+    [
+     1.0,
+     0.0,
+     0.5
+    ],
+    [
+     3.0,
+     0.0,
+     0.5
+    ],
+    [
+     3.0,
+     1.0,
+     0.5
+    ],
+    [
+     1.0,
+     1.0,
+     0.5
+    ]
+   ],
+   "polygons": [
+    [
+     0,
+     3,
+     2,
+     1
+    ],
+    [
+     4,
+     5,
+     6,
+     7
+    ],
+    [
+     0,
+     1,
+     5,
+     4
+    ],
+    [
+     2,
+     3,
+     7,
+     6
+    ],
+    [
+     1,
+     2,
+     6,
+     5
+    ],
+    [
+     0,
+     4,
+     7,
+     3
+    ]
+   ],
+   "selection": {
+    "mode": "polygon",
+    "polygons": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5
+    ]
+   },
+   "item_transform": {
+    "position": [
+     5,
+     0,
+     0
+    ],
+    "scale": [
+     2,
+     2,
+     2
+    ]
+   }
+  },
+  "settings": {
+   "button": "Explicit Scale",
+   "fields": {
+    "Uniform": 0.0,
+    "Axis": "Longest Axis",
+    "Orient To Selection": false,
+    "X": 4.0,
+    "Y": 2.0,
+    "Z": 1.0,
+    "X Center": "Center",
+    "Y Center": "Center",
+    "Z Center": "Center"
+   }
+  },
+  "expected": {
+   "points": [
+    [
+     0.0,
+     -0.5,
+     -0.25
+    ],
+    [
+     4.0,
+     -0.5,
+     -0.25
+    ],
+    [
+     4.0,
+     1.5,
+     -0.25
+    ],
+    [
+     0.0,
+     1.5,
+     -0.25
+    ],
+    [
+     0.0,
+     -0.5,
+     0.75
+    ],
+    [
+     4.0,
+     -0.5,
+     0.75
+    ],
+    [
+     4.0,
+     1.5,
+     0.75
+    ],
+    [
+     0.0,
+     1.5,
+     0.75
+    ]
+   ],
+   "polygons_unchanged": true,
+   "fields_after": {
+    "Uniform": 4.0,
+    "Axis": "Longest Axis",
+    "Orient To Selection": false,
+    "X": 4.0,
+    "Y": 2.0,
+    "Z": 1.0,
+    "X Center": "Center",
+    "Y Center": "Center",
+    "Z Center": "Center"
+   }
+  },
+  "tolerance": 1e-05
+ },
+ {
+  "id": "AS-21_explicit_negative_x",
+  "tool": "Absolute Scaling",
+  "description": "Explicit -4,1,0.5: mirror or refuse?",
+  "input": {
+   "points": [
+    [
+     1.0,
+     0.0,
+     0.0
+    ],
+    [
+     3.0,
+     0.0,
+     0.0
+    ],
+    [
+     3.0,
+     1.0,
+     0.0
+    ],
+    [
+     1.0,
+     1.0,
+     0.0
+    ],
+    [
+     1.0,
+     0.0,
+     0.5
+    ],
+    [
+     3.0,
+     0.0,
+     0.5
+    ],
+    [
+     3.0,
+     1.0,
+     0.5
+    ],
+    [
+     1.0,
+     1.0,
+     0.5
+    ]
+   ],
+   "polygons": [
+    [
+     0,
+     3,
+     2,
+     1
+    ],
+    [
+     4,
+     5,
+     6,
+     7
+    ],
+    [
+     0,
+     1,
+     5,
+     4
+    ],
+    [
+     2,
+     3,
+     7,
+     6
+    ],
+    [
+     1,
+     2,
+     6,
+     5
+    ],
+    [
+     0,
+     4,
+     7,
+     3
+    ]
+   ],
+   "selection": {
+    "mode": "polygon",
+    "polygons": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5
+    ]
+   }
+  },
+  "settings": {
+   "button": "Explicit Scale",
+   "fields": {
+    "Uniform": 0.0,
+    "Axis": "Longest Axis",
+    "Orient To Selection": false,
+    "X": -4.0,
+    "Y": 1.0,
+    "Z": 0.5,
+    "X Center": "Center",
+    "Y Center": "Center",
+    "Z Center": "Center"
+   }
+  },
+  "expected": {
+   "points": [
+    [
+     4.0,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     1.0,
+     0.0
+    ],
+    [
+     4.0,
+     1.0,
+     0.0
+    ],
+    [
+     4.0,
+     0.0,
+     0.5
+    ],
+    [
+     0.0,
+     0.0,
+     0.5
+    ],
+    [
+     0.0,
+     1.0,
+     0.5
+    ],
+    [
+     4.0,
+     1.0,
+     0.5
+    ]
+   ],
+   "polygons_unchanged": true,
+   "fields_after": {
+    "Uniform": 4.0,
+    "Axis": "Longest Axis",
+    "Orient To Selection": false,
+    "X": 4.0,
+    "Y": 1.0,
+    "Z": 0.5,
+    "X Center": "Center",
+    "Y Center": "Center",
+    "Z Center": "Center"
+   }
+  },
+  "tolerance": 1e-05
+ },
+ {
+  "id": "AS-22_uniform_zero",
+  "tool": "Absolute Scaling",
+  "description": "Uniform 0: collapse or refuse?",
+  "input": {
+   "points": [
+    [
+     1.0,
+     0.0,
+     0.0
+    ],
+    [
+     3.0,
+     0.0,
+     0.0
+    ],
+    [
+     3.0,
+     1.0,
+     0.0
+    ],
+    [
+     1.0,
+     1.0,
+     0.0
+    ],
+    [
+     1.0,
+     0.0,
+     0.5
+    ],
+    [
+     3.0,
+     0.0,
+     0.5
+    ],
+    [
+     3.0,
+     1.0,
+     0.5
+    ],
+    [
+     1.0,
+     1.0,
+     0.5
+    ]
+   ],
+   "polygons": [
+    [
+     0,
+     3,
+     2,
+     1
+    ],
+    [
+     4,
+     5,
+     6,
+     7
+    ],
+    [
+     0,
+     1,
+     5,
+     4
+    ],
+    [
+     2,
+     3,
+     7,
+     6
+    ],
+    [
+     1,
+     2,
+     6,
+     5
+    ],
+    [
+     0,
+     4,
+     7,
+     3
+    ]
+   ],
+   "selection": {
+    "mode": "polygon",
+    "polygons": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5
+    ]
+   }
+  },
+  "settings": {
+   "button": "Uniform Scale",
+   "fields": {
+    "Uniform": 0.0,
+    "Axis": "Longest Axis",
+    "Orient To Selection": false,
+    "X": 0.0,
+    "Y": 0.0,
+    "Z": 0.0,
+    "X Center": "Center",
+    "Y Center": "Center",
+    "Z Center": "Center"
+   }
+  },
+  "expected": {
+   "points": [
+    [
+     2.0,
+     0.5,
+     0.25
+    ],
+    [
+     2.0,
+     0.5,
+     0.25
+    ],
+    [
+     2.0,
+     0.5,
+     0.25
+    ],
+    [
+     2.0,
+     0.5,
+     0.25
+    ],
+    [
+     2.0,
+     0.5,
+     0.25
+    ],
+    [
+     2.0,
+     0.5,
+     0.25
+    ],
+    [
+     2.0,
+     0.5,
+     0.25
+    ],
+    [
+     2.0,
+     0.5,
+     0.25
+    ]
+   ],
+   "polygons_unchanged": true,
+   "fields_after": {
+    "Uniform": 0.0,
+    "Axis": "Longest Axis",
+    "Orient To Selection": false,
+    "X": 0.0,
+    "Y": 0.0,
+    "Z": 0.0,
+    "X Center": "Center",
+    "Y Center": "Center",
+    "Z Center": "Center"
+   }
+  },
+  "tolerance": 1e-05
+ },
+ {
+  "id": "AS-23_explicit_axis_y_field",
+  "tool": "Absolute Scaling",
+  "description": "Explicit 4,2,1 with Uniform Axis Y: what does Uniform show afterwards?",
+  "input": {
+   "points": [
+    [
+     1.0,
+     0.0,
+     0.0
+    ],
+    [
+     3.0,
+     0.0,
+     0.0
+    ],
+    [
+     3.0,
+     1.0,
+     0.0
+    ],
+    [
+     1.0,
+     1.0,
+     0.0
+    ],
+    [
+     1.0,
+     0.0,
+     0.5
+    ],
+    [
+     3.0,
+     0.0,
+     0.5
+    ],
+    [
+     3.0,
+     1.0,
+     0.5
+    ],
+    [
+     1.0,
+     1.0,
+     0.5
+    ]
+   ],
+   "polygons": [
+    [
+     0,
+     3,
+     2,
+     1
+    ],
+    [
+     4,
+     5,
+     6,
+     7
+    ],
+    [
+     0,
+     1,
+     5,
+     4
+    ],
+    [
+     2,
+     3,
+     7,
+     6
+    ],
+    [
+     1,
+     2,
+     6,
+     5
+    ],
+    [
+     0,
+     4,
+     7,
+     3
+    ]
+   ],
+   "selection": {
+    "mode": "polygon",
+    "polygons": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5
+    ]
+   }
+  },
+  "settings": {
+   "button": "Explicit Scale",
+   "fields": {
+    "Uniform": 0.0,
+    "Axis": "Y Axis",
+    "Orient To Selection": false,
+    "X": 4.0,
+    "Y": 2.0,
+    "Z": 1.0,
+    "X Center": "Center",
+    "Y Center": "Center",
+    "Z Center": "Center"
+   }
+  },
+  "expected": {
+   "points": [
+    [
+     0.0,
+     -0.5,
+     -0.25
+    ],
+    [
+     4.0,
+     -0.5,
+     -0.25
+    ],
+    [
+     4.0,
+     1.5,
+     -0.25
+    ],
+    [
+     0.0,
+     1.5,
+     -0.25
+    ],
+    [
+     0.0,
+     -0.5,
+     0.75
+    ],
+    [
+     4.0,
+     -0.5,
+     0.75
+    ],
+    [
+     4.0,
+     1.5,
+     0.75
+    ],
+    [
+     0.0,
+     1.5,
+     0.75
+    ]
+   ],
+   "polygons_unchanged": true,
+   "fields_after": {
+    "Uniform": 2.0,
+    "Axis": "Y Axis",
+    "Orient To Selection": false,
+    "X": 4.0,
+    "Y": 2.0,
+    "Z": 1.0,
+    "X Center": "Center",
+    "Y Center": "Center",
+    "Z Center": "Center"
+   }
+  },
+  "tolerance": 1e-05
+ },
+ {
+  "id": "AS-24_explicit_item_mode",
+  "tool": "Absolute Scaling",
+  "description": "Item mode with the mesh item selected (no components): Explicit 4,2,1.",
+  "input": {
+   "points": [
+    [
+     1.0,
+     0.0,
+     0.0
+    ],
+    [
+     3.0,
+     0.0,
+     0.0
+    ],
+    [
+     3.0,
+     1.0,
+     0.0
+    ],
+    [
+     1.0,
+     1.0,
+     0.0
+    ],
+    [
+     1.0,
+     0.0,
+     0.5
+    ],
+    [
+     3.0,
+     0.0,
+     0.5
+    ],
+    [
+     3.0,
+     1.0,
+     0.5
+    ],
+    [
+     1.0,
+     1.0,
+     0.5
+    ]
+   ],
+   "polygons": [
+    [
+     0,
+     3,
+     2,
+     1
+    ],
+    [
+     4,
+     5,
+     6,
+     7
+    ],
+    [
+     0,
+     1,
+     5,
+     4
+    ],
+    [
+     2,
+     3,
+     7,
+     6
+    ],
+    [
+     1,
+     2,
+     6,
+     5
+    ],
+    [
+     0,
+     4,
+     7,
+     3
+    ]
+   ],
+   "selection": {
+    "mode": "item",
+    "items": [
+     "mesh"
+    ]
+   }
+  },
+  "settings": {
+   "button": "Explicit Scale",
+   "fields": {
+    "Uniform": 0.0,
+    "Axis": "Longest Axis",
+    "Orient To Selection": false,
+    "X": 4.0,
+    "Y": 2.0,
+    "Z": 1.0,
+    "X Center": "Center",
+    "Y Center": "Center",
+    "Z Center": "Center"
+   }
+  },
+  "expected": {
+   "points": [
+    [
+     0.0,
+     -0.5,
+     -0.25
+    ],
+    [
+     4.0,
+     -0.5,
+     -0.25
+    ],
+    [
+     4.0,
+     1.5,
+     -0.25
+    ],
+    [
+     0.0,
+     1.5,
+     -0.25
+    ],
+    [
+     0.0,
+     -0.5,
+     0.75
+    ],
+    [
+     4.0,
+     -0.5,
+     0.75
+    ],
+    [
+     4.0,
+     1.5,
+     0.75
+    ],
+    [
+     0.0,
+     1.5,
+     0.75
+    ]
+   ],
+   "polygons_unchanged": true,
+   "fields_after": {
+    "Uniform": 4.0,
+    "Axis": "Longest Axis",
+    "Orient To Selection": false,
+    "X": 4.0,
+    "Y": 2.0,
+    "Z": 1.0,
+    "X Center": "Center",
+    "Y Center": "Center",
+    "Z Center": "Center"
+   }
+  },
+  "tolerance": 1e-05
+ },
+ {
+  "id": "AS-25_uniform_edge_mode",
+  "tool": "Absolute Scaling",
+  "description": "Edge mode, one bottom edge along X selected, Uniform 4.",
+  "input": {
+   "points": [
+    [
+     1.0,
+     0.0,
+     0.0
+    ],
+    [
+     3.0,
+     0.0,
+     0.0
+    ],
+    [
+     3.0,
+     1.0,
+     0.0
+    ],
+    [
+     1.0,
+     1.0,
+     0.0
+    ],
+    [
+     1.0,
+     0.0,
+     0.5
+    ],
+    [
+     3.0,
+     0.0,
+     0.5
+    ],
+    [
+     3.0,
+     1.0,
+     0.5
+    ],
+    [
+     1.0,
+     1.0,
+     0.5
+    ]
+   ],
+   "polygons": [
+    [
+     0,
+     3,
+     2,
+     1
+    ],
+    [
+     4,
+     5,
+     6,
+     7
+    ],
+    [
+     0,
+     1,
+     5,
+     4
+    ],
+    [
+     2,
+     3,
+     7,
+     6
+    ],
+    [
+     1,
+     2,
+     6,
+     5
+    ],
+    [
+     0,
+     4,
+     7,
+     3
+    ]
+   ],
+   "selection": {
+    "mode": "edge",
+    "edges": [
+     [
+      0,
+      1
+     ]
+    ]
+   }
+  },
+  "settings": {
+   "button": "Uniform Scale",
+   "fields": {
+    "Uniform": 4.0,
+    "Axis": "Longest Axis",
+    "Orient To Selection": false,
+    "X": 0.0,
+    "Y": 0.0,
+    "Z": 0.0,
+    "X Center": "Center",
+    "Y Center": "Center",
+    "Z Center": "Center"
+   }
+  },
+  "expected": {
+   "points": [
+    [
+     2.0,
+     0.0,
+     0.0
+    ],
+    [
+     2.0,
+     0.0,
+     0.0
+    ],
+    [
+     3.0,
+     1.0,
+     0.0
+    ],
+    [
+     1.0,
+     1.0,
+     0.0
+    ],
+    [
+     1.0,
+     0.0,
+     0.5
+    ],
+    [
+     3.0,
+     0.0,
+     0.5
+    ],
+    [
+     3.0,
+     1.0,
+     0.5
+    ],
+    [
+     1.0,
+     1.0,
+     0.5
+    ]
+   ],
+   "polygons_unchanged": true,
+   "fields_after": {
+    "Uniform": 0.0,
+    "Axis": "Longest Axis",
+    "Orient To Selection": false,
+    "X": 0.0,
+    "Y": 0.0,
+    "Z": 0.0,
+    "X Center": "Center",
+    "Y Center": "Center",
+    "Z Center": "Center"
+   }
+  },
+  "tolerance": 1e-05
+ },
+ {
+  "id": "AS-26_uniform_axis_x_shorter",
+  "tool": "Absolute Scaling",
+  "description": "Uniform 1 on X (box is 2 long in X): factor 0.5 everywhere?",
+  "input": {
+   "points": [
+    [
+     1.0,
+     0.0,
+     0.0
+    ],
+    [
+     3.0,
+     0.0,
+     0.0
+    ],
+    [
+     3.0,
+     1.0,
+     0.0
+    ],
+    [
+     1.0,
+     1.0,
+     0.0
+    ],
+    [
+     1.0,
+     0.0,
+     0.5
+    ],
+    [
+     3.0,
+     0.0,
+     0.5
+    ],
+    [
+     3.0,
+     1.0,
+     0.5
+    ],
+    [
+     1.0,
+     1.0,
+     0.5
+    ]
+   ],
+   "polygons": [
+    [
+     0,
+     3,
+     2,
+     1
+    ],
+    [
+     4,
+     5,
+     6,
+     7
+    ],
+    [
+     0,
+     1,
+     5,
+     4
+    ],
+    [
+     2,
+     3,
+     7,
+     6
+    ],
+    [
+     1,
+     2,
+     6,
+     5
+    ],
+    [
+     0,
+     4,
+     7,
+     3
+    ]
+   ],
+   "selection": {
+    "mode": "polygon",
+    "polygons": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5
+    ]
+   }
+  },
+  "settings": {
+   "button": "Uniform Scale",
+   "fields": {
+    "Uniform": 1.0,
+    "Axis": "X Axis",
+    "Orient To Selection": false,
+    "X": 0.0,
+    "Y": 0.0,
+    "Z": 0.0,
+    "X Center": "Center",
+    "Y Center": "Center",
+    "Z Center": "Center"
+   }
+  },
+  "expected": {
+   "points": [
+    [
+     1.5,
+     0.25,
+     0.125
+    ],
+    [
+     2.5,
+     0.25,
+     0.125
+    ],
+    [
+     2.5,
+     0.75,
+     0.125
+    ],
+    [
+     1.5,
+     0.75,
+     0.125
+    ],
+    [
+     1.5,
+     0.25,
+     0.375
+    ],
+    [
+     2.5,
+     0.25,
+     0.375
+    ],
+    [
+     2.5,
+     0.75,
+     0.375
+    ],
+    [
+     1.5,
+     0.75,
+     0.375
+    ]
+   ],
+   "polygons_unchanged": true,
+   "fields_after": {
+    "Uniform": 1.0,
+    "Axis": "X Axis",
+    "Orient To Selection": false,
+    "X": 1.0,
+    "Y": 0.5,
+    "Z": 0.25,
+    "X Center": "Center",
+    "Y Center": "Center",
+    "Z Center": "Center"
+   }
+  },
+  "tolerance": 1e-05
+ },
+ {
+  "id": "AS-27_center_uneven_thick",
+  "tool": "Absolute Scaling",
+  "description": "Uniform 4 (longest X = 2) on an unevenly spaced, non-flat strip: center = bbox middle or vertex average?",
+  "input": {
+   "points": [
+    [
+     0.0,
+     0.0,
+     0.0
+    ],
+    [
+     0.1,
+     0.0,
+     0.0
+    ],
+    [
+     0.2,
+     0.0,
+     0.0
+    ],
+    [
+     2.0,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     1.0,
+     0.0
+    ],
+    [
+     0.1,
+     1.0,
+     0.0
+    ],
+    [
+     0.2,
+     1.0,
+     0.0
+    ],
+    [
+     2.0,
+     1.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     1.0
+    ],
+    [
+     0.1,
+     0.0,
+     1.0
+    ],
+    [
+     0.2,
+     0.0,
+     1.0
+    ],
+    [
+     2.0,
+     0.0,
+     1.0
+    ],
+    [
+     0.0,
+     1.0,
+     1.0
+    ],
+    [
+     0.1,
+     1.0,
+     1.0
+    ],
+    [
+     0.2,
+     1.0,
+     1.0
+    ],
+    [
+     2.0,
+     1.0,
+     1.0
+    ]
+   ],
+   "polygons": [
+    [
+     0,
+     1,
+     5,
+     4
+    ],
+    [
+     1,
+     2,
+     6,
+     5
+    ],
+    [
+     2,
+     3,
+     7,
+     6
+    ],
+    [
+     8,
+     9,
+     13,
+     12
+    ],
+    [
+     9,
+     10,
+     14,
+     13
+    ],
+    [
+     10,
+     11,
+     15,
+     14
+    ]
+   ],
+   "selection": {
+    "mode": "polygon",
+    "polygons": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5
+    ]
+   }
+  },
+  "settings": {
+   "button": "Uniform Scale",
+   "fields": {
+    "Uniform": 4.0,
+    "Axis": "Longest Axis",
+    "Orient To Selection": false,
+    "X": 0.0,
+    "Y": 0.0,
+    "Z": 0.0,
+    "X Center": "Center",
+    "Y Center": "Center",
+    "Z Center": "Center"
+   }
+  },
+  "expected": {
+   "points": [
+    [
+     -1.0,
+     -0.5,
+     -0.5
+    ],
+    [
+     -0.8,
+     -0.5,
+     -0.5
+    ],
+    [
+     -0.6,
+     -0.5,
+     -0.5
+    ],
+    [
+     3.0,
+     -0.5,
+     -0.5
+    ],
+    [
+     -1.0,
+     1.5,
+     -0.5
+    ],
+    [
+     -0.8,
+     1.5,
+     -0.5
+    ],
+    [
+     -0.6,
+     1.5,
+     -0.5
+    ],
+    [
+     3.0,
+     1.5,
+     -0.5
+    ],
+    [
+     -1.0,
+     -0.5,
+     1.5
+    ],
+    [
+     -0.8,
+     -0.5,
+     1.5
+    ],
+    [
+     -0.6,
+     -0.5,
+     1.5
+    ],
+    [
+     3.0,
+     -0.5,
+     1.5
+    ],
+    [
+     -1.0,
+     1.5,
+     1.5
+    ],
+    [
+     -0.8,
+     1.5,
+     1.5
+    ],
+    [
+     -0.6,
+     1.5,
+     1.5
+    ],
+    [
+     3.0,
+     1.5,
+     1.5
+    ]
+   ],
+   "polygons_unchanged": true,
+   "fields_after": {
+    "Uniform": 4.0,
+    "Axis": "Longest Axis",
+    "Orient To Selection": false,
+    "X": 4.0,
+    "Y": 2.0,
+    "Z": 2.0,
+    "X Center": "Center",
+    "Y Center": "Center",
+    "Z Center": "Center"
+   }
+  },
+  "tolerance": 1e-05
+ },
+ {
+  "id": "AS-28_explicit_topface_y0",
+  "tool": "Absolute Scaling",
+  "description": "Explicit 4,0,1 with only the flat top face selected.",
+  "input": {
+   "points": [
+    [
+     1.0,
+     0.0,
+     0.0
+    ],
+    [
+     3.0,
+     0.0,
+     0.0
+    ],
+    [
+     3.0,
+     1.0,
+     0.0
+    ],
+    [
+     1.0,
+     1.0,
+     0.0
+    ],
+    [
+     1.0,
+     0.0,
+     0.5
+    ],
+    [
+     3.0,
+     0.0,
+     0.5
+    ],
+    [
+     3.0,
+     1.0,
+     0.5
+    ],
+    [
+     1.0,
+     1.0,
+     0.5
+    ]
+   ],
+   "polygons": [
+    [
+     0,
+     3,
+     2,
+     1
+    ],
+    [
+     4,
+     5,
+     6,
+     7
+    ],
+    [
+     0,
+     1,
+     5,
+     4
+    ],
+    [
+     2,
+     3,
+     7,
+     6
+    ],
+    [
+     1,
+     2,
+     6,
+     5
+    ],
+    [
+     0,
+     4,
+     7,
+     3
+    ]
+   ],
+   "selection": {
+    "mode": "polygon",
+    "polygons": [
+     3
+    ]
+   }
+  },
+  "settings": {
+   "button": "Explicit Scale",
+   "fields": {
+    "Uniform": 0.0,
+    "Axis": "Longest Axis",
+    "Orient To Selection": false,
+    "X": 4.0,
+    "Y": 0.0,
+    "Z": 1.0,
+    "X Center": "Center",
+    "Y Center": "Center",
+    "Z Center": "Center"
+   }
+  },
+  "expected": {
+   "points": [
+    [
+     1.0,
+     0.0,
+     0.0
+    ],
+    [
+     3.0,
+     0.0,
+     0.0
+    ],
+    [
+     4.0,
+     1.0,
+     -0.25
+    ],
+    [
+     0.0,
+     1.0,
+     -0.25
+    ],
+    [
+     1.0,
+     0.0,
+     0.5
+    ],
+    [
+     3.0,
+     0.0,
+     0.5
+    ],
+    [
+     4.0,
+     1.0,
+     0.75
+    ],
+    [
+     0.0,
+     1.0,
+     0.75
+    ]
+   ],
+   "polygons_unchanged": true,
+   "fields_after": {
+    "Uniform": 4.0,
+    "Axis": "Longest Axis",
+    "Orient To Selection": false,
+    "X": 4.0,
+    "Y": 0.0,
+    "Z": 1.0,
+    "X Center": "Center",
+    "Y Center": "Center",
+    "Z Center": "Center"
+   }
+  },
+  "tolerance": 1e-05
+ },
+ {
+  "id": "AS-29_reference_topface_y5",
+  "tool": "Absolute Scaling",
+  "description": "Reference 4,5,1 with A's flat top face selected (B separate).",
+  "input": {
+   "points": [
+    [
+     0.0,
+     0.0,
+     0.0
+    ],
+    [
+     2.0,
+     0.0,
+     0.0
+    ],
+    [
+     2.0,
+     1.0,
+     0.0
+    ],
+    [
+     0.0,
+     1.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.5
+    ],
+    [
+     2.0,
+     0.0,
+     0.5
+    ],
+    [
+     2.0,
+     1.0,
+     0.5
+    ],
+    [
+     0.0,
+     1.0,
+     0.5
+    ],
+    [
+     5.0,
+     0.0,
+     0.0
+    ],
+    [
+     6.0,
+     0.0,
+     0.0
+    ],
+    [
+     6.0,
+     1.0,
+     0.0
+    ],
+    [
+     5.0,
+     1.0,
+     0.0
+    ],
+    [
+     5.0,
+     0.0,
+     1.0
+    ],
+    [
+     6.0,
+     0.0,
+     1.0
+    ],
+    [
+     6.0,
+     1.0,
+     1.0
+    ],
+    [
+     5.0,
+     1.0,
+     1.0
+    ]
+   ],
+   "polygons": [
+    [
+     0,
+     3,
+     2,
+     1
+    ],
+    [
+     4,
+     5,
+     6,
+     7
+    ],
+    [
+     0,
+     1,
+     5,
+     4
+    ],
+    [
+     2,
+     3,
+     7,
+     6
+    ],
+    [
+     1,
+     2,
+     6,
+     5
+    ],
+    [
+     0,
+     4,
+     7,
+     3
+    ],
+    [
+     8,
+     11,
+     10,
+     9
+    ],
+    [
+     12,
+     13,
+     14,
+     15
+    ],
+    [
+     8,
+     9,
+     13,
+     12
+    ],
+    [
+     10,
+     11,
+     15,
+     14
+    ],
+    [
+     9,
+     10,
+     14,
+     13
+    ],
+    [
+     8,
+     12,
+     15,
+     11
+    ]
+   ],
+   "selection": {
+    "mode": "polygon",
+    "polygons": [
+     3
+    ]
+   }
+  },
+  "settings": {
+   "button": "Reference Scale",
+   "fields": {
+    "Uniform": 0.0,
+    "Axis": "Longest Axis",
+    "Orient To Selection": false,
+    "X": 4.0,
+    "Y": 5.0,
+    "Z": 1.0,
+    "X Center": "Center",
+    "Y Center": "Center",
+    "Z Center": "Center"
+   }
+  },
+  "expected": {
+   "points": [
+    [
+     -3.0,
+     0.5,
+     -0.5
+    ],
+    [
+     1.0,
+     0.5,
+     -0.5
+    ],
+    [
+     1.0,
+     0.5,
+     -0.5
+    ],
+    [
+     -3.0,
+     0.5,
+     -0.5
+    ],
+    [
+     -3.0,
+     0.5,
+     0.5
+    ],
+    [
+     1.0,
+     0.5,
+     0.5
+    ],
+    [
+     1.0,
+     0.5,
+     0.5
+    ],
+    [
+     -3.0,
+     0.5,
+     0.5
+    ],
+    [
+     7.0,
+     0.5,
+     -0.5
+    ],
+    [
+     9.0,
+     0.5,
+     -0.5
+    ],
+    [
+     9.0,
+     0.5,
+     -0.5
+    ],
+    [
+     7.0,
+     0.5,
+     -0.5
+    ],
+    [
+     7.0,
+     0.5,
+     1.5
+    ],
+    [
+     9.0,
+     0.5,
+     1.5
+    ],
+    [
+     9.0,
+     0.5,
+     1.5
+    ],
+    [
+     7.0,
+     0.5,
+     1.5
+    ]
+   ],
+   "polygons_unchanged": true,
+   "fields_after": {
+    "Uniform": 4.0,
+    "Axis": "Longest Axis",
+    "Orient To Selection": false,
+    "X": 4.0,
+    "Y": 0.0,
+    "Z": 1.0,
+    "X Center": "Center",
+    "Y Center": "Center",
+    "Z Center": "Center"
+   }
+  },
+  "tolerance": 1e-05
+ },
+ {
+  "id": "AS-30_reference_wholeA",
+  "tool": "Absolute Scaling",
+  "description": "Reference 4,2,1 with all of A selected (A is 2x1x0.5); B separate in the same mesh.",
+  "input": {
+   "points": [
+    [
+     0.0,
+     0.0,
+     0.0
+    ],
+    [
+     2.0,
+     0.0,
+     0.0
+    ],
+    [
+     2.0,
+     1.0,
+     0.0
+    ],
+    [
+     0.0,
+     1.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.5
+    ],
+    [
+     2.0,
+     0.0,
+     0.5
+    ],
+    [
+     2.0,
+     1.0,
+     0.5
+    ],
+    [
+     0.0,
+     1.0,
+     0.5
+    ],
+    [
+     5.0,
+     0.0,
+     0.0
+    ],
+    [
+     6.0,
+     0.0,
+     0.0
+    ],
+    [
+     6.0,
+     1.0,
+     0.0
+    ],
+    [
+     5.0,
+     1.0,
+     0.0
+    ],
+    [
+     5.0,
+     0.0,
+     1.0
+    ],
+    [
+     6.0,
+     0.0,
+     1.0
+    ],
+    [
+     6.0,
+     1.0,
+     1.0
+    ],
+    [
+     5.0,
+     1.0,
+     1.0
+    ]
+   ],
+   "polygons": [
+    [
+     0,
+     3,
+     2,
+     1
+    ],
+    [
+     4,
+     5,
+     6,
+     7
+    ],
+    [
+     0,
+     1,
+     5,
+     4
+    ],
+    [
+     2,
+     3,
+     7,
+     6
+    ],
+    [
+     1,
+     2,
+     6,
+     5
+    ],
+    [
+     0,
+     4,
+     7,
+     3
+    ],
+    [
+     8,
+     11,
+     10,
+     9
+    ],
+    [
+     12,
+     13,
+     14,
+     15
+    ],
+    [
+     8,
+     9,
+     13,
+     12
+    ],
+    [
+     10,
+     11,
+     15,
+     14
+    ],
+    [
+     9,
+     10,
+     14,
+     13
+    ],
+    [
+     8,
+     12,
+     15,
+     11
+    ]
+   ],
+   "selection": {
+    "mode": "polygon",
+    "polygons": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5
+    ]
+   }
+  },
+  "settings": {
+   "button": "Reference Scale",
+   "fields": {
+    "Uniform": 0.0,
+    "Axis": "Longest Axis",
+    "Orient To Selection": false,
+    "X": 4.0,
+    "Y": 2.0,
+    "Z": 1.0,
+    "X Center": "Center",
+    "Y Center": "Center",
+    "Z Center": "Center"
+   }
+  },
+  "expected": {
+   "points": [
+    [
+     -3.0,
+     -0.5,
+     -0.5
+    ],
+    [
+     1.0,
+     -0.5,
+     -0.5
+    ],
+    [
+     1.0,
+     1.5,
+     -0.5
+    ],
+    [
+     -3.0,
+     1.5,
+     -0.5
+    ],
+    [
+     -3.0,
+     -0.5,
+     0.5
+    ],
+    [
+     1.0,
+     -0.5,
+     0.5
+    ],
+    [
+     1.0,
+     1.5,
+     0.5
+    ],
+    [
+     -3.0,
+     1.5,
+     0.5
+    ],
+    [
+     7.0,
+     -0.5,
+     -0.5
+    ],
+    [
+     9.0,
+     -0.5,
+     -0.5
+    ],
+    [
+     9.0,
+     1.5,
+     -0.5
+    ],
+    [
+     7.0,
+     1.5,
+     -0.5
+    ],
+    [
+     7.0,
+     -0.5,
+     1.5
+    ],
+    [
+     9.0,
+     -0.5,
+     1.5
+    ],
+    [
+     9.0,
+     1.5,
+     1.5
+    ],
+    [
+     7.0,
+     1.5,
+     1.5
+    ]
+   ],
+   "polygons_unchanged": true,
+   "fields_after": {
+    "Uniform": 4.0,
+    "Axis": "Longest Axis",
+    "Orient To Selection": false,
+    "X": 4.0,
+    "Y": 2.0,
+    "Z": 1.0,
+    "X Center": "Center",
+    "Y Center": "Center",
+    "Z Center": "Center"
+   }
+  },
+  "tolerance": 1e-05
+ },
+ {
+  "id": "AS-31_uniform_rotbox_noorient",
+  "tool": "Absolute Scaling",
+  "description": "Box 2x1x1 turned 45 deg about Z, Uniform 4, Orient off.",
+  "input": {
+   "points": [
+    [
+     -0.353553,
+     -1.06066,
+     0.0
+    ],
+    [
+     1.06066,
+     0.353553,
+     0.0
+    ],
+    [
+     0.353553,
+     1.06066,
+     0.0
+    ],
+    [
+     -1.06066,
+     -0.353553,
+     0.0
+    ],
+    [
+     -0.353553,
+     -1.06066,
+     1.0
+    ],
+    [
+     1.06066,
+     0.353553,
+     1.0
+    ],
+    [
+     0.353553,
+     1.06066,
+     1.0
+    ],
+    [
+     -1.06066,
+     -0.353553,
+     1.0
+    ]
+   ],
+   "polygons": [
+    [
+     0,
+     3,
+     2,
+     1
+    ],
+    [
+     4,
+     5,
+     6,
+     7
+    ],
+    [
+     0,
+     1,
+     5,
+     4
+    ],
+    [
+     2,
+     3,
+     7,
+     6
+    ],
+    [
+     1,
+     2,
+     6,
+     5
+    ],
+    [
+     0,
+     4,
+     7,
+     3
+    ]
+   ],
+   "selection": {
+    "mode": "polygon",
+    "polygons": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5
+    ]
+   }
+  },
+  "settings": {
+   "button": "Uniform Scale",
+   "fields": {
+    "Uniform": 4.0,
+    "Axis": "Longest Axis",
+    "Orient To Selection": false,
+    "X": 0.0,
+    "Y": 0.0,
+    "Z": 0.0,
+    "X Center": "Center",
+    "Y Center": "Center",
+    "Z Center": "Center"
+   }
+  },
+  "expected": {
+   "points": [
+    [
+     -0.666667,
+     -2.0,
+     -0.442809
+    ],
+    [
+     2.0,
+     0.666667,
+     -0.442809
+    ],
+    [
+     0.666667,
+     2.0,
+     -0.442809
+    ],
+    [
+     -2.0,
+     -0.666667,
+     -0.442809
+    ],
+    [
+     -0.666667,
+     -2.0,
+     1.442809
+    ],
+    [
+     2.0,
+     0.666667,
+     1.442809
+    ],
+    [
+     0.666667,
+     2.0,
+     1.442809
+    ],
+    [
+     -2.0,
+     -0.666667,
+     1.442809
+    ]
+   ],
+   "polygons_unchanged": true,
+   "fields_after": {
+    "Uniform": 4.0,
+    "Axis": "Longest Axis",
+    "Orient To Selection": false,
+    "X": 4.0,
+    "Y": 4.0,
+    "Z": 1.88562,
+    "X Center": "Center",
+    "Y Center": "Center",
+    "Z Center": "Center"
+   }
+  },
+  "tolerance": 1e-05
+ },
+ {
+  "id": "AS-32_uniform_rotbox_orient",
+  "tool": "Absolute Scaling",
+  "description": "Same, Orient to Selection on.",
+  "input": {
+   "points": [
+    [
+     -0.353553,
+     -1.06066,
+     0.0
+    ],
+    [
+     1.06066,
+     0.353553,
+     0.0
+    ],
+    [
+     0.353553,
+     1.06066,
+     0.0
+    ],
+    [
+     -1.06066,
+     -0.353553,
+     0.0
+    ],
+    [
+     -0.353553,
+     -1.06066,
+     1.0
+    ],
+    [
+     1.06066,
+     0.353553,
+     1.0
+    ],
+    [
+     0.353553,
+     1.06066,
+     1.0
+    ],
+    [
+     -1.06066,
+     -0.353553,
+     1.0
+    ]
+   ],
+   "polygons": [
+    [
+     0,
+     3,
+     2,
+     1
+    ],
+    [
+     4,
+     5,
+     6,
+     7
+    ],
+    [
+     0,
+     1,
+     5,
+     4
+    ],
+    [
+     2,
+     3,
+     7,
+     6
+    ],
+    [
+     1,
+     2,
+     6,
+     5
+    ],
+    [
+     0,
+     4,
+     7,
+     3
+    ]
+   ],
+   "selection": {
+    "mode": "polygon",
+    "polygons": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5
+    ]
+   }
+  },
+  "settings": {
+   "button": "Uniform Scale",
+   "fields": {
+    "Uniform": 4.0,
+    "Axis": "Longest Axis",
+    "Orient To Selection": true,
+    "X": 0.0,
+    "Y": 0.0,
+    "Z": 0.0,
+    "X Center": "Center",
+    "Y Center": "Center",
+    "Z Center": "Center"
+   }
+  },
+  "expected": {
+   "points": [
+    [
+     -0.707107,
+     -2.12132,
+     -0.5
+    ],
+    [
+     2.12132,
+     0.707107,
+     -0.5
+    ],
+    [
+     0.707107,
+     2.12132,
+     -0.5
+    ],
+    [
+     -2.12132,
+     -0.707107,
+     -0.5
+    ],
+    [
+     -0.707107,
+     -2.12132,
+     1.5
+    ],
+    [
+     2.12132,
+     0.707107,
+     1.5
+    ],
+    [
+     0.707107,
+     2.12132,
+     1.5
+    ],
+    [
+     -2.12132,
+     -0.707107,
+     1.5
+    ]
+   ],
+   "polygons_unchanged": true,
+   "fields_after": {
+    "Uniform": 4.0,
+    "Axis": "Longest Axis",
+    "Orient To Selection": true,
+    "X": 4.0,
+    "Y": 2.0,
+    "Z": 2.0,
+    "X Center": "Center",
+    "Y Center": "Center",
+    "Z Center": "Center"
+   }
+  },
+  "tolerance": 1e-05
+ },
+ {
+  "id": "AS-33_explicit_y0_solid",
+  "tool": "Absolute Scaling",
+  "description": "Explicit 4,0,1 on the whole (non-flat) box: refuse, partial or flatten?",
+  "input": {
+   "points": [
+    [
+     1.0,
+     0.0,
+     0.0
+    ],
+    [
+     3.0,
+     0.0,
+     0.0
+    ],
+    [
+     3.0,
+     1.0,
+     0.0
+    ],
+    [
+     1.0,
+     1.0,
+     0.0
+    ],
+    [
+     1.0,
+     0.0,
+     0.5
+    ],
+    [
+     3.0,
+     0.0,
+     0.5
+    ],
+    [
+     3.0,
+     1.0,
+     0.5
+    ],
+    [
+     1.0,
+     1.0,
+     0.5
+    ]
+   ],
+   "polygons": [
+    [
+     0,
+     3,
+     2,
+     1
+    ],
+    [
+     4,
+     5,
+     6,
+     7
+    ],
+    [
+     0,
+     1,
+     5,
+     4
+    ],
+    [
+     2,
+     3,
+     7,
+     6
+    ],
+    [
+     1,
+     2,
+     6,
+     5
+    ],
+    [
+     0,
+     4,
+     7,
+     3
+    ]
+   ],
+   "selection": {
+    "mode": "polygon",
+    "polygons": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5
+    ]
+   }
+  },
+  "settings": {
+   "button": "Explicit Scale",
+   "fields": {
+    "Uniform": 0.0,
+    "Axis": "Longest Axis",
+    "Orient To Selection": false,
+    "X": 4.0,
+    "Y": 0.0,
+    "Z": 1.0,
+    "X Center": "Center",
+    "Y Center": "Center",
+    "Z Center": "Center"
+   }
+  },
+  "expected": {
+   "points": [
+    [
+     0.0,
+     0.0,
+     -0.25
+    ],
+    [
+     4.0,
+     0.0,
+     -0.25
+    ],
+    [
+     4.0,
+     1.0,
+     -0.25
+    ],
+    [
+     0.0,
+     1.0,
+     -0.25
+    ],
+    [
+     0.0,
+     0.0,
+     0.75
+    ],
+    [
+     4.0,
+     0.0,
+     0.75
+    ],
+    [
+     4.0,
+     1.0,
+     0.75
+    ],
+    [
+     0.0,
+     1.0,
+     0.75
+    ]
+   ],
+   "polygons_unchanged": true,
+   "fields_after": {
+    "Uniform": 4.0,
+    "Axis": "Longest Axis",
+    "Orient To Selection": false,
+    "X": 4.0,
+    "Y": 1.0,
+    "Z": 1.0,
+    "X Center": "Center",
+    "Y Center": "Center",
+    "Z Center": "Center"
+   }
+  },
+  "tolerance": 1e-05
+ },
+ {
+  "id": "AS-34_uniform_flat_face_in_box",
+  "tool": "Absolute Scaling",
+  "description": "Uniform 4 with only the flat top face of the box selected.",
+  "input": {
+   "points": [
+    [
+     1.0,
+     0.0,
+     0.0
+    ],
+    [
+     3.0,
+     0.0,
+     0.0
+    ],
+    [
+     3.0,
+     1.0,
+     0.0
+    ],
+    [
+     1.0,
+     1.0,
+     0.0
+    ],
+    [
+     1.0,
+     0.0,
+     0.5
+    ],
+    [
+     3.0,
+     0.0,
+     0.5
+    ],
+    [
+     3.0,
+     1.0,
+     0.5
+    ],
+    [
+     1.0,
+     1.0,
+     0.5
+    ]
+   ],
+   "polygons": [
+    [
+     0,
+     3,
+     2,
+     1
+    ],
+    [
+     4,
+     5,
+     6,
+     7
+    ],
+    [
+     0,
+     1,
+     5,
+     4
+    ],
+    [
+     2,
+     3,
+     7,
+     6
+    ],
+    [
+     1,
+     2,
+     6,
+     5
+    ],
+    [
+     0,
+     4,
+     7,
+     3
+    ]
+   ],
+   "selection": {
+    "mode": "polygon",
+    "polygons": [
+     3
+    ]
+   }
+  },
+  "settings": {
+   "button": "Uniform Scale",
+   "fields": {
+    "Uniform": 4.0,
+    "Axis": "Longest Axis",
+    "Orient To Selection": false,
+    "X": 0.0,
+    "Y": 0.0,
+    "Z": 0.0,
+    "X Center": "Center",
+    "Y Center": "Center",
+    "Z Center": "Center"
+   }
+  },
+  "expected": {
+   "points": [
+    [
+     1.0,
+     0.0,
+     0.0
+    ],
+    [
+     3.0,
+     0.0,
+     0.0
+    ],
+    [
+     2.0,
+     1.0,
+     0.25
+    ],
+    [
+     2.0,
+     1.0,
+     0.25
+    ],
+    [
+     1.0,
+     0.0,
+     0.5
+    ],
+    [
+     3.0,
+     0.0,
+     0.5
+    ],
+    [
+     2.0,
+     1.0,
+     0.25
+    ],
+    [
+     2.0,
+     1.0,
+     0.25
+    ]
+   ],
+   "polygons_unchanged": true,
+   "fields_after": {
+    "Uniform": 0.0,
+    "Axis": "Longest Axis",
+    "Orient To Selection": false,
+    "X": 0.0,
+    "Y": 0.0,
+    "Z": 0.0,
+    "X Center": "Center",
+    "Y Center": "Center",
+    "Z Center": "Center"
+   }
+  },
+  "tolerance": 1e-05
+ },
+ {
+  "id": "AS-35_reference_low_centers",
+  "tool": "Absolute Scaling",
+  "description": "Reference 4,2,1 with all of A selected and Low centers.",
+  "input": {
+   "points": [
+    [
+     0.0,
+     0.0,
+     0.0
+    ],
+    [
+     2.0,
+     0.0,
+     0.0
+    ],
+    [
+     2.0,
+     1.0,
+     0.0
+    ],
+    [
+     0.0,
+     1.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.5
+    ],
+    [
+     2.0,
+     0.0,
+     0.5
+    ],
+    [
+     2.0,
+     1.0,
+     0.5
+    ],
+    [
+     0.0,
+     1.0,
+     0.5
+    ],
+    [
+     5.0,
+     0.0,
+     0.0
+    ],
+    [
+     6.0,
+     0.0,
+     0.0
+    ],
+    [
+     6.0,
+     1.0,
+     0.0
+    ],
+    [
+     5.0,
+     1.0,
+     0.0
+    ],
+    [
+     5.0,
+     0.0,
+     1.0
+    ],
+    [
+     6.0,
+     0.0,
+     1.0
+    ],
+    [
+     6.0,
+     1.0,
+     1.0
+    ],
+    [
+     5.0,
+     1.0,
+     1.0
+    ]
+   ],
+   "polygons": [
+    [
+     0,
+     3,
+     2,
+     1
+    ],
+    [
+     4,
+     5,
+     6,
+     7
+    ],
+    [
+     0,
+     1,
+     5,
+     4
+    ],
+    [
+     2,
+     3,
+     7,
+     6
+    ],
+    [
+     1,
+     2,
+     6,
+     5
+    ],
+    [
+     0,
+     4,
+     7,
+     3
+    ],
+    [
+     8,
+     11,
+     10,
+     9
+    ],
+    [
+     12,
+     13,
+     14,
+     15
+    ],
+    [
+     8,
+     9,
+     13,
+     12
+    ],
+    [
+     10,
+     11,
+     15,
+     14
+    ],
+    [
+     9,
+     10,
+     14,
+     13
+    ],
+    [
+     8,
+     12,
+     15,
+     11
+    ]
+   ],
+   "selection": {
+    "mode": "polygon",
+    "polygons": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5
+    ]
+   }
+  },
+  "settings": {
+   "button": "Reference Scale",
+   "fields": {
+    "Uniform": 0.0,
+    "Axis": "Longest Axis",
+    "Orient To Selection": false,
+    "X": 4.0,
+    "Y": 2.0,
+    "Z": 1.0,
+    "X Center": "Low",
+    "Y Center": "Low",
+    "Z Center": "Low"
+   }
+  },
+  "expected": {
+   "points": [
+    [
+     0.0,
+     0.0,
+     0.0
+    ],
+    [
+     4.0,
+     0.0,
+     0.0
+    ],
+    [
+     4.0,
+     2.0,
+     0.0
+    ],
+    [
+     0.0,
+     2.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     1.0
+    ],
+    [
+     4.0,
+     0.0,
+     1.0
+    ],
+    [
+     4.0,
+     2.0,
+     1.0
+    ],
+    [
+     0.0,
+     2.0,
+     1.0
+    ],
+    [
+     10.0,
+     0.0,
+     0.0
+    ],
+    [
+     12.0,
+     0.0,
+     0.0
+    ],
+    [
+     12.0,
+     2.0,
+     0.0
+    ],
+    [
+     10.0,
+     2.0,
+     0.0
+    ],
+    [
+     10.0,
+     0.0,
+     2.0
+    ],
+    [
+     12.0,
+     0.0,
+     2.0
+    ],
+    [
+     12.0,
+     2.0,
+     2.0
+    ],
+    [
+     10.0,
+     2.0,
+     2.0
+    ]
+   ],
+   "polygons_unchanged": true,
+   "fields_after": {
+    "Uniform": 4.0,
+    "Axis": "Longest Axis",
+    "Orient To Selection": false,
+    "X": 4.0,
+    "Y": 2.0,
+    "Z": 1.0,
+    "X Center": "Low",
+    "Y Center": "Low",
+    "Z Center": "Low"
+   }
+  },
+  "tolerance": 1e-05
+ },
+ {
+  "id": "AS-36_explicit_rotbox_orient",
+  "tool": "Absolute Scaling",
+  "description": "Explicit 2,1,1 on the turned box with Orient on: does Orient affect Explicit?",
+  "input": {
+   "points": [
+    [
+     -0.353553,
+     -1.06066,
+     0.0
+    ],
+    [
+     1.06066,
+     0.353553,
+     0.0
+    ],
+    [
+     0.353553,
+     1.06066,
+     0.0
+    ],
+    [
+     -1.06066,
+     -0.353553,
+     0.0
+    ],
+    [
+     -0.353553,
+     -1.06066,
+     1.0
+    ],
+    [
+     1.06066,
+     0.353553,
+     1.0
+    ],
+    [
+     0.353553,
+     1.06066,
+     1.0
+    ],
+    [
+     -1.06066,
+     -0.353553,
+     1.0
+    ]
+   ],
+   "polygons": [
+    [
+     0,
+     3,
+     2,
+     1
+    ],
+    [
+     4,
+     5,
+     6,
+     7
+    ],
+    [
+     0,
+     1,
+     5,
+     4
+    ],
+    [
+     2,
+     3,
+     7,
+     6
+    ],
+    [
+     1,
+     2,
+     6,
+     5
+    ],
+    [
+     0,
+     4,
+     7,
+     3
+    ]
+   ],
+   "selection": {
+    "mode": "polygon",
+    "polygons": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5
+    ]
+   }
+  },
+  "settings": {
+   "button": "Explicit Scale",
+   "fields": {
+    "Uniform": 0.0,
+    "Axis": "Longest Axis",
+    "Orient To Selection": true,
+    "X": 2.0,
+    "Y": 1.0,
+    "Z": 1.0,
+    "X Center": "Center",
+    "Y Center": "Center",
+    "Z Center": "Center"
+   }
+  },
+  "expected": {
+   "points": [
+    [
+     -0.353553,
+     -1.06066,
+     0.0
+    ],
+    [
+     1.06066,
+     0.353553,
+     0.0
+    ],
+    [
+     0.353553,
+     1.06066,
+     0.0
+    ],
+    [
+     -1.06066,
+     -0.353553,
+     0.0
+    ],
+    [
+     -0.353553,
+     -1.06066,
+     1.0
+    ],
+    [
+     1.06066,
+     0.353553,
+     1.0
+    ],
+    [
+     0.353553,
+     1.06066,
+     1.0
+    ],
+    [
+     -1.06066,
+     -0.353553,
+     1.0
+    ]
+   ],
+   "polygons_unchanged": true,
+   "fields_after": {
+    "Uniform": 2.0,
+    "Axis": "Longest Axis",
+    "Orient To Selection": true,
+    "X": 2.0,
+    "Y": 1.0,
+    "Z": 1.0,
+    "X Center": "Center",
+    "Y Center": "Center",
+    "Z Center": "Center"
+   }
+  },
+  "tolerance": 1e-05
+ },
+ {
+  "id": "AS-37_grab_rotbox_orient",
+  "tool": "Absolute Scaling",
+  "description": "Grab Size on the 45-deg turned 2x1x1 box with Orient on.",
+  "input": {
+   "points": [
+    [
+     -0.353553,
+     -1.06066,
+     0.0
+    ],
+    [
+     1.06066,
+     0.353553,
+     0.0
+    ],
+    [
+     0.353553,
+     1.06066,
+     0.0
+    ],
+    [
+     -1.06066,
+     -0.353553,
+     0.0
+    ],
+    [
+     -0.353553,
+     -1.06066,
+     1.0
+    ],
+    [
+     1.06066,
+     0.353553,
+     1.0
+    ],
+    [
+     0.353553,
+     1.06066,
+     1.0
+    ],
+    [
+     -1.06066,
+     -0.353553,
+     1.0
+    ]
+   ],
+   "polygons": [
+    [
+     0,
+     3,
+     2,
+     1
+    ],
+    [
+     4,
+     5,
+     6,
+     7
+    ],
+    [
+     0,
+     1,
+     5,
+     4
+    ],
+    [
+     2,
+     3,
+     7,
+     6
+    ],
+    [
+     1,
+     2,
+     6,
+     5
+    ],
+    [
+     0,
+     4,
+     7,
+     3
+    ]
+   ],
+   "selection": {
+    "mode": "polygon",
+    "polygons": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5
+    ]
+   }
+  },
+  "settings": {
+   "button": "Grab Size",
+   "fields": {
+    "Uniform": 0.0,
+    "Axis": "Longest Axis",
+    "Orient To Selection": true,
+    "X": 0.0,
+    "Y": 0.0,
+    "Z": 0.0,
+    "X Center": "Center",
+    "Y Center": "Center",
+    "Z Center": "Center"
+   }
+  },
+  "expected": {
+   "points": [
+    [
+     -0.353553,
+     -1.06066,
+     0.0
+    ],
+    [
+     1.06066,
+     0.353553,
+     0.0
+    ],
+    [
+     0.353553,
+     1.06066,
+     0.0
+    ],
+    [
+     -1.06066,
+     -0.353553,
+     0.0
+    ],
+    [
+     -0.353553,
+     -1.06066,
+     1.0
+    ],
+    [
+     1.06066,
+     0.353553,
+     1.0
+    ],
+    [
+     0.353553,
+     1.06066,
+     1.0
+    ],
+    [
+     -1.06066,
+     -0.353553,
+     1.0
+    ]
+   ],
+   "polygons_unchanged": true,
+   "fields_after": {
+    "Uniform": 2.0,
+    "Axis": "Longest Axis",
+    "Orient To Selection": true,
+    "X": 2.0,
+    "Y": 1.0,
+    "Z": 1.0,
+    "X Center": "Center",
+    "Y Center": "Center",
+    "Z Center": "Center"
+   }
+  },
+  "tolerance": 1e-05
+ },
+ {
+  "id": "AS-38_explicit_two_items",
+  "tool": "Absolute Scaling",
+  "description": "Two mesh items selected in item mode, Explicit 4,2,2: one combined box or each item on its own?",
+  "input": {
+   "meshes": {
+    "A": {
+     "points": [
+      [
+       0.0,
+       0.0,
+       0.0
+      ],
+      [
+       2.0,
+       0.0,
+       0.0
+      ],
+      [
+       2.0,
+       1.0,
+       0.0
+      ],
+      [
+       0.0,
+       1.0,
+       0.0
+      ],
+      [
+       0.0,
+       0.0,
+       1.0
+      ],
+      [
+       2.0,
+       0.0,
+       1.0
+      ],
+      [
+       2.0,
+       1.0,
+       1.0
+      ],
+      [
+       0.0,
+       1.0,
+       1.0
+      ]
+     ],
+     "polygons": [
+      [
+       0,
+       3,
+       2,
+       1
+      ],
+      [
+       4,
+       5,
+       6,
+       7
+      ],
+      [
+       0,
+       1,
+       5,
+       4
+      ],
+      [
+       2,
+       3,
+       7,
+       6
+      ],
+      [
+       1,
+       2,
+       6,
+       5
+      ],
+      [
+       0,
+       4,
+       7,
+       3
+      ]
+     ]
+    },
+    "B": {
+     "points": [
+      [
+       5.0,
+       0.0,
+       0.0
+      ],
+      [
+       6.0,
+       0.0,
+       0.0
+      ],
+      [
+       6.0,
+       1.0,
+       0.0
+      ],
+      [
+       5.0,
+       1.0,
+       0.0
+      ],
+      [
+       5.0,
+       0.0,
+       1.0
+      ],
+      [
+       6.0,
+       0.0,
+       1.0
+      ],
+      [
+       6.0,
+       1.0,
+       1.0
+      ],
+      [
+       5.0,
+       1.0,
+       1.0
+      ]
+     ],
+     "polygons": [
+      [
+       0,
+       3,
+       2,
+       1
+      ],
+      [
+       4,
+       5,
+       6,
+       7
+      ],
+      [
+       0,
+       1,
+       5,
+       4
+      ],
+      [
+       2,
+       3,
+       7,
+       6
+      ],
+      [
+       1,
+       2,
+       6,
+       5
+      ],
+      [
+       0,
+       4,
+       7,
+       3
+      ]
+     ]
+    }
+   },
+   "selection": {
+    "mode": "item",
+    "items": [
+     "A",
+     "B"
+    ]
+   }
+  },
+  "settings": {
+   "button": "Explicit Scale",
+   "fields": {
+    "X": 4,
+    "Y": 2,
+    "Z": 2,
+    "X Center": "Center",
+    "Y Center": "Center",
+    "Z Center": "Center",
+    "Orient To Selection": false
+   }
+  },
+  "expected": {
+   "meshes": {
+    "A": {
+     "points": [
+      [
+       1.0,
+       -0.5,
+       -0.5
+      ],
+      [
+       2.333333,
+       -0.5,
+       -0.5
+      ],
+      [
+       2.333333,
+       1.5,
+       -0.5
+      ],
+      [
+       1.0,
+       1.5,
+       -0.5
+      ],
+      [
+       1.0,
+       -0.5,
+       1.5
+      ],
+      [
+       2.333333,
+       -0.5,
+       1.5
+      ],
+      [
+       2.333333,
+       1.5,
+       1.5
+      ],
+      [
+       1.0,
+       1.5,
+       1.5
+      ]
+     ]
+    },
+    "B": {
+     "points": [
+      [
+       4.333333,
+       -0.5,
+       -0.5
+      ],
+      [
+       5.0,
+       -0.5,
+       -0.5
+      ],
+      [
+       5.0,
+       1.5,
+       -0.5
+      ],
+      [
+       4.333333,
+       1.5,
+       -0.5
+      ],
+      [
+       4.333333,
+       -0.5,
+       1.5
+      ],
+      [
+       5.0,
+       -0.5,
+       1.5
+      ],
+      [
+       5.0,
+       1.5,
+       1.5
+      ],
+      [
+       4.333333,
+       1.5,
+       1.5
+      ]
+     ]
+    }
+   },
+   "fields_after": {
+    "Uniform": 4.0,
+    "Axis": "Longest Axis",
+    "Orient To Selection": false,
+    "X": 4.0,
+    "Y": 2.0,
+    "Z": 2.0,
+    "X Center": "Center",
+    "Y Center": "Center",
+    "Z Center": "Center"
+   }
+  },
+  "tolerance": 1e-05
+ },
+ {
+  "id": "SZ-scaleabs_01_sx2_abs12",
+  "tool": "Scale tool (Scale Absolute)",
+  "description": "Transform tool, Scale on, Absolute Handle on, abs 1.2, SX 2.",
+  "input": {
+   "points": [
+    [
+     1.0,
+     0.0,
+     0.0
+    ],
+    [
+     3.0,
+     0.0,
+     0.0
+    ],
+    [
+     3.0,
+     1.0,
+     0.0
+    ],
+    [
+     1.0,
+     1.0,
+     0.0
+    ],
+    [
+     1.0,
+     0.0,
+     0.5
+    ],
+    [
+     3.0,
+     0.0,
+     0.5
+    ],
+    [
+     3.0,
+     1.0,
+     0.5
+    ],
+    [
+     1.0,
+     1.0,
+     0.5
+    ]
+   ],
+   "polygons": [
+    [
+     0,
+     3,
+     2,
+     1
+    ],
+    [
+     4,
+     5,
+     6,
+     7
+    ],
+    [
+     0,
+     1,
+     5,
+     4
+    ],
+    [
+     2,
+     3,
+     7,
+     6
+    ],
+    [
+     1,
+     2,
+     6,
+     5
+    ],
+    [
+     0,
+     4,
+     7,
+     3
+    ]
+   ],
+   "selection": {
+    "mode": "polygon",
+    "polygons": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5
+    ]
+   }
+  },
+  "settings": {
+   "Absolute Handle": true,
+   "absX": 1.2,
+   "Scale X": 2,
+   "center": [
+    0,
+    0,
+    0
+   ]
+  },
+  "expected": {
+   "points": [
+    [
+     2.0,
+     0.0,
+     0.0
+    ],
+    [
+     6.0,
+     0.0,
+     0.0
+    ],
+    [
+     6.0,
+     1.0,
+     0.0
+    ],
+    [
+     2.0,
+     1.0,
+     0.0
+    ],
+    [
+     2.0,
+     0.0,
+     0.5
+    ],
+    [
+     6.0,
+     0.0,
+     0.5
+    ],
+    [
+     6.0,
+     1.0,
+     0.5
+    ],
+    [
+     2.0,
+     1.0,
+     0.5
+    ]
+   ]
+  },
+  "tolerance": 1e-05
+ },
+ {
+  "id": "SZ-scaleabs_02_sx2_noabs",
+  "tool": "Scale tool (Scale Absolute)",
+  "description": "Same with Absolute Handle off, for contrast.",
+  "input": {
+   "points": [
+    [
+     1.0,
+     0.0,
+     0.0
+    ],
+    [
+     3.0,
+     0.0,
+     0.0
+    ],
+    [
+     3.0,
+     1.0,
+     0.0
+    ],
+    [
+     1.0,
+     1.0,
+     0.0
+    ],
+    [
+     1.0,
+     0.0,
+     0.5
+    ],
+    [
+     3.0,
+     0.0,
+     0.5
+    ],
+    [
+     3.0,
+     1.0,
+     0.5
+    ],
+    [
+     1.0,
+     1.0,
+     0.5
+    ]
+   ],
+   "polygons": [
+    [
+     0,
+     3,
+     2,
+     1
+    ],
+    [
+     4,
+     5,
+     6,
+     7
+    ],
+    [
+     0,
+     1,
+     5,
+     4
+    ],
+    [
+     2,
+     3,
+     7,
+     6
+    ],
+    [
+     1,
+     2,
+     6,
+     5
+    ],
+    [
+     0,
+     4,
+     7,
+     3
+    ]
+   ],
+   "selection": {
+    "mode": "polygon",
+    "polygons": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5
+    ]
+   }
+  },
+  "settings": {
+   "Absolute Handle": false,
+   "absX": 1,
+   "Scale X": 2,
+   "center": [
+    0,
+    0,
+    0
+   ]
+  },
+  "expected": {
+   "points": [
+    [
+     2.0,
+     0.0,
+     0.0
+    ],
+    [
+     6.0,
+     0.0,
+     0.0
+    ],
+    [
+     6.0,
+     1.0,
+     0.0
+    ],
+    [
+     2.0,
+     1.0,
+     0.0
+    ],
+    [
+     2.0,
+     0.0,
+     0.5
+    ],
+    [
+     6.0,
+     0.0,
+     0.5
+    ],
+    [
+     6.0,
+     1.0,
+     0.5
+    ],
+    [
+     2.0,
+     1.0,
+     0.5
+    ]
+   ]
+  },
+  "tolerance": 1e-05
+ },
+ {
+  "id": "SZ-size_01_default",
+  "tool": "Size tool (Size Absolute)",
+  "description": "Size tool, all six values 1: any change?",
+  "input": {
+   "points": [
+    [
+     1.0,
+     0.0,
+     0.0
+    ],
+    [
+     3.0,
+     0.0,
+     0.0
+    ],
+    [
+     3.0,
+     1.0,
+     0.0
+    ],
+    [
+     1.0,
+     1.0,
+     0.0
+    ],
+    [
+     1.0,
+     0.0,
+     0.5
+    ],
+    [
+     3.0,
+     0.0,
+     0.5
+    ],
+    [
+     3.0,
+     1.0,
+     0.5
+    ],
+    [
+     1.0,
+     1.0,
+     0.5
+    ]
+   ],
+   "polygons": [
+    [
+     0,
+     3,
+     2,
+     1
+    ],
+    [
+     4,
+     5,
+     6,
+     7
+    ],
+    [
+     0,
+     1,
+     5,
+     4
+    ],
+    [
+     2,
+     3,
+     7,
+     6
+    ],
+    [
+     1,
+     2,
+     6,
+     5
+    ],
+    [
+     0,
+     4,
+     7,
+     3
+    ]
+   ],
+   "selection": {
+    "mode": "polygon",
+    "polygons": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5
+    ]
+   }
+  },
+  "settings": {
+   "absX": 1,
+   "absY": 1,
+   "absZ": 1,
+   "relX": 1,
+   "relY": 1,
+   "relZ": 1,
+   "center": [
+    0,
+    0,
+    0
+   ]
+  },
+  "expected": {
+   "points": [
+    [
+     1.0,
+     0.0,
+     0.0
+    ],
+    [
+     3.0,
+     0.0,
+     0.0
+    ],
+    [
+     3.0,
+     1.0,
+     0.0
+    ],
+    [
+     1.0,
+     1.0,
+     0.0
+    ],
+    [
+     1.0,
+     0.0,
+     0.5
+    ],
+    [
+     3.0,
+     0.0,
+     0.5
+    ],
+    [
+     3.0,
+     1.0,
+     0.5
+    ],
+    [
+     1.0,
+     1.0,
+     0.5
+    ]
+   ]
+  },
+  "tolerance": 1e-05
+ },
+ {
+  "id": "SZ-size_02_rel4_abs2_x",
+  "tool": "Size tool (Size Absolute)",
+  "description": "Size tool, Absolute X 2, Relative X 4.",
+  "input": {
+   "points": [
+    [
+     1.0,
+     0.0,
+     0.0
+    ],
+    [
+     3.0,
+     0.0,
+     0.0
+    ],
+    [
+     3.0,
+     1.0,
+     0.0
+    ],
+    [
+     1.0,
+     1.0,
+     0.0
+    ],
+    [
+     1.0,
+     0.0,
+     0.5
+    ],
+    [
+     3.0,
+     0.0,
+     0.5
+    ],
+    [
+     3.0,
+     1.0,
+     0.5
+    ],
+    [
+     1.0,
+     1.0,
+     0.5
+    ]
+   ],
+   "polygons": [
+    [
+     0,
+     3,
+     2,
+     1
+    ],
+    [
+     4,
+     5,
+     6,
+     7
+    ],
+    [
+     0,
+     1,
+     5,
+     4
+    ],
+    [
+     2,
+     3,
+     7,
+     6
+    ],
+    [
+     1,
+     2,
+     6,
+     5
+    ],
+    [
+     0,
+     4,
+     7,
+     3
+    ]
+   ],
+   "selection": {
+    "mode": "polygon",
+    "polygons": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5
+    ]
+   }
+  },
+  "settings": {
+   "absX": 2,
+   "absY": 1,
+   "absZ": 1,
+   "relX": 4,
+   "relY": 1,
+   "relZ": 1,
+   "center": [
+    0,
+    0,
+    0
+   ]
+  },
+  "expected": {
+   "points": [
+    [
+     2.0,
+     0.0,
+     0.0
+    ],
+    [
+     6.0,
+     0.0,
+     0.0
+    ],
+    [
+     6.0,
+     1.0,
+     0.0
+    ],
+    [
+     2.0,
+     1.0,
+     0.0
+    ],
+    [
+     2.0,
+     0.0,
+     0.5
+    ],
+    [
+     6.0,
+     0.0,
+     0.5
+    ],
+    [
+     6.0,
+     1.0,
+     0.5
+    ],
+    [
+     2.0,
+     1.0,
+     0.5
+    ]
+   ]
+  },
+  "tolerance": 1e-05
+ },
+ {
+  "id": "SZ-size_03_rel3_x",
+  "tool": "Size tool (Size Absolute)",
+  "description": "Size tool, Absolute X 1, Relative X 3.",
+  "input": {
+   "points": [
+    [
+     1.0,
+     0.0,
+     0.0
+    ],
+    [
+     3.0,
+     0.0,
+     0.0
+    ],
+    [
+     3.0,
+     1.0,
+     0.0
+    ],
+    [
+     1.0,
+     1.0,
+     0.0
+    ],
+    [
+     1.0,
+     0.0,
+     0.5
+    ],
+    [
+     3.0,
+     0.0,
+     0.5
+    ],
+    [
+     3.0,
+     1.0,
+     0.5
+    ],
+    [
+     1.0,
+     1.0,
+     0.5
+    ]
+   ],
+   "polygons": [
+    [
+     0,
+     3,
+     2,
+     1
+    ],
+    [
+     4,
+     5,
+     6,
+     7
+    ],
+    [
+     0,
+     1,
+     5,
+     4
+    ],
+    [
+     2,
+     3,
+     7,
+     6
+    ],
+    [
+     1,
+     2,
+     6,
+     5
+    ],
+    [
+     0,
+     4,
+     7,
+     3
+    ]
+   ],
+   "selection": {
+    "mode": "polygon",
+    "polygons": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5
+    ]
+   }
+  },
+  "settings": {
+   "absX": 1,
+   "absY": 1,
+   "absZ": 1,
+   "relX": 3,
+   "relY": 1,
+   "relZ": 1,
+   "center": [
+    0,
+    0,
+    0
+   ]
+  },
+  "expected": {
+   "points": [
+    [
+     3.0,
+     0.0,
+     0.0
+    ],
+    [
+     9.0,
+     0.0,
+     0.0
+    ],
+    [
+     9.0,
+     1.0,
+     0.0
+    ],
+    [
+     3.0,
+     1.0,
+     0.0
+    ],
+    [
+     3.0,
+     0.0,
+     0.5
+    ],
+    [
+     9.0,
+     0.0,
+     0.5
+    ],
+    [
+     9.0,
+     1.0,
+     0.5
+    ],
+    [
+     3.0,
+     1.0,
+     0.5
+    ]
+   ]
+  },
+  "tolerance": 1e-05
+ },
+ {
+  "id": "SZ-size_04_xyz",
+  "tool": "Size tool (Size Absolute)",
+  "description": "Size tool, abs 2,1,0.5 rel 4,3,1.",
+  "input": {
+   "points": [
+    [
+     1.0,
+     0.0,
+     0.0
+    ],
+    [
+     3.0,
+     0.0,
+     0.0
+    ],
+    [
+     3.0,
+     1.0,
+     0.0
+    ],
+    [
+     1.0,
+     1.0,
+     0.0
+    ],
+    [
+     1.0,
+     0.0,
+     0.5
+    ],
+    [
+     3.0,
+     0.0,
+     0.5
+    ],
+    [
+     3.0,
+     1.0,
+     0.5
+    ],
+    [
+     1.0,
+     1.0,
+     0.5
+    ]
+   ],
+   "polygons": [
+    [
+     0,
+     3,
+     2,
+     1
+    ],
+    [
+     4,
+     5,
+     6,
+     7
+    ],
+    [
+     0,
+     1,
+     5,
+     4
+    ],
+    [
+     2,
+     3,
+     7,
+     6
+    ],
+    [
+     1,
+     2,
+     6,
+     5
+    ],
+    [
+     0,
+     4,
+     7,
+     3
+    ]
+   ],
+   "selection": {
+    "mode": "polygon",
+    "polygons": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5
+    ]
+   }
+  },
+  "settings": {
+   "absX": 2,
+   "absY": 1,
+   "absZ": 0.5,
+   "relX": 4,
+   "relY": 3,
+   "relZ": 1,
+   "center": [
+    0,
+    0,
+    0
+   ]
+  },
+  "expected": {
+   "points": [
+    [
+     2.0,
+     0.0,
+     0.0
+    ],
+    [
+     6.0,
+     0.0,
+     0.0
+    ],
+    [
+     6.0,
+     3.0,
+     0.0
+    ],
+    [
+     2.0,
+     3.0,
+     0.0
+    ],
+    [
+     2.0,
+     0.0,
+     1.0
+    ],
+    [
+     6.0,
+     0.0,
+     1.0
+    ],
+    [
+     6.0,
+     3.0,
+     1.0
+    ],
+    [
+     2.0,
+     3.0,
+     1.0
+    ]
+   ]
+  },
+  "tolerance": 1e-05
+ }
+]

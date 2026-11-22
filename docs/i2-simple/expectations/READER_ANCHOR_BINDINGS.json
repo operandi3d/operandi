@@ -1,0 +1,32 @@
+{
+  "RA": {
+    "capture_state": "A_move",
+    "captured_anchor": {
+      "scope": "D0/item1/generation1",
+      "cursor": 3,
+      "completed_boundary": "H3",
+      "base": {
+        "graph": "G0",
+        "identity": "I0"
+      }
+    },
+    "bind_stage_anchor_to": "THIS copied capture metadata,never current state.selected_anchor",
+    "captured_visible": "G2/I1"
+  },
+  "RC": {
+    "capture_state": "ParkCdropA",
+    "captured_anchor": {
+      "scope": "D0/item1/generation1",
+      "cursor": 3,
+      "completed_boundary": "H3",
+      "base": {
+        "graph": "G0",
+        "identity": "I0"
+      }
+    },
+    "bind_stage_anchor_to": "THIS copied capture metadata,never current state.selected_anchor",
+    "captured_visible": "G0/I0"
+  },
+  "ownership": "Anchor metadata references the reader-owned stage base snapshot;does not copy/retain the whole document timeline or add a Scene root",
+  "eligibility": "Captured publication/request is read-only provenance,not editable-session eligibility on resume"
+}

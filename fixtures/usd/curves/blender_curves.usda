@@ -1,0 +1,93 @@
+#usda 1.0
+(
+    defaultPrim = "root"
+    doc = "Blender v5.2.2 LTS"
+    metersPerUnit = 1
+    upAxis = "Z"
+)
+
+def Xform "root" (
+    prepend apiSchemas = ["ColorSpaceAPI"]
+    customData = {
+        dictionary Blender = {
+            bool generated = 1
+        }
+    }
+)
+{
+    uniform token colorSpace:name = "lin_rec709_scene"
+
+    def Xform "Path"
+    {
+        custom string userProperties:blender:object_name = "Path"
+        float3 xformOp:rotateXYZ = (0, -0, 0)
+        float3 xformOp:scale = (1, 1, 1)
+        double3 xformOp:translate = (0, 3, 0)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+
+        def NurbsCurves "NurbsPath"
+        {
+            int[] curveVertexCounts = [5]
+            float3[] extent = [(-3, -1, -1), (3, 1, 1)]
+            double[] knots = [0, 0, 0, 0, 0, 1, 1, 1, 1, 1]
+            int[] order = [5]
+            point3f[] points = [(-2, 0, 0), (-1, 0, 0), (0, 0, 0), (1, 0, 0), (2, 0, 0)]
+            double[] pointWeights = [1, 1, 1, 1, 1]
+            float[] primvars:tilt = [0, 0, 0, 0, 0] (
+                interpolation = "vertex"
+            )
+            custom string userProperties:blender:data_name = "Curves"
+            float[] widths = [2, 2, 2, 2, 2] (
+                interpolation = "vertex"
+            )
+        }
+    }
+
+    def Xform "Circle"
+    {
+        custom string userProperties:blender:object_name = "Circle"
+
+        def BasisCurves "BézierCircle"
+        {
+            uniform token basis = "bezier"
+            int[] curveVertexCounts = [12]
+            float3[] extent = [(-2, -2, -1), (2, 2, 1)]
+            point3f[] points = [(-1, 0, 0), (-1, 0.5521252, 0), (-0.5521252, 1, 0), (0, 1, 0), (0.5521252, 1, 0), (1, 0.5521252, 0), (1, 0, 0), (1, -0.5521252, 0), (0.5521252, -1, 0), (0, -1, 0), (-0.5521252, -1, 0), (-1, -0.5521252, 0)]
+            float[] primvars:tilt = [0, 0, 0, 0] (
+                interpolation = "varying"
+            )
+            uniform token type = "cubic"
+            custom string userProperties:blender:data_name = "Curves"
+            float[] widths = [2, 2, 2, 2] (
+                interpolation = "varying"
+            )
+            uniform token wrap = "periodic"
+        }
+    }
+
+    def Xform "Poly"
+    {
+        custom string userProperties:blender:object_name = "Poly"
+        float3 xformOp:rotateXYZ = (0, -0, 0)
+        float3 xformOp:scale = (1, 1, 1)
+        double3 xformOp:translate = (0, -3, 0)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+
+        def BasisCurves "Poly"
+        {
+            int[] curveVertexCounts = [4]
+            float3[] extent = [(-1, -1, -1), (3, 2, 2)]
+            point3f[] points = [(0, 0, 0), (1, 0, 0), (1, 1, 0), (2, 1, 1)]
+            float[] primvars:tilt = [0, 0, 0, 0] (
+                interpolation = "vertex"
+            )
+            uniform token type = "linear"
+            custom string userProperties:blender:data_name = "Curves"
+            float[] widths = [2, 2, 2, 2] (
+                interpolation = "vertex"
+            )
+            uniform token wrap = "nonperiodic"
+        }
+    }
+}
+

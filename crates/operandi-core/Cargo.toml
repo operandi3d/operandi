@@ -1,0 +1,68 @@
+[package]
+name = "operandi-core"
+version = "0.1.0"
+edition = "2024"
+license = "GPL-3.0-or-later"
+# Integration tests build as one program, tests/all.rs (see its header).
+autotests = false
+
+[dependencies]
+base64 = "0.22"
+glam.workspace = true
+gltf = { version = "1", default-features = false, features = ["utils", "names", "extras"] }
+serde.workspace = true
+serde_json.workspace = true
+stl_io = "0.11.0"
+# FBX import (interchange/fbx.rs); MIT OR Unlicense.
+ufbx = "0.11.5"
+# 3MF packages (interchange/zip.rs): deflate and CRC-32; MIT OR Apache-2.0.
+flate2 = "1"
+crc32fast = "1"
+# Bake output and UV padding of textures (bake/); MIT OR Apache-2.0.
+png = "0.18"
+# Alembic import and export (interchange/abc.rs): vendored Alembic and
+# Imath (BSD-3-Clause) behind a small C shim.
+operandi-alembic = { path = "../operandi-alembic" }
+toml = "0.8"
+# MaterialX reading (materialx/doc.rs); MIT OR Apache-2.0.
+roxmltree = "0.21"
+ttf-parser = "0.25"
+epaint_default_fonts = "0.33"
+earcut = "0.4"
+# UV unwrap and pack maths, adapted from Blender (GPL-2.0-or-later / MPL-2.0).
+operandi-uv = { path = "../operandi-uv" }
+# Automatic Retopology: QuadriFlow, C++ built by cc (GPL-2.0-or-later
+# glue from Blender; see crates/operandi-remesh/README.md).
+operandi-remesh = { path = "../operandi-remesh" }
+# Booleans (boolean.rs): Manifold is the engine, boolmesh the second
+# opinion, robust the exact predicates of the pre-flight check. Manifold's
+# thread pool (TBB) is off so its C++ build stays plain on every platform.
+manifold-csg = { version = "0.4.1", default-features = false }
+boolmesh = { version = "0.2.2", default-features = false }
+robust = "1"
+# 3D painting's images (PNT stage 1); only with the `painting` feature.
+operandi-paint = { path = "../operandi-paint", optional = true }
+
+[features]
+# 3D painting, stage 1 (PNT-01..39, PNT-300..309): paintable images in the
+# scene and the image commands. Off by default: release and tester builds
+# never carry it. The app's own `painting` feature turns it on.
+painting = ["dep:operandi-paint"]
+
+# All of tests/*.rs is one test program (see tests/all.rs); these keep
+# their own because they count something process-wide (see OWN_PROGRAM there).
+[[test]]
+name = "all"
+path = "tests/all.rs"
+
+[[test]]
+name = "lxo_allocation_measurement"
+path = "tests/lxo_allocation_measurement.rs"
+
+[[test]]
+name = "mesh_slot"
+path = "tests/mesh_slot.rs"
+
+[[test]]
+name = "packed_mesh_probe"
+path = "tests/packed_mesh_probe.rs"

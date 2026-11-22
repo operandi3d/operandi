@@ -1,0 +1,41 @@
+{
+  "version": 1,
+  "id": "menu.window",
+  "label": "Window",
+  "style": "menu",
+  "controls": [
+    { "form": "menu.layout.layouts" },
+    {
+      "form": {
+        "id": "menu.window.panels",
+        "label": "Panels",
+        "style": "menu",
+        "controls": [{ "list": "panels" }]
+      }
+    },
+    { "divider": "" },
+    {
+      "command": "operandi.window.diagnostics",
+      "label": "Diagnostics…"
+    },
+    {
+      "command": "operandi.window.frameTime",
+      "label": "Frame Time"
+    },
+    {
+      "command": "operandi.mcp.bridge",
+      "label": "MCP Bridge"
+    },
+    {
+      "divider": ""
+    },
+    {
+      "command": "operandi.window.size size:compact",
+      "label": "Compact"
+    },
+    {
+      "command": "operandi.window.size size:standard",
+      "label": "Standard"
+    }
+  ]
+}

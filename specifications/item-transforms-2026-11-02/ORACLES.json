@@ -1,0 +1,3613 @@
+{
+ "modo_version": "17.1v1",
+ "observed": "2026-11-02\u20132026-11-03",
+ "oracles": [
+  {
+   "id": "IT-O-IT-01",
+   "description": "Typed +1 m tool offset; item X becomes 2 m.",
+   "input": {
+    "mesh": {
+     "points": [
+      [
+       -0.5,
+       -0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       -0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       0.5,
+       -0.5
+      ],
+      [
+       -0.5,
+       0.5,
+       -0.5
+      ],
+      [
+       -0.5,
+       -0.5,
+       0.5
+      ],
+      [
+       0.5,
+       -0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       -0.5,
+       0.5,
+       0.5
+      ]
+     ],
+     "polygons": [
+      [
+       0,
+       3,
+       2,
+       1
+      ],
+      [
+       4,
+       5,
+       6,
+       7
+      ],
+      [
+       0,
+       1,
+       5,
+       4
+      ],
+      [
+       3,
+       7,
+       6,
+       2
+      ],
+      [
+       0,
+       4,
+       7,
+       3
+      ],
+      [
+       1,
+       2,
+       6,
+       5
+      ]
+     ]
+    },
+    "items": {
+     "main": {
+      "position_m": [
+       1.0,
+       0.0,
+       0.0
+      ],
+      "rotation_degrees": [
+       0.0,
+       45.0,
+       0.0
+      ],
+      "scale": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "rotation_order": "ZXY"
+     },
+     "child": {
+      "position_m": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "rotation_degrees": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "scale": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "rotation_order": "ZXY"
+     },
+     "parent": {
+      "position_m": [
+       3.0,
+       0.0,
+       0.0
+      ],
+      "rotation_degrees": [
+       30.0,
+       0.0,
+       0.0
+      ],
+      "scale": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "rotation_order": "ZXY"
+     }
+    },
+    "parenting": {
+     "child": "parent"
+    }
+   },
+   "settings": {
+    "tool": "Move",
+    "selection_mode": "Items",
+    "selected": "main",
+    "Action Center": "None",
+    "snapping": false,
+    "Gimbal": true
+   },
+   "selection": {
+    "mode": "Items",
+    "items": [
+     "main"
+    ]
+   },
+   "gesture": {
+    "view": "Front orthographic",
+    "button": "left",
+    "modifiers": [],
+    "notes": "Typed +1 m tool offset; item X becomes 2 m.",
+    "px_per_m": 359,
+    "typed_values": {
+     "Position X": "1 m"
+    }
+   },
+   "expected": {
+    "items": {
+     "main": {
+      "position_m": [
+       2.0,
+       0.0,
+       0.0
+      ],
+      "rotation_degrees": [
+       0.0,
+       45.0,
+       0.0
+      ],
+      "scale": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "rotation_order": "ZXY"
+     },
+     "child": {
+      "position_m": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "rotation_degrees": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "scale": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "rotation_order": "ZXY"
+     },
+     "parent": {
+      "position_m": [
+       3.0,
+       0.0,
+       0.0
+      ],
+      "rotation_degrees": [
+       30.0,
+       0.0,
+       0.0
+      ],
+      "scale": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "rotation_order": "ZXY"
+     }
+    },
+    "selected": [
+     "main"
+    ]
+   },
+   "tolerance": 1e-05
+  },
+  {
+   "id": "IT-O-IT-02",
+   "description": "X arrow 100 px right; item X becomes 1.28 m.",
+   "input": {
+    "mesh": {
+     "points": [
+      [
+       -0.5,
+       -0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       -0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       0.5,
+       -0.5
+      ],
+      [
+       -0.5,
+       0.5,
+       -0.5
+      ],
+      [
+       -0.5,
+       -0.5,
+       0.5
+      ],
+      [
+       0.5,
+       -0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       -0.5,
+       0.5,
+       0.5
+      ]
+     ],
+     "polygons": [
+      [
+       0,
+       3,
+       2,
+       1
+      ],
+      [
+       4,
+       5,
+       6,
+       7
+      ],
+      [
+       0,
+       1,
+       5,
+       4
+      ],
+      [
+       3,
+       7,
+       6,
+       2
+      ],
+      [
+       0,
+       4,
+       7,
+       3
+      ],
+      [
+       1,
+       2,
+       6,
+       5
+      ]
+     ]
+    },
+    "items": {
+     "main": {
+      "position_m": [
+       1.0,
+       0.0,
+       0.0
+      ],
+      "rotation_degrees": [
+       0.0,
+       45.0,
+       0.0
+      ],
+      "scale": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "rotation_order": "ZXY"
+     },
+     "child": {
+      "position_m": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "rotation_degrees": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "scale": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "rotation_order": "ZXY"
+     },
+     "parent": {
+      "position_m": [
+       3.0,
+       0.0,
+       0.0
+      ],
+      "rotation_degrees": [
+       30.0,
+       0.0,
+       0.0
+      ],
+      "scale": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "rotation_order": "ZXY"
+     }
+    },
+    "parenting": {
+     "child": "parent"
+    }
+   },
+   "settings": {
+    "tool": "Move",
+    "selection_mode": "Items",
+    "selected": "main",
+    "Action Center": "None",
+    "snapping": false,
+    "Gimbal": true
+   },
+   "selection": {
+    "mode": "Items",
+    "items": [
+     "main"
+    ]
+   },
+   "gesture": {
+    "view": "Front orthographic",
+    "button": "left",
+    "modifiers": [],
+    "notes": "X arrow 100 px right; item X becomes 1.28 m.",
+    "from_px": [
+     880,
+     588
+    ],
+    "to_px": [
+     980,
+     588
+    ],
+    "px_per_m": 359,
+    "typed_values": {}
+   },
+   "expected": {
+    "items": {
+     "main": {
+      "position_m": [
+       1.28,
+       0.0,
+       0.0
+      ],
+      "rotation_degrees": [
+       0.0,
+       45.0,
+       0.0
+      ],
+      "scale": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "rotation_order": "ZXY"
+     },
+     "child": {
+      "position_m": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "rotation_degrees": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "scale": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "rotation_order": "ZXY"
+     },
+     "parent": {
+      "position_m": [
+       3.0,
+       0.0,
+       0.0
+      ],
+      "rotation_degrees": [
+       30.0,
+       0.0,
+       0.0
+      ],
+      "scale": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "rotation_order": "ZXY"
+     }
+    },
+    "selected": [
+     "main"
+    ]
+   },
+   "tolerance": 1e-05
+  },
+  {
+   "id": "IT-O-IT-03",
+   "description": "Gimbal on; Euler channels become (30,45,0) degrees.",
+   "input": {
+    "mesh": {
+     "points": [
+      [
+       -0.5,
+       -0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       -0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       0.5,
+       -0.5
+      ],
+      [
+       -0.5,
+       0.5,
+       -0.5
+      ],
+      [
+       -0.5,
+       -0.5,
+       0.5
+      ],
+      [
+       0.5,
+       -0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       -0.5,
+       0.5,
+       0.5
+      ]
+     ],
+     "polygons": [
+      [
+       0,
+       3,
+       2,
+       1
+      ],
+      [
+       4,
+       5,
+       6,
+       7
+      ],
+      [
+       0,
+       1,
+       5,
+       4
+      ],
+      [
+       3,
+       7,
+       6,
+       2
+      ],
+      [
+       0,
+       4,
+       7,
+       3
+      ],
+      [
+       1,
+       2,
+       6,
+       5
+      ]
+     ]
+    },
+    "items": {
+     "main": {
+      "position_m": [
+       1.0,
+       0.0,
+       0.0
+      ],
+      "rotation_degrees": [
+       0.0,
+       45.0,
+       0.0
+      ],
+      "scale": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "rotation_order": "ZXY"
+     },
+     "child": {
+      "position_m": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "rotation_degrees": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "scale": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "rotation_order": "ZXY"
+     },
+     "parent": {
+      "position_m": [
+       3.0,
+       0.0,
+       0.0
+      ],
+      "rotation_degrees": [
+       30.0,
+       0.0,
+       0.0
+      ],
+      "scale": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "rotation_order": "ZXY"
+     }
+    },
+    "parenting": {
+     "child": "parent"
+    }
+   },
+   "settings": {
+    "tool": "Rotate",
+    "selection_mode": "Items",
+    "selected": "main",
+    "Action Center": "None",
+    "snapping": false,
+    "Gimbal": true
+   },
+   "selection": {
+    "mode": "Items",
+    "items": [
+     "main"
+    ]
+   },
+   "gesture": {
+    "view": "Front orthographic",
+    "button": "left",
+    "modifiers": [],
+    "notes": "Gimbal on; Euler channels become (30,45,0) degrees.",
+    "px_per_m": 359,
+    "typed_values": {
+     "Rotation X": "30 degrees"
+    }
+   },
+   "expected": {
+    "items": {
+     "main": {
+      "position_m": [
+       1.0,
+       0.0,
+       0.0
+      ],
+      "rotation_degrees": [
+       30.0,
+       45.0,
+       0.0
+      ],
+      "scale": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "rotation_order": "ZXY"
+     },
+     "child": {
+      "position_m": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "rotation_degrees": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "scale": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "rotation_order": "ZXY"
+     },
+     "parent": {
+      "position_m": [
+       3.0,
+       0.0,
+       0.0
+      ],
+      "rotation_degrees": [
+       30.0,
+       0.0,
+       0.0
+      ],
+      "scale": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "rotation_order": "ZXY"
+     }
+    },
+    "selected": [
+     "main"
+    ]
+   },
+   "tolerance": 1e-05
+  },
+  {
+   "id": "IT-O-IT-04",
+   "description": "Negative Scale on; item scale X becomes -1.",
+   "input": {
+    "mesh": {
+     "points": [
+      [
+       -0.5,
+       -0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       -0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       0.5,
+       -0.5
+      ],
+      [
+       -0.5,
+       0.5,
+       -0.5
+      ],
+      [
+       -0.5,
+       -0.5,
+       0.5
+      ],
+      [
+       0.5,
+       -0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       -0.5,
+       0.5,
+       0.5
+      ]
+     ],
+     "polygons": [
+      [
+       0,
+       3,
+       2,
+       1
+      ],
+      [
+       4,
+       5,
+       6,
+       7
+      ],
+      [
+       0,
+       1,
+       5,
+       4
+      ],
+      [
+       3,
+       7,
+       6,
+       2
+      ],
+      [
+       0,
+       4,
+       7,
+       3
+      ],
+      [
+       1,
+       2,
+       6,
+       5
+      ]
+     ]
+    },
+    "items": {
+     "main": {
+      "position_m": [
+       1.0,
+       0.0,
+       0.0
+      ],
+      "rotation_degrees": [
+       0.0,
+       45.0,
+       0.0
+      ],
+      "scale": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "rotation_order": "ZXY"
+     },
+     "child": {
+      "position_m": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "rotation_degrees": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "scale": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "rotation_order": "ZXY"
+     },
+     "parent": {
+      "position_m": [
+       3.0,
+       0.0,
+       0.0
+      ],
+      "rotation_degrees": [
+       30.0,
+       0.0,
+       0.0
+      ],
+      "scale": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "rotation_order": "ZXY"
+     }
+    },
+    "parenting": {
+     "child": "parent"
+    }
+   },
+   "settings": {
+    "tool": "Scale",
+    "selection_mode": "Items",
+    "selected": "main",
+    "Action Center": "None",
+    "snapping": false,
+    "Gimbal": true,
+    "Negative Scale": true
+   },
+   "selection": {
+    "mode": "Items",
+    "items": [
+     "main"
+    ]
+   },
+   "gesture": {
+    "view": "Front orthographic",
+    "button": "left",
+    "modifiers": [],
+    "notes": "Negative Scale on; item scale X becomes -1.",
+    "px_per_m": 359,
+    "typed_values": {
+     "Scale X": "-100%"
+    }
+   },
+   "expected": {
+    "items": {
+     "main": {
+      "position_m": [
+       1.0,
+       0.0,
+       0.0
+      ],
+      "rotation_degrees": [
+       0.0,
+       45.0,
+       0.0
+      ],
+      "scale": [
+       -1.0,
+       1.0,
+       1.0
+      ],
+      "rotation_order": "ZXY"
+     },
+     "child": {
+      "position_m": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "rotation_degrees": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "scale": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "rotation_order": "ZXY"
+     },
+     "parent": {
+      "position_m": [
+       3.0,
+       0.0,
+       0.0
+      ],
+      "rotation_degrees": [
+       30.0,
+       0.0,
+       0.0
+      ],
+      "scale": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "rotation_order": "ZXY"
+     }
+    },
+    "selected": [
+     "main"
+    ]
+   },
+   "tolerance": 1e-05
+  },
+  {
+   "id": "IT-O-IT-05",
+   "description": "Negative Scale off; tool X scale clamps to zero, item scale remains one.",
+   "input": {
+    "mesh": {
+     "points": [
+      [
+       -0.5,
+       -0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       -0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       0.5,
+       -0.5
+      ],
+      [
+       -0.5,
+       0.5,
+       -0.5
+      ],
+      [
+       -0.5,
+       -0.5,
+       0.5
+      ],
+      [
+       0.5,
+       -0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       -0.5,
+       0.5,
+       0.5
+      ]
+     ],
+     "polygons": [
+      [
+       0,
+       3,
+       2,
+       1
+      ],
+      [
+       4,
+       5,
+       6,
+       7
+      ],
+      [
+       0,
+       1,
+       5,
+       4
+      ],
+      [
+       3,
+       7,
+       6,
+       2
+      ],
+      [
+       0,
+       4,
+       7,
+       3
+      ],
+      [
+       1,
+       2,
+       6,
+       5
+      ]
+     ]
+    },
+    "items": {
+     "main": {
+      "position_m": [
+       1.0,
+       0.0,
+       0.0
+      ],
+      "rotation_degrees": [
+       0.0,
+       45.0,
+       0.0
+      ],
+      "scale": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "rotation_order": "ZXY"
+     },
+     "child": {
+      "position_m": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "rotation_degrees": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "scale": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "rotation_order": "ZXY"
+     },
+     "parent": {
+      "position_m": [
+       3.0,
+       0.0,
+       0.0
+      ],
+      "rotation_degrees": [
+       30.0,
+       0.0,
+       0.0
+      ],
+      "scale": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "rotation_order": "ZXY"
+     }
+    },
+    "parenting": {
+     "child": "parent"
+    }
+   },
+   "settings": {
+    "tool": "Scale",
+    "selection_mode": "Items",
+    "selected": "main",
+    "Action Center": "None",
+    "snapping": false,
+    "Gimbal": true,
+    "Negative Scale": false
+   },
+   "selection": {
+    "mode": "Items",
+    "items": [
+     "main"
+    ]
+   },
+   "gesture": {
+    "view": "Front orthographic",
+    "button": "left",
+    "modifiers": [],
+    "notes": "Negative Scale off; tool X scale clamps to zero, item scale remains one.",
+    "px_per_m": 359,
+    "typed_values": {
+     "Scale X": "-100%"
+    }
+   },
+   "expected": {
+    "items": {
+     "main": {
+      "position_m": [
+       1.0,
+       0.0,
+       0.0
+      ],
+      "rotation_degrees": [
+       0.0,
+       45.0,
+       0.0
+      ],
+      "scale": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "rotation_order": "ZXY"
+     },
+     "child": {
+      "position_m": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "rotation_degrees": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "scale": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "rotation_order": "ZXY"
+     },
+     "parent": {
+      "position_m": [
+       3.0,
+       0.0,
+       0.0
+      ],
+      "rotation_degrees": [
+       30.0,
+       0.0,
+       0.0
+      ],
+      "scale": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "rotation_order": "ZXY"
+     }
+    },
+    "selected": [
+     "main"
+    ],
+    "tool_scale": [
+     0,
+     1,
+     1
+    ]
+   },
+   "tolerance": 1e-05
+  },
+  {
+   "id": "IT-O-IT-06",
+   "description": "Item scale X becomes 0.5.",
+   "input": {
+    "mesh": {
+     "points": [
+      [
+       -0.5,
+       -0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       -0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       0.5,
+       -0.5
+      ],
+      [
+       -0.5,
+       0.5,
+       -0.5
+      ],
+      [
+       -0.5,
+       -0.5,
+       0.5
+      ],
+      [
+       0.5,
+       -0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       -0.5,
+       0.5,
+       0.5
+      ]
+     ],
+     "polygons": [
+      [
+       0,
+       3,
+       2,
+       1
+      ],
+      [
+       4,
+       5,
+       6,
+       7
+      ],
+      [
+       0,
+       1,
+       5,
+       4
+      ],
+      [
+       3,
+       7,
+       6,
+       2
+      ],
+      [
+       0,
+       4,
+       7,
+       3
+      ],
+      [
+       1,
+       2,
+       6,
+       5
+      ]
+     ]
+    },
+    "items": {
+     "main": {
+      "position_m": [
+       1.0,
+       0.0,
+       0.0
+      ],
+      "rotation_degrees": [
+       0.0,
+       45.0,
+       0.0
+      ],
+      "scale": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "rotation_order": "ZXY"
+     },
+     "child": {
+      "position_m": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "rotation_degrees": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "scale": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "rotation_order": "ZXY"
+     },
+     "parent": {
+      "position_m": [
+       3.0,
+       0.0,
+       0.0
+      ],
+      "rotation_degrees": [
+       30.0,
+       0.0,
+       0.0
+      ],
+      "scale": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "rotation_order": "ZXY"
+     }
+    },
+    "parenting": {
+     "child": "parent"
+    }
+   },
+   "settings": {
+    "tool": "Scale",
+    "selection_mode": "Items",
+    "selected": "main",
+    "Action Center": "None",
+    "snapping": false,
+    "Gimbal": true,
+    "Negative Scale": true
+   },
+   "selection": {
+    "mode": "Items",
+    "items": [
+     "main"
+    ]
+   },
+   "gesture": {
+    "view": "Front orthographic",
+    "button": "left",
+    "modifiers": [],
+    "notes": "Item scale X becomes 0.5.",
+    "px_per_m": 359,
+    "typed_values": {
+     "Scale X": "50%"
+    }
+   },
+   "expected": {
+    "items": {
+     "main": {
+      "position_m": [
+       1.0,
+       0.0,
+       0.0
+      ],
+      "rotation_degrees": [
+       0.0,
+       45.0,
+       0.0
+      ],
+      "scale": [
+       0.5,
+       1.0,
+       1.0
+      ],
+      "rotation_order": "ZXY"
+     },
+     "child": {
+      "position_m": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "rotation_degrees": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "scale": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "rotation_order": "ZXY"
+     },
+     "parent": {
+      "position_m": [
+       3.0,
+       0.0,
+       0.0
+      ],
+      "rotation_degrees": [
+       30.0,
+       0.0,
+       0.0
+      ],
+      "scale": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "rotation_order": "ZXY"
+     }
+    },
+    "selected": [
+     "main"
+    ]
+   },
+   "tolerance": 1e-05
+  },
+  {
+   "id": "IT-O-IT-07",
+   "description": "Combined X translation arrow 100 px right; item X becomes 1.28 m.",
+   "input": {
+    "mesh": {
+     "points": [
+      [
+       -0.5,
+       -0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       -0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       0.5,
+       -0.5
+      ],
+      [
+       -0.5,
+       0.5,
+       -0.5
+      ],
+      [
+       -0.5,
+       -0.5,
+       0.5
+      ],
+      [
+       0.5,
+       -0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       -0.5,
+       0.5,
+       0.5
+      ]
+     ],
+     "polygons": [
+      [
+       0,
+       3,
+       2,
+       1
+      ],
+      [
+       4,
+       5,
+       6,
+       7
+      ],
+      [
+       0,
+       1,
+       5,
+       4
+      ],
+      [
+       3,
+       7,
+       6,
+       2
+      ],
+      [
+       0,
+       4,
+       7,
+       3
+      ],
+      [
+       1,
+       2,
+       6,
+       5
+      ]
+     ]
+    },
+    "items": {
+     "main": {
+      "position_m": [
+       1.0,
+       0.0,
+       0.0
+      ],
+      "rotation_degrees": [
+       0.0,
+       45.0,
+       0.0
+      ],
+      "scale": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "rotation_order": "ZXY"
+     },
+     "child": {
+      "position_m": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "rotation_degrees": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "scale": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "rotation_order": "ZXY"
+     },
+     "parent": {
+      "position_m": [
+       3.0,
+       0.0,
+       0.0
+      ],
+      "rotation_degrees": [
+       30.0,
+       0.0,
+       0.0
+      ],
+      "scale": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "rotation_order": "ZXY"
+     }
+    },
+    "parenting": {
+     "child": "parent"
+    }
+   },
+   "settings": {
+    "tool": "Transform",
+    "selection_mode": "Items",
+    "selected": "main",
+    "Action Center": "None",
+    "snapping": false,
+    "Gimbal": true,
+    "Negative Scale": false
+   },
+   "selection": {
+    "mode": "Items",
+    "items": [
+     "main"
+    ]
+   },
+   "gesture": {
+    "view": "Front orthographic",
+    "button": "left",
+    "modifiers": [],
+    "notes": "Combined X translation arrow 100 px right; item X becomes 1.28 m.",
+    "from_px": [
+     865,
+     588
+    ],
+    "to_px": [
+     965,
+     588
+    ],
+    "px_per_m": 359,
+    "typed_values": {}
+   },
+   "expected": {
+    "items": {
+     "main": {
+      "position_m": [
+       1.28,
+       0.0,
+       0.0
+      ],
+      "rotation_degrees": [
+       0.0,
+       45.0,
+       0.0
+      ],
+      "scale": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "rotation_order": "ZXY"
+     },
+     "child": {
+      "position_m": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "rotation_degrees": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "scale": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "rotation_order": "ZXY"
+     },
+     "parent": {
+      "position_m": [
+       3.0,
+       0.0,
+       0.0
+      ],
+      "rotation_degrees": [
+       30.0,
+       0.0,
+       0.0
+      ],
+      "scale": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "rotation_order": "ZXY"
+     }
+    },
+    "selected": [
+     "main"
+    ]
+   },
+   "tolerance": 1e-05
+  },
+  {
+   "id": "IT-O-IT-08",
+   "description": "Parented child local position becomes (0,1,0).",
+   "input": {
+    "mesh": {
+     "points": [
+      [
+       -0.5,
+       -0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       -0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       0.5,
+       -0.5
+      ],
+      [
+       -0.5,
+       0.5,
+       -0.5
+      ],
+      [
+       -0.5,
+       -0.5,
+       0.5
+      ],
+      [
+       0.5,
+       -0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       -0.5,
+       0.5,
+       0.5
+      ]
+     ],
+     "polygons": [
+      [
+       0,
+       3,
+       2,
+       1
+      ],
+      [
+       4,
+       5,
+       6,
+       7
+      ],
+      [
+       0,
+       1,
+       5,
+       4
+      ],
+      [
+       3,
+       7,
+       6,
+       2
+      ],
+      [
+       0,
+       4,
+       7,
+       3
+      ],
+      [
+       1,
+       2,
+       6,
+       5
+      ]
+     ]
+    },
+    "items": {
+     "main": {
+      "position_m": [
+       1.0,
+       0.0,
+       0.0
+      ],
+      "rotation_degrees": [
+       0.0,
+       45.0,
+       0.0
+      ],
+      "scale": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "rotation_order": "ZXY"
+     },
+     "child": {
+      "position_m": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "rotation_degrees": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "scale": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "rotation_order": "ZXY"
+     },
+     "parent": {
+      "position_m": [
+       3.0,
+       0.0,
+       0.0
+      ],
+      "rotation_degrees": [
+       30.0,
+       0.0,
+       0.0
+      ],
+      "scale": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "rotation_order": "ZXY"
+     }
+    },
+    "parenting": {
+     "child": "parent"
+    }
+   },
+   "settings": {
+    "tool": "Move",
+    "selection_mode": "Items",
+    "selected": "child",
+    "Action Center": "None",
+    "snapping": false,
+    "Gimbal": true,
+    "Negative Scale": false
+   },
+   "selection": {
+    "mode": "Items",
+    "items": [
+     "child"
+    ]
+   },
+   "gesture": {
+    "view": "Front orthographic",
+    "button": "left",
+    "modifiers": [],
+    "notes": "Parented child local position becomes (0,1,0).",
+    "px_per_m": 359,
+    "typed_values": {
+     "Position Y": "1 m"
+    }
+   },
+   "expected": {
+    "items": {
+     "main": {
+      "position_m": [
+       1.0,
+       0.0,
+       0.0
+      ],
+      "rotation_degrees": [
+       0.0,
+       45.0,
+       0.0
+      ],
+      "scale": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "rotation_order": "ZXY"
+     },
+     "child": {
+      "position_m": [
+       0.0,
+       1.0,
+       0.0
+      ],
+      "rotation_degrees": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "scale": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "rotation_order": "ZXY"
+     },
+     "parent": {
+      "position_m": [
+       3.0,
+       0.0,
+       0.0
+      ],
+      "rotation_degrees": [
+       30.0,
+       0.0,
+       0.0
+      ],
+      "scale": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "rotation_order": "ZXY"
+     }
+    },
+    "selected": [
+     "child"
+    ]
+   },
+   "tolerance": 1e-05
+  },
+  {
+   "id": "IT-O-IT-10",
+   "description": "X scale endpoint 100 px right; item scale X becomes 1.69.",
+   "input": {
+    "mesh": {
+     "points": [
+      [
+       -0.5,
+       -0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       -0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       0.5,
+       -0.5
+      ],
+      [
+       -0.5,
+       0.5,
+       -0.5
+      ],
+      [
+       -0.5,
+       -0.5,
+       0.5
+      ],
+      [
+       0.5,
+       -0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       -0.5,
+       0.5,
+       0.5
+      ]
+     ],
+     "polygons": [
+      [
+       0,
+       3,
+       2,
+       1
+      ],
+      [
+       4,
+       5,
+       6,
+       7
+      ],
+      [
+       0,
+       1,
+       5,
+       4
+      ],
+      [
+       3,
+       7,
+       6,
+       2
+      ],
+      [
+       0,
+       4,
+       7,
+       3
+      ],
+      [
+       1,
+       2,
+       6,
+       5
+      ]
+     ]
+    },
+    "items": {
+     "main": {
+      "position_m": [
+       1.0,
+       0.0,
+       0.0
+      ],
+      "rotation_degrees": [
+       0.0,
+       45.0,
+       0.0
+      ],
+      "scale": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "rotation_order": "ZXY"
+     },
+     "child": {
+      "position_m": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "rotation_degrees": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "scale": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "rotation_order": "ZXY"
+     },
+     "parent": {
+      "position_m": [
+       3.0,
+       0.0,
+       0.0
+      ],
+      "rotation_degrees": [
+       30.0,
+       0.0,
+       0.0
+      ],
+      "scale": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "rotation_order": "ZXY"
+     }
+    },
+    "parenting": {
+     "child": "parent"
+    }
+   },
+   "settings": {
+    "tool": "Scale",
+    "selection_mode": "Items",
+    "selected": "main",
+    "Action Center": "None",
+    "snapping": false,
+    "Gimbal": true,
+    "Negative Scale": true
+   },
+   "selection": {
+    "mode": "Items",
+    "items": [
+     "main"
+    ]
+   },
+   "gesture": {
+    "view": "Front orthographic",
+    "button": "left",
+    "modifiers": [],
+    "notes": "X scale endpoint 100 px right; item scale X becomes 1.69.",
+    "from_px": [
+     897,
+     588
+    ],
+    "to_px": [
+     997,
+     588
+    ],
+    "px_per_m": 359,
+    "typed_values": {}
+   },
+   "expected": {
+    "items": {
+     "main": {
+      "position_m": [
+       1.0,
+       0.0,
+       0.0
+      ],
+      "rotation_degrees": [
+       0.0,
+       45.0,
+       0.0
+      ],
+      "scale": [
+       1.69,
+       1.0,
+       1.0
+      ],
+      "rotation_order": "ZXY"
+     },
+     "child": {
+      "position_m": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "rotation_degrees": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "scale": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "rotation_order": "ZXY"
+     },
+     "parent": {
+      "position_m": [
+       3.0,
+       0.0,
+       0.0
+      ],
+      "rotation_degrees": [
+       30.0,
+       0.0,
+       0.0
+      ],
+      "scale": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "rotation_order": "ZXY"
+     }
+    },
+    "selected": [
+     "main"
+    ]
+   },
+   "tolerance": 1e-05
+  },
+  {
+   "id": "IT-O-IT-11",
+   "description": "Red X ring chord; Euler channels become (-90.5,45,0) degrees.",
+   "input": {
+    "mesh": {
+     "points": [
+      [
+       -0.5,
+       -0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       -0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       0.5,
+       -0.5
+      ],
+      [
+       -0.5,
+       0.5,
+       -0.5
+      ],
+      [
+       -0.5,
+       -0.5,
+       0.5
+      ],
+      [
+       0.5,
+       -0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       -0.5,
+       0.5,
+       0.5
+      ]
+     ],
+     "polygons": [
+      [
+       0,
+       3,
+       2,
+       1
+      ],
+      [
+       4,
+       5,
+       6,
+       7
+      ],
+      [
+       0,
+       1,
+       5,
+       4
+      ],
+      [
+       3,
+       7,
+       6,
+       2
+      ],
+      [
+       0,
+       4,
+       7,
+       3
+      ],
+      [
+       1,
+       2,
+       6,
+       5
+      ]
+     ]
+    },
+    "items": {
+     "main": {
+      "position_m": [
+       1.0,
+       0.0,
+       0.0
+      ],
+      "rotation_degrees": [
+       0.0,
+       45.0,
+       0.0
+      ],
+      "scale": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "rotation_order": "ZXY"
+     },
+     "child": {
+      "position_m": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "rotation_degrees": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "scale": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "rotation_order": "ZXY"
+     },
+     "parent": {
+      "position_m": [
+       3.0,
+       0.0,
+       0.0
+      ],
+      "rotation_degrees": [
+       30.0,
+       0.0,
+       0.0
+      ],
+      "scale": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "rotation_order": "ZXY"
+     }
+    },
+    "parenting": {
+     "child": "parent"
+    }
+   },
+   "settings": {
+    "tool": "Rotate",
+    "selection_mode": "Items",
+    "selected": "main",
+    "Action Center": "None",
+    "snapping": false,
+    "Gimbal": true,
+    "Negative Scale": false
+   },
+   "selection": {
+    "mode": "Items",
+    "items": [
+     "main"
+    ]
+   },
+   "gesture": {
+    "view": "Front orthographic",
+    "button": "left",
+    "modifiers": [],
+    "notes": "Red X ring chord; Euler channels become (-90.5,45,0) degrees.",
+    "from_px": [
+     872,
+     588
+    ],
+    "to_px": [
+     787,
+     468
+    ],
+    "px_per_m": 359,
+    "typed_values": {}
+   },
+   "expected": {
+    "items": {
+     "main": {
+      "position_m": [
+       1.0,
+       0.0,
+       0.0
+      ],
+      "rotation_degrees": [
+       -90.5,
+       45.0,
+       0.0
+      ],
+      "scale": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "rotation_order": "ZXY"
+     },
+     "child": {
+      "position_m": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "rotation_degrees": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "scale": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "rotation_order": "ZXY"
+     },
+     "parent": {
+      "position_m": [
+       3.0,
+       0.0,
+       0.0
+      ],
+      "rotation_degrees": [
+       30.0,
+       0.0,
+       0.0
+      ],
+      "scale": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "rotation_order": "ZXY"
+     }
+    },
+    "selected": [
+     "main"
+    ]
+   },
+   "tolerance": 1e-05
+  },
+  {
+   "id": "IT-O-H3-rotation-order",
+   "description": "Physical XYZ\u2192ZXY preserves Euler numbers but changes evaluated orientation at 30/45/60 degrees",
+   "input": {
+    "item": {
+     "position_m": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "rotation_degrees": [
+      30.0,
+      45.0,
+      60.0
+     ],
+     "scale": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "rotation_order": "XYZ",
+     "world_matrix": [
+      [
+       0.353553,
+       0.612372,
+       -0.707107,
+       0.0
+      ],
+      [
+       -0.573223,
+       0.739199,
+       0.353553,
+       0.0
+      ],
+      [
+       0.739199,
+       0.28033,
+       0.612372,
+       0.0
+      ],
+      [
+       0.0,
+       0.0,
+       0.0,
+       1.0
+      ]
+     ],
+     "mesh": {
+      "points": [
+       [
+        -0.5,
+        -0.5,
+        -0.5
+       ],
+       [
+        0.5,
+        -0.5,
+        -0.5
+       ],
+       [
+        -0.5,
+        0.5,
+        -0.5
+       ],
+       [
+        0.5,
+        0.5,
+        -0.5
+       ],
+       [
+        -0.5,
+        -0.5,
+        0.5
+       ],
+       [
+        0.5,
+        -0.5,
+        0.5
+       ],
+       [
+        -0.5,
+        0.5,
+        0.5
+       ],
+       [
+        0.5,
+        0.5,
+        0.5
+       ]
+      ],
+      "polygons": [
+       [
+        0,
+        2,
+        3,
+        1
+       ],
+       [
+        4,
+        5,
+        7,
+        6
+       ],
+       [
+        0,
+        1,
+        5,
+        4
+       ],
+       [
+        2,
+        6,
+        7,
+        3
+       ],
+       [
+        0,
+        4,
+        6,
+        2
+       ],
+       [
+        1,
+        3,
+        7,
+        5
+       ]
+      ],
+      "n_points": 8,
+      "n_polygons": 6,
+      "sel_vertices": [],
+      "sel_edges": [],
+      "sel_polygons": []
+     }
+    }
+   },
+   "settings": {
+    "mode": "Items",
+    "operation": "Change Properties > Transform > Order from XYZ to ZXY; do not edit angle fields"
+   },
+   "selection": {
+    "items": [
+     "cube"
+    ]
+   },
+   "expected": {
+    "item": {
+     "position_m": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "rotation_degrees": [
+      30.0,
+      45.0,
+      60.0
+     ],
+     "scale": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "rotation_order": "ZXY",
+     "world_matrix": [
+      [
+       0.65974,
+       0.75,
+       -0.047367,
+       0.0
+      ],
+      [
+       -0.435596,
+       0.433013,
+       0.789149,
+       0.0
+      ],
+      [
+       0.612372,
+       -0.5,
+       0.612372,
+       0.0
+      ],
+      [
+       0.0,
+       0.0,
+       0.0,
+       1.0
+      ]
+     ],
+     "mesh": {
+      "points": [
+       [
+        -0.5,
+        -0.5,
+        -0.5
+       ],
+       [
+        0.5,
+        -0.5,
+        -0.5
+       ],
+       [
+        -0.5,
+        0.5,
+        -0.5
+       ],
+       [
+        0.5,
+        0.5,
+        -0.5
+       ],
+       [
+        -0.5,
+        -0.5,
+        0.5
+       ],
+       [
+        0.5,
+        -0.5,
+        0.5
+       ],
+       [
+        -0.5,
+        0.5,
+        0.5
+       ],
+       [
+        0.5,
+        0.5,
+        0.5
+       ]
+      ],
+      "polygons": [
+       [
+        0,
+        2,
+        3,
+        1
+       ],
+       [
+        4,
+        5,
+        7,
+        6
+       ],
+       [
+        0,
+        1,
+        5,
+        4
+       ],
+       [
+        2,
+        6,
+        7,
+        3
+       ],
+       [
+        0,
+        4,
+        6,
+        2
+       ],
+       [
+        1,
+        3,
+        7,
+        5
+       ]
+      ],
+      "n_points": 8,
+      "n_polygons": 6,
+      "sel_vertices": [],
+      "sel_edges": [],
+      "sel_polygons": []
+     }
+    },
+    "selected_items": [
+     "cube"
+    ],
+    "local_mesh_unchanged": true
+   },
+   "tolerance": 1e-05
+  },
+  {
+   "id": "IT-O-H5-left-control",
+   "description": "Ordinary left drag moves the sole Mesh right by 0.03 m",
+   "input": {
+    "items": {
+     "source": {
+      "type": "Mesh",
+      "position_m": [
+       1.0,
+       0.0,
+       0.0
+      ],
+      "rotation_degrees": [
+       0.0,
+       45.0,
+       0.0
+      ],
+      "scale": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "rotation_order": "ZXY",
+      "world_matrix": [
+       [
+        0.707107,
+        0.0,
+        -0.707107,
+        0.0
+       ],
+       [
+        0.0,
+        1.0,
+        0.0,
+        0.0
+       ],
+       [
+        0.707107,
+        0.0,
+        0.707107,
+        0.0
+       ],
+       [
+        1.0,
+        0.0,
+        0.0,
+        1.0
+       ]
+      ],
+      "mesh": {
+       "points": [
+        [
+         -0.5,
+         -0.5,
+         -0.5
+        ],
+        [
+         0.5,
+         -0.5,
+         -0.5
+        ],
+        [
+         -0.5,
+         0.5,
+         -0.5
+        ],
+        [
+         0.5,
+         0.5,
+         -0.5
+        ],
+        [
+         -0.5,
+         -0.5,
+         0.5
+        ],
+        [
+         0.5,
+         -0.5,
+         0.5
+        ],
+        [
+         -0.5,
+         0.5,
+         0.5
+        ],
+        [
+         0.5,
+         0.5,
+         0.5
+        ]
+       ],
+       "polygons": [
+        [
+         0,
+         2,
+         3,
+         1
+        ],
+        [
+         4,
+         5,
+         7,
+         6
+        ],
+        [
+         0,
+         1,
+         5,
+         4
+        ],
+        [
+         2,
+         6,
+         7,
+         3
+        ],
+        [
+         0,
+         4,
+         6,
+         2
+        ],
+        [
+         1,
+         3,
+         7,
+         5
+        ]
+       ],
+       "n_points": 8,
+       "n_polygons": 6,
+       "sel_vertices": [],
+       "sel_edges": [],
+       "sel_polygons": []
+      }
+     }
+    }
+   },
+   "settings": {
+    "selection_mode": "Items",
+    "tool": "Move",
+    "view": "Front orthographic",
+    "Duplicate Mode": "Instance",
+    "snapping": false,
+    "Action Center": "None"
+   },
+   "selection": {
+    "items": [
+     "source"
+    ]
+   },
+   "gesture": {
+    "performed_by": "Jason",
+    "button": "left",
+    "modifiers": [],
+    "target": "red X translation handle",
+    "direction": "right",
+    "actual_pixel_path": "unmeasured; use as result sample, not a sensitivity law",
+    "requested_modifier_timing": "held before mouse-down, released after mouse-up"
+   },
+   "expected": {
+    "items": {
+     "source": {
+      "type": "Mesh",
+      "position_m": [
+       1.03,
+       0.0,
+       0.0
+      ],
+      "rotation_degrees": [
+       0.0,
+       45.0,
+       0.0
+      ],
+      "scale": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "rotation_order": "ZXY",
+      "world_matrix": [
+       [
+        0.707107,
+        0.0,
+        -0.707107,
+        0.0
+       ],
+       [
+        0.0,
+        1.0,
+        0.0,
+        0.0
+       ],
+       [
+        0.707107,
+        0.0,
+        0.707107,
+        0.0
+       ],
+       [
+        1.03,
+        0.0,
+        0.0,
+        1.0
+       ]
+      ],
+      "mesh": {
+       "points": [
+        [
+         -0.5,
+         -0.5,
+         -0.5
+        ],
+        [
+         0.5,
+         -0.5,
+         -0.5
+        ],
+        [
+         -0.5,
+         0.5,
+         -0.5
+        ],
+        [
+         0.5,
+         0.5,
+         -0.5
+        ],
+        [
+         -0.5,
+         -0.5,
+         0.5
+        ],
+        [
+         0.5,
+         -0.5,
+         0.5
+        ],
+        [
+         -0.5,
+         0.5,
+         0.5
+        ],
+        [
+         0.5,
+         0.5,
+         0.5
+        ]
+       ],
+       "polygons": [
+        [
+         0,
+         2,
+         3,
+         1
+        ],
+        [
+         4,
+         5,
+         7,
+         6
+        ],
+        [
+         0,
+         1,
+         5,
+         4
+        ],
+        [
+         2,
+         6,
+         7,
+         3
+        ],
+        [
+         0,
+         4,
+         6,
+         2
+        ],
+        [
+         1,
+         3,
+         7,
+         5
+        ]
+       ],
+       "n_points": 8,
+       "n_polygons": 6,
+       "sel_vertices": [],
+       "sel_edges": [],
+       "sel_polygons": []
+      }
+     }
+    },
+    "selected_items": [
+     "source"
+    ]
+   },
+   "tolerance": 1e-05
+  },
+  {
+   "id": "IT-O-H5-middle-clone",
+   "description": "Middle-button drag moves the sole Mesh right by 0.06 m without creating an item",
+   "input": {
+    "items": {
+     "source": {
+      "type": "Mesh",
+      "position_m": [
+       1.0,
+       0.0,
+       0.0
+      ],
+      "rotation_degrees": [
+       0.0,
+       45.0,
+       0.0
+      ],
+      "scale": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "rotation_order": "ZXY",
+      "world_matrix": [
+       [
+        0.707107,
+        0.0,
+        -0.707107,
+        0.0
+       ],
+       [
+        0.0,
+        1.0,
+        0.0,
+        0.0
+       ],
+       [
+        0.707107,
+        0.0,
+        0.707107,
+        0.0
+       ],
+       [
+        1.0,
+        0.0,
+        0.0,
+        1.0
+       ]
+      ],
+      "mesh": {
+       "points": [
+        [
+         -0.5,
+         -0.5,
+         -0.5
+        ],
+        [
+         0.5,
+         -0.5,
+         -0.5
+        ],
+        [
+         -0.5,
+         0.5,
+         -0.5
+        ],
+        [
+         0.5,
+         0.5,
+         -0.5
+        ],
+        [
+         -0.5,
+         -0.5,
+         0.5
+        ],
+        [
+         0.5,
+         -0.5,
+         0.5
+        ],
+        [
+         -0.5,
+         0.5,
+         0.5
+        ],
+        [
+         0.5,
+         0.5,
+         0.5
+        ]
+       ],
+       "polygons": [
+        [
+         0,
+         2,
+         3,
+         1
+        ],
+        [
+         4,
+         5,
+         7,
+         6
+        ],
+        [
+         0,
+         1,
+         5,
+         4
+        ],
+        [
+         2,
+         6,
+         7,
+         3
+        ],
+        [
+         0,
+         4,
+         6,
+         2
+        ],
+        [
+         1,
+         3,
+         7,
+         5
+        ]
+       ],
+       "n_points": 8,
+       "n_polygons": 6,
+       "sel_vertices": [],
+       "sel_edges": [],
+       "sel_polygons": []
+      }
+     }
+    }
+   },
+   "settings": {
+    "selection_mode": "Items",
+    "tool": "Move",
+    "view": "Front orthographic",
+    "Duplicate Mode": "Instance",
+    "snapping": false,
+    "Action Center": "None"
+   },
+   "selection": {
+    "items": [
+     "source"
+    ]
+   },
+   "gesture": {
+    "performed_by": "Jason",
+    "button": "middle",
+    "modifiers": [],
+    "target": "red X translation handle",
+    "direction": "right",
+    "actual_pixel_path": "unmeasured; use as result sample, not a sensitivity law",
+    "requested_modifier_timing": "held before mouse-down, released after mouse-up"
+   },
+   "expected": {
+    "items": {
+     "source": {
+      "type": "Mesh",
+      "position_m": [
+       1.06,
+       0.0,
+       0.0
+      ],
+      "rotation_degrees": [
+       0.0,
+       45.0,
+       0.0
+      ],
+      "scale": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "rotation_order": "ZXY",
+      "world_matrix": [
+       [
+        0.707107,
+        0.0,
+        -0.707107,
+        0.0
+       ],
+       [
+        0.0,
+        1.0,
+        0.0,
+        0.0
+       ],
+       [
+        0.707107,
+        0.0,
+        0.707107,
+        0.0
+       ],
+       [
+        1.06,
+        0.0,
+        0.0,
+        1.0
+       ]
+      ],
+      "mesh": {
+       "points": [
+        [
+         -0.5,
+         -0.5,
+         -0.5
+        ],
+        [
+         0.5,
+         -0.5,
+         -0.5
+        ],
+        [
+         -0.5,
+         0.5,
+         -0.5
+        ],
+        [
+         0.5,
+         0.5,
+         -0.5
+        ],
+        [
+         -0.5,
+         -0.5,
+         0.5
+        ],
+        [
+         0.5,
+         -0.5,
+         0.5
+        ],
+        [
+         -0.5,
+         0.5,
+         0.5
+        ],
+        [
+         0.5,
+         0.5,
+         0.5
+        ]
+       ],
+       "polygons": [
+        [
+         0,
+         2,
+         3,
+         1
+        ],
+        [
+         4,
+         5,
+         7,
+         6
+        ],
+        [
+         0,
+         1,
+         5,
+         4
+        ],
+        [
+         2,
+         6,
+         7,
+         3
+        ],
+        [
+         0,
+         4,
+         6,
+         2
+        ],
+        [
+         1,
+         3,
+         7,
+         5
+        ]
+       ],
+       "n_points": 8,
+       "n_polygons": 6,
+       "sel_vertices": [],
+       "sel_edges": [],
+       "sel_polygons": []
+      }
+     }
+    },
+    "selected_items": [
+     "source"
+    ]
+   },
+   "tolerance": 1e-05
+  },
+  {
+   "id": "IT-O-H5-control-shift-duplicate",
+   "description": "Control+Shift left drag creates and moves a linked Mesh Instance right by 0.084 m",
+   "input": {
+    "items": {
+     "source": {
+      "type": "Mesh",
+      "position_m": [
+       1.0,
+       0.0,
+       0.0
+      ],
+      "rotation_degrees": [
+       0.0,
+       45.0,
+       0.0
+      ],
+      "scale": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "rotation_order": "ZXY",
+      "world_matrix": [
+       [
+        0.707107,
+        0.0,
+        -0.707107,
+        0.0
+       ],
+       [
+        0.0,
+        1.0,
+        0.0,
+        0.0
+       ],
+       [
+        0.707107,
+        0.0,
+        0.707107,
+        0.0
+       ],
+       [
+        1.0,
+        0.0,
+        0.0,
+        1.0
+       ]
+      ],
+      "mesh": {
+       "points": [
+        [
+         -0.5,
+         -0.5,
+         -0.5
+        ],
+        [
+         0.5,
+         -0.5,
+         -0.5
+        ],
+        [
+         -0.5,
+         0.5,
+         -0.5
+        ],
+        [
+         0.5,
+         0.5,
+         -0.5
+        ],
+        [
+         -0.5,
+         -0.5,
+         0.5
+        ],
+        [
+         0.5,
+         -0.5,
+         0.5
+        ],
+        [
+         -0.5,
+         0.5,
+         0.5
+        ],
+        [
+         0.5,
+         0.5,
+         0.5
+        ]
+       ],
+       "polygons": [
+        [
+         0,
+         2,
+         3,
+         1
+        ],
+        [
+         4,
+         5,
+         7,
+         6
+        ],
+        [
+         0,
+         1,
+         5,
+         4
+        ],
+        [
+         2,
+         6,
+         7,
+         3
+        ],
+        [
+         0,
+         4,
+         6,
+         2
+        ],
+        [
+         1,
+         3,
+         7,
+         5
+        ]
+       ],
+       "n_points": 8,
+       "n_polygons": 6,
+       "sel_vertices": [],
+       "sel_edges": [],
+       "sel_polygons": []
+      }
+     }
+    }
+   },
+   "settings": {
+    "selection_mode": "Items",
+    "tool": "Move",
+    "view": "Front orthographic",
+    "Duplicate Mode": "Instance",
+    "snapping": false,
+    "Action Center": "None"
+   },
+   "selection": {
+    "items": [
+     "source"
+    ]
+   },
+   "gesture": {
+    "performed_by": "Jason",
+    "button": "left",
+    "modifiers": [
+     "Control",
+     "Shift"
+    ],
+    "target": "red X translation handle",
+    "direction": "right",
+    "actual_pixel_path": "unmeasured; use as result sample, not a sensitivity law",
+    "requested_modifier_timing": "held before mouse-down, released after mouse-up"
+   },
+   "expected": {
+    "items": {
+     "source": {
+      "type": "Mesh",
+      "position_m": [
+       1.0,
+       0.0,
+       0.0
+      ],
+      "rotation_degrees": [
+       0.0,
+       45.0,
+       0.0
+      ],
+      "scale": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "rotation_order": "ZXY",
+      "world_matrix": [
+       [
+        0.707107,
+        0.0,
+        -0.707107,
+        0.0
+       ],
+       [
+        0.0,
+        1.0,
+        0.0,
+        0.0
+       ],
+       [
+        0.707107,
+        0.0,
+        0.707107,
+        0.0
+       ],
+       [
+        1.0,
+        0.0,
+        0.0,
+        1.0
+       ]
+      ],
+      "mesh": {
+       "points": [
+        [
+         -0.5,
+         -0.5,
+         -0.5
+        ],
+        [
+         0.5,
+         -0.5,
+         -0.5
+        ],
+        [
+         -0.5,
+         0.5,
+         -0.5
+        ],
+        [
+         0.5,
+         0.5,
+         -0.5
+        ],
+        [
+         -0.5,
+         -0.5,
+         0.5
+        ],
+        [
+         0.5,
+         -0.5,
+         0.5
+        ],
+        [
+         -0.5,
+         0.5,
+         0.5
+        ],
+        [
+         0.5,
+         0.5,
+         0.5
+        ]
+       ],
+       "polygons": [
+        [
+         0,
+         2,
+         3,
+         1
+        ],
+        [
+         4,
+         5,
+         7,
+         6
+        ],
+        [
+         0,
+         1,
+         5,
+         4
+        ],
+        [
+         2,
+         6,
+         7,
+         3
+        ],
+        [
+         0,
+         4,
+         6,
+         2
+        ],
+        [
+         1,
+         3,
+         7,
+         5
+        ]
+       ],
+       "n_points": 8,
+       "n_polygons": 6,
+       "sel_vertices": [],
+       "sel_edges": [],
+       "sel_polygons": []
+      }
+     },
+     "instance": {
+      "type": "Mesh Instance",
+      "position_m": [
+       1.084,
+       0.0,
+       0.0
+      ],
+      "rotation_degrees": [
+       0.0,
+       45.0,
+       0.0
+      ],
+      "scale": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "rotation_order": "ZXY",
+      "world_matrix": [
+       [
+        0.707107,
+        0.0,
+        -0.707107,
+        0.0
+       ],
+       [
+        0.0,
+        1.0,
+        0.0,
+        0.0
+       ],
+       [
+        0.707107,
+        0.0,
+        0.707107,
+        0.0
+       ],
+       [
+        1.084,
+        0.0,
+        0.0,
+        1.0
+       ]
+      ],
+      "source_items": [
+       "source"
+      ]
+     }
+    },
+    "selected_items": [
+     "instance"
+    ]
+   },
+   "tolerance": 1e-05
+  }
+ ]
+}

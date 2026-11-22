@@ -1,0 +1,577 @@
+{
+  "modo_version": "17.1v1",
+  "observed": "2026-11-02",
+  "oracles": [
+    {
+      "id": "ACT-O-AC-03",
+      "description": "Automatic center, no component selection",
+      "input": {
+        "points": [
+          [
+            1.5,
+            0.5,
+            -0.5
+          ],
+          [
+            2.5,
+            0.5,
+            -0.5
+          ],
+          [
+            2.5,
+            1.5,
+            -0.5
+          ],
+          [
+            1.5,
+            1.5,
+            -0.5
+          ],
+          [
+            1.5,
+            0.5,
+            0.5
+          ],
+          [
+            2.5,
+            0.5,
+            0.5
+          ],
+          [
+            2.5,
+            1.5,
+            0.5
+          ],
+          [
+            1.5,
+            1.5,
+            0.5
+          ]
+        ],
+        "polygons": [
+          [
+            0,
+            3,
+            2,
+            1
+          ],
+          [
+            4,
+            5,
+            6,
+            7
+          ],
+          [
+            0,
+            1,
+            5,
+            4
+          ],
+          [
+            3,
+            7,
+            6,
+            2
+          ],
+          [
+            0,
+            4,
+            7,
+            3
+          ],
+          [
+            1,
+            2,
+            6,
+            5
+          ]
+        ]
+      },
+      "settings": {
+        "fixture": "C",
+        "selection_mode": "Polygon",
+        "tool": "Rotate",
+        "action_center": "Automatic",
+        "snapping": false,
+        "ui_center_m": [
+          2,
+          1,
+          0
+        ]
+      },
+      "selection": {
+        "sel_vertices": [],
+        "sel_edges": [],
+        "sel_polygons": []
+      },
+      "gesture": {
+        "view": "Front orthographic",
+        "button": "left",
+        "modifiers": [],
+        "notes": "Native Tool Properties entry while tool is live; no viewport drag.",
+        "px_per_m": 359,
+        "typed_values": {
+          "Rotation Y": "90 degrees"
+        }
+      },
+      "expected": {
+        "points": [
+          [
+            1.5,
+            0.5,
+            0.5
+          ],
+          [
+            1.5,
+            0.5,
+            -0.5
+          ],
+          [
+            1.5,
+            1.5,
+            -0.5
+          ],
+          [
+            1.5,
+            1.5,
+            0.5
+          ],
+          [
+            2.5,
+            0.5,
+            0.5
+          ],
+          [
+            2.5,
+            0.5,
+            -0.5
+          ],
+          [
+            2.5,
+            1.5,
+            -0.5
+          ],
+          [
+            2.5,
+            1.5,
+            0.5
+          ]
+        ],
+        "polygons": [
+          [
+            0,
+            3,
+            2,
+            1
+          ],
+          [
+            4,
+            5,
+            6,
+            7
+          ],
+          [
+            0,
+            1,
+            5,
+            4
+          ],
+          [
+            3,
+            7,
+            6,
+            2
+          ],
+          [
+            0,
+            4,
+            7,
+            3
+          ],
+          [
+            1,
+            2,
+            6,
+            5
+          ]
+        ],
+        "n_points": 8,
+        "n_polygons": 6,
+        "selection": {
+          "sel_vertices": [],
+          "sel_edges": [],
+          "sel_polygons": []
+        }
+      },
+      "tolerance": 1e-05
+    },
+    {
+      "id": "ACT-O-AC-03-asym",
+      "description": "Automatic center, no component selection",
+      "input": {
+        "points": [
+          [
+            1.5,
+            0.5,
+            -0.5
+          ],
+          [
+            2.5,
+            0.5,
+            -0.5
+          ],
+          [
+            2.5,
+            1.5,
+            -0.5
+          ],
+          [
+            1.5,
+            1.5,
+            -0.5
+          ],
+          [
+            1.5,
+            0.5,
+            0.5
+          ],
+          [
+            2.5,
+            0.5,
+            0.5
+          ],
+          [
+            3.5,
+            1.5,
+            0.5
+          ],
+          [
+            1.5,
+            1.5,
+            0.5
+          ]
+        ],
+        "polygons": [
+          [
+            0,
+            3,
+            2,
+            1
+          ],
+          [
+            4,
+            5,
+            6,
+            7
+          ],
+          [
+            0,
+            1,
+            5,
+            4
+          ],
+          [
+            3,
+            7,
+            6,
+            2
+          ],
+          [
+            0,
+            4,
+            7,
+            3
+          ],
+          [
+            1,
+            2,
+            6,
+            5
+          ]
+        ]
+      },
+      "settings": {
+        "fixture": "asym",
+        "selection_mode": "Polygon",
+        "tool": "Scale",
+        "action_center": "Automatic",
+        "snapping": false,
+        "ui_center_m": [
+          2.5,
+          1,
+          0
+        ]
+      },
+      "selection": {
+        "sel_vertices": [],
+        "sel_edges": [],
+        "sel_polygons": []
+      },
+      "gesture": {
+        "view": "Front orthographic",
+        "button": "left",
+        "modifiers": [],
+        "notes": "Native Tool Properties entry while tool is live; no viewport drag.",
+        "px_per_m": 359,
+        "typed_values": {
+          "Scale X": "0%",
+          "Scale Y": "0%",
+          "Scale Z": "0%"
+        }
+      },
+      "expected": {
+        "points": [
+          [
+            2.5,
+            1.0,
+            0.0
+          ],
+          [
+            2.5,
+            1.0,
+            0.0
+          ],
+          [
+            2.5,
+            1.0,
+            0.0
+          ],
+          [
+            2.5,
+            1.0,
+            0.0
+          ],
+          [
+            2.5,
+            1.0,
+            0.0
+          ],
+          [
+            2.5,
+            1.0,
+            0.0
+          ],
+          [
+            2.5,
+            1.0,
+            0.0
+          ],
+          [
+            2.5,
+            1.0,
+            0.0
+          ]
+        ],
+        "polygons": [
+          [
+            0,
+            3,
+            2,
+            1
+          ],
+          [
+            4,
+            5,
+            6,
+            7
+          ],
+          [
+            0,
+            1,
+            5,
+            4
+          ],
+          [
+            3,
+            7,
+            6,
+            2
+          ],
+          [
+            0,
+            4,
+            7,
+            3
+          ],
+          [
+            1,
+            2,
+            6,
+            5
+          ]
+        ],
+        "n_points": 8,
+        "n_polygons": 6,
+        "selection": {
+          "sel_vertices": [],
+          "sel_edges": [],
+          "sel_polygons": []
+        }
+      },
+      "tolerance": 1e-05
+    },
+    {
+      "id": "ACT-O-AC-10",
+      "description": "Local rotates disconnected polygons about their own centers and normals",
+      "input": {
+        "points": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            1,
+            0,
+            0
+          ],
+          [
+            1,
+            1,
+            0
+          ],
+          [
+            0,
+            1,
+            0
+          ],
+          [
+            5,
+            0,
+            -0.5
+          ],
+          [
+            5,
+            1,
+            -0.5
+          ],
+          [
+            5,
+            1,
+            0.5
+          ],
+          [
+            5,
+            0,
+            0.5
+          ]
+        ],
+        "polygons": [
+          [
+            0,
+            1,
+            2,
+            3
+          ],
+          [
+            4,
+            5,
+            6,
+            7
+          ]
+        ]
+      },
+      "settings": {
+        "fixture": "islands",
+        "selection_mode": "Polygon",
+        "tool": "Rotate",
+        "action_center": "Local",
+        "snapping": false,
+        "Gimbal": true
+      },
+      "selection": {
+        "sel_vertices": [],
+        "sel_edges": [],
+        "sel_polygons": [
+          0,
+          1
+        ]
+      },
+      "gesture": {
+        "view": "Front orthographic",
+        "button": "left",
+        "modifiers": [],
+        "notes": "Straight chord right-to-top of blue ring on first quad, center approximately (648,588), radius 120 px. 1 m quad spans 230 px. Measured angle +90.5 degrees.",
+        "from_px": [
+          768,
+          588
+        ],
+        "to_px": [
+          648,
+          468
+        ],
+        "px_per_m": 230
+      },
+      "expected": {
+        "points": [
+          [
+            1.004344,
+            0.004382,
+            0.0
+          ],
+          [
+            0.995618,
+            1.004344,
+            0.0
+          ],
+          [
+            -0.004344,
+            0.995618,
+            0.0
+          ],
+          [
+            0.004382,
+            -0.004344,
+            0.0
+          ],
+          [
+            5.0,
+            1.004344,
+            -0.495618
+          ],
+          [
+            5.0,
+            0.995618,
+            0.504344
+          ],
+          [
+            5.0,
+            -0.004344,
+            0.495618
+          ],
+          [
+            5.0,
+            0.004382,
+            -0.504344
+          ]
+        ],
+        "polygons": [
+          [
+            0,
+            1,
+            2,
+            3
+          ],
+          [
+            4,
+            5,
+            6,
+            7
+          ]
+        ],
+        "n_points": 8,
+        "n_polygons": 2,
+        "selection": {
+          "sel_vertices": [],
+          "sel_edges": [],
+          "sel_polygons": [
+            0,
+            1
+          ]
+        },
+        "rotation_degrees": 90.5
+      },
+      "tolerance": 1e-05
+    }
+  ]
+}

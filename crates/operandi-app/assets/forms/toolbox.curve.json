@@ -1,0 +1,205 @@
+{
+  "version": 1,
+  "id": "toolbox.curve",
+  "label": "Curve",
+  "exported": true,
+  "controls": [
+    {
+      "divider": "Tools",
+      "id": "curve-tools"
+    },
+    {
+      "command": "Bezier Curve",
+      "label": "Bezier",
+      "icon": "bezier-curve"
+    },
+    {
+      "command": "Curve",
+      "label": "Curve",
+      "icon": "curve"
+    },
+    {
+      "command": "B-Spline",
+      "label": "B-Spline",
+      "icon": "b-spline"
+    },
+    {
+      "command": "Sketch",
+      "label": "Sketch",
+      "icon": "sketch"
+    },
+    {
+      "command": "Retopo Sketch",
+      "label": "Retopo Sketch"
+    },
+    {
+      "divider": ""
+    },
+    {
+      "command": "Solid Sketch",
+      "label": "Solid Sketch",
+      "icon": "solid-sketch"
+    },
+    {
+      "command": "Tube",
+      "label": "Tube"
+    },
+    {
+      "command": "Draw Patch",
+      "label": "Patch"
+    },
+    {
+      "divider": ""
+    },
+    {
+      "command": "operandi.notBuilt \"Hair Guide\"",
+      "label": "Hair Guide",
+      "noShortcut": true,
+      "tooltip": "Hair Guide · not built yet: hair isn't built"
+    },
+    {
+      "divider": "Commands",
+      "id": "curve-commands"
+    },
+    {
+      "command": "curves.setColor",
+      "label": "Set Curves Color…",
+      "look": "flat",
+      "tooltip": "Set Curves Color… · the colour curves draw in this view; not saved in the scene · curves.setColor"
+    },
+    {
+      "command": "Freeze",
+      "label": "Freeze...",
+      "look": "flat"
+    },
+    {
+      "command": "curve.winding",
+      "label": "Align Winding",
+      "look": "flat",
+      "tooltip": "Align Winding · every selected closed curve runs the same way round · curve.winding"
+    },
+    {
+      "divider": ""
+    },
+    {
+      "command": "poly.makeCurveOpen",
+      "label": "Make Open Curve",
+      "look": "flat",
+      "tooltip": "Make Open Curve · a Curve through the selected vertices, in selection order · poly.makeCurveOpen",
+      "shortcut": "Make Open Curve"
+    },
+    {
+      "command": "poly.makeCurveClosed",
+      "label": "Make Closed Curves",
+      "look": "flat",
+      "tooltip": "Make Closed Curve · a closed Curve through the selected vertices, in selection order · poly.makeCurveClosed"
+    },
+    {
+      "command": "poly.makeCurveFill",
+      "label": "Make Curve Fill",
+      "look": "flat",
+      "tooltip": "Make Curve Fill · a flat polygon filling each selected closed curve; the curve stays · poly.makeCurveFill"
+    },
+    {
+      "command": "edges.toCurve",
+      "label": "Edges to Curves",
+      "look": "flat"
+    },
+    {
+      "divider": ""
+    },
+    {
+      "id": "Open Curve Offset",
+      "form": {
+        "style": "flyout",
+        "controls": [
+          {
+            "command": "ppi.curveOffset closed:false trio:false",
+            "label": "Open Curve Offset…",
+            "look": "flat",
+            "tooltip": "Open Curve Offset… · an offset copy of the selected open curves in the same item · ppi.curveOffset"
+          },
+          {
+            "command": "ppi.curveOffset closed:false trio:true",
+            "label": "Open Curve Offset Trio…",
+            "look": "flat",
+            "tooltip": "Open Curve Offset Trio… · an offset copy of the selected open curves in the same item (both sides) · ppi.curveOffset"
+          }
+        ]
+      }
+    },
+    {
+      "id": "Closed Curve Offset",
+      "form": {
+        "style": "flyout",
+        "controls": [
+          {
+            "command": "ppi.curveOffset closed:true trio:false",
+            "label": "Closed Curve Offset…",
+            "look": "flat",
+            "tooltip": "Closed Curve Offset… · an offset copy of the selected closed curves in the same item · ppi.curveOffset"
+          },
+          {
+            "command": "ppi.curveOffset closed:true trio:true",
+            "label": "Closed Curve Offset Trio…",
+            "look": "flat",
+            "tooltip": "Closed Curve Offset Trio… · an offset copy of the selected closed curves in the same item (both sides) · ppi.curveOffset"
+          }
+        ]
+      }
+    },
+    {
+      "divider": ""
+    },
+    {
+      "id": "Convert Curves",
+      "form": {
+        "style": "flyout",
+        "controls": [
+          {
+            "command": "curve.convert from:curve to:bspline",
+            "label": "Curve to B-Spline",
+            "look": "flat",
+            "tooltip": "Curve to B-Spline · the selected curves become a new Converted item; the source stays · curve.convert"
+          },
+          {
+            "command": "curve.convert from:curve to:bezier",
+            "label": "Curve to Bezier",
+            "look": "flat",
+            "tooltip": "Curve to Bezier · the selected curves become a new Converted item; the source stays · curve.convert"
+          },
+          {
+            "command": "curve.convert from:bezier to:curve",
+            "label": "Bezier to Curve",
+            "look": "flat",
+            "tooltip": "Bezier to Curve · the selected curves become a new Converted item; the source stays · curve.convert"
+          },
+          {
+            "command": "curve.convert from:bezier to:bspline",
+            "label": "Bezier to B-Spline",
+            "look": "flat",
+            "tooltip": "Bezier to B-Spline · the selected curves become a new Converted item; the source stays · curve.convert"
+          },
+          {
+            "command": "curve.convert from:bspline to:bezier",
+            "label": "B-Spline to Bezier",
+            "look": "flat",
+            "tooltip": "B-Spline to Bezier · the selected curves become a new Converted item; the source stays · curve.convert"
+          },
+          {
+            "command": "curve.convert from:bspline to:curve",
+            "label": "B-Spline to Curve",
+            "look": "flat",
+            "tooltip": "B-Spline to Curve · the selected curves become a new Converted item; the source stays · curve.convert"
+          }
+        ]
+      }
+    },
+    {
+      "command": "bezier.tangent",
+      "label": "Bezier Tangent…",
+      "look": "flat",
+      "tooltip": "Bezier Tangent… · sharpen, smooth or even the handles of the selected Bezier knots · bezier.tangent"
+    }
+  ]
+}

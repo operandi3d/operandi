@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "id": "menu.file.projectPresets",
+  "label": "Project Presets",
+  "style": "menu",
+  "controls": [
+    {
+      "command": "operandi.project.loadPreset preset:layout",
+      "label": "Load Project Layout"
+    },
+    {
+      "command": "operandi.project.loadPreset preset:viewportDisplay",
+      "label": "Load Project Viewport Display"
+    },
+    {
+      "command": "operandi.project.loadPreset preset:inputMap",
+      "label": "Load Project Input Map"
+    },
+    {
+      "divider": ""
+    },
+    {
+      "command": "operandi.project.savePreset preset:layout",
+      "label": "Save Layout to Project"
+    },
+    {
+      "command": "operandi.project.savePreset preset:viewportDisplay",
+      "label": "Save Viewport Display to Project"
+    },
+    {
+      "command": "operandi.project.savePreset preset:inputMap",
+      "label": "Save Input Map to Project"
+    }
+  ]
+}

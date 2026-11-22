@@ -1,0 +1,16 @@
+[package]
+name = "operandi-remesh"
+version = "0.1.0"
+edition = "2024"
+# Automatic Retopology's back end. Blender's QuadriFlow glue is
+# GPL-2.0-or-later; QuadriFlow is BSD-3-Clause, its LEMON graph library
+# BSL-1.0, pcg32 Apache-2.0, parallel stable sort BSD-3-Clause, the
+# Boykov-Kolmogorov max-flow MIT and Eigen MPL-2.0. See README.md.
+license = "GPL-2.0-or-later AND BSD-3-Clause AND BSL-1.0 AND Apache-2.0 AND MIT AND MPL-2.0"
+build = "build.rs"
+links = "operandi_remesh"
+
+[dependencies]
+
+[build-dependencies]
+cc = "1.2"

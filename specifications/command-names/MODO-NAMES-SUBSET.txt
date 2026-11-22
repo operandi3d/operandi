@@ -1,0 +1,179 @@
+FORMAT: name(arg:type, ...)  # label
+scene.open(filename:string, mode:integer)
+scene.new()
+scene.save(mode:integer, format:string)
+scene.saveAs(filename:string, format:string, export:boolean, index:integer)
+scene.close()
+scene.closeAll()
+scene.openRecent(recentInd:integer)
+scene.importReference(filename:string, meshes:boolean, shaders:boolean, lights:boolean, environments:boolean, cameras:boolean)
+item.create(type:string, name:string, mask:string, filename:filepath, position:integer, applyDefaultPreset:boolean)
+item.name(name:string, type:string, item:&item)
+item.channel(name:string, value:?, mode:integer, item:&item)
+channel.value(value:?, mode:integer, strict:boolean, channel:&channel)
+item.setType(type:string, mask:string)
+item.delete(mask:string, child:integer, item:&item)
+item.tag(mode:integer, tag:?, value:string)
+select.item(item:&item, mode:integer, mask:string)
+transform.channel(name:string, value:?, mode:integer, item:&item, filter:string, replace:string)
+backdrop.edit(image:&clip, project:integer, aspect:boolean, flip:boolean, invert:boolean, blend:boolean, contrast:percent, brightness:percent, transparency:percent)
+clip.reload()
+clip.addStill(filename:string, layered:boolean)  # Add Still Image
+clip.replace(clip:&item, filename:string, type:string)  # Replace Image Clip
+preset.saveAs(item:&item, subtype:integer, filename:string, createPkg:boolean, useCurrent:boolean, scriptOnly:boolean)
+preset.do(preset:filepath, handler:string)
+app.undo(steps:integer, fine:boolean)
+app.redo(steps:integer, fine:boolean)
+select.all()
+select.more(space:integer)
+select.less()
+select.convert(type:string)
+lock.sel() / lock.unsel() / lock.invert() / unlock()
+hide.sel() / hide.unsel() / hide.invert() / unhide(mode:integer)
+cut(state:integer) / copy(state:integer) / paste(state:integer)
+layer.mergeMeshes(comp:boolean)
+layer.unmerge(item:&item, select:boolean)
+viewport.fit(selected:boolean, align:boolean, viewport:integer)
+viewport.fitSelected()
+viewport.maximize(useSelection:integer)
+viewport.split(direction:integer)
+viewport.detach(keep:integer, fromMouse:integer)
+falloff.state(enable:boolean) / symmetry.state(enable:boolean) / actionCenter.state(enable:boolean)
+render(filename:string, format:string, options:integer, group:&item)
+pref.value(name:string, value:?)
+pref.defaultScene() / pref.autoSaveDir() / pref.contentDir()
+tool.attr(tool:string, attr:string, value:?)
+shader.setBlend(mode:integer)
+shader.setOpacity(opacity:percent)
+shader.setEffect(effect:string)
+shader.setVisible(item:&item, visible:boolean, all:integer)
+mask.setPTag(name:string, item:&item)  # Group Set Material
+mask.setPTagType(name:string, item:&item)
+mask.setMesh(name:string, item:&item)
+texture.new(image:string, clip:&clip)  # Create Texture
+texture.delete(select:boolean, item:&item)  # Delete Texture
+texture.setProj(type:integer)
+texture.setUV(name:string)
+texture.setIMap(image:&clip, name:string)
+texture.setAxis(axis:integer)
+texture.size(axis:integer, size:distance, forRWTS:boolean)
+texture.autoSize()
+texture.setLocator(item:string, locator:string)
+texture.setVMap(name:string)
+texture.setCamera(name:string)
+light.temperature(kelvins:float, gamma:float)
+light.mesh(light:&item, mesh:&item)
+light.photometryFile()
+camera.filmBack(preset:string)
+poly.convert(to:string, from:string, toggle:boolean)
+select.lazy(enable:boolean)
+cmds.showHelp(command:string)  # alias target for help
+cmds.saveList(filename:string, verbose:boolean)
+layout.lockDividers(lock:boolean) / layout.lockThumbs(lock:boolean)  # chrome; optional
+view3d.shadingStyle(style:integer, bgmesh:integer)
+view3d.wireframeOverlay(mode:integer, bgmesh:integer)
+view3d.wireframeViewColor(color:color, bgmesh:integer)
+view3d.wireframeAlpha(alpha:percent, bgmesh:integer)
+view3d.showGrid(state:integer)
+view3d.fadedGrid(state:boolean)
+view3d.fadedGridAxes(state:boolean)
+view3d.showBackdrop / showCameras / showLights / showLocators / showMeshes / showTextureLocators / showSelections / showSelectionRollover / selectedNormals / fillSelected / outlineSelected / showWireframeItemMode / showLightIllumination / showGnzShadows / inactiveInvisible / sameAsActive / orbitSelected / overlay / showHUD / controls (state:boolean)
+view3d.meshSmoothing(enable:boolean)
+view3d.showVertices(state:boolean, bgmesh:integer)
+view3d.showUVBounds(state:boolean, bgmesh:integer)
+view3d.showweights(state:boolean)  # 3D View Shaded Weightmap Drawing
+view3d.showDistortion(enabled:boolean, bgmesh:integer)  # 3D View Show UV Distortion
+view3d.showWorkPlane(state:integer)
+view3d.gnzAmbientColor(color:color)
+view3d.gnzAmbientIntensity(light:light)
+view3d.pointSize(size:float, bgmesh:integer)  # Independent Point Size
+view3d.indPointSize(state:boolean, bgmesh:integer)
+view3d.useTrackball(mode:integer)
+view3d.projection(type:integer)
+view3d.bgEnvironment(type:integer, mode:integer)
+view3d.TransparencyOverride(mode:integer, bgmesh:integer)
+view3d.TransparencyOverrideFlatShade(flatShade:integer, bgmesh:integer, mode:integer)
+view3d.TransparencyOverrideLinkWireframeOpacity(link:integer, bgmesh:integer, mode:integer)
+view3d.TransparencyOverrideOverlayMode(overlay:integer, bgmesh:integer, mode:integer)
+view3d.TransparencyOverrideSolidAlphaBack / SolidAlphaFront(alpha:percent, bgmesh:integer, mode:integer)
+view3d.TransparencyOverrideSolidColorBack / SolidColorFront(color:color, bgmesh:integer, mode:integer)
+view3d.TransparencyOverrideWireframeAlphaBack(alpha:percent, bgmesh:integer, mode:integer)
+view3d.TransparencyOverrideWireframeColorBack / WireframeColorFront(color:color, bgmesh:integer, mode:integer)
+item.parent(item:&item, parent:&item, position:integer)  # Parent / move a mesh operation
+meshop.create(type:string, mode:integer, category:string, applyDefaultPreset:boolean)  # Add Mesh Operation
+deformer.enable(deformer:&item, enable:boolean)
+deformer.freeze(duplicate:boolean, deformer:&item)  # Freeze / Duplicate and Freeze
+mesh.freeze()  # Freeze whole Mesh Ops stack
+deformer.selectBaseMesh(item:&item, select:boolean)  # Edit Base Mesh
+selop.indexcreate()  # Select by Index
+selop.selection(mode:string, item:&item)
+layout.window(hash:string, open:boolean, pin:boolean, popUnderMouse:boolean)  # Layout Window
+pbview.basePathAdd(path:filepath, basePathKey:string, set:string)
+pbview.basePathRemove(path:filepath, basePathKey:string)
+pbview.refresh()
+pbview.mode(mode:integer)
+pbview.sortMode(mode:integer)
+pbview.filterString(filter:string)
+pbview.filterStringEnable(state:boolean)
+dircache.copy(source:filepath, dest:filepath, overwrite:boolean)
+file.rename(newName:string, path:filepath)
+file.duplicate(newName:string, path:filepath)
+file.delete(path:filepath)
+tool.set(preset:string, mode:string)
+tool.reset(tool:string)
+tool.apply()
+tool.drop()
+backdrop.add(name:string, image:filepath, project:string)
+backdrop.fit()
+sculpt.smooth()  # sculpt brush
+sculpt.push()  # sculpt brush
+sculpt.inflate()  # sculpt brush
+sculpt.move()  # sculpt brush
+sculpt.fold()  # sculpt brush
+sculpt.clay()  # sculpt brush
+sculpt.smudge()  # sculpt brush
+sculpt.carve()  # sculpt brush
+sculpt.scar()  # sculpt brush
+sculpt.flatten()  # sculpt brush
+sculpt.tangentPinch()  # sculpt brush
+sculpt.centerPinch()  # sculpt brush
+sculpt.emboss()  # sculpt brush
+sculpt.shrink()  # sculpt brush
+sculpt.spin()  # sculpt brush
+brush.smooth() / brush.hard()  # brush tips
+sculpt.borderLock(state:boolean) / sculpt.cornerLock(state:boolean)
+mesh.retopo(countMode:integer, polyTargetNum:integer, polyTargetPct:percent, creaseAngle:angle, boundaryAlign:boolean, vertNormals:boolean, newMesh:boolean, seed:integer)  # Automatic Retopology
+sculpt.remesh(density:percent, voxelSize:distance, keepMaps:boolean, vertNormals:boolean)  # Voxel Remesh
+Integer enum VALUES (e.g. what shadingStyle 2 means) are not in the map: use readable string values (e.g. "shade", "wire") accepted alongside, and list the integer meanings you chose as an open question in docs/COMMAND_REGISTRY.md rather than guessing they match.
+environment.light(envMaterial:&item, sunLight:&item)  # Set Physical Sun
+attr.formPopover(form:&attr, proficiency:integer, pin:boolean, lockProficiency:boolean, focusFirstField:boolean, open:boolean)
+select.nextMode(mode:integer)  # Select Next Mode
+scale.absolute(mode:integer, absolute_size_uniform:distance, absolute_size_uniform_pref:string, orient_to_selection:boolean, absolute_size_x:distance, absolute_size_y:distance, absolute_size_z:distance, absolute_size_center_x:integer, absolute_size_center_y:integer, absolute_size_center_z:integer)  # Absolute Scaling (snaps-precision-2026-11-10 D)
+poly.boolean(mode:integer, cutmesh:integer, item:&item, children:boolean)  # Boolean CSG (booleans/BOOLEANS.md BOOL-25; registry thread 2026-11-11)
+# Vertex Map Tools and falloffs (registry reply 2026-11-11; added with Jason's OK)
+sculpt.vmapPaint / sculpt.vmapSmooth / sculpt.vmapScale / sculpt.vmapErase / sculpt.vmapSetVal  # tools (tool.set <name> on); attrs offset, oval, sval, nmod, dmod, smod, alpha, strokeStep, level, normalize, screenBrush, blendMode
+sculpt.liveWeightEdit(live:boolean)  # Live Deformers
+vertMap.new(name:string, type:string, init:boolean, color:string, value:float)  # New Vertex Map
+select.vertexMap(name:string, type:string, mode:integer)  # select a vertex map (set, add, remove)
+falloff.vertexMap(mode:integer, index:integer, mix:integer)  # Vertex Map falloff (tool.set falloff.vertexMap on)
+falloff.invert()  # Invert falloff
+TOOL const.bg: geometry:integer=0, bkgOffset:distance=0, negative:boolean=1, dblSided:boolean=0, handle:boolean=1, target:&item  # Background Constraint (tool.set const.bg on; registry thread 2026-11-13). geometry readable values off/screen/vector/point = 0-3 (order to confirm); Operandi keeps Negative Offset off by default (spec v1.1)
+uv.pack(pack:boolean, stretch:boolean, orient:boolean, keepSize:boolean, direction:integer, gaps:percent, byPixel:boolean, gapsByPixel:float, bbox:boolean, stack:boolean, region:integer, udim:integer, regionX:uvcoord, regionY:uvcoord, regionW:uvcoord, regionH:uvcoord, tileU:integer, tileV:integer, polygonTag:integer, background:boolean, writeNew:boolean, bestrot:boolean)  # Pack UVs, one-shot command (uv-unwrap-pack-relax v1.1; registry thread 2026-11-11)
+uv.relax(iterations:integer, modelLength:boolean, mode:integer, seal:boolean, boundary:integer, area:percent, uniform:boolean)  # UV Relax, command form
+TOOL uv.unwrap: iter:integer=100, gaps:percent=0.2, matr:boolean=0, part:boolean=0, project:integer=0, pinning:integer=0, axis:integer=1, angle:angle=0, seal:boolean=1, layout:boolean=1, mode:integer=0, symmetrize:boolean=0, symmAxis:integer=0, symmComp:integer=0, name:vertmapname=Texture, seam:integer=0, seamName:vertmapname, pickName:vertmapname
+TOOL uv.relax: mode:integer=1, iter:integer=0, live:boolean=0, seal:boolean=0, boundary:integer=0, area:percent=0.1, pick:boolean=0, uniform:boolean=0, pause:boolean=0, noEdge:boolean=1, name:vertmapname, showHandle:boolean=0, offsetU/offsetV:uvcoord=0, scaleU/scaleV:percent=1, pivotU/pivotV:uvcoord=0.5, angle:angle=0
+TOOL uv.pelt: enableU:boolean=1, iter:integer=0, gaps:percent=0.2, matr:boolean=0, part:boolean=0, project:integer=0, pinning:integer=0, axis:integer=1, angle:angle=0, seal:boolean=1, layout:boolean=1, mode:integer=0, symmetrize:boolean=0, symmAxis:integer=0, symmComp:integer=0, name:vertmapname=Texture, seam:integer=0, seamName:vertmapname, pickName:vertmapname, enableR:boolean=1, relaxmode:integer=2, relaxiter:integer=0, boundary:integer=0, area:percent=0.1, uniform:boolean=0
+TOOL edge.extend: offX/offY/offZ:distance=0, rotX/rotY/rotZ:angle=0, sclX/sclY/sclZ:percent=1, segs:integer=1, inset:distance=0, shift:distance=0, moveHandle:boolean=1, rotateHandle:boolean=0, scaleHandle:boolean=0, localHandle:boolean=0, planeHandle:integer=0 (none/move/scale), hauling:integer=0 (global/local), uvs:integer=1 (off/u/v)
+TOOL solid.sketch: emod:integer=0, subdiv:integer=2, rotate:boolean=0, current:integer=0, cenX/cenY/cenZ:distance=0, sizX/sizY/sizZ:distance=0, bank:angle=0, tension:percent=0, align:boolean=0, merge:boolean=0, negative:boolean=0, material:string, part:string, uvmap:string, uvProj:integer=0, cenU/cenV:float=0, rotU:angle=0
+poly.freeze(face:integer, drill:boolean, axis:integer, disp:boolean, deform:boolean, tess:boolean, fixed:boolean, cangle:angle, morphSave:boolean, morphName:string)  # Freeze Polygons. face (Curves As): 0=Faces, 1=Polylines are reference; 2=2 Point Polygons is OPERANDI-ONLY; other values rejected
+meshop.create(type:string, mode:integer, category:string, applyDefaultPreset:boolean)  # Add a mesh operation (MeshOps; registry MESHOPS-NAMES rev 3)
+mirror.clone.create()  # Add a Mirror mesh operation (Clone Effector + pmodel.mirror)
+array.clone.create()  # Add an Array mesh operation (Clone Effector + pmodel.array)
+deformer.enable(deformer:&item, enable:boolean)  # Mesh operation on/off
+deformer.freeze(duplicate:boolean, deformer:&item, mesh:&item)  # Freeze Deformer
+mesh.freeze()  # Freeze To Mesh
+deformer.selectBaseMesh(item:&item, select:boolean)  # Edit Base Mesh
+selop.indexcreate()  # Select by Index op from the selection
+selop.selection(mode:integer, item:&item)  # Select by Index Set/Clear/Add/Remove
+TOOL falloff.selection: steps:integer=2, shape:integer=3 (linear/easeIn/easeOut/smooth/custom = 0..4), p0:float=0 (In), p1:float=0 (Out), mix:integer=0  # Selection falloff (registry reply 2026-11-13)
+TOOL xfrm.bend: angle:angle=0, spineX:distance=0, spineY:distance=1, spineZ:distance=0, bothSides:boolean=0, lockUV:boolean=0 (Slip UVs), morph:integer=0  # Bend (tool.set "Bend" on is the preset; registry reply 2026-11-13)

@@ -1,0 +1,1942 @@
+{
+  "format": "Operandi",
+  "version": 19,
+  "scene": {
+    "items": [
+      {
+        "id": 1,
+        "name": "UV Image",
+        "visible": true,
+        "transform": {
+          "translation": [
+            -4.5,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "zxy": false
+        },
+        "mesh": {
+          "attributes": {
+            "representations": [],
+            "creases": [],
+            "uv_records": {},
+            "corner_normals": {},
+            "point_weights": {},
+            "point_colors": {},
+            "degenerate_faces": []
+          },
+          "vertices": [
+            [
+              -1.25,
+              -1.25,
+              -0.0005
+            ],
+            [
+              1.25,
+              -1.25,
+              -0.0005
+            ],
+            [
+              1.25,
+              1.25,
+              -0.0005
+            ],
+            [
+              -1.25,
+              1.25,
+              -0.0005
+            ],
+            [
+              -1.25,
+              -1.25,
+              0.0005
+            ],
+            [
+              1.25,
+              -1.25,
+              0.0005
+            ],
+            [
+              1.25,
+              1.25,
+              0.0005
+            ],
+            [
+              -1.25,
+              1.25,
+              0.0005
+            ]
+          ],
+          "faces": [
+            {
+              "vertices": [
+                0,
+                3,
+                2,
+                1
+              ],
+              "uv": [
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0
+                ],
+                [
+                  1.0,
+                  1.0
+                ],
+                [
+                  1.0,
+                  0.0
+                ]
+              ],
+              "material": "",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                4,
+                5,
+                6,
+                7
+              ],
+              "uv": [
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  1.0,
+                  0.0
+                ],
+                [
+                  1.0,
+                  1.0
+                ],
+                [
+                  0.0,
+                  1.0
+                ]
+              ],
+              "material": "",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                0,
+                4,
+                7,
+                3
+              ],
+              "uv": [
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0
+                ],
+                [
+                  0.0,
+                  1.0
+                ]
+              ],
+              "material": "",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                1,
+                2,
+                6,
+                5
+              ],
+              "uv": [
+                [
+                  1.0,
+                  0.0
+                ],
+                [
+                  1.0,
+                  1.0
+                ],
+                [
+                  1.0,
+                  1.0
+                ],
+                [
+                  1.0,
+                  0.0
+                ]
+              ],
+              "material": "",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                0,
+                1,
+                5,
+                4
+              ],
+              "uv": [
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  1.0,
+                  0.0
+                ],
+                [
+                  1.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ]
+              ],
+              "material": "",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                3,
+                7,
+                6,
+                2
+              ],
+              "uv": [
+                [
+                  0.0,
+                  1.0
+                ],
+                [
+                  0.0,
+                  1.0
+                ],
+                [
+                  1.0,
+                  1.0
+                ],
+                [
+                  1.0,
+                  1.0
+                ]
+              ],
+              "material": "",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            }
+          ],
+          "uv_maps": {}
+        },
+        "parent": null,
+        "source_id": null,
+        "source_display_name": null
+      },
+      {
+        "id": 2,
+        "name": "Planar Image",
+        "visible": true,
+        "transform": {
+          "translation": [
+            -1.5,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "zxy": false
+        },
+        "mesh": {
+          "attributes": {
+            "representations": [],
+            "creases": [],
+            "uv_records": {},
+            "corner_normals": {},
+            "point_weights": {},
+            "point_colors": {},
+            "degenerate_faces": []
+          },
+          "vertices": [
+            [
+              -1.0,
+              -1.0,
+              -1.0
+            ],
+            [
+              1.0,
+              -1.0,
+              -1.0
+            ],
+            [
+              1.0,
+              1.0,
+              -1.0
+            ],
+            [
+              -1.0,
+              1.0,
+              -1.0
+            ],
+            [
+              -1.0,
+              -1.0,
+              1.0
+            ],
+            [
+              1.0,
+              -1.0,
+              1.0
+            ],
+            [
+              1.0,
+              1.0,
+              1.0
+            ],
+            [
+              -1.0,
+              1.0,
+              1.0
+            ]
+          ],
+          "faces": [
+            {
+              "vertices": [
+                0,
+                3,
+                2,
+                1
+              ],
+              "uv": null,
+              "material": "",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                4,
+                5,
+                6,
+                7
+              ],
+              "uv": null,
+              "material": "",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                0,
+                4,
+                7,
+                3
+              ],
+              "uv": null,
+              "material": "",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                1,
+                2,
+                6,
+                5
+              ],
+              "uv": null,
+              "material": "",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                0,
+                1,
+                5,
+                4
+              ],
+              "uv": null,
+              "material": "",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                3,
+                7,
+                6,
+                2
+              ],
+              "uv": null,
+              "material": "",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            }
+          ],
+          "uv_maps": {}
+        },
+        "parent": null,
+        "source_id": null,
+        "source_display_name": null
+      },
+      {
+        "id": 3,
+        "name": "Reset Over Colour",
+        "visible": true,
+        "transform": {
+          "translation": [
+            1.5,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "zxy": false
+        },
+        "mesh": {
+          "attributes": {
+            "representations": [],
+            "creases": [],
+            "uv_records": {},
+            "corner_normals": {},
+            "point_weights": {},
+            "point_colors": {},
+            "degenerate_faces": []
+          },
+          "vertices": [
+            [
+              -1.25,
+              -1.25,
+              -0.0005
+            ],
+            [
+              1.25,
+              -1.25,
+              -0.0005
+            ],
+            [
+              1.25,
+              1.25,
+              -0.0005
+            ],
+            [
+              -1.25,
+              1.25,
+              -0.0005
+            ],
+            [
+              -1.25,
+              -1.25,
+              0.0005
+            ],
+            [
+              1.25,
+              -1.25,
+              0.0005
+            ],
+            [
+              1.25,
+              1.25,
+              0.0005
+            ],
+            [
+              -1.25,
+              1.25,
+              0.0005
+            ]
+          ],
+          "faces": [
+            {
+              "vertices": [
+                0,
+                3,
+                2,
+                1
+              ],
+              "uv": [
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0
+                ],
+                [
+                  1.0,
+                  1.0
+                ],
+                [
+                  1.0,
+                  0.0
+                ]
+              ],
+              "material": "",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                4,
+                5,
+                6,
+                7
+              ],
+              "uv": [
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  1.0,
+                  0.0
+                ],
+                [
+                  1.0,
+                  1.0
+                ],
+                [
+                  0.0,
+                  1.0
+                ]
+              ],
+              "material": "",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                0,
+                4,
+                7,
+                3
+              ],
+              "uv": [
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0
+                ],
+                [
+                  0.0,
+                  1.0
+                ]
+              ],
+              "material": "",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                1,
+                2,
+                6,
+                5
+              ],
+              "uv": [
+                [
+                  1.0,
+                  0.0
+                ],
+                [
+                  1.0,
+                  1.0
+                ],
+                [
+                  1.0,
+                  1.0
+                ],
+                [
+                  1.0,
+                  0.0
+                ]
+              ],
+              "material": "",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                0,
+                1,
+                5,
+                4
+              ],
+              "uv": [
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  1.0,
+                  0.0
+                ],
+                [
+                  1.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ]
+              ],
+              "material": "",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                3,
+                7,
+                6,
+                2
+              ],
+              "uv": [
+                [
+                  0.0,
+                  1.0
+                ],
+                [
+                  0.0,
+                  1.0
+                ],
+                [
+                  1.0,
+                  1.0
+                ],
+                [
+                  1.0,
+                  1.0
+                ]
+              ],
+              "material": "",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            }
+          ],
+          "uv_maps": {}
+        },
+        "parent": null,
+        "source_id": null,
+        "source_display_name": null
+      },
+      {
+        "id": 4,
+        "name": "Alpha Image",
+        "visible": true,
+        "transform": {
+          "translation": [
+            4.5,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "zxy": false
+        },
+        "mesh": {
+          "attributes": {
+            "representations": [],
+            "creases": [],
+            "uv_records": {},
+            "corner_normals": {},
+            "point_weights": {},
+            "point_colors": {},
+            "degenerate_faces": []
+          },
+          "vertices": [
+            [
+              -1.25,
+              -1.25,
+              -0.0005
+            ],
+            [
+              1.25,
+              -1.25,
+              -0.0005
+            ],
+            [
+              1.25,
+              1.25,
+              -0.0005
+            ],
+            [
+              -1.25,
+              1.25,
+              -0.0005
+            ],
+            [
+              -1.25,
+              -1.25,
+              0.0005
+            ],
+            [
+              1.25,
+              -1.25,
+              0.0005
+            ],
+            [
+              1.25,
+              1.25,
+              0.0005
+            ],
+            [
+              -1.25,
+              1.25,
+              0.0005
+            ]
+          ],
+          "faces": [
+            {
+              "vertices": [
+                0,
+                3,
+                2,
+                1
+              ],
+              "uv": [
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0
+                ],
+                [
+                  1.0,
+                  1.0
+                ],
+                [
+                  1.0,
+                  0.0
+                ]
+              ],
+              "material": "",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                4,
+                5,
+                6,
+                7
+              ],
+              "uv": [
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  1.0,
+                  0.0
+                ],
+                [
+                  1.0,
+                  1.0
+                ],
+                [
+                  0.0,
+                  1.0
+                ]
+              ],
+              "material": "",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                0,
+                4,
+                7,
+                3
+              ],
+              "uv": [
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0
+                ],
+                [
+                  0.0,
+                  1.0
+                ]
+              ],
+              "material": "",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                1,
+                2,
+                6,
+                5
+              ],
+              "uv": [
+                [
+                  1.0,
+                  0.0
+                ],
+                [
+                  1.0,
+                  1.0
+                ],
+                [
+                  1.0,
+                  1.0
+                ],
+                [
+                  1.0,
+                  0.0
+                ]
+              ],
+              "material": "",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                0,
+                1,
+                5,
+                4
+              ],
+              "uv": [
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  1.0,
+                  0.0
+                ],
+                [
+                  1.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0
+                ]
+              ],
+              "material": "",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                3,
+                7,
+                6,
+                2
+              ],
+              "uv": [
+                [
+                  0.0,
+                  1.0
+                ],
+                [
+                  0.0,
+                  1.0
+                ],
+                [
+                  1.0,
+                  1.0
+                ],
+                [
+                  1.0,
+                  1.0
+                ]
+              ],
+              "material": "",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            }
+          ],
+          "uv_maps": {}
+        },
+        "parent": null,
+        "source_id": null,
+        "source_display_name": null
+      },
+      {
+        "id": 5,
+        "name": "Texture Group",
+        "visible": true,
+        "transform": {
+          "translation": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "zxy": false
+        },
+        "mesh": {
+          "attributes": {
+            "representations": [],
+            "creases": [],
+            "uv_records": {},
+            "corner_normals": {},
+            "point_weights": {},
+            "point_colors": {},
+            "degenerate_faces": []
+          },
+          "vertices": [],
+          "faces": [],
+          "uv_maps": {}
+        },
+        "parent": null,
+        "source_id": null,
+        "source_display_name": null,
+        "texture": "Group"
+      },
+      {
+        "id": 6,
+        "name": "Image Map (Texture)",
+        "visible": true,
+        "transform": {
+          "translation": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "zxy": false
+        },
+        "mesh": {
+          "attributes": {
+            "representations": [],
+            "creases": [],
+            "uv_records": {},
+            "corner_normals": {},
+            "point_weights": {},
+            "point_colors": {},
+            "degenerate_faces": []
+          },
+          "vertices": [],
+          "faces": [],
+          "uv_maps": {}
+        },
+        "parent": 5,
+        "source_id": null,
+        "source_display_name": null,
+        "texture": {
+          "Locator": {
+            "projection": "UvMap",
+            "axis": 0,
+            "uv_map": null,
+            "repeat": [
+              1.0,
+              1.0
+            ],
+            "uv_rotation": 0.0,
+            "tiling": [
+              "Repeat",
+              "Repeat"
+            ],
+            "world_coordinates": false,
+            "world_transforms": true,
+            "front_culling": "ProjectThrough",
+            "triplanar_hardness": 0.0,
+            "random_offsets": "None",
+            "random_strength": 0.0,
+            "falloff_type": "Cubic",
+            "falloff": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "tangent": "DpduDpdv",
+            "real_world_size": false,
+            "particle_source": null,
+            "real_world_size_xy": [
+              1.0,
+              1.0
+            ],
+            "replicator": null,
+            "projection_camera": null
+          }
+        }
+      },
+      {
+        "id": 7,
+        "name": "Image Map (2) (Texture)",
+        "visible": true,
+        "transform": {
+          "translation": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "zxy": false
+        },
+        "mesh": {
+          "attributes": {
+            "representations": [],
+            "creases": [],
+            "uv_records": {},
+            "corner_normals": {},
+            "point_weights": {},
+            "point_colors": {},
+            "degenerate_faces": []
+          },
+          "vertices": [],
+          "faces": [],
+          "uv_maps": {}
+        },
+        "parent": 5,
+        "source_id": null,
+        "source_display_name": null,
+        "texture": {
+          "Locator": {
+            "projection": "Planar",
+            "axis": 2,
+            "uv_map": null,
+            "repeat": [
+              2.0,
+              2.0
+            ],
+            "uv_rotation": 0.0,
+            "tiling": [
+              "Repeat",
+              "Repeat"
+            ],
+            "world_coordinates": false,
+            "world_transforms": true,
+            "front_culling": "ProjectThrough",
+            "triplanar_hardness": 0.0,
+            "random_offsets": "None",
+            "random_strength": 0.0,
+            "falloff_type": "Cubic",
+            "falloff": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "tangent": "DpduDpdv",
+            "real_world_size": false,
+            "particle_source": null,
+            "real_world_size_xy": [
+              1.0,
+              1.0
+            ],
+            "replicator": null,
+            "projection_camera": null
+          }
+        }
+      },
+      {
+        "id": 8,
+        "name": "Constant (Texture)",
+        "visible": true,
+        "transform": {
+          "translation": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "zxy": false
+        },
+        "mesh": {
+          "attributes": {
+            "representations": [],
+            "creases": [],
+            "uv_records": {},
+            "corner_normals": {},
+            "point_weights": {},
+            "point_colors": {},
+            "degenerate_faces": []
+          },
+          "vertices": [],
+          "faces": [],
+          "uv_maps": {}
+        },
+        "parent": 5,
+        "source_id": null,
+        "source_display_name": null,
+        "texture": {
+          "Locator": {
+            "projection": "Solid",
+            "axis": 0,
+            "uv_map": null,
+            "repeat": [
+              1.0,
+              1.0
+            ],
+            "uv_rotation": 0.0,
+            "tiling": [
+              "Repeat",
+              "Repeat"
+            ],
+            "world_coordinates": false,
+            "world_transforms": true,
+            "front_culling": "ProjectThrough",
+            "triplanar_hardness": 0.0,
+            "random_offsets": "None",
+            "random_strength": 0.0,
+            "falloff_type": "Cubic",
+            "falloff": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "tangent": "DpduDpdv",
+            "real_world_size": false,
+            "particle_source": null,
+            "real_world_size_xy": [
+              1.0,
+              1.0
+            ],
+            "replicator": null,
+            "projection_camera": null
+          }
+        }
+      },
+      {
+        "id": 9,
+        "name": "Image Map (3) (Texture)",
+        "visible": true,
+        "transform": {
+          "translation": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "zxy": false
+        },
+        "mesh": {
+          "attributes": {
+            "representations": [],
+            "creases": [],
+            "uv_records": {},
+            "corner_normals": {},
+            "point_weights": {},
+            "point_colors": {},
+            "degenerate_faces": []
+          },
+          "vertices": [],
+          "faces": [],
+          "uv_maps": {}
+        },
+        "parent": 5,
+        "source_id": null,
+        "source_display_name": null,
+        "texture": {
+          "Locator": {
+            "projection": "Planar",
+            "axis": 2,
+            "uv_map": null,
+            "repeat": [
+              1.0,
+              1.0
+            ],
+            "uv_rotation": 0.0,
+            "tiling": [
+              "Reset",
+              "Reset"
+            ],
+            "world_coordinates": false,
+            "world_transforms": true,
+            "front_culling": "ProjectThrough",
+            "triplanar_hardness": 0.0,
+            "random_offsets": "None",
+            "random_strength": 0.0,
+            "falloff_type": "Cubic",
+            "falloff": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "tangent": "DpduDpdv",
+            "real_world_size": false,
+            "particle_source": null,
+            "real_world_size_xy": [
+              1.0,
+              1.0
+            ],
+            "replicator": null,
+            "projection_camera": null
+          }
+        }
+      },
+      {
+        "id": 10,
+        "name": "Constant (2) (Texture)",
+        "visible": true,
+        "transform": {
+          "translation": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "zxy": false
+        },
+        "mesh": {
+          "attributes": {
+            "representations": [],
+            "creases": [],
+            "uv_records": {},
+            "corner_normals": {},
+            "point_weights": {},
+            "point_colors": {},
+            "degenerate_faces": []
+          },
+          "vertices": [],
+          "faces": [],
+          "uv_maps": {}
+        },
+        "parent": 5,
+        "source_id": null,
+        "source_display_name": null,
+        "texture": {
+          "Locator": {
+            "projection": "Solid",
+            "axis": 0,
+            "uv_map": null,
+            "repeat": [
+              1.0,
+              1.0
+            ],
+            "uv_rotation": 0.0,
+            "tiling": [
+              "Repeat",
+              "Repeat"
+            ],
+            "world_coordinates": false,
+            "world_transforms": true,
+            "front_culling": "ProjectThrough",
+            "triplanar_hardness": 0.0,
+            "random_offsets": "None",
+            "random_strength": 0.0,
+            "falloff_type": "Cubic",
+            "falloff": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "tangent": "DpduDpdv",
+            "real_world_size": false,
+            "particle_source": null,
+            "real_world_size_xy": [
+              1.0,
+              1.0
+            ],
+            "replicator": null,
+            "projection_camera": null
+          }
+        }
+      },
+      {
+        "id": 11,
+        "name": "Image Map (4) (Texture)",
+        "visible": true,
+        "transform": {
+          "translation": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "zxy": false
+        },
+        "mesh": {
+          "attributes": {
+            "representations": [],
+            "creases": [],
+            "uv_records": {},
+            "corner_normals": {},
+            "point_weights": {},
+            "point_colors": {},
+            "degenerate_faces": []
+          },
+          "vertices": [],
+          "faces": [],
+          "uv_maps": {}
+        },
+        "parent": 5,
+        "source_id": null,
+        "source_display_name": null,
+        "texture": {
+          "Locator": {
+            "projection": "UvMap",
+            "axis": 0,
+            "uv_map": null,
+            "repeat": [
+              1.0,
+              1.0
+            ],
+            "uv_rotation": 0.0,
+            "tiling": [
+              "Repeat",
+              "Repeat"
+            ],
+            "world_coordinates": false,
+            "world_transforms": true,
+            "front_culling": "ProjectThrough",
+            "triplanar_hardness": 0.0,
+            "random_offsets": "None",
+            "random_strength": 0.0,
+            "falloff_type": "Cubic",
+            "falloff": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "tangent": "DpduDpdv",
+            "real_world_size": false,
+            "particle_source": null,
+            "real_world_size_xy": [
+              1.0,
+              1.0
+            ],
+            "replicator": null,
+            "projection_camera": null
+          }
+        }
+      }
+    ],
+    "next_id": 12,
+    "selection": {
+      "item": 4,
+      "mode": "Polygon",
+      "vertices": [],
+      "edges": [],
+      "faces": []
+    },
+    "workplane": {
+      "fixed": false,
+      "plane": 0,
+      "center": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "import_source": null,
+    "images": [
+      {
+        "id": 1,
+        "name": "uv-grid",
+        "path": "fixtures/viewport-image-textures/uv-grid.png",
+        "width": 256,
+        "height": 256
+      },
+      {
+        "id": 2,
+        "name": "planar-stripes",
+        "path": "fixtures/viewport-image-textures/planar-stripes.png",
+        "width": 128,
+        "height": 128
+      },
+      {
+        "id": 3,
+        "name": "reset-badge",
+        "path": "fixtures/viewport-image-textures/reset-badge.png",
+        "width": 128,
+        "height": 128
+      },
+      {
+        "id": 4,
+        "name": "alpha-disc",
+        "path": "fixtures/viewport-image-textures/alpha-disc.png",
+        "width": 128,
+        "height": 128
+      }
+    ],
+    "shader_tree": {
+      "nodes": [
+        {
+          "id": 1,
+          "parent": null,
+          "name": "Alpha Output",
+          "layer": {
+            "enable": true,
+            "invert": false,
+            "blend": "Normal",
+            "opacity": 1.0
+          },
+          "kind": {
+            "RenderOutput": "Alpha"
+          }
+        },
+        {
+          "id": 2,
+          "parent": null,
+          "name": "Final Color Output",
+          "layer": {
+            "enable": true,
+            "invert": false,
+            "blend": "Normal",
+            "opacity": 1.0
+          },
+          "kind": {
+            "RenderOutput": "FinalColor"
+          }
+        },
+        {
+          "id": 3,
+          "parent": null,
+          "name": "Base Shader",
+          "layer": {
+            "enable": true,
+            "invert": false,
+            "blend": "Normal",
+            "opacity": 1.0
+          },
+          "kind": {
+            "Shader": {
+              "effect": "FullShading",
+              "gl_display": true,
+              "cast_shadows": true,
+              "receive_shadows": true,
+              "visible_to_camera": true,
+              "visible_to_indirect": true,
+              "visible_to_reflection": true,
+              "visible_to_refraction": true,
+              "alpha_type": "Opacity",
+              "alpha_value": 1.0
+            }
+          }
+        },
+        {
+          "id": 12,
+          "parent": null,
+          "name": "Group (4)",
+          "layer": {
+            "enable": true,
+            "invert": false,
+            "blend": "Normal",
+            "opacity": 1.0
+          },
+          "kind": {
+            "Group": {
+              "item": {
+                "Item": 4
+              },
+              "tag_type": "Material",
+              "tag": "All",
+              "scope": "Surface",
+              "apply_to_sub_group": false,
+              "apply_to_instances": true
+            }
+          }
+        },
+        {
+          "id": 14,
+          "parent": 12,
+          "name": "Image Map (4)",
+          "layer": {
+            "enable": true,
+            "invert": false,
+            "blend": "Normal",
+            "opacity": 1.0
+          },
+          "kind": {
+            "Texture": {
+              "source": {
+                "ImageMap": {
+                  "image": 4,
+                  "settings": {
+                    "low_value": 0.0,
+                    "high_value": 1.0,
+                    "invert_red": false,
+                    "invert_green": false,
+                    "invert_blue": false,
+                    "gamma": 1.0,
+                    "brightness": 1.0,
+                    "contrast": 1.0,
+                    "clamp": false,
+                    "swizzle": "Rgba",
+                    "alpha": "Use",
+                    "filtering": "Bilinear",
+                    "antialiasing": true,
+                    "antialiasing_strength": 1.0,
+                    "minimum_spot": 1.0
+                  }
+                }
+              },
+              "effect": "DiffuseColor",
+              "locator": 11
+            }
+          }
+        },
+        {
+          "id": 13,
+          "parent": 12,
+          "name": "Constant (2)",
+          "layer": {
+            "enable": true,
+            "invert": false,
+            "blend": "Normal",
+            "opacity": 1.0
+          },
+          "kind": {
+            "Texture": {
+              "source": {
+                "Constant": {
+                  "color": [
+                    0.1,
+                    0.25,
+                    0.9
+                  ],
+                  "value": 1.0
+                }
+              },
+              "effect": "DiffuseColor",
+              "locator": 10
+            }
+          }
+        },
+        {
+          "id": 9,
+          "parent": null,
+          "name": "Group (3)",
+          "layer": {
+            "enable": true,
+            "invert": false,
+            "blend": "Normal",
+            "opacity": 1.0
+          },
+          "kind": {
+            "Group": {
+              "item": {
+                "Item": 3
+              },
+              "tag_type": "Material",
+              "tag": "All",
+              "scope": "Surface",
+              "apply_to_sub_group": false,
+              "apply_to_instances": true
+            }
+          }
+        },
+        {
+          "id": 11,
+          "parent": 9,
+          "name": "Image Map (3)",
+          "layer": {
+            "enable": true,
+            "invert": false,
+            "blend": "Normal",
+            "opacity": 1.0
+          },
+          "kind": {
+            "Texture": {
+              "source": {
+                "ImageMap": {
+                  "image": 3,
+                  "settings": {
+                    "low_value": 0.0,
+                    "high_value": 1.0,
+                    "invert_red": false,
+                    "invert_green": false,
+                    "invert_blue": false,
+                    "gamma": 1.0,
+                    "brightness": 1.0,
+                    "contrast": 1.0,
+                    "clamp": false,
+                    "swizzle": "Rgba",
+                    "alpha": "Use",
+                    "filtering": "Bilinear",
+                    "antialiasing": true,
+                    "antialiasing_strength": 1.0,
+                    "minimum_spot": 1.0
+                  }
+                }
+              },
+              "effect": "DiffuseColor",
+              "locator": 9
+            }
+          }
+        },
+        {
+          "id": 10,
+          "parent": 9,
+          "name": "Constant",
+          "layer": {
+            "enable": true,
+            "invert": false,
+            "blend": "Normal",
+            "opacity": 1.0
+          },
+          "kind": {
+            "Texture": {
+              "source": {
+                "Constant": {
+                  "color": [
+                    1.0,
+                    0.45,
+                    0.05
+                  ],
+                  "value": 1.0
+                }
+              },
+              "effect": "DiffuseColor",
+              "locator": 8
+            }
+          }
+        },
+        {
+          "id": 7,
+          "parent": null,
+          "name": "Group (2)",
+          "layer": {
+            "enable": true,
+            "invert": false,
+            "blend": "Normal",
+            "opacity": 1.0
+          },
+          "kind": {
+            "Group": {
+              "item": {
+                "Item": 2
+              },
+              "tag_type": "Material",
+              "tag": "All",
+              "scope": "Surface",
+              "apply_to_sub_group": false,
+              "apply_to_instances": true
+            }
+          }
+        },
+        {
+          "id": 8,
+          "parent": 7,
+          "name": "Image Map (2)",
+          "layer": {
+            "enable": true,
+            "invert": false,
+            "blend": "Normal",
+            "opacity": 1.0
+          },
+          "kind": {
+            "Texture": {
+              "source": {
+                "ImageMap": {
+                  "image": 2,
+                  "settings": {
+                    "low_value": 0.0,
+                    "high_value": 1.0,
+                    "invert_red": false,
+                    "invert_green": false,
+                    "invert_blue": false,
+                    "gamma": 1.0,
+                    "brightness": 1.0,
+                    "contrast": 1.0,
+                    "clamp": false,
+                    "swizzle": "Rgba",
+                    "alpha": "Use",
+                    "filtering": "Bilinear",
+                    "antialiasing": true,
+                    "antialiasing_strength": 1.0,
+                    "minimum_spot": 1.0
+                  }
+                }
+              },
+              "effect": "DiffuseColor",
+              "locator": 7
+            }
+          }
+        },
+        {
+          "id": 5,
+          "parent": null,
+          "name": "Group",
+          "layer": {
+            "enable": true,
+            "invert": false,
+            "blend": "Normal",
+            "opacity": 1.0
+          },
+          "kind": {
+            "Group": {
+              "item": {
+                "Item": 1
+              },
+              "tag_type": "Material",
+              "tag": "All",
+              "scope": "Surface",
+              "apply_to_sub_group": false,
+              "apply_to_instances": true
+            }
+          }
+        },
+        {
+          "id": 6,
+          "parent": 5,
+          "name": "Image Map",
+          "layer": {
+            "enable": true,
+            "invert": false,
+            "blend": "Normal",
+            "opacity": 1.0
+          },
+          "kind": {
+            "Texture": {
+              "source": {
+                "ImageMap": {
+                  "image": 1,
+                  "settings": {
+                    "low_value": 0.0,
+                    "high_value": 1.0,
+                    "invert_red": false,
+                    "invert_green": false,
+                    "invert_blue": false,
+                    "gamma": 1.0,
+                    "brightness": 1.0,
+                    "contrast": 1.0,
+                    "clamp": false,
+                    "swizzle": "Rgba",
+                    "alpha": "Use",
+                    "filtering": "Bilinear",
+                    "antialiasing": true,
+                    "antialiasing_strength": 1.0,
+                    "minimum_spot": 1.0
+                  }
+                }
+              },
+              "effect": "DiffuseColor",
+              "locator": 6
+            }
+          }
+        },
+        {
+          "id": 4,
+          "parent": null,
+          "name": "Base Material",
+          "layer": {
+            "enable": true,
+            "invert": false,
+            "blend": "Normal",
+            "opacity": 1.0
+          },
+          "kind": {
+            "Material": {
+              "shading_model": "Principled",
+              "gl_display": true,
+              "diffuse_color": [
+                0.6,
+                0.6,
+                0.6
+              ],
+              "diffuse_amount": 0.8,
+              "diffuse_roughness": 0.0,
+              "specular_color": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "specular_amount": 0.5,
+              "fresnel": 1.0,
+              "roughness": 0.4,
+              "anisotropy": 0.0,
+              "match_specular": true,
+              "reflection_color": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "reflection_amount": 0.0,
+              "reflection_fresnel": 0.0,
+              "clearcoat_amount": 0.0,
+              "clearcoat_roughness": 0.0,
+              "clearcoat_bump": 1.0,
+              "metallic": 0.0,
+              "sheen": 0.0,
+              "sheen_tint": 0.0,
+              "specular_tint": 0.0,
+              "flatness": 0.0,
+              "transparent_color": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "transparent_amount": 0.0,
+              "refractive_index": 1.0,
+              "refraction_roughness": 0.0,
+              "absorption_distance": 0.0,
+              "dissolve": 0.0,
+              "subsurface_color": [
+                0.8,
+                0.8,
+                0.8
+              ],
+              "subsurface_amount": 0.0,
+              "subsurface_distance": 0.005,
+              "luminous_color": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "luminous_intensity": 0.0,
+              "bump_amplitude": 0.005,
+              "displacement_distance": 0.02,
+              "smoothing": 1.0,
+              "smoothing_angle": 40.0,
+              "double_sided": false
+            }
+          }
+        }
+      ],
+      "next_id": 15
+    }
+  }
+}

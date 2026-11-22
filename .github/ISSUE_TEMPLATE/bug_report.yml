@@ -1,0 +1,29 @@
+name: Bug
+description: Something in Operandi doesn't work as it should.
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Starting scene, then each action. Attach a small scene if you can.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+      description: If you're describing how it should behave, point to the spec in specifications/ rather than to Modo.
+  - type: input
+    id: version
+    attributes:
+      label: Version or commit, and system
+      placeholder: "0.1.0 abc1234, macOS 27.2, Apple M4"
+    validations:
+      required: true

@@ -1,0 +1,80 @@
+[
+  {
+    "id": "return-zero-before-park",
+    "start": "A_move",
+    "steps": [
+      {
+        "action": "MoveTo0",
+        "after": "A_return_zero",
+        "publication_delta": 1,
+        "request_delta": 1
+      },
+      {
+        "action": "identical0",
+        "after": "A_return_zero",
+        "publication_delta": 1,
+        "request_delta": 1
+      }
+    ]
+  },
+  {
+    "id": "zero-idempotent-with-local-redo",
+    "start": "A_undo_move",
+    "steps": [
+      {
+        "action": "identical0 preserves local MoveRedo",
+        "after": "A_undo_move",
+        "publication_delta": 1,
+        "request_delta": 1
+      }
+    ]
+  },
+  {
+    "id": "return-zero-after-park",
+    "start": "A_resume_move",
+    "steps": [
+      {
+        "action": "MoveTo0 removes Movement;everParked persists",
+        "after": "A_return_zero_after_park",
+        "publication_delta": 1,
+        "request_delta": 1
+      }
+    ]
+  },
+  {
+    "id": "local-new-move-before-park",
+    "start": "A_undo_move",
+    "steps": [
+      {
+        "action": "MoveTo.25 replaces localRedo,documentR untouched",
+        "after": "A_new_quarter",
+        "publication_delta": 1,
+        "request_delta": 1
+      },
+      {
+        "action": "Cancel restores old documentR",
+        "after": "CancelNeverA",
+        "publication_delta": 1,
+        "request_delta": 1
+      }
+    ]
+  },
+  {
+    "id": "local-new-move-after-park",
+    "start": "A_resume_begin",
+    "steps": [
+      {
+        "action": "MoveTo.25",
+        "after": "A_quarter_after_park",
+        "publication_delta": 1,
+        "request_delta": 1
+      },
+      {
+        "action": "Cancel never resurrects R",
+        "after": "CancelEverA",
+        "publication_delta": 1,
+        "request_delta": 1
+      }
+    ]
+  }
+]

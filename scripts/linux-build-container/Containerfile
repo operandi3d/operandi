@@ -1,0 +1,24 @@
+# An older Linux (Rocky Linux 8, glibc 2.28) for building Linux releases
+# that run on most distributions from 2019 on, the same base Blender builds
+# on. scripts/build-release-container.sh builds and uses it with podman.
+FROM docker.io/library/rockylinux:8
+RUN dnf -y install epel-release dnf-plugins-core \
+ && dnf config-manager --set-enabled powertools \
+ && dnf -y install gcc-toolset-14-gcc gcc-toolset-14-gcc-c++ gcc-toolset-14-binutils \
+        git git-lfs cmake ninja-build python3.11 make patchelf libzstd-devel zlib-devel \
+        curl which findutils diffutils xz \
+ && dnf clean all \
+ && alternatives --set python3 /usr/bin/python3.11
+# Rocky 8's squashfs-tools can't write zstd, which the AppImage runtime
+# reads; build a newer one.
+RUN curl -fsSL https://github.com/plougher/squashfs-tools/archive/refs/tags/4.6.1.tar.gz | tar xz -C /tmp \
+ && make -C /tmp/squashfs-tools-4.6.1/squashfs-tools -j4 CC=/opt/rh/gcc-toolset-14/root/usr/bin/gcc ZSTD_SUPPORT=1 mksquashfs \
+ && cp /tmp/squashfs-tools-4.6.1/squashfs-tools/mksquashfs /usr/local/bin/ \
+ && rm -rf /tmp/squashfs-tools-4.6.1
+# GCC 14 from gcc-toolset; its newer C++ library parts are linked into the
+# program, so the result still only needs the system's older libstdc++.
+ENV PATH=/opt/rh/gcc-toolset-14/root/usr/bin:/root/.cargo/bin:$PATH \
+    CC=gcc CXX=g++
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal --default-toolchain none \
+ && git config --global --add safe.directory '*' \
+ && git lfs install

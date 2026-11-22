@@ -1,0 +1,28 @@
+{
+  "version": 1,
+  "id": "menu.geometry",
+  "label": "Geometry",
+  "style": "menu",
+  "controls": [
+    {
+      "command": "mesh.cleanup",
+      "label": "Mesh Cleanup..."
+    },
+    {
+      "command": "Vertex Normal Tools...",
+      "label": "Vertex Normal Tools..."
+    },
+    {
+      "form": "menu.geometry.draw"
+    },
+    {
+      "form": "menu.geometry.subdivision"
+    },
+    {
+      "form": "menu.geometry.polygon"
+    },
+    {
+      "form": "menu.geometry.duplicate"
+    }
+  ]
+}

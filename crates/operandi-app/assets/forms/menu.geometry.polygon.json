@@ -1,0 +1,78 @@
+{
+  "version": 1,
+  "id": "menu.geometry.polygon",
+  "label": "Polygon",
+  "style": "menu",
+  "controls": [
+    {
+      "command": "Smooth Shift",
+      "label": "Smooth Shift",
+      "shortcut": "Smooth Shift"
+    },
+    {
+      "command": "Thicken",
+      "label": "Thicken",
+      "shortcut": "Thicken"
+    },
+    {
+      "command": "Shift",
+      "label": "Shift",
+      "shortcut": "Shift"
+    },
+    {
+      "command": "Inset",
+      "label": "Inset",
+      "shortcut": "Inset"
+    },
+    {
+      "command": "Bridge",
+      "label": "Bridge",
+      "shortcut": "Bridge"
+    },
+    {
+      "command": "Set Part",
+      "label": "Set Part...",
+      "shortcut": "Set Part"
+    },
+    {
+      "command": "Detriangulate",
+      "label": "Detriangulate...",
+      "shortcut": "Detriangulate"
+    },
+    {
+      "command": "Boolean",
+      "label": "Boolean...",
+      "shortcut": "Boolean"
+    },
+    {
+      "command": "Solid Drill",
+      "label": "Solid Drill...",
+      "shortcut": "Solid Drill"
+    },
+    {
+      "command": "Axis Drill",
+      "label": "Axis Drill...",
+      "shortcut": "Axis Drill"
+    },
+    {
+      "command": "Automatic Retopology",
+      "label": "Automatic Retopology...",
+      "shortcut": "Automatic Retopology"
+    },
+    {
+      "command": "Remesh",
+      "label": "Remesh...",
+      "shortcut": "Remesh"
+    },
+    {
+      "command": "UV Unwrap",
+      "label": "UV Unwrap...",
+      "shortcut": "UV Unwrap"
+    },
+    {
+      "command": "Pack UVs",
+      "label": "Pack UVs...",
+      "shortcut": "Pack UVs"
+    }
+  ]
+}

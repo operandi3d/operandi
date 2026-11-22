@@ -1,0 +1,542 @@
+[
+  {
+    "id": "required-local-history",
+    "start": "BaseArmed",
+    "steps": [
+      {
+        "action": "Begin",
+        "after": "A_begin",
+        "publication_delta": 1,
+        "request_delta": 1
+      },
+      {
+        "action": "Move .5",
+        "after": "A_move",
+        "publication_delta": 1,
+        "request_delta": 1
+      },
+      {
+        "action": "Undo Move",
+        "after": "A_undo_move",
+        "publication_delta": 1,
+        "request_delta": 1
+      },
+      {
+        "action": "Undo Begin =>first park,discard R",
+        "after": "A_park",
+        "publication_delta": 1,
+        "request_delta": 1
+      },
+      {
+        "action": "Redo Begin",
+        "after": "A_resume_begin",
+        "publication_delta": 1,
+        "request_delta": 1
+      },
+      {
+        "action": "Redo Move",
+        "after": "A_resume_move",
+        "publication_delta": 1,
+        "request_delta": 1
+      }
+    ]
+  },
+  {
+    "id": "park-three-document-undos",
+    "start": "A_park",
+    "steps": [
+      {
+        "action": "Undo H3",
+        "after": "ParkDoc2",
+        "publication_delta": 1,
+        "request_delta": 1
+      },
+      {
+        "action": "Undo H2",
+        "after": "ParkDoc1",
+        "publication_delta": 1,
+        "request_delta": 1
+      },
+      {
+        "action": "Undo H1",
+        "after": "ParkDoc0",
+        "publication_delta": 1,
+        "request_delta": 1
+      },
+      {
+        "action": "Redo H1",
+        "after": "ParkDoc1",
+        "publication_delta": 1,
+        "request_delta": 1
+      },
+      {
+        "action": "Redo H2",
+        "after": "ParkDoc2",
+        "publication_delta": 1,
+        "request_delta": 1
+      },
+      {
+        "action": "Redo H3;still parked",
+        "after": "A_park",
+        "publication_delta": 1,
+        "request_delta": 1
+      },
+      {
+        "action": "separate Redo Begin",
+        "after": "A_resume_begin",
+        "publication_delta": 1,
+        "request_delta": 1
+      },
+      {
+        "action": "separate Redo Move",
+        "after": "A_resume_move",
+        "publication_delta": 1,
+        "request_delta": 1
+      }
+    ]
+  },
+  {
+    "id": "cancel-never-parked",
+    "start": "A_move",
+    "steps": [
+      {
+        "action": "Cancel A",
+        "after": "CancelNeverA",
+        "publication_delta": 1,
+        "request_delta": 1
+      },
+      {
+        "action": "Drop merely Armed",
+        "after": "CancelNeverDropped",
+        "publication_delta": 1,
+        "request_delta": 1
+      },
+      {
+        "action": "Redo old completed R",
+        "after": "OldDocRedoR",
+        "publication_delta": 1,
+        "request_delta": 1
+      }
+    ]
+  },
+  {
+    "id": "cancel-after-resume",
+    "start": "A_resume_move",
+    "steps": [
+      {
+        "action": "Cancel A,never revive R",
+        "after": "CancelEverA",
+        "publication_delta": 1,
+        "request_delta": 1
+      }
+    ]
+  },
+  {
+    "id": "cancel-parked-away-from-anchor",
+    "start": "ParkDoc0",
+    "steps": [
+      {
+        "action": "Explicit parked Cancel,do not jump",
+        "after": "CancelParkAtDoc0",
+        "publication_delta": 1,
+        "request_delta": 1
+      }
+    ]
+  },
+  {
+    "id": "parkedA-B-cancel-before-park",
+    "start": "ParkExtrudeArmed",
+    "steps": [
+      {
+        "action": "Begin B,save only A",
+        "after": "BeginBsaveA",
+        "publication_delta": 1,
+        "request_delta": 1
+      },
+      {
+        "action": "Cancel never-parked B =>A",
+        "after": "CancelBrestoreA",
+        "publication_delta": 1,
+        "request_delta": 1
+      }
+    ]
+  },
+  {
+    "id": "parkedA-B-park-redo-cancel",
+    "start": "ParkExtrudeArmed",
+    "steps": [
+      {
+        "action": "Begin B",
+        "after": "BeginBsaveA",
+        "publication_delta": 1,
+        "request_delta": 1
+      },
+      {
+        "action": "Undo Begin B =>park,discard saved A",
+        "after": "ParkBdropA",
+        "publication_delta": 1,
+        "request_delta": 1
+      },
+      {
+        "action": "Redo B Begin",
+        "after": "ResumeB",
+        "publication_delta": 1,
+        "request_delta": 1
+      },
+      {
+        "action": "Cancel previously parked B",
+        "after": "CancelEverB",
+        "publication_delta": 1,
+        "request_delta": 1
+      }
+    ]
+  },
+  {
+    "id": "park-arm-drop-redo",
+    "start": "A_park",
+    "steps": [
+      {
+        "action": "Arm Move only",
+        "after": "ParkOtherArmed",
+        "publication_delta": 1,
+        "request_delta": 1
+      },
+      {
+        "action": "Drop merely Armed Move",
+        "after": "A_park",
+        "publication_delta": 1,
+        "request_delta": 1
+      },
+      {
+        "action": "Redo resumes Extrude",
+        "after": "A_resume_begin",
+        "publication_delta": 1,
+        "request_delta": 1
+      }
+    ]
+  },
+  {
+    "id": "park-arm-redo-direct",
+    "start": "A_park",
+    "steps": [
+      {
+        "action": "Arm Move",
+        "after": "ParkOtherArmed",
+        "publication_delta": 1,
+        "request_delta": 1
+      },
+      {
+        "action": "Redo closes mere arm,resumes A",
+        "after": "A_resume_begin",
+        "publication_delta": 1,
+        "request_delta": 1
+      }
+    ]
+  },
+  {
+    "id": "other-cancel-precedence",
+    "start": "ParkOtherArmed",
+    "steps": [
+      {
+        "action": "Cancel Move,not parked Extrude",
+        "after": "A_park",
+        "publication_delta": 1,
+        "request_delta": 1
+      }
+    ]
+  },
+  {
+    "id": "noop-rejected-new-edit",
+    "start": "A_park",
+    "steps": [
+      {
+        "action": "Recall already-selected top",
+        "after": "A_park",
+        "publication_delta": 1,
+        "request_delta": 1
+      },
+      {
+        "action": "Recall missing set refuses",
+        "after": "A_park",
+        "publication_delta": 0,
+        "request_delta": 0
+      },
+      {
+        "action": "Recall bottom =>new completed selection",
+        "after": "NewSelectionDiscardsPark",
+        "publication_delta": 1,
+        "request_delta": 1
+      }
+    ]
+  },
+  {
+    "id": "finish-with-local-redo",
+    "start": "A_undo_move",
+    "steps": [
+      {
+        "action": "Finish accepted zero,discard local MoveRedo+R",
+        "after": "FinishAtLocalS1",
+        "publication_delta": 1,
+        "request_delta": 1
+      }
+    ]
+  },
+  {
+    "id": "finish-never-parked",
+    "start": "A_move",
+    "steps": [
+      {
+        "action": "Finish",
+        "after": "FinishNeverA",
+        "publication_delta": 1,
+        "request_delta": 1
+      }
+    ]
+  },
+  {
+    "id": "bounded-repeated-readers",
+    "start": "ReaderA_ParkA",
+    "steps": [
+      {
+        "action": "Arm Extrude;Begin B (two publications)",
+        "after": "ReaderA_BeginB",
+        "publication_delta": 2,
+        "request_delta": 2
+      },
+      {
+        "action": "Cancel B restores A",
+        "after": "ReaderA_CancelB",
+        "publication_delta": 1,
+        "request_delta": 1
+      },
+      {
+        "action": "Begin C",
+        "after": "ReaderA_BeginC",
+        "publication_delta": 1,
+        "request_delta": 1
+      },
+      {
+        "action": "Park C,release original A alternative",
+        "after": "ReaderA_ParkC",
+        "publication_delta": 1,
+        "request_delta": 1
+      },
+      {
+        "action": "Hold copied reader RC",
+        "after": "ReadersAC_ParkC",
+        "publication_delta": 0,
+        "request_delta": 0
+      },
+      {
+        "action": "Arm Extrude;Begin D",
+        "after": "ReadersAC_BeginD",
+        "publication_delta": 2,
+        "request_delta": 2
+      },
+      {
+        "action": "Cancel D restores only C",
+        "after": "ReadersAC_CancelD",
+        "publication_delta": 1,
+        "request_delta": 1
+      },
+      {
+        "action": "Explicit parked Cancel C",
+        "after": "ReadersAC_CancelParkedC",
+        "publication_delta": 1,
+        "request_delta": 1
+      },
+      {
+        "action": "Release RC",
+        "after": "ReaderA_Only",
+        "publication_delta": 0,
+        "request_delta": 0
+      },
+      {
+        "action": "Release RA",
+        "after": "ReadersReleased",
+        "publication_delta": 0,
+        "request_delta": 0
+      }
+    ]
+  },
+  {
+    "id": "capacity-cancel-98",
+    "start": "Cap98Base",
+    "steps": [
+      {
+        "action": "Begin",
+        "after": "Cap98Begin",
+        "publication_delta": 1,
+        "request_delta": 1
+      },
+      {
+        "action": "Move",
+        "after": "Cap98Move",
+        "publication_delta": 1,
+        "request_delta": 1
+      },
+      {
+        "action": "Cancel never parked",
+        "after": "Cap98Cancel",
+        "publication_delta": 1,
+        "request_delta": 1
+      }
+    ]
+  },
+  {
+    "id": "capacity-finish-98",
+    "start": "Cap98Base",
+    "steps": [
+      {
+        "action": "Begin",
+        "after": "Cap98Begin",
+        "publication_delta": 1,
+        "request_delta": 1
+      },
+      {
+        "action": "Move",
+        "after": "Cap98Move",
+        "publication_delta": 1,
+        "request_delta": 1
+      },
+      {
+        "action": "Undo Move then Undo Begin(first park)",
+        "after": "Cap98Park",
+        "publication_delta": 2,
+        "request_delta": 2
+      },
+      {
+        "action": "Redo Begin then Redo Move",
+        "after": "Cap98Resume",
+        "publication_delta": 2,
+        "request_delta": 2
+      },
+      {
+        "action": "Finish,only now capacity eviction",
+        "after": "Cap98Finish",
+        "publication_delta": 1,
+        "request_delta": 1
+      }
+    ]
+  },
+  {
+    "id": "capacity-cancel-99",
+    "start": "Cap99Base",
+    "steps": [
+      {
+        "action": "Begin",
+        "after": "Cap99Begin",
+        "publication_delta": 1,
+        "request_delta": 1
+      },
+      {
+        "action": "Move",
+        "after": "Cap99Move",
+        "publication_delta": 1,
+        "request_delta": 1
+      },
+      {
+        "action": "Cancel never parked",
+        "after": "Cap99Cancel",
+        "publication_delta": 1,
+        "request_delta": 1
+      }
+    ]
+  },
+  {
+    "id": "capacity-finish-99",
+    "start": "Cap99Base",
+    "steps": [
+      {
+        "action": "Begin",
+        "after": "Cap99Begin",
+        "publication_delta": 1,
+        "request_delta": 1
+      },
+      {
+        "action": "Move",
+        "after": "Cap99Move",
+        "publication_delta": 1,
+        "request_delta": 1
+      },
+      {
+        "action": "Undo Move then Undo Begin(first park)",
+        "after": "Cap99Park",
+        "publication_delta": 2,
+        "request_delta": 2
+      },
+      {
+        "action": "Redo Begin then Redo Move",
+        "after": "Cap99Resume",
+        "publication_delta": 2,
+        "request_delta": 2
+      },
+      {
+        "action": "Finish,only now capacity eviction",
+        "after": "Cap99Finish",
+        "publication_delta": 1,
+        "request_delta": 1
+      }
+    ]
+  },
+  {
+    "id": "capacity-cancel-100",
+    "start": "Cap100Base",
+    "steps": [
+      {
+        "action": "Begin",
+        "after": "Cap100Begin",
+        "publication_delta": 1,
+        "request_delta": 1
+      },
+      {
+        "action": "Move",
+        "after": "Cap100Move",
+        "publication_delta": 1,
+        "request_delta": 1
+      },
+      {
+        "action": "Cancel never parked",
+        "after": "Cap100Cancel",
+        "publication_delta": 1,
+        "request_delta": 1
+      }
+    ]
+  },
+  {
+    "id": "capacity-finish-100",
+    "start": "Cap100Base",
+    "steps": [
+      {
+        "action": "Begin",
+        "after": "Cap100Begin",
+        "publication_delta": 1,
+        "request_delta": 1
+      },
+      {
+        "action": "Move",
+        "after": "Cap100Move",
+        "publication_delta": 1,
+        "request_delta": 1
+      },
+      {
+        "action": "Undo Move then Undo Begin(first park)",
+        "after": "Cap100Park",
+        "publication_delta": 2,
+        "request_delta": 2
+      },
+      {
+        "action": "Redo Begin then Redo Move",
+        "after": "Cap100Resume",
+        "publication_delta": 2,
+        "request_delta": 2
+      },
+      {
+        "action": "Finish,only now capacity eviction",
+        "after": "Cap100Finish",
+        "publication_delta": 1,
+        "request_delta": 1
+      }
+    ]
+  }
+]

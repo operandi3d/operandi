@@ -1,0 +1,210 @@
+{
+  "version": 1,
+  "id": "toolbox.deform",
+  "label": "Deform",
+  "exported": true,
+  "controls": [
+    {
+      "divider": "Move Tools",
+      "id": "deform-move"
+    },
+    {
+      "command": "Element Move",
+      "label": "Element Move"
+    },
+    {
+      "command": "Element Push",
+      "label": "Element Push",
+      "icon": "element-push"
+    },
+    {
+      "command": "Flex",
+      "label": "Flex",
+      "icon": "flex"
+    },
+    {
+      "form": {
+        "style": "flyout",
+        "controls": [
+          {
+            "command": "Soft Drag",
+            "label": "Soft Drag",
+            "icon": "soft-drag"
+          },
+          {
+            "command": "Soft Move",
+            "label": "Soft Move",
+            "icon": "soft-move"
+          },
+          {
+            "command": "Shear",
+            "label": "Shear",
+            "icon": "shear"
+          }
+        ]
+      },
+      "id": "Soft Drag"
+    },
+    {
+      "form": {
+        "style": "flyout",
+        "controls": [
+          {
+            "command": "Smooth",
+            "label": "Smooth",
+            "tooltip": "Smooth · Evens out bumps: pulls each selected point toward its neighbours; drag left or right to change Strength. Click again to drop."
+          },
+          {
+            "command": "Jitter",
+            "label": "Jitter",
+            "icon": "jitter"
+          },
+          {
+            "command": "Quantize",
+            "label": "Quantize",
+            "icon": "quantize"
+          }
+        ]
+      },
+      "id": "Smooth"
+    },
+    {
+      "form": {
+        "style": "flyout",
+        "controls": [
+          {
+            "command": "Soft Selection Move",
+            "label": "Soft Selection Move",
+            "icon": "soft-selection-move"
+          },
+          {
+            "command": "Soft Selection Rotate",
+            "label": "Soft Selection Rotate",
+            "icon": "soft-selection-rotate"
+          },
+          {
+            "command": "Soft Selection Scale",
+            "label": "Soft Selection Scale",
+            "icon": "soft-selection-scale"
+          },
+          {
+            "command": "Soft Selection Transform",
+            "label": "Soft Selection Transform",
+            "icon": "soft-selection-transform"
+          }
+        ]
+      },
+      "id": "Soft Selection Move"
+    },
+    {
+      "form": {
+        "controls": [
+          {
+            "divider": "Rotate Tools",
+            "id": "deform-rotate"
+          },
+          {
+            "command": "Twist",
+            "label": "Twist",
+            "icon": "twist"
+          },
+          {
+            "command": "Bend",
+            "label": "Bend",
+            "icon": "bend",
+            "look": "flat"
+          },
+          {
+            "command": "Vortex",
+            "label": "Vortex",
+            "icon": "vortex"
+          },
+          {
+            "command": "Swirl",
+            "label": "Swirl",
+            "icon": "swirl"
+          },
+          {
+            "divider": "Scale Tools",
+            "id": "deform-scale"
+          },
+          {
+            "command": "Push",
+            "label": "Push"
+          },
+          {
+            "command": "operandi.notBuilt \"Sculpt\"",
+            "label": "Sculpt",
+            "icon": "sculpt"
+          },
+          {
+            "command": "Taper",
+            "label": "Taper",
+            "icon": "taper"
+          },
+          {
+            "form": {
+              "style": "flyout",
+              "controls": [
+                {
+                  "command": "Bulge",
+                  "label": "Bulge",
+                  "icon": "bulge"
+                },
+                {
+                  "command": "Flare",
+                  "label": "Flare",
+                  "icon": "flare"
+                }
+              ]
+            },
+            "id": "Bulge"
+          },
+          {
+            "divider": "Align Tools",
+            "id": "deform-align"
+          },
+          {
+            "command": "Radial Align",
+            "label": "Radial",
+            "icon": "radial-align"
+          },
+          {
+            "command": "Linear Align",
+            "label": "Linear",
+            "icon": "linear-align"
+          },
+          {
+            "form": {
+              "style": "horizontal",
+              "controls": [
+                {
+                  "command": "Quick Align",
+                  "label": "Quick Align",
+                  "icon": "quick-align",
+                  "noShortcut": true,
+                  "tooltip": "Quick Align · line the selection up with a target element · Shortcut: {shortcut}"
+                },
+                {
+                  "command": "Ground Align",
+                  "label": "Ground Align",
+                  "icon": "ground-align",
+                  "noShortcut": true,
+                  "tooltip": "Ground Align · click in the viewport to drop the geometry onto the ground · Shortcut: {shortcut}"
+                }
+              ]
+            }
+          },
+          {
+            "divider": "Commands",
+            "id": "deform-commands"
+          },
+          {
+            "command": "Relax Mesh",
+            "label": "Relax Mesh..."
+          }
+        ]
+      }
+    }
+  ]
+}

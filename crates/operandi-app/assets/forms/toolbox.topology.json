@@ -1,0 +1,178 @@
+{
+  "version": 1,
+  "id": "toolbox.topology",
+  "label": "Topology",
+  "exported": true,
+  "controls": [
+    {
+      "divider": "Tools",
+      "id": "topology-tools"
+    },
+    {
+      "command": "operandi.topology.tool \"Topology Pen\"",
+      "label": "Topology Pen",
+      "icon": "topology-pen",
+      "tooltip": "Topology Pen · with Constrain to Background on (TB-11) · operandi.topology.tool"
+    },
+    {
+      "command": "operandi.topology.tool \"tool.set prim.pen on\"",
+      "label": "Pen",
+      "icon": "pen",
+      "tooltip": "Pen · with Constrain to Background on (TB-11) · operandi.topology.tool"
+    },
+    {
+      "command": "operandi.topology.tool \"Sketch\"",
+      "label": "Topology Sketch",
+      "icon": "sketch",
+      "tooltip": "Topology Sketch · with Constrain to Background on (TB-11) · operandi.topology.tool"
+    },
+    {
+      "command": "operandi.topology.tool \"Bridge\"",
+      "label": "Bridge",
+      "icon": "bridge",
+      "tooltip": "Bridge · with Constrain to Background on (TB-11) · operandi.topology.tool"
+    },
+    {
+      "divider": ""
+    },
+    {
+      "command": "operandi.topology.tool \"Element Move\"",
+      "label": "Topology Tweak",
+      "tooltip": "Topology Tweak · with Constrain to Background on (TB-11) · operandi.topology.tool",
+      "icon": "element-move"
+    },
+    {
+      "command": "operandi.topology.tool \"Slide\"",
+      "label": "Edge Slide",
+      "icon": "edge-slide",
+      "tooltip": "Edge Slide · with Constrain to Background on (TB-11) · operandi.topology.tool"
+    },
+    {
+      "command": "operandi.topology.tool \"Smooth\"",
+      "label": "Smooth",
+      "icon": "smooth",
+      "tooltip": "Smooth · with Constrain to Background on (TB-11) · operandi.topology.tool"
+    },
+    {
+      "divider": ""
+    },
+    {
+      "command": "operandi.topology.tool \"Edge Slice\"",
+      "label": "Edge Slice",
+      "icon": "edge-slice",
+      "tooltip": "Edge Slice · with Constrain to Background on (TB-11) · operandi.topology.tool"
+    },
+    {
+      "command": "operandi.topology.tool \"Loop Slice\"",
+      "label": "Loop Slice",
+      "icon": "loop-slice",
+      "tooltip": "Loop Slice · with Constrain to Background on (TB-11) · operandi.topology.tool"
+    },
+    {
+      "command": "operandi.topology.tool \"Add Loop\"",
+      "label": "Add Loop",
+      "tooltip": "Add Loop · with Constrain to Background on (TB-11) · operandi.topology.tool",
+      "icon": "loop-cut"
+    },
+    {
+      "command": "operandi.topology.tool \"Contour\"",
+      "label": "Contour",
+      "tooltip": "Contour{binding} · drag across a background mesh: the cut under the line becomes a curve loop in the active mesh",
+      "icon": "contour"
+    },
+    {
+      "divider": ""
+    },
+    {
+      "command": "Retopo Sketch",
+      "label": "Retopo Guides",
+      "tooltip": "Retopo Guides · Retopo Sketch under this tab's name: drag across a background mesh to draw a guide curve on it"
+    },
+    {
+      "divider": "Commands",
+      "id": "topology-commands"
+    },
+    {
+      "command": "Automatic Retopology",
+      "label": "Automatic Retopology...",
+      "look": "flat"
+    },
+    {
+      "divider": ""
+    },
+    {
+      "command": "Triple",
+      "label": "Convert to Triangles",
+      "look": "flat"
+    },
+    {
+      "command": "Quadruple",
+      "label": "Convert to Quadrangles",
+      "look": "flat"
+    },
+    {
+      "command": "Grow Quads",
+      "label": "Grow Quads",
+      "look": "flat"
+    },
+    {
+      "command": "SDS Subdivide",
+      "label": "Subdivide",
+      "look": "flat"
+    },
+    {
+      "divider": ""
+    },
+    {
+      "command": "Instance Mirror",
+      "label": "Instance Mirror",
+      "icon": "instance-mirror",
+      "tooltip": "Instance Mirror{binding} · mirror the selected mesh as an instance that shares its mesh (the Duplicate tab's tool)"
+    },
+    {
+      "command": "Merge Instance",
+      "label": "Merge Instance",
+      "tooltip": "Merge Instance{binding} · needs a selection: a mesh with one instance; bakes the instance's geometry into it and deletes the instance"
+    },
+    {
+      "divider": "Settings",
+      "id": "topology-settings"
+    },
+    {
+      "command": "Show Vertices",
+      "label": "Toggle Verts",
+      "look": "flat"
+    },
+    {
+      "command": "view.topologyMode",
+      "label": "Topology Mode",
+      "look": "flat",
+      "tooltip": "Topology Mode{binding} · draw the active meshes over the background meshes, see-through, in this view · view.topologyMode"
+    },
+    {
+      "command": "Constrain to Background",
+      "label": "Constrain to Background",
+      "look": "flat"
+    },
+    {
+      "widget": "topology.hitSize"
+    },
+    {
+      "widget": "topology.foregroundOpacity"
+    },
+    {
+      "divider": "Modifiers",
+      "id": "topology-modifiers"
+    },
+    {
+      "command": "tool.set falloff.softSelection on",
+      "label": "Soft Selection",
+      "look": "flat"
+    },
+    {
+      "command": "Lazy Selection",
+      "label": "Lazy Select",
+      "look": "flat"
+    }
+  ]
+}

@@ -1,0 +1,93 @@
+{
+  "version": 1,
+  "id": "menu.view",
+  "label": "View",
+  "style": "menu",
+  "controls": [
+    {
+      "command": "Frame All",
+      "label": "Frame All",
+      "shortcut": "Frame All"
+    },
+    {
+      "command": "Frame Selection",
+      "label": "Frame Selection",
+      "shortcut": "Frame Selection"
+    },
+    {
+      "command": "UV View",
+      "label": "UV View",
+      "shortcut": "UV View"
+    },
+    {
+      "form": "menu.view.navigate"
+    },
+    {
+      "divider": ""
+    },
+    {
+      "command": "Hide Selected",
+      "label": "Hide Selected",
+      "shortcut": "Hide Selected"
+    },
+    {
+      "command": "Hide Unselected",
+      "label": "Hide Unselected",
+      "shortcut": "Hide Unselected"
+    },
+    {
+      "command": "Hide Invert",
+      "label": "Hide Invert",
+      "shortcut": "Hide Invert"
+    },
+    {
+      "command": "Unhide",
+      "label": "Unhide",
+      "shortcut": "Unhide"
+    },
+    {
+      "command": "operandi.view.showLocked",
+      "label": "Show Locked Mesh Items"
+    },
+    {
+      "command": "operandi.view.showFalloffs",
+      "label": "Show Falloffs"
+    },
+    {
+      "form": "menu.view.toolHandles"
+    },
+    {
+      "divider": ""
+    },
+    {
+      "command": "viewport.split",
+      "label": "Split View"
+    },
+    {
+      "command": "viewport.maximize",
+      "label": "{title}"
+    },
+    {
+      "command": "Viewport Properties",
+      "label": "Viewport Properties…"
+    },
+    {
+      "divider": ""
+    },
+    {
+      "command": "viewport.detach",
+      "label": "Tear Off View"
+    },
+    {
+      "command": "operandi.viewport.close",
+      "label": "Close View"
+    },
+    {
+      "divider": ""
+    },
+    {
+      "command": "operandi.help.navigation",
+      "label": "Navigation Help"
+    }
+  ]
+}

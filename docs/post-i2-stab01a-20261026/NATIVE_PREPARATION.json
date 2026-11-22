@@ -1,0 +1,27 @@
+{
+  "status": "prepared_not_launched",
+  "pid": null,
+  "title": "Operandi STAB-01A Menu QA",
+  "executable": "~/Documents/Operandi-Rust-stab00/development/post-i2-stab01a-20261026/target/release/operandi-app",
+  "binary_identity": {
+    "path": "~/Documents/Operandi-Rust-stab00/development/post-i2-stab01a-20261026/target/release/operandi-app",
+    "bytes": 20394816,
+    "sha256": "f08c2896ccf3258547bdb7b53c3f409fd6c8cee58bc85d6afa010fca5607d4e8",
+    "features": "normal release; no qa feature",
+    "launched": false
+  },
+  "args": [
+    "~/Documents/Operandi-Rust-stab00/development/post-i2-stab01a-20261026/native/prepared-20261027T021231Z/input.opscene"
+  ],
+  "cwd": "~/Documents/Operandi-Rust-stab00",
+  "env": {
+    "OPERANDI_DEV_TITLE": "Operandi STAB-01A Menu QA",
+    "OPERANDI_DEV_DATA": "~/Documents/Operandi-Rust-stab00/development/post-i2-stab01a-20261026/native/prepared-20261027T021231Z/data",
+    "TMPDIR": "~/Documents/Operandi-Rust-stab00/development/post-i2-stab01a-20261026/native/prepared-20261027T021231Z/tmp"
+  },
+  "scene_sha256": "e2d786c12e454935fdf4a1832a0708151d9f1fd55bc04971106c078aca3f47a5",
+  "scene_source": "exact G0 in explicit admitted version8 wrapper; real codec tested",
+  "controller": "None established; no app resolver, protected instance, historical PID or audit may be adopted",
+  "ownership": "Future coordinated direct launch must record new PID/start identity and unique title; no native app launched here",
+  "checklist": "~/Documents/Operandi-Rust-stab00/docs/post-i2-stab01a-20261026/NATIVE_CHECKLIST.md"
+}

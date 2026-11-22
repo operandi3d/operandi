@@ -1,0 +1,1393 @@
+{
+ "spec": "action-center-scale-2026-11-06",
+ "comparison_rule": "Uniform scale 50 % with the listed action center; match points to 1e-6 (item at (2,1,0); points are the mesh's own coordinates).",
+ "cases": [
+  {
+   "id": "F1",
+   "description": "Selection",
+   "input": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      7,
+      6,
+      5,
+      4
+     ],
+     [
+      0,
+      4,
+      5,
+      1
+     ],
+     [
+      1,
+      5,
+      6,
+      2
+     ],
+     [
+      2,
+      6,
+      7,
+      3
+     ],
+     [
+      3,
+      7,
+      4,
+      0
+     ]
+    ],
+    "item_position": [
+     2,
+     1,
+     0
+    ],
+    "selection_mode": "polygon",
+    "selected_polygons": [
+     1
+    ]
+   },
+   "action": "click empty viewport, uniform 0.5 by script + apply",
+   "observed_summary": "top corners to local +-0.25 at y 0.5: centre = face centre.",
+   "expected": {
+    "after": {
+     "meshes": {
+      "Cube": {
+       "points": [
+        [
+         -0.5,
+         -0.5,
+         -0.5
+        ],
+        [
+         0.5,
+         -0.5,
+         -0.5
+        ],
+        [
+         0.5,
+         -0.5,
+         0.5
+        ],
+        [
+         -0.5,
+         -0.5,
+         0.5
+        ],
+        [
+         -0.25,
+         0.5,
+         -0.25
+        ],
+        [
+         0.25,
+         0.5,
+         -0.25
+        ],
+        [
+         0.25,
+         0.5,
+         0.25
+        ],
+        [
+         -0.25,
+         0.5,
+         0.25
+        ]
+       ],
+       "polygons": [
+        [
+         0,
+         1,
+         2,
+         3
+        ],
+        [
+         7,
+         6,
+         5,
+         4
+        ],
+        [
+         0,
+         4,
+         5,
+         1
+        ],
+        [
+         1,
+         5,
+         6,
+         2
+        ],
+        [
+         2,
+         6,
+         7,
+         3
+        ],
+        [
+         3,
+         7,
+         4,
+         0
+        ]
+       ],
+       "polygon_types": [
+        "face",
+        "face",
+        "face",
+        "face",
+        "face",
+        "face"
+       ],
+       "selected_points": [],
+       "selected_edges": [],
+       "selected_polygons": [
+        1
+       ]
+      }
+     },
+     "selection_mode": "polygon",
+     "tool_on": [
+      "Scale"
+     ],
+     "action_center": [
+      "Selection"
+     ],
+     "tool_settings": {}
+    }
+   }
+  },
+  {
+   "id": "F2",
+   "description": "Selection Border",
+   "input": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      7,
+      6,
+      5,
+      4
+     ],
+     [
+      0,
+      4,
+      5,
+      1
+     ],
+     [
+      1,
+      5,
+      6,
+      2
+     ],
+     [
+      2,
+      6,
+      7,
+      3
+     ],
+     [
+      3,
+      7,
+      4,
+      0
+     ]
+    ],
+    "item_position": [
+     2,
+     1,
+     0
+    ],
+    "selection_mode": "polygon",
+    "selected_polygons": [
+     1
+    ]
+   },
+   "action": "same",
+   "observed_summary": "same as F1 for a single face (border centre = face centre).",
+   "expected": {
+    "after": {
+     "meshes": {
+      "Cube": {
+       "points": [
+        [
+         -0.5,
+         -0.5,
+         -0.5
+        ],
+        [
+         0.5,
+         -0.5,
+         -0.5
+        ],
+        [
+         0.5,
+         -0.5,
+         0.5
+        ],
+        [
+         -0.5,
+         -0.5,
+         0.5
+        ],
+        [
+         -0.25,
+         0.5,
+         -0.25
+        ],
+        [
+         0.25,
+         0.5,
+         -0.25
+        ],
+        [
+         0.25,
+         0.5,
+         0.25
+        ],
+        [
+         -0.25,
+         0.5,
+         0.25
+        ]
+       ],
+       "polygons": [
+        [
+         0,
+         1,
+         2,
+         3
+        ],
+        [
+         7,
+         6,
+         5,
+         4
+        ],
+        [
+         0,
+         4,
+         5,
+         1
+        ],
+        [
+         1,
+         5,
+         6,
+         2
+        ],
+        [
+         2,
+         6,
+         7,
+         3
+        ],
+        [
+         3,
+         7,
+         4,
+         0
+        ]
+       ],
+       "polygon_types": [
+        "face",
+        "face",
+        "face",
+        "face",
+        "face",
+        "face"
+       ],
+       "selected_points": [],
+       "selected_edges": [],
+       "selected_polygons": [
+        1
+       ]
+      }
+     },
+     "selection_mode": "polygon",
+     "tool_on": [
+      "Scale"
+     ],
+     "action_center": [
+      "Selection Border"
+     ],
+     "tool_settings": {}
+    }
+   }
+  },
+  {
+   "id": "F3",
+   "description": "Selection Center Auto Axis",
+   "input": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      7,
+      6,
+      5,
+      4
+     ],
+     [
+      0,
+      4,
+      5,
+      1
+     ],
+     [
+      1,
+      5,
+      6,
+      2
+     ],
+     [
+      2,
+      6,
+      7,
+      3
+     ],
+     [
+      3,
+      7,
+      4,
+      0
+     ]
+    ],
+    "item_position": [
+     2,
+     1,
+     0
+    ],
+    "selection_mode": "polygon",
+    "selected_polygons": [
+     1
+    ]
+   },
+   "action": "same",
+   "observed_summary": "same as F1.",
+   "expected": {
+    "after": {
+     "meshes": {
+      "Cube": {
+       "points": [
+        [
+         -0.5,
+         -0.5,
+         -0.5
+        ],
+        [
+         0.5,
+         -0.5,
+         -0.5
+        ],
+        [
+         0.5,
+         -0.5,
+         0.5
+        ],
+        [
+         -0.5,
+         -0.5,
+         0.5
+        ],
+        [
+         -0.25,
+         0.5,
+         -0.25
+        ],
+        [
+         0.25,
+         0.5,
+         -0.25
+        ],
+        [
+         0.25,
+         0.5,
+         0.25
+        ],
+        [
+         -0.25,
+         0.5,
+         0.25
+        ]
+       ],
+       "polygons": [
+        [
+         0,
+         1,
+         2,
+         3
+        ],
+        [
+         7,
+         6,
+         5,
+         4
+        ],
+        [
+         0,
+         4,
+         5,
+         1
+        ],
+        [
+         1,
+         5,
+         6,
+         2
+        ],
+        [
+         2,
+         6,
+         7,
+         3
+        ],
+        [
+         3,
+         7,
+         4,
+         0
+        ]
+       ],
+       "polygon_types": [
+        "face",
+        "face",
+        "face",
+        "face",
+        "face",
+        "face"
+       ],
+       "selected_points": [],
+       "selected_edges": [],
+       "selected_polygons": [
+        1
+       ]
+      }
+     },
+     "selection_mode": "polygon",
+     "tool_on": [
+      "Scale"
+     ],
+     "action_center": [
+      "Selection Center Auto Axis"
+     ],
+     "tool_settings": {}
+    }
+   }
+  },
+  {
+   "id": "F4",
+   "description": "Element, click on the near top corner (+X+Y+Z)",
+   "input": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      7,
+      6,
+      5,
+      4
+     ],
+     [
+      0,
+      4,
+      5,
+      1
+     ],
+     [
+      1,
+      5,
+      6,
+      2
+     ],
+     [
+      2,
+      6,
+      7,
+      3
+     ],
+     [
+      3,
+      7,
+      4,
+      0
+     ]
+    ],
+    "item_position": [
+     2,
+     1,
+     0
+    ],
+    "selection_mode": "polygon",
+    "selected_polygons": [
+     1
+    ]
+   },
+   "action": "same",
+   "observed_summary": "scaled toward the clicked corner (0.5,0.5,0.5): top points (0..0.5, 0.5, 0..0.5); handle drawn with the element's own axes.",
+   "expected": {
+    "after": {
+     "meshes": {
+      "Cube": {
+       "points": [
+        [
+         -0.5,
+         -0.5,
+         -0.5
+        ],
+        [
+         0.5,
+         -0.5,
+         -0.5
+        ],
+        [
+         0.5,
+         -0.5,
+         0.5
+        ],
+        [
+         -0.5,
+         -0.5,
+         0.5
+        ],
+        [
+         0.0,
+         0.5,
+         0.0
+        ],
+        [
+         0.5,
+         0.5,
+         0.0
+        ],
+        [
+         0.5,
+         0.5,
+         0.5
+        ],
+        [
+         0.0,
+         0.5,
+         0.5
+        ]
+       ],
+       "polygons": [
+        [
+         0,
+         1,
+         2,
+         3
+        ],
+        [
+         7,
+         6,
+         5,
+         4
+        ],
+        [
+         0,
+         4,
+         5,
+         1
+        ],
+        [
+         1,
+         5,
+         6,
+         2
+        ],
+        [
+         2,
+         6,
+         7,
+         3
+        ],
+        [
+         3,
+         7,
+         4,
+         0
+        ]
+       ],
+       "polygon_types": [
+        "face",
+        "face",
+        "face",
+        "face",
+        "face",
+        "face"
+       ],
+       "selected_points": [],
+       "selected_edges": [],
+       "selected_polygons": [
+        1
+       ]
+      }
+     },
+     "selection_mode": "polygon",
+     "tool_on": [
+      "Scale"
+     ],
+     "action_center": [
+      "Element"
+     ],
+     "tool_settings": {}
+    }
+   }
+  },
+  {
+   "id": "F5",
+   "description": "Origin",
+   "input": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      7,
+      6,
+      5,
+      4
+     ],
+     [
+      0,
+      4,
+      5,
+      1
+     ],
+     [
+      1,
+      5,
+      6,
+      2
+     ],
+     [
+      2,
+      6,
+      7,
+      3
+     ],
+     [
+      3,
+      7,
+      4,
+      0
+     ]
+    ],
+    "item_position": [
+     2,
+     1,
+     0
+    ],
+    "selection_mode": "polygon",
+    "selected_polygons": [
+     1
+    ]
+   },
+   "action": "same",
+   "observed_summary": "scaled about WORLD origin: local top points x -1+-0.25, y -0.25, z +-0.25 (world (1+-0.25, 0.75, +-0.25)).",
+   "expected": {
+    "after": {
+     "meshes": {
+      "Cube": {
+       "points": [
+        [
+         -0.5,
+         -0.5,
+         -0.5
+        ],
+        [
+         0.5,
+         -0.5,
+         -0.5
+        ],
+        [
+         0.5,
+         -0.5,
+         0.5
+        ],
+        [
+         -0.5,
+         -0.5,
+         0.5
+        ],
+        [
+         -1.25,
+         -0.25,
+         -0.25
+        ],
+        [
+         -0.75,
+         -0.25,
+         -0.25
+        ],
+        [
+         -0.75,
+         -0.25,
+         0.25
+        ],
+        [
+         -1.25,
+         -0.25,
+         0.25
+        ]
+       ],
+       "polygons": [
+        [
+         0,
+         1,
+         2,
+         3
+        ],
+        [
+         7,
+         6,
+         5,
+         4
+        ],
+        [
+         0,
+         4,
+         5,
+         1
+        ],
+        [
+         1,
+         5,
+         6,
+         2
+        ],
+        [
+         2,
+         6,
+         7,
+         3
+        ],
+        [
+         3,
+         7,
+         4,
+         0
+        ]
+       ],
+       "polygon_types": [
+        "face",
+        "face",
+        "face",
+        "face",
+        "face",
+        "face"
+       ],
+       "selected_points": [],
+       "selected_edges": [],
+       "selected_polygons": [
+        1
+       ]
+      }
+     },
+     "selection_mode": "polygon",
+     "tool_on": [
+      "Scale"
+     ],
+     "action_center": [
+      "Origin"
+     ],
+     "tool_settings": {}
+    }
+   }
+  },
+  {
+   "id": "F6",
+   "description": "Screen, click at lower-left empty space",
+   "input": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      7,
+      6,
+      5,
+      4
+     ],
+     [
+      0,
+      4,
+      5,
+      1
+     ],
+     [
+      1,
+      5,
+      6,
+      2
+     ],
+     [
+      2,
+      6,
+      7,
+      3
+     ],
+     [
+      3,
+      7,
+      4,
+      0
+     ]
+    ],
+    "item_position": [
+     2,
+     1,
+     0
+    ],
+    "selection_mode": "polygon",
+    "selected_polygons": [
+     1
+    ]
+   },
+   "action": "same",
+   "observed_summary": "scaled about a point fixed by the click: centre local (-0.358,-0.593,0.645) (world 1.642,0.407,0.645); top moved to y -0.047.",
+   "expected": {
+    "after": {
+     "meshes": {
+      "Cube": {
+       "points": [
+        [
+         -0.5,
+         -0.5,
+         -0.5
+        ],
+        [
+         0.5,
+         -0.5,
+         -0.5
+        ],
+        [
+         0.5,
+         -0.5,
+         0.5
+        ],
+        [
+         -0.5,
+         -0.5,
+         0.5
+        ],
+        [
+         -0.429024,
+         -0.046702,
+         0.072464
+        ],
+        [
+         0.070976,
+         -0.046702,
+         0.072464
+        ],
+        [
+         0.070976,
+         -0.046702,
+         0.572464
+        ],
+        [
+         -0.429024,
+         -0.046702,
+         0.572464
+        ]
+       ],
+       "polygons": [
+        [
+         0,
+         1,
+         2,
+         3
+        ],
+        [
+         7,
+         6,
+         5,
+         4
+        ],
+        [
+         0,
+         4,
+         5,
+         1
+        ],
+        [
+         1,
+         5,
+         6,
+         2
+        ],
+        [
+         2,
+         6,
+         7,
+         3
+        ],
+        [
+         3,
+         7,
+         4,
+         0
+        ]
+       ],
+       "polygon_types": [
+        "face",
+        "face",
+        "face",
+        "face",
+        "face",
+        "face"
+       ],
+       "selected_points": [],
+       "selected_edges": [],
+       "selected_polygons": [
+        1
+       ]
+      }
+     },
+     "selection_mode": "polygon",
+     "tool_on": [
+      "Scale"
+     ],
+     "action_center": [
+      "Screen"
+     ],
+     "tool_settings": {}
+    }
+   }
+  },
+  {
+   "id": "F7",
+   "description": "Local, two separate quads",
+   "input": {
+    "points": [
+     [
+      0,
+      0,
+      0
+     ],
+     [
+      1,
+      0,
+      0
+     ],
+     [
+      1,
+      1,
+      0
+     ],
+     [
+      0,
+      1,
+      0
+     ],
+     [
+      2,
+      0,
+      0
+     ],
+     [
+      3,
+      0,
+      0
+     ],
+     [
+      3,
+      1,
+      0
+     ],
+     [
+      2,
+      1,
+      0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      4,
+      5,
+      6,
+      7
+     ]
+    ],
+    "selection_mode": "polygon",
+    "selected_polygons": [
+     0,
+     1
+    ]
+   },
+   "action": "same",
+   "observed_summary": "each quad scaled about its OWN centre (0.25..0.75 and 2.25..2.75). Automatic restored after.",
+   "expected": {
+    "after": {
+     "meshes": {
+      "TwoQuads": {
+       "points": [
+        [
+         0.25,
+         0.25,
+         0.0
+        ],
+        [
+         0.75,
+         0.25,
+         0.0
+        ],
+        [
+         0.75,
+         0.75,
+         0.0
+        ],
+        [
+         0.25,
+         0.75,
+         0.0
+        ],
+        [
+         2.25,
+         0.25,
+         0.0
+        ],
+        [
+         2.75,
+         0.25,
+         0.0
+        ],
+        [
+         2.75,
+         0.75,
+         0.0
+        ],
+        [
+         2.25,
+         0.75,
+         0.0
+        ]
+       ],
+       "polygons": [
+        [
+         0,
+         1,
+         2,
+         3
+        ],
+        [
+         4,
+         5,
+         6,
+         7
+        ]
+       ],
+       "polygon_types": [
+        "face",
+        "face"
+       ],
+       "selected_points": [],
+       "selected_edges": [],
+       "selected_polygons": [
+        0,
+        1
+       ]
+      }
+     },
+     "selection_mode": "polygon",
+     "tool_on": [
+      "Scale"
+     ],
+     "action_center": [
+      "Local"
+     ],
+     "tool_settings": {}
+    }
+   }
+  }
+ ]
+}

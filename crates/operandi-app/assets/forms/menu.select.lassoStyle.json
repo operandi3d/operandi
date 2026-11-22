@@ -1,0 +1,28 @@
+{
+  "version": 1,
+  "id": "menu.select.lassoStyle",
+  "label": "Lasso Style",
+  "style": "menu",
+  "controls": [
+    {
+      "command": "operandi.lasso.style style:freeform",
+      "label": "Freeform"
+    },
+    {
+      "command": "operandi.lasso.style style:rectangle",
+      "label": "Rectangle"
+    },
+    {
+      "command": "operandi.lasso.style style:circle",
+      "label": "Circle"
+    },
+    {
+      "command": "operandi.lasso.style style:ellipse",
+      "label": "Ellipse"
+    },
+    {
+      "command": "operandi.lasso.partial",
+      "label": "Partial"
+    }
+  ]
+}

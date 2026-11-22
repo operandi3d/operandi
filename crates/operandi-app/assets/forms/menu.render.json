@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "id": "menu.render",
+  "label": "Render",
+  "style": "menu",
+  "controls": [
+    { "command": "render", "label": "Render", "shortcut": "Render" },
+    { "command": "Preview", "label": "Preview", "shortcut": "Preview" },
+    { "command": "Open Render Window", "label": "Open Render Window", "shortcut": "Open Render Window" },
+    { "divider": "" },
+    { "command": "operandi.render.addPerLightOutputs", "label": "Add Per-Light Render Outputs" }
+  ]
+}

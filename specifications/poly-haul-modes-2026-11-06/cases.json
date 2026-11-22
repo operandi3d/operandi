@@ -1,0 +1,3027 @@
+{
+ "spec": "poly-haul-modes-2026-11-06",
+ "comparison_rule": "Interactive cases: drag lengths differ, so compare which elements change and how (direction, counts, topology); the amounts recorded in tool_settings are Modo's for this drag and the geometry must match those amounts to 1e-6.",
+ "cases": [
+  {
+   "id": "C1",
+   "description": "Mode Offset, drag on the top face",
+   "input": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      7,
+      6,
+      5,
+      4
+     ],
+     [
+      0,
+      4,
+      5,
+      1
+     ],
+     [
+      1,
+      5,
+      6,
+      2
+     ],
+     [
+      2,
+      6,
+      7,
+      3
+     ],
+     [
+      3,
+      7,
+      4,
+      0
+     ]
+    ],
+    "selection_mode": "polygon",
+    "selected_polygons": [
+     1
+    ]
+   },
+   "action": "short drag up on top face",
+   "observed_summary": "offset 0.318; top face moved +0.318 along its normal (y 0.818). Counts unchanged 8/6.",
+   "expected": {
+    "after": {
+     "meshes": {
+      "Cube": {
+       "points": [
+        [
+         -0.5,
+         -0.5,
+         -0.5
+        ],
+        [
+         0.5,
+         -0.5,
+         -0.5
+        ],
+        [
+         0.5,
+         -0.5,
+         0.5
+        ],
+        [
+         -0.5,
+         -0.5,
+         0.5
+        ],
+        [
+         -0.5,
+         0.818,
+         0.5
+        ],
+        [
+         0.5,
+         0.818,
+         0.5
+        ],
+        [
+         0.5,
+         0.818,
+         -0.5
+        ],
+        [
+         -0.5,
+         0.818,
+         -0.5
+        ]
+       ],
+       "polygons": [
+        [
+         0,
+         1,
+         2,
+         3
+        ],
+        [
+         1,
+         0,
+         7,
+         6
+        ],
+        [
+         2,
+         1,
+         6,
+         5
+        ],
+        [
+         3,
+         2,
+         5,
+         4
+        ],
+        [
+         0,
+         3,
+         4,
+         7
+        ],
+        [
+         4,
+         5,
+         6,
+         7
+        ]
+       ],
+       "polygon_types": [
+        "face",
+        "face",
+        "face",
+        "face",
+        "face",
+        "face"
+       ],
+       "selected_points": [],
+       "selected_edges": [],
+       "selected_polygons": []
+      }
+     },
+     "selection_mode": "polygon",
+     "tool_on": [
+      "Poly Haul"
+     ],
+     "action_center": [],
+     "tool_settings": {
+      "Poly Haul": {
+       "mode": "offset",
+       "vert0": "",
+       "vert1": "",
+       "poly": "",
+       "item": null,
+       "offset": 0.31800000000000006,
+       "position": 0.5,
+       "distance1": 0.5,
+       "distance2": 0.5,
+       "snap2end": 1,
+       "scaleX": 1.0,
+       "scaleY": 1.0,
+       "scaleZ": 1.0,
+       "inset": 0.0,
+       "shift": 0.0,
+       "segments": "1",
+       "group": 1,
+       "spin": 0,
+       "keepVertex": 0,
+       "vectorX": 0.0,
+       "vectorY": 0.0,
+       "vectorZ": 0.0,
+       "duplicate": 0,
+       "pushAngle": 0.017453292519943295,
+       "bothSides": 0,
+       "boolMode": 1,
+       "curvature": 0,
+       "middle": 0,
+       "quad": 0,
+       "absDistance": 0,
+       "absFromEnd": 0,
+       "tension": 1.0,
+       "split": 0,
+       "caps": 0,
+       "gap": 0.0,
+       "useMat": 0,
+       "matName": "Default",
+       "thicken": 0,
+       "square": 0,
+       "edgeRail": 0,
+       "offsetEven": 1,
+       "maxAngle": 1.5690509975429023,
+       "roundLevel": 0,
+       "shape": "round",
+       "stopAtEdge": 1,
+       "autoWeld": 0,
+       "depth": 1.0,
+       "parallel": 1,
+       "coplanar": 0,
+       "edgeEnd": "profile",
+       "flatness": 1e-05,
+       "boundExtend": 1,
+       "mitering": 0.0,
+       "sharpCorner": 0,
+       "fallMode": "vertex"
+      }
+     }
+    }
+   }
+  },
+  {
+   "id": "C2",
+   "description": "Mode Extrude, drag on the top face",
+   "input": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      7,
+      6,
+      5,
+      4
+     ],
+     [
+      0,
+      4,
+      5,
+      1
+     ],
+     [
+      1,
+      5,
+      6,
+      2
+     ],
+     [
+      2,
+      6,
+      7,
+      3
+     ],
+     [
+      3,
+      7,
+      4,
+      0
+     ]
+    ],
+    "selection_mode": "polygon",
+    "selected_polygons": [
+     1
+    ]
+   },
+   "action": "same drag",
+   "observed_summary": "offset 0.318; 12/10: top extruded by 0.318 with 4 new side walls.",
+   "expected": {
+    "after": {
+     "meshes": {
+      "Cube": {
+       "points": [
+        [
+         -0.5,
+         -0.5,
+         -0.5
+        ],
+        [
+         0.5,
+         -0.5,
+         -0.5
+        ],
+        [
+         0.5,
+         -0.5,
+         0.5
+        ],
+        [
+         -0.5,
+         -0.5,
+         0.5
+        ],
+        [
+         -0.5,
+         0.5,
+         -0.5
+        ],
+        [
+         0.5,
+         0.5,
+         -0.5
+        ],
+        [
+         0.5,
+         0.5,
+         0.5
+        ],
+        [
+         -0.5,
+         0.5,
+         0.5
+        ],
+        [
+         -0.5,
+         0.818,
+         0.5
+        ],
+        [
+         0.5,
+         0.818,
+         0.5
+        ],
+        [
+         0.5,
+         0.818,
+         -0.5
+        ],
+        [
+         -0.5,
+         0.818,
+         -0.5
+        ]
+       ],
+       "polygons": [
+        [
+         0,
+         1,
+         2,
+         3
+        ],
+        [
+         5,
+         1,
+         0,
+         4
+        ],
+        [
+         6,
+         2,
+         1,
+         5
+        ],
+        [
+         7,
+         3,
+         2,
+         6
+        ],
+        [
+         4,
+         0,
+         3,
+         7
+        ],
+        [
+         8,
+         9,
+         10,
+         11
+        ],
+        [
+         9,
+         8,
+         7,
+         6
+        ],
+        [
+         10,
+         9,
+         6,
+         5
+        ],
+        [
+         11,
+         10,
+         5,
+         4
+        ],
+        [
+         8,
+         11,
+         4,
+         7
+        ]
+       ],
+       "polygon_types": [
+        "face",
+        "face",
+        "face",
+        "face",
+        "face",
+        "face",
+        "face",
+        "face",
+        "face",
+        "face"
+       ],
+       "selected_points": [],
+       "selected_edges": [],
+       "selected_polygons": []
+      }
+     },
+     "selection_mode": "polygon",
+     "tool_on": [
+      "Poly Haul"
+     ],
+     "action_center": [],
+     "tool_settings": {
+      "Poly Haul": {
+       "mode": "extrude",
+       "vert0": "",
+       "vert1": "",
+       "poly": "",
+       "item": null,
+       "offset": 0.31800000000000006,
+       "position": 0.5,
+       "distance1": 0.5,
+       "distance2": 0.5,
+       "snap2end": 1,
+       "scaleX": 1.0,
+       "scaleY": 1.0,
+       "scaleZ": 1.0,
+       "inset": 0.0,
+       "shift": 0.0,
+       "segments": "1",
+       "group": 1,
+       "spin": 0,
+       "keepVertex": 0,
+       "vectorX": 0.0,
+       "vectorY": 0.0,
+       "vectorZ": 0.0,
+       "duplicate": 0,
+       "pushAngle": 0.017453292519943295,
+       "bothSides": 0,
+       "boolMode": 1,
+       "curvature": 0,
+       "middle": 0,
+       "quad": 0,
+       "absDistance": 0,
+       "absFromEnd": 0,
+       "tension": 1.0,
+       "split": 0,
+       "caps": 0,
+       "gap": 0.0,
+       "useMat": 0,
+       "matName": "Default",
+       "thicken": 0,
+       "square": 0,
+       "edgeRail": 0,
+       "offsetEven": 1,
+       "maxAngle": 1.5690509975429023,
+       "roundLevel": 0,
+       "shape": "round",
+       "stopAtEdge": 1,
+       "autoWeld": 0,
+       "depth": 1.0,
+       "parallel": 1,
+       "coplanar": 0,
+       "edgeEnd": "profile",
+       "flatness": 1e-05,
+       "boundExtend": 1,
+       "mitering": 0.0,
+       "sharpCorner": 0,
+       "fallMode": "vertex"
+      }
+     }
+    },
+    "after_drop": {
+     "meshes": {
+      "Cube": {
+       "points": [
+        [
+         -0.5,
+         -0.5,
+         -0.5
+        ],
+        [
+         0.5,
+         -0.5,
+         -0.5
+        ],
+        [
+         0.5,
+         -0.5,
+         0.5
+        ],
+        [
+         -0.5,
+         -0.5,
+         0.5
+        ],
+        [
+         -0.5,
+         0.5,
+         -0.5
+        ],
+        [
+         0.5,
+         0.5,
+         -0.5
+        ],
+        [
+         0.5,
+         0.5,
+         0.5
+        ],
+        [
+         -0.5,
+         0.5,
+         0.5
+        ],
+        [
+         -0.5,
+         0.818,
+         0.5
+        ],
+        [
+         0.5,
+         0.818,
+         0.5
+        ],
+        [
+         0.5,
+         0.818,
+         -0.5
+        ],
+        [
+         -0.5,
+         0.818,
+         -0.5
+        ]
+       ],
+       "polygons": [
+        [
+         0,
+         1,
+         2,
+         3
+        ],
+        [
+         5,
+         1,
+         0,
+         4
+        ],
+        [
+         6,
+         2,
+         1,
+         5
+        ],
+        [
+         7,
+         3,
+         2,
+         6
+        ],
+        [
+         4,
+         0,
+         3,
+         7
+        ],
+        [
+         8,
+         9,
+         10,
+         11
+        ],
+        [
+         9,
+         8,
+         7,
+         6
+        ],
+        [
+         10,
+         9,
+         6,
+         5
+        ],
+        [
+         11,
+         10,
+         5,
+         4
+        ],
+        [
+         8,
+         11,
+         4,
+         7
+        ]
+       ],
+       "polygon_types": [
+        "face",
+        "face",
+        "face",
+        "face",
+        "face",
+        "face",
+        "face",
+        "face",
+        "face",
+        "face"
+       ],
+       "selected_points": [],
+       "selected_edges": [],
+       "selected_polygons": []
+      }
+     },
+     "selection_mode": "polygon",
+     "tool_on": [],
+     "action_center": [],
+     "tool_settings": {}
+    }
+   }
+  },
+  {
+   "id": "C3",
+   "description": "Mode Bevel, drag near the top face's +X edge",
+   "input": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      7,
+      6,
+      5,
+      4
+     ],
+     [
+      0,
+      4,
+      5,
+      1
+     ],
+     [
+      1,
+      5,
+      6,
+      2
+     ],
+     [
+      2,
+      6,
+      7,
+      3
+     ],
+     [
+      3,
+      7,
+      4,
+      0
+     ]
+    ],
+    "selection_mode": "polygon",
+    "selected_polygons": [
+     1
+    ]
+   },
+   "action": "drag starting on the centre handle: nothing. Drag starting near the +X/+Y edge of the top face",
+   "observed_summary": "10/7: the EDGE under the cursor was chamfered (inset 0.075 -> new points at x 0.425 / y 0.425). Bevel mode works on the edge nearest the cursor, not the selected face.",
+   "expected": {
+    "after": {
+     "meshes": {
+      "Cube": {
+       "points": [
+        [
+         -0.5,
+         -0.5,
+         -0.5
+        ],
+        [
+         0.5,
+         -0.5,
+         -0.5
+        ],
+        [
+         0.5,
+         -0.5,
+         0.5
+        ],
+        [
+         -0.5,
+         -0.5,
+         0.5
+        ],
+        [
+         -0.5,
+         0.5,
+         -0.5
+        ],
+        [
+         -0.5,
+         0.5,
+         0.5
+        ],
+        [
+         0.424667,
+         0.5,
+         -0.5
+        ],
+        [
+         0.424667,
+         0.5,
+         0.5
+        ],
+        [
+         0.5,
+         0.424667,
+         0.5
+        ],
+        [
+         0.5,
+         0.424667,
+         -0.5
+        ]
+       ],
+       "polygons": [
+        [
+         0,
+         1,
+         2,
+         3
+        ],
+        [
+         3,
+         2,
+         8,
+         7,
+         5
+        ],
+        [
+         1,
+         9,
+         8,
+         2
+        ],
+        [
+         0,
+         4,
+         6,
+         9,
+         1
+        ],
+        [
+         5,
+         7,
+         6,
+         4
+        ],
+        [
+         3,
+         5,
+         4,
+         0
+        ],
+        [
+         8,
+         9,
+         6,
+         7
+        ]
+       ],
+       "polygon_types": [
+        "face",
+        "face",
+        "face",
+        "face",
+        "face",
+        "face",
+        "face"
+       ],
+       "selected_points": [],
+       "selected_edges": [],
+       "selected_polygons": [
+        4
+       ]
+      }
+     },
+     "selection_mode": "polygon",
+     "tool_on": [
+      "Poly Haul"
+     ],
+     "action_center": [],
+     "tool_settings": {
+      "Poly Haul": {
+       "mode": "bevel",
+       "vert0": "0,-838909392",
+       "vert1": "0,-838909392",
+       "poly": "",
+       "item": null,
+       "offset": 0.0,
+       "position": 0.5,
+       "distance1": 0.5,
+       "distance2": 0.5,
+       "snap2end": 1,
+       "scaleX": 1.0,
+       "scaleY": 1.0,
+       "scaleZ": 1.0,
+       "inset": 0.07533333333333335,
+       "shift": 0.0,
+       "segments": "1",
+       "group": 1,
+       "spin": 0,
+       "keepVertex": 0,
+       "vectorX": 0.0,
+       "vectorY": 0.0,
+       "vectorZ": 0.0,
+       "duplicate": 0,
+       "pushAngle": 0.017453292519943295,
+       "bothSides": 0,
+       "boolMode": 1,
+       "curvature": 0,
+       "middle": 0,
+       "quad": 0,
+       "absDistance": 0,
+       "absFromEnd": 0,
+       "tension": 1.0,
+       "split": 0,
+       "caps": 0,
+       "gap": 0.0,
+       "useMat": 0,
+       "matName": "Default",
+       "thicken": 0,
+       "square": 0,
+       "edgeRail": 0,
+       "offsetEven": 1,
+       "maxAngle": 1.5690509975429023,
+       "roundLevel": 0,
+       "shape": "round",
+       "stopAtEdge": 1,
+       "autoWeld": 0,
+       "depth": 1.0,
+       "parallel": 1,
+       "coplanar": 0,
+       "edgeEnd": "profile",
+       "flatness": 1e-05,
+       "boundExtend": 1,
+       "mitering": 0.0,
+       "sharpCorner": 0,
+       "fallMode": "vertex"
+      }
+     }
+    },
+    "after_drop": {
+     "meshes": {
+      "Cube": {
+       "points": [
+        [
+         -0.5,
+         -0.5,
+         -0.5
+        ],
+        [
+         0.5,
+         -0.5,
+         -0.5
+        ],
+        [
+         0.5,
+         -0.5,
+         0.5
+        ],
+        [
+         -0.5,
+         -0.5,
+         0.5
+        ],
+        [
+         -0.5,
+         0.5,
+         -0.5
+        ],
+        [
+         -0.5,
+         0.5,
+         0.5
+        ],
+        [
+         0.424667,
+         0.5,
+         -0.5
+        ],
+        [
+         0.424667,
+         0.5,
+         0.5
+        ],
+        [
+         0.5,
+         0.424667,
+         0.5
+        ],
+        [
+         0.5,
+         0.424667,
+         -0.5
+        ]
+       ],
+       "polygons": [
+        [
+         0,
+         1,
+         2,
+         3
+        ],
+        [
+         3,
+         2,
+         8,
+         7,
+         5
+        ],
+        [
+         1,
+         9,
+         8,
+         2
+        ],
+        [
+         0,
+         4,
+         6,
+         9,
+         1
+        ],
+        [
+         5,
+         7,
+         6,
+         4
+        ],
+        [
+         3,
+         5,
+         4,
+         0
+        ],
+        [
+         8,
+         9,
+         6,
+         7
+        ]
+       ],
+       "polygon_types": [
+        "face",
+        "face",
+        "face",
+        "face",
+        "face",
+        "face",
+        "face"
+       ],
+       "selected_points": [],
+       "selected_edges": [],
+       "selected_polygons": [
+        4
+       ]
+      }
+     },
+     "selection_mode": "polygon",
+     "tool_on": [],
+     "action_center": [],
+     "tool_settings": {}
+    }
+   }
+  },
+  {
+   "id": "C4",
+   "description": "Mode Scale, drag toward the face centre",
+   "input": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      7,
+      6,
+      5,
+      4
+     ],
+     [
+      0,
+      4,
+      5,
+      1
+     ],
+     [
+      1,
+      5,
+      6,
+      2
+     ],
+     [
+      2,
+      6,
+      7,
+      3
+     ],
+     [
+      3,
+      7,
+      4,
+      0
+     ]
+    ],
+    "selection_mode": "polygon",
+    "selected_polygons": [
+     1
+    ]
+   },
+   "action": "drag toward top-face centre",
+   "observed_summary": "scaleX = scaleZ-equivalent 0.26 uniform in the face plane about the face centre: top corners at +-0.13. 8/6.",
+   "expected": {
+    "after": {
+     "meshes": {
+      "Cube": {
+       "points": [
+        [
+         -0.5,
+         -0.5,
+         -0.5
+        ],
+        [
+         0.5,
+         -0.5,
+         -0.5
+        ],
+        [
+         0.5,
+         -0.5,
+         0.5
+        ],
+        [
+         -0.5,
+         -0.5,
+         0.5
+        ],
+        [
+         -0.13,
+         0.5,
+         -0.13
+        ],
+        [
+         0.13,
+         0.5,
+         -0.13
+        ],
+        [
+         0.13,
+         0.5,
+         0.13
+        ],
+        [
+         -0.13,
+         0.5,
+         0.13
+        ]
+       ],
+       "polygons": [
+        [
+         0,
+         1,
+         2,
+         3
+        ],
+        [
+         7,
+         6,
+         5,
+         4
+        ],
+        [
+         0,
+         4,
+         5,
+         1
+        ],
+        [
+         1,
+         5,
+         6,
+         2
+        ],
+        [
+         2,
+         6,
+         7,
+         3
+        ],
+        [
+         3,
+         7,
+         4,
+         0
+        ]
+       ],
+       "polygon_types": [
+        "face",
+        "face",
+        "face",
+        "face",
+        "face",
+        "face"
+       ],
+       "selected_points": [],
+       "selected_edges": [],
+       "selected_polygons": [
+        1
+       ]
+      }
+     },
+     "selection_mode": "polygon",
+     "tool_on": [
+      "Poly Haul"
+     ],
+     "action_center": [],
+     "tool_settings": {
+      "Poly Haul": {
+       "mode": "scale",
+       "vert0": "",
+       "vert1": "",
+       "poly": "0,1",
+       "item": null,
+       "offset": 0.0,
+       "position": 0.5,
+       "distance1": 0.5,
+       "distance2": 0.5,
+       "snap2end": 1,
+       "scaleX": 0.26,
+       "scaleY": 0.26,
+       "scaleZ": 1.0,
+       "inset": 0.0,
+       "shift": 0.0,
+       "segments": "1",
+       "group": 1,
+       "spin": 0,
+       "keepVertex": 0,
+       "vectorX": 0.0,
+       "vectorY": 0.0,
+       "vectorZ": 0.0,
+       "duplicate": 0,
+       "pushAngle": 0.017453292519943295,
+       "bothSides": 0,
+       "boolMode": 1,
+       "curvature": 0,
+       "middle": 0,
+       "quad": 0,
+       "absDistance": 0,
+       "absFromEnd": 0,
+       "tension": 1.0,
+       "split": 0,
+       "caps": 0,
+       "gap": 0.0,
+       "useMat": 0,
+       "matName": "Default",
+       "thicken": 0,
+       "square": 0,
+       "edgeRail": 0,
+       "offsetEven": 1,
+       "maxAngle": 1.5690509975429023,
+       "roundLevel": 0,
+       "shape": "round",
+       "stopAtEdge": 1,
+       "autoWeld": 0,
+       "depth": 1.0,
+       "parallel": 1,
+       "coplanar": 0,
+       "edgeEnd": "profile",
+       "flatness": 1e-05,
+       "boundExtend": 1,
+       "mitering": 0.0,
+       "sharpCorner": 0,
+       "fallMode": "vertex"
+      }
+     }
+    },
+    "after_drop": {
+     "meshes": {
+      "Cube": {
+       "points": [
+        [
+         -0.5,
+         -0.5,
+         -0.5
+        ],
+        [
+         0.5,
+         -0.5,
+         -0.5
+        ],
+        [
+         0.5,
+         -0.5,
+         0.5
+        ],
+        [
+         -0.5,
+         -0.5,
+         0.5
+        ],
+        [
+         -0.13,
+         0.5,
+         -0.13
+        ],
+        [
+         0.13,
+         0.5,
+         -0.13
+        ],
+        [
+         0.13,
+         0.5,
+         0.13
+        ],
+        [
+         -0.13,
+         0.5,
+         0.13
+        ]
+       ],
+       "polygons": [
+        [
+         0,
+         1,
+         2,
+         3
+        ],
+        [
+         7,
+         6,
+         5,
+         4
+        ],
+        [
+         0,
+         4,
+         5,
+         1
+        ],
+        [
+         1,
+         5,
+         6,
+         2
+        ],
+        [
+         2,
+         6,
+         7,
+         3
+        ],
+        [
+         3,
+         7,
+         4,
+         0
+        ]
+       ],
+       "polygon_types": [
+        "face",
+        "face",
+        "face",
+        "face",
+        "face",
+        "face"
+       ],
+       "selected_points": [],
+       "selected_edges": [],
+       "selected_polygons": [
+        1
+       ]
+      }
+     },
+     "selection_mode": "polygon",
+     "tool_on": [],
+     "action_center": [],
+     "tool_settings": {}
+    }
+   }
+  },
+  {
+   "id": "C5",
+   "description": "Mode Split, drag along an edge",
+   "input": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      0.0
+     ],
+     [
+      0.5,
+      -0.5,
+      0.0
+     ],
+     [
+      -0.5,
+      0.5,
+      0.0
+     ],
+     [
+      0.5,
+      0.5,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      3,
+      2
+     ]
+    ],
+    "selection_mode": "polygon",
+    "selected_polygons": [
+     0
+    ]
+   },
+   "action": "drag across from left to right edge: marker slid to 100% on an edge, no change. Short drag down along the left edge",
+   "observed_summary": "6/2: quad split in two by a new edge across it at 49.3% (y 0.007). Split picks the edge under the cursor and the drag slides the cut position along it. Selection cleared.",
+   "expected": {
+    "after": {
+     "meshes": {
+      "Quad": {
+       "points": [
+        [
+         -0.5,
+         -0.5,
+         0.0
+        ],
+        [
+         0.5,
+         -0.5,
+         0.0
+        ],
+        [
+         -0.5,
+         0.5,
+         0.0
+        ],
+        [
+         0.5,
+         0.5,
+         0.0
+        ]
+       ],
+       "polygons": [
+        [
+         0,
+         1,
+         3,
+         2
+        ]
+       ],
+       "polygon_types": [
+        "face"
+       ],
+       "selected_points": [],
+       "selected_edges": [],
+       "selected_polygons": [
+        0
+       ]
+      }
+     },
+     "selection_mode": "polygon",
+     "tool_on": [
+      "Poly Haul"
+     ],
+     "action_center": [],
+     "tool_settings": {
+      "Poly Haul": {
+       "mode": "split",
+       "vert0": "",
+       "vert1": "",
+       "poly": "0,0",
+       "item": null,
+       "offset": 0.0,
+       "position": 1.0,
+       "distance1": 1.0,
+       "distance2": 0.0,
+       "snap2end": 1,
+       "scaleX": 1.0,
+       "scaleY": 1.0,
+       "scaleZ": 1.0,
+       "inset": 0.0,
+       "shift": 0.0,
+       "segments": "1",
+       "group": 1,
+       "spin": 0,
+       "keepVertex": 0,
+       "vectorX": 0.0,
+       "vectorY": 0.0,
+       "vectorZ": 0.0,
+       "duplicate": 0,
+       "pushAngle": 0.017453292519943295,
+       "bothSides": 0,
+       "boolMode": 1,
+       "curvature": 0,
+       "middle": 0,
+       "quad": 0,
+       "absDistance": 0,
+       "absFromEnd": 0,
+       "tension": 1.0,
+       "split": 0,
+       "caps": 0,
+       "gap": 0.0,
+       "useMat": 0,
+       "matName": "Default",
+       "thicken": 0,
+       "square": 0,
+       "edgeRail": 0,
+       "offsetEven": 1,
+       "maxAngle": 1.5690509975429023,
+       "roundLevel": 0,
+       "shape": "round",
+       "stopAtEdge": 1,
+       "autoWeld": 0,
+       "depth": 1.0,
+       "parallel": 1,
+       "coplanar": 0,
+       "edgeEnd": "profile",
+       "flatness": 1e-05,
+       "boundExtend": 1,
+       "mitering": 0.0,
+       "sharpCorner": 0,
+       "fallMode": "vertex"
+      }
+     }
+    },
+    "after_drop": {
+     "meshes": {
+      "Quad": {
+       "points": [
+        [
+         -0.5,
+         -0.5,
+         0.0
+        ],
+        [
+         0.5,
+         -0.5,
+         0.0
+        ],
+        [
+         -0.5,
+         0.5,
+         0.0
+        ],
+        [
+         0.5,
+         0.5,
+         0.0
+        ],
+        [
+         -0.5,
+         0.006932,
+         0.0
+        ],
+        [
+         0.5,
+         0.006932,
+         0.0
+        ]
+       ],
+       "polygons": [
+        [
+         5,
+         3,
+         2,
+         4
+        ],
+        [
+         4,
+         0,
+         1,
+         5
+        ]
+       ],
+       "polygon_types": [
+        "face",
+        "face"
+       ],
+       "selected_points": [],
+       "selected_edges": [],
+       "selected_polygons": []
+      }
+     },
+     "selection_mode": "polygon",
+     "tool_on": [],
+     "action_center": [],
+     "tool_settings": {}
+    }
+   }
+  },
+  {
+   "id": "C6",
+   "description": "Mode Add Loop, drag on the middle quad (no cut: open)",
+   "input": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      2.0,
+      0.0,
+      0.0
+     ],
+     [
+      3.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      2.0,
+      1.0,
+      0.0
+     ],
+     [
+      3.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      5,
+      4
+     ],
+     [
+      1,
+      2,
+      6,
+      5
+     ],
+     [
+      2,
+      3,
+      7,
+      6
+     ]
+    ],
+    "selection_mode": "polygon",
+    "selected_polygons": [
+     1
+    ]
+   },
+   "action": "short drag on middle quad; then drag along its bottom edge",
+   "observed_summary": "No cut in either try (8/3 unchanged). First try showed a 79.5% marker on the bottom edge. Unresolved.",
+   "expected": {
+    "after": {
+     "meshes": {
+      "Strip": {
+       "points": [
+        [
+         0.0,
+         0.0,
+         0.0
+        ],
+        [
+         1.0,
+         0.0,
+         0.0
+        ],
+        [
+         2.0,
+         0.0,
+         0.0
+        ],
+        [
+         3.0,
+         0.0,
+         0.0
+        ],
+        [
+         0.0,
+         1.0,
+         0.0
+        ],
+        [
+         1.0,
+         1.0,
+         0.0
+        ],
+        [
+         2.0,
+         1.0,
+         0.0
+        ],
+        [
+         3.0,
+         1.0,
+         0.0
+        ]
+       ],
+       "polygons": [
+        [
+         0,
+         1,
+         5,
+         4
+        ],
+        [
+         1,
+         2,
+         6,
+         5
+        ],
+        [
+         2,
+         3,
+         7,
+         6
+        ]
+       ],
+       "polygon_types": [
+        "face",
+        "face",
+        "face"
+       ],
+       "selected_points": [],
+       "selected_edges": [],
+       "selected_polygons": [
+        1
+       ]
+      }
+     },
+     "selection_mode": "polygon",
+     "tool_on": [
+      "Poly Haul"
+     ],
+     "action_center": [],
+     "tool_settings": {
+      "Poly Haul": {
+       "mode": "loopSlice",
+       "vert0": "",
+       "vert1": "",
+       "poly": "0,1",
+       "item": null,
+       "offset": 0.0,
+       "position": 0.795,
+       "distance1": 0.795,
+       "distance2": 0.20499999999999996,
+       "snap2end": 1,
+       "scaleX": 1.0,
+       "scaleY": 1.0,
+       "scaleZ": 1.0,
+       "inset": 0.0,
+       "shift": 0.0,
+       "segments": "1",
+       "group": 1,
+       "spin": 0,
+       "keepVertex": 0,
+       "vectorX": 0.0,
+       "vectorY": 0.0,
+       "vectorZ": 0.0,
+       "duplicate": 0,
+       "pushAngle": 0.017453292519943295,
+       "bothSides": 0,
+       "boolMode": 1,
+       "curvature": 0,
+       "middle": 0,
+       "quad": 0,
+       "absDistance": 0,
+       "absFromEnd": 0,
+       "tension": 1.0,
+       "split": 0,
+       "caps": 0,
+       "gap": 0.0,
+       "useMat": 0,
+       "matName": "Default",
+       "thicken": 0,
+       "square": 0,
+       "edgeRail": 0,
+       "offsetEven": 1,
+       "maxAngle": 1.5690509975429023,
+       "roundLevel": 0,
+       "shape": "round",
+       "stopAtEdge": 1,
+       "autoWeld": 0,
+       "depth": 1.0,
+       "parallel": 1,
+       "coplanar": 0,
+       "edgeEnd": "profile",
+       "flatness": 1e-05,
+       "boundExtend": 1,
+       "mitering": 0.0,
+       "sharpCorner": 0,
+       "fallMode": "vertex"
+      }
+     }
+    },
+    "after_drop": {
+     "meshes": {
+      "Strip": {
+       "points": [
+        [
+         0.0,
+         0.0,
+         0.0
+        ],
+        [
+         1.0,
+         0.0,
+         0.0
+        ],
+        [
+         2.0,
+         0.0,
+         0.0
+        ],
+        [
+         3.0,
+         0.0,
+         0.0
+        ],
+        [
+         0.0,
+         1.0,
+         0.0
+        ],
+        [
+         1.0,
+         1.0,
+         0.0
+        ],
+        [
+         2.0,
+         1.0,
+         0.0
+        ],
+        [
+         3.0,
+         1.0,
+         0.0
+        ]
+       ],
+       "polygons": [
+        [
+         0,
+         1,
+         5,
+         4
+        ],
+        [
+         1,
+         2,
+         6,
+         5
+        ],
+        [
+         2,
+         3,
+         7,
+         6
+        ]
+       ],
+       "polygon_types": [
+        "face",
+        "face",
+        "face"
+       ],
+       "selected_points": [],
+       "selected_edges": [],
+       "selected_polygons": [
+        1
+       ]
+      }
+     },
+     "selection_mode": "polygon",
+     "tool_on": [],
+     "action_center": [],
+     "tool_settings": {}
+    }
+   }
+  },
+  {
+   "id": "C7",
+   "description": "Mode Remove, click the top face",
+   "input": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      7,
+      6,
+      5,
+      4
+     ],
+     [
+      0,
+      4,
+      5,
+      1
+     ],
+     [
+      1,
+      5,
+      6,
+      2
+     ],
+     [
+      2,
+      6,
+      7,
+      3
+     ],
+     [
+      3,
+      7,
+      4,
+      0
+     ]
+    ],
+    "selection_mode": "polygon",
+    "selected_polygons": [
+     1
+    ]
+   },
+   "action": "single click on top face",
+   "observed_summary": "8/5: top polygon removed, its points kept (shared with sides). Selection cleared.",
+   "expected": {
+    "after": {
+     "meshes": {
+      "Cube": {
+       "points": [
+        [
+         -0.5,
+         -0.5,
+         -0.5
+        ],
+        [
+         0.5,
+         -0.5,
+         -0.5
+        ],
+        [
+         0.5,
+         -0.5,
+         0.5
+        ],
+        [
+         -0.5,
+         -0.5,
+         0.5
+        ],
+        [
+         -0.5,
+         0.5,
+         -0.5
+        ],
+        [
+         0.5,
+         0.5,
+         -0.5
+        ],
+        [
+         0.5,
+         0.5,
+         0.5
+        ],
+        [
+         -0.5,
+         0.5,
+         0.5
+        ]
+       ],
+       "polygons": [
+        [
+         0,
+         1,
+         2,
+         3
+        ],
+        [
+         0,
+         4,
+         5,
+         1
+        ],
+        [
+         1,
+         5,
+         6,
+         2
+        ],
+        [
+         2,
+         6,
+         7,
+         3
+        ],
+        [
+         3,
+         7,
+         4,
+         0
+        ]
+       ],
+       "polygon_types": [
+        "face",
+        "face",
+        "face",
+        "face",
+        "face"
+       ],
+       "selected_points": [],
+       "selected_edges": [],
+       "selected_polygons": []
+      }
+     },
+     "selection_mode": "polygon",
+     "tool_on": [
+      "Poly Haul"
+     ],
+     "action_center": [],
+     "tool_settings": {
+      "Poly Haul": {
+       "mode": "remove",
+       "vert0": "",
+       "vert1": "",
+       "poly": "",
+       "item": null,
+       "offset": 0.0,
+       "position": 0.5,
+       "distance1": 0.5,
+       "distance2": 0.5,
+       "snap2end": 1,
+       "scaleX": 1.0,
+       "scaleY": 1.0,
+       "scaleZ": 1.0,
+       "inset": 0.0,
+       "shift": 0.0,
+       "segments": "1",
+       "group": 1,
+       "spin": 0,
+       "keepVertex": 0,
+       "vectorX": 0.0,
+       "vectorY": 0.0,
+       "vectorZ": 0.0,
+       "duplicate": 0,
+       "pushAngle": 0.017453292519943295,
+       "bothSides": 0,
+       "boolMode": 1,
+       "curvature": 0,
+       "middle": 0,
+       "quad": 0,
+       "absDistance": 0,
+       "absFromEnd": 0,
+       "tension": 1.0,
+       "split": 0,
+       "caps": 0,
+       "gap": 0.0,
+       "useMat": 0,
+       "matName": "Default",
+       "thicken": 0,
+       "square": 0,
+       "edgeRail": 0,
+       "offsetEven": 1,
+       "maxAngle": 1.5690509975429023,
+       "roundLevel": 0,
+       "shape": "round",
+       "stopAtEdge": 1,
+       "autoWeld": 0,
+       "depth": 1.0,
+       "parallel": 1,
+       "coplanar": 0,
+       "edgeEnd": "profile",
+       "flatness": 1e-05,
+       "boundExtend": 1,
+       "mitering": 0.0,
+       "sharpCorner": 0,
+       "fallMode": "vertex"
+      }
+     }
+    },
+    "after_drop": {
+     "meshes": {
+      "Cube": {
+       "points": [
+        [
+         -0.5,
+         -0.5,
+         -0.5
+        ],
+        [
+         0.5,
+         -0.5,
+         -0.5
+        ],
+        [
+         0.5,
+         -0.5,
+         0.5
+        ],
+        [
+         -0.5,
+         -0.5,
+         0.5
+        ],
+        [
+         -0.5,
+         0.5,
+         -0.5
+        ],
+        [
+         0.5,
+         0.5,
+         -0.5
+        ],
+        [
+         0.5,
+         0.5,
+         0.5
+        ],
+        [
+         -0.5,
+         0.5,
+         0.5
+        ]
+       ],
+       "polygons": [
+        [
+         0,
+         1,
+         2,
+         3
+        ],
+        [
+         0,
+         4,
+         5,
+         1
+        ],
+        [
+         1,
+         5,
+         6,
+         2
+        ],
+        [
+         2,
+         6,
+         7,
+         3
+        ],
+        [
+         3,
+         7,
+         4,
+         0
+        ]
+       ],
+       "polygon_types": [
+        "face",
+        "face",
+        "face",
+        "face",
+        "face"
+       ],
+       "selected_points": [],
+       "selected_edges": [],
+       "selected_polygons": []
+      }
+     },
+     "selection_mode": "polygon",
+     "tool_on": [],
+     "action_center": [],
+     "tool_settings": {}
+    }
+   }
+  },
+  {
+   "id": "C8",
+   "description": "Mode Tear, drag a top corner outward (Select Through off)",
+   "input": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      7,
+      6,
+      5,
+      4
+     ],
+     [
+      0,
+      4,
+      5,
+      1
+     ],
+     [
+      1,
+      5,
+      6,
+      2
+     ],
+     [
+      2,
+      6,
+      7,
+      3
+     ],
+     [
+      3,
+      7,
+      4,
+      0
+     ]
+    ],
+    "selection_mode": "vertex",
+    "selected_points": []
+   },
+   "action": "drag from the near top corner outward (screen up-right)",
+   "observed_summary": "9/6: the corner was torn off ONE polygon only (+X side face now uses a new point moved by vector (0.178, 0.074, 0)); top and other faces keep the original corner.",
+   "expected": {
+    "after": {
+     "meshes": {
+      "Cube": {
+       "points": [
+        [
+         -0.5,
+         -0.5,
+         -0.5
+        ],
+        [
+         0.5,
+         -0.5,
+         -0.5
+        ],
+        [
+         0.5,
+         -0.5,
+         0.5
+        ],
+        [
+         -0.5,
+         -0.5,
+         0.5
+        ],
+        [
+         -0.5,
+         0.5,
+         -0.5
+        ],
+        [
+         0.5,
+         0.5,
+         -0.5
+        ],
+        [
+         0.5,
+         0.5,
+         0.5
+        ],
+        [
+         -0.5,
+         0.5,
+         0.5
+        ],
+        [
+         0.678,
+         0.574,
+         0.5
+        ]
+       ],
+       "polygons": [
+        [
+         0,
+         1,
+         2,
+         3
+        ],
+        [
+         7,
+         6,
+         5,
+         4
+        ],
+        [
+         0,
+         4,
+         5,
+         1
+        ],
+        [
+         1,
+         5,
+         8,
+         2
+        ],
+        [
+         2,
+         6,
+         7,
+         3
+        ],
+        [
+         3,
+         7,
+         4,
+         0
+        ]
+       ],
+       "polygon_types": [
+        "face",
+        "face",
+        "face",
+        "face",
+        "face",
+        "face"
+       ],
+       "selected_points": [],
+       "selected_edges": [],
+       "selected_polygons": []
+      }
+     },
+     "selection_mode": "vertex",
+     "tool_on": [
+      "Poly Haul"
+     ],
+     "action_center": [],
+     "tool_settings": {
+      "Poly Haul": {
+       "mode": "tear",
+       "vert0": "0,6",
+       "vert1": "",
+       "poly": "0,3",
+       "item": null,
+       "offset": 0.0,
+       "position": 0.5,
+       "distance1": 0.5,
+       "distance2": 0.5,
+       "snap2end": 1,
+       "scaleX": 1.0,
+       "scaleY": 1.0,
+       "scaleZ": 1.0,
+       "inset": 0.0,
+       "shift": 0.0,
+       "segments": "1",
+       "group": 1,
+       "spin": 0,
+       "keepVertex": 0,
+       "vectorX": 0.17800000000000005,
+       "vectorY": 0.07400000000000007,
+       "vectorZ": 0.0,
+       "duplicate": 0,
+       "pushAngle": 0.017453292519943295,
+       "bothSides": 0,
+       "boolMode": 1,
+       "curvature": 0,
+       "middle": 0,
+       "quad": 0,
+       "absDistance": 0,
+       "absFromEnd": 0,
+       "tension": 1.0,
+       "split": 0,
+       "caps": 0,
+       "gap": 0.0,
+       "useMat": 0,
+       "matName": "Default",
+       "thicken": 0,
+       "square": 0,
+       "edgeRail": 0,
+       "offsetEven": 1,
+       "maxAngle": 1.5690509975429023,
+       "roundLevel": 0,
+       "shape": "round",
+       "stopAtEdge": 1,
+       "autoWeld": 0,
+       "depth": 1.0,
+       "parallel": 1,
+       "coplanar": 0,
+       "edgeEnd": "profile",
+       "flatness": 1e-05,
+       "boundExtend": 1,
+       "mitering": 0.0,
+       "sharpCorner": 0,
+       "fallMode": "vertex"
+      }
+     }
+    },
+    "after_drop": {
+     "meshes": {
+      "Cube": {
+       "points": [
+        [
+         -0.5,
+         -0.5,
+         -0.5
+        ],
+        [
+         0.5,
+         -0.5,
+         -0.5
+        ],
+        [
+         0.5,
+         -0.5,
+         0.5
+        ],
+        [
+         -0.5,
+         -0.5,
+         0.5
+        ],
+        [
+         -0.5,
+         0.5,
+         -0.5
+        ],
+        [
+         0.5,
+         0.5,
+         -0.5
+        ],
+        [
+         0.5,
+         0.5,
+         0.5
+        ],
+        [
+         -0.5,
+         0.5,
+         0.5
+        ],
+        [
+         0.678,
+         0.574,
+         0.5
+        ]
+       ],
+       "polygons": [
+        [
+         0,
+         1,
+         2,
+         3
+        ],
+        [
+         7,
+         6,
+         5,
+         4
+        ],
+        [
+         0,
+         4,
+         5,
+         1
+        ],
+        [
+         1,
+         5,
+         8,
+         2
+        ],
+        [
+         2,
+         6,
+         7,
+         3
+        ],
+        [
+         3,
+         7,
+         4,
+         0
+        ]
+       ],
+       "polygon_types": [
+        "face",
+        "face",
+        "face",
+        "face",
+        "face",
+        "face"
+       ],
+       "selected_points": [],
+       "selected_edges": [],
+       "selected_polygons": []
+      }
+     },
+     "selection_mode": "vertex",
+     "tool_on": [],
+     "action_center": [],
+     "tool_settings": {}
+    }
+   }
+  },
+  {
+   "id": "C9",
+   "description": "Mode Slide, drag the centre point toward +X",
+   "input": {
+    "points": [
+     [
+      -1.0,
+      -1.0,
+      0.0
+     ],
+     [
+      0.0,
+      -1.0,
+      0.0
+     ],
+     [
+      1.0,
+      -1.0,
+      0.0
+     ],
+     [
+      -1.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      -1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      4,
+      3
+     ],
+     [
+      1,
+      2,
+      5,
+      4
+     ],
+     [
+      3,
+      4,
+      7,
+      6
+     ],
+     [
+      4,
+      5,
+      8,
+      7
+     ]
+    ],
+    "selection_mode": "vertex",
+    "selected_points": [
+     4
+    ]
+   },
+   "action": "drag centre point toward +X edge",
+   "observed_summary": "centre point moved by (0.362, 0.06, 0): mostly along the +X edge direction, not perfectly constrained. 9/4.",
+   "expected": {
+    "after": {
+     "meshes": {
+      "Grid": {
+       "points": [
+        [
+         -1.0,
+         -1.0,
+         0.0
+        ],
+        [
+         0.0,
+         -1.0,
+         0.0
+        ],
+        [
+         1.0,
+         -1.0,
+         0.0
+        ],
+        [
+         -1.0,
+         0.0,
+         0.0
+        ],
+        [
+         0.362,
+         0.06,
+         0.0
+        ],
+        [
+         1.0,
+         0.0,
+         0.0
+        ],
+        [
+         -1.0,
+         1.0,
+         0.0
+        ],
+        [
+         0.0,
+         1.0,
+         0.0
+        ],
+        [
+         1.0,
+         1.0,
+         0.0
+        ]
+       ],
+       "polygons": [
+        [
+         0,
+         1,
+         4,
+         3
+        ],
+        [
+         1,
+         2,
+         5,
+         4
+        ],
+        [
+         3,
+         4,
+         7,
+         6
+        ],
+        [
+         4,
+         5,
+         8,
+         7
+        ]
+       ],
+       "polygon_types": [
+        "face",
+        "face",
+        "face",
+        "face"
+       ],
+       "selected_points": [
+        4
+       ],
+       "selected_edges": [],
+       "selected_polygons": []
+      }
+     },
+     "selection_mode": "vertex",
+     "tool_on": [
+      "Poly Haul"
+     ],
+     "action_center": [],
+     "tool_settings": {
+      "Poly Haul": {
+       "mode": "slide",
+       "vert0": "0,4",
+       "vert1": "",
+       "poly": "0,3",
+       "item": null,
+       "offset": 0.0,
+       "position": 0.5,
+       "distance1": 0.5,
+       "distance2": 0.5,
+       "snap2end": 1,
+       "scaleX": 1.0,
+       "scaleY": 1.0,
+       "scaleZ": 1.0,
+       "inset": 0.0,
+       "shift": 0.0,
+       "segments": "1",
+       "group": 1,
+       "spin": 0,
+       "keepVertex": 0,
+       "vectorX": 0.362,
+       "vectorY": 0.06,
+       "vectorZ": 0.0,
+       "duplicate": 0,
+       "pushAngle": 0.017453292519943295,
+       "bothSides": 0,
+       "boolMode": 1,
+       "curvature": 0,
+       "middle": 0,
+       "quad": 0,
+       "absDistance": 0,
+       "absFromEnd": 0,
+       "tension": 1.0,
+       "split": 0,
+       "caps": 0,
+       "gap": 0.0,
+       "useMat": 0,
+       "matName": "Default",
+       "thicken": 0,
+       "square": 0,
+       "edgeRail": 0,
+       "offsetEven": 1,
+       "maxAngle": 1.5690509975429023,
+       "roundLevel": 0,
+       "shape": "round",
+       "stopAtEdge": 1,
+       "autoWeld": 0,
+       "depth": 1.0,
+       "parallel": 1,
+       "coplanar": 0,
+       "edgeEnd": "profile",
+       "flatness": 1e-05,
+       "boundExtend": 1,
+       "mitering": 0.0,
+       "sharpCorner": 0,
+       "fallMode": "vertex"
+      }
+     }
+    },
+    "after_drop": {
+     "meshes": {
+      "Grid": {
+       "points": [
+        [
+         -1.0,
+         -1.0,
+         0.0
+        ],
+        [
+         0.0,
+         -1.0,
+         0.0
+        ],
+        [
+         1.0,
+         -1.0,
+         0.0
+        ],
+        [
+         -1.0,
+         0.0,
+         0.0
+        ],
+        [
+         0.362,
+         0.06,
+         0.0
+        ],
+        [
+         1.0,
+         0.0,
+         0.0
+        ],
+        [
+         -1.0,
+         1.0,
+         0.0
+        ],
+        [
+         0.0,
+         1.0,
+         0.0
+        ],
+        [
+         1.0,
+         1.0,
+         0.0
+        ]
+       ],
+       "polygons": [
+        [
+         0,
+         1,
+         4,
+         3
+        ],
+        [
+         1,
+         2,
+         5,
+         4
+        ],
+        [
+         3,
+         4,
+         7,
+         6
+        ],
+        [
+         4,
+         5,
+         8,
+         7
+        ]
+       ],
+       "polygon_types": [
+        "face",
+        "face",
+        "face",
+        "face"
+       ],
+       "selected_points": [
+        4
+       ],
+       "selected_edges": [],
+       "selected_polygons": []
+      }
+     },
+     "selection_mode": "vertex",
+     "tool_on": [],
+     "action_center": [],
+     "tool_settings": {}
+    }
+   }
+  }
+ ]
+}

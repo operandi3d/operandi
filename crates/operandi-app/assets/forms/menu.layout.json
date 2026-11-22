@@ -1,0 +1,76 @@
+{
+  "version": 1,
+  "id": "menu.layout",
+  "label": "Layout",
+  "style": "menu",
+  "controls": [
+    {
+      "command": "operandi.layout.create",
+      "label": "New Layout…"
+    },
+    {
+      "command": "operandi.layout.save",
+      "label": "Save Layout"
+    },
+    {
+      "command": "operandi.layout.saveAs",
+      "label": "Save Layout As…"
+    },
+    {
+      "command": "operandi.layout.rename",
+      "label": "Rename Layout…"
+    },
+    {
+      "command": "operandi.layout.delete ask:true",
+      "label": "Delete Layout…"
+    },
+    {
+      "command": "operandi.layout.revert ask:true",
+      "label": "Reset Layout…"
+    },
+    {
+      "command": "operandi.layout.clear",
+      "label": "Clear Layout"
+    },
+    {
+      "divider": ""
+    },
+    {
+      "form": "menu.layout.layouts"
+    },
+    {
+      "command": "operandi.layout.switcher",
+      "label": "Recent Layouts…",
+      "shortcut": "Layout Switcher"
+    },
+    {
+      "divider": ""
+    },
+    {
+      "command": "layout.lockDividers",
+      "label": "Lock Divider Dragging"
+    },
+    {
+      "command": "operandi.layout.buildMode",
+      "label": "UI Build Mode",
+      "shortcut": "UI Build Mode"
+    },
+    {
+      "divider": ""
+    },
+    {
+      "form": "menu.layout.palettes"
+    },
+    {
+      "divider": ""
+    },
+    {
+      "command": "operandi.toolbox.tab workbench",
+      "label": "Workbench"
+    },
+    {
+      "command": "operandi.workbench.topBar",
+      "label": "Top Workbench"
+    }
+  ]
+}

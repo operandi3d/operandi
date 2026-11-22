@@ -1,0 +1,192 @@
+{
+  "version": 1,
+  "id": "toolbox.sculpt.painting",
+  "label": "Sculpt (painting tips)",
+  "exported": true,
+  "slot": {
+    "form": "toolbox.sculpt",
+    "at": "tail",
+    "sort": 50
+  },
+  "controls": [
+    {
+      "divider": "Brushes and Nozzle",
+      "id": "sculpt-painting-tips"
+    },
+    {
+      "form": {
+        "style": "flyout",
+        "controls": [
+          {
+            "command": "operandi.paint.sculptTip kind:procedural",
+            "label": "Procedural",
+            "icon": "tip-procedural",
+            "tooltip": "Procedural tip \u00b7 operandi.paint.sculptTip kind:procedural\nBreaks strokes up with a noise pattern."
+          },
+          {
+            "command": "operandi.paint.sculptTip kind:sphere",
+            "label": "Sphere",
+            "icon": "tip-sphere",
+            "tooltip": "Sphere tip \u00b7 operandi.paint.sculptTip kind:sphere\nA rounded profile: rounded ridges."
+          }
+        ]
+      },
+      "id": "Sculpt Procedural"
+    },
+    {
+      "form": {
+        "style": "horizontal",
+        "controls": [
+          {
+            "command": "operandi.paint.sculptTip kind:image",
+            "label": "Texture",
+            "icon": "tip-texture",
+            "tooltip": "Texture tip \u00b7 operandi.paint.sculptTip kind:image\nPushes a picture into the surface; Offset is its zero point."
+          },
+          {
+            "command": "operandi.paint.sculptTip kind:stamp",
+            "label": "Stamp",
+            "icon": "tip-stamp",
+            "tooltip": "Stamp tip \u00b7 operandi.paint.sculptTip kind:stamp"
+          }
+        ]
+      }
+    },
+    {
+      "form": {
+        "style": "horizontal",
+        "controls": [
+          {
+            "command": "operandi.paint.sculptTip kind:text",
+            "label": "Text",
+            "icon": "tip-text",
+            "tooltip": "Text tip \u00b7 operandi.paint.sculptTip kind:text"
+          },
+          {
+            "command": "operandi.paint.savePreset",
+            "label": "Save Brush Preset",
+            "icon": "paint-save-preset",
+            "tooltip": "Save Brush Preset \u00b7 operandi.paint.savePreset\nThe sculpt tip, its values and the nozzle."
+          }
+        ]
+      }
+    },
+    {
+      "form": {
+        "style": "horizontal",
+        "controls": [
+          {
+            "command": "operandi.paint.nozzle",
+            "label": "Nozzle",
+            "icon": "paint-nozzle",
+            "tooltip": "Tablet Nozzle \u00b7 operandi.paint.nozzle\nPressure, speed and jitter for every brush."
+          }
+        ]
+      }
+    },
+    {
+      "form": {
+        "style": "flyout",
+        "controls": [
+          {
+            "command": "operandi.paint.ink kind:image",
+            "label": "Image Ink",
+            "icon": "ink-image",
+            "tooltip": "Image Ink \u00b7 operandi.paint.ink kind:image\nThe picture's brightness scales the brush."
+          },
+          {
+            "command": "operandi.paint.ink kind:parametric",
+            "label": "Parametric Ink",
+            "icon": "ink-parametric",
+            "tooltip": "Parametric Ink \u00b7 operandi.paint.ink kind:parametric\nSlope, altitude, angle or pressure scale the brush."
+          },
+          {
+            "command": "operandi.paint.ink kind:random",
+            "label": "Random Ink",
+            "icon": "ink-random",
+            "tooltip": "Random Ink \u00b7 operandi.paint.ink kind:random\nBrightness varies each dab's strength."
+          },
+          {
+            "command": "operandi.paint.ink kind:projection",
+            "label": "Projection Ink",
+            "icon": "ink-projection",
+            "tooltip": "Projection Ink \u00b7 paint tools only"
+          }
+        ]
+      },
+      "id": "Sculpt Inks"
+    },
+    {
+      "divider": "Mask",
+      "id": "sculpt-painting-mask"
+    },
+    {
+      "form": {
+        "style": "horizontal",
+        "controls": [
+          {
+            "command": "operandi.paint.maskBrush kind:paint",
+            "label": "Mask Paint",
+            "icon": "vmap-paint",
+            "tooltip": "Mask Paint \u00b7 operandi.paint.maskBrush kind:paint\nAdds mask; Ctrl erases."
+          },
+          {
+            "command": "operandi.paint.maskBrush kind:smooth",
+            "label": "Mask Smooth",
+            "icon": "vmap-smooth",
+            "tooltip": "Mask Smooth \u00b7 operandi.paint.maskBrush kind:smooth\nBlurs the mask's edge."
+          }
+        ]
+      }
+    },
+    {
+      "form": {
+        "style": "horizontal",
+        "controls": [
+          {
+            "command": "operandi.paint.maskBrush kind:scaleDown",
+            "label": "Mask Scale Down",
+            "icon": "vmap-scale-down",
+            "tooltip": "Mask Scale Down \u00b7 operandi.paint.maskBrush kind:scaleDown\nWeakens the mask; Ctrl strengthens."
+          },
+          {
+            "command": "operandi.paint.maskBrush kind:erase",
+            "label": "Mask Erase",
+            "icon": "vmap-erase",
+            "tooltip": "Mask Erase \u00b7 operandi.paint.maskBrush kind:erase\nRemoves mask."
+          }
+        ]
+      }
+    },
+    {
+      "form": {
+        "style": "horizontal",
+        "controls": [
+          {
+            "command": "operandi.paint.maskBrush kind:setValue",
+            "label": "Mask Set Value",
+            "icon": "vmap-set-value",
+            "tooltip": "Mask Set Value \u00b7 operandi.paint.maskBrush kind:setValue\nWrites Value exactly, hard-edged."
+          },
+          {
+            "command": "operandi.paint.maskClear",
+            "label": "Clear Mask",
+            "tooltip": "Clear Mask \u00b7 operandi.paint.maskClear"
+          }
+        ]
+      }
+    },
+    {
+      "form": {
+        "style": "horizontal",
+        "controls": [
+          {
+            "command": "operandi.paint.maskBakeFalloff",
+            "label": "Bake Falloff",
+            "tooltip": "Bake Falloff \u00b7 operandi.paint.maskBakeFalloff\nThe active falloff becomes the mask."
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+# Rust build output
+/target/
+
+# Local development builds, logs, and temporary QA files
+/development/
+
+# macOS metadata
+.DS_Store
+
+# Editor temporary files
+*.swp
+*.swo
+*~
+
+# Local environment files that may contain credentials
+.env
+.env.*
+!.env.example
+!.env.*.example
+
+# Local LXO samples for importer checks; never committed (clean room).
+local-samples/
+
+# Video subtitles and transcripts (Modo tutorials among them); never committed (clean room).
+*.vtt
+*.srt
+*transcript*

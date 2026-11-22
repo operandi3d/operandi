@@ -1,0 +1,349 @@
+{
+  "format": "Operandi",
+  "version": 4,
+  "scene": {
+    "items": [
+      {
+        "id": 1,
+        "name": "Mesh 1",
+        "visible": true,
+        "transform": {
+          "translation": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "zxy": false
+        },
+        "mesh": {
+          "attributes": {
+            "representations": [],
+            "creases": [],
+            "uv_records": {},
+            "corner_normals": {},
+            "point_weights": {},
+            "point_colors": {},
+            "degenerate_faces": []
+          },
+          "vertices": [
+            [
+              -0.5,
+              -0.5,
+              -0.5
+            ],
+            [
+              0.5,
+              -0.5,
+              -0.5
+            ],
+            [
+              0.5,
+              0.5,
+              -0.5
+            ],
+            [
+              -0.5,
+              0.5,
+              -0.5
+            ],
+            [
+              -0.5,
+              -0.5,
+              0.5
+            ],
+            [
+              0.5,
+              -0.5,
+              0.5
+            ],
+            [
+              0.5,
+              0.5,
+              0.5
+            ],
+            [
+              -0.5,
+              0.5,
+              0.5
+            ]
+          ],
+          "faces": [
+            {
+              "vertices": [
+                0,
+                3,
+                2,
+                1
+              ],
+              "uv": null,
+              "material": "",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                4,
+                5,
+                6,
+                7
+              ],
+              "uv": null,
+              "material": "",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                0,
+                4,
+                7,
+                3
+              ],
+              "uv": null,
+              "material": "",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                1,
+                2,
+                6,
+                5
+              ],
+              "uv": null,
+              "material": "",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                0,
+                1,
+                5,
+                4
+              ],
+              "uv": null,
+              "material": "",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                3,
+                7,
+                6,
+                2
+              ],
+              "uv": null,
+              "material": "",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            }
+          ],
+          "uv_maps": {}
+        },
+        "parent": null,
+        "source_id": null,
+        "source_display_name": null
+      },
+      {
+        "id": 2,
+        "name": "Mesh 2",
+        "visible": true,
+        "transform": {
+          "translation": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "zxy": false
+        },
+        "mesh": {
+          "attributes": {
+            "representations": [],
+            "creases": [],
+            "uv_records": {},
+            "corner_normals": {},
+            "point_weights": {},
+            "point_colors": {},
+            "degenerate_faces": []
+          },
+          "vertices": [
+            [
+              0.5,
+              0.5,
+              0.5
+            ],
+            [
+              0.5,
+              0.5,
+              -0.5
+            ],
+            [
+              -0.5,
+              -0.5,
+              0.5
+            ],
+            [
+              -0.5,
+              0.5,
+              0.5
+            ],
+            [
+              -0.5,
+              -0.5,
+              -0.5
+            ],
+            [
+              0.5,
+              -0.5,
+              -0.5
+            ],
+            [
+              -0.5,
+              0.5,
+              -0.5
+            ],
+            [
+              0.5,
+              -0.5,
+              0.5
+            ]
+          ],
+          "faces": [
+            {
+              "vertices": [
+                4,
+                6,
+                1,
+                5
+              ],
+              "uv": null,
+              "material": "",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                2,
+                7,
+                0,
+                3
+              ],
+              "uv": null,
+              "material": "",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                4,
+                2,
+                3,
+                6
+              ],
+              "uv": null,
+              "material": "",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                5,
+                1,
+                0,
+                7
+              ],
+              "uv": null,
+              "material": "",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                4,
+                5,
+                7,
+                2
+              ],
+              "uv": null,
+              "material": "",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                6,
+                3,
+                0,
+                1
+              ],
+              "uv": null,
+              "material": "",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            }
+          ],
+          "uv_maps": {}
+        },
+        "parent": null,
+        "source_id": null,
+        "source_display_name": null
+      }
+    ],
+    "next_id": 3,
+    "selection": {
+      "item": 2,
+      "mode": "Polygon",
+      "vertices": [],
+      "edges": [],
+      "faces": [
+        0,
+        1
+      ]
+    },
+    "workplane": {
+      "fixed": false,
+      "plane": 0,
+      "center": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "import_source": null
+  }
+}

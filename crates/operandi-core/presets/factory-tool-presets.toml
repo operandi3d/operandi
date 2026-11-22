@@ -1,0 +1,841 @@
+# Factory tool presets: the recipe table (specifications/tool-presets-2026-11-15).
+#
+# Each [[preset]] is one button: which pipe layers it puts in place, then
+# which tool (the actor) it starts and with which values. Operandi reads this
+# file at start; user presets (stage 2) will use the same format.
+#
+#   id       the script name, `tool.set <id> on` (TP-01)
+#   label    the button and history name
+#   names    extra command-line phrases that start it (old Operandi names)
+#   tooltip, icon (a generator slug), group (where the button sits)
+#   layers   slot + kind + values, in pipe order (TP-03). Slots this preset
+#            doesn't name keep whatever the user had (TP-10), and every slot
+#            it names goes back to the user's layer when the tool drops
+#            (TP-12).
+#   actor    tool = an Operandi tool, or operation = a one-shot command,
+#            plus the values that differ from the tool's own (TP-04)
+#
+# Layer kinds:
+#   slot = "action_center", center = automatic | selection | selection_border | origin
+#   slot = "action_axis",   axis = world | selection | selection_all | auto (Selection needs selected
+#                           polygons; otherwise the user's axis stays, SF-Q6;
+#                           auto = the tool's own X/Y/Z row on World axes)
+#   slot = "falloff",       kind = linear | radial | cylinder | selection |
+#                           soft_selection | element | screen, shape =
+#                           linear | ease_in | ease_out | smooth. Linear and
+#                           Radial are fitted to the selection (FO-04, TP-17).
+#                           at_tool = true (TP-19): a Radial or Cylinder
+#                           falloff keeps its fitted size but starts centred
+#                           where the tool is placed (its first click).
+#   slot = "snapping",      target = points, radius_px: the tool's own snap
+#                           (separate from the user's Snapping settings)
+#
+#   auto_activate  (CS-01/05) false: picking the row only arms the tool;
+#            the first left click in a 3D view makes it live, and Apply
+#            runs it once with the panel's values. Unset: the tool's own
+#            [[tool]] row at the end of this file, else true (live at once).
+#
+# Actors: tool = an editor tool by its enum name; operation = flip_it; or
+# app = the command-line phrase of a mode the app runs itself (Weld, the
+# Align tools).
+
+# Deform tab, Move Tools ---------------------------------------------------
+
+[[preset]]
+id = "ElementMove"
+label = "Element Move"
+group = "deform.move"
+actor = { tool = "Tweak" }
+auto_activate = false  # CS-01: waits for a click
+
+[[preset]]
+id = "xfrm.magnet"
+label = "Soft Move"
+names = ["soft move"]
+tooltip = "Move with its own Radial falloff: click to place both, then size the falloff with its boxes"
+icon = "soft-move"
+group = "deform.move"
+layers = [{ slot = "falloff", kind = "radial", shape = "linear", at_tool = true }]
+actor = { tool = "Move" }
+auto_activate = false  # CS-01: Magnet (provisional: its id; the button says Soft Move)
+
+[[preset]]
+id = "xfrm.shear"
+label = "Shear"
+names = ["shear"]
+tooltip = "Move with a Linear falloff: one end moves, the other stays"
+icon = "shear"
+group = "deform.move"
+layers = [{ slot = "falloff", kind = "linear", shape = "linear" }]
+actor = { tool = "Move" }
+auto_activate = false  # CS-01: waits for a click
+
+[[preset]]
+id = "Flex"
+label = "Flex"
+names = ["flex"]
+tooltip = "Transform with a Selection falloff about the selection's border: bends a limb at the joint"
+icon = "flex"
+group = "deform.move"
+layers = [
+    { slot = "action_center", center = "selection_border" },
+    { slot = "action_axis", axis = "selection" },
+    { slot = "falloff", kind = "selection" },
+]
+actor = { tool = "Transform" }
+
+# Deform finish (modelling parity batch 1; DEFORM-PROBES presets): Element
+# falloff + Push, Screen falloff + Move, and the Soft Selection family.
+[[preset]]
+id = "ElementPush"
+label = "Element Push"
+names = ["element push"]
+tooltip = "Push the element under the pointer along its normal; Range spreads it to its neighbours"
+icon = "element-push"
+group = "deform.move"
+layers = [{ slot = "falloff", kind = "element" }]
+actor = { tool = "Push" }
+auto_activate = false  # CS-01: waits for a click
+
+[[preset]]
+id = "xfrm.softDrag"
+label = "Soft Drag"
+names = ["soft drag"]
+tooltip = "Drag what's inside a screen circle around the pointer, fading to its edge; right-drag sizes the circle"
+icon = "soft-drag"
+group = "deform.move"
+layers = [{ slot = "falloff", kind = "screen" }]
+actor = { tool = "Move" }
+
+[[preset]]
+id = "SoftSelectionMove"
+label = "Soft Selection Move"
+names = ["soft selection move"]
+tooltip = "Move the selection, fading out over Radius beyond it"
+icon = "soft-selection-move"
+group = "deform.move"
+layers = [
+    { slot = "action_center", center = "selection" },
+    { slot = "action_axis", axis = "selection_all" },
+    { slot = "falloff", kind = "soft_selection" },
+]
+actor = { tool = "Move" }
+
+[[preset]]
+id = "SoftSelectionRotate"
+label = "Soft Selection Rotate"
+names = ["soft selection rotate"]
+tooltip = "Rotate the selection, fading out over Radius beyond it"
+icon = "soft-selection-rotate"
+group = "deform.move"
+layers = [
+    { slot = "action_center", center = "selection" },
+    { slot = "action_axis", axis = "selection_all" },
+    { slot = "falloff", kind = "soft_selection" },
+]
+actor = { tool = "Rotate", angle_by_weight = true }
+
+[[preset]]
+id = "SoftSelectionScale"
+label = "Soft Selection Scale"
+names = ["soft selection scale"]
+tooltip = "Scale the selection, fading out over Radius beyond it"
+icon = "soft-selection-scale"
+group = "deform.move"
+layers = [
+    { slot = "action_center", center = "selection" },
+    { slot = "action_axis", axis = "selection_all" },
+    { slot = "falloff", kind = "soft_selection" },
+]
+actor = { tool = "Scale" }
+
+[[preset]]
+id = "SoftSelectionTransform"
+label = "Soft Selection Transform"
+names = ["soft selection transform"]
+tooltip = "Move, rotate and scale the selection, fading out over Radius beyond it"
+icon = "soft-selection-transform"
+group = "deform.move"
+layers = [
+    { slot = "action_center", center = "selection" },
+    { slot = "action_axis", axis = "selection_all" },
+    { slot = "falloff", kind = "soft_selection" },
+]
+actor = { tool = "Transform" }
+
+# Deform tab, Rotate Tools ---------------------------------------------------
+# Twist and Swirl turn each point by weight × Angle (TW-Q1). The spec's
+# table also gives them Auto action centre / axis layers; those would change
+# what they do today, so they wait for TP-Q5.
+
+[[preset]]
+id = "xfrm.twist"
+label = "Twist"
+names = ["twist"]
+tooltip = "Rotate with a Linear falloff: wrings the mesh along the line"
+icon = "twist"
+group = "deform.rotate"
+layers = [{ slot = "falloff", kind = "linear", shape = "linear" }]
+actor = { tool = "Rotate", angle_by_weight = true }
+
+# Bend (bend-handles-2026-11-15 BN-01): Action Center Auto, Action Axis
+# Auto, then Bend. No falloff layer. Ctrl+E and the tool's own names
+# ("bend") start the Bend tool, which the editor routes through this row.
+[[preset]]
+id = "xfrm.bend"
+label = "Bend"
+tooltip = "Curls the selection into an arc about the action centre. Drag the ring to bend; drag the spine's end to set the bent region; click elsewhere to move the centre"
+icon = "bend"
+group = "deform.rotate"
+layers = [
+    { slot = "action_center", center = "automatic" },
+    { slot = "action_axis", axis = "auto" },
+]
+actor = { tool = "Bend" }
+auto_activate = false  # CS-01: waits for a click
+
+# Vortex (DP-30..32): Rotate with a Cylinder falloff fitted to the
+# selection; the click sets the rotation centre (Automatic, CS-10). Each
+# point turns by weight x Angle.
+[[preset]]
+id = "xfrm.vortex"
+label = "Vortex"
+names = ["vortex"]
+tooltip = "Rotate with a Cylinder falloff: points on the axis turn by Angle, fading to none at its radius"
+icon = "vortex"
+group = "deform.rotate"
+layers = [
+    { slot = "action_center", center = "automatic" },
+    { slot = "falloff", kind = "cylinder", shape = "linear" },
+]
+actor = { tool = "Rotate", angle_by_weight = true }
+auto_activate = false  # CS-01: the click is the centre
+
+[[preset]]
+id = "Swirl"
+label = "Swirl"
+names = ["swirl"]
+tooltip = "Rotate with a Radial falloff: the middle turns most"
+icon = "swirl"
+group = "deform.rotate"
+layers = [{ slot = "falloff", kind = "radial", shape = "linear" }]
+actor = { tool = "Rotate", angle_by_weight = true }
+
+# Deform tab, Scale Tools ----------------------------------------------------
+
+[[preset]]
+id = "xfrm.taper"
+label = "Taper"
+names = ["taper"]
+tooltip = "Scale with a Linear falloff: one end scales, the other stays"
+icon = "taper"
+group = "deform.scale"
+layers = [{ slot = "falloff", kind = "linear", shape = "linear" }]
+actor = { tool = "Scale" }
+auto_activate = false  # CS-01: waits for a click
+
+[[preset]]
+id = "xfrm.pole"
+label = "Bulge"
+names = ["bulge"]
+tooltip = "Scale with a Radial falloff (Smooth shape): swells or pinches the middle"
+icon = "bulge"
+group = "deform.scale"
+layers = [{ slot = "falloff", kind = "radial", shape = "smooth" }]
+actor = { tool = "Scale" }
+auto_activate = false  # CS-01: Pole (Bulge)
+
+[[preset]]
+id = "Flare"
+label = "Flare"
+names = ["flare"]
+tooltip = "Push with a Linear falloff fitted to the selection: one end swells out, the other stays"
+icon = "flare"
+group = "deform.scale"
+layers = [
+    { slot = "action_center", center = "automatic" },
+    { slot = "falloff", kind = "linear", shape = "linear" },
+]
+actor = { tool = "Push" }
+auto_activate = false  # CS-01: waits for a click
+
+# Deform tab, other ----------------------------------------------------------
+
+[[preset]]
+id = "Push"
+label = "Push"
+group = "deform"
+actor = { tool = "Push" }
+auto_activate = false  # CS-01: waits for a click
+
+[[preset]]
+id = "QuickAlign"
+label = "Quick Align"
+group = "deform.align"
+actor = { app = "Quick Align" }
+
+[[preset]]
+id = "GroundAlign"
+label = "Ground Align"
+group = "deform.align"
+actor = { app = "Ground Align" }
+
+# Vertex tab -----------------------------------------------------------------
+
+[[preset]]
+id = "DragWeld"
+label = "Weld"
+group = "vertex"
+layers = [{ slot = "snapping", target = "points", radius_px = 15.0 }]
+actor = { app = "Weld" }
+
+# Polygon tab ----------------------------------------------------------------
+
+[[preset]]
+id = "Thicken"
+label = "Thicken"
+group = "polygon"
+actor = { tool = "Thicken", thicken = true, shift = 0.0, scale = 1.0, max_smoothing_angle = 90.1 }
+auto_activate = false  # CS-01: waits for a click
+
+[[preset]]
+id = "FlipIt"
+label = "Flip It"
+names = ["flip it"]
+tooltip = "Mirror the selected polygons across an axis through the selection's centre, facing out"
+group = "polygon.commands"
+layers = [{ slot = "action_center", center = "selection" }]
+actor = { operation = "flip_it" }
+
+[[preset]]
+id = "FlipItOrigin"
+label = "Flip It Origin"
+names = ["flip it origin"]
+tooltip = "Mirror the selected polygons across an axis through the world origin, facing out"
+group = "polygon.commands"
+layers = [{ slot = "action_center", center = "origin" }]
+actor = { operation = "flip_it" }
+
+# Axis Rotate (TC-30..32): Rotate with one ring, the work plane's normal,
+# chosen when the tool starts. Operandi's id (the name map gives none).
+[[preset]]
+id = "AxisRotate"
+label = "Axis Rotate"
+names = ["axis rotate"]
+tooltip = "Click to place the ring, then drag it: rotate about one world axis, the one the view looks along"
+icon = "rotate"
+group = "transform"
+# TC-33: no handle until a click; the click is the centre (Automatic).
+layers = [{ slot = "action_center", center = "automatic" }]
+actor = { tool = "Rotate", single_ring = true }
+auto_activate = false
+
+# Topology Pen (TC-40..45): Element Move with Topology Pen's Shift+drag,
+# which pulls a new strip from an edge onto the background (new points
+# always land on it; plain moves aren't snapped, TC-Q6). The other modes
+# wait for their own hands-on check (TC-Q1).
+[[preset]]
+id = "mesh.topology"
+label = "Topology Pen"
+names = ["topology pen"]
+tooltip = "Drag an element to move it; Shift+drag an edge to pull out a new strip onto the background mesh"
+icon = "topology-pen"
+group = "polygon"
+actor = { tool = "Tweak", topology_pen = true }
+
+# Transform tools: plain tools, no layers -----------------------------------
+
+[[preset]]
+id = "Transform"
+label = "Transform"
+group = "transform"
+actor = { tool = "Transform" }
+
+[[preset]]
+id = "TransformMove"
+label = "Move"
+group = "transform"
+actor = { tool = "Move" }
+
+[[preset]]
+id = "TransformRotate"
+label = "Rotate"
+group = "transform"
+actor = { tool = "Rotate" }
+
+[[preset]]
+id = "TransformScale"
+label = "Scale"
+group = "transform"
+actor = { tool = "Scale" }
+
+# UV tab: island affine buttons (E7, uv_edit.rs; uv-editing-2026-11-16) ----
+#
+# operation = "uv_island" runs one rule of the E7 table on the selected UV
+# map: uv = { rule = fit | flip | mirror | align, axis = u | v,
+# to = low | high }. Shift and Alt pick the rule table's other groupings
+# (UVT-50..53); Ctrl/Cmd+click opens the rule's dialog in the app (UVT-08).
+
+[[preset]]
+id = "uv.fitUVs"
+label = "Fit UVs"
+names = ["fit uvs"]
+tooltip = "Scale and move the selected UVs to fill the tile · Shift: each island · Alt: each polygon · Ctrl: options"
+group = "uv.fit"
+actor = { operation = "uv_island", uv = { rule = "fit" } }
+
+[[preset]]
+id = "uv.flipU"
+label = "Flip U"
+names = ["flip u"]
+tooltip = "Mirror the selected UVs left to right about their centre · Alt: each polygon · Ctrl: options"
+group = "uv.flip"
+actor = { operation = "uv_island", uv = { rule = "flip", axis = "u" } }
+
+[[preset]]
+id = "uv.flipV"
+label = "Flip V"
+names = ["flip v"]
+tooltip = "Mirror the selected UVs top to bottom about their centre · Alt: each polygon · Ctrl: options"
+group = "uv.flip"
+actor = { operation = "uv_island", uv = { rule = "flip", axis = "v" } }
+
+[[preset]]
+id = "uv.mirrorU"
+label = "Mirror U"
+names = ["mirror u"]
+tooltip = "Mirror the selected UVs across the line U = Center · Ctrl: options"
+group = "uv.mirror"
+actor = { operation = "uv_island", uv = { rule = "mirror", axis = "u" } }
+
+[[preset]]
+id = "uv.mirrorV"
+label = "Mirror V"
+names = ["mirror v"]
+tooltip = "Mirror the selected UVs across the line V = Center · Ctrl: options"
+group = "uv.mirror"
+actor = { operation = "uv_island", uv = { rule = "mirror", axis = "v" } }
+
+[[preset]]
+id = "uv.alignUp"
+label = "Align Up"
+names = ["align up"]
+tooltip = "Move the selected UVs up to the highest one · Alt: each edge row · Ctrl: options"
+group = "uv.align"
+actor = { operation = "uv_island", uv = { rule = "align", axis = "v", to = "high" } }
+
+[[preset]]
+id = "uv.alignDown"
+label = "Align Down"
+names = ["align down"]
+tooltip = "Move the selected UVs down to the lowest one · Alt: each edge row · Ctrl: options"
+group = "uv.align"
+actor = { operation = "uv_island", uv = { rule = "align", axis = "v", to = "low" } }
+
+[[preset]]
+id = "uv.alignLeft"
+label = "Align Left"
+names = ["align left"]
+tooltip = "Move the selected UVs left to the leftmost one · Alt: each edge row · Ctrl: options"
+group = "uv.align"
+actor = { operation = "uv_island", uv = { rule = "align", axis = "u", to = "low" } }
+
+[[preset]]
+id = "uv.alignRight"
+label = "Align Right"
+names = ["align right"]
+tooltip = "Move the selected UVs right to the rightmost one · Alt: each edge row · Ctrl: options"
+group = "uv.align"
+actor = { operation = "uv_island", uv = { rule = "align", axis = "u", to = "high" } }
+
+# Auto-Activate per plain tool (click-to-start CS-01/05) ----------------------
+#
+# A tool picked without a preset row takes its flag from here; tools not
+# listed start at once (Move/Rotate/Scale/Transform, Twist, Swirl, Flex, the
+# Slides, Vertex Extrude, Loop Slice ...). Rows above override these.
+
+[[tool]]
+tool = "Bend"
+auto_activate = false
+
+[[tool]]
+tool = "Push"
+auto_activate = false
+
+[[tool]]
+tool = "Smooth"
+auto_activate = false
+
+# Deform finish: like Smooth, they show their result from the first click.
+[[tool]]
+tool = "Jitter"
+auto_activate = false
+
+[[tool]]
+tool = "Quantize"
+auto_activate = false
+
+[[tool]]
+tool = "RadialAlign"
+auto_activate = false
+
+[[tool]]
+tool = "LinearAlign"
+auto_activate = false
+
+[[tool]]
+tool = "Thicken"
+auto_activate = false
+
+[[tool]]
+tool = "Extrude"
+auto_activate = false
+
+[[tool]]
+tool = "SmoothShift"
+auto_activate = false
+
+[[tool]]
+tool = "EdgeExtend"
+auto_activate = false
+
+# Approved deviation (CS-07, CS-Q01 decided 2026-11-16, Jason: consistency
+# over the reference): the reference starts these four at once; here they
+# wait for the first click like the other tools.
+[[tool]]
+tool = "Bevel"
+auto_activate = false
+
+[[tool]]
+tool = "EdgeBevel"
+auto_activate = false
+
+[[tool]]
+tool = "VertexBevel"
+auto_activate = false
+
+[[tool]]
+tool = "EdgeChamfer"
+auto_activate = false
+
+# These already wait for a click (or Apply) by their own logic: primitives
+# draw from the press, Duplicate tools place on the first click (DS-30/31),
+# the slices cut where clicked. The flag records it; their own press code
+# is unchanged.
+[[tool]]
+tool = "Box"
+auto_activate = false
+
+[[tool]]
+tool = "Sphere"
+auto_activate = false
+
+[[tool]]
+tool = "Cylinder"
+auto_activate = false
+
+[[tool]]
+tool = "EdgeSlice"
+auto_activate = false
+
+[[tool]]
+tool = "PolygonSlice"
+auto_activate = false
+
+[[tool]]
+tool = "CurveSlice"
+auto_activate = false
+
+[[tool]]
+tool = "PenSlice"
+auto_activate = false
+
+[[tool]]
+tool = "Mirror"
+auto_activate = false
+
+[[tool]]
+tool = "Lathe"
+auto_activate = false
+
+[[tool]]
+tool = "Clone"
+auto_activate = false
+
+[[tool]]
+tool = "Array"
+auto_activate = false
+
+[[tool]]
+tool = "RadialArray"
+auto_activate = false
+
+# Duplicate tab, path tools (CX-01): a path generator + an effector. The
+# extrude buttons switch Start at Source on, Cap Start off and Invert on;
+# the clone buttons keep the Clone effector's own values. Ids provisional
+# (CX-Q6: the reference's button invocations aren't in the name map).
+# Pen Extrude: one section per pen point (hands-on 2026-11-17).
+
+[[preset]]
+id = "CurveExtrude"
+label = "Curve Extrude"
+names = ["curve extrude"]
+tooltip = "Extrude the selected polygons along a smooth curve you click out"
+group = "duplicate.extend"
+actor = { tool = "CurveExtrude", path = { kind = "curve", start_at_source = true, cap_start = false, invert = true } }
+
+[[preset]]
+id = "BezierExtrude"
+label = "Bezier Extrude"
+names = ["bezier extrude"]
+tooltip = "Extrude the selected polygons along a Bezier path with handles"
+group = "duplicate.extend"
+actor = { tool = "CurveExtrude", path = { kind = "bezier", start_at_source = true, cap_start = false, invert = true } }
+
+[[preset]]
+id = "BSplineExtrude"
+label = "B-Spline Extrude"
+names = ["b-spline extrude", "bspline extrude"]
+tooltip = "Extrude the selected polygons along a B-Spline path"
+group = "duplicate.extend"
+actor = { tool = "CurveExtrude", path = { kind = "b_spline", start_at_source = true, cap_start = false, invert = true } }
+
+[[preset]]
+id = "PenExtrude"
+label = "Pen Extrude"
+names = ["pen extrude"]
+tooltip = "Extrude the selected polygons along a straight-line path you click out: one section per point"
+group = "duplicate.extend"
+actor = { tool = "CurveExtrude", path = { kind = "pen", start_at_source = false, cap_start = false, invert = true } }
+
+[[preset]]
+id = "CurveClone"
+label = "Curve Clone"
+names = ["curve clone"]
+tooltip = "Copies along a smooth curve you click out"
+group = "duplicate.clone"
+actor = { tool = "CurveClone", path = { kind = "curve" } }
+
+[[preset]]
+id = "BezierClone"
+label = "Bezier Clone"
+names = ["bezier clone"]
+tooltip = "Copies along a Bezier path with handles"
+group = "duplicate.clone"
+actor = { tool = "CurveClone", path = { kind = "bezier" } }
+
+[[preset]]
+id = "BSplineClone"
+label = "B-Spline Clone"
+names = ["b-spline clone", "bspline clone"]
+tooltip = "Copies along a B-Spline path"
+group = "duplicate.clone"
+actor = { tool = "CurveClone", path = { kind = "b_spline" } }
+
+[[preset]]
+id = "PenClone"
+label = "Pen Clone"
+names = ["pen clone"]
+tooltip = "Copies at each point of a straight-line path, turned to follow it"
+group = "duplicate.clone"
+actor = { tool = "CurveClone", path = { kind = "pen" } }
+
+[[preset]]
+id = "CurveInstance"
+label = "Curve Instance"
+tooltip = "Instances of the selection along a smooth curve you click out"
+group = "duplicate.clone"
+actor = { tool = "CurveClone", copier = "instance", path = { kind = "curve" } }
+
+[[preset]]
+id = "BezierInstance"
+label = "Bezier Instance"
+tooltip = "Instances of the selection along a Bezier path with handles"
+group = "duplicate.clone"
+actor = { tool = "CurveClone", copier = "instance", path = { kind = "bezier" } }
+
+[[preset]]
+id = "BSplineInstance"
+label = "B-Spline Instance"
+tooltip = "Instances of the selection along a B-Spline path"
+group = "duplicate.clone"
+actor = { tool = "CurveClone", copier = "instance", path = { kind = "b_spline" } }
+
+[[preset]]
+id = "PenInstance"
+label = "Pen Instance"
+tooltip = "Instances of the selection at each point of a straight-line path"
+group = "duplicate.clone"
+actor = { tool = "CurveClone", copier = "instance", path = { kind = "pen" } }
+
+# Duplicate tab, Instance buttons (duplicate-panel-2026-11-20 DX-30..37):
+# the tool's own placer and Item section, making Mesh Instances of the
+# selected items (duplicate_items.rs). Ids provisional, like CX-Q6.
+
+[[preset]]
+id = "InstanceClone"
+label = "Instance Clone"
+tooltip = "Instances of the selection in a line: each shares its source's mesh"
+group = "duplicate.clone"
+actor = { tool = "Clone", copier = "instance" }
+
+[[preset]]
+id = "InstanceArray"
+label = "Instance Array"
+tooltip = "Instances of the selection in a grid: each shares its source's mesh"
+group = "duplicate.array"
+actor = { tool = "Array", copier = "instance" }
+
+[[preset]]
+id = "InstanceRadialArray"
+label = "Instance Radial Array"
+tooltip = "Instances of the selection round a circle: each shares its source's mesh"
+group = "duplicate.array"
+actor = { tool = "RadialArray", copier = "instance" }
+
+[[preset]]
+id = "InstanceMirror"
+label = "Instance Mirror"
+tooltip = "A mirrored instance of the selection: it shares its source's mesh"
+group = "duplicate.duplicate"
+actor = { tool = "Mirror", copier = "instance" }
+
+[[preset]]
+id = "InstanceScatter"
+label = "Instance Scatter"
+tooltip = "Instances of the selection scattered in a box: each shares its source's mesh"
+group = "duplicate.clone"
+actor = { tool = "ScatterClone", copier = "instance" }
+
+# Duplicate tab, Replica buttons (missing-tools-g8 RP-6): the Instance
+# buttons' placement, making one Replicator (replicator.rs) instead of
+# instance items.
+
+[[preset]]
+id = "ReplicaClone"
+label = "Replica Clone"
+tooltip = "A Replicator of the selection in a line: a point per copy, drawn as boxes until shaded"
+group = "duplicate.clone"
+actor = { tool = "Clone", copier = "replica" }
+
+[[preset]]
+id = "CurveReplica"
+label = "Curve Replica"
+tooltip = "A Replicator of the selection along a smooth curve you click out"
+group = "duplicate.clone"
+actor = { tool = "CurveClone", copier = "replica", path = { kind = "curve" } }
+
+[[preset]]
+id = "BezierReplica"
+label = "Bezier Replica"
+tooltip = "A Replicator of the selection along a Bezier path with handles"
+group = "duplicate.clone"
+actor = { tool = "CurveClone", copier = "replica", path = { kind = "bezier" } }
+
+[[preset]]
+id = "BSplineReplica"
+label = "B-Spline Replica"
+tooltip = "A Replicator of the selection along a B-Spline path"
+group = "duplicate.clone"
+actor = { tool = "CurveClone", copier = "replica", path = { kind = "b_spline" } }
+
+[[preset]]
+id = "PenReplicate"
+label = "Pen Replicate"
+tooltip = "A Replicator of the selection at each point of a straight-line path"
+group = "duplicate.clone"
+actor = { tool = "CurveClone", copier = "replica", path = { kind = "pen" } }
+
+[[preset]]
+id = "ReplicaScatter"
+label = "Replica Scatter"
+tooltip = "A Replicator of the selection scattered in a box"
+group = "duplicate.clone"
+actor = { tool = "ScatterClone", copier = "replica" }
+
+[[preset]]
+id = "ReplicaArray"
+label = "Replica Array"
+tooltip = "A Replicator of the selection in a grid: a point per copy"
+group = "duplicate.array"
+actor = { tool = "Array", copier = "replica" }
+
+[[preset]]
+id = "ReplicaRadialArray"
+label = "Replica Radial Array"
+tooltip = "A Replicator of the selection round a circle: a point per copy"
+group = "duplicate.array"
+actor = { tool = "RadialArray", copier = "replica" }
+
+[[preset]]
+id = "ReplicaMirror"
+label = "Replica Mirror"
+tooltip = "A Replicator with one mirrored copy of the selection"
+group = "duplicate.duplicate"
+actor = { tool = "Mirror", copier = "replica" }
+
+# Scatter Clone waits for the first click (or Apply), like the other
+# Duplicate tools (DS-30/31).
+[[tool]]
+tool = "ScatterClone"
+auto_activate = false
+
+# Duplicate tab, Transform buttons (duplicate-panel-2026-11-20 DX-20..26):
+# the tool's own placer, but the selected items themselves move onto its
+# spots instead of new copies being made (duplicate_transform.rs).
+
+[[preset]]
+id = "TransformArray"
+label = "Transform Array"
+names = ["array transform"]
+tooltip = "Move the selected items onto the cells of an Array grid, one item per cell"
+group = "duplicate.array"
+actor = { tool = "Array", copier = "transform" }
+
+[[preset]]
+id = "TransformRadialArray"
+label = "Transform Radial Array"
+names = ["radial array transform"]
+tooltip = "Move the selected items round a circle, one item per place, each turned to face round"
+group = "duplicate.array"
+actor = { tool = "RadialArray", copier = "transform" }
+
+[[preset]]
+id = "TransformScatter"
+label = "Transform Scatter"
+names = ["scatter transform"]
+tooltip = "Move the selected items onto scattered places, one item per place"
+group = "duplicate.clone"
+actor = { tool = "ScatterClone", copier = "transform" }
+
+[[preset]]
+id = "CurveTransform"
+label = "Curve Transform"
+names = ["curve transform"]
+tooltip = "Move the selected items along a smooth curve you click out, one item per place"
+group = "duplicate.clone"
+actor = { tool = "CurveClone", copier = "transform", path = { kind = "curve" } }
+
+[[preset]]
+id = "BezierTransform"
+label = "Bezier Transform"
+names = ["bezier transform"]
+tooltip = "Move the selected items along a Bezier path, one item per place"
+group = "duplicate.clone"
+actor = { tool = "CurveClone", copier = "transform", path = { kind = "bezier" } }
+
+[[preset]]
+id = "BSplineTransform"
+label = "B-Spline Transform"
+names = ["b-spline transform", "bspline transform"]
+tooltip = "Move the selected items along a B-Spline path, one item per place"
+group = "duplicate.clone"
+actor = { tool = "CurveClone", copier = "transform", path = { kind = "b_spline" } }
+
+[[preset]]
+id = "PenTransform"
+label = "Transform Pen"
+names = ["pen transform"]
+tooltip = "Move the selected items to the points of a straight-line path you click out, one item per point"
+group = "duplicate.clone"
+actor = { tool = "CurveClone", copier = "transform", path = { kind = "pen" } }

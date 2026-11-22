@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Operandi owns .opscene scene files on macOS. scripts/macos-app-bundle.sh
+  merges this into every app's Info.plist (QA builds and releases). The type
+  is exported (we define it), so Finder shows OperandiScene.icns for these
+  files and opens them in Operandi on double-click or a drop on the app icon.
+  The identifier stays the same in every build, whatever the bundle ID.
+-->
+<plist version="1.0"><dict>
+<key>CFBundleDocumentTypes</key>
+<array>
+  <dict>
+    <key>CFBundleTypeName</key><string>Operandi Scene</string>
+    <key>CFBundleTypeRole</key><string>Editor</string>
+    <key>LSHandlerRank</key><string>Owner</string>
+    <key>CFBundleTypeIconFile</key><string>OperandiScene.icns</string>
+    <key>LSItemContentTypes</key>
+    <array><string>org.operandi3d.opscene</string></array>
+  </dict>
+</array>
+<key>UTExportedTypeDeclarations</key>
+<array>
+  <dict>
+    <key>UTTypeIdentifier</key><string>org.operandi3d.opscene</string>
+    <key>UTTypeDescription</key><string>Operandi Scene</string>
+    <key>UTTypeIconFile</key><string>OperandiScene.icns</string>
+    <key>UTTypeConformsTo</key>
+    <array><string>public.data</string><string>public.content</string></array>
+    <key>UTTypeTagSpecification</key>
+    <dict>
+      <key>public.filename-extension</key><array><string>opscene</string></array>
+      <key>public.mime-type</key><array><string>application/x-operandi-scene</string></array>
+    </dict>
+  </dict>
+</array>
+</dict></plist>

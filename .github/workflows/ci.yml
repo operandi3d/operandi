@@ -1,0 +1,107 @@
+# Runs the same checks AGENTS.md asks for (fmt, clippy, tests) on every
+# pull request and every push to main, on macOS and Linux.
+#
+# Cycles is NOT built here: operandi-cycles only links it with the `cycles`
+# feature, which nothing turns on by default, so tests run without it.
+#
+# Minutes: the repo is private, so GitHub's machines count against the
+# account's Actions allowance, and macOS minutes count 10x. So both jobs
+# run on Jason's own machines (self-hosted runners, see docs/CI.md), which
+# cost no minutes and keep their build folder between runs. While a runner
+# is off, its job waits in the queue and runs when it's turned back on. A
+# manual run can pick GitHub's Mac or Linux machine instead.
+#
+# Self-hosted runners are only safe while the repo is private: on a public
+# repo, anyone's pull request could run code on those machines. Switch both
+# jobs back to GitHub's machines before going public (public repos run free).
+#
+# Pushes to other branches don't run CI; start a run by hand from the
+# Actions tab (workflow_dispatch) if needed.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      github_mac:
+        description: "Run the macOS job on GitHub's Mac (uses 10x minutes) instead of the self-hosted one"
+        type: boolean
+        default: false
+      github_linux:
+        description: "Run the Linux job on GitHub's Linux machine instead of the self-hosted one"
+        type: boolean
+        default: false
+
+# A newer push to the same branch or PR cancels the older run.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+  # No incremental builds or debug info: smaller cache, and the full debug
+  # target otherwise grows past 25 GB.
+  CARGO_INCREMENTAL: 0
+  CARGO_PROFILE_DEV_DEBUG: 0
+  CARGO_PROFILE_TEST_DEBUG: 0
+
+jobs:
+  check:
+    name: ${{ matrix.name }}
+    strategy:
+      fail-fast: false
+      matrix:
+        name: [macOS, Linux]
+    # Jason's machines (his Mac, his Linux box) only for runs Jason started
+    # himself (his pushes and PRs, github.actor stays the original pusher
+    # even on a re-run), unless a manual run ticked github_mac / github_linux.
+    # Anyone else's push or PR runs on GitHub's machines, so other people's
+    # code never runs on Jason's.
+    runs-on: ${{ matrix.name == 'Linux' && ((inputs.github_linux || github.actor != github.repository_owner) && 'ubuntu-latest' || fromJSON('["self-hosted", "Linux", "X64"]')) || ((inputs.github_mac || github.actor != github.repository_owner) && 'macos-latest' || fromJSON('["self-hosted", "macOS", "ARM64"]')) }}
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      # GitHub's Linux machine starts with about 14 GB free, and the test
+      # build no longer fits ("No space left on device"). Remove preinstalled
+      # SDKs we never use (.NET, Android, Haskell, CodeQL), which frees
+      # roughly 25-30 GB.
+      - name: Free disk space
+        if: runner.os == 'Linux' && runner.environment == 'github-hosted'
+        run: |
+          df -h /
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /usr/local/.ghcup /opt/hostedtoolcache/CodeQL
+          df -h /
+
+      # rustup is preinstalled (on the Mac, from rustup.rs); this installs the version pinned in
+      # rust-toolchain.toml (with clippy and rustfmt).
+      - name: Install Rust from rust-toolchain.toml
+        run: rustup toolchain install && rustup show active-toolchain
+
+      # A self-hosted runner keeps its target folder between runs, so only
+      # GitHub's machines need the cache.
+      - uses: Swatinem/rust-cache@v2
+        if: runner.environment == 'github-hosted'
+        with:
+          # Only main saves the cache; PRs reuse it.
+          save-if: ${{ github.ref == 'refs/heads/main' }}
+
+      - name: Format
+        if: runner.os == 'Linux'
+        run: cargo fmt --check
+
+      - name: Clippy
+        run: cargo clippy --locked --workspace --all-targets -- -D warnings
+
+      # Jason's Linux runner hides its graphics card from the tests, so GPU
+      # tests skip there as on GitHub's machine: they're tuned to Apple's
+      # GPUs and run on the Mac job (docs/CI.md).
+      - name: Test
+        env:
+          OPERANDI_TEST_GPU: ${{ runner.os == 'Linux' && runner.environment == 'self-hosted' && 'off' || '' }}
+        run: cargo test --locked --workspace

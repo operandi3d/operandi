@@ -1,0 +1,4657 @@
+{
+ "spec": "make-split-2026-11-05",
+ "comparison_rule": "Build the input, select as listed (selection order matters), run the command with the listed type option. Match corner order up to rotation; 'failed' means nothing changed.",
+ "cases": [
+  {
+   "id": "MP01",
+   "description": "4 floating points selected 0,1,2,3 (counter-clockwise from +Z), P key",
+   "input": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": []
+   },
+   "selection": {
+    "sel_vertices": [
+     0,
+     1,
+     2,
+     3
+    ],
+    "sel_edges": [],
+    "sel_polygons": []
+   },
+   "selection_mode": "vertex",
+   "option": [
+    "auto"
+   ],
+   "expected": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      3,
+      0,
+      1,
+      2
+     ]
+    ],
+    "polygon_types": [
+     "face"
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": [
+      0
+     ]
+    },
+    "selection_mode_after": "vertex",
+    "failed": false
+   }
+  },
+  {
+   "id": "MP02",
+   "description": "4 floating points selected 0,3,2,1, P key",
+   "input": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": []
+   },
+   "selection": {
+    "sel_vertices": [
+     0,
+     3,
+     2,
+     1
+    ],
+    "sel_edges": [],
+    "sel_polygons": []
+   },
+   "selection_mode": "vertex",
+   "option": [
+    "auto"
+   ],
+   "expected": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      1,
+      0,
+      3,
+      2
+     ]
+    ],
+    "polygon_types": [
+     "face"
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": [
+      0
+     ]
+    },
+    "selection_mode_after": "vertex",
+    "failed": false
+   }
+  },
+  {
+   "id": "MP03",
+   "description": "4 floating points selected 0,2,1,3 (crossing order), P key",
+   "input": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": []
+   },
+   "selection": {
+    "sel_vertices": [
+     0,
+     2,
+     1,
+     3
+    ],
+    "sel_edges": [],
+    "sel_polygons": []
+   },
+   "selection_mode": "vertex",
+   "option": [
+    "auto"
+   ],
+   "expected": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      1,
+      3,
+      0,
+      2
+     ]
+    ],
+    "polygon_types": [
+     "face"
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": [
+      0
+     ]
+    },
+    "selection_mode_after": "vertex",
+    "failed": false
+   }
+  },
+  {
+   "id": "MP04",
+   "description": "3 floating points selected 0,1,2, P key",
+   "input": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": []
+   },
+   "selection": {
+    "sel_vertices": [
+     0,
+     1,
+     2
+    ],
+    "sel_edges": [],
+    "sel_polygons": []
+   },
+   "selection_mode": "vertex",
+   "option": [
+    "auto"
+   ],
+   "expected": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      2,
+      0,
+      1
+     ]
+    ],
+    "polygon_types": [
+     "face"
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": [
+      0
+     ]
+    },
+    "selection_mode_after": "vertex",
+    "failed": false
+   }
+  },
+  {
+   "id": "MP05",
+   "description": "2 floating points selected, P key",
+   "input": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": []
+   },
+   "selection": {
+    "sel_vertices": [
+     0,
+     1
+    ],
+    "sel_edges": [],
+    "sel_polygons": []
+   },
+   "selection_mode": "vertex",
+   "option": [
+    "auto"
+   ],
+   "expected": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      1,
+      0
+     ]
+    ],
+    "polygon_types": [
+     "line"
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": [
+      0
+     ]
+    },
+    "selection_mode_after": "vertex",
+    "failed": false
+   }
+  },
+  {
+   "id": "MP06",
+   "description": "1 floating point selected, P key",
+   "input": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": []
+   },
+   "selection": {
+    "sel_vertices": [
+     0
+    ],
+    "sel_edges": [],
+    "sel_polygons": []
+   },
+   "selection_mode": "vertex",
+   "option": [
+    "auto"
+   ],
+   "expected": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0
+     ]
+    ],
+    "polygon_types": [
+     "onePoint"
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": [
+      0
+     ]
+    },
+    "selection_mode_after": "vertex",
+    "failed": false
+   }
+  },
+  {
+   "id": "MP07",
+   "description": "5 points, type subdiv",
+   "input": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.5,
+      1.5,
+      0.0
+     ]
+    ],
+    "polygons": []
+   },
+   "selection": {
+    "sel_vertices": [
+     0,
+     1,
+     2,
+     4,
+     3
+    ],
+    "sel_edges": [],
+    "sel_polygons": []
+   },
+   "selection_mode": "vertex",
+   "option": [
+    "subdiv"
+   ],
+   "expected": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.5,
+      1.5,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      3,
+      0,
+      1,
+      2,
+      4
+     ]
+    ],
+    "polygon_types": [
+     "subdiv"
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": [
+      0
+     ]
+    },
+    "selection_mode_after": "vertex",
+    "failed": false
+   }
+  },
+  {
+   "id": "MP08",
+   "description": "4 points, type curve",
+   "input": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": []
+   },
+   "selection": {
+    "sel_vertices": [
+     0,
+     1,
+     2,
+     3
+    ],
+    "sel_edges": [],
+    "sel_polygons": []
+   },
+   "selection_mode": "vertex",
+   "option": [
+    "curve"
+   ],
+   "expected": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ]
+    ],
+    "polygon_types": [
+     "curve"
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": [
+      0
+     ]
+    },
+    "selection_mode_after": "vertex",
+    "failed": false
+   }
+  },
+  {
+   "id": "MP09",
+   "description": "4 points, type curve, close on",
+   "input": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": []
+   },
+   "selection": {
+    "sel_vertices": [
+     0,
+     1,
+     2,
+     3
+    ],
+    "sel_edges": [],
+    "sel_polygons": []
+   },
+   "selection_mode": "vertex",
+   "option": [
+    "curve",
+    "true"
+   ],
+   "expected": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      2,
+      3,
+      0,
+      1,
+      2,
+      3,
+      0
+     ]
+    ],
+    "polygon_types": [
+     "curve"
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": [
+      0
+     ]
+    },
+    "selection_mode_after": "vertex",
+    "failed": false
+   }
+  },
+  {
+   "id": "MP10",
+   "description": "4 points, type face, close on",
+   "input": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": []
+   },
+   "selection": {
+    "sel_vertices": [
+     0,
+     1,
+     2,
+     3
+    ],
+    "sel_edges": [],
+    "sel_polygons": []
+   },
+   "selection_mode": "vertex",
+   "option": [
+    "face",
+    "true"
+   ],
+   "expected": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      3,
+      0,
+      1,
+      2
+     ]
+    ],
+    "polygon_types": [
+     "face"
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": [
+      0
+     ]
+    },
+    "selection_mode_after": "vertex",
+    "failed": false
+   }
+  },
+  {
+   "id": "MP11",
+   "description": "4 points, type spline patch",
+   "input": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": []
+   },
+   "selection": {
+    "sel_vertices": [
+     0,
+     1,
+     2,
+     3
+    ],
+    "sel_edges": [],
+    "sel_polygons": []
+   },
+   "selection_mode": "vertex",
+   "option": [
+    "patch"
+   ],
+   "expected": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      3,
+      0,
+      1,
+      2
+     ]
+    ],
+    "polygon_types": [
+     "subdiv"
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": [
+      0
+     ]
+    },
+    "selection_mode_after": "vertex",
+    "failed": false
+   }
+  },
+  {
+   "id": "MP11b",
+   "description": "4 points, type spatch (Shift-P binding form)",
+   "input": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": []
+   },
+   "selection": {
+    "sel_vertices": [
+     0,
+     1,
+     2,
+     3
+    ],
+    "sel_edges": [],
+    "sel_polygons": []
+   },
+   "selection_mode": "vertex",
+   "option": [
+    "spatch"
+   ],
+   "expected": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      3,
+      0,
+      1,
+      2
+     ]
+    ],
+    "polygon_types": [
+     "spatch"
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": [
+      0
+     ]
+    },
+    "selection_mode_after": "vertex",
+    "failed": false
+   }
+  },
+  {
+   "id": "MP12",
+   "description": "4 points, type psubdiv",
+   "input": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": []
+   },
+   "selection": {
+    "sel_vertices": [
+     0,
+     1,
+     2,
+     3
+    ],
+    "sel_edges": [],
+    "sel_polygons": []
+   },
+   "selection_mode": "vertex",
+   "option": [
+    "psubdiv"
+   ],
+   "expected": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      3,
+      0,
+      1,
+      2
+     ]
+    ],
+    "polygon_types": [
+     "psubdiv"
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": [
+      0
+     ]
+    },
+    "selection_mode_after": "vertex",
+    "failed": false
+   }
+  },
+  {
+   "id": "MP13",
+   "description": "4 points, type polyline",
+   "input": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": []
+   },
+   "selection": {
+    "sel_vertices": [
+     0,
+     1,
+     2,
+     3
+    ],
+    "sel_edges": [],
+    "sel_polygons": []
+   },
+   "selection_mode": "vertex",
+   "option": [
+    "line"
+   ],
+   "expected": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ]
+    ],
+    "polygon_types": [
+     "line"
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": [
+      0
+     ]
+    },
+    "selection_mode_after": "vertex",
+    "failed": false
+   }
+  },
+  {
+   "id": "MP14",
+   "description": "4 points, type auto, floating",
+   "input": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": []
+   },
+   "selection": {
+    "sel_vertices": [
+     0,
+     1,
+     2,
+     3
+    ],
+    "sel_edges": [],
+    "sel_polygons": []
+   },
+   "selection_mode": "vertex",
+   "option": [
+    "auto"
+   ],
+   "expected": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      3,
+      0,
+      1,
+      2
+     ]
+    ],
+    "polygon_types": [
+     "face"
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": [
+      0
+     ]
+    },
+    "selection_mode_after": "vertex",
+    "failed": false
+   }
+  },
+  {
+   "id": "MP15",
+   "description": "Cube missing its top: top border points selected 7,6,5,4, P key",
+   "input": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      0,
+      4,
+      5,
+      1
+     ],
+     [
+      1,
+      5,
+      6,
+      2
+     ],
+     [
+      2,
+      6,
+      7,
+      3
+     ],
+     [
+      3,
+      7,
+      4,
+      0
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [
+     7,
+     6,
+     5,
+     4
+    ],
+    "sel_edges": [],
+    "sel_polygons": []
+   },
+   "selection_mode": "vertex",
+   "option": [
+    "auto"
+   ],
+   "expected": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      0,
+      4,
+      5,
+      1
+     ],
+     [
+      1,
+      5,
+      6,
+      2
+     ],
+     [
+      2,
+      6,
+      7,
+      3
+     ],
+     [
+      3,
+      7,
+      4,
+      0
+     ],
+     [
+      4,
+      7,
+      6,
+      5
+     ]
+    ],
+    "polygon_types": [
+     "face",
+     "face",
+     "face",
+     "face",
+     "face",
+     "face"
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": [
+      5
+     ]
+    },
+    "selection_mode_after": "vertex",
+    "failed": false
+   }
+  },
+  {
+   "id": "MP16",
+   "description": "Cube missing its top: top border points selected 4,5,6,7, P key",
+   "input": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      0,
+      4,
+      5,
+      1
+     ],
+     [
+      1,
+      5,
+      6,
+      2
+     ],
+     [
+      2,
+      6,
+      7,
+      3
+     ],
+     [
+      3,
+      7,
+      4,
+      0
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [
+     4,
+     5,
+     6,
+     7
+    ],
+    "sel_edges": [],
+    "sel_polygons": []
+   },
+   "selection_mode": "vertex",
+   "option": [
+    "auto"
+   ],
+   "expected": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      0,
+      4,
+      5,
+      1
+     ],
+     [
+      1,
+      5,
+      6,
+      2
+     ],
+     [
+      2,
+      6,
+      7,
+      3
+     ],
+     [
+      3,
+      7,
+      4,
+      0
+     ],
+     [
+      7,
+      6,
+      5,
+      4
+     ]
+    ],
+    "polygon_types": [
+     "face",
+     "face",
+     "face",
+     "face",
+     "face",
+     "face"
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": [
+      5
+     ]
+    },
+    "selection_mode_after": "vertex",
+    "failed": false
+   }
+  },
+  {
+   "id": "MP17",
+   "description": "Grid with hole: border edge loop selected (edge mode), P key",
+   "input": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      2.0,
+      0.0,
+      0.0
+     ],
+     [
+      3.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      2.0,
+      1.0,
+      0.0
+     ],
+     [
+      3.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      2.0,
+      0.0
+     ],
+     [
+      1.0,
+      2.0,
+      0.0
+     ],
+     [
+      2.0,
+      2.0,
+      0.0
+     ],
+     [
+      3.0,
+      2.0,
+      0.0
+     ],
+     [
+      0.0,
+      3.0,
+      0.0
+     ],
+     [
+      1.0,
+      3.0,
+      0.0
+     ],
+     [
+      2.0,
+      3.0,
+      0.0
+     ],
+     [
+      3.0,
+      3.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      5,
+      4
+     ],
+     [
+      1,
+      2,
+      6,
+      5
+     ],
+     [
+      2,
+      3,
+      7,
+      6
+     ],
+     [
+      4,
+      5,
+      9,
+      8
+     ],
+     [
+      6,
+      7,
+      11,
+      10
+     ],
+     [
+      8,
+      9,
+      13,
+      12
+     ],
+     [
+      9,
+      10,
+      14,
+      13
+     ],
+     [
+      10,
+      11,
+      15,
+      14
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [
+     [
+      5,
+      6
+     ],
+     [
+      5,
+      9
+     ],
+     [
+      6,
+      10
+     ],
+     [
+      9,
+      10
+     ]
+    ],
+    "sel_polygons": []
+   },
+   "selection_mode": "edge",
+   "option": [
+    "auto"
+   ],
+   "expected": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      2.0,
+      0.0,
+      0.0
+     ],
+     [
+      3.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      2.0,
+      1.0,
+      0.0
+     ],
+     [
+      3.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      2.0,
+      0.0
+     ],
+     [
+      1.0,
+      2.0,
+      0.0
+     ],
+     [
+      2.0,
+      2.0,
+      0.0
+     ],
+     [
+      3.0,
+      2.0,
+      0.0
+     ],
+     [
+      0.0,
+      3.0,
+      0.0
+     ],
+     [
+      1.0,
+      3.0,
+      0.0
+     ],
+     [
+      2.0,
+      3.0,
+      0.0
+     ],
+     [
+      3.0,
+      3.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      5,
+      4
+     ],
+     [
+      1,
+      2,
+      6,
+      5
+     ],
+     [
+      2,
+      3,
+      7,
+      6
+     ],
+     [
+      4,
+      5,
+      9,
+      8
+     ],
+     [
+      6,
+      7,
+      11,
+      10
+     ],
+     [
+      8,
+      9,
+      13,
+      12
+     ],
+     [
+      9,
+      10,
+      14,
+      13
+     ],
+     [
+      10,
+      11,
+      15,
+      14
+     ],
+     [
+      5,
+      6,
+      10,
+      9
+     ]
+    ],
+    "polygon_types": [
+     "face",
+     "face",
+     "face",
+     "face",
+     "face",
+     "face",
+     "face",
+     "face",
+     "face"
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [
+      [
+       5,
+       6
+      ],
+      [
+       5,
+       9
+      ],
+      [
+       6,
+       10
+      ],
+      [
+       9,
+       10
+      ]
+     ],
+     "sel_polygons": [
+      8
+     ]
+    },
+    "selection_mode_after": "edge",
+    "failed": false
+   }
+  },
+  {
+   "id": "MP18",
+   "description": "Two quads one unit apart; facing edges 2-3 and 4-5 selected (edge mode), P key",
+   "input": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      2.0,
+      0.0
+     ],
+     [
+      1.0,
+      2.0,
+      0.0
+     ],
+     [
+      1.0,
+      3.0,
+      0.0
+     ],
+     [
+      0.0,
+      3.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      4,
+      5,
+      6,
+      7
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [
+     [
+      2,
+      3
+     ],
+     [
+      4,
+      5
+     ]
+    ],
+    "sel_polygons": []
+   },
+   "selection_mode": "edge",
+   "option": [
+    "auto"
+   ],
+   "expected": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      2.0,
+      0.0
+     ],
+     [
+      1.0,
+      2.0,
+      0.0
+     ],
+     [
+      1.0,
+      3.0,
+      0.0
+     ],
+     [
+      0.0,
+      3.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      4,
+      5,
+      6,
+      7
+     ]
+    ],
+    "polygon_types": [
+     "face",
+     "face"
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [
+      [
+       2,
+       3
+      ],
+      [
+       4,
+       5
+      ]
+     ],
+     "sel_polygons": []
+    },
+    "selection_mode_after": "edge",
+    "failed": false
+   }
+  },
+  {
+   "id": "MP19",
+   "description": "Subdiv neighbour, type auto: points on a subdiv-tagged open mesh",
+   "input": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      2.0,
+      0.0,
+      0.0
+     ],
+     [
+      3.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      2.0,
+      1.0,
+      0.0
+     ],
+     [
+      3.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      2.0,
+      0.0
+     ],
+     [
+      1.0,
+      2.0,
+      0.0
+     ],
+     [
+      2.0,
+      2.0,
+      0.0
+     ],
+     [
+      3.0,
+      2.0,
+      0.0
+     ],
+     [
+      0.0,
+      3.0,
+      0.0
+     ],
+     [
+      1.0,
+      3.0,
+      0.0
+     ],
+     [
+      2.0,
+      3.0,
+      0.0
+     ],
+     [
+      3.0,
+      3.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      5,
+      4
+     ],
+     [
+      1,
+      2,
+      6,
+      5
+     ],
+     [
+      2,
+      3,
+      7,
+      6
+     ],
+     [
+      4,
+      5,
+      9,
+      8
+     ],
+     [
+      6,
+      7,
+      11,
+      10
+     ],
+     [
+      8,
+      9,
+      13,
+      12
+     ],
+     [
+      9,
+      10,
+      14,
+      13
+     ],
+     [
+      10,
+      11,
+      15,
+      14
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [
+     5,
+     6,
+     10,
+     9
+    ],
+    "sel_edges": [],
+    "sel_polygons": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7
+    ]
+   },
+   "selection_mode": "vertex",
+   "option": [
+    "auto"
+   ],
+   "expected": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      2.0,
+      0.0,
+      0.0
+     ],
+     [
+      3.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      2.0,
+      1.0,
+      0.0
+     ],
+     [
+      3.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      2.0,
+      0.0
+     ],
+     [
+      1.0,
+      2.0,
+      0.0
+     ],
+     [
+      2.0,
+      2.0,
+      0.0
+     ],
+     [
+      3.0,
+      2.0,
+      0.0
+     ],
+     [
+      0.0,
+      3.0,
+      0.0
+     ],
+     [
+      1.0,
+      3.0,
+      0.0
+     ],
+     [
+      2.0,
+      3.0,
+      0.0
+     ],
+     [
+      3.0,
+      3.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      5,
+      4
+     ],
+     [
+      1,
+      2,
+      6,
+      5
+     ],
+     [
+      2,
+      3,
+      7,
+      6
+     ],
+     [
+      4,
+      5,
+      9,
+      8
+     ],
+     [
+      6,
+      7,
+      11,
+      10
+     ],
+     [
+      8,
+      9,
+      13,
+      12
+     ],
+     [
+      9,
+      10,
+      14,
+      13
+     ],
+     [
+      10,
+      11,
+      15,
+      14
+     ],
+     [
+      9,
+      5,
+      6,
+      10
+     ]
+    ],
+    "polygon_types": [
+     "subdiv",
+     "subdiv",
+     "subdiv",
+     "subdiv",
+     "subdiv",
+     "subdiv",
+     "subdiv",
+     "subdiv",
+     "subdiv"
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+     ]
+    },
+    "selection_mode_after": "vertex",
+    "failed": false
+   }
+  },
+  {
+   "id": "MP20",
+   "description": "Cube missing its top: top border points 7,6,5,4, type face (no auto)",
+   "input": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      0,
+      4,
+      5,
+      1
+     ],
+     [
+      1,
+      5,
+      6,
+      2
+     ],
+     [
+      2,
+      6,
+      7,
+      3
+     ],
+     [
+      3,
+      7,
+      4,
+      0
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [
+     7,
+     6,
+     5,
+     4
+    ],
+    "sel_edges": [],
+    "sel_polygons": []
+   },
+   "selection_mode": "vertex",
+   "option": [
+    "face"
+   ],
+   "expected": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      0,
+      4,
+      5,
+      1
+     ],
+     [
+      1,
+      5,
+      6,
+      2
+     ],
+     [
+      2,
+      6,
+      7,
+      3
+     ],
+     [
+      3,
+      7,
+      4,
+      0
+     ],
+     [
+      4,
+      7,
+      6,
+      5
+     ]
+    ],
+    "polygon_types": [
+     "face",
+     "face",
+     "face",
+     "face",
+     "face",
+     "face"
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": [
+      5
+     ]
+    },
+    "selection_mode_after": "vertex",
+    "failed": false
+   }
+  },
+  {
+   "id": "MP21",
+   "description": "5 floating points selected in order (pentagon), P key",
+   "input": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.5,
+      1.5,
+      0.0
+     ]
+    ],
+    "polygons": []
+   },
+   "selection": {
+    "sel_vertices": [
+     0,
+     1,
+     2,
+     4,
+     3
+    ],
+    "sel_edges": [],
+    "sel_polygons": []
+   },
+   "selection_mode": "vertex",
+   "option": [
+    "auto"
+   ],
+   "expected": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.5,
+      1.5,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      4,
+      3,
+      0,
+      1,
+      2
+     ]
+    ],
+    "polygon_types": [
+     "face"
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": [
+      0
+     ]
+    },
+    "selection_mode_after": "vertex",
+    "failed": false
+   }
+  },
+  {
+   "id": "MP22",
+   "description": "Cube missing its top: top border points 4,5,6,7, type face (no auto)",
+   "input": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      0,
+      4,
+      5,
+      1
+     ],
+     [
+      1,
+      5,
+      6,
+      2
+     ],
+     [
+      2,
+      6,
+      7,
+      3
+     ],
+     [
+      3,
+      7,
+      4,
+      0
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [
+     4,
+     5,
+     6,
+     7
+    ],
+    "sel_edges": [],
+    "sel_polygons": []
+   },
+   "selection_mode": "vertex",
+   "option": [
+    "face"
+   ],
+   "expected": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      0,
+      4,
+      5,
+      1
+     ],
+     [
+      1,
+      5,
+      6,
+      2
+     ],
+     [
+      2,
+      6,
+      7,
+      3
+     ],
+     [
+      3,
+      7,
+      4,
+      0
+     ],
+     [
+      7,
+      6,
+      5,
+      4
+     ]
+    ],
+    "polygon_types": [
+     "face",
+     "face",
+     "face",
+     "face",
+     "face",
+     "face"
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": [
+      5
+     ]
+    },
+    "selection_mode_after": "vertex",
+    "failed": false
+   }
+  },
+  {
+   "id": "MP23",
+   "description": "Cube missing its top: top border points 4,5,6,7, type subdiv",
+   "input": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      0,
+      4,
+      5,
+      1
+     ],
+     [
+      1,
+      5,
+      6,
+      2
+     ],
+     [
+      2,
+      6,
+      7,
+      3
+     ],
+     [
+      3,
+      7,
+      4,
+      0
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [
+     4,
+     5,
+     6,
+     7
+    ],
+    "sel_edges": [],
+    "sel_polygons": []
+   },
+   "selection_mode": "vertex",
+   "option": [
+    "subdiv"
+   ],
+   "expected": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      0,
+      4,
+      5,
+      1
+     ],
+     [
+      1,
+      5,
+      6,
+      2
+     ],
+     [
+      2,
+      6,
+      7,
+      3
+     ],
+     [
+      3,
+      7,
+      4,
+      0
+     ],
+     [
+      7,
+      6,
+      5,
+      4
+     ]
+    ],
+    "polygon_types": [
+     "face",
+     "face",
+     "face",
+     "face",
+     "face",
+     "subdiv"
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": [
+      5
+     ]
+    },
+    "selection_mode_after": "vertex",
+    "failed": false
+   }
+  },
+  {
+   "id": "SP01",
+   "description": "Quad, opposite corners 0,2 selected",
+   "input": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      0.0
+     ],
+     [
+      0.5,
+      -0.5,
+      0.0
+     ],
+     [
+      -0.5,
+      0.5,
+      0.0
+     ],
+     [
+      0.5,
+      0.5,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      3,
+      2
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [
+     0,
+     2
+    ],
+    "sel_edges": [],
+    "sel_polygons": []
+   },
+   "selection_mode": "vertex",
+   "expected": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      0.0
+     ],
+     [
+      0.5,
+      -0.5,
+      0.0
+     ],
+     [
+      -0.5,
+      0.5,
+      0.0
+     ],
+     [
+      0.5,
+      0.5,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      3,
+      2
+     ]
+    ],
+    "polygon_types": [
+     "face"
+    ],
+    "selection_after": {
+     "sel_vertices": [
+      0,
+      2
+     ],
+     "sel_edges": [],
+     "sel_polygons": []
+    },
+    "selection_mode_after": "vertex",
+    "failed": false
+   }
+  },
+  {
+   "id": "SP02",
+   "description": "Quad, adjacent corners 0,1 selected",
+   "input": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      0.0
+     ],
+     [
+      0.5,
+      -0.5,
+      0.0
+     ],
+     [
+      -0.5,
+      0.5,
+      0.0
+     ],
+     [
+      0.5,
+      0.5,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      3,
+      2
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [
+     0,
+     1
+    ],
+    "sel_edges": [],
+    "sel_polygons": []
+   },
+   "selection_mode": "vertex",
+   "expected": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      0.0
+     ],
+     [
+      0.5,
+      -0.5,
+      0.0
+     ],
+     [
+      -0.5,
+      0.5,
+      0.0
+     ],
+     [
+      0.5,
+      0.5,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      3,
+      2
+     ]
+    ],
+    "polygon_types": [
+     "face"
+    ],
+    "selection_after": {
+     "sel_vertices": [
+      0,
+      1
+     ],
+     "sel_edges": [],
+     "sel_polygons": []
+    },
+    "selection_mode_after": "vertex",
+    "failed": false
+   }
+  },
+  {
+   "id": "SP03",
+   "description": "Hexagon, corners 0,3",
+   "input": {
+    "points": [
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.5,
+      0.866025,
+      0.0
+     ],
+     [
+      -0.5,
+      0.866025,
+      0.0
+     ],
+     [
+      -1.0,
+      0.0,
+      0.0
+     ],
+     [
+      -0.5,
+      -0.866025,
+      0.0
+     ],
+     [
+      0.5,
+      -0.866025,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [
+     0,
+     3
+    ],
+    "sel_edges": [],
+    "sel_polygons": []
+   },
+   "selection_mode": "vertex",
+   "expected": {
+    "points": [
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.5,
+      0.866025,
+      0.0
+     ],
+     [
+      -0.5,
+      0.866025,
+      0.0
+     ],
+     [
+      -1.0,
+      0.0,
+      0.0
+     ],
+     [
+      -0.5,
+      -0.866025,
+      0.0
+     ],
+     [
+      0.5,
+      -0.866025,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      3,
+      4,
+      5
+     ],
+     [
+      0,
+      1,
+      2,
+      3
+     ]
+    ],
+    "polygon_types": [
+     "face",
+     "face"
+    ],
+    "selection_after": {
+     "sel_vertices": [
+      0,
+      3
+     ],
+     "sel_edges": [],
+     "sel_polygons": []
+    },
+    "selection_mode_after": "vertex",
+    "failed": false
+   }
+  },
+  {
+   "id": "SP04",
+   "description": "Hexagon, corners 0,2,4 in order",
+   "input": {
+    "points": [
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.5,
+      0.866025,
+      0.0
+     ],
+     [
+      -0.5,
+      0.866025,
+      0.0
+     ],
+     [
+      -1.0,
+      0.0,
+      0.0
+     ],
+     [
+      -0.5,
+      -0.866025,
+      0.0
+     ],
+     [
+      0.5,
+      -0.866025,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [
+     0,
+     2,
+     4
+    ],
+    "sel_edges": [],
+    "sel_polygons": []
+   },
+   "selection_mode": "vertex",
+   "expected": {
+    "points": [
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.5,
+      0.866025,
+      0.0
+     ],
+     [
+      -0.5,
+      0.866025,
+      0.0
+     ],
+     [
+      -1.0,
+      0.0,
+      0.0
+     ],
+     [
+      -0.5,
+      -0.866025,
+      0.0
+     ],
+     [
+      0.5,
+      -0.866025,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      2,
+      3,
+      4,
+      5
+     ],
+     [
+      0,
+      1,
+      2
+     ]
+    ],
+    "polygon_types": [
+     "face",
+     "face"
+    ],
+    "selection_after": {
+     "sel_vertices": [
+      0,
+      2,
+      4
+     ],
+     "sel_edges": [],
+     "sel_polygons": []
+    },
+    "selection_mode_after": "vertex",
+    "failed": false
+   }
+  },
+  {
+   "id": "SP05",
+   "description": "2x2 grid, diagonal 0,4,8 across two quads",
+   "input": {
+    "points": [
+     [
+      -1.0,
+      -1.0,
+      0.0
+     ],
+     [
+      0.0,
+      -1.0,
+      0.0
+     ],
+     [
+      1.0,
+      -1.0,
+      0.0
+     ],
+     [
+      -1.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      -1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      4,
+      3
+     ],
+     [
+      1,
+      2,
+      5,
+      4
+     ],
+     [
+      3,
+      4,
+      7,
+      6
+     ],
+     [
+      4,
+      5,
+      8,
+      7
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [
+     0,
+     4,
+     8
+    ],
+    "sel_edges": [],
+    "sel_polygons": []
+   },
+   "selection_mode": "vertex",
+   "expected": {
+    "points": [
+     [
+      -1.0,
+      -1.0,
+      0.0
+     ],
+     [
+      0.0,
+      -1.0,
+      0.0
+     ],
+     [
+      1.0,
+      -1.0,
+      0.0
+     ],
+     [
+      -1.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      -1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      1,
+      2,
+      5,
+      4
+     ],
+     [
+      3,
+      4,
+      7,
+      6
+     ],
+     [
+      0,
+      4,
+      3
+     ],
+     [
+      0,
+      1,
+      4
+     ],
+     [
+      4,
+      8,
+      7
+     ],
+     [
+      4,
+      5,
+      8
+     ]
+    ],
+    "polygon_types": [
+     "face",
+     "face",
+     "face",
+     "face",
+     "face",
+     "face"
+    ],
+    "selection_after": {
+     "sel_vertices": [
+      0,
+      4,
+      8
+     ],
+     "sel_edges": [],
+     "sel_polygons": []
+    },
+    "selection_mode_after": "vertex",
+    "failed": false
+   }
+  },
+  {
+   "id": "SP06",
+   "description": "2x2 grid, corners 0 and 8 (no shared polygon)",
+   "input": {
+    "points": [
+     [
+      -1.0,
+      -1.0,
+      0.0
+     ],
+     [
+      0.0,
+      -1.0,
+      0.0
+     ],
+     [
+      1.0,
+      -1.0,
+      0.0
+     ],
+     [
+      -1.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      -1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      4,
+      3
+     ],
+     [
+      1,
+      2,
+      5,
+      4
+     ],
+     [
+      3,
+      4,
+      7,
+      6
+     ],
+     [
+      4,
+      5,
+      8,
+      7
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [
+     0,
+     8
+    ],
+    "sel_edges": [],
+    "sel_polygons": []
+   },
+   "selection_mode": "vertex",
+   "expected": {
+    "points": [
+     [
+      -1.0,
+      -1.0,
+      0.0
+     ],
+     [
+      0.0,
+      -1.0,
+      0.0
+     ],
+     [
+      1.0,
+      -1.0,
+      0.0
+     ],
+     [
+      -1.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      -1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      4,
+      3
+     ],
+     [
+      1,
+      2,
+      5,
+      4
+     ],
+     [
+      3,
+      4,
+      7,
+      6
+     ],
+     [
+      4,
+      5,
+      8,
+      7
+     ]
+    ],
+    "polygon_types": [
+     "face",
+     "face",
+     "face",
+     "face"
+    ],
+    "selection_after": {
+     "sel_vertices": [
+      0,
+      8
+     ],
+     "sel_edges": [],
+     "sel_polygons": []
+    },
+    "selection_mode_after": "vertex",
+    "failed": false
+   }
+  },
+  {
+   "id": "SP07",
+   "description": "Pentagon, corners 1,3",
+   "input": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      2.0,
+      0.0,
+      0.0
+     ],
+     [
+      2.0,
+      1.0,
+      0.0
+     ],
+     [
+      1.0,
+      2.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3,
+      4
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [
+     1,
+     3
+    ],
+    "sel_edges": [],
+    "sel_polygons": []
+   },
+   "selection_mode": "vertex",
+   "expected": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      2.0,
+      0.0,
+      0.0
+     ],
+     [
+      2.0,
+      1.0,
+      0.0
+     ],
+     [
+      1.0,
+      2.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      1,
+      3,
+      4,
+      0
+     ],
+     [
+      1,
+      2,
+      3
+     ]
+    ],
+    "polygon_types": [
+     "face",
+     "face"
+    ],
+    "selection_after": {
+     "sel_vertices": [
+      1,
+      3
+     ],
+     "sel_edges": [],
+     "sel_polygons": []
+    },
+    "selection_mode_after": "vertex",
+    "failed": false
+   }
+  },
+  {
+   "id": "SP08",
+   "description": "Pentagon, corners 3,1 (reverse order)",
+   "input": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      2.0,
+      0.0,
+      0.0
+     ],
+     [
+      2.0,
+      1.0,
+      0.0
+     ],
+     [
+      1.0,
+      2.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3,
+      4
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [
+     3,
+     1
+    ],
+    "sel_edges": [],
+    "sel_polygons": []
+   },
+   "selection_mode": "vertex",
+   "expected": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      2.0,
+      0.0,
+      0.0
+     ],
+     [
+      2.0,
+      1.0,
+      0.0
+     ],
+     [
+      1.0,
+      2.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      1,
+      3,
+      4,
+      0
+     ],
+     [
+      1,
+      2,
+      3
+     ]
+    ],
+    "polygon_types": [
+     "face",
+     "face"
+    ],
+    "selection_after": {
+     "sel_vertices": [
+      3,
+      1
+     ],
+     "sel_edges": [],
+     "sel_polygons": []
+    },
+    "selection_mode_after": "vertex",
+    "failed": false
+   }
+  },
+  {
+   "id": "SP09",
+   "description": "Quad, nothing selected (vertex mode)",
+   "input": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      0.0
+     ],
+     [
+      0.5,
+      -0.5,
+      0.0
+     ],
+     [
+      -0.5,
+      0.5,
+      0.0
+     ],
+     [
+      0.5,
+      0.5,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      3,
+      2
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": []
+   },
+   "selection_mode": "vertex",
+   "expected": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      0.0
+     ],
+     [
+      0.5,
+      -0.5,
+      0.0
+     ],
+     [
+      -0.5,
+      0.5,
+      0.0
+     ],
+     [
+      0.5,
+      0.5,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      3,
+      2
+     ]
+    ],
+    "polygon_types": [
+     "face"
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": []
+    },
+    "selection_mode_after": "vertex",
+    "failed": true
+   }
+  },
+  {
+   "id": "SP10",
+   "description": "Hexagon, corners 2,4 then 0 (succession order 2,4,0)",
+   "input": {
+    "points": [
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.5,
+      0.866025,
+      0.0
+     ],
+     [
+      -0.5,
+      0.866025,
+      0.0
+     ],
+     [
+      -1.0,
+      0.0,
+      0.0
+     ],
+     [
+      -0.5,
+      -0.866025,
+      0.0
+     ],
+     [
+      0.5,
+      -0.866025,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [
+     2,
+     4,
+     0
+    ],
+    "sel_edges": [],
+    "sel_polygons": []
+   },
+   "selection_mode": "vertex",
+   "expected": {
+    "points": [
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.5,
+      0.866025,
+      0.0
+     ],
+     [
+      -0.5,
+      0.866025,
+      0.0
+     ],
+     [
+      -1.0,
+      0.0,
+      0.0
+     ],
+     [
+      -0.5,
+      -0.866025,
+      0.0
+     ],
+     [
+      0.5,
+      -0.866025,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      2,
+      3,
+      4,
+      5
+     ],
+     [
+      0,
+      1,
+      2
+     ]
+    ],
+    "polygon_types": [
+     "face",
+     "face"
+    ],
+    "selection_after": {
+     "sel_vertices": [
+      2,
+      4,
+      0
+     ],
+     "sel_edges": [],
+     "sel_polygons": []
+    },
+    "selection_mode_after": "vertex",
+    "failed": false
+   }
+  },
+  {
+   "id": "SP12",
+   "description": "Hexagon, corners 2,4 only",
+   "input": {
+    "points": [
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.5,
+      0.866025,
+      0.0
+     ],
+     [
+      -0.5,
+      0.866025,
+      0.0
+     ],
+     [
+      -1.0,
+      0.0,
+      0.0
+     ],
+     [
+      -0.5,
+      -0.866025,
+      0.0
+     ],
+     [
+      0.5,
+      -0.866025,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [
+     2,
+     4
+    ],
+    "sel_edges": [],
+    "sel_polygons": []
+   },
+   "selection_mode": "vertex",
+   "expected": {
+    "points": [
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.5,
+      0.866025,
+      0.0
+     ],
+     [
+      -0.5,
+      0.866025,
+      0.0
+     ],
+     [
+      -1.0,
+      0.0,
+      0.0
+     ],
+     [
+      -0.5,
+      -0.866025,
+      0.0
+     ],
+     [
+      0.5,
+      -0.866025,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      2,
+      4,
+      5,
+      0,
+      1
+     ],
+     [
+      2,
+      3,
+      4
+     ]
+    ],
+    "polygon_types": [
+     "face",
+     "face"
+    ],
+    "selection_after": {
+     "sel_vertices": [
+      2,
+      4
+     ],
+     "sel_edges": [],
+     "sel_polygons": []
+    },
+    "selection_mode_after": "vertex",
+    "failed": false
+   }
+  },
+  {
+   "id": "SP13",
+   "description": "Hexagon, corners 4,0,2",
+   "input": {
+    "points": [
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.5,
+      0.866025,
+      0.0
+     ],
+     [
+      -0.5,
+      0.866025,
+      0.0
+     ],
+     [
+      -1.0,
+      0.0,
+      0.0
+     ],
+     [
+      -0.5,
+      -0.866025,
+      0.0
+     ],
+     [
+      0.5,
+      -0.866025,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [
+     4,
+     0,
+     2
+    ],
+    "sel_edges": [],
+    "sel_polygons": []
+   },
+   "selection_mode": "vertex",
+   "expected": {
+    "points": [
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.5,
+      0.866025,
+      0.0
+     ],
+     [
+      -0.5,
+      0.866025,
+      0.0
+     ],
+     [
+      -1.0,
+      0.0,
+      0.0
+     ],
+     [
+      -0.5,
+      -0.866025,
+      0.0
+     ],
+     [
+      0.5,
+      -0.866025,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      2,
+      3,
+      4,
+      5
+     ],
+     [
+      0,
+      1,
+      2
+     ]
+    ],
+    "polygon_types": [
+     "face",
+     "face"
+    ],
+    "selection_after": {
+     "sel_vertices": [
+      4,
+      0,
+      2
+     ],
+     "sel_edges": [],
+     "sel_polygons": []
+    },
+    "selection_mode_after": "vertex",
+    "failed": false
+   }
+  }
+ ]
+}

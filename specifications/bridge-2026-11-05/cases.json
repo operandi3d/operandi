@@ -1,0 +1,3540 @@
+{
+ "spec": "bridge-2026-11-05",
+ "comparison_rule": "Build the input mesh, select as listed, apply with the listed settings. Point order and polygon corner order are the observed order; implementations should match positions, polygon count and corner order (up to rotation of a polygon's corner list).",
+ "cases": [
+  {
+   "id": "BR01",
+   "description": "Two separated quads, all attributes at reset defaults",
+   "input": {
+    "points": [
+     [
+      -0.5,
+      -1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      -1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      -1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      -1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      1.0,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      7,
+      6,
+      5,
+      4
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": [
+     0,
+     1
+    ]
+   },
+   "selection_mode": "polygon",
+   "settings": {
+    "segments": 0,
+    "twist": 0,
+    "mode": "curve",
+    "remove": 1,
+    "flip": 0,
+    "orient": 0,
+    "tension": 1.0,
+    "uvs": "none",
+    "inset": 0.0,
+    "reversex": 0,
+    "reversey": 0,
+    "aspect": 1,
+    "connect": 1,
+    "autoStep": 0,
+    "steps": 10,
+    "continuous": 1,
+    "guideCurve": 0,
+    "array": "",
+    "closeLoop": 0
+   },
+   "expected": {
+    "points": [
+     [
+      -0.5,
+      -1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      -1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      -1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      -1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      1.0,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      1,
+      0,
+      4,
+      5
+     ],
+     [
+      2,
+      1,
+      5,
+      6
+     ],
+     [
+      3,
+      2,
+      6,
+      7
+     ],
+     [
+      0,
+      3,
+      7,
+      4
+     ]
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": []
+    },
+    "selection_mode_after": "polygon",
+    "message": null
+   }
+  },
+  {
+   "id": "BR02",
+   "description": "Two quads, segments 1, linear",
+   "input": {
+    "points": [
+     [
+      -0.5,
+      -1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      -1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      -1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      -1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      1.0,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      7,
+      6,
+      5,
+      4
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": [
+     0,
+     1
+    ]
+   },
+   "selection_mode": "polygon",
+   "settings": {
+    "segments": 1,
+    "twist": 0,
+    "mode": "linear",
+    "remove": 1,
+    "flip": 0,
+    "orient": 0,
+    "tension": 1.0,
+    "uvs": "none",
+    "inset": 0.0,
+    "reversex": 0,
+    "reversey": 0,
+    "aspect": 1,
+    "connect": 1,
+    "autoStep": 0,
+    "steps": 10,
+    "continuous": 1,
+    "guideCurve": 0,
+    "array": "",
+    "closeLoop": 0
+   },
+   "expected": {
+    "points": [
+     [
+      -0.5,
+      -1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      -1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      -1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      -1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      1.0,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      1,
+      0,
+      4,
+      5
+     ],
+     [
+      2,
+      1,
+      5,
+      6
+     ],
+     [
+      3,
+      2,
+      6,
+      7
+     ],
+     [
+      0,
+      3,
+      7,
+      4
+     ]
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": []
+    },
+    "selection_mode_after": "polygon",
+    "message": null
+   }
+  },
+  {
+   "id": "BR03",
+   "description": "Two quads, segments 3, linear",
+   "input": {
+    "points": [
+     [
+      -0.5,
+      -1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      -1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      -1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      -1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      1.0,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      7,
+      6,
+      5,
+      4
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": [
+     0,
+     1
+    ]
+   },
+   "selection_mode": "polygon",
+   "settings": {
+    "segments": 3,
+    "twist": 0,
+    "mode": "linear",
+    "remove": 1,
+    "flip": 0,
+    "orient": 0,
+    "tension": 1.0,
+    "uvs": "none",
+    "inset": 0.0,
+    "reversex": 0,
+    "reversey": 0,
+    "aspect": 1,
+    "connect": 1,
+    "autoStep": 0,
+    "steps": 10,
+    "continuous": 1,
+    "guideCurve": 0,
+    "array": "",
+    "closeLoop": 0
+   },
+   "expected": {
+    "points": [
+     [
+      -0.5,
+      -1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      -1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      -1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      -1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      -0.333333,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.333333,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.333333,
+      0.5
+     ],
+     [
+      -0.5,
+      -0.333333,
+      0.5
+     ],
+     [
+      -0.5,
+      0.333333,
+      -0.5
+     ],
+     [
+      0.5,
+      0.333333,
+      -0.5
+     ],
+     [
+      0.5,
+      0.333333,
+      0.5
+     ],
+     [
+      -0.5,
+      0.333333,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      1,
+      0,
+      8,
+      9
+     ],
+     [
+      2,
+      1,
+      9,
+      10
+     ],
+     [
+      3,
+      2,
+      10,
+      11
+     ],
+     [
+      0,
+      3,
+      11,
+      8
+     ],
+     [
+      8,
+      12,
+      13,
+      9
+     ],
+     [
+      9,
+      13,
+      14,
+      10
+     ],
+     [
+      10,
+      14,
+      15,
+      11
+     ],
+     [
+      11,
+      15,
+      12,
+      8
+     ],
+     [
+      12,
+      4,
+      5,
+      13
+     ],
+     [
+      13,
+      5,
+      6,
+      14
+     ],
+     [
+      14,
+      6,
+      7,
+      15
+     ],
+     [
+      15,
+      7,
+      4,
+      12
+     ]
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": []
+    },
+    "selection_mode_after": "polygon",
+    "message": null
+   }
+  },
+  {
+   "id": "BR04",
+   "description": "Two quads, segments 3, curve, tension 100%",
+   "input": {
+    "points": [
+     [
+      -0.5,
+      -1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      -1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      -1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      -1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      1.0,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      7,
+      6,
+      5,
+      4
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": [
+     0,
+     1
+    ]
+   },
+   "selection_mode": "polygon",
+   "settings": {
+    "segments": 3,
+    "twist": 0,
+    "mode": "curve",
+    "remove": 1,
+    "flip": 0,
+    "orient": 0,
+    "tension": 1.0,
+    "uvs": "none",
+    "inset": 0.0,
+    "reversex": 0,
+    "reversey": 0,
+    "aspect": 1,
+    "connect": 1,
+    "autoStep": 0,
+    "steps": 10,
+    "continuous": 1,
+    "guideCurve": 0,
+    "array": "",
+    "closeLoop": 0
+   },
+   "expected": {
+    "points": [
+     [
+      -0.5,
+      -1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      -1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      -1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      -1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      -0.333333,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.333333,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.333333,
+      0.5
+     ],
+     [
+      -0.5,
+      -0.333333,
+      0.5
+     ],
+     [
+      -0.5,
+      0.333333,
+      -0.5
+     ],
+     [
+      0.5,
+      0.333333,
+      -0.5
+     ],
+     [
+      0.5,
+      0.333333,
+      0.5
+     ],
+     [
+      -0.5,
+      0.333333,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      1,
+      0,
+      8,
+      9
+     ],
+     [
+      2,
+      1,
+      9,
+      10
+     ],
+     [
+      3,
+      2,
+      10,
+      11
+     ],
+     [
+      0,
+      3,
+      11,
+      8
+     ],
+     [
+      8,
+      12,
+      13,
+      9
+     ],
+     [
+      9,
+      13,
+      14,
+      10
+     ],
+     [
+      10,
+      14,
+      15,
+      11
+     ],
+     [
+      11,
+      15,
+      12,
+      8
+     ],
+     [
+      12,
+      4,
+      5,
+      13
+     ],
+     [
+      13,
+      5,
+      6,
+      14
+     ],
+     [
+      14,
+      6,
+      7,
+      15
+     ],
+     [
+      15,
+      7,
+      4,
+      12
+     ]
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": []
+    },
+    "selection_mode_after": "polygon",
+    "message": null
+   }
+  },
+  {
+   "id": "BR05",
+   "description": "Two quads, segments 3, curve, tension 50%",
+   "input": {
+    "points": [
+     [
+      -0.5,
+      -1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      -1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      -1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      -1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      1.0,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      7,
+      6,
+      5,
+      4
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": [
+     0,
+     1
+    ]
+   },
+   "selection_mode": "polygon",
+   "settings": {
+    "segments": 3,
+    "twist": 0,
+    "mode": "curve",
+    "remove": 1,
+    "flip": 0,
+    "orient": 0,
+    "tension": 0.5,
+    "uvs": "none",
+    "inset": 0.0,
+    "reversex": 0,
+    "reversey": 0,
+    "aspect": 1,
+    "connect": 1,
+    "autoStep": 0,
+    "steps": 10,
+    "continuous": 1,
+    "guideCurve": 0,
+    "array": "",
+    "closeLoop": 0
+   },
+   "expected": {
+    "points": [
+     [
+      -0.5,
+      -1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      -1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      -1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      -1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      -0.407407,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.407407,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.407407,
+      0.5
+     ],
+     [
+      -0.5,
+      -0.407407,
+      0.5
+     ],
+     [
+      -0.5,
+      0.407407,
+      -0.5
+     ],
+     [
+      0.5,
+      0.407407,
+      -0.5
+     ],
+     [
+      0.5,
+      0.407407,
+      0.5
+     ],
+     [
+      -0.5,
+      0.407407,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      1,
+      0,
+      8,
+      9
+     ],
+     [
+      2,
+      1,
+      9,
+      10
+     ],
+     [
+      3,
+      2,
+      10,
+      11
+     ],
+     [
+      0,
+      3,
+      11,
+      8
+     ],
+     [
+      8,
+      12,
+      13,
+      9
+     ],
+     [
+      9,
+      13,
+      14,
+      10
+     ],
+     [
+      10,
+      14,
+      15,
+      11
+     ],
+     [
+      11,
+      15,
+      12,
+      8
+     ],
+     [
+      12,
+      4,
+      5,
+      13
+     ],
+     [
+      13,
+      5,
+      6,
+      14
+     ],
+     [
+      14,
+      6,
+      7,
+      15
+     ],
+     [
+      15,
+      7,
+      4,
+      12
+     ]
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": []
+    },
+    "selection_mode_after": "polygon",
+    "message": null
+   }
+  },
+  {
+   "id": "BR06",
+   "description": "Two quads, segments 3, smooth",
+   "input": {
+    "points": [
+     [
+      -0.5,
+      -1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      -1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      -1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      -1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      1.0,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      7,
+      6,
+      5,
+      4
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": [
+     0,
+     1
+    ]
+   },
+   "selection_mode": "polygon",
+   "settings": {
+    "segments": 3,
+    "twist": 0,
+    "mode": "smooth",
+    "remove": 1,
+    "flip": 0,
+    "orient": 0,
+    "tension": 1.0,
+    "uvs": "none",
+    "inset": 0.0,
+    "reversex": 0,
+    "reversey": 0,
+    "aspect": 1,
+    "connect": 1,
+    "autoStep": 0,
+    "steps": 10,
+    "continuous": 1,
+    "guideCurve": 0,
+    "array": "",
+    "closeLoop": 0
+   },
+   "expected": {
+    "points": [
+     [
+      -0.5,
+      -1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      -1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      -1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      -1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      -0.333333,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.333333,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.333333,
+      0.5
+     ],
+     [
+      -0.5,
+      -0.333333,
+      0.5
+     ],
+     [
+      -0.5,
+      0.333333,
+      -0.5
+     ],
+     [
+      0.5,
+      0.333333,
+      -0.5
+     ],
+     [
+      0.5,
+      0.333333,
+      0.5
+     ],
+     [
+      -0.5,
+      0.333333,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      1,
+      0,
+      8,
+      9
+     ],
+     [
+      2,
+      1,
+      9,
+      10
+     ],
+     [
+      3,
+      2,
+      10,
+      11
+     ],
+     [
+      0,
+      3,
+      11,
+      8
+     ],
+     [
+      8,
+      12,
+      13,
+      9
+     ],
+     [
+      9,
+      13,
+      14,
+      10
+     ],
+     [
+      10,
+      14,
+      15,
+      11
+     ],
+     [
+      11,
+      15,
+      12,
+      8
+     ],
+     [
+      12,
+      4,
+      5,
+      13
+     ],
+     [
+      13,
+      5,
+      6,
+      14
+     ],
+     [
+      14,
+      6,
+      7,
+      15
+     ],
+     [
+      15,
+      7,
+      4,
+      12
+     ]
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": []
+    },
+    "selection_mode_after": "polygon",
+    "message": null
+   }
+  },
+  {
+   "id": "BR07",
+   "description": "Two quads, segments 1, linear, twist 1",
+   "input": {
+    "points": [
+     [
+      -0.5,
+      -1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      -1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      -1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      -1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      1.0,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      7,
+      6,
+      5,
+      4
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": [
+     0,
+     1
+    ]
+   },
+   "selection_mode": "polygon",
+   "settings": {
+    "segments": 1,
+    "twist": 1,
+    "mode": "linear",
+    "remove": 1,
+    "flip": 0,
+    "orient": 0,
+    "tension": 1.0,
+    "uvs": "none",
+    "inset": 0.0,
+    "reversex": 0,
+    "reversey": 0,
+    "aspect": 1,
+    "connect": 1,
+    "autoStep": 0,
+    "steps": 10,
+    "continuous": 1,
+    "guideCurve": 0,
+    "array": "",
+    "closeLoop": 0
+   },
+   "expected": {
+    "points": [
+     [
+      -0.5,
+      -1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      -1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      -1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      -1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      1.0,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      1,
+      0,
+      5,
+      6
+     ],
+     [
+      2,
+      1,
+      6,
+      7
+     ],
+     [
+      3,
+      2,
+      7,
+      4
+     ],
+     [
+      0,
+      3,
+      4,
+      5
+     ]
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": []
+    },
+    "selection_mode_after": "polygon",
+    "message": null
+   }
+  },
+  {
+   "id": "BR08",
+   "description": "Two quads, segments 1, linear, remove off",
+   "input": {
+    "points": [
+     [
+      -0.5,
+      -1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      -1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      -1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      -1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      1.0,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      7,
+      6,
+      5,
+      4
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": [
+     0,
+     1
+    ]
+   },
+   "selection_mode": "polygon",
+   "settings": {
+    "segments": 1,
+    "twist": 0,
+    "mode": "linear",
+    "remove": 0,
+    "flip": 0,
+    "orient": 0,
+    "tension": 1.0,
+    "uvs": "none",
+    "inset": 0.0,
+    "reversex": 0,
+    "reversey": 0,
+    "aspect": 1,
+    "connect": 1,
+    "autoStep": 0,
+    "steps": 10,
+    "continuous": 1,
+    "guideCurve": 0,
+    "array": "",
+    "closeLoop": 0
+   },
+   "expected": {
+    "points": [
+     [
+      -0.5,
+      -1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      -1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      -1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      -1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      1.0,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      7,
+      6,
+      5,
+      4
+     ],
+     [
+      1,
+      0,
+      4,
+      5
+     ],
+     [
+      2,
+      1,
+      5,
+      6
+     ],
+     [
+      3,
+      2,
+      6,
+      7
+     ],
+     [
+      0,
+      3,
+      7,
+      4
+     ]
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": [
+      0,
+      1
+     ]
+    },
+    "selection_mode_after": "polygon",
+    "message": null
+   }
+  },
+  {
+   "id": "BR09",
+   "description": "Two quads, segments 1, linear, flip on",
+   "input": {
+    "points": [
+     [
+      -0.5,
+      -1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      -1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      -1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      -1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      1.0,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      7,
+      6,
+      5,
+      4
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": [
+     0,
+     1
+    ]
+   },
+   "selection_mode": "polygon",
+   "settings": {
+    "segments": 1,
+    "twist": 0,
+    "mode": "linear",
+    "remove": 1,
+    "flip": 1,
+    "orient": 0,
+    "tension": 1.0,
+    "uvs": "none",
+    "inset": 0.0,
+    "reversex": 0,
+    "reversey": 0,
+    "aspect": 1,
+    "connect": 1,
+    "autoStep": 0,
+    "steps": 10,
+    "continuous": 1,
+    "guideCurve": 0,
+    "array": "",
+    "closeLoop": 0
+   },
+   "expected": {
+    "points": [
+     [
+      -0.5,
+      -1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      -1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      -1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      -1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      1.0,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      1,
+      5,
+      4,
+      0
+     ],
+     [
+      2,
+      6,
+      5,
+      1
+     ],
+     [
+      3,
+      7,
+      6,
+      2
+     ],
+     [
+      0,
+      4,
+      7,
+      3
+     ]
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": []
+    },
+    "selection_mode_after": "polygon",
+    "message": null
+   }
+  },
+  {
+   "id": "BR10",
+   "description": "Two quads, segments 1, linear, reversex on",
+   "input": {
+    "points": [
+     [
+      -0.5,
+      -1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      -1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      -1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      -1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      1.0,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      7,
+      6,
+      5,
+      4
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": [
+     0,
+     1
+    ]
+   },
+   "selection_mode": "polygon",
+   "settings": {
+    "segments": 1,
+    "twist": 0,
+    "mode": "linear",
+    "remove": 1,
+    "flip": 0,
+    "orient": 0,
+    "tension": 1.0,
+    "uvs": "none",
+    "inset": 0.0,
+    "reversex": 0,
+    "reversey": 0,
+    "aspect": 1,
+    "connect": 1,
+    "autoStep": 0,
+    "steps": 10,
+    "continuous": 1,
+    "guideCurve": 0,
+    "array": "",
+    "closeLoop": 0
+   },
+   "expected": {
+    "points": [
+     [
+      -0.5,
+      -1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      -1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      -1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      -1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      1.0,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      1,
+      0,
+      4,
+      5
+     ],
+     [
+      2,
+      1,
+      5,
+      6
+     ],
+     [
+      3,
+      2,
+      6,
+      7
+     ],
+     [
+      0,
+      3,
+      7,
+      4
+     ]
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": []
+    },
+    "selection_mode_after": "polygon",
+    "message": null
+   }
+  },
+  {
+   "id": "BR11",
+   "description": "Two quads, segments 1, linear, reversey on",
+   "input": {
+    "points": [
+     [
+      -0.5,
+      -1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      -1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      -1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      -1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      1.0,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      7,
+      6,
+      5,
+      4
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": [
+     0,
+     1
+    ]
+   },
+   "selection_mode": "polygon",
+   "settings": {
+    "segments": 1,
+    "twist": 0,
+    "mode": "linear",
+    "remove": 1,
+    "flip": 0,
+    "orient": 0,
+    "tension": 1.0,
+    "uvs": "none",
+    "inset": 0.0,
+    "reversex": 0,
+    "reversey": 0,
+    "aspect": 1,
+    "connect": 1,
+    "autoStep": 0,
+    "steps": 10,
+    "continuous": 1,
+    "guideCurve": 0,
+    "array": "",
+    "closeLoop": 0
+   },
+   "expected": {
+    "points": [
+     [
+      -0.5,
+      -1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      -1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      -1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      -1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      1.0,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      1,
+      0,
+      4,
+      5
+     ],
+     [
+      2,
+      1,
+      5,
+      6
+     ],
+     [
+      3,
+      2,
+      6,
+      7
+     ],
+     [
+      0,
+      3,
+      7,
+      4
+     ]
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": []
+    },
+    "selection_mode_after": "polygon",
+    "message": null
+   }
+  },
+  {
+   "id": "BR12",
+   "description": "Two quads, segments 1, linear, orient on",
+   "input": {
+    "points": [
+     [
+      -0.5,
+      -1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      -1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      -1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      -1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      1.0,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      7,
+      6,
+      5,
+      4
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": [
+     0,
+     1
+    ]
+   },
+   "selection_mode": "polygon",
+   "settings": {
+    "segments": 1,
+    "twist": 0,
+    "mode": "linear",
+    "remove": 1,
+    "flip": 0,
+    "orient": 1,
+    "tension": 1.0,
+    "uvs": "none",
+    "inset": 0.0,
+    "reversex": 0,
+    "reversey": 0,
+    "aspect": 1,
+    "connect": 1,
+    "autoStep": 0,
+    "steps": 10,
+    "continuous": 1,
+    "guideCurve": 0,
+    "array": "",
+    "closeLoop": 0
+   },
+   "expected": {
+    "points": [
+     [
+      -0.5,
+      -1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      -1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      -1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      -1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      1.0,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      1,
+      0,
+      4,
+      7
+     ],
+     [
+      1,
+      7,
+      6,
+      2
+     ],
+     [
+      3,
+      2,
+      6,
+      5
+     ],
+     [
+      3,
+      5,
+      4,
+      0
+     ]
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": []
+    },
+    "selection_mode_after": "polygon",
+    "message": null
+   }
+  },
+  {
+   "id": "BR13",
+   "description": "Two quads, segments 1, linear, inset 0.1",
+   "input": {
+    "points": [
+     [
+      -0.5,
+      -1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      -1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      -1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      -1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      1.0,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      7,
+      6,
+      5,
+      4
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": [
+     0,
+     1
+    ]
+   },
+   "selection_mode": "polygon",
+   "settings": {
+    "segments": 1,
+    "twist": 0,
+    "mode": "linear",
+    "remove": 1,
+    "flip": 0,
+    "orient": 0,
+    "tension": 1.0,
+    "uvs": "none",
+    "inset": 0.0,
+    "reversex": 0,
+    "reversey": 0,
+    "aspect": 1,
+    "connect": 1,
+    "autoStep": 0,
+    "steps": 10,
+    "continuous": 1,
+    "guideCurve": 0,
+    "array": "",
+    "closeLoop": 0
+   },
+   "expected": {
+    "points": [
+     [
+      -0.5,
+      -1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      -1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      -1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      -1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      1.0,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      1,
+      0,
+      4,
+      5
+     ],
+     [
+      2,
+      1,
+      5,
+      6
+     ],
+     [
+      3,
+      2,
+      6,
+      7
+     ],
+     [
+      0,
+      3,
+      7,
+      4
+     ]
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": []
+    },
+    "selection_mode_after": "polygon",
+    "message": null
+   }
+  },
+  {
+   "id": "BR14",
+   "description": "Two quads, segments 1, linear, connect off",
+   "input": {
+    "points": [
+     [
+      -0.5,
+      -1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      -1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      -1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      -1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      1.0,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      7,
+      6,
+      5,
+      4
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": [
+     0,
+     1
+    ]
+   },
+   "selection_mode": "polygon",
+   "settings": {
+    "segments": 1,
+    "twist": 0,
+    "mode": "linear",
+    "remove": 1,
+    "flip": 0,
+    "orient": 0,
+    "tension": 1.0,
+    "uvs": "none",
+    "inset": 0.0,
+    "reversex": 0,
+    "reversey": 0,
+    "aspect": 1,
+    "connect": 0,
+    "autoStep": 0,
+    "steps": 10,
+    "continuous": 1,
+    "guideCurve": 0,
+    "array": "",
+    "closeLoop": 0
+   },
+   "expected": {
+    "points": [
+     [
+      -0.5,
+      -1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      -1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      -1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      -1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      1.0,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      1,
+      0,
+      4,
+      5
+     ],
+     [
+      2,
+      1,
+      5,
+      6
+     ],
+     [
+      3,
+      2,
+      6,
+      7
+     ],
+     [
+      0,
+      3,
+      7,
+      4
+     ]
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": []
+    },
+    "selection_mode_after": "polygon",
+    "message": null
+   }
+  },
+  {
+   "id": "BR15",
+   "description": "Quad to triangle, segments 1, linear",
+   "input": {
+    "points": [
+     [
+      -0.5,
+      -1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      -1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      -1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      -1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      1.0,
+      -0.5
+     ],
+     [
+      0.0,
+      1.0,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      6,
+      5,
+      4
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": [
+     0,
+     1
+    ]
+   },
+   "selection_mode": "polygon",
+   "settings": {
+    "segments": 1,
+    "twist": 0,
+    "mode": "linear",
+    "remove": 1,
+    "flip": 0,
+    "orient": 0,
+    "tension": 1.0,
+    "uvs": "none",
+    "inset": 0.0,
+    "reversex": 0,
+    "reversey": 0,
+    "aspect": 1,
+    "connect": 1,
+    "autoStep": 0,
+    "steps": 10,
+    "continuous": 1,
+    "guideCurve": 0,
+    "array": "",
+    "closeLoop": 0
+   },
+   "expected": {
+    "points": [
+     [
+      -0.5,
+      -1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      -1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      -1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      -1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      1.0,
+      -0.5
+     ],
+     [
+      0.0,
+      1.0,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      1,
+      0,
+      4,
+      5
+     ],
+     [
+      2,
+      1,
+      5,
+      6
+     ],
+     [
+      2,
+      6,
+      3
+     ],
+     [
+      3,
+      6,
+      4,
+      0
+     ]
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": []
+    },
+    "selection_mode_after": "polygon",
+    "message": null
+   }
+  },
+  {
+   "id": "BR16",
+   "description": "2x1 strip, left and right border edges (edge mode), segments 1, linear",
+   "input": {
+    "points": [
+     [
+      -1.0,
+      -0.5,
+      0.0
+     ],
+     [
+      0.0,
+      -0.5,
+      0.0
+     ],
+     [
+      1.0,
+      -0.5,
+      0.0
+     ],
+     [
+      -1.0,
+      0.5,
+      0.0
+     ],
+     [
+      0.0,
+      0.5,
+      0.0
+     ],
+     [
+      1.0,
+      0.5,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      4,
+      3
+     ],
+     [
+      1,
+      2,
+      5,
+      4
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [
+     [
+      0,
+      3
+     ],
+     [
+      2,
+      5
+     ]
+    ],
+    "sel_polygons": []
+   },
+   "selection_mode": "edge",
+   "settings": {
+    "segments": 1,
+    "twist": 0,
+    "mode": "linear",
+    "remove": 1,
+    "flip": 0,
+    "orient": 0,
+    "tension": 1.0,
+    "uvs": "none",
+    "inset": 0.0,
+    "reversex": 0,
+    "reversey": 0,
+    "aspect": 1,
+    "connect": 1,
+    "autoStep": 0,
+    "steps": 10,
+    "continuous": 1,
+    "guideCurve": 0,
+    "array": "",
+    "closeLoop": 0
+   },
+   "expected": {
+    "points": [
+     [
+      -1.0,
+      -0.5,
+      0.0
+     ],
+     [
+      0.0,
+      -0.5,
+      0.0
+     ],
+     [
+      1.0,
+      -0.5,
+      0.0
+     ],
+     [
+      -1.0,
+      0.5,
+      0.0
+     ],
+     [
+      0.0,
+      0.5,
+      0.0
+     ],
+     [
+      1.0,
+      0.5,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      4,
+      3
+     ],
+     [
+      1,
+      2,
+      5,
+      4
+     ],
+     [
+      3,
+      5,
+      2,
+      0
+     ]
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [
+      [
+       0,
+       3
+      ],
+      [
+       2,
+       5
+      ]
+     ],
+     "sel_polygons": []
+    },
+    "selection_mode_after": "edge",
+    "message": null
+   }
+  },
+  {
+   "id": "BR17",
+   "description": "2x1 strip, border edges, segments 2, linear",
+   "input": {
+    "points": [
+     [
+      -1.0,
+      -0.5,
+      0.0
+     ],
+     [
+      0.0,
+      -0.5,
+      0.0
+     ],
+     [
+      1.0,
+      -0.5,
+      0.0
+     ],
+     [
+      -1.0,
+      0.5,
+      0.0
+     ],
+     [
+      0.0,
+      0.5,
+      0.0
+     ],
+     [
+      1.0,
+      0.5,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      4,
+      3
+     ],
+     [
+      1,
+      2,
+      5,
+      4
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [
+     [
+      0,
+      3
+     ],
+     [
+      2,
+      5
+     ]
+    ],
+    "sel_polygons": []
+   },
+   "selection_mode": "edge",
+   "settings": {
+    "segments": 2,
+    "twist": 0,
+    "mode": "linear",
+    "remove": 1,
+    "flip": 0,
+    "orient": 0,
+    "tension": 1.0,
+    "uvs": "none",
+    "inset": 0.0,
+    "reversex": 0,
+    "reversey": 0,
+    "aspect": 1,
+    "connect": 1,
+    "autoStep": 0,
+    "steps": 10,
+    "continuous": 1,
+    "guideCurve": 0,
+    "array": "",
+    "closeLoop": 0
+   },
+   "expected": {
+    "points": [
+     [
+      -1.0,
+      -0.5,
+      0.0
+     ],
+     [
+      0.0,
+      -0.5,
+      0.0
+     ],
+     [
+      1.0,
+      -0.5,
+      0.0
+     ],
+     [
+      -1.0,
+      0.5,
+      0.0
+     ],
+     [
+      0.0,
+      0.5,
+      0.0
+     ],
+     [
+      1.0,
+      0.5,
+      0.0
+     ],
+     [
+      0.0,
+      0.5,
+      0.0
+     ],
+     [
+      0.0,
+      -0.5,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      4,
+      3
+     ],
+     [
+      1,
+      2,
+      5,
+      4
+     ],
+     [
+      3,
+      6,
+      7,
+      0
+     ],
+     [
+      6,
+      5,
+      2,
+      7
+     ]
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [
+      [
+       0,
+       3
+      ],
+      [
+       2,
+       5
+      ]
+     ],
+     "sel_polygons": []
+    },
+    "selection_mode_after": "edge",
+    "message": null
+   }
+  },
+  {
+   "id": "BR18",
+   "description": "Two quads, nothing selected, segments 1, linear",
+   "input": {
+    "points": [
+     [
+      -0.5,
+      -1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      -1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      -1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      -1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      1.0,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      7,
+      6,
+      5,
+      4
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": []
+   },
+   "selection_mode": "polygon",
+   "settings": {
+    "segments": 1,
+    "twist": 0,
+    "mode": "linear",
+    "remove": 1,
+    "flip": 0,
+    "orient": 0,
+    "tension": 1.0,
+    "uvs": "none",
+    "inset": 0.0,
+    "reversex": 0,
+    "reversey": 0,
+    "aspect": 1,
+    "connect": 1,
+    "autoStep": 0,
+    "steps": 10,
+    "continuous": 1,
+    "guideCurve": 0,
+    "array": "",
+    "closeLoop": 0
+   },
+   "expected": {
+    "points": [
+     [
+      -0.5,
+      -1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      -1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      -1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      -1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      1.0,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      7,
+      6,
+      5,
+      4
+     ]
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": []
+    },
+    "selection_mode_after": "polygon",
+    "message": null
+   }
+  },
+  {
+   "id": "BR19",
+   "description": "Only one quad selected, segments 1, linear",
+   "input": {
+    "points": [
+     [
+      -0.5,
+      -1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      -1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      -1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      -1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      1.0,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      7,
+      6,
+      5,
+      4
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": [
+     0
+    ]
+   },
+   "selection_mode": "polygon",
+   "settings": {
+    "segments": 1,
+    "twist": 0,
+    "mode": "linear",
+    "remove": 1,
+    "flip": 0,
+    "orient": 0,
+    "tension": 1.0,
+    "uvs": "none",
+    "inset": 0.0,
+    "reversex": 0,
+    "reversey": 0,
+    "aspect": 1,
+    "connect": 1,
+    "autoStep": 0,
+    "steps": 10,
+    "continuous": 1,
+    "guideCurve": 0,
+    "array": "",
+    "closeLoop": 0
+   },
+   "expected": {
+    "points": [
+     [
+      -0.5,
+      -1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      -1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      -1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      -1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      1.0,
+      -0.5
+     ],
+     [
+      0.5,
+      1.0,
+      0.5
+     ],
+     [
+      -0.5,
+      1.0,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      7,
+      6,
+      5,
+      4
+     ]
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": [
+      0
+     ]
+    },
+    "selection_mode_after": "polygon",
+    "message": null
+   }
+  }
+ ]
+}

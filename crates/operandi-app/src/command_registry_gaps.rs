@@ -1,0 +1,72 @@
+//! UIC-164 known gaps: controls that call the app directly and run no
+//! registered command yet ("surface | label", or "menu | entry").
+//! Stage 4 of the extensibility plan backfills them; this list only shrinks.
+//! command_registry_tests.rs fails on a new click-only control, and on an
+//! entry here that has since gained a command.
+pub(super) const KNOWN_GAPS: &[&str] = &[
+    "loose | Lasso Style",
+    "loose | Select Falloff",
+    "preferences/Application | Choose…",
+    "preferences/Application | Clear",
+    "preferences/AutoSave | Browse…",
+    "preferences/AutoSave | Default",
+    "preferences/Colors | ",
+    "preferences/Colors | Scheme",
+    "preferences/Display | Item Drawing: Current Scene",
+    "preferences/Input | Input Map…",
+    "preferences/Rendering | Choose...",
+    "preferences/Rendering | Default",
+    "preferences/Rendering | Max Samples",
+    "preferences/Selection | Lasso: Allow Partial Element Selection",
+    "preferences/ToolHandles | Inner Range",
+    "preferences/ToolHandles | Outer Range",
+    "properties/Camera Effects | Enable",
+    "properties/Camera Effects | F-Stop Preset",
+    "properties/Camera View | Film Back Preset",
+    "properties/Camera View | Film Fit",
+    "properties/Camera View | Lens Preset",
+    "properties/Camera View | Override Render Resolution",
+    "properties/Camera View | Projection Type",
+    "properties/Render Output | Denoising",
+    "properties/Render Output | Exposure Control",
+    "properties/Render Output | Film Speed (ISO)",
+    "properties/Render Output | Input Black Level",
+    "properties/Render Output | Input Gray Level",
+    "properties/Render Output | Input White Level",
+    "properties/Render Output | Maximum Depth",
+    "properties/Render Output | Maximum Motion",
+    "properties/Render Output | Output Black Level",
+    "properties/Render Output | Output White Level",
+    "properties/Render Output | Tone Map Amount",
+    "properties/Render Output | Tone Map Type",
+    "properties/Render Output | Vignette Amount",
+    "properties/Texture | Alpha 1",
+    "properties/Texture | Alpha 2",
+    "properties/Texture | Alpha Variation",
+    "properties/Texture | Cell Density",
+    "properties/Texture | Color 1",
+    "properties/Texture | Color 2",
+    "properties/Texture | Hue Variation",
+    "properties/Texture | Ignore Scale Group",
+    "properties/Texture | Input Parameter",
+    "properties/Texture | Occlusion Distance",
+    "properties/Texture | Saturation Variation",
+    "properties/Texture | Swizzling",
+    "properties/Texture | Transition Width",
+    "properties/Texture | Type",
+    "properties/Texture | Value 1",
+    "properties/Texture | Value 2",
+    "properties/Texture | Value Variation",
+    "properties/Texture | Variation Source",
+    "toolbox | Convert",
+    "toolbox | Mesh Cleanup",
+    "viewport-properties | Replicators",
+    "viewport-properties | Show Vertices",
+    "viewport-properties | Smooth Shade",
+];
+
+/// Window chrome that may stay click-only (UIC-165, Jason 2026-11-09):
+/// layout locks, window sizes, floating and tearing off panels, splitting
+/// and closing views, and the lasso's Partial switch. Permanent: the
+/// UIC-164 test never asks these for a command.
+pub(super) const CHROME_EXEMPT: &[&str] = &[];

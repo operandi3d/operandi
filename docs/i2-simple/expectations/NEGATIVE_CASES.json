@@ -1,0 +1,764 @@
+[
+  {
+    "id": "numeric-'abc'",
+    "before_state": "A_begin",
+    "action": "Confirm field",
+    "args": {
+      "raw": "abc",
+      "draft_kept": true,
+      "error_visible": true
+    },
+    "expected": "Refuse",
+    "after_state": "A_begin",
+    "publication_delta": 0,
+    "request_delta": 0,
+    "allocation_delta": {
+      "geometry": 0,
+      "stage": 0
+    },
+    "classification": "Malformed or invalid"
+  },
+  {
+    "id": "numeric-''",
+    "before_state": "A_begin",
+    "action": "Confirm field",
+    "args": {
+      "raw": "",
+      "draft_kept": true,
+      "error_visible": true
+    },
+    "expected": "Refuse",
+    "after_state": "A_begin",
+    "publication_delta": 0,
+    "request_delta": 0,
+    "allocation_delta": {
+      "geometry": 0,
+      "stage": 0
+    },
+    "classification": "Malformed or invalid"
+  },
+  {
+    "id": "numeric-'1 m/0'",
+    "before_state": "A_begin",
+    "action": "Confirm field",
+    "args": {
+      "raw": "1 m/0",
+      "draft_kept": true,
+      "error_visible": true
+    },
+    "expected": "Refuse",
+    "after_state": "A_begin",
+    "publication_delta": 0,
+    "request_delta": 0,
+    "allocation_delta": {
+      "geometry": 0,
+      "stage": 0
+    },
+    "classification": "Malformed or invalid"
+  },
+  {
+    "id": "numeric-'1 m + 30 deg'",
+    "before_state": "A_begin",
+    "action": "Confirm field",
+    "args": {
+      "raw": "1 m + 30 deg",
+      "draft_kept": true,
+      "error_visible": true
+    },
+    "expected": "Refuse",
+    "after_state": "A_begin",
+    "publication_delta": 0,
+    "request_delta": 0,
+    "allocation_delta": {
+      "geometry": 0,
+      "stage": 0
+    },
+    "classification": "Malformed or invalid"
+  },
+  {
+    "id": "numeric-'NaN'",
+    "before_state": "A_begin",
+    "action": "Confirm field",
+    "args": {
+      "raw": "NaN",
+      "draft_kept": true,
+      "error_visible": true
+    },
+    "expected": "Refuse",
+    "after_state": "A_begin",
+    "publication_delta": 0,
+    "request_delta": 0,
+    "allocation_delta": {
+      "geometry": 0,
+      "stage": 0
+    },
+    "classification": "Malformed or invalid"
+  },
+  {
+    "id": "numeric-'Infinity'",
+    "before_state": "A_begin",
+    "action": "Confirm field",
+    "args": {
+      "raw": "Infinity",
+      "draft_kept": true,
+      "error_visible": true
+    },
+    "expected": "Refuse",
+    "after_state": "A_begin",
+    "publication_delta": 0,
+    "request_delta": 0,
+    "allocation_delta": {
+      "geometry": 0,
+      "stage": 0
+    },
+    "classification": "Malformed or invalid"
+  },
+  {
+    "id": "numeric-'-Infinity'",
+    "before_state": "A_begin",
+    "action": "Confirm field",
+    "args": {
+      "raw": "-Infinity",
+      "draft_kept": true,
+      "error_visible": true
+    },
+    "expected": "Refuse",
+    "after_state": "A_begin",
+    "publication_delta": 0,
+    "request_delta": 0,
+    "allocation_delta": {
+      "geometry": 0,
+      "stage": 0
+    },
+    "classification": "Malformed or invalid"
+  },
+  {
+    "id": "numeric-programmatic-NaN",
+    "before_state": "A_begin",
+    "action": "MoveTo",
+    "args": {
+      "z_spec": "NaN"
+    },
+    "expected": "Refuse",
+    "after_state": "A_begin",
+    "publication_delta": 0,
+    "request_delta": 0,
+    "allocation_delta": {
+      "geometry": 0,
+      "stage": 0
+    },
+    "classification": "Malformed or invalid"
+  },
+  {
+    "id": "numeric-programmatic-+Infinity",
+    "before_state": "A_begin",
+    "action": "MoveTo",
+    "args": {
+      "z_spec": "+Infinity"
+    },
+    "expected": "Refuse",
+    "after_state": "A_begin",
+    "publication_delta": 0,
+    "request_delta": 0,
+    "allocation_delta": {
+      "geometry": 0,
+      "stage": 0
+    },
+    "classification": "Malformed or invalid"
+  },
+  {
+    "id": "numeric-programmatic--Infinity",
+    "before_state": "A_begin",
+    "action": "MoveTo",
+    "args": {
+      "z_spec": "-Infinity"
+    },
+    "expected": "Refuse",
+    "after_state": "A_begin",
+    "publication_delta": 0,
+    "request_delta": 0,
+    "allocation_delta": {
+      "geometry": 0,
+      "stage": 0
+    },
+    "classification": "Malformed or invalid"
+  },
+  {
+    "id": "numeric-programmatic-1e12",
+    "before_state": "A_begin",
+    "action": "MoveTo",
+    "args": {
+      "z_spec": "1e12"
+    },
+    "expected": "Refuse",
+    "after_state": "A_begin",
+    "publication_delta": 0,
+    "request_delta": 0,
+    "allocation_delta": {
+      "geometry": 0,
+      "stage": 0
+    },
+    "classification": "Malformed or invalid"
+  },
+  {
+    "id": "target-empty",
+    "before_state": "A_begin",
+    "action": "CheckedMove",
+    "args": {
+      "targets": []
+    },
+    "expected": "Refuse",
+    "after_state": "A_begin",
+    "publication_delta": 0,
+    "request_delta": 0,
+    "allocation_delta": {
+      "geometry": 0,
+      "stage": 0
+    },
+    "classification": "Malformed or invalid"
+  },
+  {
+    "id": "target-duplicate",
+    "before_state": "A_begin",
+    "action": "CheckedMove",
+    "args": {
+      "targets": [
+        10,
+        10
+      ]
+    },
+    "expected": "Refuse",
+    "after_state": "A_begin",
+    "publication_delta": 0,
+    "request_delta": 0,
+    "allocation_delta": {
+      "geometry": 0,
+      "stage": 0
+    },
+    "classification": "Malformed or invalid"
+  },
+  {
+    "id": "target-missing",
+    "before_state": "A_begin",
+    "action": "CheckedMove",
+    "args": {
+      "targets": [
+        999
+      ]
+    },
+    "expected": "Refuse",
+    "after_state": "A_begin",
+    "publication_delta": 0,
+    "request_delta": 0,
+    "allocation_delta": {
+      "geometry": 0,
+      "stage": 0
+    },
+    "classification": "Malformed or invalid"
+  },
+  {
+    "id": "target-retired",
+    "before_state": "A_begin",
+    "action": "CheckedMove",
+    "args": {
+      "targets": [
+        999
+      ],
+      "retired_binding": true
+    },
+    "expected": "Refuse",
+    "after_state": "A_begin",
+    "publication_delta": 0,
+    "request_delta": 0,
+    "allocation_delta": {
+      "geometry": 0,
+      "stage": 0
+    },
+    "classification": "Malformed or invalid"
+  },
+  {
+    "id": "target-foreign_doc",
+    "before_state": "A_begin",
+    "action": "CheckedMove",
+    "args": {
+      "targets": [
+        10
+      ],
+      "scope": "D1/item1/generation1"
+    },
+    "expected": "Refuse",
+    "after_state": "A_begin",
+    "publication_delta": 0,
+    "request_delta": 0,
+    "allocation_delta": {
+      "geometry": 0,
+      "stage": 0
+    },
+    "classification": "Malformed or invalid"
+  },
+  {
+    "id": "target-foreign_mesh",
+    "before_state": "A_begin",
+    "action": "CheckedMove",
+    "args": {
+      "targets": [
+        10
+      ],
+      "scope": "D0/item2/generation1"
+    },
+    "expected": "Refuse",
+    "after_state": "A_begin",
+    "publication_delta": 0,
+    "request_delta": 0,
+    "allocation_delta": {
+      "geometry": 0,
+      "stage": 0
+    },
+    "classification": "Malformed or invalid"
+  },
+  {
+    "id": "target-wrong_generation",
+    "before_state": "A_begin",
+    "action": "CheckedMove",
+    "args": {
+      "targets": [
+        10
+      ],
+      "scope": "D0/item1/generation2"
+    },
+    "expected": "Refuse",
+    "after_state": "A_begin",
+    "publication_delta": 0,
+    "request_delta": 0,
+    "allocation_delta": {
+      "geometry": 0,
+      "stage": 0
+    },
+    "classification": "Malformed or invalid"
+  },
+  {
+    "id": "target-wrong_stage",
+    "before_state": "A_begin",
+    "action": "CheckedMove",
+    "args": {
+      "targets": [
+        10
+      ],
+      "stage_key": 2
+    },
+    "expected": "Refuse",
+    "after_state": "A_begin",
+    "publication_delta": 0,
+    "request_delta": 0,
+    "allocation_delta": {
+      "geometry": 0,
+      "stage": 0
+    },
+    "classification": "Malformed or invalid"
+  },
+  {
+    "id": "target-source_layout",
+    "before_state": "A_begin",
+    "action": "CheckedMove",
+    "args": {
+      "targets": [
+        10
+      ],
+      "source_layout_permuted": true
+    },
+    "expected": "Refuse",
+    "after_state": "A_begin",
+    "publication_delta": 0,
+    "request_delta": 0,
+    "allocation_delta": {
+      "geometry": 0,
+      "stage": 0
+    },
+    "classification": "Malformed or invalid"
+  },
+  {
+    "id": "profile-Sides2",
+    "before_state": "A_begin",
+    "action": "Attempt unsupported change",
+    "args": {
+      "sides": 2
+    },
+    "expected": "Refuse",
+    "after_state": "A_begin",
+    "publication_delta": 0,
+    "request_delta": 0,
+    "allocation_delta": {
+      "geometry": 0,
+      "stage": 0
+    },
+    "classification": "Valid unsupported I2 combination"
+  },
+  {
+    "id": "profile-ModeThick",
+    "before_state": "A_begin",
+    "action": "Attempt unsupported change",
+    "args": {
+      "mode": "Thick"
+    },
+    "expected": "Refuse",
+    "after_state": "A_begin",
+    "publication_delta": 0,
+    "request_delta": 0,
+    "allocation_delta": {
+      "geometry": 0,
+      "stage": 0
+    },
+    "classification": "Valid unsupported I2 combination"
+  },
+  {
+    "id": "profile-ModeAuto",
+    "before_state": "A_begin",
+    "action": "Attempt unsupported change",
+    "args": {
+      "mode": "Auto"
+    },
+    "expected": "Refuse",
+    "after_state": "A_begin",
+    "publication_delta": 0,
+    "request_delta": 0,
+    "allocation_delta": {
+      "geometry": 0,
+      "stage": 0
+    },
+    "classification": "Valid unsupported I2 combination"
+  },
+  {
+    "id": "profile-UVU",
+    "before_state": "A_begin",
+    "action": "Attempt unsupported change",
+    "args": {
+      "make_uvs": "U"
+    },
+    "expected": "Refuse",
+    "after_state": "A_begin",
+    "publication_delta": 0,
+    "request_delta": 0,
+    "allocation_delta": {
+      "geometry": 0,
+      "stage": 0
+    },
+    "classification": "Valid unsupported I2 combination"
+  },
+  {
+    "id": "profile-UVV",
+    "before_state": "A_begin",
+    "action": "Attempt unsupported change",
+    "args": {
+      "make_uvs": "V"
+    },
+    "expected": "Refuse",
+    "after_state": "A_begin",
+    "publication_delta": 0,
+    "request_delta": 0,
+    "allocation_delta": {
+      "geometry": 0,
+      "stage": 0
+    },
+    "classification": "Valid unsupported I2 combination"
+  },
+  {
+    "id": "profile-MapEmpty",
+    "before_state": "A_begin",
+    "action": "Attempt unsupported change",
+    "args": {
+      "uv_map": "Empty"
+    },
+    "expected": "Refuse",
+    "after_state": "A_begin",
+    "publication_delta": 0,
+    "request_delta": 0,
+    "allocation_delta": {
+      "geometry": 0,
+      "stage": 0
+    },
+    "classification": "Valid unsupported I2 combination"
+  },
+  {
+    "id": "profile-NonZ",
+    "before_state": "A_begin",
+    "action": "Attempt unsupported change",
+    "args": {
+      "extent_world_m": [
+        0.25,
+        0,
+        0
+      ]
+    },
+    "expected": "Refuse",
+    "after_state": "A_begin",
+    "publication_delta": 0,
+    "request_delta": 0,
+    "allocation_delta": {
+      "geometry": 0,
+      "stage": 0
+    },
+    "classification": "Valid unsupported I2 combination"
+  },
+  {
+    "id": "profile-Xhandle",
+    "before_state": "A_begin",
+    "action": "Attempt unsupported change",
+    "args": {
+      "handle": "WorldX"
+    },
+    "expected": "Refuse",
+    "after_state": "A_begin",
+    "publication_delta": 0,
+    "request_delta": 0,
+    "allocation_delta": {
+      "geometry": 0,
+      "stage": 0
+    },
+    "classification": "Valid unsupported I2 combination"
+  },
+  {
+    "id": "profile-Yhandle",
+    "before_state": "A_begin",
+    "action": "Attempt unsupported change",
+    "args": {
+      "handle": "WorldY"
+    },
+    "expected": "Refuse",
+    "after_state": "A_begin",
+    "publication_delta": 0,
+    "request_delta": 0,
+    "allocation_delta": {
+      "geometry": 0,
+      "stage": 0
+    },
+    "classification": "Valid unsupported I2 combination"
+  },
+  {
+    "id": "profile-Ambiguous",
+    "before_state": "A_begin",
+    "action": "Attempt unsupported change",
+    "args": {
+      "handle": "ambiguous"
+    },
+    "expected": "Refuse",
+    "after_state": "A_begin",
+    "publication_delta": 0,
+    "request_delta": 0,
+    "allocation_delta": {
+      "geometry": 0,
+      "stage": 0
+    },
+    "classification": "Valid unsupported I2 combination"
+  },
+  {
+    "id": "profile-InteractiveApply",
+    "before_state": "A_begin",
+    "action": "Attempt unsupported change",
+    "args": {},
+    "expected": "Refuse",
+    "after_state": "A_begin",
+    "publication_delta": 0,
+    "request_delta": 0,
+    "allocation_delta": {
+      "geometry": 0,
+      "stage": 0
+    },
+    "classification": "Valid unsupported I2 combination"
+  },
+  {
+    "id": "source-record_missing",
+    "input_graph": "bad_missing_uv_record",
+    "source_identity": "I0",
+    "expected": "Refuse before Begin",
+    "preserve_entire_input": true,
+    "geometry_allocation_delta": 0,
+    "stage_allocation_delta": 0,
+    "classification": "Malformed"
+  },
+  {
+    "id": "source-record_orphan",
+    "input_graph": "bad_orphan_uv_record",
+    "source_identity": "I0",
+    "expected": "Refuse before Begin",
+    "preserve_entire_input": true,
+    "geometry_allocation_delta": 0,
+    "stage_allocation_delta": 0,
+    "classification": "Malformed"
+  },
+  {
+    "id": "source-corner_repeat",
+    "input_graph": "bad_repeated_corner",
+    "source_identity": "I0",
+    "expected": "Refuse before Begin",
+    "preserve_entire_input": true,
+    "geometry_allocation_delta": 0,
+    "stage_allocation_delta": 0,
+    "classification": "Malformed"
+  },
+  {
+    "id": "source-vertex_set",
+    "input_graph": "unsupported_vertex_set",
+    "source_identity": "I0",
+    "expected": "Refuse before Begin",
+    "preserve_entire_input": true,
+    "geometry_allocation_delta": 0,
+    "stage_allocation_delta": 0,
+    "classification": "Valid unsupported"
+  },
+  {
+    "id": "source-transform",
+    "input_graph": "unsupported_transform",
+    "source_identity": "I0",
+    "expected": "Refuse before Begin",
+    "preserve_entire_input": true,
+    "geometry_allocation_delta": 0,
+    "stage_allocation_delta": 0,
+    "classification": "Valid unsupported"
+  },
+  {
+    "id": "source-multiselection",
+    "input_graph": "unsupported_multiselection",
+    "source_identity": "I0",
+    "expected": "Refuse before Begin",
+    "preserve_entire_input": true,
+    "geometry_allocation_delta": 0,
+    "stage_allocation_delta": 0,
+    "classification": "Valid unsupported"
+  },
+  {
+    "id": "source-known_split",
+    "input_graph": "known_split",
+    "source_identity": "PI0",
+    "expected": "Refuse before Begin",
+    "preserve_entire_input": true,
+    "geometry_allocation_delta": 0,
+    "stage_allocation_delta": 0,
+    "classification": "Valid unsupported"
+  },
+  {
+    "id": "exhaust-pub",
+    "before_state": "BaseArmed",
+    "set_counter": "publication",
+    "value_decimal": "18446744073709551615",
+    "action": "Begin",
+    "expected": "Refuse",
+    "preserve_model_session_journal_selection": true,
+    "publication_delta": 0,
+    "request_delta": 0,
+    "allocation_delta": {
+      "geometry": 0,
+      "stage": 0
+    },
+    "policy": "New I2 preflights all required checked counter budgets before reservation;still rechecks at publication;legacy I1 controls unchanged"
+  },
+  {
+    "id": "exhaust-request",
+    "before_state": "BaseArmed",
+    "set_counter": "request",
+    "value_decimal": "18446744073709551615",
+    "action": "IssueTicket",
+    "expected": "Refuse",
+    "preserve_model_session_journal_selection": true,
+    "publication_delta": 0,
+    "request_delta": 0,
+    "allocation_delta": {
+      "geometry": 0,
+      "stage": 0
+    },
+    "policy": "New I2 preflights all required checked counter budgets before reservation;still rechecks at publication;legacy I1 controls unchanged"
+  },
+  {
+    "id": "exhaust-stage",
+    "before_state": "BaseArmed",
+    "set_counter": "stage_next",
+    "value_decimal": "18446744073709551615",
+    "action": "Begin",
+    "expected": "Refuse",
+    "preserve_model_session_journal_selection": true,
+    "publication_delta": 0,
+    "request_delta": 0,
+    "allocation_delta": {
+      "geometry": 0,
+      "stage": 0
+    },
+    "policy": "New I2 preflights all required checked counter budgets before reservation;still rechecks at publication;legacy I1 controls unchanged"
+  },
+  {
+    "id": "exhaust-geometry",
+    "before_state": "BaseArmed",
+    "set_counter": "geometry_next",
+    "value_decimal": "18446744073709551615",
+    "action": "Begin",
+    "expected": "Refuse",
+    "preserve_model_session_journal_selection": true,
+    "publication_delta": 0,
+    "request_delta": 0,
+    "allocation_delta": {
+      "geometry": 0,
+      "stage": 0
+    },
+    "policy": "New I2 preflights all required checked counter budgets before reservation;still rechecks at publication;legacy I1 controls unchanged"
+  },
+  {
+    "id": "exhaust-request-at-begin",
+    "before_state": "BaseArmed",
+    "set_counter": "request",
+    "value_decimal": "18446744073709551615",
+    "action": "Begin",
+    "expected": "Refuse",
+    "publication_delta": 0,
+    "request_delta": 0,
+    "allocation_delta": {
+      "geometry": 0,
+      "stage": 0
+    },
+    "preserve_entire_state": true
+  },
+  {
+    "id": "invalid-switch",
+    "before_state": "A_move",
+    "action": "Atomic Drop+activate unsupported target",
+    "args": {
+      "target": "invalid"
+    },
+    "expected": "Refuse",
+    "after_state": "A_move",
+    "publication_delta": 0,
+    "request_delta": 0,
+    "allocation_delta": {
+      "geometry": 0,
+      "stage": 0
+    },
+    "classification": "Invalid target"
+  },
+  {
+    "id": "invalid-save-draft",
+    "before_state": "A_move",
+    "action": "Save",
+    "args": {
+      "raw": "abc",
+      "reach_filesystem": false
+    },
+    "expected": "Refuse",
+    "after_state": "A_move",
+    "publication_delta": 0,
+    "request_delta": 0,
+    "allocation_delta": {
+      "geometry": 0,
+      "stage": 0
+    },
+    "classification": "Invalid draft"
+  },
+  {
+    "id": "document-capacity101-malformed",
+    "expected": "Refuse malformed completed history input;not a refusal of100 supported entries",
+    "preserve_entire_input": true
+  },
+  {
+    "id": "redo-while-other-live-geometry",
+    "before": "ParkOtherArmed",
+    "setup": "other tool owns substantive live preview",
+    "expected": "Keep existing other-tool history guard;do not silently drop/cancel it to resume Extrude",
+    "classification": "Untested extra legacy combination;requires its exact own geometry control before claiming coverage"
+  }
+]

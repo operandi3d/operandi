@@ -1,0 +1,810 @@
+{
+ "spec": "polyscale-offset-2026-11-06",
+ "comparison_rule": "Run the command on the input with the listed value (typed into its dialog). Match points to 1e-6 and the polygon lists up to renumbering.",
+ "cases": [
+  {
+   "id": "B1",
+   "description": "PolyScale Offset, value 0.1 (dialog opens at 0)",
+   "input": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      7,
+      6,
+      5,
+      4
+     ],
+     [
+      0,
+      4,
+      5,
+      1
+     ],
+     [
+      1,
+      5,
+      6,
+      2
+     ],
+     [
+      2,
+      6,
+      7,
+      3
+     ],
+     [
+      3,
+      7,
+      4,
+      0
+     ]
+    ],
+    "selection_mode": "polygon",
+    "selected_polygons": [
+     1
+    ]
+   },
+   "expected": {
+    "after": {
+     "meshes": {
+      "Cube": {
+       "points": [
+        [
+         -0.5,
+         -0.5,
+         -0.5
+        ],
+        [
+         0.5,
+         -0.5,
+         -0.5
+        ],
+        [
+         0.5,
+         -0.5,
+         0.5
+        ],
+        [
+         -0.5,
+         -0.5,
+         0.5
+        ],
+        [
+         0.4,
+         0.5,
+         0.4
+        ],
+        [
+         -0.4,
+         0.5,
+         0.4
+        ],
+        [
+         0.4,
+         0.5,
+         -0.4
+        ],
+        [
+         -0.4,
+         0.5,
+         -0.4
+        ]
+       ],
+       "polygons": [
+        [
+         0,
+         1,
+         2,
+         3
+        ],
+        [
+         3,
+         5,
+         7,
+         0
+        ],
+        [
+         2,
+         4,
+         5,
+         3
+        ],
+        [
+         1,
+         6,
+         4,
+         2
+        ],
+        [
+         0,
+         7,
+         6,
+         1
+        ],
+        [
+         5,
+         4,
+         6,
+         7
+        ]
+       ],
+       "polygon_types": [
+        "face",
+        "face",
+        "face",
+        "face",
+        "face",
+        "face"
+       ],
+       "selected_points": [],
+       "selected_edges": [],
+       "selected_polygons": [
+        5
+       ]
+      }
+     },
+     "selection_mode": "polygon",
+     "tool_on": [],
+     "action_center": [],
+     "tool_settings": {}
+    }
+   }
+  },
+  {
+   "id": "B2",
+   "description": "PolyScale Offset, value 0.1, two faces",
+   "input": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      7,
+      6,
+      5,
+      4
+     ],
+     [
+      0,
+      4,
+      5,
+      1
+     ],
+     [
+      1,
+      5,
+      6,
+      2
+     ],
+     [
+      2,
+      6,
+      7,
+      3
+     ],
+     [
+      3,
+      7,
+      4,
+      0
+     ]
+    ],
+    "selection_mode": "polygon",
+    "selected_polygons": [
+     1,
+     4
+    ]
+   },
+   "expected": {
+    "after": {
+     "meshes": {
+      "Cube": {
+       "points": [
+        [
+         -0.5,
+         -0.5,
+         -0.5
+        ],
+        [
+         0.5,
+         -0.5,
+         -0.5
+        ],
+        [
+         0.4,
+         -0.4,
+         0.5
+        ],
+        [
+         -0.4,
+         -0.4,
+         0.5
+        ],
+        [
+         0.4,
+         0.5,
+         0.5
+        ],
+        [
+         0.4,
+         0.5,
+         -0.4
+        ],
+        [
+         -0.4,
+         0.5,
+         -0.4
+        ],
+        [
+         -0.4,
+         0.5,
+         0.5
+        ]
+       ],
+       "polygons": [
+        [
+         3,
+         7,
+         6,
+         0
+        ],
+        [
+         7,
+         4,
+         5,
+         6
+        ],
+        [
+         1,
+         5,
+         4,
+         2
+        ],
+        [
+         0,
+         6,
+         5,
+         1
+        ],
+        [
+         2,
+         4,
+         7,
+         3
+        ],
+        [
+         0,
+         1,
+         2,
+         3
+        ]
+       ],
+       "polygon_types": [
+        "face",
+        "face",
+        "face",
+        "face",
+        "face",
+        "face"
+       ],
+       "selected_points": [],
+       "selected_edges": [],
+       "selected_polygons": [
+        1,
+        4
+       ]
+      }
+     },
+     "selection_mode": "polygon",
+     "tool_on": [],
+     "action_center": [],
+     "tool_settings": {}
+    }
+   }
+  },
+  {
+   "id": "B3",
+   "description": "PolyScale Offset, value -0.1",
+   "input": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      7,
+      6,
+      5,
+      4
+     ],
+     [
+      0,
+      4,
+      5,
+      1
+     ],
+     [
+      1,
+      5,
+      6,
+      2
+     ],
+     [
+      2,
+      6,
+      7,
+      3
+     ],
+     [
+      3,
+      7,
+      4,
+      0
+     ]
+    ],
+    "selection_mode": "polygon",
+    "selected_polygons": [
+     1
+    ]
+   },
+   "expected": {
+    "after": {
+     "meshes": {
+      "Cube": {
+       "points": [
+        [
+         -0.5,
+         -0.5,
+         -0.5
+        ],
+        [
+         0.5,
+         -0.5,
+         -0.5
+        ],
+        [
+         0.5,
+         -0.5,
+         0.5
+        ],
+        [
+         -0.5,
+         -0.5,
+         0.5
+        ],
+        [
+         0.6,
+         0.5,
+         0.6
+        ],
+        [
+         -0.6,
+         0.5,
+         0.6
+        ],
+        [
+         0.6,
+         0.5,
+         -0.6
+        ],
+        [
+         -0.6,
+         0.5,
+         -0.6
+        ]
+       ],
+       "polygons": [
+        [
+         0,
+         1,
+         2,
+         3
+        ],
+        [
+         3,
+         5,
+         7,
+         0
+        ],
+        [
+         2,
+         4,
+         5,
+         3
+        ],
+        [
+         1,
+         6,
+         4,
+         2
+        ],
+        [
+         0,
+         7,
+         6,
+         1
+        ],
+        [
+         5,
+         4,
+         6,
+         7
+        ]
+       ],
+       "polygon_types": [
+        "face",
+        "face",
+        "face",
+        "face",
+        "face",
+        "face"
+       ],
+       "selected_points": [],
+       "selected_edges": [],
+       "selected_polygons": [
+        5
+       ]
+      }
+     },
+     "selection_mode": "polygon",
+     "tool_on": [],
+     "action_center": [],
+     "tool_settings": {}
+    }
+   }
+  },
+  {
+   "id": "B4",
+   "description": "PolyScale Offset Detach, value 0.1",
+   "input": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      7,
+      6,
+      5,
+      4
+     ],
+     [
+      0,
+      4,
+      5,
+      1
+     ],
+     [
+      1,
+      5,
+      6,
+      2
+     ],
+     [
+      2,
+      6,
+      7,
+      3
+     ],
+     [
+      3,
+      7,
+      4,
+      0
+     ]
+    ],
+    "selection_mode": "polygon",
+    "selected_polygons": [
+     1
+    ]
+   },
+   "action": "Polygon tab > Commands > Scale Offset flyout > Scale Offset (Detach)...; dialog \"Enter Inset Amount\", starts at 0 m; typed 0.1, OK",
+   "observed_summary": "8->12 pts, 6 polys. Top polygon rebuilt on 4 NEW points at x,z = +-0.4, y 0.5 (shrunk 0.1 per side); original top corners stay with the side polygons, so the box is open and the smaller top floats detached in the same plane. Selection cleared.",
+   "expected": {
+    "after": {
+     "meshes": {
+      "Cube": {
+       "points": [
+        [
+         -0.5,
+         -0.5,
+         -0.5
+        ],
+        [
+         0.5,
+         -0.5,
+         -0.5
+        ],
+        [
+         0.5,
+         -0.5,
+         0.5
+        ],
+        [
+         -0.5,
+         -0.5,
+         0.5
+        ],
+        [
+         -0.5,
+         0.5,
+         -0.5
+        ],
+        [
+         0.5,
+         0.5,
+         -0.5
+        ],
+        [
+         0.5,
+         0.5,
+         0.5
+        ],
+        [
+         -0.5,
+         0.5,
+         0.5
+        ],
+        [
+         -0.4,
+         0.5,
+         -0.4
+        ],
+        [
+         0.4,
+         0.5,
+         -0.4
+        ],
+        [
+         0.4,
+         0.5,
+         0.4
+        ],
+        [
+         -0.4,
+         0.5,
+         0.4
+        ]
+       ],
+       "polygons": [
+        [
+         0,
+         1,
+         2,
+         3
+        ],
+        [
+         11,
+         10,
+         9,
+         8
+        ],
+        [
+         0,
+         4,
+         5,
+         1
+        ],
+        [
+         1,
+         5,
+         6,
+         2
+        ],
+        [
+         2,
+         6,
+         7,
+         3
+        ],
+        [
+         3,
+         7,
+         4,
+         0
+        ]
+       ],
+       "polygon_types": [
+        "face",
+        "face",
+        "face",
+        "face",
+        "face",
+        "face"
+       ],
+       "selected_points": [],
+       "selected_edges": [],
+       "selected_polygons": []
+      }
+     },
+     "selection_mode": "polygon",
+     "tool_on": [],
+     "action_center": [
+      "Automatic"
+     ],
+     "tool_settings": {}
+    }
+   }
+  }
+ ]
+}

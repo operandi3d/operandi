@@ -1,0 +1,87 @@
+{
+  "schema": "operandi.branding-assets.v1",
+  "date": "2026-11-10",
+  "scope": "Operandi's logo: a stylized capital O with a fading grid, the original wordmark, and its app-icon derivatives. Branding assets only.",
+  "provenance": {
+    "method": "Modelled and rendered in Operandi itself (MCP bridge, Cycles) on 2026-11-10: a torus O with a gradient from the interface accent orange (sRGB 245, 158, 32, theme.rs ORANGE) to a warm cream (close to the old wordmark's 242, 231, 216), and a tube wireframe that fades in with the orange. Transparency comes from a separate white matte render. The wordmark is unchanged, copied from the 2026-10-22 logo (OP-LOGO-A2). Scenes and renders: ~/Developer/Operandi-Content/Logo-O (logo-o-orange-cream.opscene).",
+    "design_reference": "The previous donut logo (OP-LOGO-A2, 2026-10-22) for layout and wordmark only.",
+    "approval": "On 2026-11-10 the user chose the grid-fade O, first in deep blue, then asked for the interface orange and the earlier warm cream instead (the blue clashed with the UI), keeping the wordmark font and colour.",
+    "license": "No project license or publication permission is assigned by this asset record."
+  },
+  "assets": [
+    {
+      "id": "OP-LOGO-B1",
+      "file": "operandi-logo.png",
+      "role": "Full logo with wordmark",
+      "status": "Operandi's logo since 2026-11-10 (replaces the donut OP-LOGO-A2). The O replaces the donut; the wordmark pixels are OP-LOGO-A2's.",
+      "width": 1448,
+      "height": 1086,
+      "format": "PNG",
+      "channels": "RGBA",
+      "background": "Transparent (matte render)",
+      "sha256": "d96873a5fda696b065b612ee726c6ad80cda57cfacfb731188092a11a8726707"
+    },
+    {
+      "id": "OP-LOGO-APP-2",
+      "file": "operandi-app-icon.png",
+      "role": "Square symbol-only app-icon master",
+      "status": "Derived 2026-11-10 from the same render as OP-LOGO-B1.",
+      "width": 1254,
+      "height": 1254,
+      "format": "PNG",
+      "channels": "RGBA",
+      "background": "Transparent (matte render)",
+      "sha256": "65f705e5b0955afd01f3a500fdb405a91fc4f3d48a9b509379faeecb93caa7fb"
+    },
+    {
+      "id": "OP-LOGO-DOCK-2",
+      "file": "operandi-dock-icon.png",
+      "role": "macOS Dock/app icon: OP-LOGO-APP-2 on a black rounded tile",
+      "status": "Derived 2026-11-10 from OP-LOGO-APP-2; the tile and its shadow are OP-LOGO-DOCK-1's.",
+      "width": 1024,
+      "height": 1024,
+      "format": "PNG",
+      "channels": "RGBA",
+      "background": "Black rounded tile on transparent canvas",
+      "sha256": "29ce7bc982a23fe0f65ae21ceb15d16c60f16126af568b46e48de44c180e8a14"
+    },
+    {
+      "id": "OP-LOGO-GLASS-2",
+      "file": "Operandi.icon",
+      "role": "macOS 26+ Liquid Glass app icon (Icon Composer bundle): solid black fill, one layer = the OP-LOGO-APP-2 O cropped to its alpha bounds, 780 px on its longer side; system supplies glass, specular and shadow. Compiled into Assets.car as the bundle's icon Operandi (CFBundleIconName). The layer file keeps the name donut.png.",
+      "status": "Derived 2026-11-10 from OP-LOGO-APP-2.",
+      "format": "Icon Composer .icon bundle (icon.json + Assets/donut.png)",
+      "layer_width": 615,
+      "layer_height": 780,
+      "channels": "RGBA layer",
+      "background": "Solid black fill (system glass)",
+      "sha256": {
+        "icon.json": "0fb7b81e0c8d4cfb3fbd633369aa07900dc51a86e7aa58ea3df9eb9414c6d3cb",
+        "Assets/donut.png": "33989a471cb5f04589107131f2ef04db435e8ea4d41dd273ea732957aa589b68"
+      }
+    },
+    {
+      "id": "OP-DOC-1",
+      "file": "operandi-document-icon.png",
+      "role": "macOS document icon for .opscene scene files: the OP-LOGO-APP-2 O on a dark page with a folded corner and an OPSCENE label in the wordmark cream. Built into OperandiScene.icns by scripts/macos-app-bundle.sh.",
+      "status": "Drawn 2026-11-10 by tools/document-icon/make-document-icon.swift from OP-LOGO-APP-2; approved by the user on 2026-11-10.",
+      "width": 1024,
+      "height": 1024,
+      "format": "PNG",
+      "channels": "RGBA",
+      "background": "Dark page on transparent canvas",
+      "sha256": "79600b68cd6275811df050d78e813929859ca74f7f99f00ddbfa364e911d22bb"
+    }
+  ],
+  "validation": {
+    "performed": [
+      "Visual review of the full logo and Dock tile",
+      "PNG dimensions kept (logo 1448 x 1086, app icon 1254, Dock 1024; the toolbar symbol 128)",
+      "SHA-256 recorded"
+    ],
+    "unperformed": [
+      "Small-size optical and physical display checks",
+      "Liquid Glass look on macOS 26 (actool compile only)"
+    ]
+  }
+}

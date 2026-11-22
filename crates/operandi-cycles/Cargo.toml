@@ -1,0 +1,25 @@
+[package]
+name = "operandi-cycles"
+version = "0.1.0"
+edition = "2024"
+license = "GPL-3.0-or-later"
+description = "Final renders through the Cycles path tracer (spike)"
+links = "operandi_cycles"
+build = "build.rs"
+
+[dependencies]
+operandi-core = { path = "../operandi-core" }
+glam.workspace = true
+serde_json.workspace = true
+
+[dev-dependencies]
+image = { version = "=0.25.10", default-features = false, features = ["png", "exr"] }
+
+[features]
+# Link liboperandi_cycles (built by scripts/build-cycles.sh). Without it the
+# crate still builds and `render` reports that Cycles isn't included.
+cycles = []
+
+[[example]]
+name = "render_scene"
+required-features = ["cycles"]

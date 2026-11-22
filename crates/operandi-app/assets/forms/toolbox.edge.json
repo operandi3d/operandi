@@ -1,0 +1,124 @@
+{
+  "version": 1,
+  "id": "toolbox.edge",
+  "label": "Edge",
+  "exported": true,
+  "controls": [
+    {
+      "divider": "Edge Tools",
+      "id": "edge-tools"
+    },
+    {
+      "command": "Edge Bevel"
+    },
+    {
+      "command": "Edge Extrude"
+    },
+    {
+      "command": "Extend"
+    },
+    {
+      "command": "Bridge",
+      "label": "Bridge",
+      "icon": "bridge",
+      "noShortcut": true,
+      "tooltip": "Bridge · join two selected border edge chains with polygons · tool.set edge.bridge on{binding}"
+    },
+    {
+      "command": "Slide"
+    },
+    {
+      "command": "Edge Relax"
+    },
+    {
+      "command": "Edge Chamfer"
+    },
+    {
+      "command": "Add Loop",
+      "label": "Add Loop",
+      "icon": "loop-cut",
+      "noShortcut": true,
+      "tooltip": "Add Loop · click an edge in the viewport (Ctrl: middle) · edge.addLoop"
+    },
+    {
+      "command": "Add Point",
+      "label": "Add Point",
+      "icon": "edge-add-point",
+      "noShortcut": true,
+      "tooltip": "Add Point · click an edge in the viewport (Ctrl: middle) · edge.addPoint"
+    },
+    {
+      "command": "Edge Weight"
+    },
+    {
+      "space": 4
+    },
+    {
+      "heading": "Commands",
+      "id": "Edge Commands"
+    },
+    {
+      "command": "Grow Quads",
+      "tooltip": "Grow Quads · edge.growQuads{binding}"
+    },
+    {
+      "command": "Fill Quads",
+      "tooltip": "Fill Quads · edge.fillQuads{binding}"
+    },
+    {
+      "command": "Set Position",
+      "label": "Set Position...",
+      "tooltip": "Set Position... · vert.set{binding}"
+    },
+    {
+      "command": "Edge Split",
+      "label": "Split",
+      "tooltip": "Split · edge.split{binding}"
+    },
+    {
+      "command": "Split Normals",
+      "tooltip": "Split Normals · edge.splitNormals{binding}"
+    },
+    {
+      "command": "Vertex Normal Tools...",
+      "label": "Vertex Normal Tools",
+      "icon": "vertex-normal-tools",
+      "tooltip": "Vertex Normal Tools{binding} · hard edges and the vertex normal map, in their own palette"
+    },
+    {
+      "command": "Edge Spin",
+      "label": "Spin",
+      "tooltip": "Spin · edge.spinQuads{binding}"
+    },
+    {
+      "command": "Join",
+      "tooltip": "Join · edge.join{binding}"
+    },
+    {
+      "command": "Join Averaged",
+      "tooltip": "Join Averaged · edge.join average:true{binding}"
+    },
+    {
+      "command": "Edge Collapse",
+      "label": "Collapse",
+      "tooltip": "Collapse · edge.collapse{binding}"
+    },
+    {
+      "command": "Edge Remove",
+      "label": "Remove",
+      "tooltip": "Remove · edge.remove{binding}"
+    },
+    {
+      "command": "Edges To Curves",
+      "tooltip": "Edges To Curves · edges.toCurve{binding}"
+    },
+    {
+      "command": "Unbevel",
+      "tooltip": "Unbevel · edge.unbevel{binding}"
+    },
+    {
+      "command": "Edge Subdivide",
+      "tooltip": "Edge Subdivide · edge.subdivide{binding}"
+    }
+  ]
+}

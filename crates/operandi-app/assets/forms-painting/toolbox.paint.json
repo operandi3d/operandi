@@ -1,0 +1,287 @@
+{
+  "version": 1,
+  "id": "toolbox.paint",
+  "label": "Paint",
+  "exported": true,
+  "controls": [
+    {
+      "divider": "Current Image",
+      "id": "paint-image"
+    },
+    {
+      "command": "operandi.paint.images",
+      "label": "Current Image\u2026",
+      "tooltip": "The Images window: pick the texture to paint (the paint target)",
+      "icon": "paint-target"
+    },
+    {
+      "divider": "Paint Tools",
+      "id": "paint-tools"
+    },
+    {
+      "form": {
+        "style": "horizontal",
+        "controls": [
+          {
+            "command": "operandi.paint.airbrush",
+            "label": "Airbrush",
+            "tooltip": "Airbrush \u00b7 operandi.paint.airbrush\nSoft strokes that build up within a stroke, up to Opacity.",
+            "icon": "paint-airbrush"
+          },
+          {
+            "command": "operandi.paint.paintbrush",
+            "label": "Paintbrush",
+            "tooltip": "Paintbrush \u00b7 operandi.paint.paintbrush\nSolid strokes: overlaps in one stroke don't darken.",
+            "icon": "paint-paintbrush"
+          }
+        ]
+      }
+    },
+    {
+      "form": {
+        "style": "horizontal",
+        "controls": [
+          {
+            "command": "operandi.paint.eraser",
+            "label": "Eraser",
+            "tooltip": "Eraser \u00b7 operandi.paint.eraser\nLowers alpha; paints the BG colour on images without alpha.",
+            "icon": "paint-eraser"
+          },
+          {
+            "command": "operandi.paint.clone",
+            "label": "Clone",
+            "tooltip": "Clone \u00b7 operandi.paint.clone\nCtrl+click to set the source, then paint to copy from it.",
+            "icon": "paint-clone"
+          }
+        ]
+      }
+    },
+    {
+      "form": {
+        "style": "horizontal",
+        "controls": [
+          {
+            "command": "operandi.paint.line",
+            "label": "Line",
+            "tooltip": "Line \u00b7 operandi.paint.line\nDrag a line, circle or rectangle; it goes down on release.",
+            "icon": "paint-line"
+          }
+        ]
+      }
+    },
+    {
+      "form": {
+        "style": "flyout",
+        "controls": [
+          {
+            "command": "operandi.paint.fill",
+            "label": "Fill",
+            "tooltip": "Fill \u00b7 operandi.paint.fill\nClick: every pixel close to that colour takes the FG colour.",
+            "icon": "paint-fill"
+          },
+          {
+            "command": "operandi.paint.linearGradient",
+            "label": "Linear Gradient",
+            "tooltip": "Linear Gradient \u00b7 operandi.paint.linearGradient\nDrag: the image ramps from FG to BG across the line.\nAlt+click: Radial Gradient",
+            "icon": "paint-linear-gradient"
+          },
+          {
+            "command": "operandi.paint.radialGradient",
+            "label": "Radial Gradient",
+            "tooltip": "Radial Gradient \u00b7 operandi.paint.radialGradient\nDrag from the centre: FG there, BG at the end.",
+            "icon": "paint-radial-gradient"
+          }
+        ]
+      },
+      "id": "Fill"
+    },
+    {
+      "form": {
+        "style": "horizontal",
+        "controls": [
+          {
+            "command": "operandi.paint.smudge",
+            "label": "Smudge",
+            "tooltip": "Smudge \u00b7 operandi.paint.smudge\nDrags the pixels under the brush along the stroke.",
+            "icon": "paint-smudge"
+          }
+        ]
+      }
+    },
+    {
+      "form": {
+        "style": "flyout",
+        "controls": [
+          {
+            "command": "operandi.paint.blur",
+            "label": "Blur",
+            "tooltip": "Blur \u00b7 operandi.paint.blur\nSoftens the pixels under the brush.",
+            "icon": "paint-blur"
+          },
+          {
+            "command": "operandi.paint.sharpen",
+            "label": "Sharp",
+            "tooltip": "Sharpen \u00b7 operandi.paint.sharpen\nRaises edge contrast under the brush.",
+            "icon": "paint-sharpen"
+          }
+        ]
+      },
+      "id": "Blur"
+    },
+    {
+      "form": {
+        "style": "horizontal",
+        "controls": [
+          {
+            "command": "operandi.paint.lasso",
+            "label": "Lasso",
+            "tooltip": "Lasso \u00b7 operandi.paint.lasso\nDraw a shape (left-drag) that limits paint with Use Falloff on.",
+            "icon": "paint-lasso"
+          }
+        ]
+      }
+    },
+    {
+      "form": {
+        "style": "horizontal",
+        "controls": [
+          {
+            "command": "operandi.paint.notYet name:{Duplicate Tools}",
+            "label": "Duplicate Tools",
+            "tooltip": "Duplicate Tools \u00b7 coming in a later stage"
+          }
+        ]
+      }
+    },
+    {
+      "divider": "Brushes",
+      "id": "paint-brushes"
+    },
+    {
+      "form": {
+        "style": "horizontal",
+        "controls": [
+          {
+            "command": "operandi.paint.tip kind:smooth",
+            "label": "Smooth",
+            "tooltip": "Smooth tip \u00b7 operandi.paint.tip kind:smooth\nA soft tip with a shape preset.",
+            "icon": "tip-smooth"
+          },
+          {
+            "command": "operandi.paint.tip kind:hard",
+            "label": "Hard",
+            "tooltip": "Hard tip \u00b7 operandi.paint.tip kind:hard\nA solid core with a soft border.",
+            "icon": "tip-hard"
+          }
+        ]
+      }
+    },
+    {
+      "form": {
+        "style": "flyout",
+        "controls": [
+          {
+            "command": "operandi.paint.tip kind:procedural",
+            "label": "Procedural",
+            "tooltip": "Procedural tip \u00b7 operandi.paint.tip kind:procedural\nStrength patterned by noise, cells or dots.",
+            "icon": "tip-procedural"
+          },
+          {
+            "command": "operandi.paint.tip kind:sphere",
+            "label": "Sphere",
+            "tooltip": "Sphere tip \u00b7 operandi.paint.tip kind:sphere\nA shaded, rounded dab.",
+            "icon": "tip-sphere"
+          }
+        ]
+      },
+      "id": "Procedural"
+    },
+    {
+      "form": {
+        "style": "horizontal",
+        "controls": [
+          {
+            "command": "operandi.paint.tip kind:image",
+            "label": "Texture",
+            "tooltip": "Texture tip \u00b7 operandi.paint.tip kind:image\nA picture is the dab: Normal, Roller or Stamp.",
+            "icon": "tip-texture"
+          },
+          {
+            "command": "operandi.paint.tip kind:stamp",
+            "label": "Stamp",
+            "tooltip": "Stamp tip \u00b7 operandi.paint.tip kind:stamp\nPress the centre, drag for size and angle, release to stamp.",
+            "icon": "tip-stamp"
+          }
+        ]
+      }
+    },
+    {
+      "form": {
+        "style": "horizontal",
+        "controls": [
+          {
+            "command": "operandi.paint.tip kind:text",
+            "label": "Text",
+            "tooltip": "Text tip \u00b7 operandi.paint.tip kind:text\nStamps a text: drag for size and angle.",
+            "icon": "tip-text"
+          },
+          {
+            "command": "operandi.paint.savePreset",
+            "label": "Save Brush Preset",
+            "tooltip": "Save Brush Preset \u00b7 operandi.paint.savePreset\nThe tip, its values and the nozzle, for any tool.",
+            "icon": "paint-save-preset"
+          }
+        ]
+      }
+    },
+    {
+      "divider": "Nozzle and Inks",
+      "id": "paint-inks"
+    },
+    {
+      "form": {
+        "style": "horizontal",
+        "controls": [
+          {
+            "command": "operandi.paint.nozzle",
+            "label": "Nozzle",
+            "tooltip": "Tablet Nozzle \u00b7 operandi.paint.nozzle\nPressure, speed, rotation and jitter for the dabs.",
+            "icon": "paint-nozzle"
+          }
+        ]
+      }
+    },
+    {
+      "form": {
+        "style": "flyout",
+        "controls": [
+          {
+            "command": "operandi.paint.ink kind:image",
+            "label": "Image Ink",
+            "tooltip": "Image Ink \u00b7 operandi.paint.ink kind:image\nPaints the colours of a picture floating over the view. Click in the view to show it.",
+            "icon": "ink-image"
+          },
+          {
+            "command": "operandi.paint.ink kind:parametric",
+            "label": "Parametric Ink",
+            "tooltip": "Parametric Ink \u00b7 operandi.paint.ink kind:parametric\nFG to BG (or less paint) by slope, altitude, incidence angle or pressure.",
+            "icon": "ink-parametric"
+          },
+          {
+            "command": "operandi.paint.ink kind:random",
+            "label": "Random Ink",
+            "tooltip": "Random Ink \u00b7 operandi.paint.ink kind:random\nEach dab's hue, saturation and brightness vary at random.",
+            "icon": "ink-random"
+          },
+          {
+            "command": "operandi.paint.ink kind:projection",
+            "label": "Projection Ink",
+            "tooltip": "Projection Ink \u00b7 operandi.paint.ink kind:projection\nPaints the camera's background image, projected from the camera.",
+            "icon": "ink-projection"
+          }
+        ]
+      },
+      "id": "Inks"
+    }
+  ]
+}

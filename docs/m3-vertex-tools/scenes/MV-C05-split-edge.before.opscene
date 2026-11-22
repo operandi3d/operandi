@@ -1,0 +1,268 @@
+{
+  "format": "Operandi",
+  "version": 4,
+  "scene": {
+    "items": [
+      {
+        "id": 1,
+        "name": "Mesh 1",
+        "visible": true,
+        "transform": {
+          "translation": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "zxy": false
+        },
+        "mesh": {
+          "attributes": {
+            "representations": [],
+            "creases": [],
+            "uv_records": {},
+            "corner_normals": {},
+            "point_weights": {},
+            "point_colors": {},
+            "degenerate_faces": []
+          },
+          "vertices": [
+            [
+              0.0,
+              0.0,
+              0.0
+            ],
+            [
+              1.0,
+              0.0,
+              0.0
+            ],
+            [
+              2.0,
+              0.0,
+              0.0
+            ],
+            [
+              3.0,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              1.0,
+              0.0
+            ],
+            [
+              1.0,
+              1.0,
+              0.0
+            ],
+            [
+              2.0,
+              1.0,
+              0.0
+            ],
+            [
+              3.0,
+              1.0,
+              0.0
+            ],
+            [
+              0.0,
+              2.0,
+              0.0
+            ],
+            [
+              1.0,
+              2.0,
+              0.0
+            ],
+            [
+              2.0,
+              2.0,
+              0.0
+            ],
+            [
+              3.0,
+              2.0,
+              0.0
+            ],
+            [
+              0.0,
+              3.0,
+              0.0
+            ],
+            [
+              1.0,
+              3.0,
+              0.0
+            ],
+            [
+              2.0,
+              3.0,
+              0.0
+            ],
+            [
+              3.0,
+              3.0,
+              0.0
+            ]
+          ],
+          "faces": [
+            {
+              "vertices": [
+                0,
+                1,
+                5,
+                4
+              ],
+              "uv": null,
+              "material": "Default",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                1,
+                2,
+                6,
+                5
+              ],
+              "uv": null,
+              "material": "Default",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                2,
+                3,
+                7,
+                6
+              ],
+              "uv": null,
+              "material": "Default",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                4,
+                5,
+                9,
+                8
+              ],
+              "uv": null,
+              "material": "Default",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                5,
+                6,
+                10,
+                9
+              ],
+              "uv": null,
+              "material": "Default",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                6,
+                7,
+                11,
+                10
+              ],
+              "uv": null,
+              "material": "Default",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                8,
+                9,
+                13,
+                12
+              ],
+              "uv": null,
+              "material": "Default",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                9,
+                10,
+                14,
+                13
+              ],
+              "uv": null,
+              "material": "Default",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                10,
+                11,
+                15,
+                14
+              ],
+              "uv": null,
+              "material": "Default",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            }
+          ],
+          "uv_maps": {}
+        },
+        "parent": null,
+        "source_id": null,
+        "source_display_name": null
+      }
+    ],
+    "next_id": 2,
+    "selection": {
+      "item": 1,
+      "mode": "Vertex",
+      "vertices": [
+        5,
+        6
+      ],
+      "edges": [],
+      "faces": []
+    },
+    "workplane": {
+      "fixed": false,
+      "plane": 0,
+      "center": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "import_source": null
+  }
+}

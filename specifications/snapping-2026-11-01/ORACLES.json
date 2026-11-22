@@ -1,0 +1,456 @@
+{
+ "modo_version": "17.1v1",
+ "observed": "2026-11-01\u20132026-11-02",
+ "oracles": [
+  {
+   "id": "SNP-O-01",
+   "description": "Numeric move with Vertex snapping on is not snapped",
+   "input": {
+    "points": [
+     [
+      0,
+      0,
+      0
+     ],
+     [
+      1,
+      0,
+      0
+     ],
+     [
+      1,
+      1,
+      0
+     ],
+     [
+      0,
+      1,
+      0
+     ],
+     [
+      3,
+      0,
+      0
+     ],
+     [
+      4,
+      0,
+      0
+     ],
+     [
+      4,
+      1,
+      0
+     ],
+     [
+      3,
+      1,
+      0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      4,
+      5,
+      6,
+      7
+     ]
+    ]
+   },
+   "settings": {
+    "snapping": true,
+    "targets": {
+     "global": [
+      "vertex"
+     ]
+    },
+    "selected_vertices": [
+     2
+    ],
+    "move": [
+     1.98,
+     0.01,
+     0
+    ]
+   },
+   "expected": {
+    "point2": [
+     2.98,
+     1.01,
+     0.0
+    ]
+   },
+   "tolerance": 1e-05
+  },
+  {
+   "id": "SNP-O-02",
+   "description": "Numeric move with Grid snapping on is not snapped (applied after SNP-O-01's move)",
+   "input": "SNP-O-01 result",
+   "settings": {
+    "snapping": true,
+    "targets": {
+     "global": [
+      "vertex",
+      "grid"
+     ]
+    },
+    "selected_vertices": [
+     1
+    ],
+    "move": [
+     0.33,
+     0.27,
+     0
+    ]
+   },
+   "expected": {
+    "point1": [
+     1.33,
+     0.27,
+     0.0
+    ]
+   },
+   "tolerance": 1e-05
+  },
+  {
+   "id": "SNP-O-SN-03",
+   "description": "Vertex snap landing 3 px short of target",
+   "input": {
+    "points": [
+     [
+      0,
+      0,
+      0
+     ],
+     [
+      1,
+      0,
+      0
+     ],
+     [
+      1,
+      1,
+      0
+     ],
+     [
+      0,
+      1,
+      0
+     ],
+     [
+      3,
+      0,
+      0
+     ],
+     [
+      4,
+      0,
+      0
+     ],
+     [
+      4,
+      1,
+      0
+     ],
+     [
+      3,
+      1,
+      0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      4,
+      5,
+      6,
+      7
+     ]
+    ]
+   },
+   "settings": {
+    "tool": "Move",
+    "selection_mode": "Vertex",
+    "snapping": true,
+    "Global targets": [],
+    "Component targets": [
+     "Vertex"
+    ],
+    "Items targets": [],
+    "Inner Range (px)": 24,
+    "Outer Range (px)": 40,
+    "Coordinate Rounding": "Fine",
+    "Action Center": "Selection Center Auto Axis"
+   },
+   "selection": {
+    "sel_vertices": [
+     2
+    ],
+    "sel_edges": [],
+    "sel_polygons": []
+   },
+   "gesture": {
+    "view": "Front orthographic",
+    "px_per_m": 288.3,
+    "button": "left",
+    "from_px": [
+     821,
+     444
+    ],
+    "to_px": [
+     1395,
+     444
+    ],
+    "modifiers": [],
+    "notes": "Straight drag of center handle; release 3 px before target projected at (1398,444), approximately 0.010406 m away without snapping. View calibration: 4 m spans 1153 px."
+   },
+   "expected": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      3.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      3.0,
+      0.0,
+      0.0
+     ],
+     [
+      4.0,
+      0.0,
+      0.0
+     ],
+     [
+      4.0,
+      1.0,
+      0.0
+     ],
+     [
+      3.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      4,
+      5,
+      6,
+      7
+     ]
+    ],
+    "n_points": 8,
+    "n_polygons": 2,
+    "selection": {
+     "sel_vertices": [
+      2
+     ],
+     "sel_edges": [],
+     "sel_polygons": []
+    },
+    "Position X offset (m)": 2
+   },
+   "tolerance": 1e-05
+  },
+  {
+   "id": "SNP-O-SN-03-15px",
+   "description": "Vertex snap landing 15 px short of target",
+   "input": {
+    "points": [
+     [
+      0,
+      0,
+      0
+     ],
+     [
+      1,
+      0,
+      0
+     ],
+     [
+      1,
+      1,
+      0
+     ],
+     [
+      0,
+      1,
+      0
+     ],
+     [
+      3,
+      0,
+      0
+     ],
+     [
+      4,
+      0,
+      0
+     ],
+     [
+      4,
+      1,
+      0
+     ],
+     [
+      3,
+      1,
+      0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      4,
+      5,
+      6,
+      7
+     ]
+    ]
+   },
+   "settings": {
+    "tool": "Move",
+    "selection_mode": "Vertex",
+    "snapping": true,
+    "Global targets": [],
+    "Component targets": [
+     "Vertex"
+    ],
+    "Items targets": [],
+    "Inner Range (px)": 24,
+    "Outer Range (px)": 40,
+    "Coordinate Rounding": "Fine",
+    "Action Center": "Selection Center Auto Axis"
+   },
+   "selection": {
+    "sel_vertices": [
+     2
+    ],
+    "sel_edges": [],
+    "sel_polygons": []
+   },
+   "gesture": {
+    "view": "Front orthographic",
+    "px_per_m": 288.3,
+    "button": "left",
+    "from_px": [
+     821,
+     444
+    ],
+    "to_px": [
+     1383,
+     444
+    ],
+    "modifiers": [],
+    "notes": "Straight drag of center handle; release 15 px before target projected at (1398,444), approximately 0.052029 m away without snapping. View calibration: 4 m spans 1153 px."
+   },
+   "expected": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      3.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      3.0,
+      0.0,
+      0.0
+     ],
+     [
+      4.0,
+      0.0,
+      0.0
+     ],
+     [
+      4.0,
+      1.0,
+      0.0
+     ],
+     [
+      3.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      4,
+      5,
+      6,
+      7
+     ]
+    ],
+    "n_points": 8,
+    "n_polygons": 2,
+    "selection": {
+     "sel_vertices": [
+      2
+     ],
+     "sel_edges": [],
+     "sel_polygons": []
+    },
+    "Position X offset (m)": 2
+   },
+   "tolerance": 1e-05
+  }
+ ]
+}

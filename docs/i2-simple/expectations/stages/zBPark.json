@@ -1,0 +1,43 @@
+{
+  "stage_key": 2,
+  "component_scope": "D0/item1/generation1",
+  "roots": {
+    "base": {
+      "graph": "G1",
+      "identity": "I1",
+      "session": "zArm"
+    },
+    "begun": {
+      "graph": "AZ_B1",
+      "identity": "AZ_B2I",
+      "session": "zB0"
+    },
+    "movement": {
+      "graph": "AZ_B2",
+      "identity": "AZ_B2I",
+      "session": "zB5"
+    }
+  },
+  "local_entries": [
+    {
+      "role": "Begin",
+      "before_root": "base",
+      "after_root": "begun",
+      "label": "Begin Extrude"
+    },
+    {
+      "role": "Movement",
+      "before_root": "begun",
+      "after_root": "movement",
+      "label": "Move Extrude"
+    }
+  ],
+  "local_cursor": 0,
+  "has_ever_parked": true,
+  "anchor_binding": "state.selected_anchor",
+  "snapshot_root_pairs": 3,
+  "component_identity_not_reallocated_by_resume": true,
+  "stored_eligibility": null,
+  "OS_capture": null,
+  "roles": "BafterZero"
+}

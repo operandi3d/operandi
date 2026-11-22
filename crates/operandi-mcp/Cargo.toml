@@ -1,0 +1,11 @@
+[package]
+name = "operandi-mcp"
+version = "0.1.0"
+edition = "2024"
+license = "GPL-3.0-or-later"
+description = "Model Context Protocol bridge: drive operandi-core headlessly"
+
+[dependencies]
+operandi-core = { path = "../operandi-core" }
+glam.workspace = true
+serde_json.workspace = true

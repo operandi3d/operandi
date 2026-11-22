@@ -1,0 +1,289 @@
+{
+  "format": "Operandi",
+  "version": 1,
+  "scene": {
+    "items": [
+      {
+        "id": 1,
+        "name": "VS_Box",
+        "visible": true,
+        "transform": {
+          "translation": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "mesh": {
+          "vertices": [
+            [
+              -1.0,
+              -1.0,
+              -1.0
+            ],
+            [
+              1.0,
+              -1.0,
+              -1.0
+            ],
+            [
+              1.0,
+              1.0,
+              -1.0
+            ],
+            [
+              -1.0,
+              1.0,
+              -1.0
+            ],
+            [
+              -1.0,
+              -1.0,
+              1.0
+            ],
+            [
+              1.0,
+              -1.0,
+              1.0
+            ],
+            [
+              1.0,
+              1.0,
+              1.0
+            ],
+            [
+              -1.0,
+              1.0,
+              1.0
+            ],
+            [
+              -0.75,
+              1.0,
+              -0.75
+            ],
+            [
+              -0.75,
+              1.0,
+              0.75
+            ],
+            [
+              0.75,
+              1.0,
+              0.75
+            ],
+            [
+              0.75,
+              1.0,
+              -0.75
+            ],
+            [
+              -0.75,
+              1.5,
+              -0.75
+            ],
+            [
+              -0.75,
+              1.5,
+              0.75
+            ],
+            [
+              0.75,
+              1.5,
+              0.75
+            ],
+            [
+              0.75,
+              1.5,
+              -0.75
+            ]
+          ],
+          "faces": [
+            {
+              "vertices": [
+                0,
+                3,
+                2,
+                1
+              ],
+              "uv": null,
+              "material": "",
+              "smooth": false
+            },
+            {
+              "vertices": [
+                4,
+                5,
+                6,
+                7
+              ],
+              "uv": null,
+              "material": "",
+              "smooth": false
+            },
+            {
+              "vertices": [
+                0,
+                4,
+                7,
+                3
+              ],
+              "uv": null,
+              "material": "",
+              "smooth": false
+            },
+            {
+              "vertices": [
+                1,
+                2,
+                6,
+                5
+              ],
+              "uv": null,
+              "material": "",
+              "smooth": false
+            },
+            {
+              "vertices": [
+                0,
+                1,
+                5,
+                4
+              ],
+              "uv": null,
+              "material": "",
+              "smooth": false
+            },
+            {
+              "vertices": [
+                12,
+                13,
+                14,
+                15
+              ],
+              "uv": null,
+              "material": "",
+              "smooth": false
+            },
+            {
+              "vertices": [
+                3,
+                7,
+                9,
+                8
+              ],
+              "uv": null,
+              "material": "",
+              "smooth": false
+            },
+            {
+              "vertices": [
+                7,
+                6,
+                10,
+                9
+              ],
+              "uv": null,
+              "material": "",
+              "smooth": false
+            },
+            {
+              "vertices": [
+                6,
+                2,
+                11,
+                10
+              ],
+              "uv": null,
+              "material": "",
+              "smooth": false
+            },
+            {
+              "vertices": [
+                2,
+                3,
+                8,
+                11
+              ],
+              "uv": null,
+              "material": "",
+              "smooth": false
+            },
+            {
+              "vertices": [
+                8,
+                9,
+                13,
+                12
+              ],
+              "uv": null,
+              "material": "",
+              "smooth": false
+            },
+            {
+              "vertices": [
+                9,
+                10,
+                14,
+                13
+              ],
+              "uv": null,
+              "material": "",
+              "smooth": false
+            },
+            {
+              "vertices": [
+                10,
+                11,
+                15,
+                14
+              ],
+              "uv": null,
+              "material": "",
+              "smooth": false
+            },
+            {
+              "vertices": [
+                11,
+                8,
+                12,
+                15
+              ],
+              "uv": null,
+              "material": "",
+              "smooth": false
+            }
+          ]
+        }
+      }
+    ],
+    "next_id": 2,
+    "selection": {
+      "item": 1,
+      "mode": "Polygon",
+      "vertices": [],
+      "edges": [],
+      "faces": [
+        5
+      ]
+    },
+    "workplane": {
+      "fixed": true,
+      "plane": 0,
+      "center": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    }
+  }
+}

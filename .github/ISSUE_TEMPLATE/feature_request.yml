@@ -1,0 +1,19 @@
+name: Feature or tool
+description: Suggest a tool, option or improvement.
+labels: [enhancement]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What you'd like
+      description: Describe what you want to do in Operandi, in your own words.
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why it helps
+  - type: markdown
+    attributes:
+      value: |
+        Describe what you'd like in your own words. Please don't paste Modo screenshots or text copied from its documentation (see docs/CLEAN_ROOM.md).

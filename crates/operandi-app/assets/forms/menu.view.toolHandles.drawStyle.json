@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "id": "menu.view.toolHandles.drawStyle",
+  "label": "Draw Style",
+  "style": "menu",
+  "controls": [
+    {
+      "command": "tool.handleStyle invisible",
+      "label": "Invisible"
+    },
+    {
+      "command": "tool.handleStyle basic",
+      "label": "Basic"
+    },
+    {
+      "command": "tool.handleStyle advanced",
+      "label": "Advanced"
+    },
+    {
+      "command": "tool.handleStyle default",
+      "label": "Default"
+    }
+  ]
+}

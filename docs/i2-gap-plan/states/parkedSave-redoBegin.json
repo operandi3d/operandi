@@ -1,0 +1,5942 @@
+{
+  "visible": {
+    "scene": {
+      "items": [
+        {
+          "id": 1,
+          "name": "I1 cube",
+          "visible": true,
+          "transform": {
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotation": [
+              0,
+              0,
+              0
+            ],
+            "scale": [
+              1,
+              1,
+              1
+            ],
+            "zxy": false
+          },
+          "mesh": {
+            "attributes": {
+              "typed_maps": {},
+              "vertex_sets": {},
+              "polygon_sets": {
+                "bottom": [
+                  0
+                ],
+                "top": [
+                  1
+                ],
+                "front": [
+                  2,
+                  6
+                ],
+                "right": [
+                  3,
+                  7
+                ],
+                "back": [
+                  4,
+                  8
+                ],
+                "left": [
+                  5,
+                  9
+                ]
+              },
+              "point_uvs": {},
+              "corner_weights": {},
+              "corner_colors": {},
+              "extrude_edge_uses": {},
+              "relative_morphs": {},
+              "smoothing_labels": [],
+              "representations": [],
+              "creases": [],
+              "uv_records": {
+                "Texture": [
+                  [
+                    200,
+                    201,
+                    202,
+                    203
+                  ],
+                  [
+                    100,
+                    101,
+                    102,
+                    103
+                  ],
+                  [
+                    208,
+                    209,
+                    210,
+                    211
+                  ],
+                  [
+                    212,
+                    213,
+                    214,
+                    215
+                  ],
+                  [
+                    216,
+                    217,
+                    218,
+                    219
+                  ],
+                  [
+                    220,
+                    221,
+                    222,
+                    223
+                  ],
+                  [
+                    null,
+                    211,
+                    210,
+                    null
+                  ],
+                  [
+                    null,
+                    215,
+                    214,
+                    null
+                  ],
+                  [
+                    null,
+                    219,
+                    218,
+                    null
+                  ],
+                  [
+                    null,
+                    223,
+                    222,
+                    null
+                  ]
+                ],
+                "Empty": [
+                  [
+                    null,
+                    null,
+                    null,
+                    null
+                  ],
+                  [
+                    null,
+                    null,
+                    null,
+                    null
+                  ],
+                  [
+                    null,
+                    null,
+                    null,
+                    null
+                  ],
+                  [
+                    null,
+                    null,
+                    null,
+                    null
+                  ],
+                  [
+                    null,
+                    null,
+                    null,
+                    null
+                  ],
+                  [
+                    null,
+                    null,
+                    null,
+                    null
+                  ],
+                  [
+                    null,
+                    null,
+                    null,
+                    null
+                  ],
+                  [
+                    null,
+                    null,
+                    null,
+                    null
+                  ],
+                  [
+                    null,
+                    null,
+                    null,
+                    null
+                  ],
+                  [
+                    null,
+                    null,
+                    null,
+                    null
+                  ]
+                ]
+              },
+              "normal_map_order": [],
+              "corner_normals": {},
+              "point_weights": {},
+              "point_colors": {},
+              "degenerate_faces": [
+                6,
+                7,
+                8,
+                9
+              ]
+            },
+            "vertices": [
+              [
+                -1,
+                -1,
+                -1
+              ],
+              [
+                1,
+                -1,
+                -1
+              ],
+              [
+                1,
+                1,
+                -1
+              ],
+              [
+                -1,
+                1,
+                -1
+              ],
+              [
+                -1,
+                -1,
+                1
+              ],
+              [
+                1,
+                -1,
+                1
+              ],
+              [
+                1,
+                1,
+                1
+              ],
+              [
+                -1,
+                1,
+                1
+              ],
+              [
+                -1,
+                -1,
+                1
+              ],
+              [
+                1,
+                -1,
+                1
+              ],
+              [
+                1,
+                1,
+                1
+              ],
+              [
+                -1,
+                1,
+                1
+              ]
+            ],
+            "faces": [
+              {
+                "vertices": [
+                  0,
+                  3,
+                  2,
+                  1
+                ],
+                "uv": null,
+                "material": "bottom",
+                "smooth": false,
+                "part": null,
+                "material_label": "bottom"
+              },
+              {
+                "vertices": [
+                  8,
+                  9,
+                  10,
+                  11
+                ],
+                "uv": null,
+                "material": "top",
+                "smooth": false,
+                "part": null,
+                "material_label": "top"
+              },
+              {
+                "vertices": [
+                  0,
+                  1,
+                  5,
+                  4
+                ],
+                "uv": null,
+                "material": "front",
+                "smooth": false,
+                "part": null,
+                "material_label": "front"
+              },
+              {
+                "vertices": [
+                  1,
+                  2,
+                  6,
+                  5
+                ],
+                "uv": null,
+                "material": "right",
+                "smooth": false,
+                "part": null,
+                "material_label": "right"
+              },
+              {
+                "vertices": [
+                  2,
+                  3,
+                  7,
+                  6
+                ],
+                "uv": null,
+                "material": "back",
+                "smooth": false,
+                "part": null,
+                "material_label": "back"
+              },
+              {
+                "vertices": [
+                  3,
+                  0,
+                  4,
+                  7
+                ],
+                "uv": null,
+                "material": "left",
+                "smooth": false,
+                "part": null,
+                "material_label": "left"
+              },
+              {
+                "vertices": [
+                  8,
+                  4,
+                  5,
+                  9
+                ],
+                "uv": null,
+                "material": "front",
+                "smooth": false,
+                "part": null,
+                "material_label": "front"
+              },
+              {
+                "vertices": [
+                  9,
+                  5,
+                  6,
+                  10
+                ],
+                "uv": null,
+                "material": "right",
+                "smooth": false,
+                "part": null,
+                "material_label": "right"
+              },
+              {
+                "vertices": [
+                  10,
+                  6,
+                  7,
+                  11
+                ],
+                "uv": null,
+                "material": "back",
+                "smooth": false,
+                "part": null,
+                "material_label": "back"
+              },
+              {
+                "vertices": [
+                  11,
+                  7,
+                  4,
+                  8
+                ],
+                "uv": null,
+                "material": "left",
+                "smooth": false,
+                "part": null,
+                "material_label": "left"
+              }
+            ],
+            "uv_maps": {
+              "Texture": [
+                [
+                  [
+                    0,
+                    0
+                  ],
+                  [
+                    1,
+                    0
+                  ],
+                  [
+                    1,
+                    1
+                  ],
+                  [
+                    0,
+                    1
+                  ]
+                ],
+                [
+                  [
+                    0,
+                    0
+                  ],
+                  [
+                    1,
+                    0
+                  ],
+                  [
+                    1,
+                    1
+                  ],
+                  [
+                    0,
+                    1
+                  ]
+                ],
+                [
+                  [
+                    0,
+                    0
+                  ],
+                  [
+                    1,
+                    0
+                  ],
+                  [
+                    1,
+                    1
+                  ],
+                  [
+                    0,
+                    1
+                  ]
+                ],
+                [
+                  [
+                    0,
+                    0
+                  ],
+                  [
+                    1,
+                    0
+                  ],
+                  [
+                    1,
+                    1
+                  ],
+                  [
+                    0,
+                    1
+                  ]
+                ],
+                [
+                  [
+                    0,
+                    0
+                  ],
+                  [
+                    1,
+                    0
+                  ],
+                  [
+                    1,
+                    1
+                  ],
+                  [
+                    0,
+                    1
+                  ]
+                ],
+                [
+                  [
+                    0,
+                    0
+                  ],
+                  [
+                    1,
+                    0
+                  ],
+                  [
+                    1,
+                    1
+                  ],
+                  [
+                    0,
+                    1
+                  ]
+                ],
+                [
+                  null,
+                  [
+                    0,
+                    1
+                  ],
+                  [
+                    1,
+                    1
+                  ],
+                  null
+                ],
+                [
+                  null,
+                  [
+                    0,
+                    1
+                  ],
+                  [
+                    1,
+                    1
+                  ],
+                  null
+                ],
+                [
+                  null,
+                  [
+                    0,
+                    1
+                  ],
+                  [
+                    1,
+                    1
+                  ],
+                  null
+                ],
+                [
+                  null,
+                  [
+                    0,
+                    1
+                  ],
+                  [
+                    1,
+                    1
+                  ],
+                  null
+                ]
+              ],
+              "Empty": [
+                [
+                  null,
+                  null,
+                  null,
+                  null
+                ],
+                [
+                  null,
+                  null,
+                  null,
+                  null
+                ],
+                [
+                  null,
+                  null,
+                  null,
+                  null
+                ],
+                [
+                  null,
+                  null,
+                  null,
+                  null
+                ],
+                [
+                  null,
+                  null,
+                  null,
+                  null
+                ],
+                [
+                  null,
+                  null,
+                  null,
+                  null
+                ],
+                [
+                  null,
+                  null,
+                  null,
+                  null
+                ],
+                [
+                  null,
+                  null,
+                  null,
+                  null
+                ],
+                [
+                  null,
+                  null,
+                  null,
+                  null
+                ],
+                [
+                  null,
+                  null,
+                  null,
+                  null
+                ]
+              ]
+            }
+          },
+          "parent": null,
+          "source_id": null,
+          "source_display_name": null
+        }
+      ],
+      "next_id": 2,
+      "selection": {
+        "item": 1,
+        "mode": "Polygon",
+        "vertices": [],
+        "edges": [],
+        "faces": [
+          1
+        ]
+      },
+      "workplane": {
+        "fixed": false,
+        "plane": 0,
+        "center": [
+          0,
+          0,
+          0
+        ]
+      },
+      "import_source": null
+    },
+    "identities": {
+      "vertices": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        51,
+        52,
+        53,
+        54
+      ],
+      "faces": [
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        55,
+        56,
+        57,
+        58
+      ],
+      "corners": [
+        [
+          15,
+          16,
+          17,
+          18
+        ],
+        [
+          19,
+          20,
+          21,
+          22
+        ],
+        [
+          23,
+          24,
+          25,
+          26
+        ],
+        [
+          27,
+          28,
+          29,
+          30
+        ],
+        [
+          31,
+          32,
+          33,
+          34
+        ],
+        [
+          35,
+          36,
+          37,
+          38
+        ],
+        [
+          59,
+          60,
+          61,
+          62
+        ],
+        [
+          63,
+          64,
+          65,
+          66
+        ],
+        [
+          67,
+          68,
+          69,
+          70
+        ],
+        [
+          71,
+          72,
+          73,
+          74
+        ]
+      ],
+      "edges": [
+        {
+          "vertices": [
+            1,
+            2
+          ],
+          "id": 39
+        },
+        {
+          "vertices": [
+            1,
+            4
+          ],
+          "id": 40
+        },
+        {
+          "vertices": [
+            1,
+            5
+          ],
+          "id": 41
+        },
+        {
+          "vertices": [
+            2,
+            3
+          ],
+          "id": 42
+        },
+        {
+          "vertices": [
+            2,
+            6
+          ],
+          "id": 43
+        },
+        {
+          "vertices": [
+            3,
+            4
+          ],
+          "id": 44
+        },
+        {
+          "vertices": [
+            3,
+            7
+          ],
+          "id": 45
+        },
+        {
+          "vertices": [
+            4,
+            8
+          ],
+          "id": 46
+        },
+        {
+          "vertices": [
+            5,
+            6
+          ],
+          "id": 47
+        },
+        {
+          "vertices": [
+            5,
+            8
+          ],
+          "id": 48
+        },
+        {
+          "vertices": [
+            5,
+            51
+          ],
+          "id": 75
+        },
+        {
+          "vertices": [
+            6,
+            7
+          ],
+          "id": 49
+        },
+        {
+          "vertices": [
+            6,
+            52
+          ],
+          "id": 76
+        },
+        {
+          "vertices": [
+            7,
+            8
+          ],
+          "id": 50
+        },
+        {
+          "vertices": [
+            7,
+            53
+          ],
+          "id": 77
+        },
+        {
+          "vertices": [
+            8,
+            54
+          ],
+          "id": 78
+        },
+        {
+          "vertices": [
+            51,
+            52
+          ],
+          "id": 79
+        },
+        {
+          "vertices": [
+            51,
+            54
+          ],
+          "id": 80
+        },
+        {
+          "vertices": [
+            52,
+            53
+          ],
+          "id": 81
+        },
+        {
+          "vertices": [
+            53,
+            54
+          ],
+          "id": 82
+        }
+      ],
+      "logical_faces": [
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        55,
+        56,
+        57,
+        58
+      ],
+      "next_id": 83
+    }
+  },
+  "document": {
+    "entries": [],
+    "cursor": 0,
+    "applied": [],
+    "redo_next_first": []
+  },
+  "selected_stage": {
+    "key": 1,
+    "scope": "D0/item1/generation1",
+    "anchor": 0,
+    "cursor": 1,
+    "ever_parked": true,
+    "base": {
+      "scene": {
+        "items": [
+          {
+            "id": 1,
+            "name": "I1 cube",
+            "visible": true,
+            "transform": {
+              "translation": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "scale": [
+                1,
+                1,
+                1
+              ],
+              "zxy": false
+            },
+            "mesh": {
+              "attributes": {
+                "typed_maps": {},
+                "vertex_sets": {},
+                "polygon_sets": {
+                  "bottom": [
+                    0
+                  ],
+                  "top": [
+                    1
+                  ],
+                  "front": [
+                    2
+                  ],
+                  "right": [
+                    3
+                  ],
+                  "back": [
+                    4
+                  ],
+                  "left": [
+                    5
+                  ]
+                },
+                "point_uvs": {},
+                "corner_weights": {},
+                "corner_colors": {},
+                "extrude_edge_uses": {},
+                "relative_morphs": {},
+                "smoothing_labels": [],
+                "representations": [],
+                "creases": [],
+                "uv_records": {
+                  "Texture": [
+                    [
+                      200,
+                      201,
+                      202,
+                      203
+                    ],
+                    [
+                      100,
+                      101,
+                      102,
+                      103
+                    ],
+                    [
+                      208,
+                      209,
+                      210,
+                      211
+                    ],
+                    [
+                      212,
+                      213,
+                      214,
+                      215
+                    ],
+                    [
+                      216,
+                      217,
+                      218,
+                      219
+                    ],
+                    [
+                      220,
+                      221,
+                      222,
+                      223
+                    ]
+                  ],
+                  "Empty": [
+                    [
+                      null,
+                      null,
+                      null,
+                      null
+                    ],
+                    [
+                      null,
+                      null,
+                      null,
+                      null
+                    ],
+                    [
+                      null,
+                      null,
+                      null,
+                      null
+                    ],
+                    [
+                      null,
+                      null,
+                      null,
+                      null
+                    ],
+                    [
+                      null,
+                      null,
+                      null,
+                      null
+                    ],
+                    [
+                      null,
+                      null,
+                      null,
+                      null
+                    ]
+                  ]
+                },
+                "normal_map_order": [],
+                "corner_normals": {},
+                "point_weights": {},
+                "point_colors": {},
+                "degenerate_faces": []
+              },
+              "vertices": [
+                [
+                  -1,
+                  -1,
+                  -1
+                ],
+                [
+                  1,
+                  -1,
+                  -1
+                ],
+                [
+                  1,
+                  1,
+                  -1
+                ],
+                [
+                  -1,
+                  1,
+                  -1
+                ],
+                [
+                  -1,
+                  -1,
+                  1
+                ],
+                [
+                  1,
+                  -1,
+                  1
+                ],
+                [
+                  1,
+                  1,
+                  1
+                ],
+                [
+                  -1,
+                  1,
+                  1
+                ]
+              ],
+              "faces": [
+                {
+                  "vertices": [
+                    0,
+                    3,
+                    2,
+                    1
+                  ],
+                  "uv": null,
+                  "material": "bottom",
+                  "smooth": false,
+                  "part": null,
+                  "material_label": "bottom"
+                },
+                {
+                  "vertices": [
+                    4,
+                    5,
+                    6,
+                    7
+                  ],
+                  "uv": null,
+                  "material": "top",
+                  "smooth": false,
+                  "part": null,
+                  "material_label": "top"
+                },
+                {
+                  "vertices": [
+                    0,
+                    1,
+                    5,
+                    4
+                  ],
+                  "uv": null,
+                  "material": "front",
+                  "smooth": false,
+                  "part": null,
+                  "material_label": "front"
+                },
+                {
+                  "vertices": [
+                    1,
+                    2,
+                    6,
+                    5
+                  ],
+                  "uv": null,
+                  "material": "right",
+                  "smooth": false,
+                  "part": null,
+                  "material_label": "right"
+                },
+                {
+                  "vertices": [
+                    2,
+                    3,
+                    7,
+                    6
+                  ],
+                  "uv": null,
+                  "material": "back",
+                  "smooth": false,
+                  "part": null,
+                  "material_label": "back"
+                },
+                {
+                  "vertices": [
+                    3,
+                    0,
+                    4,
+                    7
+                  ],
+                  "uv": null,
+                  "material": "left",
+                  "smooth": false,
+                  "part": null,
+                  "material_label": "left"
+                }
+              ],
+              "uv_maps": {
+                "Texture": [
+                  [
+                    [
+                      0,
+                      0
+                    ],
+                    [
+                      1,
+                      0
+                    ],
+                    [
+                      1,
+                      1
+                    ],
+                    [
+                      0,
+                      1
+                    ]
+                  ],
+                  [
+                    [
+                      0,
+                      0
+                    ],
+                    [
+                      1,
+                      0
+                    ],
+                    [
+                      1,
+                      1
+                    ],
+                    [
+                      0,
+                      1
+                    ]
+                  ],
+                  [
+                    [
+                      0,
+                      0
+                    ],
+                    [
+                      1,
+                      0
+                    ],
+                    [
+                      1,
+                      1
+                    ],
+                    [
+                      0,
+                      1
+                    ]
+                  ],
+                  [
+                    [
+                      0,
+                      0
+                    ],
+                    [
+                      1,
+                      0
+                    ],
+                    [
+                      1,
+                      1
+                    ],
+                    [
+                      0,
+                      1
+                    ]
+                  ],
+                  [
+                    [
+                      0,
+                      0
+                    ],
+                    [
+                      1,
+                      0
+                    ],
+                    [
+                      1,
+                      1
+                    ],
+                    [
+                      0,
+                      1
+                    ]
+                  ],
+                  [
+                    [
+                      0,
+                      0
+                    ],
+                    [
+                      1,
+                      0
+                    ],
+                    [
+                      1,
+                      1
+                    ],
+                    [
+                      0,
+                      1
+                    ]
+                  ]
+                ],
+                "Empty": [
+                  [
+                    null,
+                    null,
+                    null,
+                    null
+                  ],
+                  [
+                    null,
+                    null,
+                    null,
+                    null
+                  ],
+                  [
+                    null,
+                    null,
+                    null,
+                    null
+                  ],
+                  [
+                    null,
+                    null,
+                    null,
+                    null
+                  ],
+                  [
+                    null,
+                    null,
+                    null,
+                    null
+                  ],
+                  [
+                    null,
+                    null,
+                    null,
+                    null
+                  ]
+                ]
+              }
+            },
+            "parent": null,
+            "source_id": null,
+            "source_display_name": null
+          }
+        ],
+        "next_id": 2,
+        "selection": {
+          "item": 1,
+          "mode": "Polygon",
+          "vertices": [],
+          "edges": [],
+          "faces": [
+            1
+          ]
+        },
+        "workplane": {
+          "fixed": false,
+          "plane": 0,
+          "center": [
+            0,
+            0,
+            0
+          ]
+        },
+        "import_source": null
+      },
+      "identities": {
+        "vertices": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "faces": [
+          9,
+          10,
+          11,
+          12,
+          13,
+          14
+        ],
+        "corners": [
+          [
+            15,
+            16,
+            17,
+            18
+          ],
+          [
+            19,
+            20,
+            21,
+            22
+          ],
+          [
+            23,
+            24,
+            25,
+            26
+          ],
+          [
+            27,
+            28,
+            29,
+            30
+          ],
+          [
+            31,
+            32,
+            33,
+            34
+          ],
+          [
+            35,
+            36,
+            37,
+            38
+          ]
+        ],
+        "edges": [
+          {
+            "vertices": [
+              1,
+              2
+            ],
+            "id": 39
+          },
+          {
+            "vertices": [
+              1,
+              4
+            ],
+            "id": 40
+          },
+          {
+            "vertices": [
+              1,
+              5
+            ],
+            "id": 41
+          },
+          {
+            "vertices": [
+              2,
+              3
+            ],
+            "id": 42
+          },
+          {
+            "vertices": [
+              2,
+              6
+            ],
+            "id": 43
+          },
+          {
+            "vertices": [
+              3,
+              4
+            ],
+            "id": 44
+          },
+          {
+            "vertices": [
+              3,
+              7
+            ],
+            "id": 45
+          },
+          {
+            "vertices": [
+              4,
+              8
+            ],
+            "id": 46
+          },
+          {
+            "vertices": [
+              5,
+              6
+            ],
+            "id": 47
+          },
+          {
+            "vertices": [
+              5,
+              8
+            ],
+            "id": 48
+          },
+          {
+            "vertices": [
+              6,
+              7
+            ],
+            "id": 49
+          },
+          {
+            "vertices": [
+              7,
+              8
+            ],
+            "id": 50
+          }
+        ],
+        "logical_faces": [
+          9,
+          10,
+          11,
+          12,
+          13,
+          14
+        ],
+        "next_id": 51
+      }
+    },
+    "begun": {
+      "scene": {
+        "items": [
+          {
+            "id": 1,
+            "name": "I1 cube",
+            "visible": true,
+            "transform": {
+              "translation": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "scale": [
+                1,
+                1,
+                1
+              ],
+              "zxy": false
+            },
+            "mesh": {
+              "attributes": {
+                "typed_maps": {},
+                "vertex_sets": {},
+                "polygon_sets": {
+                  "bottom": [
+                    0
+                  ],
+                  "top": [
+                    1
+                  ],
+                  "front": [
+                    2,
+                    6
+                  ],
+                  "right": [
+                    3,
+                    7
+                  ],
+                  "back": [
+                    4,
+                    8
+                  ],
+                  "left": [
+                    5,
+                    9
+                  ]
+                },
+                "point_uvs": {},
+                "corner_weights": {},
+                "corner_colors": {},
+                "extrude_edge_uses": {},
+                "relative_morphs": {},
+                "smoothing_labels": [],
+                "representations": [],
+                "creases": [],
+                "uv_records": {
+                  "Texture": [
+                    [
+                      200,
+                      201,
+                      202,
+                      203
+                    ],
+                    [
+                      100,
+                      101,
+                      102,
+                      103
+                    ],
+                    [
+                      208,
+                      209,
+                      210,
+                      211
+                    ],
+                    [
+                      212,
+                      213,
+                      214,
+                      215
+                    ],
+                    [
+                      216,
+                      217,
+                      218,
+                      219
+                    ],
+                    [
+                      220,
+                      221,
+                      222,
+                      223
+                    ],
+                    [
+                      null,
+                      211,
+                      210,
+                      null
+                    ],
+                    [
+                      null,
+                      215,
+                      214,
+                      null
+                    ],
+                    [
+                      null,
+                      219,
+                      218,
+                      null
+                    ],
+                    [
+                      null,
+                      223,
+                      222,
+                      null
+                    ]
+                  ],
+                  "Empty": [
+                    [
+                      null,
+                      null,
+                      null,
+                      null
+                    ],
+                    [
+                      null,
+                      null,
+                      null,
+                      null
+                    ],
+                    [
+                      null,
+                      null,
+                      null,
+                      null
+                    ],
+                    [
+                      null,
+                      null,
+                      null,
+                      null
+                    ],
+                    [
+                      null,
+                      null,
+                      null,
+                      null
+                    ],
+                    [
+                      null,
+                      null,
+                      null,
+                      null
+                    ],
+                    [
+                      null,
+                      null,
+                      null,
+                      null
+                    ],
+                    [
+                      null,
+                      null,
+                      null,
+                      null
+                    ],
+                    [
+                      null,
+                      null,
+                      null,
+                      null
+                    ],
+                    [
+                      null,
+                      null,
+                      null,
+                      null
+                    ]
+                  ]
+                },
+                "normal_map_order": [],
+                "corner_normals": {},
+                "point_weights": {},
+                "point_colors": {},
+                "degenerate_faces": [
+                  6,
+                  7,
+                  8,
+                  9
+                ]
+              },
+              "vertices": [
+                [
+                  -1,
+                  -1,
+                  -1
+                ],
+                [
+                  1,
+                  -1,
+                  -1
+                ],
+                [
+                  1,
+                  1,
+                  -1
+                ],
+                [
+                  -1,
+                  1,
+                  -1
+                ],
+                [
+                  -1,
+                  -1,
+                  1
+                ],
+                [
+                  1,
+                  -1,
+                  1
+                ],
+                [
+                  1,
+                  1,
+                  1
+                ],
+                [
+                  -1,
+                  1,
+                  1
+                ],
+                [
+                  -1,
+                  -1,
+                  1
+                ],
+                [
+                  1,
+                  -1,
+                  1
+                ],
+                [
+                  1,
+                  1,
+                  1
+                ],
+                [
+                  -1,
+                  1,
+                  1
+                ]
+              ],
+              "faces": [
+                {
+                  "vertices": [
+                    0,
+                    3,
+                    2,
+                    1
+                  ],
+                  "uv": null,
+                  "material": "bottom",
+                  "smooth": false,
+                  "part": null,
+                  "material_label": "bottom"
+                },
+                {
+                  "vertices": [
+                    8,
+                    9,
+                    10,
+                    11
+                  ],
+                  "uv": null,
+                  "material": "top",
+                  "smooth": false,
+                  "part": null,
+                  "material_label": "top"
+                },
+                {
+                  "vertices": [
+                    0,
+                    1,
+                    5,
+                    4
+                  ],
+                  "uv": null,
+                  "material": "front",
+                  "smooth": false,
+                  "part": null,
+                  "material_label": "front"
+                },
+                {
+                  "vertices": [
+                    1,
+                    2,
+                    6,
+                    5
+                  ],
+                  "uv": null,
+                  "material": "right",
+                  "smooth": false,
+                  "part": null,
+                  "material_label": "right"
+                },
+                {
+                  "vertices": [
+                    2,
+                    3,
+                    7,
+                    6
+                  ],
+                  "uv": null,
+                  "material": "back",
+                  "smooth": false,
+                  "part": null,
+                  "material_label": "back"
+                },
+                {
+                  "vertices": [
+                    3,
+                    0,
+                    4,
+                    7
+                  ],
+                  "uv": null,
+                  "material": "left",
+                  "smooth": false,
+                  "part": null,
+                  "material_label": "left"
+                },
+                {
+                  "vertices": [
+                    8,
+                    4,
+                    5,
+                    9
+                  ],
+                  "uv": null,
+                  "material": "front",
+                  "smooth": false,
+                  "part": null,
+                  "material_label": "front"
+                },
+                {
+                  "vertices": [
+                    9,
+                    5,
+                    6,
+                    10
+                  ],
+                  "uv": null,
+                  "material": "right",
+                  "smooth": false,
+                  "part": null,
+                  "material_label": "right"
+                },
+                {
+                  "vertices": [
+                    10,
+                    6,
+                    7,
+                    11
+                  ],
+                  "uv": null,
+                  "material": "back",
+                  "smooth": false,
+                  "part": null,
+                  "material_label": "back"
+                },
+                {
+                  "vertices": [
+                    11,
+                    7,
+                    4,
+                    8
+                  ],
+                  "uv": null,
+                  "material": "left",
+                  "smooth": false,
+                  "part": null,
+                  "material_label": "left"
+                }
+              ],
+              "uv_maps": {
+                "Texture": [
+                  [
+                    [
+                      0,
+                      0
+                    ],
+                    [
+                      1,
+                      0
+                    ],
+                    [
+                      1,
+                      1
+                    ],
+                    [
+                      0,
+                      1
+                    ]
+                  ],
+                  [
+                    [
+                      0,
+                      0
+                    ],
+                    [
+                      1,
+                      0
+                    ],
+                    [
+                      1,
+                      1
+                    ],
+                    [
+                      0,
+                      1
+                    ]
+                  ],
+                  [
+                    [
+                      0,
+                      0
+                    ],
+                    [
+                      1,
+                      0
+                    ],
+                    [
+                      1,
+                      1
+                    ],
+                    [
+                      0,
+                      1
+                    ]
+                  ],
+                  [
+                    [
+                      0,
+                      0
+                    ],
+                    [
+                      1,
+                      0
+                    ],
+                    [
+                      1,
+                      1
+                    ],
+                    [
+                      0,
+                      1
+                    ]
+                  ],
+                  [
+                    [
+                      0,
+                      0
+                    ],
+                    [
+                      1,
+                      0
+                    ],
+                    [
+                      1,
+                      1
+                    ],
+                    [
+                      0,
+                      1
+                    ]
+                  ],
+                  [
+                    [
+                      0,
+                      0
+                    ],
+                    [
+                      1,
+                      0
+                    ],
+                    [
+                      1,
+                      1
+                    ],
+                    [
+                      0,
+                      1
+                    ]
+                  ],
+                  [
+                    null,
+                    [
+                      0,
+                      1
+                    ],
+                    [
+                      1,
+                      1
+                    ],
+                    null
+                  ],
+                  [
+                    null,
+                    [
+                      0,
+                      1
+                    ],
+                    [
+                      1,
+                      1
+                    ],
+                    null
+                  ],
+                  [
+                    null,
+                    [
+                      0,
+                      1
+                    ],
+                    [
+                      1,
+                      1
+                    ],
+                    null
+                  ],
+                  [
+                    null,
+                    [
+                      0,
+                      1
+                    ],
+                    [
+                      1,
+                      1
+                    ],
+                    null
+                  ]
+                ],
+                "Empty": [
+                  [
+                    null,
+                    null,
+                    null,
+                    null
+                  ],
+                  [
+                    null,
+                    null,
+                    null,
+                    null
+                  ],
+                  [
+                    null,
+                    null,
+                    null,
+                    null
+                  ],
+                  [
+                    null,
+                    null,
+                    null,
+                    null
+                  ],
+                  [
+                    null,
+                    null,
+                    null,
+                    null
+                  ],
+                  [
+                    null,
+                    null,
+                    null,
+                    null
+                  ],
+                  [
+                    null,
+                    null,
+                    null,
+                    null
+                  ],
+                  [
+                    null,
+                    null,
+                    null,
+                    null
+                  ],
+                  [
+                    null,
+                    null,
+                    null,
+                    null
+                  ],
+                  [
+                    null,
+                    null,
+                    null,
+                    null
+                  ]
+                ]
+              }
+            },
+            "parent": null,
+            "source_id": null,
+            "source_display_name": null
+          }
+        ],
+        "next_id": 2,
+        "selection": {
+          "item": 1,
+          "mode": "Polygon",
+          "vertices": [],
+          "edges": [],
+          "faces": [
+            1
+          ]
+        },
+        "workplane": {
+          "fixed": false,
+          "plane": 0,
+          "center": [
+            0,
+            0,
+            0
+          ]
+        },
+        "import_source": null
+      },
+      "identities": {
+        "vertices": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          51,
+          52,
+          53,
+          54
+        ],
+        "faces": [
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          55,
+          56,
+          57,
+          58
+        ],
+        "corners": [
+          [
+            15,
+            16,
+            17,
+            18
+          ],
+          [
+            19,
+            20,
+            21,
+            22
+          ],
+          [
+            23,
+            24,
+            25,
+            26
+          ],
+          [
+            27,
+            28,
+            29,
+            30
+          ],
+          [
+            31,
+            32,
+            33,
+            34
+          ],
+          [
+            35,
+            36,
+            37,
+            38
+          ],
+          [
+            59,
+            60,
+            61,
+            62
+          ],
+          [
+            63,
+            64,
+            65,
+            66
+          ],
+          [
+            67,
+            68,
+            69,
+            70
+          ],
+          [
+            71,
+            72,
+            73,
+            74
+          ]
+        ],
+        "edges": [
+          {
+            "vertices": [
+              1,
+              2
+            ],
+            "id": 39
+          },
+          {
+            "vertices": [
+              1,
+              4
+            ],
+            "id": 40
+          },
+          {
+            "vertices": [
+              1,
+              5
+            ],
+            "id": 41
+          },
+          {
+            "vertices": [
+              2,
+              3
+            ],
+            "id": 42
+          },
+          {
+            "vertices": [
+              2,
+              6
+            ],
+            "id": 43
+          },
+          {
+            "vertices": [
+              3,
+              4
+            ],
+            "id": 44
+          },
+          {
+            "vertices": [
+              3,
+              7
+            ],
+            "id": 45
+          },
+          {
+            "vertices": [
+              4,
+              8
+            ],
+            "id": 46
+          },
+          {
+            "vertices": [
+              5,
+              6
+            ],
+            "id": 47
+          },
+          {
+            "vertices": [
+              5,
+              8
+            ],
+            "id": 48
+          },
+          {
+            "vertices": [
+              5,
+              51
+            ],
+            "id": 75
+          },
+          {
+            "vertices": [
+              6,
+              7
+            ],
+            "id": 49
+          },
+          {
+            "vertices": [
+              6,
+              52
+            ],
+            "id": 76
+          },
+          {
+            "vertices": [
+              7,
+              8
+            ],
+            "id": 50
+          },
+          {
+            "vertices": [
+              7,
+              53
+            ],
+            "id": 77
+          },
+          {
+            "vertices": [
+              8,
+              54
+            ],
+            "id": 78
+          },
+          {
+            "vertices": [
+              51,
+              52
+            ],
+            "id": 79
+          },
+          {
+            "vertices": [
+              51,
+              54
+            ],
+            "id": 80
+          },
+          {
+            "vertices": [
+              52,
+              53
+            ],
+            "id": 81
+          },
+          {
+            "vertices": [
+              53,
+              54
+            ],
+            "id": 82
+          }
+        ],
+        "logical_faces": [
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          55,
+          56,
+          57,
+          58
+        ],
+        "next_id": 83
+      }
+    },
+    "movement": {
+      "scene": {
+        "items": [
+          {
+            "id": 1,
+            "name": "I1 cube",
+            "visible": true,
+            "transform": {
+              "translation": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "scale": [
+                1,
+                1,
+                1
+              ],
+              "zxy": false
+            },
+            "mesh": {
+              "attributes": {
+                "typed_maps": {},
+                "vertex_sets": {},
+                "polygon_sets": {
+                  "bottom": [
+                    0
+                  ],
+                  "top": [
+                    1
+                  ],
+                  "front": [
+                    2,
+                    6
+                  ],
+                  "right": [
+                    3,
+                    7
+                  ],
+                  "back": [
+                    4,
+                    8
+                  ],
+                  "left": [
+                    5,
+                    9
+                  ]
+                },
+                "point_uvs": {},
+                "corner_weights": {},
+                "corner_colors": {},
+                "extrude_edge_uses": {},
+                "relative_morphs": {},
+                "smoothing_labels": [],
+                "representations": [],
+                "creases": [],
+                "uv_records": {
+                  "Texture": [
+                    [
+                      200,
+                      201,
+                      202,
+                      203
+                    ],
+                    [
+                      100,
+                      101,
+                      102,
+                      103
+                    ],
+                    [
+                      208,
+                      209,
+                      210,
+                      211
+                    ],
+                    [
+                      212,
+                      213,
+                      214,
+                      215
+                    ],
+                    [
+                      216,
+                      217,
+                      218,
+                      219
+                    ],
+                    [
+                      220,
+                      221,
+                      222,
+                      223
+                    ],
+                    [
+                      null,
+                      211,
+                      210,
+                      null
+                    ],
+                    [
+                      null,
+                      215,
+                      214,
+                      null
+                    ],
+                    [
+                      null,
+                      219,
+                      218,
+                      null
+                    ],
+                    [
+                      null,
+                      223,
+                      222,
+                      null
+                    ]
+                  ],
+                  "Empty": [
+                    [
+                      null,
+                      null,
+                      null,
+                      null
+                    ],
+                    [
+                      null,
+                      null,
+                      null,
+                      null
+                    ],
+                    [
+                      null,
+                      null,
+                      null,
+                      null
+                    ],
+                    [
+                      null,
+                      null,
+                      null,
+                      null
+                    ],
+                    [
+                      null,
+                      null,
+                      null,
+                      null
+                    ],
+                    [
+                      null,
+                      null,
+                      null,
+                      null
+                    ],
+                    [
+                      null,
+                      null,
+                      null,
+                      null
+                    ],
+                    [
+                      null,
+                      null,
+                      null,
+                      null
+                    ],
+                    [
+                      null,
+                      null,
+                      null,
+                      null
+                    ],
+                    [
+                      null,
+                      null,
+                      null,
+                      null
+                    ]
+                  ]
+                },
+                "normal_map_order": [],
+                "corner_normals": {},
+                "point_weights": {},
+                "point_colors": {},
+                "degenerate_faces": []
+              },
+              "vertices": [
+                [
+                  -1,
+                  -1,
+                  -1
+                ],
+                [
+                  1,
+                  -1,
+                  -1
+                ],
+                [
+                  1,
+                  1,
+                  -1
+                ],
+                [
+                  -1,
+                  1,
+                  -1
+                ],
+                [
+                  -1,
+                  -1,
+                  1
+                ],
+                [
+                  1,
+                  -1,
+                  1
+                ],
+                [
+                  1,
+                  1,
+                  1
+                ],
+                [
+                  -1,
+                  1,
+                  1
+                ],
+                [
+                  -1,
+                  -1,
+                  1.5
+                ],
+                [
+                  1,
+                  -1,
+                  1.5
+                ],
+                [
+                  1,
+                  1,
+                  1.5
+                ],
+                [
+                  -1,
+                  1,
+                  1.5
+                ]
+              ],
+              "faces": [
+                {
+                  "vertices": [
+                    0,
+                    3,
+                    2,
+                    1
+                  ],
+                  "uv": null,
+                  "material": "bottom",
+                  "smooth": false,
+                  "part": null,
+                  "material_label": "bottom"
+                },
+                {
+                  "vertices": [
+                    8,
+                    9,
+                    10,
+                    11
+                  ],
+                  "uv": null,
+                  "material": "top",
+                  "smooth": false,
+                  "part": null,
+                  "material_label": "top"
+                },
+                {
+                  "vertices": [
+                    0,
+                    1,
+                    5,
+                    4
+                  ],
+                  "uv": null,
+                  "material": "front",
+                  "smooth": false,
+                  "part": null,
+                  "material_label": "front"
+                },
+                {
+                  "vertices": [
+                    1,
+                    2,
+                    6,
+                    5
+                  ],
+                  "uv": null,
+                  "material": "right",
+                  "smooth": false,
+                  "part": null,
+                  "material_label": "right"
+                },
+                {
+                  "vertices": [
+                    2,
+                    3,
+                    7,
+                    6
+                  ],
+                  "uv": null,
+                  "material": "back",
+                  "smooth": false,
+                  "part": null,
+                  "material_label": "back"
+                },
+                {
+                  "vertices": [
+                    3,
+                    0,
+                    4,
+                    7
+                  ],
+                  "uv": null,
+                  "material": "left",
+                  "smooth": false,
+                  "part": null,
+                  "material_label": "left"
+                },
+                {
+                  "vertices": [
+                    8,
+                    4,
+                    5,
+                    9
+                  ],
+                  "uv": null,
+                  "material": "front",
+                  "smooth": false,
+                  "part": null,
+                  "material_label": "front"
+                },
+                {
+                  "vertices": [
+                    9,
+                    5,
+                    6,
+                    10
+                  ],
+                  "uv": null,
+                  "material": "right",
+                  "smooth": false,
+                  "part": null,
+                  "material_label": "right"
+                },
+                {
+                  "vertices": [
+                    10,
+                    6,
+                    7,
+                    11
+                  ],
+                  "uv": null,
+                  "material": "back",
+                  "smooth": false,
+                  "part": null,
+                  "material_label": "back"
+                },
+                {
+                  "vertices": [
+                    11,
+                    7,
+                    4,
+                    8
+                  ],
+                  "uv": null,
+                  "material": "left",
+                  "smooth": false,
+                  "part": null,
+                  "material_label": "left"
+                }
+              ],
+              "uv_maps": {
+                "Texture": [
+                  [
+                    [
+                      0,
+                      0
+                    ],
+                    [
+                      1,
+                      0
+                    ],
+                    [
+                      1,
+                      1
+                    ],
+                    [
+                      0,
+                      1
+                    ]
+                  ],
+                  [
+                    [
+                      0,
+                      0
+                    ],
+                    [
+                      1,
+                      0
+                    ],
+                    [
+                      1,
+                      1
+                    ],
+                    [
+                      0,
+                      1
+                    ]
+                  ],
+                  [
+                    [
+                      0,
+                      0
+                    ],
+                    [
+                      1,
+                      0
+                    ],
+                    [
+                      1,
+                      1
+                    ],
+                    [
+                      0,
+                      1
+                    ]
+                  ],
+                  [
+                    [
+                      0,
+                      0
+                    ],
+                    [
+                      1,
+                      0
+                    ],
+                    [
+                      1,
+                      1
+                    ],
+                    [
+                      0,
+                      1
+                    ]
+                  ],
+                  [
+                    [
+                      0,
+                      0
+                    ],
+                    [
+                      1,
+                      0
+                    ],
+                    [
+                      1,
+                      1
+                    ],
+                    [
+                      0,
+                      1
+                    ]
+                  ],
+                  [
+                    [
+                      0,
+                      0
+                    ],
+                    [
+                      1,
+                      0
+                    ],
+                    [
+                      1,
+                      1
+                    ],
+                    [
+                      0,
+                      1
+                    ]
+                  ],
+                  [
+                    null,
+                    [
+                      0,
+                      1
+                    ],
+                    [
+                      1,
+                      1
+                    ],
+                    null
+                  ],
+                  [
+                    null,
+                    [
+                      0,
+                      1
+                    ],
+                    [
+                      1,
+                      1
+                    ],
+                    null
+                  ],
+                  [
+                    null,
+                    [
+                      0,
+                      1
+                    ],
+                    [
+                      1,
+                      1
+                    ],
+                    null
+                  ],
+                  [
+                    null,
+                    [
+                      0,
+                      1
+                    ],
+                    [
+                      1,
+                      1
+                    ],
+                    null
+                  ]
+                ],
+                "Empty": [
+                  [
+                    null,
+                    null,
+                    null,
+                    null
+                  ],
+                  [
+                    null,
+                    null,
+                    null,
+                    null
+                  ],
+                  [
+                    null,
+                    null,
+                    null,
+                    null
+                  ],
+                  [
+                    null,
+                    null,
+                    null,
+                    null
+                  ],
+                  [
+                    null,
+                    null,
+                    null,
+                    null
+                  ],
+                  [
+                    null,
+                    null,
+                    null,
+                    null
+                  ],
+                  [
+                    null,
+                    null,
+                    null,
+                    null
+                  ],
+                  [
+                    null,
+                    null,
+                    null,
+                    null
+                  ],
+                  [
+                    null,
+                    null,
+                    null,
+                    null
+                  ],
+                  [
+                    null,
+                    null,
+                    null,
+                    null
+                  ]
+                ]
+              }
+            },
+            "parent": null,
+            "source_id": null,
+            "source_display_name": null
+          }
+        ],
+        "next_id": 2,
+        "selection": {
+          "item": 1,
+          "mode": "Polygon",
+          "vertices": [],
+          "edges": [],
+          "faces": [
+            1
+          ]
+        },
+        "workplane": {
+          "fixed": false,
+          "plane": 0,
+          "center": [
+            0,
+            0,
+            0
+          ]
+        },
+        "import_source": null
+      },
+      "identities": {
+        "vertices": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          51,
+          52,
+          53,
+          54
+        ],
+        "faces": [
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          55,
+          56,
+          57,
+          58
+        ],
+        "corners": [
+          [
+            15,
+            16,
+            17,
+            18
+          ],
+          [
+            19,
+            20,
+            21,
+            22
+          ],
+          [
+            23,
+            24,
+            25,
+            26
+          ],
+          [
+            27,
+            28,
+            29,
+            30
+          ],
+          [
+            31,
+            32,
+            33,
+            34
+          ],
+          [
+            35,
+            36,
+            37,
+            38
+          ],
+          [
+            59,
+            60,
+            61,
+            62
+          ],
+          [
+            63,
+            64,
+            65,
+            66
+          ],
+          [
+            67,
+            68,
+            69,
+            70
+          ],
+          [
+            71,
+            72,
+            73,
+            74
+          ]
+        ],
+        "edges": [
+          {
+            "vertices": [
+              1,
+              2
+            ],
+            "id": 39
+          },
+          {
+            "vertices": [
+              1,
+              4
+            ],
+            "id": 40
+          },
+          {
+            "vertices": [
+              1,
+              5
+            ],
+            "id": 41
+          },
+          {
+            "vertices": [
+              2,
+              3
+            ],
+            "id": 42
+          },
+          {
+            "vertices": [
+              2,
+              6
+            ],
+            "id": 43
+          },
+          {
+            "vertices": [
+              3,
+              4
+            ],
+            "id": 44
+          },
+          {
+            "vertices": [
+              3,
+              7
+            ],
+            "id": 45
+          },
+          {
+            "vertices": [
+              4,
+              8
+            ],
+            "id": 46
+          },
+          {
+            "vertices": [
+              5,
+              6
+            ],
+            "id": 47
+          },
+          {
+            "vertices": [
+              5,
+              8
+            ],
+            "id": 48
+          },
+          {
+            "vertices": [
+              5,
+              51
+            ],
+            "id": 75
+          },
+          {
+            "vertices": [
+              6,
+              7
+            ],
+            "id": 49
+          },
+          {
+            "vertices": [
+              6,
+              52
+            ],
+            "id": 76
+          },
+          {
+            "vertices": [
+              7,
+              8
+            ],
+            "id": 50
+          },
+          {
+            "vertices": [
+              7,
+              53
+            ],
+            "id": 77
+          },
+          {
+            "vertices": [
+              8,
+              54
+            ],
+            "id": 78
+          },
+          {
+            "vertices": [
+              51,
+              52
+            ],
+            "id": 79
+          },
+          {
+            "vertices": [
+              51,
+              54
+            ],
+            "id": 80
+          },
+          {
+            "vertices": [
+              52,
+              53
+            ],
+            "id": 81
+          },
+          {
+            "vertices": [
+              53,
+              54
+            ],
+            "id": 82
+          }
+        ],
+        "logical_faces": [
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          55,
+          56,
+          57,
+          58
+        ],
+        "next_id": 83
+      }
+    },
+    "armed_params": {
+      "bevel": {
+        "shift_range": 0,
+        "inset_range": 0,
+        "edges": "Inner",
+        "use_material": false,
+        "material": "",
+        "segments": 1,
+        "square": false,
+        "edge_rail": false,
+        "offset_even": true,
+        "thicken": false,
+        "max_angle": 89.9,
+        "use_normal_map": false,
+        "open_boundary": false,
+        "auto_weld": false,
+        "weld_range": 0.0001,
+        "falloff": "Averaged",
+        "falloff_shift": true,
+        "falloff_inset": true,
+        "uvs": "Connected",
+        "reverse_direction": false,
+        "reverse_inset": false,
+        "keep_aspect": true
+      },
+      "smooth_shift": {
+        "offset": 0,
+        "scale": 1,
+        "angle": 89.5,
+        "thicken": false,
+        "sharp": false,
+        "angle_weight": false,
+        "both_sides": false
+      },
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "size": [
+        1,
+        1,
+        1
+      ],
+      "inset": 0,
+      "shift": 0,
+      "extent": [
+        0,
+        0,
+        0
+      ],
+      "group_polygons": true,
+      "extrude_sides": 1,
+      "extrude_mode": "Shift",
+      "extrude_uvs": "None",
+      "extrude_uv_map": "Texture",
+      "extrude_uv_selected": true,
+      "delta": [
+        0,
+        0,
+        0
+      ],
+      "rotation_delta": [
+        0,
+        0,
+        0
+      ],
+      "scale_delta": [
+        1,
+        1,
+        1
+      ],
+      "box_handle_mode": "Resize",
+      "show_corners": false,
+      "segments": [
+        1,
+        1,
+        1
+      ],
+      "radial": null
+    },
+    "movement_params": {
+      "bevel": {
+        "shift_range": 0,
+        "inset_range": 0,
+        "edges": "Inner",
+        "use_material": false,
+        "material": "",
+        "segments": 1,
+        "square": false,
+        "edge_rail": false,
+        "offset_even": true,
+        "thicken": false,
+        "max_angle": 89.9,
+        "use_normal_map": false,
+        "open_boundary": false,
+        "auto_weld": false,
+        "weld_range": 0.0001,
+        "falloff": "Averaged",
+        "falloff_shift": true,
+        "falloff_inset": true,
+        "uvs": "Connected",
+        "reverse_direction": false,
+        "reverse_inset": false,
+        "keep_aspect": true
+      },
+      "smooth_shift": {
+        "offset": 0,
+        "scale": 1,
+        "angle": 89.5,
+        "thicken": false,
+        "sharp": false,
+        "angle_weight": false,
+        "both_sides": false
+      },
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "size": [
+        1,
+        1,
+        1
+      ],
+      "inset": 0,
+      "shift": 0,
+      "extent": [
+        0,
+        0,
+        0.5
+      ],
+      "group_polygons": true,
+      "extrude_sides": 1,
+      "extrude_mode": "Shift",
+      "extrude_uvs": "None",
+      "extrude_uv_map": "Texture",
+      "extrude_uv_selected": true,
+      "delta": [
+        0,
+        0,
+        0
+      ],
+      "rotation_delta": [
+        0,
+        0,
+        0
+      ],
+      "scale_delta": [
+        1,
+        1,
+        1
+      ],
+      "box_handle_mode": "Resize",
+      "show_corners": false,
+      "segments": [
+        1,
+        1,
+        1
+      ],
+      "radial": null
+    },
+    "frame": {
+      "center": [
+        0,
+        0,
+        1
+      ],
+      "basis": [
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0,
+          1
+        ]
+      ]
+    },
+    "correspondence": {
+      "source_graph": "G0",
+      "source_identity": "I0",
+      "begun_graph": "G1",
+      "begun_identity": "I1",
+      "source_layout": [
+        [
+          0,
+          3,
+          2,
+          1
+        ],
+        [
+          4,
+          5,
+          6,
+          7
+        ],
+        [
+          0,
+          1,
+          5,
+          4
+        ],
+        [
+          1,
+          2,
+          6,
+          5
+        ],
+        [
+          2,
+          3,
+          7,
+          6
+        ],
+        [
+          3,
+          0,
+          4,
+          7
+        ]
+      ],
+      "source_vertex_count": 8,
+      "vertex_sources": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        4,
+        5,
+        6,
+        7
+      ],
+      "face_sources": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        2,
+        3,
+        4,
+        5
+      ],
+      "ordered_targets": [
+        10
+      ],
+      "cap_face_id": 10,
+      "cap_source_dense": 1,
+      "cap_output_dense": 1,
+      "cap_corner_ids": [
+        19,
+        20,
+        21,
+        22
+      ],
+      "tips": [
+        {
+          "source_dense": 4,
+          "source_id": 5,
+          "output_dense": 8,
+          "output_id": 51
+        },
+        {
+          "source_dense": 5,
+          "source_id": 6,
+          "output_dense": 9,
+          "output_id": 52
+        },
+        {
+          "source_dense": 6,
+          "source_id": 7,
+          "output_dense": 10,
+          "output_id": 53
+        },
+        {
+          "source_dense": 7,
+          "source_id": 8,
+          "output_dense": 11,
+          "output_id": 54
+        }
+      ],
+      "walls": [
+        {
+          "output_face_dense": 6,
+          "output_face_id": 55,
+          "selected_source_dense": 1,
+          "selected_source_face_id": 10,
+          "owner_dense": 2,
+          "owner_face_id": 11,
+          "source_endpoints_dense": [
+            4,
+            5
+          ],
+          "source_endpoint_ids": [
+            5,
+            6
+          ],
+          "row": 1,
+          "oriented_output_vertices": [
+            8,
+            4,
+            5,
+            9
+          ],
+          "oriented_output_vertex_ids": [
+            51,
+            5,
+            6,
+            52
+          ],
+          "output_corner_ids": [
+            59,
+            60,
+            61,
+            62
+          ],
+          "owner_corner_ordinals": [
+            3,
+            3,
+            2,
+            2
+          ],
+          "is_tip": [
+            true,
+            false,
+            false,
+            true
+          ]
+        },
+        {
+          "output_face_dense": 7,
+          "output_face_id": 56,
+          "selected_source_dense": 1,
+          "selected_source_face_id": 10,
+          "owner_dense": 3,
+          "owner_face_id": 12,
+          "source_endpoints_dense": [
+            5,
+            6
+          ],
+          "source_endpoint_ids": [
+            6,
+            7
+          ],
+          "row": 1,
+          "oriented_output_vertices": [
+            9,
+            5,
+            6,
+            10
+          ],
+          "oriented_output_vertex_ids": [
+            52,
+            6,
+            7,
+            53
+          ],
+          "output_corner_ids": [
+            63,
+            64,
+            65,
+            66
+          ],
+          "owner_corner_ordinals": [
+            3,
+            3,
+            2,
+            2
+          ],
+          "is_tip": [
+            true,
+            false,
+            false,
+            true
+          ]
+        },
+        {
+          "output_face_dense": 8,
+          "output_face_id": 57,
+          "selected_source_dense": 1,
+          "selected_source_face_id": 10,
+          "owner_dense": 4,
+          "owner_face_id": 13,
+          "source_endpoints_dense": [
+            6,
+            7
+          ],
+          "source_endpoint_ids": [
+            7,
+            8
+          ],
+          "row": 1,
+          "oriented_output_vertices": [
+            10,
+            6,
+            7,
+            11
+          ],
+          "oriented_output_vertex_ids": [
+            53,
+            7,
+            8,
+            54
+          ],
+          "output_corner_ids": [
+            67,
+            68,
+            69,
+            70
+          ],
+          "owner_corner_ordinals": [
+            3,
+            3,
+            2,
+            2
+          ],
+          "is_tip": [
+            true,
+            false,
+            false,
+            true
+          ]
+        },
+        {
+          "output_face_dense": 9,
+          "output_face_id": 58,
+          "selected_source_dense": 1,
+          "selected_source_face_id": 10,
+          "owner_dense": 5,
+          "owner_face_id": 14,
+          "source_endpoints_dense": [
+            7,
+            4
+          ],
+          "source_endpoint_ids": [
+            8,
+            5
+          ],
+          "row": 1,
+          "oriented_output_vertices": [
+            11,
+            7,
+            4,
+            8
+          ],
+          "oriented_output_vertex_ids": [
+            54,
+            8,
+            5,
+            51
+          ],
+          "output_corner_ids": [
+            71,
+            72,
+            73,
+            74
+          ],
+          "owner_corner_ordinals": [
+            3,
+            3,
+            2,
+            2
+          ],
+          "is_tip": [
+            true,
+            false,
+            false,
+            true
+          ]
+        }
+      ],
+      "retained_edges": [
+        {
+          "id": 39,
+          "source_endpoints": [
+            1,
+            2
+          ],
+          "output_endpoints": [
+            1,
+            2
+          ]
+        },
+        {
+          "id": 40,
+          "source_endpoints": [
+            1,
+            4
+          ],
+          "output_endpoints": [
+            1,
+            4
+          ]
+        },
+        {
+          "id": 41,
+          "source_endpoints": [
+            1,
+            5
+          ],
+          "output_endpoints": [
+            1,
+            5
+          ]
+        },
+        {
+          "id": 42,
+          "source_endpoints": [
+            2,
+            3
+          ],
+          "output_endpoints": [
+            2,
+            3
+          ]
+        },
+        {
+          "id": 43,
+          "source_endpoints": [
+            2,
+            6
+          ],
+          "output_endpoints": [
+            2,
+            6
+          ]
+        },
+        {
+          "id": 44,
+          "source_endpoints": [
+            3,
+            4
+          ],
+          "output_endpoints": [
+            3,
+            4
+          ]
+        },
+        {
+          "id": 45,
+          "source_endpoints": [
+            3,
+            7
+          ],
+          "output_endpoints": [
+            3,
+            7
+          ]
+        },
+        {
+          "id": 46,
+          "source_endpoints": [
+            4,
+            8
+          ],
+          "output_endpoints": [
+            4,
+            8
+          ]
+        },
+        {
+          "id": 47,
+          "source_endpoints": [
+            5,
+            6
+          ],
+          "output_endpoints": [
+            5,
+            6
+          ]
+        },
+        {
+          "id": 48,
+          "source_endpoints": [
+            5,
+            8
+          ],
+          "output_endpoints": [
+            5,
+            8
+          ]
+        },
+        {
+          "id": 49,
+          "source_endpoints": [
+            6,
+            7
+          ],
+          "output_endpoints": [
+            6,
+            7
+          ]
+        },
+        {
+          "id": 50,
+          "source_endpoints": [
+            7,
+            8
+          ],
+          "output_endpoints": [
+            7,
+            8
+          ]
+        }
+      ],
+      "retired_edge_ids": [],
+      "generated_edges": [
+        {
+          "id": 75,
+          "output_endpoints": [
+            5,
+            51
+          ]
+        },
+        {
+          "id": 76,
+          "output_endpoints": [
+            6,
+            52
+          ]
+        },
+        {
+          "id": 77,
+          "output_endpoints": [
+            7,
+            53
+          ]
+        },
+        {
+          "id": 78,
+          "output_endpoints": [
+            8,
+            54
+          ]
+        },
+        {
+          "id": 79,
+          "output_endpoints": [
+            51,
+            52
+          ]
+        },
+        {
+          "id": 80,
+          "output_endpoints": [
+            51,
+            54
+          ]
+        },
+        {
+          "id": 81,
+          "output_endpoints": [
+            52,
+            53
+          ]
+        },
+        {
+          "id": 82,
+          "output_endpoints": [
+            53,
+            54
+          ]
+        }
+      ]
+    },
+    "os_capture": null,
+    "stored_current_eligibility": null
+  },
+  "saved_prior": null,
+  "live": {
+    "tool": "Extrude",
+    "base": {
+      "scene": {
+        "items": [
+          {
+            "id": 1,
+            "name": "I1 cube",
+            "visible": true,
+            "transform": {
+              "translation": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "scale": [
+                1,
+                1,
+                1
+              ],
+              "zxy": false
+            },
+            "mesh": {
+              "attributes": {
+                "typed_maps": {},
+                "vertex_sets": {},
+                "polygon_sets": {
+                  "bottom": [
+                    0
+                  ],
+                  "top": [
+                    1
+                  ],
+                  "front": [
+                    2
+                  ],
+                  "right": [
+                    3
+                  ],
+                  "back": [
+                    4
+                  ],
+                  "left": [
+                    5
+                  ]
+                },
+                "point_uvs": {},
+                "corner_weights": {},
+                "corner_colors": {},
+                "extrude_edge_uses": {},
+                "relative_morphs": {},
+                "smoothing_labels": [],
+                "representations": [],
+                "creases": [],
+                "uv_records": {
+                  "Texture": [
+                    [
+                      200,
+                      201,
+                      202,
+                      203
+                    ],
+                    [
+                      100,
+                      101,
+                      102,
+                      103
+                    ],
+                    [
+                      208,
+                      209,
+                      210,
+                      211
+                    ],
+                    [
+                      212,
+                      213,
+                      214,
+                      215
+                    ],
+                    [
+                      216,
+                      217,
+                      218,
+                      219
+                    ],
+                    [
+                      220,
+                      221,
+                      222,
+                      223
+                    ]
+                  ],
+                  "Empty": [
+                    [
+                      null,
+                      null,
+                      null,
+                      null
+                    ],
+                    [
+                      null,
+                      null,
+                      null,
+                      null
+                    ],
+                    [
+                      null,
+                      null,
+                      null,
+                      null
+                    ],
+                    [
+                      null,
+                      null,
+                      null,
+                      null
+                    ],
+                    [
+                      null,
+                      null,
+                      null,
+                      null
+                    ],
+                    [
+                      null,
+                      null,
+                      null,
+                      null
+                    ]
+                  ]
+                },
+                "normal_map_order": [],
+                "corner_normals": {},
+                "point_weights": {},
+                "point_colors": {},
+                "degenerate_faces": []
+              },
+              "vertices": [
+                [
+                  -1,
+                  -1,
+                  -1
+                ],
+                [
+                  1,
+                  -1,
+                  -1
+                ],
+                [
+                  1,
+                  1,
+                  -1
+                ],
+                [
+                  -1,
+                  1,
+                  -1
+                ],
+                [
+                  -1,
+                  -1,
+                  1
+                ],
+                [
+                  1,
+                  -1,
+                  1
+                ],
+                [
+                  1,
+                  1,
+                  1
+                ],
+                [
+                  -1,
+                  1,
+                  1
+                ]
+              ],
+              "faces": [
+                {
+                  "vertices": [
+                    0,
+                    3,
+                    2,
+                    1
+                  ],
+                  "uv": null,
+                  "material": "bottom",
+                  "smooth": false,
+                  "part": null,
+                  "material_label": "bottom"
+                },
+                {
+                  "vertices": [
+                    4,
+                    5,
+                    6,
+                    7
+                  ],
+                  "uv": null,
+                  "material": "top",
+                  "smooth": false,
+                  "part": null,
+                  "material_label": "top"
+                },
+                {
+                  "vertices": [
+                    0,
+                    1,
+                    5,
+                    4
+                  ],
+                  "uv": null,
+                  "material": "front",
+                  "smooth": false,
+                  "part": null,
+                  "material_label": "front"
+                },
+                {
+                  "vertices": [
+                    1,
+                    2,
+                    6,
+                    5
+                  ],
+                  "uv": null,
+                  "material": "right",
+                  "smooth": false,
+                  "part": null,
+                  "material_label": "right"
+                },
+                {
+                  "vertices": [
+                    2,
+                    3,
+                    7,
+                    6
+                  ],
+                  "uv": null,
+                  "material": "back",
+                  "smooth": false,
+                  "part": null,
+                  "material_label": "back"
+                },
+                {
+                  "vertices": [
+                    3,
+                    0,
+                    4,
+                    7
+                  ],
+                  "uv": null,
+                  "material": "left",
+                  "smooth": false,
+                  "part": null,
+                  "material_label": "left"
+                }
+              ],
+              "uv_maps": {
+                "Texture": [
+                  [
+                    [
+                      0,
+                      0
+                    ],
+                    [
+                      1,
+                      0
+                    ],
+                    [
+                      1,
+                      1
+                    ],
+                    [
+                      0,
+                      1
+                    ]
+                  ],
+                  [
+                    [
+                      0,
+                      0
+                    ],
+                    [
+                      1,
+                      0
+                    ],
+                    [
+                      1,
+                      1
+                    ],
+                    [
+                      0,
+                      1
+                    ]
+                  ],
+                  [
+                    [
+                      0,
+                      0
+                    ],
+                    [
+                      1,
+                      0
+                    ],
+                    [
+                      1,
+                      1
+                    ],
+                    [
+                      0,
+                      1
+                    ]
+                  ],
+                  [
+                    [
+                      0,
+                      0
+                    ],
+                    [
+                      1,
+                      0
+                    ],
+                    [
+                      1,
+                      1
+                    ],
+                    [
+                      0,
+                      1
+                    ]
+                  ],
+                  [
+                    [
+                      0,
+                      0
+                    ],
+                    [
+                      1,
+                      0
+                    ],
+                    [
+                      1,
+                      1
+                    ],
+                    [
+                      0,
+                      1
+                    ]
+                  ],
+                  [
+                    [
+                      0,
+                      0
+                    ],
+                    [
+                      1,
+                      0
+                    ],
+                    [
+                      1,
+                      1
+                    ],
+                    [
+                      0,
+                      1
+                    ]
+                  ]
+                ],
+                "Empty": [
+                  [
+                    null,
+                    null,
+                    null,
+                    null
+                  ],
+                  [
+                    null,
+                    null,
+                    null,
+                    null
+                  ],
+                  [
+                    null,
+                    null,
+                    null,
+                    null
+                  ],
+                  [
+                    null,
+                    null,
+                    null,
+                    null
+                  ],
+                  [
+                    null,
+                    null,
+                    null,
+                    null
+                  ],
+                  [
+                    null,
+                    null,
+                    null,
+                    null
+                  ]
+                ]
+              }
+            },
+            "parent": null,
+            "source_id": null,
+            "source_display_name": null
+          }
+        ],
+        "next_id": 2,
+        "selection": {
+          "item": 1,
+          "mode": "Polygon",
+          "vertices": [],
+          "edges": [],
+          "faces": [
+            1
+          ]
+        },
+        "workplane": {
+          "fixed": false,
+          "plane": 0,
+          "center": [
+            0,
+            0,
+            0
+          ]
+        },
+        "import_source": null
+      },
+      "identities": {
+        "vertices": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "faces": [
+          9,
+          10,
+          11,
+          12,
+          13,
+          14
+        ],
+        "corners": [
+          [
+            15,
+            16,
+            17,
+            18
+          ],
+          [
+            19,
+            20,
+            21,
+            22
+          ],
+          [
+            23,
+            24,
+            25,
+            26
+          ],
+          [
+            27,
+            28,
+            29,
+            30
+          ],
+          [
+            31,
+            32,
+            33,
+            34
+          ],
+          [
+            35,
+            36,
+            37,
+            38
+          ]
+        ],
+        "edges": [
+          {
+            "vertices": [
+              1,
+              2
+            ],
+            "id": 39
+          },
+          {
+            "vertices": [
+              1,
+              4
+            ],
+            "id": 40
+          },
+          {
+            "vertices": [
+              1,
+              5
+            ],
+            "id": 41
+          },
+          {
+            "vertices": [
+              2,
+              3
+            ],
+            "id": 42
+          },
+          {
+            "vertices": [
+              2,
+              6
+            ],
+            "id": 43
+          },
+          {
+            "vertices": [
+              3,
+              4
+            ],
+            "id": 44
+          },
+          {
+            "vertices": [
+              3,
+              7
+            ],
+            "id": 45
+          },
+          {
+            "vertices": [
+              4,
+              8
+            ],
+            "id": 46
+          },
+          {
+            "vertices": [
+              5,
+              6
+            ],
+            "id": 47
+          },
+          {
+            "vertices": [
+              5,
+              8
+            ],
+            "id": 48
+          },
+          {
+            "vertices": [
+              6,
+              7
+            ],
+            "id": 49
+          },
+          {
+            "vertices": [
+              7,
+              8
+            ],
+            "id": 50
+          }
+        ],
+        "logical_faces": [
+          9,
+          10,
+          11,
+          12,
+          13,
+          14
+        ],
+        "next_id": 51
+      }
+    },
+    "params": {
+      "bevel": {
+        "shift_range": 0,
+        "inset_range": 0,
+        "edges": "Inner",
+        "use_material": false,
+        "material": "",
+        "segments": 1,
+        "square": false,
+        "edge_rail": false,
+        "offset_even": true,
+        "thicken": false,
+        "max_angle": 89.9,
+        "use_normal_map": false,
+        "open_boundary": false,
+        "auto_weld": false,
+        "weld_range": 0.0001,
+        "falloff": "Averaged",
+        "falloff_shift": true,
+        "falloff_inset": true,
+        "uvs": "Connected",
+        "reverse_direction": false,
+        "reverse_inset": false,
+        "keep_aspect": true
+      },
+      "smooth_shift": {
+        "offset": 0,
+        "scale": 1,
+        "angle": 89.5,
+        "thicken": false,
+        "sharp": false,
+        "angle_weight": false,
+        "both_sides": false
+      },
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "size": [
+        1,
+        1,
+        1
+      ],
+      "inset": 0,
+      "shift": 0,
+      "extent": [
+        0,
+        0,
+        0
+      ],
+      "group_polygons": true,
+      "extrude_sides": 1,
+      "extrude_mode": "Shift",
+      "extrude_uvs": "None",
+      "extrude_uv_map": "Texture",
+      "extrude_uv_selected": true,
+      "delta": [
+        0,
+        0,
+        0
+      ],
+      "rotation_delta": [
+        0,
+        0,
+        0
+      ],
+      "scale_delta": [
+        1,
+        1,
+        1
+      ],
+      "box_handle_mode": "Resize",
+      "show_corners": false,
+      "segments": [
+        1,
+        1,
+        1
+      ],
+      "radial": null
+    },
+    "applied": true,
+    "preview_error": null,
+    "action_frame": {
+      "center": [
+        0,
+        0,
+        1
+      ],
+      "basis": [
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0,
+          1
+        ]
+      ]
+    },
+    "identity_preview": {
+      "roles": {
+        "source_graph": "G0",
+        "source_identity": "I0",
+        "begun_graph": "G1",
+        "begun_identity": "I1",
+        "source_layout": [
+          [
+            0,
+            3,
+            2,
+            1
+          ],
+          [
+            4,
+            5,
+            6,
+            7
+          ],
+          [
+            0,
+            1,
+            5,
+            4
+          ],
+          [
+            1,
+            2,
+            6,
+            5
+          ],
+          [
+            2,
+            3,
+            7,
+            6
+          ],
+          [
+            3,
+            0,
+            4,
+            7
+          ]
+        ],
+        "source_vertex_count": 8,
+        "vertex_sources": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          4,
+          5,
+          6,
+          7
+        ],
+        "face_sources": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          2,
+          3,
+          4,
+          5
+        ],
+        "ordered_targets": [
+          10
+        ],
+        "cap_face_id": 10,
+        "cap_source_dense": 1,
+        "cap_output_dense": 1,
+        "cap_corner_ids": [
+          19,
+          20,
+          21,
+          22
+        ],
+        "tips": [
+          {
+            "source_dense": 4,
+            "source_id": 5,
+            "output_dense": 8,
+            "output_id": 51
+          },
+          {
+            "source_dense": 5,
+            "source_id": 6,
+            "output_dense": 9,
+            "output_id": 52
+          },
+          {
+            "source_dense": 6,
+            "source_id": 7,
+            "output_dense": 10,
+            "output_id": 53
+          },
+          {
+            "source_dense": 7,
+            "source_id": 8,
+            "output_dense": 11,
+            "output_id": 54
+          }
+        ],
+        "walls": [
+          {
+            "output_face_dense": 6,
+            "output_face_id": 55,
+            "selected_source_dense": 1,
+            "selected_source_face_id": 10,
+            "owner_dense": 2,
+            "owner_face_id": 11,
+            "source_endpoints_dense": [
+              4,
+              5
+            ],
+            "source_endpoint_ids": [
+              5,
+              6
+            ],
+            "row": 1,
+            "oriented_output_vertices": [
+              8,
+              4,
+              5,
+              9
+            ],
+            "oriented_output_vertex_ids": [
+              51,
+              5,
+              6,
+              52
+            ],
+            "output_corner_ids": [
+              59,
+              60,
+              61,
+              62
+            ],
+            "owner_corner_ordinals": [
+              3,
+              3,
+              2,
+              2
+            ],
+            "is_tip": [
+              true,
+              false,
+              false,
+              true
+            ]
+          },
+          {
+            "output_face_dense": 7,
+            "output_face_id": 56,
+            "selected_source_dense": 1,
+            "selected_source_face_id": 10,
+            "owner_dense": 3,
+            "owner_face_id": 12,
+            "source_endpoints_dense": [
+              5,
+              6
+            ],
+            "source_endpoint_ids": [
+              6,
+              7
+            ],
+            "row": 1,
+            "oriented_output_vertices": [
+              9,
+              5,
+              6,
+              10
+            ],
+            "oriented_output_vertex_ids": [
+              52,
+              6,
+              7,
+              53
+            ],
+            "output_corner_ids": [
+              63,
+              64,
+              65,
+              66
+            ],
+            "owner_corner_ordinals": [
+              3,
+              3,
+              2,
+              2
+            ],
+            "is_tip": [
+              true,
+              false,
+              false,
+              true
+            ]
+          },
+          {
+            "output_face_dense": 8,
+            "output_face_id": 57,
+            "selected_source_dense": 1,
+            "selected_source_face_id": 10,
+            "owner_dense": 4,
+            "owner_face_id": 13,
+            "source_endpoints_dense": [
+              6,
+              7
+            ],
+            "source_endpoint_ids": [
+              7,
+              8
+            ],
+            "row": 1,
+            "oriented_output_vertices": [
+              10,
+              6,
+              7,
+              11
+            ],
+            "oriented_output_vertex_ids": [
+              53,
+              7,
+              8,
+              54
+            ],
+            "output_corner_ids": [
+              67,
+              68,
+              69,
+              70
+            ],
+            "owner_corner_ordinals": [
+              3,
+              3,
+              2,
+              2
+            ],
+            "is_tip": [
+              true,
+              false,
+              false,
+              true
+            ]
+          },
+          {
+            "output_face_dense": 9,
+            "output_face_id": 58,
+            "selected_source_dense": 1,
+            "selected_source_face_id": 10,
+            "owner_dense": 5,
+            "owner_face_id": 14,
+            "source_endpoints_dense": [
+              7,
+              4
+            ],
+            "source_endpoint_ids": [
+              8,
+              5
+            ],
+            "row": 1,
+            "oriented_output_vertices": [
+              11,
+              7,
+              4,
+              8
+            ],
+            "oriented_output_vertex_ids": [
+              54,
+              8,
+              5,
+              51
+            ],
+            "output_corner_ids": [
+              71,
+              72,
+              73,
+              74
+            ],
+            "owner_corner_ordinals": [
+              3,
+              3,
+              2,
+              2
+            ],
+            "is_tip": [
+              true,
+              false,
+              false,
+              true
+            ]
+          }
+        ],
+        "retained_edges": [
+          {
+            "id": 39,
+            "source_endpoints": [
+              1,
+              2
+            ],
+            "output_endpoints": [
+              1,
+              2
+            ]
+          },
+          {
+            "id": 40,
+            "source_endpoints": [
+              1,
+              4
+            ],
+            "output_endpoints": [
+              1,
+              4
+            ]
+          },
+          {
+            "id": 41,
+            "source_endpoints": [
+              1,
+              5
+            ],
+            "output_endpoints": [
+              1,
+              5
+            ]
+          },
+          {
+            "id": 42,
+            "source_endpoints": [
+              2,
+              3
+            ],
+            "output_endpoints": [
+              2,
+              3
+            ]
+          },
+          {
+            "id": 43,
+            "source_endpoints": [
+              2,
+              6
+            ],
+            "output_endpoints": [
+              2,
+              6
+            ]
+          },
+          {
+            "id": 44,
+            "source_endpoints": [
+              3,
+              4
+            ],
+            "output_endpoints": [
+              3,
+              4
+            ]
+          },
+          {
+            "id": 45,
+            "source_endpoints": [
+              3,
+              7
+            ],
+            "output_endpoints": [
+              3,
+              7
+            ]
+          },
+          {
+            "id": 46,
+            "source_endpoints": [
+              4,
+              8
+            ],
+            "output_endpoints": [
+              4,
+              8
+            ]
+          },
+          {
+            "id": 47,
+            "source_endpoints": [
+              5,
+              6
+            ],
+            "output_endpoints": [
+              5,
+              6
+            ]
+          },
+          {
+            "id": 48,
+            "source_endpoints": [
+              5,
+              8
+            ],
+            "output_endpoints": [
+              5,
+              8
+            ]
+          },
+          {
+            "id": 49,
+            "source_endpoints": [
+              6,
+              7
+            ],
+            "output_endpoints": [
+              6,
+              7
+            ]
+          },
+          {
+            "id": 50,
+            "source_endpoints": [
+              7,
+              8
+            ],
+            "output_endpoints": [
+              7,
+              8
+            ]
+          }
+        ],
+        "retired_edge_ids": [],
+        "generated_edges": [
+          {
+            "id": 75,
+            "output_endpoints": [
+              5,
+              51
+            ]
+          },
+          {
+            "id": 76,
+            "output_endpoints": [
+              6,
+              52
+            ]
+          },
+          {
+            "id": 77,
+            "output_endpoints": [
+              7,
+              53
+            ]
+          },
+          {
+            "id": 78,
+            "output_endpoints": [
+              8,
+              54
+            ]
+          },
+          {
+            "id": 79,
+            "output_endpoints": [
+              51,
+              52
+            ]
+          },
+          {
+            "id": 80,
+            "output_endpoints": [
+              51,
+              54
+            ]
+          },
+          {
+            "id": 81,
+            "output_endpoints": [
+              52,
+              53
+            ]
+          },
+          {
+            "id": 82,
+            "output_endpoints": [
+              53,
+              54
+            ]
+          }
+        ]
+      },
+      "begun_identities": {
+        "vertices": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          51,
+          52,
+          53,
+          54
+        ],
+        "faces": [
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          55,
+          56,
+          57,
+          58
+        ],
+        "corners": [
+          [
+            15,
+            16,
+            17,
+            18
+          ],
+          [
+            19,
+            20,
+            21,
+            22
+          ],
+          [
+            23,
+            24,
+            25,
+            26
+          ],
+          [
+            27,
+            28,
+            29,
+            30
+          ],
+          [
+            31,
+            32,
+            33,
+            34
+          ],
+          [
+            35,
+            36,
+            37,
+            38
+          ],
+          [
+            59,
+            60,
+            61,
+            62
+          ],
+          [
+            63,
+            64,
+            65,
+            66
+          ],
+          [
+            67,
+            68,
+            69,
+            70
+          ],
+          [
+            71,
+            72,
+            73,
+            74
+          ]
+        ],
+        "edges": [
+          {
+            "vertices": [
+              1,
+              2
+            ],
+            "id": 39
+          },
+          {
+            "vertices": [
+              1,
+              4
+            ],
+            "id": 40
+          },
+          {
+            "vertices": [
+              1,
+              5
+            ],
+            "id": 41
+          },
+          {
+            "vertices": [
+              2,
+              3
+            ],
+            "id": 42
+          },
+          {
+            "vertices": [
+              2,
+              6
+            ],
+            "id": 43
+          },
+          {
+            "vertices": [
+              3,
+              4
+            ],
+            "id": 44
+          },
+          {
+            "vertices": [
+              3,
+              7
+            ],
+            "id": 45
+          },
+          {
+            "vertices": [
+              4,
+              8
+            ],
+            "id": 46
+          },
+          {
+            "vertices": [
+              5,
+              6
+            ],
+            "id": 47
+          },
+          {
+            "vertices": [
+              5,
+              8
+            ],
+            "id": 48
+          },
+          {
+            "vertices": [
+              5,
+              51
+            ],
+            "id": 75
+          },
+          {
+            "vertices": [
+              6,
+              7
+            ],
+            "id": 49
+          },
+          {
+            "vertices": [
+              6,
+              52
+            ],
+            "id": 76
+          },
+          {
+            "vertices": [
+              7,
+              8
+            ],
+            "id": 50
+          },
+          {
+            "vertices": [
+              7,
+              53
+            ],
+            "id": 77
+          },
+          {
+            "vertices": [
+              8,
+              54
+            ],
+            "id": 78
+          },
+          {
+            "vertices": [
+              51,
+              52
+            ],
+            "id": 79
+          },
+          {
+            "vertices": [
+              51,
+              54
+            ],
+            "id": 80
+          },
+          {
+            "vertices": [
+              52,
+              53
+            ],
+            "id": 81
+          },
+          {
+            "vertices": [
+              53,
+              54
+            ],
+            "id": 82
+          }
+        ],
+        "logical_faces": [
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          55,
+          56,
+          57,
+          58
+        ],
+        "next_id": 83
+      }
+    }
+  },
+  "action_context": {
+    "center": "None",
+    "axis": "World"
+  },
+  "extrude_preset": {
+    "bevel": {
+      "shift_range": 0,
+      "inset_range": 0,
+      "edges": "Inner",
+      "use_material": false,
+      "material": "",
+      "segments": 1,
+      "square": false,
+      "edge_rail": false,
+      "offset_even": true,
+      "thicken": false,
+      "max_angle": 89.9,
+      "use_normal_map": false,
+      "open_boundary": false,
+      "auto_weld": false,
+      "weld_range": 0.0001,
+      "falloff": "Averaged",
+      "falloff_shift": true,
+      "falloff_inset": true,
+      "uvs": "Connected",
+      "reverse_direction": false,
+      "reverse_inset": false,
+      "keep_aspect": true
+    },
+    "smooth_shift": {
+      "offset": 0,
+      "scale": 1,
+      "angle": 89.5,
+      "thicken": false,
+      "sharp": false,
+      "angle_weight": false,
+      "both_sides": false
+    },
+    "position": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      1,
+      1,
+      1
+    ],
+    "inset": 0,
+    "shift": 0,
+    "extent": [
+      0,
+      0,
+      0.5
+    ],
+    "group_polygons": true,
+    "extrude_sides": 1,
+    "extrude_mode": "Shift",
+    "extrude_uvs": "None",
+    "extrude_uv_map": "Texture",
+    "extrude_uv_selected": true,
+    "delta": [
+      0,
+      0,
+      0
+    ],
+    "rotation_delta": [
+      0,
+      0,
+      0
+    ],
+    "scale_delta": [
+      1,
+      1,
+      1
+    ],
+    "box_handle_mode": "Resize",
+    "show_corners": false,
+    "segments": [
+      1,
+      1,
+      1
+    ],
+    "radial": null
+  },
+  "geometry_bank_next": 83,
+  "stage_bank_next": 2,
+  "scope_binding": "D0/item1/generation1",
+  "ordered_selected_face_ids": [
+    10
+  ],
+  "capture": null,
+  "gesture_ticket": null,
+  "selection_start": null,
+  "other_numeric_owners": {
+    "cone": null,
+    "spike": null,
+    "ellipsoid": null
+  },
+  "external_readers": [],
+  "logical_roots": {
+    "current": 1,
+    "completed_pairs": 0,
+    "stage_pairs": 3,
+    "prior_pairs": 0,
+    "live_base_pairs": 1,
+    "reader_pairs": 0,
+    "total_pairs": 5
+  },
+  "save": {
+    "saved_scene": {
+      "items": [
+        {
+          "id": 1,
+          "name": "I1 cube",
+          "visible": true,
+          "transform": {
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotation": [
+              0,
+              0,
+              0
+            ],
+            "scale": [
+              1,
+              1,
+              1
+            ],
+            "zxy": false
+          },
+          "mesh": {
+            "attributes": {
+              "typed_maps": {},
+              "vertex_sets": {},
+              "polygon_sets": {
+                "bottom": [
+                  0
+                ],
+                "top": [
+                  1
+                ],
+                "front": [
+                  2
+                ],
+                "right": [
+                  3
+                ],
+                "back": [
+                  4
+                ],
+                "left": [
+                  5
+                ]
+              },
+              "point_uvs": {},
+              "corner_weights": {},
+              "corner_colors": {},
+              "extrude_edge_uses": {},
+              "relative_morphs": {},
+              "smoothing_labels": [],
+              "representations": [],
+              "creases": [],
+              "uv_records": {
+                "Texture": [
+                  [
+                    200,
+                    201,
+                    202,
+                    203
+                  ],
+                  [
+                    100,
+                    101,
+                    102,
+                    103
+                  ],
+                  [
+                    208,
+                    209,
+                    210,
+                    211
+                  ],
+                  [
+                    212,
+                    213,
+                    214,
+                    215
+                  ],
+                  [
+                    216,
+                    217,
+                    218,
+                    219
+                  ],
+                  [
+                    220,
+                    221,
+                    222,
+                    223
+                  ]
+                ],
+                "Empty": [
+                  [
+                    null,
+                    null,
+                    null,
+                    null
+                  ],
+                  [
+                    null,
+                    null,
+                    null,
+                    null
+                  ],
+                  [
+                    null,
+                    null,
+                    null,
+                    null
+                  ],
+                  [
+                    null,
+                    null,
+                    null,
+                    null
+                  ],
+                  [
+                    null,
+                    null,
+                    null,
+                    null
+                  ],
+                  [
+                    null,
+                    null,
+                    null,
+                    null
+                  ]
+                ]
+              },
+              "normal_map_order": [],
+              "corner_normals": {},
+              "point_weights": {},
+              "point_colors": {},
+              "degenerate_faces": []
+            },
+            "vertices": [
+              [
+                -1,
+                -1,
+                -1
+              ],
+              [
+                1,
+                -1,
+                -1
+              ],
+              [
+                1,
+                1,
+                -1
+              ],
+              [
+                -1,
+                1,
+                -1
+              ],
+              [
+                -1,
+                -1,
+                1
+              ],
+              [
+                1,
+                -1,
+                1
+              ],
+              [
+                1,
+                1,
+                1
+              ],
+              [
+                -1,
+                1,
+                1
+              ]
+            ],
+            "faces": [
+              {
+                "vertices": [
+                  0,
+                  3,
+                  2,
+                  1
+                ],
+                "uv": null,
+                "material": "bottom",
+                "smooth": false,
+                "part": null,
+                "material_label": "bottom"
+              },
+              {
+                "vertices": [
+                  4,
+                  5,
+                  6,
+                  7
+                ],
+                "uv": null,
+                "material": "top",
+                "smooth": false,
+                "part": null,
+                "material_label": "top"
+              },
+              {
+                "vertices": [
+                  0,
+                  1,
+                  5,
+                  4
+                ],
+                "uv": null,
+                "material": "front",
+                "smooth": false,
+                "part": null,
+                "material_label": "front"
+              },
+              {
+                "vertices": [
+                  1,
+                  2,
+                  6,
+                  5
+                ],
+                "uv": null,
+                "material": "right",
+                "smooth": false,
+                "part": null,
+                "material_label": "right"
+              },
+              {
+                "vertices": [
+                  2,
+                  3,
+                  7,
+                  6
+                ],
+                "uv": null,
+                "material": "back",
+                "smooth": false,
+                "part": null,
+                "material_label": "back"
+              },
+              {
+                "vertices": [
+                  3,
+                  0,
+                  4,
+                  7
+                ],
+                "uv": null,
+                "material": "left",
+                "smooth": false,
+                "part": null,
+                "material_label": "left"
+              }
+            ],
+            "uv_maps": {
+              "Texture": [
+                [
+                  [
+                    0,
+                    0
+                  ],
+                  [
+                    1,
+                    0
+                  ],
+                  [
+                    1,
+                    1
+                  ],
+                  [
+                    0,
+                    1
+                  ]
+                ],
+                [
+                  [
+                    0,
+                    0
+                  ],
+                  [
+                    1,
+                    0
+                  ],
+                  [
+                    1,
+                    1
+                  ],
+                  [
+                    0,
+                    1
+                  ]
+                ],
+                [
+                  [
+                    0,
+                    0
+                  ],
+                  [
+                    1,
+                    0
+                  ],
+                  [
+                    1,
+                    1
+                  ],
+                  [
+                    0,
+                    1
+                  ]
+                ],
+                [
+                  [
+                    0,
+                    0
+                  ],
+                  [
+                    1,
+                    0
+                  ],
+                  [
+                    1,
+                    1
+                  ],
+                  [
+                    0,
+                    1
+                  ]
+                ],
+                [
+                  [
+                    0,
+                    0
+                  ],
+                  [
+                    1,
+                    0
+                  ],
+                  [
+                    1,
+                    1
+                  ],
+                  [
+                    0,
+                    1
+                  ]
+                ],
+                [
+                  [
+                    0,
+                    0
+                  ],
+                  [
+                    1,
+                    0
+                  ],
+                  [
+                    1,
+                    1
+                  ],
+                  [
+                    0,
+                    1
+                  ]
+                ]
+              ],
+              "Empty": [
+                [
+                  null,
+                  null,
+                  null,
+                  null
+                ],
+                [
+                  null,
+                  null,
+                  null,
+                  null
+                ],
+                [
+                  null,
+                  null,
+                  null,
+                  null
+                ],
+                [
+                  null,
+                  null,
+                  null,
+                  null
+                ],
+                [
+                  null,
+                  null,
+                  null,
+                  null
+                ],
+                [
+                  null,
+                  null,
+                  null,
+                  null
+                ]
+              ]
+            }
+          },
+          "parent": null,
+          "source_id": null,
+          "source_display_name": null
+        }
+      ],
+      "next_id": 2,
+      "selection": {
+        "item": 1,
+        "mode": "Polygon",
+        "vertices": [],
+        "edges": [],
+        "faces": [
+          1
+        ]
+      },
+      "workplane": {
+        "fixed": false,
+        "plane": 0,
+        "center": [
+          0,
+          0,
+          0
+        ]
+      },
+      "import_source": null
+    },
+    "association": "PARKED_DEST",
+    "dirty": true
+  },
+  "tokens": "Bound before action; exact semantic deltas in TRANSITIONS.json; do not restore any old token"
+}

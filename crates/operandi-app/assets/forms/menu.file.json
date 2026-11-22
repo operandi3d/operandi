@@ -1,0 +1,95 @@
+{
+  "version": 1,
+  "id": "menu.file",
+  "label": "File",
+  "style": "menu",
+  "controls": [
+    {
+      "command": "scene.new",
+      "label": "New"
+    },
+    {
+      "command": "scene.open",
+      "label": "Open…"
+    },
+    {
+      "command": "scene.save",
+      "label": "Save",
+      "keyEquivalent": "s"
+    },
+    {
+      "command": "scene.saveAs",
+      "label": "Save As…"
+    },
+    {
+      "form": "menu.file.current"
+    },
+    {
+      "divider": ""
+    },
+    {
+      "command": "scene.importReference",
+      "label": "Import…"
+    },
+    {
+      "command": "operandi.materialx.import",
+      "label": "Import MaterialX…"
+    },
+    {
+      "form": "menu.file.export"
+    },
+    {
+      "command": "operandi.materialx.export",
+      "label": "Export Material as MaterialX…"
+    },
+    {
+      "divider": ""
+    },
+    {
+      "command": "preset.do",
+      "label": "Load Preset…"
+    },
+    {
+      "command": "preset.saveAs",
+      "label": "Save Item Preset…"
+    },
+    {
+      "command": "preset.saveAs kind:assembly",
+      "label": "Save Assembly Preset…"
+    },
+    {
+      "command": "preset.saveAs kind:environment",
+      "label": "Save Environment Preset…"
+    },
+    {
+      "divider": ""
+    },
+    {
+      "command": "operandi.project.new",
+      "label": "New Project…"
+    },
+    {
+      "command": "operandi.project.set",
+      "label": "Set Project…"
+    },
+    {
+      "form": "menu.file.recentProjects"
+    },
+    {
+      "form": "menu.file.projectPresets"
+    },
+    {
+      "divider": ""
+    },
+    {
+      "command": "scene.close",
+      "label": "Close Scene",
+      "keyEquivalent": "w"
+    },
+    {
+      "command": "scene.closeAll",
+      "label": "Close All…",
+      "keyEquivalent": "W"
+    }
+  ]
+}

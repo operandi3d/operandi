@@ -1,0 +1,36 @@
+[workspace]
+members = ["crates/operandi-core", "crates/operandi-uv", "crates/operandi-remesh", "crates/operandi-alembic", "crates/operandi-app", "crates/operandi-mcp", "crates/operandi-layout", "crates/operandi-cycles", "crates/operandi-preset-convert", "crates/operandi-usd", "crates/operandi-paint"]
+resolver = "2"
+# Vendored third-party crates used as path dependencies, not ours to lint
+# or test (vendor/craft-psd/OPERANDI.md).
+exclude = ["vendor/craft-psd"]
+
+[workspace.dependencies]
+glam = { version = "0.30", features = ["serde"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = { version = "1", features = ["float_roundtrip"] }
+
+# Our copy of egui-winit 0.33.3 with one patch: it reports whether a digit
+# came from the keypad or the main row (egui merges them). See
+# vendor/egui-winit/OPERANDI-PATCH.md. Re-apply when upgrading eframe.
+[patch.crates-io]
+egui-winit = { path = "vendor/egui-winit" }
+
+# Tests build in the dev profile, unoptimised. The UV packer and its
+# linear-algebra crate are number crunching that runs 20-50x slower that way
+# (one cube pack test took 64 s), so they're optimised even in dev builds.
+# They rarely change, so the extra compile time is paid once per build folder.
+[profile.dev.package.operandi-uv]
+opt-level = 3
+
+[profile.dev.package.faer]
+opt-level = 3
+
+# QA builds for Jason (scripts/bundle-dev.sh): fully optimised like release,
+# but incremental and split into many small pieces, so after a small change
+# only the changed pieces recompile. The code can run a little slower than a
+# real release (less inlining across pieces); releases still use `release`.
+[profile.qa]
+inherits = "release"
+incremental = true
+codegen-units = 256

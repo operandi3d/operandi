@@ -1,0 +1,132 @@
+{
+  "version": 1,
+  "id": "menu.select",
+  "label": "Select",
+  "style": "menu",
+  "controls": [
+    {
+      "command": "Vertices",
+      "label": "Vertices",
+      "shortcut": "Vertices"
+    },
+    {
+      "command": "Edges",
+      "label": "Edges",
+      "shortcut": "Edges"
+    },
+    {
+      "command": "Polygons",
+      "label": "Polygons",
+      "shortcut": "Polygons"
+    },
+    {
+      "command": "Items",
+      "label": "Items",
+      "shortcut": "Items"
+    },
+    {
+      "command": "Materials",
+      "label": "Materials",
+      "shortcut": "Materials"
+    },
+    {
+      "form": "menu.select.polygonTagType"
+    },
+    {
+      "divider": ""
+    },
+    {
+      "form": "menu.select.lassoStyle"
+    },
+    {
+      "command": "Close Loop",
+      "label": "Close Loop",
+      "shortcut": "Close Loop"
+    },
+    {
+      "command": "Grow",
+      "label": "Grow",
+      "shortcut": "Grow"
+    },
+    {
+      "command": "Shrink",
+      "label": "Shrink",
+      "shortcut": "Shrink"
+    },
+    {
+      "command": "Loop",
+      "label": "Loop",
+      "shortcut": "Loop"
+    },
+    {
+      "command": "Ring",
+      "label": "Ring",
+      "shortcut": "Ring"
+    },
+    {
+      "command": "Next Loop",
+      "label": "Next Loop",
+      "shortcut": "Next Loop"
+    },
+    {
+      "command": "Previous Loop",
+      "label": "Previous Loop",
+      "shortcut": "Previous Loop"
+    },
+    {
+      "command": "Select All",
+      "label": "Select All",
+      "shortcut": "Select All"
+    },
+    {
+      "command": "Invert",
+      "label": "Invert",
+      "shortcut": "Invert"
+    },
+    {
+      "command": "Connected",
+      "label": "Connected",
+      "shortcut": "Connected"
+    },
+    {
+      "command": "Invert Connected",
+      "label": "Invert Connected",
+      "shortcut": "Invert Connected"
+    },
+    {
+      "command": "Convert to Vertices",
+      "label": "Convert to Vertices",
+      "shortcut": "Convert to Vertices"
+    },
+    {
+      "command": "Convert to Edges",
+      "label": "Convert to Edges",
+      "shortcut": "Convert to Edges"
+    },
+    {
+      "command": "Convert to Polygons",
+      "label": "Convert to Polygons",
+      "shortcut": "Convert to Polygons"
+    },
+    {
+      "command": "Boundary",
+      "label": "Boundary",
+      "shortcut": "Boundary"
+    },
+    {
+      "command": "Select More",
+      "label": "Select More",
+      "shortcut": "Select More"
+    },
+    {
+      "command": "Select Less",
+      "label": "Select Less",
+      "shortcut": "Select Less"
+    },
+    {
+      "command": "Select Between",
+      "label": "Select Between",
+      "shortcut": "Select Between"
+    }
+  ]
+}

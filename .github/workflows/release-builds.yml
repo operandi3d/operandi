@@ -1,0 +1,149 @@
+# Builds the Linux and Windows release files for one tag, on Jason's own
+# machines, and keeps them for a day as run artifacts. Nothing here
+# publishes anything: scripts/release.sh (run by hand on the Mac) starts
+# this workflow, waits for it, downloads the files and makes the GitHub
+# Release itself. See docs/RELEASING.md, "Releasing all three".
+#
+# Runs only when started by hand (scripts/release.sh does it with
+# `gh workflow run`), and only for the repo owner, so nobody else's code
+# runs on Jason's machines.
+#
+# Machines (self-hosted runners, docs/CI.md):
+#   Linux:   the "gaming" box (labels self-hosted, Linux, X64)
+#   Windows: the Windows VM (labels self-hosted, Windows, X64), with the
+#            tools from docs/RELEASE_BUILDS.md installed
+name: Release builds
+run-name: Release builds ${{ inputs.tag }} (${{ inputs.request_id }})
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag to build, e.g. v0.1.0"
+        required: true
+        type: string
+      linux:
+        description: "Build Linux"
+        type: boolean
+        default: true
+      windows:
+        description: "Build Windows"
+        type: boolean
+        default: true
+      request_id:
+        description: "Set by scripts/release.sh so it can find this run"
+        type: string
+        default: manual
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  linux:
+    name: Linux
+    if: inputs.linux && github.actor == github.repository_owner
+    runs-on: [self-hosted, Linux, X64]
+    # The first build on a machine downloads Cycles' libraries and builds
+    # Cycles (about an hour); later ones take minutes.
+    timeout-minutes: 240
+    steps:
+      # Not actions/checkout: CI's checkout on the same machine wipes its
+      # folder (git clean -ffdx) every run, which would throw away the Cycles
+      # build (an hour) each time. This keeps its own folder in the home
+      # folder, and its clean leaves ignored folders (development/,
+      # target/) alone.
+      - name: Get the tagged code
+        shell: bash
+        env:
+          TOKEN: ${{ github.token }}
+          TAG: ${{ inputs.tag }}
+        run: |
+          set -eu
+          D="$HOME/operandi-release-build"
+          [ -d "$D/.git" ] || git init -q "$D"
+          cd "$D"
+          AUTH="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$TOKEN" | base64 | tr -d '\n')"
+          git -c http.extraheader="$AUTH" fetch --quiet --depth 1 --force \
+            "https://github.com/$GITHUB_REPOSITORY" "+refs/tags/$TAG:refs/tags/$TAG"
+          git checkout --quiet --force "refs/tags/$TAG"
+          git clean -ffdq
+          git log -1 --oneline
+      - name: Build AppImage
+        shell: bash
+        run: |
+          set -eu
+          cd "$HOME/operandi-release-build"
+          OUT="$RUNNER_TEMP/release-out"
+          rm -rf "$OUT" && mkdir -p "$OUT"
+          export OPERANDI_RELEASE_OUTPUT="$OUT"
+          # The older-Linux container makes an AppImage that runs on most
+          # distributions (docs/RELEASE_BUILDS.md). Without podman, build
+          # on this machine directly; it then needs this glibc or newer.
+          if command -v podman >/dev/null 2>&1; then
+            scripts/build-release-container.sh
+          else
+            echo "::warning::podman not installed on this machine, so the AppImage only runs on Linux with glibc $(ldd --version | head -1 | awk '{print $NF}') or newer. Install podman for a wider build (docs/RELEASE_BUILDS.md)."
+            scripts/build-release.sh
+          fi
+          ls -la "$OUT"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: linux
+          path: ${{ runner.temp }}/release-out/*.AppImage
+          if-no-files-found: error
+          # The release keeps its own copy; this one only has to last until
+          # scripts/release.sh downloads it (and counts against the
+          # private repo's storage while it exists).
+          retention-days: 1
+          compression-level: 0
+
+  windows:
+    name: Windows
+    if: inputs.windows && github.actor == github.repository_owner
+    runs-on: [self-hosted, Windows, X64]
+    timeout-minutes: 240
+    steps:
+      - name: Long paths
+        shell: bash
+        run: git config --global core.longpaths true
+      # Not actions/checkout: CI's checkout on the same machine wipes its
+      # folder (git clean -ffdx) every run, which would throw away the Cycles
+      # build (an hour) each time. This keeps its own folder in the home
+      # folder, and its clean leaves ignored folders (development/,
+      # target/) alone.
+      - name: Get the tagged code
+        shell: bash
+        env:
+          TOKEN: ${{ github.token }}
+          TAG: ${{ inputs.tag }}
+        run: |
+          set -eu
+          D="$HOME/operandi-release-build"
+          [ -d "$D/.git" ] || git init -q "$D"
+          cd "$D"
+          AUTH="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$TOKEN" | base64 | tr -d '\n')"
+          git -c http.extraheader="$AUTH" fetch --quiet --depth 1 --force \
+            "https://github.com/$GITHUB_REPOSITORY" "+refs/tags/$TAG:refs/tags/$TAG"
+          git checkout --quiet --force "refs/tags/$TAG"
+          git clean -ffdq
+          git log -1 --oneline
+      # Git Bash (from Git for Windows) runs the same script as by hand.
+      - name: Build zip
+        shell: bash
+        run: |
+          set -eu
+          cd "$HOME/operandi-release-build"
+          OUT="$(cygpath -u "$RUNNER_TEMP")/release-out"
+          rm -rf "$OUT" && mkdir -p "$OUT"
+          OPERANDI_RELEASE_OUTPUT="$OUT" scripts/build-release.sh
+          ls -la "$OUT"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows
+          path: ${{ runner.temp }}/release-out/*.zip
+          if-no-files-found: error
+          retention-days: 1
+          compression-level: 0

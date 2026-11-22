@@ -1,0 +1,196 @@
+{
+  "version": 1,
+  "id": "toolbox.select",
+  "label": "Select",
+  "exported": true,
+  "controls": [
+    {
+      "divider": "Selection",
+      "id": "select-tools"
+    },
+    {
+      "command": "Select All",
+      "label": "All",
+      "tooltip": "All · Shortcut: {shortcut}"
+    },
+    {
+      "command": "Invert",
+      "label": "Invert",
+      "tooltip": "Invert · Shortcut: {shortcut}"
+    },
+    {
+      "command": "Connected",
+      "label": "Connected",
+      "tooltip": "Connected · needs a selection · Shortcut: {shortcut}"
+    },
+    {
+      "command": "Invert Connected",
+      "label": "Invert Connected",
+      "tooltip": "Invert Connected · Shortcut: {shortcut}"
+    },
+    {
+      "command": "Grow",
+      "label": "Grow",
+      "tooltip": "Grow · needs a selection · Shortcut: {shortcut}"
+    },
+    {
+      "command": "Shrink",
+      "label": "Shrink",
+      "tooltip": "Shrink · needs a selection · Shortcut: {shortcut}"
+    },
+    {
+      "command": "Close Loop",
+      "label": "Close Loop",
+      "tooltip": "Close Loop · needs a selection: two neighbouring polygons · Shortcut: {shortcut}"
+    },
+    {
+      "space": 6
+    },
+    {
+      "command": "Loop",
+      "label": "Loop",
+      "tooltip": "Loop · needs a selection: one edge, one polygon, or two neighbouring vertices · Shortcut: {shortcut}"
+    },
+    {
+      "command": "Next Loop",
+      "label": "Next Loop",
+      "tooltip": "Next Loop · needs a selection: an edge or polygon loop (use Loop first) · Shortcut: {shortcut}"
+    },
+    {
+      "command": "Previous Loop",
+      "label": "Previous Loop",
+      "tooltip": "Previous Loop · needs a selection: an edge or polygon loop (use Loop first) · Shortcut: {shortcut}"
+    },
+    {
+      "command": "Ring",
+      "label": "Ring",
+      "tooltip": "Ring · needs a selection: one or more edges · Shortcut: {shortcut}"
+    },
+    {
+      "command": "Conditional Loop",
+      "label": "Conditional Loop"
+    },
+    {
+      "command": "Conditional Loop Tool",
+      "label": "Conditional Loop Tool"
+    },
+    {
+      "widget": "select.falloffPlaceholder"
+    },
+    {
+      "space": 6
+    },
+    {
+      "command": "Select More",
+      "label": "More",
+      "tooltip": "More · Shortcut: {shortcut}"
+    },
+    {
+      "command": "Select Less",
+      "label": "Less",
+      "tooltip": "Less · Shortcut: {shortcut}"
+    },
+    {
+      "form": {
+        "style": "menu",
+        "controls": [
+          {
+            "command": "Convert to Vertices"
+          },
+          {
+            "command": "Convert to Edges"
+          },
+          {
+            "command": "Convert to Polygons"
+          }
+        ]
+      },
+      "label": "Convert",
+      "tooltip": "Convert · change the selection to vertices, edges or polygons"
+    },
+    {
+      "command": "Boundary",
+      "label": "Boundary",
+      "tooltip": "Boundary · Shortcut: {shortcut}"
+    },
+    {
+      "command": "Select Symmetrical",
+      "label": "Symmetrical",
+      "tooltip": "Symmetrical · select the mirror partners of the selection · Shortcut: {shortcut}"
+    },
+    {
+      "command": "Coplanar Polygons Tool",
+      "label": "Coplanar Polygons Tool"
+    },
+    {
+      "command": "Coplanar Edges...",
+      "label": "Coplanar Edges..."
+    },
+    {
+      "command": "Colinear Vertices...",
+      "label": "Colinear Vertices..."
+    },
+    {
+      "command": "Select Between",
+      "label": "Between",
+      "tooltip": "Between · Shortcut: {shortcut}"
+    },
+    {
+      "command": "Shortest Path",
+      "label": "Shortest Path"
+    },
+    {
+      "command": "Diagonal...",
+      "label": "Diagonal..."
+    },
+    {
+      "command": "Sharp...",
+      "label": "Sharp..."
+    },
+    {
+      "space": 6
+    },
+    {
+      "widget": "select.lassoStyle"
+    },
+    {
+      "widget": "select.polygonTagType"
+    },
+    {
+      "space": 6
+    },
+    {
+      "form": {
+        "controls": [
+          {
+            "divider": "Selection Sets",
+            "id": "selection-sets"
+          },
+          {
+            "command": "select.editSet",
+            "label": "Assign Selection Set..."
+          },
+          {
+            "command": "select.convertGroup",
+            "label": "Create Selection Set Group..."
+          },
+          {
+            "command": "select.useSet",
+            "label": "Use Selection Set..."
+          },
+          {
+            "command": "select.deleteSet",
+            "label": "Delete Selection Set..."
+          }
+        ]
+      }
+    },
+    {
+      "space": 6
+    },
+    {
+      "command": "Lazy Selection",
+      "label": "Lazy Selection"
+    }
+  ]
+}

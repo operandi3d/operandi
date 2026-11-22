@@ -1,0 +1,30 @@
+{
+  "accepted": "I1-L legacy exact output plus I1-S single-face Shift None Sides1 profile",
+  "required": [
+    "source exact decoder equality",
+    "full zero/moved cube and pair authored graphs",
+    "cube known cap IDs unchanged",
+    "pair unknown open endpoint and unselected known owner",
+    "source ID role maps",
+    "numeric Apply Drop Undo Redo",
+    "named set recall",
+    "deletion/compaction read map",
+    "coincident and unused IDs",
+    "branch highwater and stale/foreign refusal",
+    "legacy EX/full file regressions",
+    "actual PID-bound native edit recall Undo Redo save reopen"
+  ],
+  "negative": [
+    "empty/duplicate/stale/wrong scope targets",
+    "nonfinite/overflow/ID exhaustion",
+    "unsupported typed/vertex set/extended maps/context/multiselection/Thick/Auto/Sides/generated UV",
+    "known selected-owner source-tip UV split"
+  ],
+  "deferred": [
+    "I1-D01 known open-wall split",
+    "F07 EB-C03 general fill",
+    "cross-reopen persistent IDs",
+    "begun live zero and live Undo/Redo I2",
+    "subdivision/viewport/backend/UI rewrite"
+  ]
+}

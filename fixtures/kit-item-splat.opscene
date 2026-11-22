@@ -1,0 +1,34 @@
+{
+  "format": "Operandi",
+  "version": 49,
+  "scene": {
+    "items": [
+      {
+        "id": 1,
+        "name": "Garden splat (kit missing)",
+        "visible": true,
+        "transform": {
+          "translation": [1.5, 0.0, 0.0],
+          "rotation": [0.0, 0.0, 0.0],
+          "scale": [1.0, 1.0, 1.0]
+        },
+        "mesh": {"vertices": [], "faces": []},
+        "kit": {
+          "kit": "splat",
+          "kind": "splat.cloud",
+          "version": 3,
+          "values": {
+            "count": 120000,
+            "shDegree": 3,
+            "source": {"file": "splats/garden.ply", "scale": 0.5}
+          },
+          "bounds": [[-1.0, 0.0, -0.5], [1.0, 1.5, 0.5]]
+        }
+      }
+    ],
+    "next_id": 2,
+    "selection": {"item": null, "mode": "Item", "vertices": [], "edges": [], "faces": []},
+    "workplane": {"fixed": false, "plane": 0, "center": [0.0, 0.0, 0.0]},
+    "time": {"rate": {"num": 30000, "den": 1001}, "start": 0, "end": 1017080064000, "current": 203416012800}
+  }
+}

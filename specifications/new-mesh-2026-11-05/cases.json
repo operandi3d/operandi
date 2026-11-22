@@ -1,0 +1,297 @@
+{
+ "spec": "new-mesh-2026-11-05",
+ "comparison_rule": "Set up the items as listed, run the command, compare the item list (name, parent, selected, point count) and selection mode.",
+ "cases": [
+  {
+   "id": "NM01",
+   "description": "Empty probe scene (no meshes), nothing selected; New Mesh Item",
+   "command": "New Mesh Item",
+   "items_before": [],
+   "selection_mode": "item",
+   "expected": {
+    "items_after": [
+     {
+      "name": "Mesh",
+      "parent": null,
+      "selected": true,
+      "n_points": 0
+     }
+    ],
+    "selection_mode_after": "item"
+   }
+  },
+  {
+   "id": "NM02",
+   "description": "One mesh 'Existing' selected (item mode); New Mesh Item",
+   "command": "New Mesh Item",
+   "items_before": [
+    {
+     "name": "Existing",
+     "parent": null,
+     "selected": true,
+     "n_points": 4
+    }
+   ],
+   "selection_mode": "item",
+   "expected": {
+    "items_after": [
+     {
+      "name": "Existing",
+      "parent": null,
+      "selected": false,
+      "n_points": 4
+     },
+     {
+      "name": "Mesh",
+      "parent": null,
+      "selected": true,
+      "n_points": 0
+     }
+    ],
+    "selection_mode_after": "item"
+   }
+  },
+  {
+   "id": "NM03",
+   "description": "One mesh selected, polygon mode with polygon 0 selected; New Mesh Item",
+   "command": "New Mesh Item",
+   "items_before": [
+    {
+     "name": "Existing",
+     "parent": null,
+     "selected": true,
+     "n_points": 9
+    }
+   ],
+   "selection_mode": "polygon",
+   "expected": {
+    "items_after": [
+     {
+      "name": "Existing",
+      "parent": null,
+      "selected": false,
+      "n_points": 9
+     },
+     {
+      "name": "Mesh",
+      "parent": null,
+      "selected": true,
+      "n_points": 0
+     }
+    ],
+    "selection_mode_after": "polygon"
+   }
+  },
+  {
+   "id": "NM04",
+   "description": "Two meshes A, B selected; New Mesh Item",
+   "command": "New Mesh Item",
+   "items_before": [
+    {
+     "name": "A",
+     "parent": null,
+     "selected": true,
+     "n_points": 4
+    },
+    {
+     "name": "B",
+     "parent": null,
+     "selected": true,
+     "n_points": 4
+    }
+   ],
+   "selection_mode": "item",
+   "expected": {
+    "items_after": [
+     {
+      "name": "A",
+      "parent": null,
+      "selected": false,
+      "n_points": 4
+     },
+     {
+      "name": "B",
+      "parent": null,
+      "selected": false,
+      "n_points": 4
+     },
+     {
+      "name": "Mesh",
+      "parent": null,
+      "selected": true,
+      "n_points": 0
+     }
+    ],
+    "selection_mode_after": "item"
+   }
+  },
+  {
+   "id": "NM05",
+   "description": "Mesh 'Child' (parented under 'Parent') selected; New Mesh Item",
+   "command": "New Mesh Item",
+   "items_before": [
+    {
+     "name": "Parent",
+     "parent": null,
+     "selected": false,
+     "n_points": 4
+    },
+    {
+     "name": "Child",
+     "parent": "Parent",
+     "selected": true,
+     "n_points": 4
+    }
+   ],
+   "selection_mode": "item",
+   "expected": {
+    "items_after": [
+     {
+      "name": "Parent",
+      "parent": null,
+      "selected": false,
+      "n_points": 4
+     },
+     {
+      "name": "Child",
+      "parent": "Parent",
+      "selected": false,
+      "n_points": 4
+     },
+     {
+      "name": "Mesh",
+      "parent": null,
+      "selected": true,
+      "n_points": 0
+     }
+    ],
+    "selection_mode_after": "item"
+   }
+  },
+  {
+   "id": "NM06",
+   "description": "One mesh selected; New Mesh Item twice",
+   "command": "New Mesh Item",
+   "items_before": [
+    {
+     "name": "Existing",
+     "parent": null,
+     "selected": true,
+     "n_points": 4
+    }
+   ],
+   "selection_mode": "item",
+   "expected": {
+    "items_after": [
+     {
+      "name": "Existing",
+      "parent": null,
+      "selected": false,
+      "n_points": 4
+     },
+     {
+      "name": "Mesh",
+      "parent": null,
+      "selected": true,
+      "n_points": 0
+     }
+    ],
+    "selection_mode_after": "item",
+    "items_after_second_call": [
+     {
+      "name": "Existing",
+      "parent": null,
+      "selected": false,
+      "n_points": 4
+     },
+     {
+      "name": "Mesh",
+      "parent": null,
+      "selected": false,
+      "n_points": 0
+     },
+     {
+      "name": "Mesh (2)",
+      "parent": null,
+      "selected": true,
+      "n_points": 0
+     }
+    ]
+   }
+  },
+  {
+   "id": "NM07",
+   "description": "One mesh selected; layer.new (layer-list New)",
+   "command": "New Layer (layer list)",
+   "items_before": [
+    {
+     "name": "Existing",
+     "parent": null,
+     "selected": true,
+     "n_points": 4
+    }
+   ],
+   "selection_mode": "item",
+   "expected": {
+    "items_after": [
+     {
+      "name": "Existing",
+      "parent": null,
+      "selected": false,
+      "n_points": 4
+     },
+     {
+      "name": "Mesh",
+      "parent": null,
+      "selected": true,
+      "n_points": 0
+     }
+    ],
+    "selection_mode_after": "item"
+   }
+  },
+  {
+   "id": "NM08",
+   "description": "Mesh 'Child' (parented) selected; layer.new",
+   "command": "New Layer (layer list)",
+   "items_before": [
+    {
+     "name": "Parent",
+     "parent": null,
+     "selected": false,
+     "n_points": 4
+    },
+    {
+     "name": "Child",
+     "parent": "Parent",
+     "selected": true,
+     "n_points": 4
+    }
+   ],
+   "selection_mode": "item",
+   "expected": {
+    "items_after": [
+     {
+      "name": "Parent",
+      "parent": null,
+      "selected": false,
+      "n_points": 4
+     },
+     {
+      "name": "Child",
+      "parent": "Parent",
+      "selected": false,
+      "n_points": 4
+     },
+     {
+      "name": "Mesh",
+      "parent": "Parent",
+      "selected": true,
+      "n_points": 0
+     }
+    ],
+    "selection_mode_after": "item"
+   }
+  }
+ ]
+}

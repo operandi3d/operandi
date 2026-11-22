@@ -1,0 +1,15 @@
+#usda 1.0
+(
+    defaultPrim = "Crate"
+    doc = "Operandi regression fixture (written by hand): the payload variants.usda loads."
+)
+
+def Xform "Crate"
+{
+    def Mesh "Lid"
+    {
+        int[] faceVertexCounts = [3]
+        int[] faceVertexIndices = [0, 1, 2]
+        point3f[] points = [(0, 0, 0), (1, 0, 0), (0, 0, 1)]
+    }
+}

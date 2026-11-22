@@ -1,0 +1,218 @@
+{
+  "items": [
+    {
+      "id": 1,
+      "name": "I1 pair",
+      "visible": true,
+      "transform": {
+        "translation": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "zxy": false
+      },
+      "mesh": {
+        "attributes": {
+          "typed_maps": {},
+          "vertex_sets": {},
+          "polygon_sets": {
+            "l": [
+              0
+            ],
+            "r": [
+              1
+            ]
+          },
+          "point_uvs": {},
+          "corner_weights": {},
+          "corner_colors": {},
+          "extrude_edge_uses": {},
+          "relative_morphs": {},
+          "smoothing_labels": [],
+          "representations": [],
+          "creases": [],
+          "uv_records": {
+            "Texture": [
+              [
+                null,
+                null,
+                null,
+                null
+              ],
+              [
+                200,
+                201,
+                202,
+                203
+              ]
+            ],
+            "Empty": [
+              [
+                null,
+                null,
+                null,
+                null
+              ],
+              [
+                null,
+                null,
+                null,
+                null
+              ]
+            ]
+          },
+          "normal_map_order": [],
+          "corner_normals": {},
+          "point_weights": {},
+          "point_colors": {},
+          "degenerate_faces": []
+        },
+        "vertices": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            1,
+            0,
+            0
+          ],
+          [
+            2,
+            0,
+            0
+          ],
+          [
+            0,
+            1,
+            0
+          ],
+          [
+            1,
+            1,
+            0
+          ],
+          [
+            2,
+            1,
+            0
+          ]
+        ],
+        "faces": [
+          {
+            "vertices": [
+              0,
+              1,
+              4,
+              3
+            ],
+            "uv": null,
+            "material": "l",
+            "smooth": false,
+            "part": null,
+            "material_label": "l"
+          },
+          {
+            "vertices": [
+              1,
+              2,
+              5,
+              4
+            ],
+            "uv": null,
+            "material": "r",
+            "smooth": false,
+            "part": null,
+            "material_label": "r"
+          }
+        ],
+        "uv_maps": {
+          "Texture": [
+            [
+              [
+                0,
+                0
+              ],
+              [
+                1,
+                0
+              ],
+              [
+                1,
+                1
+              ],
+              null
+            ],
+            [
+              [
+                2,
+                0
+              ],
+              [
+                3,
+                0
+              ],
+              [
+                3,
+                1
+              ],
+              [
+                2,
+                1
+              ]
+            ]
+          ],
+          "Empty": [
+            [
+              null,
+              null,
+              null,
+              null
+            ],
+            [
+              null,
+              null,
+              null,
+              null
+            ]
+          ]
+        }
+      },
+      "parent": null,
+      "source_id": null,
+      "source_display_name": null
+    }
+  ],
+  "next_id": 2,
+  "selection": {
+    "item": 1,
+    "mode": "Polygon",
+    "vertices": [],
+    "edges": [],
+    "faces": [
+      0
+    ]
+  },
+  "workplane": {
+    "fixed": false,
+    "plane": 0,
+    "center": [
+      0,
+      0,
+      0
+    ]
+  },
+  "import_source": null
+}

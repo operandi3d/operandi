@@ -1,0 +1,1464 @@
+{
+ "spec": "tool-matrix-2026-11-05",
+ "comparison_rule": "Planning reference, not behaviour: each row is one button of Modo 17.1's Model toolbox (tab, group, label) and the research spec that covers it (null = no spec yet).",
+ "cases": [
+  {
+   "tab": "Basic",
+   "group": "PrimGang > Primitives",
+   "button": "Cube Primitive",
+   "covered_by": "primitives-2026-11-02, unit-primitive-2026-11-05"
+  },
+  {
+   "tab": "Basic",
+   "group": "PrimGang > Primitives > Sphere-Ellipse",
+   "button": "Sphere Primitive",
+   "covered_by": "primitives-2026-11-02, unit-primitive-2026-11-05"
+  },
+  {
+   "tab": "Basic",
+   "group": "PrimGang > Primitives > Sphere-Ellipse",
+   "button": "Ellipsoid Primitive",
+   "covered_by": "ellipsoid-2026-11-05"
+  },
+  {
+   "tab": "Basic",
+   "group": "PrimGang > Primitives > Cyl-Caps",
+   "button": "Cylinder Primitive",
+   "covered_by": "primitives-2026-11-02, unit-primitive-2026-11-05"
+  },
+  {
+   "tab": "Basic",
+   "group": "PrimGang > Primitives > Cyl-Caps",
+   "button": "Capsule Primitive",
+   "covered_by": "primitives-2026-11-02, unit-primitive-2026-11-05"
+  },
+  {
+   "tab": "Basic",
+   "group": "PrimGang > Primitives > Cyl-Caps",
+   "button": "Arc",
+   "covered_by": "create-panel-2026-11-04 / new-primitives-2026-11-03"
+  },
+  {
+   "tab": "Basic",
+   "group": "PrimGang > Primitives",
+   "button": "Cone Primitive",
+   "covered_by": "cone-2026-11-05"
+  },
+  {
+   "tab": "Basic",
+   "group": "PrimGang > More Prim Tools",
+   "button": "Torus Primitive",
+   "covered_by": "primitives-2026-11-02, unit-primitive-2026-11-05"
+  },
+  {
+   "tab": "Basic",
+   "group": "PrimGang > More Prim Tools > VolumeDrawing",
+   "button": "Tube Primitive",
+   "covered_by": "primitives-2026-11-02, unit-primitive-2026-11-05"
+  },
+  {
+   "tab": "Basic",
+   "group": "PrimGang > More Prim Tools > VolumeDrawing",
+   "button": "Solid Sketch",
+   "covered_by": null
+  },
+  {
+   "tab": "Basic",
+   "group": "PrimGang > More Prim Tools > 2D Drawing",
+   "button": "Pen",
+   "covered_by": "pen-2026-11-05, create-panel-2026-11-04"
+  },
+  {
+   "tab": "Basic",
+   "group": "PrimGang > More Prim Tools > 2D Drawing",
+   "button": "Curve",
+   "covered_by": null
+  },
+  {
+   "tab": "Basic",
+   "group": "PrimGang > More Prim Tools > 2D Drawing",
+   "button": "B-Spline",
+   "covered_by": null
+  },
+  {
+   "tab": "Basic",
+   "group": "PrimGang > More Prim Tools > 2D Drawing",
+   "button": "Bezier Curve",
+   "covered_by": null
+  },
+  {
+   "tab": "Basic",
+   "group": "PrimGang > More Prim Tools > 2D Drawing",
+   "button": "Sketch",
+   "covered_by": null
+  },
+  {
+   "tab": "Basic",
+   "group": "PrimGang > More Prim Tools > 2D Drawing",
+   "button": "Patch Curves",
+   "covered_by": null
+  },
+  {
+   "tab": "Basic",
+   "group": "PrimGang > More Prim Tools",
+   "button": "Text",
+   "covered_by": "create-panel-2026-11-04 / new-primitives-2026-11-03"
+  },
+  {
+   "tab": "Basic",
+   "group": "Transform",
+   "button": "Transform",
+   "covered_by": "item-transforms-2026-11-02, action-center-2026-11-01, viewport-handles-2026-11-01"
+  },
+  {
+   "tab": "Basic",
+   "group": "Transform",
+   "button": "Move Tool",
+   "covered_by": "item-transforms-2026-11-02, action-center-2026-11-01, viewport-handles-2026-11-01"
+  },
+  {
+   "tab": "Basic",
+   "group": "Transform > Rotate",
+   "button": "Rotate Tool",
+   "covered_by": "item-transforms-2026-11-02, action-center-2026-11-01, viewport-handles-2026-11-01"
+  },
+  {
+   "tab": "Basic",
+   "group": "Transform > Rotate",
+   "button": "Axis Rotate",
+   "covered_by": null
+  },
+  {
+   "tab": "Basic",
+   "group": "Transform > Scale",
+   "button": "Scale Tool",
+   "covered_by": "item-transforms-2026-11-02, action-center-2026-11-01, viewport-handles-2026-11-01"
+  },
+  {
+   "tab": "Basic",
+   "group": "Transform > Scale",
+   "button": "Uniform Scale",
+   "covered_by": "item-transforms-2026-11-02, action-center-2026-11-01, viewport-handles-2026-11-01"
+  },
+  {
+   "tab": "Basic",
+   "group": "More Transforms",
+   "button": "Axis Rotate",
+   "covered_by": null
+  },
+  {
+   "tab": "Basic",
+   "group": "More Transforms",
+   "button": "Tack Tool",
+   "covered_by": null
+  },
+  {
+   "tab": "Basic",
+   "group": "More Transforms",
+   "button": "Element Snap",
+   "covered_by": "snapping-2026-11-01"
+  },
+  {
+   "tab": "Basic",
+   "group": "Snaps and Precision > Snap Modes",
+   "button": "Grid",
+   "covered_by": "snapping-2026-11-01"
+  },
+  {
+   "tab": "Basic",
+   "group": "Snaps and Precision > Snap Modes",
+   "button": "Geometry",
+   "covered_by": "snapping-2026-11-01"
+  },
+  {
+   "tab": "Basic",
+   "group": "Snaps and Precision > Snap Modes",
+   "button": "Guides",
+   "covered_by": "snapping-2026-11-01"
+  },
+  {
+   "tab": "Basic",
+   "group": "Snaps and Precision",
+   "button": "Drag Snap",
+   "covered_by": "snapping-2026-11-01"
+  },
+  {
+   "tab": "Basic",
+   "group": "Snaps and Precision",
+   "button": "Drag Snap Rigid",
+   "covered_by": "snapping-2026-11-01"
+  },
+  {
+   "tab": "Basic",
+   "group": "Snaps and Precision",
+   "button": "Planar Rotate Snap",
+   "covered_by": null
+  },
+  {
+   "tab": "Basic",
+   "group": "Snaps and Precision",
+   "button": "Planar Rotate Snap Axis",
+   "covered_by": null
+  },
+  {
+   "tab": "Basic",
+   "group": "Snaps and Precision",
+   "button": "Scale Absolute",
+   "covered_by": null
+  },
+  {
+   "tab": "Basic",
+   "group": "Snaps and Precision",
+   "button": "Size Absolute",
+   "covered_by": null
+  },
+  {
+   "tab": "Basic",
+   "group": "Snaps and Precision",
+   "button": "Advanced Handles",
+   "covered_by": null
+  },
+  {
+   "tab": "Basic",
+   "group": "Snaps and Precision > Commands",
+   "button": "Absolute Scaling",
+   "covered_by": null
+  },
+  {
+   "tab": "Basic",
+   "group": "",
+   "button": "Vertex Normal Tools",
+   "covered_by": null
+  },
+  {
+   "tab": "Basic",
+   "group": "",
+   "button": "Edge Crease Tool",
+   "covered_by": null
+  },
+  {
+   "tab": "Basic",
+   "group": "Add Geometry",
+   "button": "Topology Pen",
+   "covered_by": null
+  },
+  {
+   "tab": "Basic",
+   "group": "Add Geometry",
+   "button": "Subdivide Polygons",
+   "covered_by": "subdivision-2026-11-03, mesh-commands-2026-11-02"
+  },
+  {
+   "tab": "Basic",
+   "group": "Add Geometry",
+   "button": "Bevel (picks Polygon/Edge/Vertex Bevel by selection mode)",
+   "covered_by": "bevel-activation-2026-11-05, polygon-bevel-2026-11-02, edge-bevel-chamfer-2026-11-02, vertex-tool-options-2026-11-03"
+  },
+  {
+   "tab": "Basic",
+   "group": "Add Geometry",
+   "button": "Extrude",
+   "covered_by": "polygon-extrude-2026-11-02, extrude-2026-11-05"
+  },
+  {
+   "tab": "Basic",
+   "group": "Add Geometry",
+   "button": "Bridge",
+   "covered_by": "bridge-2026-11-05"
+  },
+  {
+   "tab": "Basic",
+   "group": "Add Geometry",
+   "button": "Polygon Slice",
+   "covered_by": null
+  },
+  {
+   "tab": "Basic",
+   "group": "Add Geometry",
+   "button": "Smooth Shift",
+   "covered_by": "smooth-shift-thicken-2026-11-05"
+  },
+  {
+   "tab": "Basic",
+   "group": "Add Geometry",
+   "button": "Thicken",
+   "covered_by": "smooth-shift-thicken-2026-11-05"
+  },
+  {
+   "tab": "Basic",
+   "group": "Edit",
+   "button": "Cut Selection",
+   "covered_by": "create-panel-2026-11-04 (clipboard)"
+  },
+  {
+   "tab": "Basic",
+   "group": "Edit",
+   "button": "Copy Selection",
+   "covered_by": "create-panel-2026-11-04 (clipboard)"
+  },
+  {
+   "tab": "Basic",
+   "group": "Edit",
+   "button": "Paste Selection",
+   "covered_by": "create-panel-2026-11-04 (clipboard)"
+  },
+  {
+   "tab": "Basic",
+   "group": "Edit",
+   "button": "Paste Tool",
+   "covered_by": null
+  },
+  {
+   "tab": "Deform",
+   "group": "Move Tools",
+   "button": "Element Move",
+   "covered_by": "tweak-2026-11-03, tweak-range-2026-11-04"
+  },
+  {
+   "tab": "Deform",
+   "group": "Move Tools",
+   "button": "Element Push",
+   "covered_by": null
+  },
+  {
+   "tab": "Deform",
+   "group": "Move Tools",
+   "button": "Flex",
+   "covered_by": null
+  },
+  {
+   "tab": "Deform",
+   "group": "Move Tools",
+   "button": "Soft Move",
+   "covered_by": null
+  },
+  {
+   "tab": "Deform",
+   "group": "Move Tools",
+   "button": "Soft Drag",
+   "covered_by": null
+  },
+  {
+   "tab": "Deform",
+   "group": "Move Tools",
+   "button": "Shear",
+   "covered_by": null
+  },
+  {
+   "tab": "Deform",
+   "group": "Move Tools > Convolve",
+   "button": "Smooth",
+   "covered_by": null
+  },
+  {
+   "tab": "Deform",
+   "group": "Move Tools > Convolve",
+   "button": "Jitter",
+   "covered_by": null
+  },
+  {
+   "tab": "Deform",
+   "group": "Move Tools > Convolve",
+   "button": "Quantize",
+   "covered_by": null
+  },
+  {
+   "tab": "Deform",
+   "group": "Move Tools > Soft Selection",
+   "button": "Soft Selection Move",
+   "covered_by": "falloff-2026-11-01"
+  },
+  {
+   "tab": "Deform",
+   "group": "Move Tools > Soft Selection",
+   "button": "Soft Selection Rotate",
+   "covered_by": "falloff-2026-11-01"
+  },
+  {
+   "tab": "Deform",
+   "group": "Move Tools > Soft Selection",
+   "button": "Soft Selection Scale",
+   "covered_by": "falloff-2026-11-01"
+  },
+  {
+   "tab": "Deform",
+   "group": "Move Tools > Soft Selection",
+   "button": "Soft Selection Transform",
+   "covered_by": "falloff-2026-11-01"
+  },
+  {
+   "tab": "Deform",
+   "group": "Rotate Tools",
+   "button": "Twist",
+   "covered_by": null
+  },
+  {
+   "tab": "Deform",
+   "group": "Rotate Tools",
+   "button": "Bend",
+   "covered_by": null
+  },
+  {
+   "tab": "Deform",
+   "group": "Rotate Tools",
+   "button": "Vortex",
+   "covered_by": null
+  },
+  {
+   "tab": "Deform",
+   "group": "Rotate Tools",
+   "button": "Swirl",
+   "covered_by": null
+  },
+  {
+   "tab": "Deform",
+   "group": "Scale Tools",
+   "button": "Push",
+   "covered_by": null
+  },
+  {
+   "tab": "Deform",
+   "group": "Scale Tools",
+   "button": "Sculpt",
+   "covered_by": null
+  },
+  {
+   "tab": "Deform",
+   "group": "Scale Tools",
+   "button": "Taper",
+   "covered_by": null
+  },
+  {
+   "tab": "Deform",
+   "group": "Scale Tools > Bulge",
+   "button": "Bulge",
+   "covered_by": null
+  },
+  {
+   "tab": "Deform",
+   "group": "Scale Tools > Bulge",
+   "button": "Flare",
+   "covered_by": null
+  },
+  {
+   "tab": "Deform",
+   "group": "Align Tools",
+   "button": "Radial",
+   "covered_by": null
+  },
+  {
+   "tab": "Deform",
+   "group": "Align Tools",
+   "button": "Linear",
+   "covered_by": null
+  },
+  {
+   "tab": "Duplicate",
+   "group": "",
+   "button": "Radial Sweep",
+   "covered_by": null
+  },
+  {
+   "tab": "Duplicate",
+   "group": "Mirror",
+   "button": "Mirror",
+   "covered_by": "symmetry-2026-11-01 (partly)"
+  },
+  {
+   "tab": "Duplicate",
+   "group": "Mirror",
+   "button": "Instance Mirror",
+   "covered_by": null
+  },
+  {
+   "tab": "Duplicate",
+   "group": "Mirror",
+   "button": "Replica Mirror",
+   "covered_by": null
+  },
+  {
+   "tab": "Duplicate",
+   "group": "",
+   "button": "Bridge",
+   "covered_by": "bridge-2026-11-05"
+  },
+  {
+   "tab": "Duplicate",
+   "group": "",
+   "button": "Patch Curves",
+   "covered_by": null
+  },
+  {
+   "tab": "Duplicate",
+   "group": "Curve Extrude",
+   "button": "Curve Extrude",
+   "covered_by": null
+  },
+  {
+   "tab": "Duplicate",
+   "group": "Curve Extrude",
+   "button": "Bezier Extrude",
+   "covered_by": null
+  },
+  {
+   "tab": "Duplicate",
+   "group": "Curve Extrude",
+   "button": "B-Spline Extrude",
+   "covered_by": null
+  },
+  {
+   "tab": "Duplicate",
+   "group": "Curve Extrude",
+   "button": "Pen Extrude",
+   "covered_by": null
+  },
+  {
+   "tab": "Duplicate",
+   "group": "Curve Clone",
+   "button": "Curve Clone",
+   "covered_by": null
+  },
+  {
+   "tab": "Duplicate",
+   "group": "Curve Clone",
+   "button": "Curve Instance",
+   "covered_by": null
+  },
+  {
+   "tab": "Duplicate",
+   "group": "Curve Clone",
+   "button": "Curve Replica",
+   "covered_by": null
+  },
+  {
+   "tab": "Duplicate",
+   "group": "Curve Clone",
+   "button": "Curve Transform",
+   "covered_by": null
+  },
+  {
+   "tab": "Duplicate",
+   "group": "Curve Clone",
+   "button": "Bezier Clone",
+   "covered_by": null
+  },
+  {
+   "tab": "Duplicate",
+   "group": "Curve Clone",
+   "button": "Bezier Instance",
+   "covered_by": null
+  },
+  {
+   "tab": "Duplicate",
+   "group": "Curve Clone",
+   "button": "Bezier Replica",
+   "covered_by": null
+  },
+  {
+   "tab": "Duplicate",
+   "group": "Curve Clone",
+   "button": "Bezier Transform",
+   "covered_by": null
+  },
+  {
+   "tab": "Duplicate",
+   "group": "Curve Clone",
+   "button": "B-Spline Clone",
+   "covered_by": null
+  },
+  {
+   "tab": "Duplicate",
+   "group": "Curve Clone",
+   "button": "B-Spline Instance",
+   "covered_by": null
+  },
+  {
+   "tab": "Duplicate",
+   "group": "Curve Clone",
+   "button": "B-Spline Replica",
+   "covered_by": null
+  },
+  {
+   "tab": "Duplicate",
+   "group": "Curve Clone",
+   "button": "B-Spline Transform",
+   "covered_by": null
+  },
+  {
+   "tab": "Duplicate",
+   "group": "Curve Clone",
+   "button": "Pen Clone",
+   "covered_by": null
+  },
+  {
+   "tab": "Duplicate",
+   "group": "Curve Clone",
+   "button": "Pen Instance",
+   "covered_by": null
+  },
+  {
+   "tab": "Duplicate",
+   "group": "Curve Clone",
+   "button": "Pen Replicate",
+   "covered_by": null
+  },
+  {
+   "tab": "Duplicate",
+   "group": "Curve Clone",
+   "button": "Transform Pen",
+   "covered_by": null
+  },
+  {
+   "tab": "Duplicate",
+   "group": "Scatter Clone",
+   "button": "Scatter Clone",
+   "covered_by": null
+  },
+  {
+   "tab": "Duplicate",
+   "group": "Scatter Clone",
+   "button": "Instance Scatter",
+   "covered_by": null
+  },
+  {
+   "tab": "Duplicate",
+   "group": "Scatter Clone",
+   "button": "Replica Scatter",
+   "covered_by": null
+  },
+  {
+   "tab": "Duplicate",
+   "group": "Scatter Clone",
+   "button": "Transform Scatter",
+   "covered_by": null
+  },
+  {
+   "tab": "Duplicate",
+   "group": "Clone",
+   "button": "Clone",
+   "covered_by": null
+  },
+  {
+   "tab": "Duplicate",
+   "group": "Clone",
+   "button": "Instance Clone",
+   "covered_by": null
+  },
+  {
+   "tab": "Duplicate",
+   "group": "Clone",
+   "button": "Replica Clone",
+   "covered_by": null
+  },
+  {
+   "tab": "Duplicate",
+   "group": "Array",
+   "button": "Array",
+   "covered_by": null
+  },
+  {
+   "tab": "Duplicate",
+   "group": "Array",
+   "button": "Instance Array",
+   "covered_by": null
+  },
+  {
+   "tab": "Duplicate",
+   "group": "Array",
+   "button": "Replica Array",
+   "covered_by": null
+  },
+  {
+   "tab": "Duplicate",
+   "group": "Array",
+   "button": "Transform Array",
+   "covered_by": null
+  },
+  {
+   "tab": "Duplicate",
+   "group": "Radial Array",
+   "button": "Radial Array",
+   "covered_by": null
+  },
+  {
+   "tab": "Duplicate",
+   "group": "Radial Array",
+   "button": "Instance Radial Array",
+   "covered_by": null
+  },
+  {
+   "tab": "Duplicate",
+   "group": "Radial Array",
+   "button": "Replica Radial Array",
+   "covered_by": null
+  },
+  {
+   "tab": "Duplicate",
+   "group": "Radial Array",
+   "button": "Transform Radial Array",
+   "covered_by": null
+  },
+  {
+   "tab": "Duplicate",
+   "group": "Mesh Paint",
+   "button": "Mesh Paint",
+   "covered_by": null
+  },
+  {
+   "tab": "Duplicate",
+   "group": "Mesh Paint",
+   "button": "Mesh Paint Instance",
+   "covered_by": null
+  },
+  {
+   "tab": "Duplicate",
+   "group": "Mesh Paint",
+   "button": "Mesh Paint Replica",
+   "covered_by": null
+  },
+  {
+   "tab": "Duplicate",
+   "group": "",
+   "button": "Paste Tool",
+   "covered_by": null
+  },
+  {
+   "tab": "Duplicate",
+   "group": "",
+   "button": "Duplicate",
+   "covered_by": null
+  },
+  {
+   "tab": "Duplicate",
+   "group": "",
+   "button": "Duplicate Hierarchy",
+   "covered_by": null
+  },
+  {
+   "tab": "Mesh Edit",
+   "group": "Tools",
+   "button": "Slice",
+   "covered_by": null
+  },
+  {
+   "tab": "Mesh Edit",
+   "group": "Tools",
+   "button": "Curve Slice",
+   "covered_by": null
+  },
+  {
+   "tab": "Mesh Edit",
+   "group": "Tools",
+   "button": "Edge Slice",
+   "covered_by": null
+  },
+  {
+   "tab": "Mesh Edit",
+   "group": "Tools",
+   "button": "Pen Slice",
+   "covered_by": null
+  },
+  {
+   "tab": "Mesh Edit",
+   "group": "Tools",
+   "button": "Loop Slice",
+   "covered_by": null
+  },
+  {
+   "tab": "Mesh Edit",
+   "group": "Tools",
+   "button": "Axis Slice",
+   "covered_by": null
+  },
+  {
+   "tab": "Mesh Edit",
+   "group": "Tools",
+   "button": "Julienne Slice Tool",
+   "covered_by": null
+  },
+  {
+   "tab": "Mesh Edit",
+   "group": "Tools",
+   "button": "Tack Tool",
+   "covered_by": null
+  },
+  {
+   "tab": "Mesh Edit",
+   "group": "Tools",
+   "button": "Bevel",
+   "covered_by": "polygon-bevel-2026-11-02, bevel-activation-2026-11-05"
+  },
+  {
+   "tab": "Mesh Edit",
+   "group": "Tools",
+   "button": "Extrude",
+   "covered_by": "polygon-extrude-2026-11-02, extrude-2026-11-05"
+  },
+  {
+   "tab": "Mesh Edit",
+   "group": "Commands > Subdivide",
+   "button": "SDS Subdivide",
+   "covered_by": "subdivision-2026-11-03, mesh-commands-2026-11-02"
+  },
+  {
+   "tab": "Mesh Edit",
+   "group": "Commands > Subdivide",
+   "button": "Faceted",
+   "covered_by": "subdivision-2026-11-03, mesh-commands-2026-11-02"
+  },
+  {
+   "tab": "Mesh Edit",
+   "group": "Commands > Subdivide",
+   "button": "Smooth",
+   "covered_by": "subdivision-2026-11-03, mesh-commands-2026-11-02"
+  },
+  {
+   "tab": "Mesh Edit",
+   "group": "Commands > Subdivide",
+   "button": "Options",
+   "covered_by": null
+  },
+  {
+   "tab": "Mesh Edit",
+   "group": "Commands > Subdivide",
+   "button": "UnSubdivide",
+   "covered_by": "subdivision-2026-11-03, mesh-commands-2026-11-02"
+  },
+  {
+   "tab": "Mesh Edit",
+   "group": "Commands",
+   "button": "Boolean CSG",
+   "covered_by": null
+  },
+  {
+   "tab": "Mesh Edit",
+   "group": "Commands",
+   "button": "Solid Drill",
+   "covered_by": null
+  },
+  {
+   "tab": "Mesh Edit",
+   "group": "Commands",
+   "button": "Axis Drill",
+   "covered_by": null
+  },
+  {
+   "tab": "Mesh Edit",
+   "group": "Commands",
+   "button": "Fix Black Dots",
+   "covered_by": null
+  },
+  {
+   "tab": "Mesh Edit",
+   "group": "Commands",
+   "button": "Edge Zip",
+   "covered_by": null
+  },
+  {
+   "tab": "Mesh Edit",
+   "group": "Commands",
+   "button": "Diagonal Re-Direct",
+   "covered_by": null
+  },
+  {
+   "tab": "Mesh Edit",
+   "group": "Commands",
+   "button": "Mesh Cleanup",
+   "covered_by": "mesh-cleanup-2026-11-05"
+  },
+  {
+   "tab": "Mesh Edit",
+   "group": "Commands",
+   "button": "Automatic Retopology",
+   "covered_by": null
+  },
+  {
+   "tab": "Mesh Edit",
+   "group": "Commands",
+   "button": "Retopo Edge Lock",
+   "covered_by": null
+  },
+  {
+   "tab": "Mesh Edit",
+   "group": "Commands",
+   "button": "Retopo Edge Flow",
+   "covered_by": null
+  },
+  {
+   "tab": "Vertex",
+   "group": "Tools",
+   "button": "Vertex Tool",
+   "covered_by": "vertex-tool-options-2026-11-03"
+  },
+  {
+   "tab": "Vertex",
+   "group": "Tools",
+   "button": "Bevel",
+   "covered_by": "vertex-tool-options-2026-11-03, bevel-activation-2026-11-05"
+  },
+  {
+   "tab": "Vertex",
+   "group": "Tools",
+   "button": "Extrude",
+   "covered_by": "extrude-2026-11-05, vertex-tool-options-2026-11-03"
+  },
+  {
+   "tab": "Vertex",
+   "group": "Tools",
+   "button": "Merge Tool",
+   "covered_by": "vertex-tool-options-2026-11-03"
+  },
+  {
+   "tab": "Vertex",
+   "group": "Tools",
+   "button": "Drag Weld",
+   "covered_by": "vertex-tool-options-2026-11-03"
+  },
+  {
+   "tab": "Vertex",
+   "group": "Tools",
+   "button": "Slide",
+   "covered_by": "vertex-tool-options-2026-11-03"
+  },
+  {
+   "tab": "Vertex",
+   "group": "Commands",
+   "button": "New Vertex",
+   "covered_by": "vertex-tool-options-2026-11-03, mesh-commands-2026-11-02, set-position-2026-11-05"
+  },
+  {
+   "tab": "Vertex",
+   "group": "Commands",
+   "button": "Center",
+   "covered_by": "vertex-tool-options-2026-11-03, mesh-commands-2026-11-02, set-position-2026-11-05"
+  },
+  {
+   "tab": "Vertex",
+   "group": "Commands",
+   "button": "Center All Axis",
+   "covered_by": "vertex-tool-options-2026-11-03, mesh-commands-2026-11-02, set-position-2026-11-05"
+  },
+  {
+   "tab": "Vertex",
+   "group": "Commands",
+   "button": "Set Position",
+   "covered_by": "vertex-tool-options-2026-11-03, mesh-commands-2026-11-02, set-position-2026-11-05"
+  },
+  {
+   "tab": "Vertex",
+   "group": "Commands",
+   "button": "Align",
+   "covered_by": "vertex-tool-options-2026-11-03, mesh-commands-2026-11-02, set-position-2026-11-05"
+  },
+  {
+   "tab": "Vertex",
+   "group": "Commands",
+   "button": "Remove",
+   "covered_by": "vertex-tool-options-2026-11-03, mesh-commands-2026-11-02, set-position-2026-11-05"
+  },
+  {
+   "tab": "Vertex",
+   "group": "Commands",
+   "button": "Collapse",
+   "covered_by": "vertex-tool-options-2026-11-03, mesh-commands-2026-11-02, set-position-2026-11-05"
+  },
+  {
+   "tab": "Vertex",
+   "group": "Commands",
+   "button": "Join",
+   "covered_by": "vertex-tool-options-2026-11-03, mesh-commands-2026-11-02, set-position-2026-11-05"
+  },
+  {
+   "tab": "Vertex",
+   "group": "Commands",
+   "button": "Join Averaged",
+   "covered_by": "vertex-tool-options-2026-11-03, mesh-commands-2026-11-02, set-position-2026-11-05"
+  },
+  {
+   "tab": "Vertex",
+   "group": "Commands",
+   "button": "Vertex Tear",
+   "covered_by": "vertex-tool-options-2026-11-03, mesh-commands-2026-11-02, set-position-2026-11-05"
+  },
+  {
+   "tab": "Vertex",
+   "group": "Commands",
+   "button": "Split",
+   "covered_by": "vertex-tool-options-2026-11-03, mesh-commands-2026-11-02, set-position-2026-11-05"
+  },
+  {
+   "tab": "Vertex",
+   "group": "Commands",
+   "button": "Merge",
+   "covered_by": "vertex-tool-options-2026-11-03, mesh-commands-2026-11-02, set-position-2026-11-05"
+  },
+  {
+   "tab": "Edge",
+   "group": "Tools",
+   "button": "Extrude",
+   "covered_by": "extrude-2026-11-05, vertex-tool-options-2026-11-03"
+  },
+  {
+   "tab": "Edge",
+   "group": "Tools",
+   "button": "Extend",
+   "covered_by": null
+  },
+  {
+   "tab": "Edge",
+   "group": "Tools",
+   "button": "Bevel",
+   "covered_by": "edge-bevel-chamfer-2026-11-02, bevel-activation-2026-11-05"
+  },
+  {
+   "tab": "Edge",
+   "group": "Tools",
+   "button": "Bridge",
+   "covered_by": "bridge-2026-11-05"
+  },
+  {
+   "tab": "Edge",
+   "group": "Tools",
+   "button": "Add Loop",
+   "covered_by": "add-loop-edge-slide-2026-11-02"
+  },
+  {
+   "tab": "Edge",
+   "group": "Tools",
+   "button": "Add Point",
+   "covered_by": null
+  },
+  {
+   "tab": "Edge",
+   "group": "Tools",
+   "button": "Edge Relax",
+   "covered_by": null
+  },
+  {
+   "tab": "Edge",
+   "group": "Tools",
+   "button": "Edge Chamfer",
+   "covered_by": "edge-bevel-chamfer-2026-11-02"
+  },
+  {
+   "tab": "Edge",
+   "group": "Commands",
+   "button": "Spin",
+   "covered_by": "mesh-commands-2026-11-02"
+  },
+  {
+   "tab": "Edge",
+   "group": "Commands",
+   "button": "Collapse",
+   "covered_by": "mesh-commands-2026-11-02"
+  },
+  {
+   "tab": "Edge",
+   "group": "Commands",
+   "button": "Remove",
+   "covered_by": "mesh-commands-2026-11-02"
+  },
+  {
+   "tab": "Edge",
+   "group": "Commands",
+   "button": "Join",
+   "covered_by": "mesh-commands-2026-11-02"
+  },
+  {
+   "tab": "Edge",
+   "group": "Commands",
+   "button": "Join Averaged",
+   "covered_by": "mesh-commands-2026-11-02"
+  },
+  {
+   "tab": "Edge",
+   "group": "Commands",
+   "button": "Split",
+   "covered_by": "mesh-commands-2026-11-02"
+  },
+  {
+   "tab": "Edge",
+   "group": "Commands",
+   "button": "Grow Quads",
+   "covered_by": null
+  },
+  {
+   "tab": "Edge",
+   "group": "Commands",
+   "button": "Fill Quads",
+   "covered_by": null
+  },
+  {
+   "tab": "Edge",
+   "group": "Commands",
+   "button": "Split Normals",
+   "covered_by": null
+  },
+  {
+   "tab": "Edge",
+   "group": "Commands",
+   "button": "Edges to Curves",
+   "covered_by": null
+  },
+  {
+   "tab": "Edge",
+   "group": "Commands",
+   "button": "Unbevel",
+   "covered_by": null
+  },
+  {
+   "tab": "Polygon",
+   "group": "Tools",
+   "button": "Pen",
+   "covered_by": "pen-2026-11-05, create-panel-2026-11-04"
+  },
+  {
+   "tab": "Polygon",
+   "group": "Tools",
+   "button": "Bevel",
+   "covered_by": "polygon-bevel-2026-11-02, bevel-activation-2026-11-05"
+  },
+  {
+   "tab": "Polygon",
+   "group": "Tools",
+   "button": "Smooth Shift",
+   "covered_by": "smooth-shift-thicken-2026-11-05"
+  },
+  {
+   "tab": "Polygon",
+   "group": "Tools",
+   "button": "Thicken",
+   "covered_by": "smooth-shift-thicken-2026-11-05"
+  },
+  {
+   "tab": "Polygon",
+   "group": "Tools",
+   "button": "Sketch Extrude",
+   "covered_by": "sketch-extrude-2026-11-05 (v0)"
+  },
+  {
+   "tab": "Polygon",
+   "group": "Tools",
+   "button": "Bridge",
+   "covered_by": "bridge-2026-11-05"
+  },
+  {
+   "tab": "Polygon",
+   "group": "Tools",
+   "button": "Spikey",
+   "covered_by": "spikey-2026-11-05"
+  },
+  {
+   "tab": "Polygon",
+   "group": "Tools",
+   "button": "Shift",
+   "covered_by": null
+  },
+  {
+   "tab": "Polygon",
+   "group": "Tools",
+   "button": "Inset",
+   "covered_by": "inset-2026-11-05"
+  },
+  {
+   "tab": "Polygon",
+   "group": "Tools",
+   "button": "Reduction Tool",
+   "covered_by": "poly-reduce-2026-11-05"
+  },
+  {
+   "tab": "Polygon",
+   "group": "Tools",
+   "button": "Topology Pen",
+   "covered_by": null
+  },
+  {
+   "tab": "Polygon",
+   "group": "Tools",
+   "button": "Symmetrize",
+   "covered_by": null
+  },
+  {
+   "tab": "Polygon",
+   "group": "Commands",
+   "button": "Make",
+   "covered_by": "make-split-2026-11-05"
+  },
+  {
+   "tab": "Polygon",
+   "group": "Commands",
+   "button": "Split",
+   "covered_by": "make-split-2026-11-05"
+  },
+  {
+   "tab": "Polygon",
+   "group": "Commands",
+   "button": "Triple",
+   "covered_by": "mesh-commands-2026-11-02"
+  },
+  {
+   "tab": "Polygon",
+   "group": "Commands",
+   "button": "Quadruple",
+   "covered_by": "quadruple-2026-11-05"
+  },
+  {
+   "tab": "Polygon",
+   "group": "Commands",
+   "button": "Spin Quad Pairs",
+   "covered_by": "mesh-commands-2026-11-02"
+  },
+  {
+   "tab": "Polygon",
+   "group": "Commands",
+   "button": "Flip Polygons",
+   "covered_by": "poly-flip-2026-11-05"
+  },
+  {
+   "tab": "Polygon",
+   "group": "Commands",
+   "button": "Align Polygons",
+   "covered_by": "mesh-commands-2026-11-02"
+  },
+  {
+   "tab": "Polygon",
+   "group": "Commands",
+   "button": "Polygon Set Part",
+   "covered_by": "set-part-2026-11-04, set-part-observed-2026-11-05"
+  },
+  {
+   "tab": "Polygon",
+   "group": "Commands",
+   "button": "Polygon Set Material",
+   "covered_by": "set-material-2026-11-05"
+  },
+  {
+   "tab": "Polygon",
+   "group": "Commands",
+   "button": "Make Curve Fill",
+   "covered_by": null
+  },
+  {
+   "tab": "Polygon",
+   "group": "Commands > Polygon Scale Offset",
+   "button": "PolyScale Offset",
+   "covered_by": "offset-flatten-2026-11-05"
+  },
+  {
+   "tab": "Polygon",
+   "group": "Commands > Polygon Scale Offset",
+   "button": "PolyScale Offset Detach",
+   "covered_by": "offset-flatten-2026-11-05"
+  },
+  {
+   "tab": "Polygon",
+   "group": "Commands",
+   "button": "Flatten Ngons",
+   "covered_by": "offset-flatten-2026-11-05"
+  },
+  {
+   "tab": "Polygon",
+   "group": "Commands > Flip It",
+   "button": "Flip It",
+   "covered_by": null
+  },
+  {
+   "tab": "Polygon",
+   "group": "Commands > Flip It",
+   "button": "Flip It Origin",
+   "covered_by": null
+  },
+  {
+   "tab": "Polygon",
+   "group": "Commands",
+   "button": "Triple Fan",
+   "covered_by": null
+  },
+  {
+   "tab": "Polygon",
+   "group": "Commands > Reduce",
+   "button": "Merge",
+   "covered_by": "mesh-commands-2026-11-02"
+  },
+  {
+   "tab": "Polygon",
+   "group": "Commands > Reduce",
+   "button": "Collapse",
+   "covered_by": "mesh-commands-2026-11-02"
+  },
+  {
+   "tab": "Polygon",
+   "group": "Commands > Reduce",
+   "button": "Collapse Selection",
+   "covered_by": null
+  },
+  {
+   "tab": "Polygon",
+   "group": "Commands > Reduce",
+   "button": "Remove",
+   "covered_by": "mesh-commands-2026-11-02"
+  },
+  {
+   "tab": "Polygon",
+   "group": "Commands > Reduce",
+   "button": "Unify Polygons",
+   "covered_by": "mesh-commands-2026-11-02"
+  },
+  {
+   "tab": "Polygon",
+   "group": "Commands > Reduce",
+   "button": "Detriangulate",
+   "covered_by": null
+  },
+  {
+   "tab": "Curve",
+   "group": "Tools",
+   "button": "Bezier",
+   "covered_by": null
+  },
+  {
+   "tab": "Curve",
+   "group": "Tools",
+   "button": "Curve",
+   "covered_by": null
+  },
+  {
+   "tab": "Curve",
+   "group": "Tools",
+   "button": "B-Spline",
+   "covered_by": null
+  },
+  {
+   "tab": "Curve",
+   "group": "Tools",
+   "button": "Sketch",
+   "covered_by": null
+  },
+  {
+   "tab": "Curve",
+   "group": "Tools",
+   "button": "Retopo Sketch",
+   "covered_by": null
+  },
+  {
+   "tab": "Curve",
+   "group": "Tools",
+   "button": "Solid Sketch",
+   "covered_by": null
+  },
+  {
+   "tab": "Curve",
+   "group": "Tools",
+   "button": "Tube",
+   "covered_by": null
+  },
+  {
+   "tab": "Curve",
+   "group": "Tools",
+   "button": "Patch",
+   "covered_by": null
+  },
+  {
+   "tab": "Curve",
+   "group": "Tools",
+   "button": "Hair Guide",
+   "covered_by": null
+  },
+  {
+   "tab": "Curve",
+   "group": "Tools",
+   "button": "Set Curves Color",
+   "covered_by": null
+  },
+  {
+   "tab": "Curve",
+   "group": "Commands",
+   "button": "Freeze Polygons",
+   "covered_by": null
+  },
+  {
+   "tab": "Curve",
+   "group": "Commands",
+   "button": "Make Open Curve",
+   "covered_by": null
+  },
+  {
+   "tab": "Curve",
+   "group": "Commands",
+   "button": "Make Closed Curves",
+   "covered_by": null
+  },
+  {
+   "tab": "Curve",
+   "group": "Commands",
+   "button": "Edges to Curves",
+   "covered_by": null
+  },
+  {
+   "tab": "Curve",
+   "group": "Commands",
+   "button": "Constrain to Background",
+   "covered_by": null
+  },
+  {
+   "tab": "Curve",
+   "group": "Commands > Open Curve Offset",
+   "button": "Open Curve Offset",
+   "covered_by": null
+  },
+  {
+   "tab": "Curve",
+   "group": "Commands > Open Curve Offset",
+   "button": "Open Curve Offset Trio",
+   "covered_by": null
+  },
+  {
+   "tab": "Curve",
+   "group": "Commands > Closed Curve Offset",
+   "button": "Closed Curve Offset",
+   "covered_by": null
+  },
+  {
+   "tab": "Curve",
+   "group": "Commands > Closed Curve Offset",
+   "button": "Closed Curve Offset Trio",
+   "covered_by": null
+  },
+  {
+   "tab": "Curve",
+   "group": "Convert Curves",
+   "button": "Curve to B-Spline",
+   "covered_by": null
+  },
+  {
+   "tab": "Curve",
+   "group": "Convert Curves",
+   "button": "Curve to Bezier",
+   "covered_by": null
+  },
+  {
+   "tab": "Curve",
+   "group": "Convert Curves",
+   "button": "Bezier to Curve",
+   "covered_by": null
+  },
+  {
+   "tab": "Curve",
+   "group": "Convert Curves",
+   "button": "Bezier to B-Spline",
+   "covered_by": null
+  },
+  {
+   "tab": "Curve",
+   "group": "Convert Curves",
+   "button": "B-Spline to Bezier",
+   "covered_by": null
+  },
+  {
+   "tab": "Curve",
+   "group": "Convert Curves",
+   "button": "B-Spline to Curve",
+   "covered_by": null
+  }
+ ]
+}

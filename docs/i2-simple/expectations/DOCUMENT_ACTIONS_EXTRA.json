@@ -1,0 +1,30 @@
+{
+  "mFinishB": {
+    "label": "Extrude",
+    "role": "Completed",
+    "before": {
+      "graph": "G2",
+      "identity": "I1",
+      "session": null
+    },
+    "after": {
+      "graph": "AM_B2",
+      "identity": "AM_B2I",
+      "session": null
+    }
+  },
+  "zFinishB": {
+    "label": "Extrude",
+    "role": "Completed",
+    "before": {
+      "graph": "G1",
+      "identity": "I1",
+      "session": null
+    },
+    "after": {
+      "graph": "AZ_B2",
+      "identity": "AZ_B2I",
+      "session": null
+    }
+  }
+}

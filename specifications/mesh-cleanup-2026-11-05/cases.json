@@ -1,0 +1,4435 @@
+{
+ "spec": "mesh-cleanup-2026-11-05",
+ "comparison_rule": "Build the input (polygons of one or two points are made as listed), select as listed, run Mesh Cleanup with every option as listed. Points (1e-6), polygon corner lists, point order and material tags must match exactly.",
+ "cases": [
+  {
+   "id": "MC01",
+   "description": "Quad plus one floating point; all options on; polygon mode, nothing selected",
+   "input": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      3.0,
+      3.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": []
+   },
+   "selection_mode": "polygon",
+   "option": {
+    "floatingVertex": true,
+    "onePointPolygon": true,
+    "twoPointPolygon": true,
+    "dupPointPolygon": true,
+    "colinear": true,
+    "faceNormal": true,
+    "mergeVertex": true,
+    "mergeDisco": true,
+    "unifyPolygon": true,
+    "forceUnify": true,
+    "removeDiscoWeight": true,
+    "fixGaps": true
+   },
+   "expected": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ]
+    ],
+    "polygon_types": [
+     "face"
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": []
+    },
+    "selection_mode_after": "polygon",
+    "failed": false,
+    "polygon_materials": [
+     "Default"
+    ]
+   },
+   "input_polygon_types": [
+    "face"
+   ]
+  },
+  {
+   "id": "MC02",
+   "description": "Quad plus floating point; only Remove Floating Vertices off",
+   "input": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      3.0,
+      3.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": []
+   },
+   "selection_mode": "polygon",
+   "option": {
+    "floatingVertex": false,
+    "onePointPolygon": true,
+    "twoPointPolygon": true,
+    "dupPointPolygon": true,
+    "colinear": true,
+    "faceNormal": true,
+    "mergeVertex": true,
+    "mergeDisco": true,
+    "unifyPolygon": true,
+    "forceUnify": true,
+    "removeDiscoWeight": true,
+    "fixGaps": true
+   },
+   "expected": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      3.0,
+      3.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ]
+    ],
+    "polygon_types": [
+     "face"
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": []
+    },
+    "selection_mode_after": "polygon",
+    "failed": false,
+    "polygon_materials": [
+     "Default"
+    ]
+   },
+   "input_polygon_types": [
+    "face"
+   ]
+  },
+  {
+   "id": "MC03",
+   "description": "Quad plus a one-point polygon on point 4; only Remove One Point Polygons on",
+   "input": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      3.0,
+      3.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      4
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": []
+   },
+   "selection_mode": "polygon",
+   "option": {
+    "floatingVertex": false,
+    "onePointPolygon": true,
+    "twoPointPolygon": false,
+    "dupPointPolygon": false,
+    "colinear": false,
+    "faceNormal": false,
+    "mergeVertex": false,
+    "mergeDisco": false,
+    "unifyPolygon": false,
+    "forceUnify": false,
+    "removeDiscoWeight": false,
+    "fixGaps": false
+   },
+   "expected": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ]
+    ],
+    "polygon_types": [
+     "face"
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": []
+    },
+    "selection_mode_after": "polygon",
+    "failed": false,
+    "polygon_materials": [
+     "Default"
+    ]
+   },
+   "input_polygon_types": [
+    "face",
+    "onePoint"
+   ]
+  },
+  {
+   "id": "MC04",
+   "description": "Quad plus a one-point polygon on point 4; all on",
+   "input": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      3.0,
+      3.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      4
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": []
+   },
+   "selection_mode": "polygon",
+   "option": {
+    "floatingVertex": true,
+    "onePointPolygon": true,
+    "twoPointPolygon": true,
+    "dupPointPolygon": true,
+    "colinear": true,
+    "faceNormal": true,
+    "mergeVertex": true,
+    "mergeDisco": true,
+    "unifyPolygon": true,
+    "forceUnify": true,
+    "removeDiscoWeight": true,
+    "fixGaps": true
+   },
+   "expected": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ]
+    ],
+    "polygon_types": [
+     "face"
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": []
+    },
+    "selection_mode_after": "polygon",
+    "failed": false,
+    "polygon_materials": [
+     "Default"
+    ]
+   },
+   "input_polygon_types": [
+    "face",
+    "onePoint"
+   ]
+  },
+  {
+   "id": "MC05",
+   "description": "Quad plus a two-point polygon 2-4 (made by Make Polygon, type face); only Remove Two Point Polygons on",
+   "input": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      3.0,
+      3.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      4,
+      2
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": []
+   },
+   "selection_mode": "polygon",
+   "option": {
+    "floatingVertex": false,
+    "onePointPolygon": false,
+    "twoPointPolygon": true,
+    "dupPointPolygon": false,
+    "colinear": false,
+    "faceNormal": false,
+    "mergeVertex": false,
+    "mergeDisco": false,
+    "unifyPolygon": false,
+    "forceUnify": false,
+    "removeDiscoWeight": false,
+    "fixGaps": false
+   },
+   "expected": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ]
+    ],
+    "polygon_types": [
+     "face"
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": []
+    },
+    "selection_mode_after": "polygon",
+    "failed": false,
+    "polygon_materials": [
+     "Default"
+    ]
+   },
+   "input_polygon_types": [
+    "face",
+    "line"
+   ]
+  },
+  {
+   "id": "MC06",
+   "description": "Quad plus a two-point polygon 2-4; all on",
+   "input": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      3.0,
+      3.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      4,
+      2
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": []
+   },
+   "selection_mode": "polygon",
+   "option": {
+    "floatingVertex": true,
+    "onePointPolygon": true,
+    "twoPointPolygon": true,
+    "dupPointPolygon": true,
+    "colinear": true,
+    "faceNormal": true,
+    "mergeVertex": true,
+    "mergeDisco": true,
+    "unifyPolygon": true,
+    "forceUnify": true,
+    "removeDiscoWeight": true,
+    "fixGaps": true
+   },
+   "expected": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ]
+    ],
+    "polygon_types": [
+     "face"
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": []
+    },
+    "selection_mode_after": "polygon",
+    "failed": false,
+    "polygon_materials": [
+     "Default"
+    ]
+   },
+   "input_polygon_types": [
+    "face",
+    "line"
+   ]
+  },
+  {
+   "id": "MC07",
+   "description": "Polygon listing point 1 twice [0,1,1,2,3]; only Fix Duplicate Points on",
+   "input": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      1,
+      2,
+      3
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": []
+   },
+   "selection_mode": "polygon",
+   "option": {
+    "floatingVertex": false,
+    "onePointPolygon": false,
+    "twoPointPolygon": false,
+    "dupPointPolygon": true,
+    "colinear": false,
+    "faceNormal": false,
+    "mergeVertex": false,
+    "mergeDisco": false,
+    "unifyPolygon": false,
+    "forceUnify": false,
+    "removeDiscoWeight": false,
+    "fixGaps": false
+   },
+   "expected": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ]
+    ],
+    "polygon_types": [
+     "face"
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": []
+    },
+    "selection_mode_after": "polygon",
+    "failed": false,
+    "polygon_materials": [
+     "Default"
+    ]
+   },
+   "input_polygon_types": [
+    "face"
+   ]
+  },
+  {
+   "id": "MC08",
+   "description": "Pentagon with unshared point 1 in the middle of edge 0-2; only Remove Colinear on",
+   "input": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      2.0,
+      0.0,
+      0.0
+     ],
+     [
+      2.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3,
+      4
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": []
+   },
+   "selection_mode": "polygon",
+   "option": {
+    "floatingVertex": false,
+    "onePointPolygon": false,
+    "twoPointPolygon": false,
+    "dupPointPolygon": false,
+    "colinear": true,
+    "faceNormal": false,
+    "mergeVertex": false,
+    "mergeDisco": false,
+    "unifyPolygon": false,
+    "forceUnify": false,
+    "removeDiscoWeight": false,
+    "fixGaps": false
+   },
+   "expected": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      2.0,
+      0.0,
+      0.0
+     ],
+     [
+      2.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ]
+    ],
+    "polygon_types": [
+     "face"
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": []
+    },
+    "selection_mode_after": "polygon",
+    "failed": false,
+    "polygon_materials": [
+     "Default"
+    ]
+   },
+   "input_polygon_types": [
+    "face"
+   ]
+  },
+  {
+   "id": "MC09",
+   "description": "Pentagon with mid-edge point 1 shared by a triangle; only Remove Colinear on",
+   "input": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      2.0,
+      0.0,
+      0.0
+     ],
+     [
+      2.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      1.0,
+      -1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3,
+      4
+     ],
+     [
+      0,
+      5,
+      1
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": []
+   },
+   "selection_mode": "polygon",
+   "option": {
+    "floatingVertex": false,
+    "onePointPolygon": false,
+    "twoPointPolygon": false,
+    "dupPointPolygon": false,
+    "colinear": true,
+    "faceNormal": false,
+    "mergeVertex": false,
+    "mergeDisco": false,
+    "unifyPolygon": false,
+    "forceUnify": false,
+    "removeDiscoWeight": false,
+    "fixGaps": false
+   },
+   "expected": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      2.0,
+      0.0,
+      0.0
+     ],
+     [
+      2.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      1.0,
+      -1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3,
+      4
+     ],
+     [
+      0,
+      5,
+      1
+     ]
+    ],
+    "polygon_types": [
+     "face",
+     "face"
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": []
+    },
+    "selection_mode_after": "polygon",
+    "failed": false,
+    "polygon_materials": [
+     "Default",
+     "Default"
+    ]
+   },
+   "input_polygon_types": [
+    "face",
+    "face"
+   ]
+  },
+  {
+   "id": "MC10",
+   "description": "Pentagon starting at a mid-edge point (last, first, second colinear); only Fix Face Normal on",
+   "input": {
+    "points": [
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      2.0,
+      0.0,
+      0.0
+     ],
+     [
+      2.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3,
+      4
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": []
+   },
+   "selection_mode": "polygon",
+   "option": {
+    "floatingVertex": false,
+    "onePointPolygon": false,
+    "twoPointPolygon": false,
+    "dupPointPolygon": false,
+    "colinear": false,
+    "faceNormal": true,
+    "mergeVertex": false,
+    "mergeDisco": false,
+    "unifyPolygon": false,
+    "forceUnify": false,
+    "removeDiscoWeight": false,
+    "fixGaps": false
+   },
+   "expected": {
+    "points": [
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      2.0,
+      0.0,
+      0.0
+     ],
+     [
+      2.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      2,
+      3,
+      4,
+      0,
+      1
+     ]
+    ],
+    "polygon_types": [
+     "face"
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": []
+    },
+    "selection_mode_after": "polygon",
+    "failed": false,
+    "polygon_materials": [
+     "Default"
+    ]
+   },
+   "input_polygon_types": [
+    "face"
+   ]
+  },
+  {
+   "id": "MC11",
+   "description": "Two quads with collocated but separate points (1=4, 2=7); only Merge Vertices on",
+   "input": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      2.0,
+      0.0,
+      0.0
+     ],
+     [
+      2.0,
+      1.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      4,
+      5,
+      6,
+      7
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": []
+   },
+   "selection_mode": "polygon",
+   "option": {
+    "floatingVertex": false,
+    "onePointPolygon": false,
+    "twoPointPolygon": false,
+    "dupPointPolygon": false,
+    "colinear": false,
+    "faceNormal": false,
+    "mergeVertex": true,
+    "mergeDisco": false,
+    "unifyPolygon": false,
+    "forceUnify": false,
+    "removeDiscoWeight": false,
+    "fixGaps": false
+   },
+   "expected": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      2.0,
+      0.0,
+      0.0
+     ],
+     [
+      2.0,
+      1.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      4,
+      5,
+      1
+     ],
+     [
+      4,
+      2,
+      3,
+      5
+     ]
+    ],
+    "polygon_types": [
+     "face",
+     "face"
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": []
+    },
+    "selection_mode_after": "polygon",
+    "failed": false,
+    "polygon_materials": [
+     "Default",
+     "Default"
+    ]
+   },
+   "input_polygon_types": [
+    "face",
+    "face"
+   ]
+  },
+  {
+   "id": "MC12",
+   "description": "Two identical polygons on the same points; only Unify on",
+   "input": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      0,
+      1,
+      2,
+      3
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": []
+   },
+   "selection_mode": "polygon",
+   "option": {
+    "floatingVertex": false,
+    "onePointPolygon": false,
+    "twoPointPolygon": false,
+    "dupPointPolygon": false,
+    "colinear": false,
+    "faceNormal": false,
+    "mergeVertex": false,
+    "mergeDisco": false,
+    "unifyPolygon": true,
+    "forceUnify": false,
+    "removeDiscoWeight": false,
+    "fixGaps": false
+   },
+   "expected": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ]
+    ],
+    "polygon_types": [
+     "face"
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": []
+    },
+    "selection_mode_after": "polygon",
+    "failed": false,
+    "polygon_materials": [
+     "Default"
+    ]
+   },
+   "input_polygon_types": [
+    "face",
+    "face"
+   ]
+  },
+  {
+   "id": "MC13",
+   "description": "Same polygon twice, second rotated [1,2,3,0]; only Unify on",
+   "input": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      1,
+      2,
+      3,
+      0
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": []
+   },
+   "selection_mode": "polygon",
+   "option": {
+    "floatingVertex": false,
+    "onePointPolygon": false,
+    "twoPointPolygon": false,
+    "dupPointPolygon": false,
+    "colinear": false,
+    "faceNormal": false,
+    "mergeVertex": false,
+    "mergeDisco": false,
+    "unifyPolygon": true,
+    "forceUnify": false,
+    "removeDiscoWeight": false,
+    "fixGaps": false
+   },
+   "expected": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ]
+    ],
+    "polygon_types": [
+     "face"
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": []
+    },
+    "selection_mode_after": "polygon",
+    "failed": false,
+    "polygon_materials": [
+     "Default"
+    ]
+   },
+   "input_polygon_types": [
+    "face",
+    "face"
+   ]
+  },
+  {
+   "id": "MC14",
+   "description": "Same points, second polygon reversed [0,3,2,1]; only Unify on",
+   "input": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      0,
+      3,
+      2,
+      1
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": []
+   },
+   "selection_mode": "polygon",
+   "option": {
+    "floatingVertex": false,
+    "onePointPolygon": false,
+    "twoPointPolygon": false,
+    "dupPointPolygon": false,
+    "colinear": false,
+    "faceNormal": false,
+    "mergeVertex": false,
+    "mergeDisco": false,
+    "unifyPolygon": true,
+    "forceUnify": false,
+    "removeDiscoWeight": false,
+    "fixGaps": false
+   },
+   "expected": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ]
+    ],
+    "polygon_types": [
+     "face"
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": []
+    },
+    "selection_mode_after": "polygon",
+    "failed": false,
+    "polygon_materials": [
+     "Default"
+    ]
+   },
+   "input_polygon_types": [
+    "face",
+    "face"
+   ]
+  },
+  {
+   "id": "MC15",
+   "description": "Identical polygons, second tagged material Other; Unify on, Force off",
+   "input": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      0,
+      1,
+      2,
+      3
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": []
+   },
+   "selection_mode": "polygon",
+   "option": {
+    "floatingVertex": false,
+    "onePointPolygon": false,
+    "twoPointPolygon": false,
+    "dupPointPolygon": false,
+    "colinear": false,
+    "faceNormal": false,
+    "mergeVertex": false,
+    "mergeDisco": false,
+    "unifyPolygon": true,
+    "forceUnify": false,
+    "removeDiscoWeight": false,
+    "fixGaps": false
+   },
+   "expected": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      0,
+      1,
+      2,
+      3
+     ]
+    ],
+    "polygon_types": [
+     "face",
+     "face"
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": []
+    },
+    "selection_mode_after": "polygon",
+    "failed": false,
+    "polygon_materials": [
+     "Default",
+     "Other"
+    ]
+   },
+   "input_polygon_materials": [
+    "Default",
+    "Other"
+   ],
+   "input_polygon_types": [
+    "face",
+    "face"
+   ]
+  },
+  {
+   "id": "MC16",
+   "description": "Identical polygons, second tagged material Other; Unify and Force Unify on",
+   "input": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      0,
+      1,
+      2,
+      3
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": []
+   },
+   "selection_mode": "polygon",
+   "option": {
+    "floatingVertex": false,
+    "onePointPolygon": false,
+    "twoPointPolygon": false,
+    "dupPointPolygon": false,
+    "colinear": false,
+    "faceNormal": false,
+    "mergeVertex": false,
+    "mergeDisco": false,
+    "unifyPolygon": true,
+    "forceUnify": true,
+    "removeDiscoWeight": false,
+    "fixGaps": false
+   },
+   "expected": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ]
+    ],
+    "polygon_types": [
+     "face"
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": []
+    },
+    "selection_mode_after": "polygon",
+    "failed": false,
+    "polygon_materials": [
+     "Default"
+    ]
+   },
+   "input_polygon_materials": [
+    "Default",
+    "Other"
+   ],
+   "input_polygon_types": [
+    "face",
+    "face"
+   ]
+  },
+  {
+   "id": "MC17",
+   "description": "Identical polygons; Force Unify on, Unify off",
+   "input": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      0,
+      1,
+      2,
+      3
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": []
+   },
+   "selection_mode": "polygon",
+   "option": {
+    "floatingVertex": false,
+    "onePointPolygon": false,
+    "twoPointPolygon": false,
+    "dupPointPolygon": false,
+    "colinear": false,
+    "faceNormal": false,
+    "mergeVertex": false,
+    "mergeDisco": false,
+    "unifyPolygon": false,
+    "forceUnify": true,
+    "removeDiscoWeight": false,
+    "fixGaps": false
+   },
+   "expected": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      0,
+      1,
+      2,
+      3
+     ]
+    ],
+    "polygon_types": [
+     "face",
+     "face"
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": []
+    },
+    "selection_mode_after": "polygon",
+    "failed": false,
+    "polygon_materials": [
+     "Default",
+     "Default"
+    ]
+   },
+   "input_polygon_types": [
+    "face",
+    "face"
+   ]
+  },
+  {
+   "id": "MC18",
+   "description": "T-gap: wide top pentagon holds mid point 6 on the shared edge, bottom quad does not; only Fix Gaps on",
+   "input": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      2.0,
+      0.0,
+      0.0
+     ],
+     [
+      2.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      2.0,
+      2.0,
+      0.0
+     ],
+     [
+      0.0,
+      2.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      3,
+      6,
+      2,
+      4,
+      5
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": []
+   },
+   "selection_mode": "polygon",
+   "option": {
+    "floatingVertex": false,
+    "onePointPolygon": false,
+    "twoPointPolygon": false,
+    "dupPointPolygon": false,
+    "colinear": false,
+    "faceNormal": false,
+    "mergeVertex": false,
+    "mergeDisco": false,
+    "unifyPolygon": false,
+    "forceUnify": false,
+    "removeDiscoWeight": false,
+    "fixGaps": true
+   },
+   "expected": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      2.0,
+      0.0,
+      0.0
+     ],
+     [
+      2.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      2.0,
+      2.0,
+      0.0
+     ],
+     [
+      0.0,
+      2.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      6,
+      3
+     ],
+     [
+      3,
+      6,
+      2,
+      4,
+      5
+     ]
+    ],
+    "polygon_types": [
+     "face",
+     "face"
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": []
+    },
+    "selection_mode_after": "polygon",
+    "failed": false,
+    "polygon_materials": [
+     "Default",
+     "Default"
+    ]
+   },
+   "input_polygon_types": [
+    "face",
+    "face"
+   ]
+  },
+  {
+   "id": "MC19",
+   "description": "T-gap: two top quads meet at point 4 on the bottom quad's top edge; only Fix Gaps on",
+   "input": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      2.0,
+      0.0,
+      0.0
+     ],
+     [
+      2.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      1.0,
+      2.0,
+      0.0
+     ],
+     [
+      0.0,
+      2.0,
+      0.0
+     ],
+     [
+      2.0,
+      2.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      3,
+      4,
+      5,
+      6
+     ],
+     [
+      4,
+      2,
+      7,
+      5
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": []
+   },
+   "selection_mode": "polygon",
+   "option": {
+    "floatingVertex": false,
+    "onePointPolygon": false,
+    "twoPointPolygon": false,
+    "dupPointPolygon": false,
+    "colinear": false,
+    "faceNormal": false,
+    "mergeVertex": false,
+    "mergeDisco": false,
+    "unifyPolygon": false,
+    "forceUnify": false,
+    "removeDiscoWeight": false,
+    "fixGaps": true
+   },
+   "expected": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      2.0,
+      0.0,
+      0.0
+     ],
+     [
+      2.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      1.0,
+      2.0,
+      0.0
+     ],
+     [
+      0.0,
+      2.0,
+      0.0
+     ],
+     [
+      2.0,
+      2.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      4,
+      3
+     ],
+     [
+      3,
+      4,
+      5,
+      6
+     ],
+     [
+      4,
+      2,
+      7,
+      5
+     ]
+    ],
+    "polygon_types": [
+     "face",
+     "face",
+     "face"
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": []
+    },
+    "selection_mode_after": "polygon",
+    "failed": false,
+    "polygon_materials": [
+     "Default",
+     "Default",
+     "Default"
+    ]
+   },
+   "input_polygon_types": [
+    "face",
+    "face",
+    "face"
+   ]
+  },
+  {
+   "id": "MC20",
+   "description": "T-gap (two top quads); all on",
+   "input": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      2.0,
+      0.0,
+      0.0
+     ],
+     [
+      2.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      1.0,
+      2.0,
+      0.0
+     ],
+     [
+      0.0,
+      2.0,
+      0.0
+     ],
+     [
+      2.0,
+      2.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      3,
+      4,
+      5,
+      6
+     ],
+     [
+      4,
+      2,
+      7,
+      5
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": []
+   },
+   "selection_mode": "polygon",
+   "option": {
+    "floatingVertex": true,
+    "onePointPolygon": true,
+    "twoPointPolygon": true,
+    "dupPointPolygon": true,
+    "colinear": true,
+    "faceNormal": true,
+    "mergeVertex": true,
+    "mergeDisco": true,
+    "unifyPolygon": true,
+    "forceUnify": true,
+    "removeDiscoWeight": true,
+    "fixGaps": true
+   },
+   "expected": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      2.0,
+      0.0,
+      0.0
+     ],
+     [
+      2.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      1.0,
+      2.0,
+      0.0
+     ],
+     [
+      0.0,
+      2.0,
+      0.0
+     ],
+     [
+      2.0,
+      2.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      4,
+      3
+     ],
+     [
+      3,
+      4,
+      5,
+      6
+     ],
+     [
+      4,
+      2,
+      7,
+      5
+     ]
+    ],
+    "polygon_types": [
+     "face",
+     "face",
+     "face"
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": []
+    },
+    "selection_mode_after": "polygon",
+    "failed": false,
+    "polygon_materials": [
+     "Default",
+     "Default",
+     "Default"
+    ]
+   },
+   "input_polygon_types": [
+    "face",
+    "face",
+    "face"
+   ]
+  },
+  {
+   "id": "MC21",
+   "description": "Mixed faults (one-point polygon on 4, two-point polygon 2-5, collocated point 6=1); all off",
+   "input": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      3.0,
+      3.0,
+      0.0
+     ],
+     [
+      4.0,
+      4.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      4
+     ],
+     [
+      5,
+      2
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": []
+   },
+   "selection_mode": "polygon",
+   "option": {
+    "floatingVertex": false,
+    "onePointPolygon": false,
+    "twoPointPolygon": false,
+    "dupPointPolygon": false,
+    "colinear": false,
+    "faceNormal": false,
+    "mergeVertex": false,
+    "mergeDisco": false,
+    "unifyPolygon": false,
+    "forceUnify": false,
+    "removeDiscoWeight": false,
+    "fixGaps": false
+   },
+   "expected": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      3.0,
+      3.0,
+      0.0
+     ],
+     [
+      4.0,
+      4.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      4
+     ],
+     [
+      5,
+      2
+     ]
+    ],
+    "polygon_types": [
+     "face",
+     "onePoint",
+     "line"
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": []
+    },
+    "selection_mode_after": "polygon",
+    "failed": false,
+    "polygon_materials": [
+     "Default",
+     "Default",
+     "Default"
+    ]
+   },
+   "input_polygon_types": [
+    "face",
+    "onePoint",
+    "line"
+   ]
+  },
+  {
+   "id": "MC22",
+   "description": "Mixed faults; all on",
+   "input": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      3.0,
+      3.0,
+      0.0
+     ],
+     [
+      4.0,
+      4.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      4
+     ],
+     [
+      5,
+      2
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": []
+   },
+   "selection_mode": "polygon",
+   "option": {
+    "floatingVertex": true,
+    "onePointPolygon": true,
+    "twoPointPolygon": true,
+    "dupPointPolygon": true,
+    "colinear": true,
+    "faceNormal": true,
+    "mergeVertex": true,
+    "mergeDisco": true,
+    "unifyPolygon": true,
+    "forceUnify": true,
+    "removeDiscoWeight": true,
+    "fixGaps": true
+   },
+   "expected": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ]
+    ],
+    "polygon_types": [
+     "face"
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": []
+    },
+    "selection_mode_after": "polygon",
+    "failed": false,
+    "polygon_materials": [
+     "Default"
+    ]
+   },
+   "input_polygon_types": [
+    "face",
+    "onePoint",
+    "line"
+   ]
+  },
+  {
+   "id": "MC23",
+   "description": "Mixed faults; all on; polygon mode with only the quad selected",
+   "input": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      3.0,
+      3.0,
+      0.0
+     ],
+     [
+      4.0,
+      4.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      4
+     ],
+     [
+      5,
+      2
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": [
+     0
+    ]
+   },
+   "selection_mode": "polygon",
+   "option": {
+    "floatingVertex": true,
+    "onePointPolygon": true,
+    "twoPointPolygon": true,
+    "dupPointPolygon": true,
+    "colinear": true,
+    "faceNormal": true,
+    "mergeVertex": true,
+    "mergeDisco": true,
+    "unifyPolygon": true,
+    "forceUnify": true,
+    "removeDiscoWeight": true,
+    "fixGaps": true
+   },
+   "expected": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      3.0,
+      3.0,
+      0.0
+     ],
+     [
+      4.0,
+      4.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      4
+     ],
+     [
+      5,
+      2
+     ]
+    ],
+    "polygon_types": [
+     "face",
+     "onePoint",
+     "line"
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": [
+      0
+     ]
+    },
+    "selection_mode_after": "polygon",
+    "failed": false,
+    "polygon_materials": [
+     "Default",
+     "Default",
+     "Default"
+    ]
+   },
+   "input_polygon_types": [
+    "face",
+    "onePoint",
+    "line"
+   ]
+  },
+  {
+   "id": "MC24",
+   "description": "Mixed faults; all on; vertex mode with point 4 (one-point polygon) selected, no polygons selected",
+   "input": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      3.0,
+      3.0,
+      0.0
+     ],
+     [
+      4.0,
+      4.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      4
+     ],
+     [
+      5,
+      2
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [
+     4
+    ],
+    "sel_edges": [],
+    "sel_polygons": []
+   },
+   "selection_mode": "vertex",
+   "option": {
+    "floatingVertex": true,
+    "onePointPolygon": true,
+    "twoPointPolygon": true,
+    "dupPointPolygon": true,
+    "colinear": true,
+    "faceNormal": true,
+    "mergeVertex": true,
+    "mergeDisco": true,
+    "unifyPolygon": true,
+    "forceUnify": true,
+    "removeDiscoWeight": true,
+    "fixGaps": true
+   },
+   "expected": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      3.0,
+      3.0,
+      0.0
+     ],
+     [
+      4.0,
+      4.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      4
+     ],
+     [
+      5,
+      2
+     ]
+    ],
+    "polygon_types": [
+     "face",
+     "onePoint",
+     "line"
+    ],
+    "selection_after": {
+     "sel_vertices": [
+      4
+     ],
+     "sel_edges": [],
+     "sel_polygons": []
+    },
+    "selection_mode_after": "vertex",
+    "failed": false,
+    "polygon_materials": [
+     "Default",
+     "Default",
+     "Default"
+    ]
+   },
+   "input_polygon_types": [
+    "face",
+    "onePoint",
+    "line"
+   ]
+  },
+  {
+   "id": "MC25",
+   "description": "Floating point; all on; item mode",
+   "input": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      3.0,
+      3.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": []
+   },
+   "selection_mode": "item",
+   "option": {
+    "floatingVertex": true,
+    "onePointPolygon": true,
+    "twoPointPolygon": true,
+    "dupPointPolygon": true,
+    "colinear": true,
+    "faceNormal": true,
+    "mergeVertex": true,
+    "mergeDisco": true,
+    "unifyPolygon": true,
+    "forceUnify": true,
+    "removeDiscoWeight": true,
+    "fixGaps": true
+   },
+   "expected": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ]
+    ],
+    "polygon_types": [
+     "face"
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": []
+    },
+    "selection_mode_after": "item",
+    "failed": false,
+    "polygon_materials": [
+     "Default"
+    ]
+   },
+   "input_polygon_types": [
+    "face"
+   ]
+  },
+  {
+   "id": "MC26",
+   "description": "Quad plus a two-point polygon 2-4; only Remove Floating Vertices on (point 4 is used by the 2-point polygon)",
+   "input": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      3.0,
+      3.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      4,
+      2
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": []
+   },
+   "selection_mode": "polygon",
+   "option": {
+    "floatingVertex": true,
+    "onePointPolygon": false,
+    "twoPointPolygon": false,
+    "dupPointPolygon": false,
+    "colinear": false,
+    "faceNormal": false,
+    "mergeVertex": false,
+    "mergeDisco": false,
+    "unifyPolygon": false,
+    "forceUnify": false,
+    "removeDiscoWeight": false,
+    "fixGaps": false
+   },
+   "expected": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      3.0,
+      3.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      4,
+      2
+     ]
+    ],
+    "polygon_types": [
+     "face",
+     "line"
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": []
+    },
+    "selection_mode_after": "polygon",
+    "failed": false,
+    "polygon_materials": [
+     "Default",
+     "Default"
+    ]
+   },
+   "input_polygon_types": [
+    "face",
+    "line"
+   ]
+  },
+  {
+   "id": "MC27",
+   "description": "Quad plus floating point 4 and collocated point 6=1; polygon mode with only the quad selected; only Merge Vertices on",
+   "input": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      3.0,
+      3.0,
+      0.0
+     ],
+     [
+      4.0,
+      4.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": [
+     0
+    ]
+   },
+   "selection_mode": "polygon",
+   "option": {
+    "floatingVertex": false,
+    "onePointPolygon": false,
+    "twoPointPolygon": false,
+    "dupPointPolygon": false,
+    "colinear": false,
+    "faceNormal": false,
+    "mergeVertex": true,
+    "mergeDisco": false,
+    "unifyPolygon": false,
+    "forceUnify": false,
+    "removeDiscoWeight": false,
+    "fixGaps": false
+   },
+   "expected": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      3.0,
+      3.0,
+      0.0
+     ],
+     [
+      4.0,
+      4.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ]
+    ],
+    "polygon_types": [
+     "face"
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": [
+      0
+     ]
+    },
+    "selection_mode_after": "polygon",
+    "failed": false,
+    "polygon_materials": [
+     "Default"
+    ]
+   },
+   "input_polygon_types": [
+    "face"
+   ]
+  },
+  {
+   "id": "MC28",
+   "description": "Mixed faults; all on; polygon mode with the one-point and two-point polygons (1, 2) selected",
+   "input": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      3.0,
+      3.0,
+      0.0
+     ],
+     [
+      4.0,
+      4.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      4
+     ],
+     [
+      5,
+      2
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": [
+     1,
+     2
+    ]
+   },
+   "selection_mode": "polygon",
+   "option": {
+    "floatingVertex": true,
+    "onePointPolygon": true,
+    "twoPointPolygon": true,
+    "dupPointPolygon": true,
+    "colinear": true,
+    "faceNormal": true,
+    "mergeVertex": true,
+    "mergeDisco": true,
+    "unifyPolygon": true,
+    "forceUnify": true,
+    "removeDiscoWeight": true,
+    "fixGaps": true
+   },
+   "expected": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ]
+    ],
+    "polygon_types": [
+     "face"
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": []
+    },
+    "selection_mode_after": "polygon",
+    "failed": false,
+    "polygon_materials": [
+     "Default"
+    ]
+   },
+   "input_polygon_types": [
+    "face",
+    "onePoint",
+    "line"
+   ]
+  },
+  {
+   "id": "MC29",
+   "description": "Mixed faults; all on; vertex mode with point 4 selected while polygons 1, 2 stay selected from polygon mode",
+   "input": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      3.0,
+      3.0,
+      0.0
+     ],
+     [
+      4.0,
+      4.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      4
+     ],
+     [
+      5,
+      2
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [
+     4
+    ],
+    "sel_edges": [],
+    "sel_polygons": [
+     1,
+     2
+    ]
+   },
+   "selection_mode": "vertex",
+   "option": {
+    "floatingVertex": true,
+    "onePointPolygon": true,
+    "twoPointPolygon": true,
+    "dupPointPolygon": true,
+    "colinear": true,
+    "faceNormal": true,
+    "mergeVertex": true,
+    "mergeDisco": true,
+    "unifyPolygon": true,
+    "forceUnify": true,
+    "removeDiscoWeight": true,
+    "fixGaps": true
+   },
+   "expected": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      3.0,
+      3.0,
+      0.0
+     ],
+     [
+      4.0,
+      4.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      4
+     ],
+     [
+      5,
+      2
+     ]
+    ],
+    "polygon_types": [
+     "face",
+     "onePoint",
+     "line"
+    ],
+    "selection_after": {
+     "sel_vertices": [
+      4
+     ],
+     "sel_edges": [],
+     "sel_polygons": [
+      1,
+      2
+     ]
+    },
+    "selection_mode_after": "vertex",
+    "failed": false,
+    "polygon_materials": [
+     "Default",
+     "Default",
+     "Default"
+    ]
+   },
+   "input_polygon_types": [
+    "face",
+    "onePoint",
+    "line"
+   ]
+  },
+  {
+   "id": "MC30",
+   "description": "Mixed faults; all on; edge mode with edge 0-1 selected",
+   "input": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      3.0,
+      3.0,
+      0.0
+     ],
+     [
+      4.0,
+      4.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      4
+     ],
+     [
+      5,
+      2
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [
+     [
+      0,
+      1
+     ]
+    ],
+    "sel_polygons": []
+   },
+   "selection_mode": "edge",
+   "option": {
+    "floatingVertex": true,
+    "onePointPolygon": true,
+    "twoPointPolygon": true,
+    "dupPointPolygon": true,
+    "colinear": true,
+    "faceNormal": true,
+    "mergeVertex": true,
+    "mergeDisco": true,
+    "unifyPolygon": true,
+    "forceUnify": true,
+    "removeDiscoWeight": true,
+    "fixGaps": true
+   },
+   "expected": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      3.0,
+      3.0,
+      0.0
+     ],
+     [
+      4.0,
+      4.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      4
+     ],
+     [
+      5,
+      2
+     ]
+    ],
+    "polygon_types": [
+     "face",
+     "onePoint",
+     "line"
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [
+      [
+       0,
+       1
+      ]
+     ],
+     "sel_polygons": []
+    },
+    "selection_mode_after": "edge",
+    "failed": false,
+    "polygon_materials": [
+     "Default",
+     "Default",
+     "Default"
+    ]
+   },
+   "input_polygon_types": [
+    "face",
+    "onePoint",
+    "line"
+   ]
+  },
+  {
+   "id": "MC31",
+   "description": "Quad, floating points 4, 5 and floating 6 collocated with 1; all on; vertex mode with floating point 4 selected",
+   "input": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      3.0,
+      3.0,
+      0.0
+     ],
+     [
+      4.0,
+      4.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [
+     4
+    ],
+    "sel_edges": [],
+    "sel_polygons": []
+   },
+   "selection_mode": "vertex",
+   "option": {
+    "floatingVertex": true,
+    "onePointPolygon": true,
+    "twoPointPolygon": true,
+    "dupPointPolygon": true,
+    "colinear": true,
+    "faceNormal": true,
+    "mergeVertex": true,
+    "mergeDisco": true,
+    "unifyPolygon": true,
+    "forceUnify": true,
+    "removeDiscoWeight": true,
+    "fixGaps": true
+   },
+   "expected": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      3,
+      1,
+      2
+     ]
+    ],
+    "polygon_types": [
+     "face"
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": []
+    },
+    "selection_mode_after": "vertex",
+    "failed": false,
+    "polygon_materials": [
+     "Default"
+    ]
+   },
+   "input_polygon_types": [
+    "face"
+   ]
+  },
+  {
+   "id": "MC32",
+   "description": "Same mesh; all on; vertex mode with quad corner 0 selected",
+   "input": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      3.0,
+      3.0,
+      0.0
+     ],
+     [
+      4.0,
+      4.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [
+     0
+    ],
+    "sel_edges": [],
+    "sel_polygons": []
+   },
+   "selection_mode": "vertex",
+   "option": {
+    "floatingVertex": true,
+    "onePointPolygon": true,
+    "twoPointPolygon": true,
+    "dupPointPolygon": true,
+    "colinear": true,
+    "faceNormal": true,
+    "mergeVertex": true,
+    "mergeDisco": true,
+    "unifyPolygon": true,
+    "forceUnify": true,
+    "removeDiscoWeight": true,
+    "fixGaps": true
+   },
+   "expected": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      3.0,
+      3.0,
+      0.0
+     ],
+     [
+      4.0,
+      4.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ]
+    ],
+    "polygon_types": [
+     "face"
+    ],
+    "selection_after": {
+     "sel_vertices": [
+      0
+     ],
+     "sel_edges": [],
+     "sel_polygons": []
+    },
+    "selection_mode_after": "vertex",
+    "failed": false,
+    "polygon_materials": [
+     "Default"
+    ]
+   },
+   "input_polygon_types": [
+    "face"
+   ]
+  },
+  {
+   "id": "MC33",
+   "description": "Same mesh; all on; vertex mode, nothing selected",
+   "input": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      3.0,
+      3.0,
+      0.0
+     ],
+     [
+      4.0,
+      4.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": []
+   },
+   "selection_mode": "vertex",
+   "option": {
+    "floatingVertex": true,
+    "onePointPolygon": true,
+    "twoPointPolygon": true,
+    "dupPointPolygon": true,
+    "colinear": true,
+    "faceNormal": true,
+    "mergeVertex": true,
+    "mergeDisco": true,
+    "unifyPolygon": true,
+    "forceUnify": true,
+    "removeDiscoWeight": true,
+    "fixGaps": true
+   },
+   "expected": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ]
+    ],
+    "polygon_types": [
+     "face"
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": []
+    },
+    "selection_mode_after": "vertex",
+    "failed": false,
+    "polygon_materials": [
+     "Default"
+    ]
+   },
+   "input_polygon_types": [
+    "face"
+   ]
+  },
+  {
+   "id": "MC34",
+   "description": "Same mesh; only Merge Vertices on; polygon mode, nothing selected",
+   "input": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      3.0,
+      3.0,
+      0.0
+     ],
+     [
+      4.0,
+      4.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": []
+   },
+   "selection_mode": "polygon",
+   "option": {
+    "floatingVertex": false,
+    "onePointPolygon": false,
+    "twoPointPolygon": false,
+    "dupPointPolygon": false,
+    "colinear": false,
+    "faceNormal": false,
+    "mergeVertex": true,
+    "mergeDisco": false,
+    "unifyPolygon": false,
+    "forceUnify": false,
+    "removeDiscoWeight": false,
+    "fixGaps": false
+   },
+   "expected": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      3.0,
+      3.0,
+      0.0
+     ],
+     [
+      4.0,
+      4.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      5,
+      1,
+      2
+     ]
+    ],
+    "polygon_types": [
+     "face"
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": []
+    },
+    "selection_mode_after": "polygon",
+    "failed": false,
+    "polygon_materials": [
+     "Default"
+    ]
+   },
+   "input_polygon_types": [
+    "face"
+   ]
+  }
+ ]
+}

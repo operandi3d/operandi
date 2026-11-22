@@ -1,0 +1,90 @@
+# Factory drag controls ("hauls"): which Tool Properties value each mouse
+# button drives when you drag away from a tool's handles
+# (specifications/loop-slice-2026-11-15/BEHAVIOR-DRAG-LAYER.md, BIBLE UIC-76).
+#
+# Each [[tool]] names an editor tool by its enum name, then up to two values
+# per button: `sideways` (left/right motion) and `up` (up/down motion). A
+# value is the key of a field on the tool's Tool Properties panel, so a haul
+# changes it exactly as typing in that field would (same limits, same
+# refusals, same live preview). Right and up make a value bigger (DL-06).
+#
+# A button the row doesn't list keeps the tool's own drag (DL-09). The user
+# will edit this table later (DL-08, "Load / Save Default Hauling"); until
+# then it is read once at start.
+#
+# The spec's starting table is longer than this file. Rows and buttons left
+# out need new core work or would replace a drag Jason already uses; they
+# are listed at the end.
+
+[[tool]]
+tool = "LoopSlice"
+# Left: only off the slider bar, with Edit = Move (LS-21). A click that
+# doesn't move still picks a ring (LS-03).
+left = { sideways = "loop_slice_position" }
+middle = { sideways = "loop_slice_current", up = "loop_slice_inset" }
+right = { sideways = "loop_slice_count" }
+
+[[tool]]
+tool = "Bevel"
+right = { sideways = "bevel_segments" }
+
+[[tool]]
+tool = "Extrude"
+# The spec's Segments is Polygon Extrude's Sides field.
+right = { sideways = "extrude_sides" }
+
+[[tool]]
+tool = "EdgeBevel"
+# Edge Bevel counts its rows as Round Level (segments = 2 x level).
+middle = { sideways = "chamfer_depth" }
+right = { sideways = "edge_round_level" }
+
+[[tool]]
+tool = "EdgeChamfer"
+middle = { sideways = "chamfer_depth" }
+right = { sideways = "chamfer_segments" }
+
+[[tool]]
+tool = "Chamfer"
+middle = { sideways = "chamfer_depth" }
+right = { sideways = "chamfer_segments", up = "chamfer_source_segments" }
+
+[[tool]]
+tool = "VertexBevel"
+right = { sideways = "vertex_round_level" }
+
+[[tool]]
+tool = "SmoothShift"
+# A middle click that doesn't move still clones the shift (as before).
+middle = { sideways = "sst_scale", up = "sst_angle" }
+
+[[tool]]
+tool = "Thicken"
+middle = { sideways = "sst_scale", up = "sst_angle" }
+
+[[tool]]
+tool = "PolygonSlice"
+right = { sideways = "polygon_slice_gap" }
+
+[[tool]]
+tool = "Sphere"
+right = { sideways = "radial_sides", up = "radial_segments" }
+
+[[tool]]
+tool = "Cylinder"
+right = { sideways = "radial_sides", up = "radial_segments" }
+
+# Not wired yet (spec section 2):
+# - Left-button values of Polygon Bevel, Edge Bevel, Chamfer edit, Vertex
+#   Bevel, Vertex Extrude and Smooth Shift: their left drag anywhere already
+#   drives the same values (Jason 2026-11-04, DRAG-Q01) without an axis lock.
+#   Moving them here changes a drag in daily use, so it waits for Jason.
+# - Edge Bevel Mitering: no such option yet.
+# - Add Loop Gap: Add Loop is an Edge panel click tool, not a live tool.
+# - Cube: its right-drag Segments X/Y/Z already exists (primitive_input.rs).
+# - Tube, Torus, Capsule, Arc, Helix, Ellipsoid, Cone, curve shapes, Linear
+#   clone, Radial Align, Smooth, Sketch Extrude, Solid Sketch: their own
+#   sessions or drags; each needs its own wiring.
+
+# Bend has no row on purpose (bend-handles-2026-11-15 §3): every press goes
+# to its ring, its spine's end or the action centre.

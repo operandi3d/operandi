@@ -1,0 +1,179 @@
+{
+  "version": 1,
+  "id": "toolbox.uv.ops",
+  "label": "UV Operations",
+  "exported": true,
+  "controls": [
+    {
+      "command": "UV Unwrap",
+      "label": "Unwrap...",
+      "tooltip": "UV Unwrap... · flatten the visible polygons into the UV map, cut at seams · uv.unwrap",
+      "look": "framed",
+      "icon": "uv-unwrap"
+    },
+    {
+      "command": "Pack UVs",
+      "label": "Pack UVs...",
+      "tooltip": "Pack UVs... · lay the UV map's islands out in the tile · uv.pack",
+      "look": "framed",
+      "icon": "uv-pack"
+    },
+    {
+      "command": "operandi.uv.atlas",
+      "label": "Atlas Unwrap...",
+      "tooltip": "Atlas Unwrap... · quick automatic UVs, no seams to mark: flat-ish charts packed at one density · operandi.uv.atlas",
+      "look": "framed",
+      "icon": "uv-atlas"
+    },
+    {
+      "command": "operandi.uv.rectangle",
+      "label": "UV Rectangle",
+      "look": "framed",
+      "tooltip": "UV Rectangle · straightens each island that is a full grid of quads into exact rectangles; other islands stay as they are · operandi.uv.rectangle",
+      "icon": "uv-rectangle"
+    },
+    {
+      "form": {
+        "style": "horizontal",
+        "controls": [
+          {
+            "command": "operandi.uv.preset uv.fitUVs",
+            "label": "Fit UVs",
+            "tooltip": "Fit UVs · Scale and move the selected UVs to fill the tile · Shift: each island · Alt: each polygon · Ctrl: options",
+            "look": "framed",
+            "variants": {
+              "shift": "operandi.uv.preset uv.fitUVs shift",
+              "alt": "operandi.uv.preset uv.fitUVs alt",
+              "ctrl": "operandi.uv.preset uv.fitUVs options"
+            },
+            "icon": "uv-fit"
+          }
+        ]
+      }
+    },
+    {
+      "form": {
+        "style": "horizontal",
+        "controls": [
+          {
+            "command": "operandi.uv.preset uv.flipU",
+            "label": "Flip U",
+            "tooltip": "Flip U · Mirror the selected UVs left to right about their centre · Alt: each polygon · Ctrl: options",
+            "look": "framed",
+            "variants": {
+              "shift": "operandi.uv.preset uv.flipU shift",
+              "alt": "operandi.uv.preset uv.flipU alt",
+              "ctrl": "operandi.uv.preset uv.flipU options"
+            },
+            "icon": "uv-flip-u"
+          },
+          {
+            "command": "operandi.uv.preset uv.flipV",
+            "label": "Flip V",
+            "tooltip": "Flip V · Mirror the selected UVs top to bottom about their centre · Alt: each polygon · Ctrl: options",
+            "look": "framed",
+            "variants": {
+              "shift": "operandi.uv.preset uv.flipV shift",
+              "alt": "operandi.uv.preset uv.flipV alt",
+              "ctrl": "operandi.uv.preset uv.flipV options"
+            },
+            "icon": "uv-flip-v"
+          }
+        ]
+      }
+    },
+    {
+      "form": {
+        "style": "horizontal",
+        "controls": [
+          {
+            "command": "operandi.uv.preset uv.mirrorU",
+            "label": "Mirror U",
+            "tooltip": "Mirror U · Mirror the selected UVs across the line U = Center · Ctrl: options",
+            "look": "framed",
+            "variants": {
+              "shift": "operandi.uv.preset uv.mirrorU shift",
+              "alt": "operandi.uv.preset uv.mirrorU alt",
+              "ctrl": "operandi.uv.preset uv.mirrorU options"
+            },
+            "icon": "uv-mirror-u"
+          },
+          {
+            "command": "operandi.uv.preset uv.mirrorV",
+            "label": "Mirror V",
+            "tooltip": "Mirror V · Mirror the selected UVs across the line V = Center · Ctrl: options",
+            "look": "framed",
+            "variants": {
+              "shift": "operandi.uv.preset uv.mirrorV shift",
+              "alt": "operandi.uv.preset uv.mirrorV alt",
+              "ctrl": "operandi.uv.preset uv.mirrorV options"
+            },
+            "icon": "uv-mirror-v"
+          }
+        ]
+      }
+    },
+    {
+      "form": {
+        "style": "horizontal",
+        "controls": [
+          {
+            "command": "operandi.uv.preset uv.alignUp",
+            "label": "Align Up",
+            "tooltip": "Align Up · Move the selected UVs up to the highest one · Alt: each edge row · Ctrl: options",
+            "look": "framed",
+            "variants": {
+              "shift": "operandi.uv.preset uv.alignUp shift",
+              "alt": "operandi.uv.preset uv.alignUp alt",
+              "ctrl": "operandi.uv.preset uv.alignUp options"
+            },
+            "icon": "uv-align-up"
+          },
+          {
+            "command": "operandi.uv.preset uv.alignDown",
+            "label": "Align Down",
+            "tooltip": "Align Down · Move the selected UVs down to the lowest one · Alt: each edge row · Ctrl: options",
+            "look": "framed",
+            "variants": {
+              "shift": "operandi.uv.preset uv.alignDown shift",
+              "alt": "operandi.uv.preset uv.alignDown alt",
+              "ctrl": "operandi.uv.preset uv.alignDown options"
+            },
+            "icon": "uv-align-down"
+          }
+        ]
+      }
+    },
+    {
+      "form": {
+        "style": "horizontal",
+        "controls": [
+          {
+            "command": "operandi.uv.preset uv.alignLeft",
+            "label": "Align Left",
+            "tooltip": "Align Left · Move the selected UVs left to the leftmost one · Alt: each edge row · Ctrl: options",
+            "look": "framed",
+            "variants": {
+              "shift": "operandi.uv.preset uv.alignLeft shift",
+              "alt": "operandi.uv.preset uv.alignLeft alt",
+              "ctrl": "operandi.uv.preset uv.alignLeft options"
+            },
+            "icon": "uv-align-left"
+          },
+          {
+            "command": "operandi.uv.preset uv.alignRight",
+            "label": "Align Right",
+            "tooltip": "Align Right · Move the selected UVs right to the rightmost one · Alt: each edge row · Ctrl: options",
+            "look": "framed",
+            "variants": {
+              "shift": "operandi.uv.preset uv.alignRight shift",
+              "alt": "operandi.uv.preset uv.alignRight alt",
+              "ctrl": "operandi.uv.preset uv.alignRight options"
+            },
+            "icon": "uv-align-right"
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "version": 1,
+  "id": "menu.edit.centerSelected",
+  "label": "Center Selected",
+  "style": "menu",
+  "controls": [
+    {
+      "command": "vert.center all",
+      "label": "All"
+    },
+    {
+      "command": "vert.center x",
+      "label": "X"
+    },
+    {
+      "command": "vert.center y",
+      "label": "Y"
+    },
+    {
+      "command": "vert.center z",
+      "label": "Z"
+    },
+    {
+      "command": "vert.center xy",
+      "label": "XY"
+    },
+    {
+      "command": "vert.center yz",
+      "label": "YZ"
+    },
+    {
+      "command": "vert.center zx",
+      "label": "ZX"
+    }
+  ]
+}

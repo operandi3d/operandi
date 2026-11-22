@@ -1,0 +1,1296 @@
+{
+ "spec": "spikey-2026-11-05",
+ "comparison_rule": "Build the input mesh, select as listed, apply. Match positions, counts and corner order up to rotation.",
+ "cases": [
+  {
+   "id": "SP01",
+   "description": "Single quad, reset defaults (factor 0)",
+   "input": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      0.0
+     ],
+     [
+      0.5,
+      -0.5,
+      0.0
+     ],
+     [
+      -0.5,
+      0.5,
+      0.0
+     ],
+     [
+      0.5,
+      0.5,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      3,
+      2
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": [
+     0
+    ]
+   },
+   "selection_mode": "polygon",
+   "settings": {
+    "factor": 0.0
+   },
+   "expected": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      0.0
+     ],
+     [
+      0.5,
+      -0.5,
+      0.0
+     ],
+     [
+      -0.5,
+      0.5,
+      0.0
+     ],
+     [
+      0.5,
+      0.5,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      4
+     ],
+     [
+      1,
+      3,
+      4
+     ],
+     [
+      3,
+      2,
+      4
+     ],
+     [
+      2,
+      0,
+      4
+     ]
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": []
+    },
+    "selection_mode_after": "polygon",
+    "message": null
+   }
+  },
+  {
+   "id": "SP02",
+   "description": "Single quad, factor 0.5",
+   "input": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      0.0
+     ],
+     [
+      0.5,
+      -0.5,
+      0.0
+     ],
+     [
+      -0.5,
+      0.5,
+      0.0
+     ],
+     [
+      0.5,
+      0.5,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      3,
+      2
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": [
+     0
+    ]
+   },
+   "selection_mode": "polygon",
+   "settings": {
+    "factor": 0.5
+   },
+   "expected": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      0.0
+     ],
+     [
+      0.5,
+      -0.5,
+      0.0
+     ],
+     [
+      -0.5,
+      0.5,
+      0.0
+     ],
+     [
+      0.5,
+      0.5,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      4
+     ],
+     [
+      1,
+      3,
+      4
+     ],
+     [
+      3,
+      2,
+      4
+     ],
+     [
+      2,
+      0,
+      4
+     ]
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": []
+    },
+    "selection_mode_after": "polygon",
+    "message": null
+   }
+  },
+  {
+   "id": "SP03",
+   "description": "Single quad, factor -0.5",
+   "input": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      0.0
+     ],
+     [
+      0.5,
+      -0.5,
+      0.0
+     ],
+     [
+      -0.5,
+      0.5,
+      0.0
+     ],
+     [
+      0.5,
+      0.5,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      3,
+      2
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": [
+     0
+    ]
+   },
+   "selection_mode": "polygon",
+   "settings": {
+    "factor": -0.5
+   },
+   "expected": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      0.0
+     ],
+     [
+      0.5,
+      -0.5,
+      0.0
+     ],
+     [
+      -0.5,
+      0.5,
+      0.0
+     ],
+     [
+      0.5,
+      0.5,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      -0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      4
+     ],
+     [
+      1,
+      3,
+      4
+     ],
+     [
+      3,
+      2,
+      4
+     ],
+     [
+      2,
+      0,
+      4
+     ]
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": []
+    },
+    "selection_mode_after": "polygon",
+    "message": null
+   }
+  },
+  {
+   "id": "SP04",
+   "description": "2 x 1 rectangle, factor 0.5 (does height scale with size?)",
+   "input": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      2.0,
+      0.0,
+      0.0
+     ],
+     [
+      2.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": [
+     0
+    ]
+   },
+   "selection_mode": "polygon",
+   "settings": {
+    "factor": 0.5
+   },
+   "expected": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      2.0,
+      0.0,
+      0.0
+     ],
+     [
+      2.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.5,
+      0.75
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      4
+     ],
+     [
+      1,
+      2,
+      4
+     ],
+     [
+      2,
+      3,
+      4
+     ],
+     [
+      3,
+      0,
+      4
+     ]
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": []
+    },
+    "selection_mode_after": "polygon",
+    "message": null
+   }
+  },
+  {
+   "id": "SP05",
+   "description": "Triangle, factor 0.5",
+   "input": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": [
+     0
+    ]
+   },
+   "selection_mode": "polygon",
+   "settings": {
+    "factor": 0.5
+   },
+   "expected": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.333333,
+      0.333333,
+      0.569036
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      3
+     ],
+     [
+      1,
+      2,
+      3
+     ],
+     [
+      2,
+      0,
+      3
+     ]
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": []
+    },
+    "selection_mode_after": "polygon",
+    "message": null
+   }
+  },
+  {
+   "id": "SP06",
+   "description": "Non-planar quad, factor 0.5",
+   "input": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.5
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": [
+     0
+    ]
+   },
+   "selection_mode": "polygon",
+   "settings": {
+    "factor": 0.5
+   },
+   "expected": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.5
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.5,
+      0.5,
+      0.654508
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      4
+     ],
+     [
+      1,
+      2,
+      4
+     ],
+     [
+      2,
+      3,
+      4
+     ],
+     [
+      3,
+      0,
+      4
+     ]
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": []
+    },
+    "selection_mode_after": "polygon",
+    "message": null
+   }
+  },
+  {
+   "id": "SP07",
+   "description": "2x2 grid, polygons 0 and 1, factor 0.5",
+   "input": {
+    "points": [
+     [
+      -1.0,
+      -1.0,
+      0.0
+     ],
+     [
+      0.0,
+      -1.0,
+      0.0
+     ],
+     [
+      1.0,
+      -1.0,
+      0.0
+     ],
+     [
+      -1.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      -1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      4,
+      3
+     ],
+     [
+      1,
+      2,
+      5,
+      4
+     ],
+     [
+      3,
+      4,
+      7,
+      6
+     ],
+     [
+      4,
+      5,
+      8,
+      7
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": [
+     0,
+     1
+    ]
+   },
+   "selection_mode": "polygon",
+   "settings": {
+    "factor": 0.5
+   },
+   "expected": {
+    "points": [
+     [
+      -1.0,
+      -1.0,
+      0.0
+     ],
+     [
+      0.0,
+      -1.0,
+      0.0
+     ],
+     [
+      1.0,
+      -1.0,
+      0.0
+     ],
+     [
+      -1.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      -1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      -0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      3,
+      4,
+      7,
+      6
+     ],
+     [
+      4,
+      5,
+      8,
+      7
+     ],
+     [
+      0,
+      1,
+      9
+     ],
+     [
+      1,
+      4,
+      9
+     ],
+     [
+      4,
+      3,
+      9
+     ],
+     [
+      3,
+      0,
+      9
+     ],
+     [
+      1,
+      2,
+      10
+     ],
+     [
+      2,
+      5,
+      10
+     ],
+     [
+      5,
+      4,
+      10
+     ],
+     [
+      4,
+      1,
+      10
+     ]
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": [
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+     ]
+    },
+    "selection_mode_after": "polygon",
+    "message": null
+   }
+  },
+  {
+   "id": "SP08",
+   "description": "Cube top face, factor 1",
+   "input": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      7,
+      6,
+      5,
+      4
+     ],
+     [
+      0,
+      4,
+      5,
+      1
+     ],
+     [
+      1,
+      5,
+      6,
+      2
+     ],
+     [
+      2,
+      6,
+      7,
+      3
+     ],
+     [
+      3,
+      7,
+      4,
+      0
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": [
+     1
+    ]
+   },
+   "selection_mode": "polygon",
+   "settings": {
+    "factor": 1.0
+   },
+   "expected": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      0.5
+     ],
+     [
+      0.0,
+      1.5,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      0,
+      4,
+      5,
+      1
+     ],
+     [
+      1,
+      5,
+      6,
+      2
+     ],
+     [
+      2,
+      6,
+      7,
+      3
+     ],
+     [
+      3,
+      7,
+      4,
+      0
+     ],
+     [
+      7,
+      6,
+      8
+     ],
+     [
+      6,
+      5,
+      8
+     ],
+     [
+      5,
+      4,
+      8
+     ],
+     [
+      4,
+      7,
+      8
+     ]
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": [
+      5,
+      6,
+      7,
+      8
+     ]
+    },
+    "selection_mode_after": "polygon",
+    "message": null
+   }
+  },
+  {
+   "id": "SP09",
+   "description": "2x2 grid, nothing selected, factor 0.5",
+   "input": {
+    "points": [
+     [
+      -1.0,
+      -1.0,
+      0.0
+     ],
+     [
+      0.0,
+      -1.0,
+      0.0
+     ],
+     [
+      1.0,
+      -1.0,
+      0.0
+     ],
+     [
+      -1.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      -1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      4,
+      3
+     ],
+     [
+      1,
+      2,
+      5,
+      4
+     ],
+     [
+      3,
+      4,
+      7,
+      6
+     ],
+     [
+      4,
+      5,
+      8,
+      7
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": []
+   },
+   "selection_mode": "polygon",
+   "settings": {
+    "factor": 0.5
+   },
+   "expected": {
+    "points": [
+     [
+      -1.0,
+      -1.0,
+      0.0
+     ],
+     [
+      0.0,
+      -1.0,
+      0.0
+     ],
+     [
+      1.0,
+      -1.0,
+      0.0
+     ],
+     [
+      -1.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      -1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ],
+     [
+      -0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      0.5
+     ],
+     [
+      0.5,
+      0.5,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      9
+     ],
+     [
+      1,
+      4,
+      9
+     ],
+     [
+      4,
+      3,
+      9
+     ],
+     [
+      3,
+      0,
+      9
+     ],
+     [
+      1,
+      2,
+      10
+     ],
+     [
+      2,
+      5,
+      10
+     ],
+     [
+      5,
+      4,
+      10
+     ],
+     [
+      4,
+      1,
+      10
+     ],
+     [
+      3,
+      4,
+      11
+     ],
+     [
+      4,
+      7,
+      11
+     ],
+     [
+      7,
+      6,
+      11
+     ],
+     [
+      6,
+      3,
+      11
+     ],
+     [
+      4,
+      5,
+      12
+     ],
+     [
+      5,
+      8,
+      12
+     ],
+     [
+      8,
+      7,
+      12
+     ],
+     [
+      7,
+      4,
+      12
+     ]
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": []
+    },
+    "selection_mode_after": "polygon",
+    "message": null
+   }
+  }
+ ]
+}

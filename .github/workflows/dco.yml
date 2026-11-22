@@ -1,0 +1,39 @@
+# Checks that every commit in a pull request ends with a "Signed-off-by:"
+# line (git commit -s), as CONTRIBUTING.md asks. Separate from ci.yml so a
+# missing sign-off shows up as its own check. Runs on GitHub's Linux machine
+# (a few seconds) and uses only git, no third-party actions.
+name: DCO
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  sign-off:
+    name: Signed-off-by check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Every commit has a Signed-off-by line
+        env:
+          BASE: ${{ github.event.pull_request.base.sha }}
+          HEAD: ${{ github.event.pull_request.head.sha }}
+        run: |
+          missing=0
+          # Merge commits are left out: they carry no new work of their own.
+          for sha in $(git rev-list --no-merges "$BASE..$HEAD"); do
+            if ! git log -1 --format=%B "$sha" | grep -q '^Signed-off-by: .\+ <.\+>'; then
+              echo "::error::Commit $(git log -1 --format='%h %s' "$sha") has no Signed-off-by line."
+              missing=1
+            fi
+          done
+          if [ "$missing" = 1 ]; then
+            echo "Add a sign-off to each commit: git commit -s (or git rebase --signoff $BASE). See CONTRIBUTING.md."
+            exit 1
+          fi
+          echo "All commits are signed off."

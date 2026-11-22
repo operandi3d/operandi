@@ -1,0 +1,548 @@
+{
+  "version": 1,
+  "id": "toolbox.uv",
+  "label": "UV",
+  "exported": true,
+  "controls": [
+    {
+      "divider": "UV Tools",
+      "id": "uv-tools"
+    },
+    {
+      "widget": "uv.mapField"
+    },
+    {
+      "divider": ""
+    },
+    {
+      "form": {
+        "style": "horizontal",
+        "icons": "icon",
+        "controls": [
+          {
+            "command": "Move",
+            "label": "Move",
+            "icon": "move"
+          },
+          {
+            "command": "Rotate",
+            "label": "Rotate",
+            "icon": "rotate"
+          },
+          {
+            "command": "Scale",
+            "label": "Scale",
+            "icon": "scale"
+          },
+          {
+            "command": "Transform",
+            "label": "Transform",
+            "icon": "transform"
+          }
+        ]
+      }
+    },
+    {
+      "divider": ""
+    },
+    {
+      "form": "toolbox.uv.ops"
+    },
+    {
+      "divider": "Create"
+    },
+    {
+      "form": {
+        "style": "horizontal",
+        "controls": [
+          {
+            "command": "UV Project",
+            "label": "Project",
+            "tooltip": "Project · UVs for the selected polygons from a Planar, Cylindrical, Spherical, Barycentric or Cubic projection · operandi.uv.project",
+            "look": "framed",
+            "icon": "uv-project"
+          },
+          {
+            "command": "Project from View",
+            "label": "From View",
+            "tooltip": "Project from View · click in a 3D view: the selected polygons get UVs as they look from there · operandi.uv.viewProject",
+            "look": "framed",
+            "icon": "uv-project-view"
+          },
+          {
+            "command": "Unwrap Tool",
+            "label": "Unwrap",
+            "tooltip": "Unwrap · flatten the visible polygons into the UV map along the selected edges, live; drag for Iterations · uv.unwrap",
+            "look": "framed",
+            "icon": "uv-unwrap"
+          }
+        ]
+      }
+    },
+    {
+      "form": {
+        "style": "horizontal",
+        "controls": [
+          {
+            "command": "UV Relax",
+            "label": "Relax",
+            "tooltip": "Relax · smooth the UV map's islands to take out stretch; drag for Iterations · uv.relax",
+            "look": "framed",
+            "icon": "uv-relax"
+          },
+          {
+            "command": "Unwrap & Relax",
+            "label": "Unwrap & Relax",
+            "tooltip": "Unwrap & Relax · unwrap, then relax the result, in one tool · uv.pelt",
+            "look": "framed",
+            "icon": "uv-pelt"
+          },
+          {
+            "command": "Peeler",
+            "label": "Peeler",
+            "tooltip": "Peeler · lay clean quad strips out as a regular grid, cut at the selected edges · operandi.uv.peeler",
+            "look": "framed",
+            "icon": "uv-rectangle"
+          }
+        ]
+      }
+    },
+    {
+      "divider": "Cut Map"
+    },
+    {
+      "form": {
+        "style": "horizontal",
+        "controls": [
+          {
+            "command": "operandi.uv.dialog seamMap",
+            "label": "UV Seam...",
+            "tooltip": "UV Seam... · pick or name the seam map these buttons use (UV Seam to start)",
+            "look": "framed"
+          },
+          {
+            "command": "operandi.uv.seam action:add",
+            "label": "Add Seam",
+            "tooltip": "Add Seam · the selected edges (every edge with none selected) join the seam map",
+            "look": "framed"
+          },
+          {
+            "command": "operandi.uv.seam action:clear",
+            "label": "Clear Seam",
+            "tooltip": "Clear Seam · the selected edges (all with none selected) leave the seam map",
+            "look": "framed"
+          }
+        ]
+      }
+    },
+    {
+      "form": {
+        "style": "horizontal",
+        "controls": [
+          {
+            "command": "operandi.uv.seam action:select",
+            "label": "Select Seam",
+            "tooltip": "Select Seam · select the seam map's edges",
+            "look": "framed"
+          },
+          {
+            "command": "operandi.uv.seam action:marker",
+            "label": "Seam Marker",
+            "tooltip": "Seam Marker · the loop grown from the selected edge goes into the seam map",
+            "look": "framed"
+          },
+          {
+            "command": "operandi.uv.seam action:delete",
+            "label": "Delete Map",
+            "tooltip": "Delete Seam Map · remove the seam map",
+            "look": "framed"
+          }
+        ]
+      }
+    },
+    {
+      "form": {
+        "style": "horizontal",
+        "controls": [
+          {
+            "command": "operandi.uv.unwrapSeams",
+            "label": "Unwrap Tool",
+            "tooltip": "Unwrap Tool · Unwrap cutting at the seam map",
+            "look": "framed"
+          },
+          {
+            "command": "operandi.uv.unwrapSeams pelt",
+            "label": "Unwrap & Relax",
+            "tooltip": "Unwrap & Relax · cutting at the seam map",
+            "look": "framed"
+          }
+        ]
+      }
+    },
+    {
+      "divider": "Align"
+    },
+    {
+      "form": {
+        "style": "horizontal",
+        "controls": [
+          {
+            "command": "operandi.uv.quickAlign mode:auto",
+            "label": "Quick Auto",
+            "tooltip": "Quick Align · turn each island so its first selected edge lies along the nearer axis · Ctrl: options",
+            "look": "framed",
+            "variants": {
+              "ctrl": "operandi.uv.dialog quickAlign"
+            },
+            "icon": "uv-quick-align"
+          },
+          {
+            "command": "operandi.uv.quickAlign mode:horizontal",
+            "label": "Quick U",
+            "tooltip": "Quick Align Horizontal · the first selected edge along U",
+            "look": "framed"
+          },
+          {
+            "command": "operandi.uv.quickAlign mode:vertical",
+            "label": "Quick V",
+            "tooltip": "Quick Align Vertical · the first selected edge along V",
+            "look": "framed"
+          }
+        ]
+      }
+    },
+    {
+      "form": {
+        "style": "horizontal",
+        "controls": [
+          {
+            "command": "operandi.uv.islandAlign u:min",
+            "label": "U Min",
+            "tooltip": "Island Align · line the selected islands' left sides up",
+            "look": "framed",
+            "icon": "uv-island-align"
+          },
+          {
+            "command": "operandi.uv.islandAlign u:center",
+            "label": "U Center",
+            "tooltip": "Island Align · line the selected islands' centres up in U",
+            "look": "framed"
+          },
+          {
+            "command": "operandi.uv.islandAlign u:max",
+            "label": "U Max",
+            "tooltip": "Island Align · line the selected islands' right sides up",
+            "look": "framed"
+          }
+        ]
+      }
+    },
+    {
+      "form": {
+        "style": "horizontal",
+        "controls": [
+          {
+            "command": "operandi.uv.islandAlign v:min",
+            "label": "V Min",
+            "tooltip": "Island Align · line the selected islands' bottoms up",
+            "look": "framed"
+          },
+          {
+            "command": "operandi.uv.islandAlign v:center",
+            "label": "V Center",
+            "tooltip": "Island Align · line the selected islands' middles up in V",
+            "look": "framed"
+          },
+          {
+            "command": "operandi.uv.islandAlign v:max",
+            "label": "V Max",
+            "tooltip": "Island Align · line the selected islands' tops up",
+            "look": "framed"
+          }
+        ]
+      }
+    },
+    {
+      "divider": "Align and Pack"
+    },
+    {
+      "form": {
+        "style": "horizontal",
+        "controls": [
+          {
+            "command": "operandi.uv.orient mode:auto",
+            "label": "Orient Pieces",
+            "tooltip": "Orient Pieces · turn each selected island to sit squarely · Ctrl: options",
+            "look": "framed",
+            "variants": {
+              "ctrl": "operandi.uv.dialog orient"
+            },
+            "icon": "uv-orient"
+          },
+          {
+            "command": "operandi.uv.toOrigin udim:1001",
+            "label": "To Origin",
+            "tooltip": "To Origin · move the selected islands to tile 1001's corner · Ctrl: pick the tile",
+            "look": "framed",
+            "variants": {
+              "ctrl": "operandi.uv.dialog toOrigin"
+            },
+            "icon": "uv-to-origin"
+          },
+          {
+            "command": "Box Transform",
+            "label": "Box",
+            "look": "framed",
+            "tooltip": "Box Transform · move, turn and scale the selected UVs by a box round them (UV view) · operandi.uv.boxTransform",
+            "icon": "transform"
+          }
+        ]
+      }
+    },
+    {
+      "command": "operandi.uv.dialog texel",
+      "label": "Texel Density...",
+      "tooltip": "Texel Density... · scale islands to a density in pixels per metre, or even them out",
+      "look": "framed",
+      "icon": "uv-texel-density"
+    },
+    {
+      "divider": "Symmetry"
+    },
+    {
+      "form": {
+        "style": "horizontal",
+        "controls": [
+          {
+            "command": "operandi.uv.symmetry axis:off",
+            "label": "Sym Off",
+            "tooltip": "UV Symmetry Off",
+            "look": "framed"
+          },
+          {
+            "command": "operandi.uv.symmetry axis:u",
+            "label": "Sym U",
+            "tooltip": "UV Symmetry U · edits in the UV view mirror across the U line at Center",
+            "look": "framed"
+          },
+          {
+            "command": "operandi.uv.symmetry axis:v",
+            "label": "Sym V",
+            "tooltip": "UV Symmetry V · edits in the UV view mirror across the V line at Center",
+            "look": "framed"
+          }
+        ]
+      }
+    },
+    {
+      "form": {
+        "style": "horizontal",
+        "controls": [
+          {
+            "command": "operandi.uv.symmetryCenter",
+            "label": "Center",
+            "tooltip": "Center · weld the UVs lying on the UV symmetry line",
+            "look": "framed"
+          },
+          {
+            "command": "operandi.uv.dialog symmetrize",
+            "label": "Symmetrize...",
+            "tooltip": "Symmetrize... · copy UVs from the other side of a symmetric mesh, mirrored",
+            "look": "framed"
+          }
+        ]
+      }
+    },
+    {
+      "divider": "Split and Sew"
+    },
+    {
+      "form": {
+        "style": "horizontal",
+        "controls": [
+          {
+            "command": "operandi.uv.split",
+            "label": "Split",
+            "tooltip": "Split · split the selected UVs from the rest · Shift: large · Ctrl: medium · Alt: custom distance",
+            "look": "framed",
+            "variants": {
+              "shift": "operandi.uv.split size:large",
+              "ctrl": "operandi.uv.split size:medium",
+              "alt": "operandi.uv.dialog split"
+            },
+            "icon": "uv-split"
+          },
+          {
+            "command": "operandi.uv.sew",
+            "label": "Sew",
+            "tooltip": "Sew · join the selected seams halfway · Shift: the selected side onto the other · Alt: the other side onto the selected · Ctrl: options",
+            "look": "framed",
+            "variants": {
+              "shift": "operandi.uv.sew connect:unselected",
+              "alt": "operandi.uv.sew connect:selected",
+              "ctrl": "operandi.uv.dialog sew"
+            },
+            "icon": "uv-sew"
+          }
+        ]
+      }
+    },
+    {
+      "form": {
+        "style": "horizontal",
+        "controls": [
+          {
+            "command": "operandi.uv.moveSew",
+            "label": "Move and Sew",
+            "tooltip": "Move and Sew · move the island across the seam to meet it, then join · Shift: this island goes · Alt: the other comes · Ctrl: options",
+            "look": "framed",
+            "variants": {
+              "shift": "operandi.uv.moveSew connect:unselected",
+              "alt": "operandi.uv.moveSew connect:selected",
+              "ctrl": "operandi.uv.dialog moveSew"
+            },
+            "icon": "uv-move-sew"
+          },
+          {
+            "command": "operandi.uv.brush split",
+            "label": "Brush",
+            "look": "framed",
+            "tooltip": "Split and Sew brush · brush over UV points in a UV view to split them (Shift: sew); right-drag sizes it; click again to stop · Alt: sew brush",
+            "variants": {
+              "alt": "operandi.uv.brush sew"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "divider": "Utilities"
+    },
+    {
+      "form": {
+        "style": "horizontal",
+        "controls": [
+          {
+            "command": "operandi.uv.selectBorder",
+            "label": "Border",
+            "tooltip": "Select Border · every UV island's outline edges",
+            "look": "framed",
+            "icon": "uv-select-border"
+          },
+          {
+            "command": "operandi.uv.dialog errors",
+            "label": "Error UVs...",
+            "tooltip": "Select Error UVs... · overlapping, twisted, flipped, stacked, tile-crossing or zero-area UV polygons",
+            "look": "framed"
+          },
+          {
+            "command": "operandi.uv.selectUnmapped",
+            "label": "Unmapped",
+            "tooltip": "Select Unmapped · polygons with no UVs in the map · Shift: the mapped ones",
+            "look": "framed",
+            "variants": {
+              "shift": "operandi.uv.selectUnmapped invert:true"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "form": {
+        "style": "horizontal",
+        "controls": [
+          {
+            "command": "operandi.uv.copy",
+            "label": "Copy",
+            "tooltip": "Copy UVs · the selected polygons' UVs onto the UV clipboard",
+            "look": "framed"
+          },
+          {
+            "command": "operandi.uv.cut",
+            "label": "Cut",
+            "tooltip": "Cut UVs · copy, then remove the selected polygons' UVs",
+            "look": "framed"
+          },
+          {
+            "command": "operandi.uv.paste",
+            "label": "Paste",
+            "tooltip": "Paste UVs · onto the selected polygons, matched by topology · Ctrl: options",
+            "look": "framed",
+            "variants": {
+              "ctrl": "operandi.uv.dialog paste"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "form": {
+        "style": "horizontal",
+        "controls": [
+          {
+            "command": "operandi.uv.delete",
+            "label": "Delete",
+            "tooltip": "Delete UVs · the selected polygons become unmapped",
+            "look": "framed"
+          },
+          {
+            "command": "operandi.uv.dialog setValue",
+            "label": "Set Value...",
+            "tooltip": "Set UV Value... · type U or V for the selected UVs",
+            "look": "framed"
+          },
+          {
+            "command": "operandi.uv.rotatePolygons",
+            "label": "Rotate",
+            "tooltip": "Rotate Polygons · each selected polygon's UVs one corner along: the texture turns 90°",
+            "look": "framed"
+          }
+        ]
+      }
+    },
+    {
+      "form": {
+        "style": "horizontal",
+        "controls": [
+          {
+            "command": "operandi.uv.dialog selectTile",
+            "label": "Select Tile...",
+            "tooltip": "UDIM Indicator · select the polygons whose UVs lie in a tile",
+            "look": "framed"
+          },
+          {
+            "command": "operandi.uv.nudgeTile u:-1",
+            "label": "Tile ◀",
+            "tooltip": "Move the selected islands one tile left",
+            "look": "framed"
+          },
+          {
+            "command": "operandi.uv.nudgeTile u:1",
+            "label": "Tile ▶",
+            "tooltip": "Move the selected islands one tile right",
+            "look": "framed"
+          }
+        ]
+      }
+    },
+    {
+      "form": {
+        "style": "horizontal",
+        "controls": [
+          {
+            "command": "operandi.uv.nudgeTile v:1",
+            "label": "Tile ▲",
+            "tooltip": "Move the selected islands one tile up",
+            "look": "framed"
+          },
+          {
+            "command": "operandi.uv.nudgeTile v:-1",
+            "label": "Tile ▼",
+            "tooltip": "Move the selected islands one tile down",
+            "look": "framed"
+          }
+        ]
+      }
+    }
+  ]
+}

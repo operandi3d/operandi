@@ -1,0 +1,17 @@
+[package]
+name = "operandi-paint"
+version = "0.1.0"
+edition = "2024"
+license = "GPL-3.0-or-later"
+description = "Operandi's paintable images: pixel buffers, image commands and file I/O (3D painting, PNT stage 1)"
+
+# Only the app's `painting` feature links this crate (through
+# operandi-core/painting); release and tester builds leave it out.
+
+[dependencies]
+# Reading and writing PNG, TGA, TIFF, JPEG and OpenEXR images; already in
+# the build through operandi-app, same version and features.
+image = { version = "=0.25.10", default-features = false, features = ["png", "jpeg", "exr", "tiff", "tga"] }
+# Photoshop PSD/PSB reading and writing (PNT-300..309): craft-libs' psd
+# crate, vendored (MIT OR Apache-2.0, vendor/craft-psd/OPERANDI.md).
+craft-psd = { path = "../../vendor/craft-psd" }

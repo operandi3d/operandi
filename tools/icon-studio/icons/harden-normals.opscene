@@ -1,0 +1,3424 @@
+{
+  "format": "Operandi",
+  "version": 44,
+  "scene": {
+    "items": [
+      {
+        "id": 1,
+        "name": "Icon Camera",
+        "visible": true,
+        "transform": {
+          "translation": [
+            5.773502691896258,
+            5.773502691896258,
+            5.773502691896258
+          ],
+          "rotation": [
+            -0.6154797086703873,
+            0.7853981633974484,
+            -3.925231146709438e-17
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "zxy": false
+        },
+        "mesh": {
+          "attributes": {
+            "representations": [],
+            "creases": [],
+            "uv_records": {},
+            "corner_normals": {},
+            "point_weights": {},
+            "point_colors": {},
+            "degenerate_faces": []
+          },
+          "vertices": [],
+          "faces": [],
+          "uv_maps": {}
+        },
+        "parent": null,
+        "source_id": null,
+        "source_display_name": null,
+        "camera": {
+          "projection": "Orthographic",
+          "focal_length": 0.05,
+          "film_width": 0.036,
+          "film_height": 0.024,
+          "film_offset": [
+            0.0,
+            0.0
+          ],
+          "film_fit": "Fill",
+          "target_distance": 4.2195833333333335,
+          "focus_distance": 10.0,
+          "clipping": false,
+          "clip_near": 4.0,
+          "clip_far": 100000.0,
+          "stored": {
+            "lens_squeeze": 1.0,
+            "film_roll": 0.0,
+            "display_size": 0.0,
+            "overscan": 1.0
+          },
+          "lens_distortion": 0.0,
+          "dof": {
+            "enable": false,
+            "f_stop": 4.0,
+            "iris_blades": 0,
+            "iris_rotation": 0.0,
+            "edge_weighting": 0.5
+          },
+          "resolution": {
+            "enable": false,
+            "width": 1920,
+            "height": 1080
+          },
+          "background": {
+            "enable": true,
+            "image": null
+          },
+          "focus_from_target": false
+        }
+      },
+      {
+        "id": 2,
+        "name": "Key Light",
+        "visible": true,
+        "transform": {
+          "translation": [
+            -0.7822861984651435,
+            9.289648606773577,
+            3.618073667901288
+          ],
+          "rotation": [
+            -1.1916065542642842,
+            -0.21293834957939717,
+            0.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "zxy": false
+        },
+        "mesh": {
+          "attributes": {
+            "representations": [],
+            "creases": [],
+            "uv_records": {},
+            "corner_normals": {},
+            "point_weights": {},
+            "point_colors": {},
+            "degenerate_faces": []
+          },
+          "vertices": [],
+          "faces": [],
+          "uv_maps": {}
+        },
+        "parent": null,
+        "source_id": null,
+        "source_display_name": null,
+        "light": {
+          "kind": "Directional",
+          "render": "Default",
+          "dissolve": 0.0,
+          "intensity": 2.54,
+          "shadow": "RayTraced",
+          "visible_to_camera": false,
+          "spread_angle": 0.05235987755982989,
+          "color": [
+            1.0,
+            0.97,
+            0.86
+          ],
+          "affect_diffuse": 1.0,
+          "affect_specular": 1.0,
+          "radius": 0.0,
+          "falloff": "InverseDistanceSquared",
+          "cone_angle": 0.7853981633974483,
+          "soft_edge": 0.08726646259971647,
+          "shape": "Rectangular",
+          "width": 1.0,
+          "height": 1.0,
+          "environment_only": false,
+          "length": 1.0,
+          "use_prototype_transform": true,
+          "stored": {
+            "visible_to_reflection": false,
+            "visible_to_refraction": false,
+            "samples": 64,
+            "importance": 1.0,
+            "display_size": 1.0,
+            "shadow_map_size": 2.0,
+            "shadow_color": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "affect_caustics": 1.0,
+            "affect_subsurface": 1.0,
+            "material_enabled": true,
+            "opacity": 1.0
+          }
+        }
+      },
+      {
+        "id": 3,
+        "name": "Icon Sky",
+        "visible": true,
+        "transform": {
+          "translation": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "zxy": false
+        },
+        "mesh": {
+          "attributes": {
+            "representations": [],
+            "creases": [],
+            "uv_records": {},
+            "corner_normals": {},
+            "point_weights": {},
+            "point_colors": {},
+            "degenerate_faces": []
+          },
+          "vertices": [],
+          "faces": [],
+          "uv_maps": {}
+        },
+        "parent": null,
+        "source_id": null,
+        "source_display_name": null,
+        "environment": {
+          "intensity": 1.0,
+          "visible_to_camera": true,
+          "visible_to_indirect": true,
+          "visible_to_reflection": true,
+          "visible_to_refraction": true,
+          "material": {
+            "id": 4294967297,
+            "name": "Environment Material",
+            "layer": {
+              "enable": true,
+              "invert": false,
+              "blend": "Normal",
+              "opacity": 1.0
+            },
+            "settings": {
+              "kind": "FourColor",
+              "zenith": [
+                0.194,
+                0.225,
+                0.252
+              ],
+              "sky": [
+                0.167,
+                0.194,
+                0.239
+              ],
+              "ground": [
+                0.117,
+                0.14,
+                0.171
+              ],
+              "nadir": [
+                0.081,
+                0.095,
+                0.122
+              ],
+              "sky_exponent": 2.0,
+              "ground_exponent": 2.0,
+              "daylight": {
+                "disc_size": 1.0,
+                "haze": 2.0,
+                "clamp_sky_brightness": true,
+                "sky_gamma": 1.0,
+                "ground_albedo": [
+                  0.5,
+                  0.5,
+                  0.5
+                ],
+                "disc_color": [
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "disc_in_scatter": 0.0
+              },
+              "fog": {
+                "fog_type": "None",
+                "start": 0.0,
+                "end": 10.0,
+                "density": 0.1,
+                "base_altitude": 0.0,
+                "altitude_falloff": 0.5
+              }
+            }
+          }
+        }
+      },
+      {
+        "id": 4,
+        "name": "harden-normals",
+        "visible": true,
+        "transform": {
+          "translation": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "zxy": false
+        },
+        "mesh": {
+          "attributes": {
+            "representations": [],
+            "creases": [],
+            "uv_records": {},
+            "corner_normals": {},
+            "point_weights": {},
+            "point_colors": {},
+            "degenerate_faces": []
+          },
+          "vertices": [
+            [
+              -0.42000000000000004,
+              -0.42000000000000004,
+              -0.42000000000000004
+            ],
+            [
+              0.21999999999999997,
+              -0.42000000000000004,
+              -0.42000000000000004
+            ],
+            [
+              0.21999999999999997,
+              0.21999999999999997,
+              -0.42000000000000004
+            ],
+            [
+              -0.42000000000000004,
+              0.21999999999999997,
+              -0.42000000000000004
+            ],
+            [
+              -0.42000000000000004,
+              -0.42000000000000004,
+              0.21999999999999997
+            ],
+            [
+              0.21999999999999997,
+              -0.42000000000000004,
+              0.21999999999999997
+            ],
+            [
+              0.21999999999999997,
+              0.21999999999999997,
+              0.21999999999999997
+            ],
+            [
+              -0.42000000000000004,
+              0.21999999999999997,
+              0.21999999999999997
+            ],
+            [
+              0.22,
+              -0.42000000000000004,
+              0.18
+            ],
+            [
+              0.19648858990830106,
+              -0.42000000000000004,
+              0.1876393202250021
+            ],
+            [
+              0.18195773934819387,
+              -0.42000000000000004,
+              0.2076393202250021
+            ],
+            [
+              0.18195773934819387,
+              -0.42000000000000004,
+              0.23236067977499789
+            ],
+            [
+              0.19648858990830106,
+              -0.42000000000000004,
+              0.2523606797749979
+            ],
+            [
+              0.22,
+              -0.42000000000000004,
+              0.26
+            ],
+            [
+              0.2435114100916989,
+              -0.42000000000000004,
+              0.2523606797749979
+            ],
+            [
+              0.25804226065180613,
+              -0.42000000000000004,
+              0.2323606797749979
+            ],
+            [
+              0.25804226065180613,
+              -0.42000000000000004,
+              0.20763932022500212
+            ],
+            [
+              0.24351141009169894,
+              -0.42000000000000004,
+              0.1876393202250021
+            ],
+            [
+              0.22,
+              0.22,
+              0.18
+            ],
+            [
+              0.19648858990830106,
+              0.22,
+              0.1876393202250021
+            ],
+            [
+              0.18195773934819387,
+              0.22,
+              0.2076393202250021
+            ],
+            [
+              0.18195773934819387,
+              0.22,
+              0.23236067977499789
+            ],
+            [
+              0.19648858990830106,
+              0.22,
+              0.2523606797749979
+            ],
+            [
+              0.22,
+              0.22,
+              0.26
+            ],
+            [
+              0.2435114100916989,
+              0.22,
+              0.2523606797749979
+            ],
+            [
+              0.25804226065180613,
+              0.22,
+              0.2323606797749979
+            ],
+            [
+              0.25804226065180613,
+              0.22,
+              0.20763932022500212
+            ],
+            [
+              0.24351141009169894,
+              0.22,
+              0.1876393202250021
+            ],
+            [
+              0.24,
+              -0.05500000000000001,
+              0.22
+            ],
+            [
+              0.24,
+              -0.061028856829700266,
+              0.2425
+            ],
+            [
+              0.24,
+              -0.0775,
+              0.25897114317029973
+            ],
+            [
+              0.24,
+              -0.1,
+              0.265
+            ],
+            [
+              0.24,
+              -0.1225,
+              0.25897114317029973
+            ],
+            [
+              0.24,
+              -0.13897114317029974,
+              0.2425
+            ],
+            [
+              0.24,
+              -0.14500000000000002,
+              0.22
+            ],
+            [
+              0.24,
+              -0.13897114317029974,
+              0.1975
+            ],
+            [
+              0.24,
+              -0.12250000000000003,
+              0.18102885682970027
+            ],
+            [
+              0.24,
+              -0.10000000000000002,
+              0.175
+            ],
+            [
+              0.24,
+              -0.0775,
+              0.18102885682970027
+            ],
+            [
+              0.24,
+              -0.06102885682970028,
+              0.19749999999999998
+            ],
+            [
+              0.6184,
+              -0.05500000000000001,
+              0.22
+            ],
+            [
+              0.6184,
+              -0.061028856829700266,
+              0.2425
+            ],
+            [
+              0.6184,
+              -0.0775,
+              0.25897114317029973
+            ],
+            [
+              0.6184,
+              -0.1,
+              0.265
+            ],
+            [
+              0.6184,
+              -0.1225,
+              0.25897114317029973
+            ],
+            [
+              0.6184,
+              -0.13897114317029974,
+              0.2425
+            ],
+            [
+              0.6184,
+              -0.14500000000000002,
+              0.22
+            ],
+            [
+              0.6184,
+              -0.13897114317029974,
+              0.1975
+            ],
+            [
+              0.6184,
+              -0.12250000000000003,
+              0.18102885682970027
+            ],
+            [
+              0.6184,
+              -0.10000000000000002,
+              0.175
+            ],
+            [
+              0.6184,
+              -0.0775,
+              0.18102885682970027
+            ],
+            [
+              0.6184,
+              -0.06102885682970028,
+              0.19749999999999998
+            ],
+            [
+              0.6184,
+              -0.1,
+              0.22
+            ],
+            [
+              0.6184,
+              -0.24399999999999997,
+              0.22
+            ],
+            [
+              0.6184,
+              -0.23303865268162527,
+              0.2751064142605729
+            ],
+            [
+              0.6184,
+              -0.20182337649086285,
+              0.3218233764908628
+            ],
+            [
+              0.6184,
+              -0.15510641426057292,
+              0.35303865268162526
+            ],
+            [
+              0.6184,
+              -0.10000000000000002,
+              0.364
+            ],
+            [
+              0.6184,
+              -0.044893585739427096,
+              0.35303865268162526
+            ],
+            [
+              0.6184,
+              0.0018233764908627964,
+              0.32182337649086284
+            ],
+            [
+              0.6184,
+              0.03303865268162526,
+              0.2751064142605729
+            ],
+            [
+              0.6184,
+              0.043999999999999956,
+              0.22000000000000003
+            ],
+            [
+              0.6184,
+              0.03303865268162526,
+              0.1648935857394271
+            ],
+            [
+              0.6184,
+              0.001823376490862838,
+              0.1181766235091372
+            ],
+            [
+              0.6184,
+              -0.044893585739427005,
+              0.0869613473183748
+            ],
+            [
+              0.6184,
+              -0.09999999999999998,
+              0.07600000000000004
+            ],
+            [
+              0.6184,
+              -0.15510641426057295,
+              0.08696134731837477
+            ],
+            [
+              0.6184,
+              -0.2018233764908628,
+              0.11817662350913716
+            ],
+            [
+              0.6184,
+              -0.2330386526816252,
+              0.164893585739427
+            ],
+            [
+              0.8199999999999998,
+              -0.1,
+              0.22
+            ],
+            [
+              0.22,
+              -0.05500000000000001,
+              0.24
+            ],
+            [
+              0.1975,
+              -0.061028856829700266,
+              0.24
+            ],
+            [
+              0.18102885682970027,
+              -0.0775,
+              0.24
+            ],
+            [
+              0.175,
+              -0.1,
+              0.24
+            ],
+            [
+              0.18102885682970027,
+              -0.1225,
+              0.24
+            ],
+            [
+              0.1975,
+              -0.13897114317029974,
+              0.24
+            ],
+            [
+              0.22,
+              -0.14500000000000002,
+              0.24
+            ],
+            [
+              0.2425,
+              -0.13897114317029974,
+              0.24
+            ],
+            [
+              0.25897114317029973,
+              -0.12250000000000003,
+              0.24
+            ],
+            [
+              0.265,
+              -0.10000000000000002,
+              0.24
+            ],
+            [
+              0.25897114317029973,
+              -0.0775,
+              0.24
+            ],
+            [
+              0.24250000000000002,
+              -0.06102885682970028,
+              0.24
+            ],
+            [
+              0.22,
+              -0.05500000000000001,
+              0.6184
+            ],
+            [
+              0.1975,
+              -0.061028856829700266,
+              0.6184
+            ],
+            [
+              0.18102885682970027,
+              -0.0775,
+              0.6184
+            ],
+            [
+              0.175,
+              -0.1,
+              0.6184
+            ],
+            [
+              0.18102885682970027,
+              -0.1225,
+              0.6184
+            ],
+            [
+              0.1975,
+              -0.13897114317029974,
+              0.6184
+            ],
+            [
+              0.22,
+              -0.14500000000000002,
+              0.6184
+            ],
+            [
+              0.2425,
+              -0.13897114317029974,
+              0.6184
+            ],
+            [
+              0.25897114317029973,
+              -0.12250000000000003,
+              0.6184
+            ],
+            [
+              0.265,
+              -0.10000000000000002,
+              0.6184
+            ],
+            [
+              0.25897114317029973,
+              -0.0775,
+              0.6184
+            ],
+            [
+              0.24250000000000002,
+              -0.06102885682970028,
+              0.6184
+            ],
+            [
+              0.22,
+              -0.1,
+              0.6184
+            ],
+            [
+              0.364,
+              -0.1,
+              0.6184
+            ],
+            [
+              0.35303865268162526,
+              -0.15510641426057292,
+              0.6184
+            ],
+            [
+              0.32182337649086284,
+              -0.2018233764908628,
+              0.6184
+            ],
+            [
+              0.2751064142605729,
+              -0.23303865268162527,
+              0.6184
+            ],
+            [
+              0.22,
+              -0.24399999999999997,
+              0.6184
+            ],
+            [
+              0.16489358573942708,
+              -0.23303865268162527,
+              0.6184
+            ],
+            [
+              0.1181766235091372,
+              -0.20182337649086285,
+              0.6184
+            ],
+            [
+              0.08696134731837474,
+              -0.15510641426057292,
+              0.6184
+            ],
+            [
+              0.07600000000000004,
+              -0.10000000000000002,
+              0.6184
+            ],
+            [
+              0.08696134731837474,
+              -0.04489358573942711,
+              0.6184
+            ],
+            [
+              0.11817662350913716,
+              0.0018233764908627964,
+              0.6184
+            ],
+            [
+              0.164893585739427,
+              0.0330386526816252,
+              0.6184
+            ],
+            [
+              0.21999999999999997,
+              0.043999999999999956,
+              0.6184
+            ],
+            [
+              0.2751064142605729,
+              0.03303865268162523,
+              0.6184
+            ],
+            [
+              0.3218233764908628,
+              0.001823376490862838,
+              0.6184
+            ],
+            [
+              0.3530386526816252,
+              -0.044893585739427,
+              0.6184
+            ],
+            [
+              0.22,
+              -0.1,
+              0.8199999999999998
+            ]
+          ],
+          "faces": [
+            {
+              "vertices": [
+                0,
+                3,
+                2,
+                1
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                4,
+                5,
+                6,
+                7
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                0,
+                4,
+                7,
+                3
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                1,
+                2,
+                6,
+                5
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                0,
+                1,
+                5,
+                4
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                3,
+                7,
+                6,
+                2
+              ],
+              "uv": null,
+              "material": "Clay",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                8,
+                9,
+                19,
+                18
+              ],
+              "uv": null,
+              "material": "Selected",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                9,
+                10,
+                20,
+                19
+              ],
+              "uv": null,
+              "material": "Selected",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                10,
+                11,
+                21,
+                20
+              ],
+              "uv": null,
+              "material": "Selected",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                11,
+                12,
+                22,
+                21
+              ],
+              "uv": null,
+              "material": "Selected",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                12,
+                13,
+                23,
+                22
+              ],
+              "uv": null,
+              "material": "Selected",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                13,
+                14,
+                24,
+                23
+              ],
+              "uv": null,
+              "material": "Selected",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                14,
+                15,
+                25,
+                24
+              ],
+              "uv": null,
+              "material": "Selected",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                15,
+                16,
+                26,
+                25
+              ],
+              "uv": null,
+              "material": "Selected",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                16,
+                17,
+                27,
+                26
+              ],
+              "uv": null,
+              "material": "Selected",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                17,
+                8,
+                18,
+                27
+              ],
+              "uv": null,
+              "material": "Selected",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                17,
+                16,
+                15,
+                14,
+                13,
+                12,
+                11,
+                10,
+                9,
+                8
+              ],
+              "uv": null,
+              "material": "Selected",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                18,
+                19,
+                20,
+                21,
+                22,
+                23,
+                24,
+                25,
+                26,
+                27
+              ],
+              "uv": null,
+              "material": "Selected",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                28,
+                29,
+                41,
+                40
+              ],
+              "uv": null,
+              "material": "New",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                29,
+                30,
+                42,
+                41
+              ],
+              "uv": null,
+              "material": "New",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                30,
+                31,
+                43,
+                42
+              ],
+              "uv": null,
+              "material": "New",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                31,
+                32,
+                44,
+                43
+              ],
+              "uv": null,
+              "material": "New",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                32,
+                33,
+                45,
+                44
+              ],
+              "uv": null,
+              "material": "New",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                33,
+                34,
+                46,
+                45
+              ],
+              "uv": null,
+              "material": "New",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                34,
+                35,
+                47,
+                46
+              ],
+              "uv": null,
+              "material": "New",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                35,
+                36,
+                48,
+                47
+              ],
+              "uv": null,
+              "material": "New",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                36,
+                37,
+                49,
+                48
+              ],
+              "uv": null,
+              "material": "New",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                37,
+                38,
+                50,
+                49
+              ],
+              "uv": null,
+              "material": "New",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                38,
+                39,
+                51,
+                50
+              ],
+              "uv": null,
+              "material": "New",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                39,
+                28,
+                40,
+                51
+              ],
+              "uv": null,
+              "material": "New",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                39,
+                38,
+                37,
+                36,
+                35,
+                34,
+                33,
+                32,
+                31,
+                30,
+                29,
+                28
+              ],
+              "uv": null,
+              "material": "New",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                40,
+                41,
+                42,
+                43,
+                44,
+                45,
+                46,
+                47,
+                48,
+                49,
+                50,
+                51
+              ],
+              "uv": null,
+              "material": "New",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                52,
+                53,
+                54
+              ],
+              "uv": null,
+              "material": "New",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                52,
+                54,
+                55
+              ],
+              "uv": null,
+              "material": "New",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                52,
+                55,
+                56
+              ],
+              "uv": null,
+              "material": "New",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                52,
+                56,
+                57
+              ],
+              "uv": null,
+              "material": "New",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                52,
+                57,
+                58
+              ],
+              "uv": null,
+              "material": "New",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                52,
+                58,
+                59
+              ],
+              "uv": null,
+              "material": "New",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                52,
+                59,
+                60
+              ],
+              "uv": null,
+              "material": "New",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                52,
+                60,
+                61
+              ],
+              "uv": null,
+              "material": "New",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                52,
+                61,
+                62
+              ],
+              "uv": null,
+              "material": "New",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                52,
+                62,
+                63
+              ],
+              "uv": null,
+              "material": "New",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                52,
+                63,
+                64
+              ],
+              "uv": null,
+              "material": "New",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                52,
+                64,
+                65
+              ],
+              "uv": null,
+              "material": "New",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                52,
+                65,
+                66
+              ],
+              "uv": null,
+              "material": "New",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                52,
+                66,
+                67
+              ],
+              "uv": null,
+              "material": "New",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                52,
+                67,
+                68
+              ],
+              "uv": null,
+              "material": "New",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                52,
+                68,
+                53
+              ],
+              "uv": null,
+              "material": "New",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                53,
+                69,
+                54
+              ],
+              "uv": null,
+              "material": "New",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                54,
+                69,
+                55
+              ],
+              "uv": null,
+              "material": "New",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                55,
+                69,
+                56
+              ],
+              "uv": null,
+              "material": "New",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                56,
+                69,
+                57
+              ],
+              "uv": null,
+              "material": "New",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                57,
+                69,
+                58
+              ],
+              "uv": null,
+              "material": "New",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                58,
+                69,
+                59
+              ],
+              "uv": null,
+              "material": "New",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                59,
+                69,
+                60
+              ],
+              "uv": null,
+              "material": "New",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                60,
+                69,
+                61
+              ],
+              "uv": null,
+              "material": "New",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                61,
+                69,
+                62
+              ],
+              "uv": null,
+              "material": "New",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                62,
+                69,
+                63
+              ],
+              "uv": null,
+              "material": "New",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                63,
+                69,
+                64
+              ],
+              "uv": null,
+              "material": "New",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                64,
+                69,
+                65
+              ],
+              "uv": null,
+              "material": "New",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                65,
+                69,
+                66
+              ],
+              "uv": null,
+              "material": "New",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                66,
+                69,
+                67
+              ],
+              "uv": null,
+              "material": "New",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                67,
+                69,
+                68
+              ],
+              "uv": null,
+              "material": "New",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                68,
+                69,
+                53
+              ],
+              "uv": null,
+              "material": "New",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                70,
+                71,
+                83,
+                82
+              ],
+              "uv": null,
+              "material": "New",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                71,
+                72,
+                84,
+                83
+              ],
+              "uv": null,
+              "material": "New",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                72,
+                73,
+                85,
+                84
+              ],
+              "uv": null,
+              "material": "New",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                73,
+                74,
+                86,
+                85
+              ],
+              "uv": null,
+              "material": "New",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                74,
+                75,
+                87,
+                86
+              ],
+              "uv": null,
+              "material": "New",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                75,
+                76,
+                88,
+                87
+              ],
+              "uv": null,
+              "material": "New",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                76,
+                77,
+                89,
+                88
+              ],
+              "uv": null,
+              "material": "New",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                77,
+                78,
+                90,
+                89
+              ],
+              "uv": null,
+              "material": "New",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                78,
+                79,
+                91,
+                90
+              ],
+              "uv": null,
+              "material": "New",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                79,
+                80,
+                92,
+                91
+              ],
+              "uv": null,
+              "material": "New",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                80,
+                81,
+                93,
+                92
+              ],
+              "uv": null,
+              "material": "New",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                81,
+                70,
+                82,
+                93
+              ],
+              "uv": null,
+              "material": "New",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                81,
+                80,
+                79,
+                78,
+                77,
+                76,
+                75,
+                74,
+                73,
+                72,
+                71,
+                70
+              ],
+              "uv": null,
+              "material": "New",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                82,
+                83,
+                84,
+                85,
+                86,
+                87,
+                88,
+                89,
+                90,
+                91,
+                92,
+                93
+              ],
+              "uv": null,
+              "material": "New",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                94,
+                95,
+                96
+              ],
+              "uv": null,
+              "material": "New",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                94,
+                96,
+                97
+              ],
+              "uv": null,
+              "material": "New",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                94,
+                97,
+                98
+              ],
+              "uv": null,
+              "material": "New",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                94,
+                98,
+                99
+              ],
+              "uv": null,
+              "material": "New",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                94,
+                99,
+                100
+              ],
+              "uv": null,
+              "material": "New",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                94,
+                100,
+                101
+              ],
+              "uv": null,
+              "material": "New",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                94,
+                101,
+                102
+              ],
+              "uv": null,
+              "material": "New",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                94,
+                102,
+                103
+              ],
+              "uv": null,
+              "material": "New",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                94,
+                103,
+                104
+              ],
+              "uv": null,
+              "material": "New",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                94,
+                104,
+                105
+              ],
+              "uv": null,
+              "material": "New",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                94,
+                105,
+                106
+              ],
+              "uv": null,
+              "material": "New",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                94,
+                106,
+                107
+              ],
+              "uv": null,
+              "material": "New",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                94,
+                107,
+                108
+              ],
+              "uv": null,
+              "material": "New",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                94,
+                108,
+                109
+              ],
+              "uv": null,
+              "material": "New",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                94,
+                109,
+                110
+              ],
+              "uv": null,
+              "material": "New",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                94,
+                110,
+                95
+              ],
+              "uv": null,
+              "material": "New",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                95,
+                111,
+                96
+              ],
+              "uv": null,
+              "material": "New",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                96,
+                111,
+                97
+              ],
+              "uv": null,
+              "material": "New",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                97,
+                111,
+                98
+              ],
+              "uv": null,
+              "material": "New",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                98,
+                111,
+                99
+              ],
+              "uv": null,
+              "material": "New",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                99,
+                111,
+                100
+              ],
+              "uv": null,
+              "material": "New",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                100,
+                111,
+                101
+              ],
+              "uv": null,
+              "material": "New",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                101,
+                111,
+                102
+              ],
+              "uv": null,
+              "material": "New",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                102,
+                111,
+                103
+              ],
+              "uv": null,
+              "material": "New",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                103,
+                111,
+                104
+              ],
+              "uv": null,
+              "material": "New",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                104,
+                111,
+                105
+              ],
+              "uv": null,
+              "material": "New",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                105,
+                111,
+                106
+              ],
+              "uv": null,
+              "material": "New",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                106,
+                111,
+                107
+              ],
+              "uv": null,
+              "material": "New",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                107,
+                111,
+                108
+              ],
+              "uv": null,
+              "material": "New",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                108,
+                111,
+                109
+              ],
+              "uv": null,
+              "material": "New",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                109,
+                111,
+                110
+              ],
+              "uv": null,
+              "material": "New",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            },
+            {
+              "vertices": [
+                110,
+                111,
+                95
+              ],
+              "uv": null,
+              "material": "New",
+              "smooth": false,
+              "part": null,
+              "material_label": null
+            }
+          ],
+          "uv_maps": {}
+        },
+        "parent": null,
+        "source_id": null,
+        "source_display_name": null
+      }
+    ],
+    "next_id": 5,
+    "selection": {
+      "item": 4,
+      "mode": "Polygon",
+      "vertices": [],
+      "edges": [],
+      "faces": []
+    },
+    "workplane": {
+      "fixed": false,
+      "plane": 0,
+      "center": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "import_source": null,
+    "render": {
+      "samples": 512,
+      "denoise": false,
+      "adaptive_threshold": 0.0,
+      "frame": [
+        32,
+        32
+      ],
+      "diffuse_depth": 7,
+      "reflection_depth": 7,
+      "refraction_depth": 7,
+      "max_radiance": 10.0,
+      "caustics": "Both",
+      "preview_convergence": 1.0,
+      "preview_time_limit": 0.0
+    },
+    "render_camera": 1,
+    "shader_tree": {
+      "nodes": [
+        {
+          "id": 1,
+          "parent": null,
+          "name": "Alpha Output",
+          "layer": {
+            "enable": true,
+            "invert": false,
+            "blend": "Normal",
+            "opacity": 1.0
+          },
+          "kind": {
+            "RenderOutput": "Alpha"
+          }
+        },
+        {
+          "id": 2,
+          "parent": null,
+          "name": "Final Color Output",
+          "layer": {
+            "enable": true,
+            "invert": false,
+            "blend": "Normal",
+            "opacity": 1.0
+          },
+          "kind": {
+            "RenderOutput": "FinalColor"
+          }
+        },
+        {
+          "id": 3,
+          "parent": null,
+          "name": "Base Shader",
+          "layer": {
+            "enable": true,
+            "invert": false,
+            "blend": "Normal",
+            "opacity": 1.0
+          },
+          "kind": {
+            "Shader": {
+              "effect": "FullShading",
+              "gl_display": true,
+              "cast_shadows": true,
+              "receive_shadows": true,
+              "visible_to_camera": true,
+              "visible_to_indirect": true,
+              "visible_to_reflection": true,
+              "visible_to_refraction": true,
+              "alpha_type": "Opacity",
+              "alpha_value": 1.0
+            }
+          }
+        },
+        {
+          "id": 17,
+          "parent": null,
+          "name": "Ink",
+          "layer": {
+            "enable": true,
+            "invert": false,
+            "blend": "Normal",
+            "opacity": 1.0
+          },
+          "kind": {
+            "Group": {
+              "item": "All",
+              "tag_type": "Material",
+              "tag": {
+                "Name": "Ink"
+              },
+              "scope": "Surface",
+              "apply_to_sub_group": false,
+              "apply_to_instances": true
+            }
+          }
+        },
+        {
+          "id": 18,
+          "parent": 17,
+          "name": "Ink Material",
+          "layer": {
+            "enable": true,
+            "invert": false,
+            "blend": "Normal",
+            "opacity": 1.0
+          },
+          "kind": {
+            "Material": {
+              "shading_model": "Principled",
+              "gl_display": true,
+              "diffuse_color": [
+                0.019382360956935723,
+                0.03433980680868217,
+                0.05448027644244237
+              ],
+              "diffuse_amount": 0.8,
+              "diffuse_roughness": 0.0,
+              "specular_color": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "specular_amount": 0.5,
+              "fresnel": 1.0,
+              "roughness": 0.7,
+              "anisotropy": 0.0,
+              "match_specular": true,
+              "reflection_color": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "reflection_amount": 0.0,
+              "reflection_fresnel": 0.0,
+              "clearcoat_amount": 0.0,
+              "clearcoat_roughness": 0.0,
+              "clearcoat_bump": 1.0,
+              "metallic": 0.0,
+              "sheen": 0.0,
+              "sheen_tint": 0.0,
+              "specular_tint": 0.0,
+              "flatness": 0.0,
+              "transparent_color": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "transparent_amount": 0.0,
+              "refractive_index": 1.0,
+              "refraction_roughness": 0.0,
+              "absorption_distance": 0.0,
+              "dissolve": 0.0,
+              "subsurface_color": [
+                0.8,
+                0.8,
+                0.8
+              ],
+              "subsurface_amount": 0.0,
+              "subsurface_distance": 0.005,
+              "luminous_color": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "luminous_intensity": 0.0,
+              "bump_amplitude": 0.0,
+              "displacement_distance": 0.0,
+              "smoothing": 1.0,
+              "smoothing_angle": 40.0,
+              "double_sided": false,
+              "openpbr": {
+                "coat_color": [
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "coat_ior": 1.6,
+                "coat_darkening": 1.0,
+                "coat_roughness_anisotropy": 0.0,
+                "fuzz_color": [
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "fuzz_roughness": 0.5,
+                "thin_film_weight": 0.0,
+                "thin_film_thickness": 0.5,
+                "thin_film_ior": 1.4,
+                "dispersion_abbe_number": 20.0,
+                "transmission_scatter": [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "transmission_scatter_anisotropy": 0.0,
+                "thin_walled": false,
+                "subsurface_albedo": [
+                  0.8,
+                  0.8,
+                  0.8
+                ],
+                "subsurface_uses_diffuse": false
+              }
+            }
+          }
+        },
+        {
+          "id": 15,
+          "parent": null,
+          "name": "Glow",
+          "layer": {
+            "enable": true,
+            "invert": false,
+            "blend": "Normal",
+            "opacity": 1.0
+          },
+          "kind": {
+            "Group": {
+              "item": "All",
+              "tag_type": "Material",
+              "tag": {
+                "Name": "Glow"
+              },
+              "scope": "Surface",
+              "apply_to_sub_group": false,
+              "apply_to_instances": true
+            }
+          }
+        },
+        {
+          "id": 16,
+          "parent": 15,
+          "name": "Glow Material",
+          "layer": {
+            "enable": true,
+            "invert": false,
+            "blend": "Normal",
+            "opacity": 1.0
+          },
+          "kind": {
+            "Material": {
+              "shading_model": "Principled",
+              "gl_display": true,
+              "diffuse_color": [
+                1.0,
+                0.7758222183174236,
+                0.35153259950043936
+              ],
+              "diffuse_amount": 0.8,
+              "diffuse_roughness": 0.0,
+              "specular_color": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "specular_amount": 0.5,
+              "fresnel": 1.0,
+              "roughness": 0.5,
+              "anisotropy": 0.0,
+              "match_specular": true,
+              "reflection_color": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "reflection_amount": 0.0,
+              "reflection_fresnel": 0.0,
+              "clearcoat_amount": 0.0,
+              "clearcoat_roughness": 0.0,
+              "clearcoat_bump": 1.0,
+              "metallic": 0.0,
+              "sheen": 0.0,
+              "sheen_tint": 0.0,
+              "specular_tint": 0.0,
+              "flatness": 0.0,
+              "transparent_color": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "transparent_amount": 0.0,
+              "refractive_index": 1.0,
+              "refraction_roughness": 0.0,
+              "absorption_distance": 0.0,
+              "dissolve": 0.0,
+              "subsurface_color": [
+                0.8,
+                0.8,
+                0.8
+              ],
+              "subsurface_amount": 0.0,
+              "subsurface_distance": 0.005,
+              "luminous_color": [
+                1.0,
+                0.7758222183174236,
+                0.35153259950043936
+              ],
+              "luminous_intensity": 0.45,
+              "bump_amplitude": 0.0,
+              "displacement_distance": 0.0,
+              "smoothing": 1.0,
+              "smoothing_angle": 40.0,
+              "double_sided": false,
+              "openpbr": {
+                "coat_color": [
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "coat_ior": 1.6,
+                "coat_darkening": 1.0,
+                "coat_roughness_anisotropy": 0.0,
+                "fuzz_color": [
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "fuzz_roughness": 0.5,
+                "thin_film_weight": 0.0,
+                "thin_film_thickness": 0.5,
+                "thin_film_ior": 1.4,
+                "dispersion_abbe_number": 20.0,
+                "transmission_scatter": [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "transmission_scatter_anisotropy": 0.0,
+                "thin_walled": false,
+                "subsurface_albedo": [
+                  0.8,
+                  0.8,
+                  0.8
+                ],
+                "subsurface_uses_diffuse": false
+              }
+            }
+          }
+        },
+        {
+          "id": 13,
+          "parent": null,
+          "name": "Axis Z",
+          "layer": {
+            "enable": true,
+            "invert": false,
+            "blend": "Normal",
+            "opacity": 1.0
+          },
+          "kind": {
+            "Group": {
+              "item": "All",
+              "tag_type": "Material",
+              "tag": {
+                "Name": "Axis Z"
+              },
+              "scope": "Surface",
+              "apply_to_sub_group": false,
+              "apply_to_instances": true
+            }
+          }
+        },
+        {
+          "id": 14,
+          "parent": 13,
+          "name": "Axis Z Material",
+          "layer": {
+            "enable": true,
+            "invert": false,
+            "blend": "Normal",
+            "opacity": 1.0
+          },
+          "kind": {
+            "Material": {
+              "shading_model": "Principled",
+              "gl_display": true,
+              "diffuse_color": [
+                0.07227185068231748,
+                0.26225065752969623,
+                0.6724431569576875
+              ],
+              "diffuse_amount": 0.8,
+              "diffuse_roughness": 0.0,
+              "specular_color": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "specular_amount": 0.5,
+              "fresnel": 1.0,
+              "roughness": 0.5,
+              "anisotropy": 0.0,
+              "match_specular": true,
+              "reflection_color": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "reflection_amount": 0.0,
+              "reflection_fresnel": 0.0,
+              "clearcoat_amount": 0.0,
+              "clearcoat_roughness": 0.0,
+              "clearcoat_bump": 1.0,
+              "metallic": 0.0,
+              "sheen": 0.0,
+              "sheen_tint": 0.0,
+              "specular_tint": 0.0,
+              "flatness": 0.0,
+              "transparent_color": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "transparent_amount": 0.0,
+              "refractive_index": 1.0,
+              "refraction_roughness": 0.0,
+              "absorption_distance": 0.0,
+              "dissolve": 0.0,
+              "subsurface_color": [
+                0.8,
+                0.8,
+                0.8
+              ],
+              "subsurface_amount": 0.0,
+              "subsurface_distance": 0.005,
+              "luminous_color": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "luminous_intensity": 0.0,
+              "bump_amplitude": 0.0,
+              "displacement_distance": 0.0,
+              "smoothing": 1.0,
+              "smoothing_angle": 40.0,
+              "double_sided": false,
+              "openpbr": {
+                "coat_color": [
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "coat_ior": 1.6,
+                "coat_darkening": 1.0,
+                "coat_roughness_anisotropy": 0.0,
+                "fuzz_color": [
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "fuzz_roughness": 0.5,
+                "thin_film_weight": 0.0,
+                "thin_film_thickness": 0.5,
+                "thin_film_ior": 1.4,
+                "dispersion_abbe_number": 20.0,
+                "transmission_scatter": [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "transmission_scatter_anisotropy": 0.0,
+                "thin_walled": false,
+                "subsurface_albedo": [
+                  0.8,
+                  0.8,
+                  0.8
+                ],
+                "subsurface_uses_diffuse": false
+              }
+            }
+          }
+        },
+        {
+          "id": 11,
+          "parent": null,
+          "name": "Axis Y",
+          "layer": {
+            "enable": true,
+            "invert": false,
+            "blend": "Normal",
+            "opacity": 1.0
+          },
+          "kind": {
+            "Group": {
+              "item": "All",
+              "tag_type": "Material",
+              "tag": {
+                "Name": "Axis Y"
+              },
+              "scope": "Surface",
+              "apply_to_sub_group": false,
+              "apply_to_instances": true
+            }
+          }
+        },
+        {
+          "id": 12,
+          "parent": 11,
+          "name": "Axis Y Material",
+          "layer": {
+            "enable": true,
+            "invert": false,
+            "blend": "Normal",
+            "opacity": 1.0
+          },
+          "kind": {
+            "Material": {
+              "shading_model": "Principled",
+              "gl_display": true,
+              "diffuse_color": [
+                0.07618538148130785,
+                0.4019777798321958,
+                0.1714411007328226
+              ],
+              "diffuse_amount": 0.8,
+              "diffuse_roughness": 0.0,
+              "specular_color": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "specular_amount": 0.5,
+              "fresnel": 1.0,
+              "roughness": 0.5,
+              "anisotropy": 0.0,
+              "match_specular": true,
+              "reflection_color": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "reflection_amount": 0.0,
+              "reflection_fresnel": 0.0,
+              "clearcoat_amount": 0.0,
+              "clearcoat_roughness": 0.0,
+              "clearcoat_bump": 1.0,
+              "metallic": 0.0,
+              "sheen": 0.0,
+              "sheen_tint": 0.0,
+              "specular_tint": 0.0,
+              "flatness": 0.0,
+              "transparent_color": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "transparent_amount": 0.0,
+              "refractive_index": 1.0,
+              "refraction_roughness": 0.0,
+              "absorption_distance": 0.0,
+              "dissolve": 0.0,
+              "subsurface_color": [
+                0.8,
+                0.8,
+                0.8
+              ],
+              "subsurface_amount": 0.0,
+              "subsurface_distance": 0.005,
+              "luminous_color": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "luminous_intensity": 0.0,
+              "bump_amplitude": 0.0,
+              "displacement_distance": 0.0,
+              "smoothing": 1.0,
+              "smoothing_angle": 40.0,
+              "double_sided": false,
+              "openpbr": {
+                "coat_color": [
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "coat_ior": 1.6,
+                "coat_darkening": 1.0,
+                "coat_roughness_anisotropy": 0.0,
+                "fuzz_color": [
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "fuzz_roughness": 0.5,
+                "thin_film_weight": 0.0,
+                "thin_film_thickness": 0.5,
+                "thin_film_ior": 1.4,
+                "dispersion_abbe_number": 20.0,
+                "transmission_scatter": [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "transmission_scatter_anisotropy": 0.0,
+                "thin_walled": false,
+                "subsurface_albedo": [
+                  0.8,
+                  0.8,
+                  0.8
+                ],
+                "subsurface_uses_diffuse": false
+              }
+            }
+          }
+        },
+        {
+          "id": 9,
+          "parent": null,
+          "name": "Axis X",
+          "layer": {
+            "enable": true,
+            "invert": false,
+            "blend": "Normal",
+            "opacity": 1.0
+          },
+          "kind": {
+            "Group": {
+              "item": "All",
+              "tag_type": "Material",
+              "tag": {
+                "Name": "Axis X"
+              },
+              "scope": "Surface",
+              "apply_to_sub_group": false,
+              "apply_to_instances": true
+            }
+          }
+        },
+        {
+          "id": 10,
+          "parent": 9,
+          "name": "Axis X Material",
+          "layer": {
+            "enable": true,
+            "invert": false,
+            "blend": "Normal",
+            "opacity": 1.0
+          },
+          "kind": {
+            "Material": {
+              "shading_model": "Principled",
+              "gl_display": true,
+              "diffuse_color": [
+                0.6866853124353135,
+                0.10702310297826761,
+                0.09758734714186246
+              ],
+              "diffuse_amount": 0.8,
+              "diffuse_roughness": 0.0,
+              "specular_color": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "specular_amount": 0.5,
+              "fresnel": 1.0,
+              "roughness": 0.5,
+              "anisotropy": 0.0,
+              "match_specular": true,
+              "reflection_color": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "reflection_amount": 0.0,
+              "reflection_fresnel": 0.0,
+              "clearcoat_amount": 0.0,
+              "clearcoat_roughness": 0.0,
+              "clearcoat_bump": 1.0,
+              "metallic": 0.0,
+              "sheen": 0.0,
+              "sheen_tint": 0.0,
+              "specular_tint": 0.0,
+              "flatness": 0.0,
+              "transparent_color": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "transparent_amount": 0.0,
+              "refractive_index": 1.0,
+              "refraction_roughness": 0.0,
+              "absorption_distance": 0.0,
+              "dissolve": 0.0,
+              "subsurface_color": [
+                0.8,
+                0.8,
+                0.8
+              ],
+              "subsurface_amount": 0.0,
+              "subsurface_distance": 0.005,
+              "luminous_color": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "luminous_intensity": 0.0,
+              "bump_amplitude": 0.0,
+              "displacement_distance": 0.0,
+              "smoothing": 1.0,
+              "smoothing_angle": 40.0,
+              "double_sided": false,
+              "openpbr": {
+                "coat_color": [
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "coat_ior": 1.6,
+                "coat_darkening": 1.0,
+                "coat_roughness_anisotropy": 0.0,
+                "fuzz_color": [
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "fuzz_roughness": 0.5,
+                "thin_film_weight": 0.0,
+                "thin_film_thickness": 0.5,
+                "thin_film_ior": 1.4,
+                "dispersion_abbe_number": 20.0,
+                "transmission_scatter": [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "transmission_scatter_anisotropy": 0.0,
+                "thin_walled": false,
+                "subsurface_albedo": [
+                  0.8,
+                  0.8,
+                  0.8
+                ],
+                "subsurface_uses_diffuse": false
+              }
+            }
+          }
+        },
+        {
+          "id": 7,
+          "parent": null,
+          "name": "New",
+          "layer": {
+            "enable": true,
+            "invert": false,
+            "blend": "Normal",
+            "opacity": 1.0
+          },
+          "kind": {
+            "Group": {
+              "item": "All",
+              "tag_type": "Material",
+              "tag": {
+                "Name": "New"
+              },
+              "scope": "Surface",
+              "apply_to_sub_group": false,
+              "apply_to_instances": true
+            }
+          }
+        },
+        {
+          "id": 8,
+          "parent": 7,
+          "name": "New Material",
+          "layer": {
+            "enable": true,
+            "invert": false,
+            "blend": "Normal",
+            "opacity": 1.0
+          },
+          "kind": {
+            "Material": {
+              "shading_model": "Principled",
+              "gl_display": true,
+              "diffuse_color": [
+                0.09305896284668745,
+                0.45641102318040466,
+                0.6514056374198242
+              ],
+              "diffuse_amount": 0.8,
+              "diffuse_roughness": 0.0,
+              "specular_color": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "specular_amount": 0.5,
+              "fresnel": 1.0,
+              "roughness": 0.5,
+              "anisotropy": 0.0,
+              "match_specular": true,
+              "reflection_color": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "reflection_amount": 0.0,
+              "reflection_fresnel": 0.0,
+              "clearcoat_amount": 0.0,
+              "clearcoat_roughness": 0.0,
+              "clearcoat_bump": 1.0,
+              "metallic": 0.0,
+              "sheen": 0.0,
+              "sheen_tint": 0.0,
+              "specular_tint": 0.0,
+              "flatness": 0.0,
+              "transparent_color": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "transparent_amount": 0.0,
+              "refractive_index": 1.0,
+              "refraction_roughness": 0.0,
+              "absorption_distance": 0.0,
+              "dissolve": 0.0,
+              "subsurface_color": [
+                0.8,
+                0.8,
+                0.8
+              ],
+              "subsurface_amount": 0.0,
+              "subsurface_distance": 0.005,
+              "luminous_color": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "luminous_intensity": 0.0,
+              "bump_amplitude": 0.0,
+              "displacement_distance": 0.0,
+              "smoothing": 1.0,
+              "smoothing_angle": 40.0,
+              "double_sided": false,
+              "openpbr": {
+                "coat_color": [
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "coat_ior": 1.6,
+                "coat_darkening": 1.0,
+                "coat_roughness_anisotropy": 0.0,
+                "fuzz_color": [
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "fuzz_roughness": 0.5,
+                "thin_film_weight": 0.0,
+                "thin_film_thickness": 0.5,
+                "thin_film_ior": 1.4,
+                "dispersion_abbe_number": 20.0,
+                "transmission_scatter": [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "transmission_scatter_anisotropy": 0.0,
+                "thin_walled": false,
+                "subsurface_albedo": [
+                  0.8,
+                  0.8,
+                  0.8
+                ],
+                "subsurface_uses_diffuse": false
+              }
+            }
+          }
+        },
+        {
+          "id": 5,
+          "parent": null,
+          "name": "Selected",
+          "layer": {
+            "enable": true,
+            "invert": false,
+            "blend": "Normal",
+            "opacity": 1.0
+          },
+          "kind": {
+            "Group": {
+              "item": "All",
+              "tag_type": "Material",
+              "tag": {
+                "Name": "Selected"
+              },
+              "scope": "Surface",
+              "apply_to_sub_group": false,
+              "apply_to_instances": true
+            }
+          }
+        },
+        {
+          "id": 6,
+          "parent": 5,
+          "name": "Selected Material",
+          "layer": {
+            "enable": true,
+            "invert": false,
+            "blend": "Normal",
+            "opacity": 1.0
+          },
+          "kind": {
+            "Material": {
+              "shading_model": "Principled",
+              "gl_display": true,
+              "diffuse_color": [
+                1.0,
+                0.6583748172794485,
+                0.162029375639111
+              ],
+              "diffuse_amount": 0.8,
+              "diffuse_roughness": 0.0,
+              "specular_color": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "specular_amount": 0.5,
+              "fresnel": 1.0,
+              "roughness": 0.5,
+              "anisotropy": 0.0,
+              "match_specular": true,
+              "reflection_color": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "reflection_amount": 0.0,
+              "reflection_fresnel": 0.0,
+              "clearcoat_amount": 0.0,
+              "clearcoat_roughness": 0.0,
+              "clearcoat_bump": 1.0,
+              "metallic": 0.0,
+              "sheen": 0.0,
+              "sheen_tint": 0.0,
+              "specular_tint": 0.0,
+              "flatness": 0.0,
+              "transparent_color": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "transparent_amount": 0.0,
+              "refractive_index": 1.0,
+              "refraction_roughness": 0.0,
+              "absorption_distance": 0.0,
+              "dissolve": 0.0,
+              "subsurface_color": [
+                0.8,
+                0.8,
+                0.8
+              ],
+              "subsurface_amount": 0.0,
+              "subsurface_distance": 0.005,
+              "luminous_color": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "luminous_intensity": 0.0,
+              "bump_amplitude": 0.0,
+              "displacement_distance": 0.0,
+              "smoothing": 1.0,
+              "smoothing_angle": 40.0,
+              "double_sided": false,
+              "openpbr": {
+                "coat_color": [
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "coat_ior": 1.6,
+                "coat_darkening": 1.0,
+                "coat_roughness_anisotropy": 0.0,
+                "fuzz_color": [
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "fuzz_roughness": 0.5,
+                "thin_film_weight": 0.0,
+                "thin_film_thickness": 0.5,
+                "thin_film_ior": 1.4,
+                "dispersion_abbe_number": 20.0,
+                "transmission_scatter": [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "transmission_scatter_anisotropy": 0.0,
+                "thin_walled": false,
+                "subsurface_albedo": [
+                  0.8,
+                  0.8,
+                  0.8
+                ],
+                "subsurface_uses_diffuse": false
+              }
+            }
+          }
+        },
+        {
+          "id": 4,
+          "parent": null,
+          "name": "Base Material",
+          "layer": {
+            "enable": true,
+            "invert": false,
+            "blend": "Normal",
+            "opacity": 1.0
+          },
+          "kind": {
+            "Material": {
+              "shading_model": "Principled",
+              "gl_display": true,
+              "diffuse_color": [
+                0.7758222183174236,
+                0.8148465722161012,
+                0.8549926081242338
+              ],
+              "diffuse_amount": 0.8,
+              "diffuse_roughness": 0.0,
+              "specular_color": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "specular_amount": 0.5,
+              "fresnel": 1.0,
+              "roughness": 0.6,
+              "anisotropy": 0.0,
+              "match_specular": true,
+              "reflection_color": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "reflection_amount": 0.0,
+              "reflection_fresnel": 0.0,
+              "clearcoat_amount": 0.0,
+              "clearcoat_roughness": 0.0,
+              "clearcoat_bump": 1.0,
+              "metallic": 0.0,
+              "sheen": 0.0,
+              "sheen_tint": 0.0,
+              "specular_tint": 0.0,
+              "flatness": 0.0,
+              "transparent_color": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "transparent_amount": 0.0,
+              "refractive_index": 1.0,
+              "refraction_roughness": 0.0,
+              "absorption_distance": 0.0,
+              "dissolve": 0.0,
+              "subsurface_color": [
+                0.8,
+                0.8,
+                0.8
+              ],
+              "subsurface_amount": 0.0,
+              "subsurface_distance": 0.005,
+              "luminous_color": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "luminous_intensity": 0.0,
+              "bump_amplitude": 0.005,
+              "displacement_distance": 0.02,
+              "smoothing": 1.0,
+              "smoothing_angle": 40.0,
+              "double_sided": false,
+              "openpbr": {
+                "coat_color": [
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "coat_ior": 1.6,
+                "coat_darkening": 1.0,
+                "coat_roughness_anisotropy": 0.0,
+                "fuzz_color": [
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "fuzz_roughness": 0.5,
+                "thin_film_weight": 0.0,
+                "thin_film_thickness": 0.5,
+                "thin_film_ior": 1.4,
+                "dispersion_abbe_number": 20.0,
+                "transmission_scatter": [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "transmission_scatter_anisotropy": 0.0,
+                "thin_walled": false,
+                "subsurface_albedo": [
+                  0.8,
+                  0.8,
+                  0.8
+                ],
+                "subsurface_uses_diffuse": false
+              }
+            }
+          }
+        }
+      ],
+      "next_id": 19
+    }
+  }
+}

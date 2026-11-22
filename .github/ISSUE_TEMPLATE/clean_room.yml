@@ -1,0 +1,11 @@
+name: Clean-room question or report
+description: Ask whether something is allowed, or report that something crossed over.
+labels: [clean-room]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What you want to ask or report
+      description: For a crossing, say what was seen, where, and which work it could have touched. Don't paste the material itself. If you'd rather not say it publicly, contact the maintainer privately instead.
+    validations:
+      required: true

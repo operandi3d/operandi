@@ -1,0 +1,880 @@
+{
+ "action_center_mesh": {
+  "points": [
+   [
+    0,
+    0,
+    0
+   ],
+   [
+    1,
+    0,
+    0
+   ],
+   [
+    2,
+    0.5,
+    0
+   ],
+   [
+    0,
+    0.5,
+    1
+   ],
+   [
+    1,
+    0.5,
+    1
+   ],
+   [
+    2,
+    1,
+    1
+   ],
+   [
+    3,
+    0,
+    0
+   ],
+   [
+    4,
+    0,
+    0
+   ],
+   [
+    4,
+    0,
+    1
+   ],
+   [
+    3,
+    0,
+    1
+   ]
+  ],
+  "polygons": [
+   [
+    0,
+    3,
+    4,
+    1
+   ],
+   [
+    1,
+    4,
+    5,
+    2
+   ],
+   [
+    6,
+    9,
+    8,
+    7
+   ]
+  ],
+  "item_transform": {
+   "pos": [
+    2,
+    0,
+    1
+   ],
+   "rot": [
+    0,
+    30,
+    0
+   ]
+  }
+ },
+ "action_center_selection": "all three polygons",
+ "meshops": {
+  "MOP-MM-M01_default": {
+   "items": [
+    {
+     "name": "S1",
+     "shape": "cube",
+     "centre": [
+      0,
+      0,
+      0
+     ],
+     "full_size": 1.0,
+     "position": [
+      3,
+      0,
+      0
+     ],
+     "rotation_deg": [
+      0,
+      0,
+      0
+     ],
+     "material": "mat_S1",
+     "parent": null
+    },
+    {
+     "name": "T",
+     "shape": "empty",
+     "position": [
+      0,
+      2,
+      0
+     ],
+     "rotation_deg": [
+      0,
+      0,
+      0
+     ]
+    }
+   ]
+  },
+  "MOP-MM-M02_world0": {
+   "items": [
+    {
+     "name": "S1",
+     "shape": "cube",
+     "centre": [
+      0,
+      0,
+      0
+     ],
+     "full_size": 1.0,
+     "position": [
+      3,
+      0,
+      0
+     ],
+     "rotation_deg": [
+      0,
+      0,
+      0
+     ],
+     "material": "mat_S1",
+     "parent": null
+    },
+    {
+     "name": "T",
+     "shape": "empty",
+     "position": [
+      0,
+      2,
+      0
+     ],
+     "rotation_deg": [
+      0,
+      0,
+      0
+     ]
+    }
+   ]
+  },
+  "MOP-MM-M03_useWorld0": {
+   "items": [
+    {
+     "name": "S1",
+     "shape": "cube",
+     "centre": [
+      0,
+      0,
+      0
+     ],
+     "full_size": 1.0,
+     "position": [
+      3,
+      0,
+      0
+     ],
+     "rotation_deg": [
+      0,
+      0,
+      0
+     ],
+     "material": "mat_S1",
+     "parent": null
+    },
+    {
+     "name": "T",
+     "shape": "empty",
+     "position": [
+      0,
+      2,
+      0
+     ],
+     "rotation_deg": [
+      0,
+      0,
+      0
+     ]
+    }
+   ]
+  },
+  "MOP-MM-M04_both0": {
+   "items": [
+    {
+     "name": "S1",
+     "shape": "cube",
+     "centre": [
+      0,
+      0,
+      0
+     ],
+     "full_size": 1.0,
+     "position": [
+      3,
+      0,
+      0
+     ],
+     "rotation_deg": [
+      0,
+      0,
+      0
+     ],
+     "material": "mat_S1",
+     "parent": null
+    },
+    {
+     "name": "T",
+     "shape": "empty",
+     "position": [
+      0,
+      2,
+      0
+     ],
+     "rotation_deg": [
+      0,
+      0,
+      0
+     ]
+    }
+   ]
+  },
+  "MOP-MM-M06_three_all": {
+   "items": [
+    {
+     "name": "S1",
+     "shape": "cube",
+     "centre": [
+      0,
+      0,
+      0
+     ],
+     "full_size": 1.0,
+     "position": [
+      3,
+      0,
+      0
+     ],
+     "rotation_deg": [
+      0,
+      0,
+      0
+     ],
+     "material": "mat_S1",
+     "parent": null
+    },
+    {
+     "name": "S2",
+     "shape": "cube",
+     "centre": [
+      0,
+      0,
+      0
+     ],
+     "full_size": 1.0,
+     "position": [
+      -3,
+      0,
+      0
+     ],
+     "rotation_deg": [
+      0,
+      0,
+      0
+     ],
+     "material": "mat_S2",
+     "parent": null
+    },
+    {
+     "name": "S3",
+     "shape": "cube",
+     "centre": [
+      0,
+      0,
+      0
+     ],
+     "full_size": 1.0,
+     "position": [
+      0,
+      0,
+      5
+     ],
+     "rotation_deg": [
+      0,
+      0,
+      0
+     ],
+     "material": "mat_S3",
+     "parent": null
+    },
+    {
+     "name": "T",
+     "shape": "empty",
+     "position": [
+      0,
+      0,
+      0
+     ],
+     "rotation_deg": [
+      0,
+      0,
+      0
+     ]
+    }
+   ]
+  },
+  "MOP-MM-M08_targetBase": {
+   "items": [
+    {
+     "name": "S1",
+     "shape": "cube",
+     "centre": [
+      0,
+      0,
+      0
+     ],
+     "full_size": 1.0,
+     "position": [
+      3,
+      0,
+      0
+     ],
+     "rotation_deg": [
+      0,
+      0,
+      0
+     ],
+     "material": "mat_S1",
+     "parent": null
+    },
+    {
+     "name": "T",
+     "shape": "cube",
+     "centre": [
+      0,
+      0,
+      0
+     ],
+     "full_size": 0.25,
+     "position": [
+      0,
+      0,
+      0
+     ],
+     "rotation_deg": [
+      0,
+      0,
+      0
+     ],
+     "material": "Default",
+     "parent": null
+    }
+   ]
+  },
+  "MOP-MM-M09_hier_on": {
+   "items": [
+    {
+     "name": "S1",
+     "shape": "cube",
+     "centre": [
+      0,
+      0,
+      0
+     ],
+     "full_size": 1.0,
+     "position": [
+      3,
+      0,
+      0
+     ],
+     "rotation_deg": [
+      0,
+      0,
+      0
+     ],
+     "material": "mat_S1",
+     "parent": null
+    },
+    {
+     "name": "K",
+     "shape": "cube",
+     "centre": [
+      0,
+      0,
+      0
+     ],
+     "full_size": 0.5,
+     "position": [
+      0,
+      2,
+      0
+     ],
+     "rotation_deg": [
+      0,
+      0,
+      0
+     ],
+     "material": "mat_K",
+     "parent": "S1"
+    },
+    {
+     "name": "T",
+     "shape": "empty",
+     "position": [
+      0,
+      0,
+      0
+     ],
+     "rotation_deg": [
+      0,
+      0,
+      0
+     ]
+    }
+   ]
+  },
+  "MOP-MM-M10_hier_off": {
+   "items": [
+    {
+     "name": "S1",
+     "shape": "cube",
+     "centre": [
+      0,
+      0,
+      0
+     ],
+     "full_size": 1.0,
+     "position": [
+      3,
+      0,
+      0
+     ],
+     "rotation_deg": [
+      0,
+      0,
+      0
+     ],
+     "material": "mat_S1",
+     "parent": null
+    },
+    {
+     "name": "K",
+     "shape": "cube",
+     "centre": [
+      0,
+      0,
+      0
+     ],
+     "full_size": 0.5,
+     "position": [
+      0,
+      2,
+      0
+     ],
+     "rotation_deg": [
+      0,
+      0,
+      0
+     ],
+     "material": "mat_K",
+     "parent": "S1"
+    },
+    {
+     "name": "T",
+     "shape": "empty",
+     "position": [
+      0,
+      0,
+      0
+     ],
+     "rotation_deg": [
+      0,
+      0,
+      0
+     ]
+    }
+   ]
+  },
+  "MOP-MM-M11_rotY90": {
+   "items": [
+    {
+     "name": "S1",
+     "shape": "cube",
+     "centre": [
+      0.5,
+      0,
+      0
+     ],
+     "full_size": 1.0,
+     "position": [
+      3,
+      0,
+      0
+     ],
+     "rotation_deg": [
+      0,
+      90,
+      0
+     ],
+     "material": "mat_S1",
+     "parent": null
+    },
+    {
+     "name": "T",
+     "shape": "empty",
+     "position": [
+      0,
+      0,
+      0
+     ],
+     "rotation_deg": [
+      0,
+      0,
+      0
+     ]
+    }
+   ]
+  },
+  "MOP-BO-Boolean-Union": {
+   "items": [
+    {
+     "name": "A",
+     "shape": "cube",
+     "centre": [
+      0,
+      0,
+      0
+     ],
+     "full_size": 2.0,
+     "position": [
+      0,
+      0,
+      0
+     ],
+     "rotation_deg": [
+      0,
+      0,
+      0
+     ],
+     "material": "matA",
+     "parent": null
+    },
+    {
+     "name": "B",
+     "shape": "cube",
+     "centre": [
+      1,
+      1,
+      1
+     ],
+     "full_size": 1.0,
+     "position": [
+      0,
+      0,
+      0
+     ],
+     "rotation_deg": [
+      0,
+      0,
+      0
+     ],
+     "material": "matB",
+     "parent": null
+    }
+   ]
+  },
+  "MOP-BO-Boolean-Intersect": {
+   "items": [
+    {
+     "name": "A",
+     "shape": "cube",
+     "centre": [
+      0,
+      0,
+      0
+     ],
+     "full_size": 2.0,
+     "position": [
+      0,
+      0,
+      0
+     ],
+     "rotation_deg": [
+      0,
+      0,
+      0
+     ],
+     "material": "matA",
+     "parent": null
+    },
+    {
+     "name": "B",
+     "shape": "cube",
+     "centre": [
+      1,
+      1,
+      1
+     ],
+     "full_size": 1.0,
+     "position": [
+      0,
+      0,
+      0
+     ],
+     "rotation_deg": [
+      0,
+      0,
+      0
+     ],
+     "material": "matB",
+     "parent": null
+    }
+   ]
+  },
+  "MOP-BO-Boolean-Subtract": {
+   "items": [
+    {
+     "name": "A",
+     "shape": "cube",
+     "centre": [
+      0,
+      0,
+      0
+     ],
+     "full_size": 2.0,
+     "position": [
+      0,
+      0,
+      0
+     ],
+     "rotation_deg": [
+      0,
+      0,
+      0
+     ],
+     "material": "matA",
+     "parent": null
+    },
+    {
+     "name": "B",
+     "shape": "cube",
+     "centre": [
+      1,
+      1,
+      1
+     ],
+     "full_size": 1.0,
+     "position": [
+      0,
+      0,
+      0
+     ],
+     "rotation_deg": [
+      0,
+      0,
+      0
+     ],
+     "material": "matB",
+     "parent": null
+    }
+   ]
+  },
+  "MOP-BO-Boolean-Add": {
+   "items": [
+    {
+     "name": "A",
+     "shape": "cube",
+     "centre": [
+      0,
+      0,
+      0
+     ],
+     "full_size": 2.0,
+     "position": [
+      0,
+      0,
+      0
+     ],
+     "rotation_deg": [
+      0,
+      0,
+      0
+     ],
+     "material": "matA",
+     "parent": null
+    },
+    {
+     "name": "B",
+     "shape": "cube",
+     "centre": [
+      1,
+      1,
+      1
+     ],
+     "full_size": 1.0,
+     "position": [
+      0,
+      0,
+      0
+     ],
+     "rotation_deg": [
+      0,
+      0,
+      0
+     ],
+     "material": "matB",
+     "parent": null
+    }
+   ]
+  },
+  "MOP-BO-Boolean-UnionAll": {
+   "items": [
+    {
+     "name": "A",
+     "shape": "cube",
+     "centre": [
+      0,
+      0,
+      0
+     ],
+     "full_size": 2.0,
+     "position": [
+      0,
+      0,
+      0
+     ],
+     "rotation_deg": [
+      0,
+      0,
+      0
+     ],
+     "material": "matA",
+     "parent": null
+    },
+    {
+     "name": "B",
+     "shape": "cube",
+     "centre": [
+      1,
+      1,
+      1
+     ],
+     "full_size": 1.0,
+     "position": [
+      0,
+      0,
+      0
+     ],
+     "rotation_deg": [
+      0,
+      0,
+      0
+     ],
+     "material": "matB",
+     "parent": null
+    }
+   ]
+  },
+  "MOP-BO-SolidDrill-Tunnel": {
+   "items": [
+    {
+     "name": "A",
+     "shape": "cube",
+     "centre": [
+      0,
+      0,
+      0
+     ],
+     "full_size": 2.0,
+     "position": [
+      0,
+      0,
+      0
+     ],
+     "rotation_deg": [
+      0,
+      0,
+      0
+     ],
+     "material": "matA",
+     "parent": null
+    },
+    {
+     "name": "B",
+     "shape": "cube",
+     "centre": [
+      1,
+      1,
+      1
+     ],
+     "full_size": 1.0,
+     "position": [
+      0,
+      0,
+      0
+     ],
+     "rotation_deg": [
+      0,
+      0,
+      0
+     ],
+     "material": "matB",
+     "parent": null
+    }
+   ]
+  },
+  "MOP-FZ-F1_circle_default": {
+   "items": [
+    {
+     "name": "M",
+     "shape": "empty"
+    }
+   ],
+   "stack": "Circle"
+  },
+  "MOP-FZ-F4_circle_bezierOff": {
+   "items": [
+    {
+     "name": "M",
+     "shape": "empty"
+    }
+   ],
+   "stack": "Circle"
+  },
+  "MOP-FZ-F5_circle_fixed": {
+   "items": [
+    {
+     "name": "M",
+     "shape": "empty"
+    }
+   ],
+   "stack": "Circle"
+  },
+  "MOP-FZ-G5_subd_freeze": {
+   "items": [
+    {
+     "name": "M",
+     "shape": "empty"
+    }
+   ],
+   "stack": "Cube+Subdivision"
+  },
+  "MOP-FZ-G7_psub_freeze_off": {
+   "items": [
+    {
+     "name": "M",
+     "shape": "empty"
+    }
+   ],
+   "stack": "Cube+CatmullClark"
+  }
+ }
+}

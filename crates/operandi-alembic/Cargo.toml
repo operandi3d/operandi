@@ -1,0 +1,11 @@
+[package]
+name = "operandi-alembic"
+version = "0.1.0"
+edition = "2024"
+# Operandi's own shim and Rust code are GPL-3.0-or-later; the vendored
+# Alembic and Imath sources keep their BSD-3-Clause licences.
+license = "GPL-3.0-or-later AND BSD-3-Clause"
+links = "operandi_alembic"
+
+[build-dependencies]
+cc = { version = "1.2", features = ["parallel"] }

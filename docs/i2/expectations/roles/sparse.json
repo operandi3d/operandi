@@ -1,0 +1,407 @@
+{
+  "source_graph": "SP0",
+  "source_identity": "PI0",
+  "begun_graph": "SP1",
+  "begun_identity": "PI1",
+  "source_layout": [
+    [
+      0,
+      1,
+      4,
+      3
+    ],
+    [
+      1,
+      2,
+      5,
+      4
+    ]
+  ],
+  "source_vertex_count": 6,
+  "vertex_sources": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    0,
+    1,
+    4,
+    3
+  ],
+  "face_sources": [
+    0,
+    1,
+    0,
+    1,
+    0,
+    0
+  ],
+  "ordered_targets": [
+    7
+  ],
+  "cap_face_id": 7,
+  "cap_source_dense": 0,
+  "cap_output_dense": 0,
+  "cap_corner_ids": [
+    9,
+    10,
+    11,
+    12
+  ],
+  "tips": [
+    {
+      "source_dense": 0,
+      "source_id": 1,
+      "output_dense": 6,
+      "output_id": 24
+    },
+    {
+      "source_dense": 1,
+      "source_id": 2,
+      "output_dense": 7,
+      "output_id": 25
+    },
+    {
+      "source_dense": 4,
+      "source_id": 5,
+      "output_dense": 8,
+      "output_id": 26
+    },
+    {
+      "source_dense": 3,
+      "source_id": 4,
+      "output_dense": 9,
+      "output_id": 27
+    }
+  ],
+  "walls": [
+    {
+      "output_face_dense": 2,
+      "output_face_id": 28,
+      "selected_source_dense": 0,
+      "selected_source_face_id": 7,
+      "owner_dense": 0,
+      "owner_face_id": 7,
+      "source_endpoints_dense": [
+        0,
+        1
+      ],
+      "source_endpoint_ids": [
+        1,
+        2
+      ],
+      "row": 1,
+      "oriented_output_vertices": [
+        6,
+        0,
+        1,
+        7
+      ],
+      "oriented_output_vertex_ids": [
+        24,
+        1,
+        2,
+        25
+      ],
+      "output_corner_ids": [
+        32,
+        33,
+        34,
+        35
+      ],
+      "owner_corner_ordinals": [
+        0,
+        0,
+        1,
+        1
+      ],
+      "is_tip": [
+        true,
+        false,
+        false,
+        true
+      ]
+    },
+    {
+      "output_face_dense": 3,
+      "output_face_id": 29,
+      "selected_source_dense": 0,
+      "selected_source_face_id": 7,
+      "owner_dense": 1,
+      "owner_face_id": 8,
+      "source_endpoints_dense": [
+        1,
+        4
+      ],
+      "source_endpoint_ids": [
+        2,
+        5
+      ],
+      "row": 1,
+      "oriented_output_vertices": [
+        7,
+        1,
+        4,
+        8
+      ],
+      "oriented_output_vertex_ids": [
+        25,
+        2,
+        5,
+        26
+      ],
+      "output_corner_ids": [
+        36,
+        37,
+        38,
+        39
+      ],
+      "owner_corner_ordinals": [
+        0,
+        0,
+        3,
+        3
+      ],
+      "is_tip": [
+        true,
+        false,
+        false,
+        true
+      ]
+    },
+    {
+      "output_face_dense": 4,
+      "output_face_id": 30,
+      "selected_source_dense": 0,
+      "selected_source_face_id": 7,
+      "owner_dense": 0,
+      "owner_face_id": 7,
+      "source_endpoints_dense": [
+        4,
+        3
+      ],
+      "source_endpoint_ids": [
+        5,
+        4
+      ],
+      "row": 1,
+      "oriented_output_vertices": [
+        8,
+        4,
+        3,
+        9
+      ],
+      "oriented_output_vertex_ids": [
+        26,
+        5,
+        4,
+        27
+      ],
+      "output_corner_ids": [
+        40,
+        41,
+        42,
+        43
+      ],
+      "owner_corner_ordinals": [
+        2,
+        2,
+        3,
+        3
+      ],
+      "is_tip": [
+        true,
+        false,
+        false,
+        true
+      ]
+    },
+    {
+      "output_face_dense": 5,
+      "output_face_id": 31,
+      "selected_source_dense": 0,
+      "selected_source_face_id": 7,
+      "owner_dense": 0,
+      "owner_face_id": 7,
+      "source_endpoints_dense": [
+        3,
+        0
+      ],
+      "source_endpoint_ids": [
+        4,
+        1
+      ],
+      "row": 1,
+      "oriented_output_vertices": [
+        9,
+        3,
+        0,
+        6
+      ],
+      "oriented_output_vertex_ids": [
+        27,
+        4,
+        1,
+        24
+      ],
+      "output_corner_ids": [
+        44,
+        45,
+        46,
+        47
+      ],
+      "owner_corner_ordinals": [
+        3,
+        3,
+        0,
+        0
+      ],
+      "is_tip": [
+        true,
+        false,
+        false,
+        true
+      ]
+    }
+  ],
+  "retained_edges": [
+    {
+      "id": 17,
+      "source_endpoints": [
+        1,
+        2
+      ],
+      "output_endpoints": [
+        1,
+        2
+      ]
+    },
+    {
+      "id": 18,
+      "source_endpoints": [
+        1,
+        4
+      ],
+      "output_endpoints": [
+        1,
+        4
+      ]
+    },
+    {
+      "id": 19,
+      "source_endpoints": [
+        2,
+        3
+      ],
+      "output_endpoints": [
+        2,
+        3
+      ]
+    },
+    {
+      "id": 20,
+      "source_endpoints": [
+        2,
+        5
+      ],
+      "output_endpoints": [
+        2,
+        5
+      ]
+    },
+    {
+      "id": 21,
+      "source_endpoints": [
+        3,
+        6
+      ],
+      "output_endpoints": [
+        3,
+        6
+      ]
+    },
+    {
+      "id": 22,
+      "source_endpoints": [
+        4,
+        5
+      ],
+      "output_endpoints": [
+        4,
+        5
+      ]
+    },
+    {
+      "id": 23,
+      "source_endpoints": [
+        5,
+        6
+      ],
+      "output_endpoints": [
+        5,
+        6
+      ]
+    }
+  ],
+  "retired_edge_ids": [],
+  "generated_edges": [
+    {
+      "id": 48,
+      "output_endpoints": [
+        1,
+        24
+      ]
+    },
+    {
+      "id": 49,
+      "output_endpoints": [
+        2,
+        25
+      ]
+    },
+    {
+      "id": 50,
+      "output_endpoints": [
+        4,
+        27
+      ]
+    },
+    {
+      "id": 51,
+      "output_endpoints": [
+        5,
+        26
+      ]
+    },
+    {
+      "id": 52,
+      "output_endpoints": [
+        24,
+        25
+      ]
+    },
+    {
+      "id": 53,
+      "output_endpoints": [
+        24,
+        27
+      ]
+    },
+    {
+      "id": 54,
+      "output_endpoints": [
+        25,
+        26
+      ]
+    },
+    {
+      "id": 55,
+      "output_endpoints": [
+        26,
+        27
+      ]
+    }
+  ]
+}

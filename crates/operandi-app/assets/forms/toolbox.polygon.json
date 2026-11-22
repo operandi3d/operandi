@@ -1,0 +1,187 @@
+{
+  "version": 1,
+  "id": "toolbox.polygon",
+  "label": "Polygon",
+  "exported": true,
+  "controls": [
+    {
+      "divider": "Polygon Tools",
+      "id": "polygon-tools"
+    },
+    {
+      "command": "Polygon Pen",
+      "label": "Pen",
+      "icon": "pen",
+      "tooltip": "Polygon Pen · {shortcut}"
+    },
+    {
+      "command": "Bevel"
+    },
+    {
+      "command": "Twist Bevel"
+    },
+    {
+      "command": "Extrude"
+    },
+    {
+      "command": "Smooth Shift"
+    },
+    {
+      "command": "Thicken"
+    },
+    {
+      "command": "Chamfer Edit"
+    },
+    {
+      "command": "Poly Haul"
+    },
+    {
+      "command": "Sketch Extrude"
+    },
+    {
+      "command": "Spike",
+      "icon": "spike",
+      "tooltip": "Spike · numeric Apply · {binding}"
+    },
+    {
+      "command": "Bridge",
+      "icon": "bridge",
+      "tooltip": "Bridge · numeric Apply · {binding}"
+    },
+    {
+      "command": "Polygon Reduction",
+      "icon": "poly-reduct",
+      "tooltip": "Polygon Reduction · reduce the selected polygons toward Number polygons while keeping their shape · tool.set poly.reduct on · Shortcut: {shortcut}"
+    },
+    {
+      "space": 4
+    },
+    {
+      "heading": "Commands"
+    },
+    {
+      "command": "Make",
+      "tooltip": "Make · fill the four-corner opening from two selected adjacent boundary edges · poly.make auto{binding}"
+    },
+    {
+      "command": "Set Position",
+      "label": "Set Position...",
+      "noShortcut": true,
+      "tooltip": "Set Position... · vert.set{binding}"
+    },
+    {
+      "command": "Triple",
+      "icon": "triple",
+      "tooltip": "Triple · split the selected polygons into triangles · poly.triple{binding}"
+    },
+    {
+      "command": "Triple Fan",
+      "label": "Triple Fan",
+      "tooltip": "Triple Fan · split the selected polygons into triangles that all meet at the selected vertex{binding}"
+    },
+    {
+      "command": "Flip",
+      "look": "natural",
+      "tooltip": "Reverse selected polygon winding · {binding}"
+    },
+    {
+      "command": "Flip It",
+      "label": "Flip It...",
+      "tooltip": "Flip It... · Mirror the selected polygons across an axis through the selection's centre, facing out · flip it{binding}"
+    },
+    {
+      "command": "Flip It Origin",
+      "label": "Flip It Origin...",
+      "tooltip": "Flip It Origin... · Mirror the selected polygons across an axis through the world origin, facing out · flip it origin{binding}"
+    },
+    {
+      "command": "Polygon Merge",
+      "label": "Merge",
+      "noShortcut": true,
+      "tooltip": "Merge · join the selected adjacent coplanar polygons into one · poly.merge{binding}"
+    },
+    {
+      "command": "Remove",
+      "tooltip": "Remove · delete the selected polygons, keeping all vertices · poly.remove{binding}"
+    },
+    {
+      "command": "Polygon Collapse",
+      "label": "Collapse",
+      "tooltip": "Collapse · replace the selected quad by one point at the mean of its corners · poly.collapse{binding}"
+    },
+    {
+      "command": "Collapse Selection",
+      "label": "Collapse Selection",
+      "tooltip": "Collapse Selection · replace the selected polygons with triangles around one new point at the middle of their outline{binding}"
+    },
+    {
+      "command": "Spin Quad",
+      "look": "natural",
+      "tooltip": "Spin Quad · rotate the shared edge of two selected quads · poly.spinQuads{binding}"
+    },
+    {
+      "command": "Unify",
+      "label": "Unify...",
+      "look": "natural",
+      "tooltip": "Unify... · remove supported duplicate polygons · poly.unify{binding}"
+    },
+    {
+      "command": "Scale Offset",
+      "label": "Scale Offset...",
+      "icon": "scale-offset",
+      "tooltip": "Scale Offset... · shrink the selected polygons in their planes by an inset distance · @ppi_PolyScale_Offset.py{binding}"
+    },
+    {
+      "command": "@ppi_PolyScale_Offset_Detach.py",
+      "label": "Scale Offset (Detach)...",
+      "icon": "scale-offset-detach",
+      "tooltip": "Scale Offset (Detach)... · inset the selected polygons onto new points, unconnected · @ppi_PolyScale_Offset.py detach"
+    },
+    {
+      "command": "Flatten Ngons",
+      "icon": "flatten-ngons",
+      "tooltip": "Flatten Ngons · flatten eligible polygons throughout the active mesh · @ppi_flatten_ngons.py{binding}"
+    },
+    {
+      "command": "Split",
+      "look": "natural",
+      "tooltip": "Split · connect selected opposite quad vertices · poly.split{binding}"
+    },
+    {
+      "command": "Quadruple",
+      "look": "natural",
+      "tooltip": "Quadruple · turn a two-row polygon into a row of quads · poly.quadruple{binding}"
+    },
+    {
+      "command": "Detriangulate",
+      "label": "Detriangulate...",
+      "icon": "detriangulate",
+      "tooltip": "Detriangulate... · join pairs of triangles back into quads · detriangulate{binding}"
+    },
+    {
+      "command": "Polygon Align",
+      "label": "Align",
+      "look": "natural",
+      "tooltip": "Align · orient two selected adjacent quads consistently · poly.align{binding}"
+    },
+    {
+      "command": "Set Part",
+      "label": "Set Part...",
+      "noShortcut": true,
+      "tooltip": "Set Part... · give the selected polygons a part name (all of them when none are selected) · poly.setPart{binding}"
+    },
+    {
+      "command": "Set Material",
+      "label": "Set Material...",
+      "noShortcut": true,
+      "tooltip": "Set Material...{binding} · assign a material to the selected polygons (all of them when none are selected) · poly.setMaterial\n{variants}",
+      "variants": {
+        "alt": {
+          "line": "Set Part",
+          "label": "Set Part...",
+          "tooltip": "Set Part...{binding} · give the selected polygons a part name (all of them when none are selected) · poly.setPart\n{variants}"
+        }
+      }
+    }
+  ]
+}

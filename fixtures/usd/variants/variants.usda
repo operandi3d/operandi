@@ -1,0 +1,42 @@
+#usda 1.0
+(
+    defaultPrim = "Shelf"
+    metersPerUnit = 1
+    upAxis = "Y"
+    doc = "Operandi regression fixture (written by hand): a variant set whose default selection picks the tall box, and a payload holding a second box."
+)
+
+def Xform "Shelf" (
+    variants = {
+        string size = "tall"
+    }
+    prepend variantSets = "size"
+)
+{
+    variantSet "size" = {
+        "short" {
+            def Mesh "Box"
+            {
+                int[] faceVertexCounts = [4]
+                int[] faceVertexIndices = [0, 1, 2, 3]
+                point3f[] points = [(0, 0, 0), (1, 0, 0), (1, 1, 0), (0, 1, 0)]
+            }
+        }
+        "tall" {
+            def Mesh "Box"
+            {
+                int[] faceVertexCounts = [4]
+                int[] faceVertexIndices = [0, 1, 2, 3]
+                point3f[] points = [(0, 0, 0), (1, 0, 0), (1, 3, 0), (0, 3, 0)]
+            }
+        }
+    }
+
+    def Xform "Crate" (
+        prepend payload = @./crate_payload.usda@
+    )
+    {
+        double3 xformOp:translate = (2, 0, 0)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+}

@@ -1,0 +1,321 @@
+[
+  {
+    "id": "pre5-reset",
+    "start": "ArmedPre5",
+    "steps": [
+      {
+        "action": "Begin =>currentD0",
+        "after": "BeginPre5",
+        "publication_delta": 1,
+        "request_delta": 1
+      },
+      {
+        "action": "first pointer+.25",
+        "after": "QuarterPre5",
+        "publication_delta": 1,
+        "request_delta": 1
+      },
+      {
+        "action": "Cancel never parked",
+        "after": "CancelPre5",
+        "publication_delta": 1,
+        "request_delta": 1
+      }
+    ]
+  },
+  {
+    "id": "field-preset",
+    "start": "A_begin",
+    "steps": [
+      {
+        "action": "field250mm",
+        "after": "QuarterField",
+        "publication_delta": 1,
+        "request_delta": 1
+      },
+      {
+        "action": "Undo localMove",
+        "after": "UndoQuarterFieldExact",
+        "publication_delta": 1,
+        "request_delta": 1
+      },
+      {
+        "action": "Cancel never parked",
+        "after": "CancelQuarterField",
+        "publication_delta": 1,
+        "request_delta": 1
+      }
+    ],
+    "field_cancel_expected_preset_override": 0.25
+  },
+  {
+    "id": "attributes-p",
+    "start": "pBase",
+    "steps": [
+      {
+        "action": "Begin",
+        "after": "p1",
+        "publication_delta": 1,
+        "request_delta": 1
+      },
+      {
+        "action": "Move .5",
+        "after": "p2",
+        "publication_delta": 1,
+        "request_delta": 1
+      },
+      {
+        "action": "Undo Move",
+        "after": "pUndo1",
+        "publication_delta": 1,
+        "request_delta": 1
+      },
+      {
+        "action": "Undo Begin=>park",
+        "after": "pPark",
+        "publication_delta": 1,
+        "request_delta": 1
+      },
+      {
+        "action": "Redo Begin",
+        "after": "pResume1",
+        "publication_delta": 1,
+        "request_delta": 1
+      },
+      {
+        "action": "Redo Move",
+        "after": "pResume2",
+        "publication_delta": 1,
+        "request_delta": 1
+      }
+    ]
+  },
+  {
+    "id": "attributes-sp",
+    "start": "spBase",
+    "steps": [
+      {
+        "action": "Begin",
+        "after": "sp1",
+        "publication_delta": 1,
+        "request_delta": 1
+      },
+      {
+        "action": "Move .5",
+        "after": "sp2",
+        "publication_delta": 1,
+        "request_delta": 1
+      },
+      {
+        "action": "Undo Move",
+        "after": "spUndo1",
+        "publication_delta": 1,
+        "request_delta": 1
+      },
+      {
+        "action": "Undo Begin=>park",
+        "after": "spPark",
+        "publication_delta": 1,
+        "request_delta": 1
+      },
+      {
+        "action": "Redo Begin",
+        "after": "spResume1",
+        "publication_delta": 1,
+        "request_delta": 1
+      },
+      {
+        "action": "Redo Move",
+        "after": "spResume2",
+        "publication_delta": 1,
+        "request_delta": 1
+      }
+    ]
+  },
+  {
+    "id": "attributes-eq",
+    "start": "eqBase",
+    "steps": [
+      {
+        "action": "Begin",
+        "after": "eq1",
+        "publication_delta": 1,
+        "request_delta": 1
+      },
+      {
+        "action": "Move .5",
+        "after": "eq2",
+        "publication_delta": 1,
+        "request_delta": 1
+      },
+      {
+        "action": "Undo Move",
+        "after": "eqUndo1",
+        "publication_delta": 1,
+        "request_delta": 1
+      },
+      {
+        "action": "Undo Begin=>park",
+        "after": "eqPark",
+        "publication_delta": 1,
+        "request_delta": 1
+      },
+      {
+        "action": "Redo Begin",
+        "after": "eqResume1",
+        "publication_delta": 1,
+        "request_delta": 1
+      },
+      {
+        "action": "Redo Move",
+        "after": "eqResume2",
+        "publication_delta": 1,
+        "request_delta": 1
+      }
+    ]
+  },
+  {
+    "id": "two-stages-m",
+    "start": "mBArmed",
+    "steps": [
+      {
+        "action": "Begin B",
+        "after": "mBBegin",
+        "publication_delta": 1,
+        "request_delta": 1
+      },
+      {
+        "action": "Move B",
+        "after": "mBMove",
+        "publication_delta": 1,
+        "request_delta": 1
+      },
+      {
+        "action": "Undo Move",
+        "after": "mBUndoMove",
+        "publication_delta": 1,
+        "request_delta": 1
+      },
+      {
+        "action": "Undo Begin=>park B",
+        "after": "mBPark",
+        "publication_delta": 1,
+        "request_delta": 1
+      },
+      {
+        "action": "Redo Begin B",
+        "after": "mBResume1",
+        "publication_delta": 1,
+        "request_delta": 1
+      },
+      {
+        "action": "Redo Move B",
+        "after": "mBResume2",
+        "publication_delta": 1,
+        "request_delta": 1
+      },
+      {
+        "action": "Finish B",
+        "after": "mFinishB",
+        "publication_delta": 1,
+        "request_delta": 1
+      },
+      {
+        "action": "Undo closed B",
+        "after": "mUndoClosedB",
+        "publication_delta": 1,
+        "request_delta": 1
+      },
+      {
+        "action": "Undo closed A",
+        "after": "mUndoClosedA",
+        "publication_delta": 1,
+        "request_delta": 1
+      }
+    ]
+  },
+  {
+    "id": "cancel-never-B-m",
+    "start": "mBMove",
+    "steps": [
+      {
+        "action": "Cancel B never parked",
+        "after": "mCancelB",
+        "publication_delta": 1,
+        "request_delta": 1
+      }
+    ]
+  },
+  {
+    "id": "two-stages-z",
+    "start": "zBArmed",
+    "steps": [
+      {
+        "action": "Begin B",
+        "after": "zBBegin",
+        "publication_delta": 1,
+        "request_delta": 1
+      },
+      {
+        "action": "Move B",
+        "after": "zBMove",
+        "publication_delta": 1,
+        "request_delta": 1
+      },
+      {
+        "action": "Undo Move",
+        "after": "zBUndoMove",
+        "publication_delta": 1,
+        "request_delta": 1
+      },
+      {
+        "action": "Undo Begin=>park B",
+        "after": "zBPark",
+        "publication_delta": 1,
+        "request_delta": 1
+      },
+      {
+        "action": "Redo Begin B",
+        "after": "zBResume1",
+        "publication_delta": 1,
+        "request_delta": 1
+      },
+      {
+        "action": "Redo Move B",
+        "after": "zBResume2",
+        "publication_delta": 1,
+        "request_delta": 1
+      },
+      {
+        "action": "Finish B",
+        "after": "zFinishB",
+        "publication_delta": 1,
+        "request_delta": 1
+      },
+      {
+        "action": "Undo closed B",
+        "after": "zUndoClosedB",
+        "publication_delta": 1,
+        "request_delta": 1
+      },
+      {
+        "action": "Undo closed A",
+        "after": "zUndoClosedA",
+        "publication_delta": 1,
+        "request_delta": 1
+      }
+    ]
+  },
+  {
+    "id": "cancel-never-B-z",
+    "start": "zBMove",
+    "steps": [
+      {
+        "action": "Cancel B never parked",
+        "after": "zCancelB",
+        "publication_delta": 1,
+        "request_delta": 1
+      }
+    ]
+  }
+]

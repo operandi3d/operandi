@@ -1,0 +1,55 @@
+{
+ "spec": "sketch-extrude-2026-11-05",
+ "comparison_rule": "Switch Sketch Extrude on with one polygon selected, Reset, compare every setting to settings_after_reset (percents as fractions, angles in radians). Switching on must not change the mesh.",
+ "cases": [
+  {
+   "id": "SE-D0",
+   "description": "Sketch Extrude settings after Reset, one polygon selected",
+   "setting_names": {
+    "mode": "Mode",
+    "path": "Move by Path",
+    "uniform": "Uniform",
+    "align": "Align to Path",
+    "prec": "Precision",
+    "scale": "Scale",
+    "spin": "Spin",
+    "uv": "Make UVs (on/off part)",
+    "urep": "U Repeat",
+    "vrep": "V Repeat",
+    "urot": "(unlabeled UV rotation)",
+    "profscale": "Profile scale",
+    "reversex": "Profile Reverse X",
+    "reversey": "Profile Reverse Y"
+   },
+   "choices": {
+    "mode": [
+     "sweep",
+     "editPath",
+     "deleteKnot",
+     "deletePath",
+     "uniformSpan",
+     "straight"
+    ]
+   },
+   "expected": {
+    "settings_after_reset": {
+     "mode": "sweep",
+     "path": 0,
+     "uniform": 0,
+     "align": 1,
+     "prec": 30,
+     "scale": 1.0,
+     "spin": 0.0,
+     "uv": 0,
+     "urep": 0,
+     "vrep": 0,
+     "urot": 0,
+     "profscale": 0.5,
+     "reversex": 0,
+     "reversey": 0
+    },
+    "mesh_unchanged": true
+   }
+  }
+ ]
+}

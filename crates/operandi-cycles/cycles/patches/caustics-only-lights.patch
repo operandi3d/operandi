@@ -1,0 +1,53 @@
+Operandi's change to Cycles (Apache-2.0): a light that reaches surfaces
+only through shadow caustics (MNEE), for caustic-only lights (Direct
+Caustics spec, Affect Diffuse 0 with Affect Caustics on). Applied by
+scripts/build-cycles.sh on top of the pinned commit.
+
+--- a/src/scene/light.h
++++ b/src/scene/light.h
+@@ -37,6 +37,8 @@ class Light : public Geometry {
+   NODE_SOCKET_API(bool, cast_shadow)
+   NODE_SOCKET_API(bool, use_mis)
+   NODE_SOCKET_API(bool, use_caustics)
++  /* Operandi: the light reaches surfaces only through shadow caustics (MNEE). */
++  NODE_SOCKET_API(bool, caustics_only)
+ 
+   NODE_SOCKET_API(bool, is_enabled)
+ 
+--- a/src/scene/light.cpp
++++ b/src/scene/light.cpp
+@@ -100,6 +100,7 @@ NODE_ABSTRACT_DEFINE(Light)
+   SOCKET_BOOLEAN(cast_shadow, "Cast Shadow", true);
+   SOCKET_BOOLEAN(use_mis, "Use Mis", false);
+   SOCKET_BOOLEAN(use_caustics, "Shadow Caustics", false);
++  SOCKET_BOOLEAN(caustics_only, "Caustics Only", false);
+ 
+   SOCKET_INT(max_bounces, "Max Bounces", 1024);
+ 
+@@ -480,7 +481,8 @@ void Light::copy_to_kernel(KernelLight *klight,
+   klight->object_id = object->index;
+   klight->max_bounces = max_bounces;
+   copy_v3_v3(klight->strength, strength);
+-  klight->use_caustics = use_caustics;
++  /* Operandi: 2 = caustics only (see kernel/integrator/shade_surface.h). */
++  klight->use_caustics = use_caustics ? (caustics_only ? 2 : 1) : 0;
+ }
+ 
+ /* Light Manager */
+--- a/src/kernel/integrator/shade_surface.h
++++ b/src/kernel/integrator/shade_surface.h
+@@ -391,6 +391,14 @@ ccl_device
+   }
+ #endif
+ 
++  /* Operandi: a caustics-only light (use_caustics 2) adds nothing but the
++   * MNEE connection through caustic casters. */
++  if (mnee_vertex_count == 0 && ls.type != LIGHT_TRIANGLE &&
++      kernel_data_fetch(lights, ls.prim).use_caustics == 2)
++  {
++    return SHADER_EVAL_EMPTY;
++  }
++
+   /* Evaluate constant part of light shader, rest will optionally be done in another kernel. */
+   Spectrum light_shader_eval ccl_optional_struct_init;
+   const bool is_constant_light_shader = light_sample_shader_eval_nee_constant(

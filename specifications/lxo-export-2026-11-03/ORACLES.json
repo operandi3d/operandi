@@ -1,0 +1,1033 @@
+{
+ "modo_version": "17.1v1",
+ "observed": "2026-11-03",
+ "oracles": [
+  {
+   "id": "LXE-O-02",
+   "description": "Smallest file: header, one LAYR/PNTS/POLS group, one mesh ITEM; nothing else.",
+   "input": {
+    "meshes": [
+     {
+      "name": "AsymTriangle",
+      "points": [
+       [
+        0.25,
+        0.5,
+        0.75
+       ],
+       [
+        2.25,
+        0.5,
+        0.75
+       ],
+       [
+        0.25,
+        3.5,
+        1.75
+       ]
+      ],
+      "polygons": [
+       [
+        0,
+        1,
+        2
+       ]
+      ]
+     }
+    ]
+   },
+   "expected": {
+    "opens": true,
+    "meshes": [
+     {
+      "name": "AsymTriangle",
+      "points": [
+       [
+        0.25,
+        0.5,
+        0.75
+       ],
+       [
+        2.25,
+        0.5,
+        0.75
+       ],
+       [
+        0.25,
+        3.5,
+        1.75
+       ]
+      ],
+      "polygons": [
+       [
+        0,
+        1,
+        2
+       ]
+      ],
+      "world_points": [
+       [
+        0.25,
+        0.5,
+        0.75
+       ],
+       [
+        2.25,
+        0.5,
+        0.75
+       ],
+       [
+        0.25,
+        3.5,
+        1.75
+       ]
+      ],
+      "poly_material": [
+       "Default"
+      ],
+      "poly_part": [
+       null
+      ],
+      "uv_maps": []
+     }
+    ]
+   },
+   "tolerance": 1e-05
+  },
+  {
+   "id": "LXE-O-05a",
+   "description": "Transforms with values in edit, scene and setup layers (Modo's own layout).",
+   "input": {
+    "meshes": [
+     {
+      "name": "Xa",
+      "points": [
+       [
+        0.25,
+        0.5,
+        0.75
+       ],
+       [
+        2.25,
+        0.5,
+        0.75
+       ],
+       [
+        0.25,
+        3.5,
+        1.75
+       ]
+      ],
+      "polygons": [
+       [
+        0,
+        1,
+        2
+       ]
+      ],
+      "position": [
+       3,
+       -2,
+       5
+      ],
+      "rotation_deg": [
+       30,
+       45,
+       60
+      ],
+      "rotation_order": "zxy",
+      "scale": [
+       1,
+       2,
+       0.5
+      ],
+      "action_layers": "edit+scene+setup"
+     }
+    ]
+   },
+   "expected": {
+    "opens": true,
+    "meshes": [
+     {
+      "world_points": [
+       [
+        2.958979,
+        -1.566987,
+        6.006947
+       ],
+       [
+        4.278458,
+        -0.066987,
+        5.912213
+       ],
+       [
+        0.651591,
+        0.781089,
+        11.048028
+       ]
+      ],
+      "pos": [
+       3.0,
+       -2.0,
+       5.0
+      ],
+      "rot_rad": [
+       0.523599,
+       0.785398,
+       1.047198
+      ],
+      "scl": [
+       1.0,
+       2.0,
+       0.5
+      ],
+      "rotation_order": "zxy"
+     }
+    ]
+   },
+   "tolerance": 1e-05
+  },
+  {
+   "id": "LXE-O-05",
+   "description": "Transforms with all values in the setup layer only (recommended).",
+   "input": {
+    "meshes": [
+     {
+      "name": "Xb",
+      "points": [
+       [
+        0.25,
+        0.5,
+        0.75
+       ],
+       [
+        2.25,
+        0.5,
+        0.75
+       ],
+       [
+        0.25,
+        3.5,
+        1.75
+       ]
+      ],
+      "polygons": [
+       [
+        0,
+        1,
+        2
+       ]
+      ],
+      "position": [
+       3,
+       -2,
+       5
+      ],
+      "rotation_deg": [
+       30,
+       45,
+       60
+      ],
+      "rotation_order": "zxy",
+      "scale": [
+       1,
+       2,
+       0.5
+      ],
+      "action_layers": "setup"
+     }
+    ]
+   },
+   "expected": {
+    "opens": true,
+    "meshes": [
+     {
+      "world_points": [
+       [
+        2.958979,
+        -1.566987,
+        6.006947
+       ],
+       [
+        4.278458,
+        -0.066987,
+        5.912213
+       ],
+       [
+        0.651591,
+        0.781089,
+        11.048028
+       ]
+      ],
+      "pos": [
+       3.0,
+       -2.0,
+       5.0
+      ],
+      "rot_rad": [
+       0.523599,
+       0.785398,
+       1.047198
+      ],
+      "scl": [
+       1.0,
+       2.0,
+       0.5
+      ],
+      "rotation_order": "zxy"
+     }
+    ]
+   },
+   "tolerance": 1e-05
+  },
+  {
+   "id": "LXE-O-05c",
+   "description": "Transforms with values only in an edit layer (not acceptable: channels read zero).",
+   "input": {
+    "meshes": [
+     {
+      "name": "Xc",
+      "points": [
+       [
+        0.25,
+        0.5,
+        0.75
+       ],
+       [
+        2.25,
+        0.5,
+        0.75
+       ],
+       [
+        0.25,
+        3.5,
+        1.75
+       ]
+      ],
+      "polygons": [
+       [
+        0,
+        1,
+        2
+       ]
+      ],
+      "position": [
+       3,
+       -2,
+       5
+      ],
+      "rotation_deg": [
+       30,
+       45,
+       60
+      ],
+      "rotation_order": "zxy",
+      "scale": [
+       1,
+       2,
+       0.5
+      ],
+      "action_layers": "edit"
+     }
+    ]
+   },
+   "expected": {
+    "opens": true,
+    "meshes": [
+     {
+      "world_points": [
+       [
+        2.958979,
+        -1.566987,
+        6.006947
+       ],
+       [
+        4.278458,
+        -0.066987,
+        5.912213
+       ],
+       [
+        0.651591,
+        0.781089,
+        11.048028
+       ]
+      ],
+      "pos": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "rot_rad": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "scl": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "rotation_order": "zxy"
+     }
+    ]
+   },
+   "tolerance": 1e-05
+  },
+  {
+   "id": "LXE-O-07",
+   "description": "Parent with transforms, child linked by parent LINK with position (1,0,0), third mesh hidden via setup visible=off.",
+   "input": {
+    "meshes": [
+     {
+      "name": "Parent",
+      "id": 0,
+      "points": [
+       [
+        0.25,
+        0.5,
+        0.75
+       ],
+       [
+        2.25,
+        0.5,
+        0.75
+       ],
+       [
+        0.25,
+        3.5,
+        1.75
+       ]
+      ],
+      "polygons": [
+       [
+        0,
+        1,
+        2
+       ]
+      ],
+      "position": [
+       3,
+       -2,
+       5
+      ],
+      "rotation_deg": [
+       30,
+       45,
+       60
+      ],
+      "scale": [
+       1,
+       2,
+       0.5
+      ]
+     },
+     {
+      "name": "Child",
+      "id": 1,
+      "parent": 0,
+      "points": [
+       [
+        0.25,
+        0.5,
+        0.75
+       ],
+       [
+        2.25,
+        0.5,
+        0.75
+       ],
+       [
+        0.25,
+        3.5,
+        1.75
+       ]
+      ],
+      "polygons": [
+       [
+        0,
+        1,
+        2
+       ]
+      ],
+      "position": [
+       1,
+       0,
+       0
+      ]
+     },
+     {
+      "name": "Hidden",
+      "id": 2,
+      "points": [
+       [
+        0.25,
+        0.5,
+        0.75
+       ],
+       [
+        2.25,
+        0.5,
+        0.75
+       ],
+       [
+        0.25,
+        3.5,
+        1.75
+       ]
+      ],
+      "polygons": [
+       [
+        0,
+        1,
+        2
+       ]
+      ],
+      "visible": "off"
+     }
+    ]
+   },
+   "expected": {
+    "opens": true,
+    "meshes": [
+     {
+      "name": "Parent",
+      "world_points": [
+       [
+        2.958979,
+        -1.566987,
+        6.006947
+       ],
+       [
+        4.278458,
+        -0.066987,
+        5.912213
+       ],
+       [
+        0.651591,
+        0.781089,
+        11.048028
+       ]
+      ],
+      "pos": [
+       3.0,
+       -2.0,
+       5.0
+      ],
+      "rot": [
+       0.523599,
+       0.785398,
+       1.047198
+      ],
+      "scl": [
+       1.0,
+       2.0,
+       0.5
+      ],
+      "parent": null,
+      "visible": "default"
+     },
+     {
+      "name": "Child",
+      "world_points": [
+       [
+        3.618718,
+        -0.816987,
+        5.95958
+       ],
+       [
+        4.938198,
+        0.683013,
+        5.864846
+       ],
+       [
+        1.31133,
+        1.531089,
+        11.000661
+       ]
+      ],
+      "pos": [
+       1.0,
+       0.0,
+       0.0
+      ],
+      "rot": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "scl": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "parent": "Parent",
+      "visible": "default"
+     },
+     {
+      "name": "Hidden",
+      "world_points": [
+       [
+        0.25,
+        0.5,
+        0.75
+       ],
+       [
+        2.25,
+        0.5,
+        0.75
+       ],
+       [
+        0.25,
+        3.5,
+        1.75
+       ]
+      ],
+      "pos": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "rot": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "scl": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "parent": null,
+      "visible": "off"
+     }
+    ]
+   },
+   "tolerance": 1e-05
+  },
+  {
+   "id": "LXE-O-09",
+   "description": "Two quads, two UV maps (UV_A continuous u=x/2,v=y with a seam on polygon 1 at points 1 and 2; UV_B u=3x-1, v=2y+5), material and part labels; VMAD after POLS.",
+   "input": {
+    "meshes": [
+     {
+      "name": "Tagged",
+      "points": [
+       [
+        0,
+        0,
+        0
+       ],
+       [
+        1,
+        0,
+        0
+       ],
+       [
+        1,
+        1,
+        0
+       ],
+       [
+        0,
+        1,
+        0
+       ],
+       [
+        2,
+        0,
+        0
+       ],
+       [
+        2,
+        1,
+        0
+       ]
+      ],
+      "polygons": [
+       [
+        0,
+        1,
+        2,
+        3
+       ],
+       [
+        1,
+        4,
+        5,
+        2
+       ]
+      ],
+      "uv": {
+       "UV_A": {
+        "per_point": "(x/2, y)",
+        "per_corner_overrides": [
+         {
+          "point": 1,
+          "polygon": 1,
+          "uv": [
+           0.9,
+           0.1
+          ]
+         },
+         {
+          "point": 2,
+          "polygon": 1,
+          "uv": [
+           0.9,
+           0.9
+          ]
+         }
+        ]
+       },
+       "UV_B": {
+        "per_point": "(3x-1, 2y+5)"
+       }
+      },
+      "material": [
+       "Red",
+       "Blue"
+      ],
+      "part": [
+       "Front",
+       "Back"
+      ]
+     }
+    ]
+   },
+   "expected": {
+    "opens": true,
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      1,
+      4,
+      5,
+      2
+     ]
+    ],
+    "uv_per_polygon_corner": {
+     "UV_A": [
+      [
+       [
+        0.0,
+        0.0
+       ],
+       [
+        0.5,
+        0.0
+       ],
+       [
+        0.5,
+        1.0
+       ],
+       [
+        0.0,
+        1.0
+       ]
+      ],
+      [
+       [
+        0.9,
+        0.1
+       ],
+       [
+        1.0,
+        0.0
+       ],
+       [
+        1.0,
+        1.0
+       ],
+       [
+        0.9,
+        0.9
+       ]
+      ]
+     ],
+     "UV_B": [
+      [
+       [
+        -1.0,
+        5.0
+       ],
+       [
+        2.0,
+        5.0
+       ],
+       [
+        2.0,
+        7.0
+       ],
+       [
+        -1.0,
+        7.0
+       ]
+      ],
+      [
+       [
+        2.0,
+        5.0
+       ],
+       [
+        5.0,
+        5.0
+       ],
+       [
+        5.0,
+        7.0
+       ],
+       [
+        2.0,
+        7.0
+       ]
+      ]
+     ]
+    },
+    "poly_material": [
+     "Red",
+     "Blue"
+    ],
+    "poly_part": [
+     "Front",
+     "Back"
+    ],
+    "material_or_mask_items_created": 0
+   },
+   "tolerance": 1e-05
+  },
+  {
+   "id": "LXE-O-12",
+   "description": "Names and ids: layers 0..3 owned by item ids 9, 5, 2, 7; ITEM chunks written in the order 7, 9, 2, 5; names '', Unicode, 'Dup', 'Dup'.",
+   "input": {
+    "layers": [
+     {
+      "ordinal": 0,
+      "item": 9,
+      "name": ""
+     },
+     {
+      "ordinal": 1,
+      "item": 5,
+      "name": "Ünïcødé 名前"
+     },
+     {
+      "ordinal": 2,
+      "item": 2,
+      "name": "Dup"
+     },
+     {
+      "ordinal": 3,
+      "item": 7,
+      "name": "Dup"
+     }
+    ]
+   },
+   "expected": {
+    "opens": true,
+    "displayed_names_in_layer_order": [
+     "Mesh",
+     "Ünïcødé 名前",
+     "Dup",
+     "Dup (2)"
+    ]
+   }
+  },
+  {
+   "id": "LXE-O-14",
+   "description": "256x256 quad grid on z=0 from 0 to 1: 66049 points, 65536 quads, long VX indices.",
+   "input": {
+    "grid": {
+     "n": 256,
+     "point_index": "j*257+i",
+     "point": "(i/256, j/256, 0)",
+     "polygon": "[a, a+1, a+258, a+257], a=j*257+i"
+    }
+   },
+   "expected": {
+    "n_points": 66049,
+    "n_polys": 65536,
+    "last_poly": [
+     65790,
+     65791,
+     66048,
+     66047
+    ],
+    "poly_255": [
+     255,
+     256,
+     513,
+     512
+    ],
+    "pt_65280": [
+     0.007812,
+     0.992188,
+     0.0
+    ],
+    "pt_last": [
+     1.0,
+     1.0,
+     0.0
+    ]
+   },
+   "tolerance": 1e-05
+  },
+  {
+   "id": "LXE-O-RT-07",
+   "description": "Open the LXE-O-07 file, save it from Modo, reopen: every fact unchanged.",
+   "input": {
+    "same_as": "LXE-O-07"
+   },
+   "expected": {
+    "identical_to": "LXE-O-07"
+   }
+  },
+  {
+   "id": "LXE-O-RT-09",
+   "description": "Open the LXE-O-09 file, save it from Modo, reopen: every fact unchanged.",
+   "input": {
+    "same_as": "LXE-O-09"
+   },
+   "expected": {
+    "identical_to": "LXE-O-09"
+   }
+  },
+  {
+   "id": "LXE-O-15",
+   "description": "Stripped triangle file declaring APPV (17,4000,8,0) plus a bare polyRender ITEM.",
+   "input": {
+    "meshes": [
+     {
+      "name": "Tri",
+      "points": [
+       [
+        0.25,
+        0.5,
+        0.75
+       ],
+       [
+        2.25,
+        0.5,
+        0.75
+       ],
+       [
+        0.25,
+        3.5,
+        1.75
+       ]
+      ],
+      "polygons": [
+       [
+        0,
+        1,
+        2
+       ]
+      ]
+     }
+    ],
+    "appv": [
+     17,
+     4000,
+     8,
+     0
+    ],
+    "render_item": "bare"
+   },
+   "expected": {
+    "opens": true,
+    "world_points": [
+     [
+      0.25,
+      0.5,
+      0.75
+     ],
+     [
+      2.25,
+      0.5,
+      0.75
+     ],
+     [
+      0.25,
+      3.5,
+      1.75
+     ]
+    ]
+   },
+   "tolerance": 1e-05
+  },
+  {
+   "id": "LXE-O-16",
+   "description": "LXE layout (APPV 17,4001,1,0) plus a bare polyRender ITEM.",
+   "input": {
+    "meshes": [
+     {
+      "name": "Tri",
+      "points": [
+       [
+        0.25,
+        0.5,
+        0.75
+       ],
+       [
+        2.25,
+        0.5,
+        0.75
+       ],
+       [
+        0.25,
+        3.5,
+        1.75
+       ]
+      ],
+      "polygons": [
+       [
+        0,
+        1,
+        2
+       ]
+      ]
+     }
+    ],
+    "render_item": "bare"
+   },
+   "expected": {
+    "opens": true,
+    "world_points": [
+     [
+      0.25,
+      0.5,
+      0.75
+     ],
+     [
+      2.25,
+      0.5,
+      0.75
+     ],
+     [
+      0.25,
+      3.5,
+      1.75
+     ]
+    ],
+    "render_item_name": "Render"
+   },
+   "tolerance": 1e-05
+  },
+  {
+   "id": "LXE-O-CRASH",
+   "description": "Layouts that terminated Modo 17.1v1 on open (no message). An exporter must never write them.",
+   "input": {},
+   "expected": {
+    "crashes": [
+     "no APPV chunk, or APPV second word 4000, in a stripped file without a render item",
+     "VMAD chunk before its layer's POLS",
+     "LAYR tail bytes other than LXE-04's"
+    ]
+   }
+  }
+ ]
+}

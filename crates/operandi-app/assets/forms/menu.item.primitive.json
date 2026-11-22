@@ -1,0 +1,77 @@
+{
+  "version": 1,
+  "id": "menu.item.primitive",
+  "label": "Primitive",
+  "style": "menu",
+  "controls": [
+    {
+      "command": "Cube",
+      "label": "Cube",
+      "shortcut": "Cube"
+    },
+    {
+      "command": "Sphere",
+      "label": "Sphere",
+      "shortcut": "Sphere"
+    },
+    {
+      "command": "Cylinder",
+      "label": "Cylinder",
+      "shortcut": "Cylinder"
+    },
+    {
+      "command": "Cone",
+      "label": "Cone"
+    },
+    {
+      "command": "Ellipsoid",
+      "label": "Ellipsoid",
+      "shortcut": "Ellipsoid"
+    },
+    {
+      "command": "Ellipsoid Unit",
+      "label": "Unit Ellipsoid in Current Mesh"
+    },
+    {
+      "command": "Ellipsoid New Unit",
+      "label": "Unit Ellipsoid in New Mesh"
+    },
+    {
+      "command": "Torus",
+      "label": "Torus",
+      "shortcut": "Torus"
+    },
+    {
+      "command": "Capsule",
+      "label": "Capsule",
+      "shortcut": "Capsule"
+    },
+    {
+      "command": "Arc",
+      "label": "Arc",
+      "shortcut": "Arc"
+    },
+    {
+      "command": "Tube",
+      "label": "Tube",
+      "shortcut": "Tube"
+    },
+    {
+      "command": "Text",
+      "label": "Text",
+      "shortcut": "Text"
+    },
+    {
+      "command": "Teapot",
+      "label": "Teapot"
+    },
+    {
+      "command": "Teapot Item",
+      "label": "Teapot in New Mesh"
+    },
+    {
+      "command": "Plane Item",
+      "label": "Plane in New Mesh"
+    }
+  ]
+}

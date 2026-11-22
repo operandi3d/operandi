@@ -1,0 +1,1146 @@
+{
+ "spec": "offset-flatten-2026-11-05",
+ "comparison_rule": "Build the input, select as listed, run Flatten Ngons. Counts, which polygons move, and selection after must match exactly; moved positions are Modo reference values (plane rule open, SPEC rule 3).",
+ "cases": [
+  {
+   "id": "FN01",
+   "description": "Non-planar quad (one corner raised 0.2) selected",
+   "input": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.2
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": [
+     0
+    ]
+   },
+   "selection_mode": "polygon",
+   "expected": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.2
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ]
+    ],
+    "polygon_types": [
+     "face"
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": []
+    },
+    "selection_mode_after": "polygon",
+    "failed": false
+   }
+  },
+  {
+   "id": "FN02",
+   "description": "Non-planar pentagon (one corner raised 0.3) selected",
+   "input": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      2.0,
+      0.0,
+      0.0
+     ],
+     [
+      2.0,
+      1.0,
+      0.3
+     ],
+     [
+      1.0,
+      2.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3,
+      4
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": [
+     0
+    ]
+   },
+   "selection_mode": "polygon",
+   "expected": {
+    "points": [
+     [
+      -0.008999,
+      0.022009,
+      0.209423
+     ],
+     [
+      1.987355,
+      0.030927,
+      0.294273
+     ],
+     [
+      2.004541,
+      0.988895,
+      0.194334
+     ],
+     [
+      0.998095,
+      2.004659,
+      0.044334
+     ],
+     [
+      -0.004541,
+      1.011105,
+      0.105666
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3,
+      4
+     ]
+    ],
+    "polygon_types": [
+     "face"
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": []
+    },
+    "selection_mode_after": "polygon",
+    "failed": false
+   }
+  },
+  {
+   "id": "FN03",
+   "description": "Two quads sharing an edge whose shared top point is raised 0.3, both selected",
+   "input": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      2.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.3
+     ],
+     [
+      2.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      4,
+      3
+     ],
+     [
+      1,
+      2,
+      5,
+      4
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": [
+     0,
+     1
+    ]
+   },
+   "selection_mode": "polygon",
+   "expected": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      2.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.3
+     ],
+     [
+      2.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      4,
+      3
+     ],
+     [
+      1,
+      2,
+      5,
+      4
+     ]
+    ],
+    "polygon_types": [
+     "face",
+     "face"
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": []
+    },
+    "selection_mode_after": "polygon",
+    "failed": false
+   }
+  },
+  {
+   "id": "FN04",
+   "description": "Non-planar quad and non-planar pentagon, both selected",
+   "input": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.2
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      3.0,
+      0.0,
+      0.0
+     ],
+     [
+      5.0,
+      0.0,
+      0.0
+     ],
+     [
+      5.0,
+      1.0,
+      0.3
+     ],
+     [
+      4.0,
+      2.0,
+      0.0
+     ],
+     [
+      3.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      4,
+      5,
+      6,
+      7,
+      8
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": [
+     0,
+     1
+    ]
+   },
+   "selection_mode": "polygon",
+   "expected": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.2
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      2.991001,
+      0.022009,
+      0.209423
+     ],
+     [
+      4.987355,
+      0.030927,
+      0.294273
+     ],
+     [
+      5.00454,
+      0.988895,
+      0.194334
+     ],
+     [
+      3.998095,
+      2.004659,
+      0.044334
+     ],
+     [
+      2.995459,
+      1.011105,
+      0.105666
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      4,
+      5,
+      6,
+      7,
+      8
+     ]
+    ],
+    "polygon_types": [
+     "face",
+     "face"
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": []
+    },
+    "selection_mode_after": "polygon",
+    "failed": false
+   }
+  },
+  {
+   "id": "FN05",
+   "description": "Non-planar quad and pentagon, only the quad selected",
+   "input": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.2
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      3.0,
+      0.0,
+      0.0
+     ],
+     [
+      5.0,
+      0.0,
+      0.0
+     ],
+     [
+      5.0,
+      1.0,
+      0.3
+     ],
+     [
+      4.0,
+      2.0,
+      0.0
+     ],
+     [
+      3.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      4,
+      5,
+      6,
+      7,
+      8
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": [
+     0
+    ]
+   },
+   "selection_mode": "polygon",
+   "expected": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.2
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      2.991001,
+      0.022009,
+      0.209423
+     ],
+     [
+      4.987355,
+      0.030927,
+      0.294273
+     ],
+     [
+      5.00454,
+      0.988895,
+      0.194334
+     ],
+     [
+      3.998095,
+      2.004659,
+      0.044334
+     ],
+     [
+      2.995459,
+      1.011105,
+      0.105666
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      4,
+      5,
+      6,
+      7,
+      8
+     ]
+    ],
+    "polygon_types": [
+     "face",
+     "face"
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": []
+    },
+    "selection_mode_after": "polygon",
+    "failed": false
+   }
+  },
+  {
+   "id": "FN06",
+   "description": "Planar quad selected",
+   "input": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      0.0
+     ],
+     [
+      0.5,
+      -0.5,
+      0.0
+     ],
+     [
+      -0.5,
+      0.5,
+      0.0
+     ],
+     [
+      0.5,
+      0.5,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      3,
+      2
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": [
+     0
+    ]
+   },
+   "selection_mode": "polygon",
+   "expected": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      0.0
+     ],
+     [
+      0.5,
+      -0.5,
+      0.0
+     ],
+     [
+      -0.5,
+      0.5,
+      0.0
+     ],
+     [
+      0.5,
+      0.5,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      3,
+      2
+     ]
+    ],
+    "polygon_types": [
+     "face"
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": []
+    },
+    "selection_mode_after": "polygon",
+    "failed": false
+   }
+  },
+  {
+   "id": "FN07",
+   "description": "Cube with corner 6 pulled to (0.5,0.8,0.5), all faces selected",
+   "input": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.8,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      7,
+      6,
+      5,
+      4
+     ],
+     [
+      0,
+      4,
+      5,
+      1
+     ],
+     [
+      1,
+      5,
+      6,
+      2
+     ],
+     [
+      2,
+      6,
+      7,
+      3
+     ],
+     [
+      3,
+      7,
+      4,
+      0
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5
+    ]
+   },
+   "selection_mode": "polygon",
+   "expected": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.8,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      7,
+      6,
+      5,
+      4
+     ],
+     [
+      0,
+      4,
+      5,
+      1
+     ],
+     [
+      1,
+      5,
+      6,
+      2
+     ],
+     [
+      2,
+      6,
+      7,
+      3
+     ],
+     [
+      3,
+      7,
+      4,
+      0
+     ]
+    ],
+    "polygon_types": [
+     "face",
+     "face",
+     "face",
+     "face",
+     "face",
+     "face"
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": []
+    },
+    "selection_mode_after": "polygon",
+    "failed": false
+   }
+  },
+  {
+   "id": "FN08",
+   "description": "Non-planar pentagon, vertex mode with all its points selected",
+   "input": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      2.0,
+      0.0,
+      0.0
+     ],
+     [
+      2.0,
+      1.0,
+      0.3
+     ],
+     [
+      1.0,
+      2.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3,
+      4
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [
+     0,
+     1,
+     2,
+     3,
+     4
+    ],
+    "sel_edges": [],
+    "sel_polygons": []
+   },
+   "selection_mode": "vertex",
+   "expected": {
+    "points": [
+     [
+      -0.008999,
+      0.022009,
+      0.209423
+     ],
+     [
+      1.987355,
+      0.030927,
+      0.294273
+     ],
+     [
+      2.004541,
+      0.988895,
+      0.194334
+     ],
+     [
+      0.998095,
+      2.004659,
+      0.044334
+     ],
+     [
+      -0.004541,
+      1.011105,
+      0.105666
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3,
+      4
+     ]
+    ],
+    "polygon_types": [
+     "face"
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": []
+    },
+    "selection_mode_after": "polygon",
+    "failed": false
+   }
+  },
+  {
+   "id": "FN09",
+   "description": "Mixed mesh, polygon mode, nothing selected",
+   "input": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.2
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      3.0,
+      0.0,
+      0.0
+     ],
+     [
+      5.0,
+      0.0,
+      0.0
+     ],
+     [
+      5.0,
+      1.0,
+      0.3
+     ],
+     [
+      4.0,
+      2.0,
+      0.0
+     ],
+     [
+      3.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      4,
+      5,
+      6,
+      7,
+      8
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": []
+   },
+   "selection_mode": "polygon",
+   "expected": {
+    "points": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.2
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      2.991001,
+      0.022009,
+      0.209423
+     ],
+     [
+      4.987355,
+      0.030927,
+      0.294273
+     ],
+     [
+      5.00454,
+      0.988895,
+      0.194334
+     ],
+     [
+      3.998095,
+      2.004659,
+      0.044334
+     ],
+     [
+      2.995459,
+      1.011105,
+      0.105666
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      4,
+      5,
+      6,
+      7,
+      8
+     ]
+    ],
+    "polygon_types": [
+     "face",
+     "face"
+    ],
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": []
+    },
+    "selection_mode_after": "polygon",
+    "failed": false
+   }
+  }
+ ]
+}

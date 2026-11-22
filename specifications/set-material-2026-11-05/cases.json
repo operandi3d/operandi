@@ -1,0 +1,1798 @@
+{
+ "spec": "set-material-2026-11-05",
+ "comparison_rule": "Build the input (all polygons tagged Default unless listed), select as listed, run Set Material with the listed options. Match polygon tags, which material groups are created or changed, their colour/amount values, and that points don't move.",
+ "cases": [
+  {
+   "id": "SM01",
+   "description": "2x2 grid, polygons 0,1 selected; name Red, colour 1 0 0, diffuse 80%, specular 20%, smoothing on",
+   "input": {
+    "points": [
+     [
+      -1.0,
+      -1.0,
+      0.0
+     ],
+     [
+      0.0,
+      -1.0,
+      0.0
+     ],
+     [
+      1.0,
+      -1.0,
+      0.0
+     ],
+     [
+      -1.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      -1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      4,
+      3
+     ],
+     [
+      1,
+      2,
+      5,
+      4
+     ],
+     [
+      3,
+      4,
+      7,
+      6
+     ],
+     [
+      4,
+      5,
+      8,
+      7
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": [
+     0,
+     1
+    ]
+   },
+   "selection_mode": "polygon",
+   "option": {
+    "name": "Red",
+    "color": [
+     1.0
+    ],
+    "diffuse": 0.8,
+    "specular": 0.2,
+    "smoothing": true,
+    "default": false
+   },
+   "expected": {
+    "polygon_materials": [
+     "Red",
+     "Red",
+     "Default",
+     "Default"
+    ],
+    "new_shader_items": [
+     {
+      "type": "advancedMaterial",
+      "name": "M_Red",
+      "parent": "Red (Material)",
+      "diffCol.R": 1.0,
+      "diffCol.G": 0.0,
+      "diffCol.B": 0.0,
+      "diffAmt": 0.8,
+      "specAmt": 0.2,
+      "smooth": 1.0
+     },
+     {
+      "type": "mask",
+      "name": "Red (Material)",
+      "parent": "Render",
+      "ptag": "Red",
+      "ptyp": "Material"
+     }
+    ],
+    "changed_shader_items": [],
+    "points_unchanged": true,
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": [
+      0,
+      1
+     ]
+    },
+    "selection_mode_after": "polygon"
+   }
+  },
+  {
+   "id": "SM02",
+   "description": "Polygon 0 already Red (from an earlier Set Material); polygons 2,3 selected; name Red again, colour 0 0 1",
+   "input": {
+    "points": [
+     [
+      -1.0,
+      -1.0,
+      0.0
+     ],
+     [
+      0.0,
+      -1.0,
+      0.0
+     ],
+     [
+      1.0,
+      -1.0,
+      0.0
+     ],
+     [
+      -1.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      -1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      4,
+      3
+     ],
+     [
+      1,
+      2,
+      5,
+      4
+     ],
+     [
+      3,
+      4,
+      7,
+      6
+     ],
+     [
+      4,
+      5,
+      8,
+      7
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": [
+     2,
+     3
+    ]
+   },
+   "selection_mode": "polygon",
+   "option": {
+    "name": "Red",
+    "color": [
+     0.0
+    ],
+    "diffuse": 0.8,
+    "specular": 0.2,
+    "smoothing": true,
+    "default": false
+   },
+   "expected": {
+    "polygon_materials": [
+     "Red",
+     "Default",
+     "Red",
+     "Red"
+    ],
+    "new_shader_items": [],
+    "changed_shader_items": [
+     {
+      "type": "advancedMaterial",
+      "name": "M_Red",
+      "parent": "Red (Material)",
+      "diffCol.R": 0.0,
+      "diffCol.G": 0.0,
+      "diffCol.B": 1.0,
+      "diffAmt": 0.8,
+      "specAmt": 0.2,
+      "smooth": 1.0
+     }
+    ],
+    "points_unchanged": true,
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": [
+      2,
+      3
+     ]
+    },
+    "selection_mode_after": "polygon"
+   },
+   "input_polygon_materials": [
+    "Red",
+    "Default",
+    "Default",
+    "Default"
+   ],
+   "setup": "material Red already exists (colour 1 0 0) from an earlier Set Material on polygon 0"
+  },
+  {
+   "id": "SM03",
+   "description": "Polygon mode, nothing selected; name Blue, colour 0 0 1",
+   "input": {
+    "points": [
+     [
+      -1.0,
+      -1.0,
+      0.0
+     ],
+     [
+      0.0,
+      -1.0,
+      0.0
+     ],
+     [
+      1.0,
+      -1.0,
+      0.0
+     ],
+     [
+      -1.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      -1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      4,
+      3
+     ],
+     [
+      1,
+      2,
+      5,
+      4
+     ],
+     [
+      3,
+      4,
+      7,
+      6
+     ],
+     [
+      4,
+      5,
+      8,
+      7
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": []
+   },
+   "selection_mode": "polygon",
+   "option": {
+    "name": "Blue",
+    "color": [
+     0.0
+    ],
+    "diffuse": 0.8,
+    "specular": 0.2,
+    "smoothing": true,
+    "default": false
+   },
+   "expected": {
+    "polygon_materials": [
+     "Blue",
+     "Blue",
+     "Blue",
+     "Blue"
+    ],
+    "new_shader_items": [
+     {
+      "type": "advancedMaterial",
+      "name": "M_Blue",
+      "parent": "Blue (Material)",
+      "diffCol.R": 0.0,
+      "diffCol.G": 0.0,
+      "diffCol.B": 1.0,
+      "diffAmt": 0.8,
+      "specAmt": 0.2,
+      "smooth": 1.0
+     },
+     {
+      "type": "mask",
+      "name": "Blue (Material)",
+      "parent": "Render",
+      "ptag": "Blue",
+      "ptyp": "Material"
+     }
+    ],
+    "changed_shader_items": [],
+    "points_unchanged": true,
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": []
+    },
+    "selection_mode_after": "polygon"
+   }
+  },
+  {
+   "id": "SM04",
+   "description": "Polygon 0 selected; name Matte, diffuse 50%, specular 0%, smoothing off",
+   "input": {
+    "points": [
+     [
+      -1.0,
+      -1.0,
+      0.0
+     ],
+     [
+      0.0,
+      -1.0,
+      0.0
+     ],
+     [
+      1.0,
+      -1.0,
+      0.0
+     ],
+     [
+      -1.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      -1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      4,
+      3
+     ],
+     [
+      1,
+      2,
+      5,
+      4
+     ],
+     [
+      3,
+      4,
+      7,
+      6
+     ],
+     [
+      4,
+      5,
+      8,
+      7
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": [
+     0
+    ]
+   },
+   "selection_mode": "polygon",
+   "option": {
+    "name": "Matte",
+    "color": [
+     0.2
+    ],
+    "diffuse": 0.5,
+    "specular": 0.0,
+    "smoothing": false,
+    "default": false
+   },
+   "expected": {
+    "polygon_materials": [
+     "Matte",
+     "Default",
+     "Default",
+     "Default"
+    ],
+    "new_shader_items": [
+     {
+      "type": "advancedMaterial",
+      "name": "M_Matte",
+      "parent": "Matte (Material)",
+      "diffCol.R": 0.2,
+      "diffCol.G": 0.4,
+      "diffCol.B": 0.6000000000000001,
+      "diffAmt": 0.5,
+      "specAmt": 0.0,
+      "smooth": 0.0
+     },
+     {
+      "type": "mask",
+      "name": "Matte (Material)",
+      "parent": "Render",
+      "ptag": "Matte",
+      "ptyp": "Material"
+     }
+    ],
+    "changed_shader_items": [],
+    "points_unchanged": true,
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": [
+      0
+     ]
+    },
+    "selection_mode_after": "polygon"
+   }
+  },
+  {
+   "id": "SM05",
+   "description": "Vertex mode, point 4 selected; name Pt",
+   "input": {
+    "points": [
+     [
+      -1.0,
+      -1.0,
+      0.0
+     ],
+     [
+      0.0,
+      -1.0,
+      0.0
+     ],
+     [
+      1.0,
+      -1.0,
+      0.0
+     ],
+     [
+      -1.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      -1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      4,
+      3
+     ],
+     [
+      1,
+      2,
+      5,
+      4
+     ],
+     [
+      3,
+      4,
+      7,
+      6
+     ],
+     [
+      4,
+      5,
+      8,
+      7
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [
+     4
+    ],
+    "sel_edges": [],
+    "sel_polygons": []
+   },
+   "selection_mode": "vertex",
+   "option": {
+    "name": "Pt",
+    "color": [
+     1.0
+    ],
+    "diffuse": 0.8,
+    "specular": 0.2,
+    "smoothing": true,
+    "default": false
+   },
+   "expected": {
+    "polygon_materials": [
+     "Default",
+     "Default",
+     "Default",
+     "Default"
+    ],
+    "new_shader_items": [
+     {
+      "type": "advancedMaterial",
+      "name": "M_Pt",
+      "parent": "Pt (Material)",
+      "diffCol.R": 1.0,
+      "diffCol.G": 0.0,
+      "diffCol.B": 0.0,
+      "diffAmt": 0.8,
+      "specAmt": 0.2,
+      "smooth": 1.0
+     },
+     {
+      "type": "mask",
+      "name": "Pt (Material)",
+      "parent": "Render",
+      "ptag": "Pt",
+      "ptyp": "Material"
+     }
+    ],
+    "changed_shader_items": [],
+    "points_unchanged": true,
+    "selection_after": {
+     "sel_vertices": [
+      4
+     ],
+     "sel_edges": [],
+     "sel_polygons": []
+    },
+    "selection_mode_after": "vertex"
+   }
+  },
+  {
+   "id": "SM06",
+   "description": "Item mode, mesh selected; name Item",
+   "input": {
+    "points": [
+     [
+      -1.0,
+      -1.0,
+      0.0
+     ],
+     [
+      0.0,
+      -1.0,
+      0.0
+     ],
+     [
+      1.0,
+      -1.0,
+      0.0
+     ],
+     [
+      -1.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      -1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      4,
+      3
+     ],
+     [
+      1,
+      2,
+      5,
+      4
+     ],
+     [
+      3,
+      4,
+      7,
+      6
+     ],
+     [
+      4,
+      5,
+      8,
+      7
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": []
+   },
+   "selection_mode": "item",
+   "option": {
+    "name": "Item",
+    "color": [
+     1.0
+    ],
+    "diffuse": 0.8,
+    "specular": 0.2,
+    "smoothing": true,
+    "default": false
+   },
+   "expected": {
+    "polygon_materials": [
+     "Item",
+     "Item",
+     "Item",
+     "Item"
+    ],
+    "new_shader_items": [
+     {
+      "type": "advancedMaterial",
+      "name": "M_Item",
+      "parent": "Item (Material)",
+      "diffCol.R": 1.0,
+      "diffCol.G": 0.0,
+      "diffCol.B": 0.0,
+      "diffAmt": 0.8,
+      "specAmt": 0.2,
+      "smooth": 1.0
+     },
+     {
+      "type": "mask",
+      "name": "Item (Material)",
+      "parent": "Render",
+      "ptag": "Item",
+      "ptyp": "Material"
+     }
+    ],
+    "changed_shader_items": [],
+    "points_unchanged": true,
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": []
+    },
+    "selection_mode_after": "item"
+   }
+  },
+  {
+   "id": "SM07",
+   "description": "Polygon 0 selected; name with a space and slash: My Mat/One",
+   "input": {
+    "points": [
+     [
+      -1.0,
+      -1.0,
+      0.0
+     ],
+     [
+      0.0,
+      -1.0,
+      0.0
+     ],
+     [
+      1.0,
+      -1.0,
+      0.0
+     ],
+     [
+      -1.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      -1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      4,
+      3
+     ],
+     [
+      1,
+      2,
+      5,
+      4
+     ],
+     [
+      3,
+      4,
+      7,
+      6
+     ],
+     [
+      4,
+      5,
+      8,
+      7
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": [
+     0
+    ]
+   },
+   "selection_mode": "polygon",
+   "option": {
+    "name": "My",
+    "color": [
+     1.0
+    ],
+    "diffuse": 0.8,
+    "specular": 0.2,
+    "smoothing": true,
+    "default": false
+   },
+   "expected": {
+    "polygon_materials": [
+     "My Mat/One",
+     "Default",
+     "Default",
+     "Default"
+    ],
+    "new_shader_items": [
+     {
+      "type": "advancedMaterial",
+      "name": "M_My Mat/One",
+      "parent": "My Mat/One (Material)",
+      "diffCol.R": 1.0,
+      "diffCol.G": 0.0,
+      "diffCol.B": 0.0,
+      "diffAmt": 0.8,
+      "specAmt": 0.2,
+      "smooth": 1.0
+     },
+     {
+      "type": "mask",
+      "name": "My Mat/One (Material)",
+      "parent": "Render",
+      "ptag": "My Mat/One",
+      "ptyp": "Material"
+     }
+    ],
+    "changed_shader_items": [],
+    "points_unchanged": true,
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": [
+      0
+     ]
+    },
+    "selection_mode_after": "polygon"
+   }
+  },
+  {
+   "id": "SM08",
+   "description": "Polygon 0 selected; name Default (the existing default tag)",
+   "input": {
+    "points": [
+     [
+      -1.0,
+      -1.0,
+      0.0
+     ],
+     [
+      0.0,
+      -1.0,
+      0.0
+     ],
+     [
+      1.0,
+      -1.0,
+      0.0
+     ],
+     [
+      -1.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      -1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      4,
+      3
+     ],
+     [
+      1,
+      2,
+      5,
+      4
+     ],
+     [
+      3,
+      4,
+      7,
+      6
+     ],
+     [
+      4,
+      5,
+      8,
+      7
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": [
+     0
+    ]
+   },
+   "selection_mode": "polygon",
+   "option": {
+    "name": "Default",
+    "color": [
+     0.0
+    ],
+    "diffuse": 0.8,
+    "specular": 0.2,
+    "smoothing": true,
+    "default": false
+   },
+   "expected": {
+    "polygon_materials": [
+     "Default",
+     "Default",
+     "Default",
+     "Default"
+    ],
+    "new_shader_items": [
+     {
+      "type": "advancedMaterial",
+      "name": "M_Default",
+      "parent": "Default (Material)",
+      "diffCol.R": 0.0,
+      "diffCol.G": 1.0,
+      "diffCol.B": 0.0,
+      "diffAmt": 0.8,
+      "specAmt": 0.2,
+      "smooth": 1.0
+     },
+     {
+      "type": "mask",
+      "name": "Default (Material)",
+      "parent": "Render",
+      "ptag": "Default",
+      "ptyp": "Material"
+     }
+    ],
+    "changed_shader_items": [],
+    "points_unchanged": true,
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": [
+      0
+     ]
+    },
+    "selection_mode_after": "polygon"
+   }
+  },
+  {
+   "id": "SM09",
+   "description": "Polygon 0 selected; name Red, default flag on",
+   "input": {
+    "points": [
+     [
+      -1.0,
+      -1.0,
+      0.0
+     ],
+     [
+      0.0,
+      -1.0,
+      0.0
+     ],
+     [
+      1.0,
+      -1.0,
+      0.0
+     ],
+     [
+      -1.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      -1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      4,
+      3
+     ],
+     [
+      1,
+      2,
+      5,
+      4
+     ],
+     [
+      3,
+      4,
+      7,
+      6
+     ],
+     [
+      4,
+      5,
+      8,
+      7
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": [
+     0
+    ]
+   },
+   "selection_mode": "polygon",
+   "option": {
+    "name": "Red",
+    "color": [
+     1.0
+    ],
+    "diffuse": 0.8,
+    "specular": 0.2,
+    "smoothing": true,
+    "default": true
+   },
+   "expected": {
+    "polygon_materials": [
+     "Red",
+     "Default",
+     "Default",
+     "Default"
+    ],
+    "new_shader_items": [
+     {
+      "type": "advancedMaterial",
+      "name": "M_Red",
+      "parent": "Red (Material)",
+      "diffCol.R": 1.0,
+      "diffCol.G": 0.0,
+      "diffCol.B": 0.0,
+      "diffAmt": 0.8,
+      "specAmt": 0.2,
+      "smooth": 1.0
+     },
+     {
+      "type": "mask",
+      "name": "Red (Material)",
+      "parent": "Render",
+      "ptag": "Red",
+      "ptyp": "Material"
+     }
+    ],
+    "changed_shader_items": [],
+    "points_unchanged": true,
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": [
+      0
+     ]
+    },
+    "selection_mode_after": "polygon"
+   }
+  },
+  {
+   "id": "SM10",
+   "description": "Edge mode, edge 0-1 selected; name Edge",
+   "input": {
+    "points": [
+     [
+      -1.0,
+      -1.0,
+      0.0
+     ],
+     [
+      0.0,
+      -1.0,
+      0.0
+     ],
+     [
+      1.0,
+      -1.0,
+      0.0
+     ],
+     [
+      -1.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      -1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      4,
+      3
+     ],
+     [
+      1,
+      2,
+      5,
+      4
+     ],
+     [
+      3,
+      4,
+      7,
+      6
+     ],
+     [
+      4,
+      5,
+      8,
+      7
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [
+     [
+      0,
+      1
+     ]
+    ],
+    "sel_polygons": []
+   },
+   "selection_mode": "edge",
+   "option": {
+    "name": "Edge",
+    "color": [
+     1.0
+    ],
+    "diffuse": 0.8,
+    "specular": 0.2,
+    "smoothing": true,
+    "default": false
+   },
+   "expected": {
+    "polygon_materials": [
+     "Default",
+     "Default",
+     "Default",
+     "Default"
+    ],
+    "new_shader_items": [
+     {
+      "type": "advancedMaterial",
+      "name": "M_Edge",
+      "parent": "Edge (Material)",
+      "diffCol.R": 1.0,
+      "diffCol.G": 0.0,
+      "diffCol.B": 0.0,
+      "diffAmt": 0.8,
+      "specAmt": 0.2,
+      "smooth": 1.0
+     },
+     {
+      "type": "mask",
+      "name": "Edge (Material)",
+      "parent": "Render",
+      "ptag": "Edge",
+      "ptyp": "Material"
+     }
+    ],
+    "changed_shader_items": [],
+    "points_unchanged": true,
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [
+      [
+       0,
+       1
+      ]
+     ],
+     "sel_polygons": []
+    },
+    "selection_mode_after": "edge"
+   }
+  },
+  {
+   "id": "SM11",
+   "description": "Edge mode, edges 0-1 and 1-2 selected; name Edge2, colour 0 1 1",
+   "input": {
+    "points": [
+     [
+      -1.0,
+      -1.0,
+      0.0
+     ],
+     [
+      0.0,
+      -1.0,
+      0.0
+     ],
+     [
+      1.0,
+      -1.0,
+      0.0
+     ],
+     [
+      -1.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      -1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      4,
+      3
+     ],
+     [
+      1,
+      2,
+      5,
+      4
+     ],
+     [
+      3,
+      4,
+      7,
+      6
+     ],
+     [
+      4,
+      5,
+      8,
+      7
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [
+     [
+      0,
+      1
+     ],
+     [
+      1,
+      2
+     ]
+    ],
+    "sel_polygons": []
+   },
+   "selection_mode": "edge",
+   "option": {
+    "name": "Edge2",
+    "color": [
+     0.0
+    ],
+    "diffuse": 0.8,
+    "specular": 0.2,
+    "smoothing": true,
+    "default": false
+   },
+   "expected": {
+    "polygon_materials": [
+     "Default",
+     "Default",
+     "Default",
+     "Default"
+    ],
+    "new_shader_items": [
+     {
+      "type": "advancedMaterial",
+      "name": "M_Edge2",
+      "parent": "Edge2 (Material)",
+      "diffCol.R": 0.0,
+      "diffCol.G": 1.0,
+      "diffCol.B": 1.0,
+      "diffAmt": 0.8,
+      "specAmt": 0.2,
+      "smooth": 1.0
+     },
+     {
+      "type": "mask",
+      "name": "Edge2 (Material)",
+      "parent": "Render",
+      "ptag": "Edge2",
+      "ptyp": "Material"
+     }
+    ],
+    "changed_shader_items": [],
+    "points_unchanged": true,
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [
+      [
+       0,
+       1
+      ],
+      [
+       1,
+       2
+      ]
+     ],
+     "sel_polygons": []
+    },
+    "selection_mode_after": "edge"
+   }
+  },
+  {
+   "id": "SM12",
+   "description": "Edge mode, nothing selected; name Edge3",
+   "input": {
+    "points": [
+     [
+      -1.0,
+      -1.0,
+      0.0
+     ],
+     [
+      0.0,
+      -1.0,
+      0.0
+     ],
+     [
+      1.0,
+      -1.0,
+      0.0
+     ],
+     [
+      -1.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      -1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      4,
+      3
+     ],
+     [
+      1,
+      2,
+      5,
+      4
+     ],
+     [
+      3,
+      4,
+      7,
+      6
+     ],
+     [
+      4,
+      5,
+      8,
+      7
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": []
+   },
+   "selection_mode": "edge",
+   "option": {
+    "name": "Edge3",
+    "color": [
+     1.0
+    ],
+    "diffuse": 0.8,
+    "specular": 0.2,
+    "smoothing": true,
+    "default": false
+   },
+   "expected": {
+    "polygon_materials": [
+     "Edge3",
+     "Edge3",
+     "Edge3",
+     "Edge3"
+    ],
+    "new_shader_items": [
+     {
+      "type": "advancedMaterial",
+      "name": "M_Edge3",
+      "parent": "Edge3 (Material)",
+      "diffCol.R": 1.0,
+      "diffCol.G": 0.0,
+      "diffCol.B": 0.0,
+      "diffAmt": 0.8,
+      "specAmt": 0.2,
+      "smooth": 1.0
+     },
+     {
+      "type": "mask",
+      "name": "Edge3 (Material)",
+      "parent": "Render",
+      "ptag": "Edge3",
+      "ptyp": "Material"
+     }
+    ],
+    "changed_shader_items": [],
+    "points_unchanged": true,
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": []
+    },
+    "selection_mode_after": "edge"
+   }
+  },
+  {
+   "id": "SM13",
+   "description": "Vertex mode, nothing selected; name Pt2",
+   "input": {
+    "points": [
+     [
+      -1.0,
+      -1.0,
+      0.0
+     ],
+     [
+      0.0,
+      -1.0,
+      0.0
+     ],
+     [
+      1.0,
+      -1.0,
+      0.0
+     ],
+     [
+      -1.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      1.0,
+      0.0,
+      0.0
+     ],
+     [
+      -1.0,
+      1.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0
+     ],
+     [
+      1.0,
+      1.0,
+      0.0
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      4,
+      3
+     ],
+     [
+      1,
+      2,
+      5,
+      4
+     ],
+     [
+      3,
+      4,
+      7,
+      6
+     ],
+     [
+      4,
+      5,
+      8,
+      7
+     ]
+    ]
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": []
+   },
+   "selection_mode": "vertex",
+   "option": {
+    "name": "Pt2",
+    "color": [
+     1.0
+    ],
+    "diffuse": 0.8,
+    "specular": 0.2,
+    "smoothing": true,
+    "default": false
+   },
+   "expected": {
+    "polygon_materials": [
+     "Pt2",
+     "Pt2",
+     "Pt2",
+     "Pt2"
+    ],
+    "new_shader_items": [
+     {
+      "type": "advancedMaterial",
+      "name": "M_Pt2",
+      "parent": "Pt2 (Material)",
+      "diffCol.R": 1.0,
+      "diffCol.G": 0.0,
+      "diffCol.B": 0.0,
+      "diffAmt": 0.8,
+      "specAmt": 0.2,
+      "smooth": 1.0
+     },
+     {
+      "type": "mask",
+      "name": "Pt2 (Material)",
+      "parent": "Render",
+      "ptag": "Pt2",
+      "ptyp": "Material"
+     }
+    ],
+    "changed_shader_items": [],
+    "points_unchanged": true,
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": []
+    },
+    "selection_mode_after": "vertex"
+   }
+  },
+  {
+   "id": "SM14",
+   "description": "Default flag: set polygon 0 of mesh A to Kiwi with default on, then build a new mesh B (and, after resetting the default to Default, mesh C)",
+   "steps": [
+    "Mesh A = 2x2 grid; select polygon 0; Set Material name Kiwi, default flag on",
+    "Build new mesh B (2x2 grid)",
+    "Set the default back to Default, build new mesh C"
+   ],
+   "expected": {
+    "tags_A": [
+     "Kiwi",
+     "Default",
+     "Default",
+     "Default"
+    ],
+    "tags_new_mesh_B": [
+     "Kiwi",
+     "Kiwi",
+     "Kiwi",
+     "Kiwi"
+    ],
+    "tags_new_mesh_C": [
+     "Default",
+     "Default",
+     "Default",
+     "Default"
+    ]
+   }
+  }
+ ]
+}

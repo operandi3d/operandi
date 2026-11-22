@@ -1,0 +1,40 @@
+{
+  "quantity": "Distance",
+  "unit": "meter",
+  "exact_valid": [
+    {
+      "raw": "250 mm",
+      "value": 0.25
+    },
+    {
+      "raw": "1 m/4",
+      "value": 0.25
+    },
+    {
+      "raw": "-250 mm",
+      "value": -0.25
+    },
+    {
+      "raw": "0",
+      "value": 0
+    },
+    {
+      "raw": "0.5 m",
+      "value": 0.5
+    }
+  ],
+  "invalid_raw": [
+    "abc",
+    "",
+    "1 m/0",
+    "1 m + 30 deg",
+    "NaN",
+    "Infinity",
+    "-Infinity"
+  ],
+  "world_budget": {
+    "absolute_coordinate_max": 1000000000.0,
+    "tested_finite_overflow_displacement": 1000000000000.0
+  },
+  "dyadic_coordinate_tolerance": 0
+}

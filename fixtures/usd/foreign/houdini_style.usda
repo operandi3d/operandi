@@ -1,0 +1,106 @@
+#usda 1.0
+(
+    defaultPrim = "obj"
+    metersPerUnit = 1
+    upAxis = "Y"
+    doc = """Hand-written to mimic how Houdini's SOP Import writes attributes
+and groups (Houdini isn't on the test machine): point attributes as
+vertex primvars, primitive attributes as uniform ones, vertex
+attributes as faceVarying, detail attributes as constant, primitive
+groups as GeomSubsets with an empty family name, a point group as a
+point GeomSubset, and the material assignment as a materialBind family.
+USD-IQ23."""
+)
+
+def Xform "obj"
+{
+    def Mesh "grid" (
+        prepend apiSchemas = ["MaterialBindingAPI"]
+    )
+    {
+        int[] faceVertexCounts = [4, 4]
+        int[] faceVertexIndices = [0, 1, 4, 3, 1, 2, 5, 4]
+        point3f[] points = [(0, 0, 0), (1, 0, 0), (2, 0, 0), (0, 0, 1), (1, 0, 1), (2, 0, 1)]
+        uniform token subdivisionScheme = "none"
+        color3f[] primvars:Cd = [(1, 0, 0), (0, 1, 0), (0, 0, 1), (1, 1, 0), (0, 1, 1), (1, 0, 1)] (
+            interpolation = "vertex"
+        )
+        float[] primvars:Alpha = [1, 0.9, 0.8, 0.7, 0.6, 0.5] (
+            interpolation = "vertex"
+        )
+        float[] primvars:pscale = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6] (
+            interpolation = "vertex"
+        )
+        point3f[] primvars:rest = [(0, 0, 0), (1, 0, 0), (2, 0, 0), (0, 0, 1), (1, 0, 1), (2, 0, 1)] (
+            interpolation = "vertex"
+        )
+        vector3f[] primvars:v = [(0, 1, 0), (0, 2, 0), (0, 3, 0), (0, 4, 0), (0, 5, 0), (0, 6, 0)] (
+            interpolation = "vertex"
+        )
+        int[] primvars:id = [10, 11, 12, 13, 14, 15] (
+            interpolation = "vertex"
+        )
+        int[] primvars:prim_id = [7, 8] (
+            interpolation = "uniform"
+        )
+        float[] primvars:area = [1, 2] (
+            interpolation = "uniform"
+        )
+        float2[] primvars:offset2 = [(0.5, 1.5), (2.5, 3.5)] (
+            interpolation = "uniform"
+        )
+        float4[] primvars:rgba = [(0, 0.25, 0.5, 1), (1, 0.75, 0.5, 0), (0, 0, 0, 0), (1, 1, 1, 1), (0.5, 0.5, 0.5, 0.5), (0.1, 0.2, 0.3, 0.4)] (
+            interpolation = "vertex"
+        )
+        float[] primvars:vtx_mask = [0, 0.125, 0.25, 0.375, 0.5, 0.625, 0.75, 0.875] (
+            interpolation = "faceVarying"
+        )
+        normal3f[] primvars:N = [(0, 1, 0), (0, 1, 0), (0, 1, 0), (0, 1, 0), (0, 1, 0), (0, 1, 0), (0, 1, 0), (0, 1, 0)] (
+            interpolation = "faceVarying"
+        )
+        texCoord2f[] primvars:st = [(0, 0), (0.5, 0), (0.5, 1), (0, 1), (0.5, 0), (1, 0), (1, 1), (0.5, 1)] (
+            interpolation = "faceVarying"
+        )
+        float[] primvars:detail_scale = [2] (
+            interpolation = "constant"
+        )
+        rel material:binding = </obj/mtl/plastic>
+
+        def GeomSubset "left"
+        {
+            uniform token elementType = "face"
+            int[] indices = [0]
+        }
+
+        def GeomSubset "right" (
+        )
+        {
+            uniform token elementType = "face"
+            uniform token familyName = "partition"
+            int[] indices = [1]
+        }
+
+        def GeomSubset "edge_pts"
+        {
+            uniform token elementType = "point"
+            int[] indices = [0, 3]
+        }
+
+        def GeomSubset "plastic_faces" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+        )
+        {
+            uniform token elementType = "face"
+            uniform token familyName = "materialBind"
+            int[] indices = [0, 1]
+            rel material:binding = </obj/mtl/plastic>
+        }
+    }
+
+    def Scope "mtl"
+    {
+        def Material "plastic"
+        {
+        }
+    }
+}

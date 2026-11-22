@@ -1,0 +1,211 @@
+{
+ "spec": "vertex-tool-options-2026-11-03",
+ "comparison_rule": "Activate the tool with the listed selection, Reset, and compare every setting's value to settings_after_reset (percents as fractions). Unlabeled settings are listed for completeness only (SPEC: don't build them until described).",
+ "cases": [
+  {
+   "id": "VTO-D0-01",
+   "description": "Slide settings after Reset in Vertex mode, centre point of a 2x2 grid selected",
+   "selection_mode": "vertex, centre point of 2x2 grid selected",
+   "types": {
+    "mode": "integer",
+    "vertMode": "integer",
+    "handleId": "integer",
+    "dirX": "distance",
+    "dirY": "distance",
+    "dirZ": "distance",
+    "interpolation": "integer",
+    "dist": "distance",
+    "percent": "percent",
+    "merge": "boolean",
+    "stop": "boolean",
+    "duplicate": "boolean",
+    "snap": "boolean",
+    "loop": "boolean",
+    "segs": "integer",
+    "inset": "distance",
+    "reversex": "boolean",
+    "reversey": "boolean",
+    "aspect": "boolean",
+    "curvature": "boolean",
+    "tension": "percent",
+    "lockUV": "boolean",
+    "handleLineWidth": "float",
+    "txuvName": "vertmapname",
+    "alpha1": "float",
+    "alpha2": "float",
+    "alphaN": "float",
+    "project": "boolean",
+    "relax": "percent",
+    "keepDir": "boolean",
+    "faceHandle": "boolean"
+   },
+   "expected": {
+    "settings_after_reset": {
+     "mode": "linear",
+     "vertMode": "edge",
+     "handleId": -1,
+     "dirX": 0.0,
+     "dirY": 0.0,
+     "dirZ": 0.0,
+     "interpolation": "percent",
+     "dist": 0.0,
+     "percent": 0.0,
+     "merge": 1,
+     "stop": 0,
+     "duplicate": 0,
+     "snap": 0,
+     "loop": 1,
+     "segs": 0,
+     "inset": 0.0,
+     "reversex": 1,
+     "reversey": 0,
+     "aspect": 1,
+     "curvature": 0,
+     "tension": 1.0,
+     "lockUV": 0,
+     "handleLineWidth": 2.5,
+     "txuvName": "",
+     "alpha1": 0.0,
+     "alpha2": 0.0,
+     "alphaN": 0.0,
+     "project": 0,
+     "relax": 0.0,
+     "keepDir": 0,
+     "faceHandle": 1
+    }
+   }
+  },
+  {
+   "id": "VTO-D0-02",
+   "description": "Slide settings after Reset in Edge mode, one edge selected",
+   "selection_mode": "edge 1-4 selected",
+   "types": {
+    "mode": "integer",
+    "vertMode": "integer",
+    "handleId": "integer",
+    "dirX": "distance",
+    "dirY": "distance",
+    "dirZ": "distance",
+    "interpolation": "integer",
+    "dist": "distance",
+    "percent": "percent",
+    "merge": "boolean",
+    "stop": "boolean",
+    "duplicate": "boolean",
+    "snap": "boolean",
+    "loop": "boolean",
+    "segs": "integer",
+    "inset": "distance",
+    "reversex": "boolean",
+    "reversey": "boolean",
+    "aspect": "boolean",
+    "curvature": "boolean",
+    "tension": "percent",
+    "lockUV": "boolean",
+    "handleLineWidth": "float",
+    "txuvName": "vertmapname",
+    "alpha1": "float",
+    "alpha2": "float",
+    "alphaN": "float",
+    "project": "boolean",
+    "relax": "percent",
+    "keepDir": "boolean",
+    "faceHandle": "boolean"
+   },
+   "expected": {
+    "settings_after_reset": {
+     "mode": "radial",
+     "vertMode": "none",
+     "handleId": -1,
+     "dirX": 0.0,
+     "dirY": 0.0,
+     "dirZ": 0.0,
+     "interpolation": "percent",
+     "dist": 0.0,
+     "percent": 0.0,
+     "merge": 1,
+     "stop": 0,
+     "duplicate": 0,
+     "snap": 0,
+     "loop": 1,
+     "segs": 0,
+     "inset": 0.0,
+     "reversex": 1,
+     "reversey": 0,
+     "aspect": 1,
+     "curvature": 0,
+     "tension": 1.0,
+     "lockUV": 0,
+     "handleLineWidth": 2.5,
+     "txuvName": "",
+     "alpha1": 0.0,
+     "alpha2": 0.0,
+     "alphaN": 0.0,
+     "project": 0,
+     "relax": 0.0,
+     "keepDir": 0,
+     "faceHandle": 1
+    }
+   }
+  },
+  {
+   "id": "VTO-D0-03",
+   "description": "Vertex Bevel settings after Reset, one point selected",
+   "selection_mode": "vertex 4 selected",
+   "types": {
+    "inset": "distance",
+    "useMat": "boolean",
+    "matName": "string",
+    "level": "integer"
+   },
+   "expected": {
+    "settings_after_reset": {
+     "inset": 0.0,
+     "useMat": 0,
+     "matName": "",
+     "level": 0
+    }
+   }
+  },
+  {
+   "id": "VTO-D0-04",
+   "description": "Vertex Extrude settings after Reset, one point selected",
+   "selection_mode": "vertex 4 selected",
+   "types": {
+    "inset": "distance",
+    "shift": "distance",
+    "useMat": "boolean",
+    "matName": "string"
+   },
+   "expected": {
+    "settings_after_reset": {
+     "inset": 0.0,
+     "shift": 0.0,
+     "useMat": 0,
+     "matName": ""
+    }
+   }
+  },
+  {
+   "id": "VTO-D0-05",
+   "description": "Merge Tool settings after Reset, one point selected",
+   "selection_mode": "vertex 4 selected",
+   "types": {
+    "dist": "distance",
+    "keep": "boolean",
+    "morph": "boolean",
+    "allowSelfMerge": "boolean",
+    "mergeToClosest": "boolean"
+   },
+   "expected": {
+    "settings_after_reset": {
+     "dist": 0.001,
+     "keep": 0,
+     "morph": 0,
+     "allowSelfMerge": 1,
+     "mergeToClosest": 0
+    }
+   }
+  }
+ ]
+}

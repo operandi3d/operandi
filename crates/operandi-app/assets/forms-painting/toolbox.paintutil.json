@@ -1,0 +1,103 @@
+{
+  "version": 1,
+  "id": "toolbox.paintutil",
+  "label": "Utilities",
+  "exported": true,
+  "controls": [
+    {
+      "divider": "Paint Commands",
+      "id": "paint-commands"
+    },
+    {
+      "command": "operandi.paint.addTexture kind:color",
+      "label": "Add Color Texture",
+      "tooltip": "Add Color Texture \u00b7 operandi.paint.addTexture kind:color\nA new image and an Image Map layer for it.",
+      "icon": "add-color-texture"
+    },
+    {
+      "command": "operandi.paint.addTexture kind:displacement",
+      "label": "Add Displacement Texture",
+      "tooltip": "Add Displacement Texture \u00b7 operandi.paint.addTexture kind:displacement",
+      "icon": "add-displacement-texture"
+    },
+    {
+      "command": "operandi.paint.addTexture kind:mask",
+      "label": "Add Mask Texture",
+      "tooltip": "Add Mask Texture \u00b7 operandi.paint.addTexture kind:mask",
+      "icon": "add-mask-texture"
+    },
+    {
+      "command": "operandi.paint.addFurTexture",
+      "label": "Add Fur Texture",
+      "tooltip": "Add Fur Texture \u00b7 not built yet"
+    },
+    {
+      "divider": "Sculpt Commands",
+      "id": "sculpt-commands"
+    },
+    {
+      "command": "operandi.paint.geometryToBrush",
+      "label": "Geometry to Brush",
+      "tooltip": "Geometry to Brush \u00b7 operandi.paint.geometryToBrush\nThe selected open patch becomes a Texture tip."
+    },
+    {
+      "command": "sculpt.relaxMesh",
+      "label": "Relax Mesh",
+      "tooltip": "Relax Mesh \u00b7 sculpt.relaxMesh"
+    },
+    {
+      "command": "operandi.paint.unavailable name:{Copy to Morph}",
+      "label": "Copy to Morph",
+      "tooltip": "Copy to Morph \u00b7 not in Operandi's sculpting yet"
+    },
+    {
+      "command": "operandi.paint.unavailable name:{Convert to Multiresolution}",
+      "label": "Convert to Multiresolution",
+      "tooltip": "Convert to Multiresolution \u00b7 not in Operandi's sculpting yet"
+    },
+    {
+      "command": "operandi.paint.unavailable name:{Background to Multiresolution}",
+      "label": "Background to Multiresolution",
+      "tooltip": "Background to Multiresolution \u00b7 not in Operandi's sculpting yet"
+    },
+    {
+      "divider": "Image Processing",
+      "id": "image-processing"
+    },
+    {
+      "command": "operandi.image.invert",
+      "label": "Invert Image",
+      "tooltip": "Invert Image \u00b7 operandi.image.invert",
+      "icon": "image-invert"
+    },
+    {
+      "command": "operandi.image.clear",
+      "label": "Clear Image",
+      "tooltip": "Clear Image \u00b7 operandi.image.clear",
+      "icon": "image-clear"
+    },
+    {
+      "command": "operandi.image.expandSeams",
+      "label": "Expand UV Seams",
+      "tooltip": "Expand UV Seams \u00b7 operandi.image.expandSeams",
+      "icon": "image-expand-seams"
+    },
+    {
+      "command": "operandi.image.toVectorDisplacement",
+      "label": "Convert to Vector Displacement",
+      "tooltip": "Convert to Vector Displacement \u00b7 not built yet"
+    },
+    {
+      "command": "operandi.image.setResolution",
+      "label": "Set Resolution",
+      "tooltip": "Set Resolution \u00b7 operandi.image.setResolution",
+      "icon": "image-set-resolution"
+    },
+    {
+      "command": "operandi.image.flatten",
+      "label": "Flatten Layers",
+      "tooltip": "Flatten Layers \u00b7 operandi.image.flatten",
+      "icon": "image-flatten"
+    }
+  ]
+}

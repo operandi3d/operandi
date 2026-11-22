@@ -1,0 +1,521 @@
+{
+ "format": "operandi-node-graph",
+ "format_version": 1,
+ "source": {
+  "app": "blender",
+  "app_version": "5.2.2 LTS",
+  "file": "t.blend"
+ },
+ "licence": null,
+ "materials": [
+  {
+   "name": "Material",
+   "output": "Material Output",
+   "nodes": [
+    {
+     "name": "Material Output",
+     "type": "ShaderNodeOutputMaterial",
+     "props": {
+      "target": "ALL"
+     },
+     "inputs": {
+      "Volume": {
+       "type": "SHADER"
+      },
+      "Displacement": {
+       "type": "VECTOR",
+       "value": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "Thickness": {
+       "type": "VALUE",
+       "value": 0.0
+      }
+     }
+    },
+    {
+     "name": "Principled BSDF",
+     "type": "ShaderNodeBsdfPrincipled",
+     "props": {
+      "distribution": "MULTI_GGX",
+      "subsurface_method": "RANDOM_WALK"
+     },
+     "inputs": {
+      "Base Color": {
+       "type": "RGBA",
+       "value": [
+        0.8,
+        0.8,
+        0.8,
+        1.0
+       ]
+      },
+      "Metallic": {
+       "type": "VALUE",
+       "value": 0.0
+      },
+      "Roughness": {
+       "type": "VALUE",
+       "value": 0.5
+      },
+      "IOR": {
+       "type": "VALUE",
+       "value": 1.5
+      },
+      "Alpha": {
+       "type": "VALUE",
+       "value": 1.0
+      },
+      "Thin Wall": {
+       "type": "BOOLEAN",
+       "value": false
+      },
+      "Normal": {
+       "type": "VECTOR",
+       "value": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "Diffuse Roughness": {
+       "type": "VALUE",
+       "value": 0.0
+      },
+      "Subsurface Weight": {
+       "type": "VALUE",
+       "value": 0.0
+      },
+      "Subsurface Radius": {
+       "type": "VECTOR",
+       "value": [
+        1.0,
+        0.2,
+        0.1
+       ]
+      },
+      "Subsurface Scale": {
+       "type": "VALUE",
+       "value": 0.005
+      },
+      "Subsurface Anisotropy": {
+       "type": "VALUE",
+       "value": 0.0
+      },
+      "Specular IOR Level": {
+       "type": "VALUE",
+       "value": 0.5
+      },
+      "Specular Tint": {
+       "type": "RGBA",
+       "value": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+       ]
+      },
+      "Anisotropic": {
+       "type": "VALUE",
+       "value": 0.0
+      },
+      "Anisotropic Rotation": {
+       "type": "VALUE",
+       "value": 0.0
+      },
+      "Tangent": {
+       "type": "VECTOR",
+       "value": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "Transmission Weight": {
+       "type": "VALUE",
+       "value": 0.0
+      },
+      "Coat Weight": {
+       "type": "VALUE",
+       "value": 0.0
+      },
+      "Coat Roughness": {
+       "type": "VALUE",
+       "value": 0.03
+      },
+      "Coat IOR": {
+       "type": "VALUE",
+       "value": 1.5
+      },
+      "Coat Tint": {
+       "type": "RGBA",
+       "value": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+       ]
+      },
+      "Coat Normal": {
+       "type": "VECTOR",
+       "value": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "Sheen Weight": {
+       "type": "VALUE",
+       "value": 0.0
+      },
+      "Sheen Roughness": {
+       "type": "VALUE",
+       "value": 0.5
+      },
+      "Sheen Tint": {
+       "type": "RGBA",
+       "value": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+       ]
+      },
+      "Emission Color": {
+       "type": "RGBA",
+       "value": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+       ]
+      },
+      "Emission Strength": {
+       "type": "VALUE",
+       "value": 0.0
+      },
+      "Thin Film Thickness": {
+       "type": "VALUE",
+       "value": 0.0
+      },
+      "Thin Film IOR": {
+       "type": "VALUE",
+       "value": 1.33
+      }
+     }
+    }
+   ],
+   "links": [
+    {
+     "from": [
+      "Principled BSDF",
+      "BSDF"
+     ],
+     "to": [
+      "Material Output",
+      "Surface"
+     ]
+    }
+   ],
+   "exposed": [],
+   "groups_used": []
+  },
+  {
+   "name": "T",
+   "output": "Material Output",
+   "nodes": [
+    {
+     "name": "Principled BSDF",
+     "type": "ShaderNodeBsdfPrincipled",
+     "props": {
+      "distribution": "MULTI_GGX",
+      "subsurface_method": "RANDOM_WALK"
+     },
+     "inputs": {
+      "Metallic": {
+       "type": "VALUE",
+       "value": 0.0
+      },
+      "IOR": {
+       "type": "VALUE",
+       "value": 1.5
+      },
+      "Alpha": {
+       "type": "VALUE",
+       "value": 1.0
+      },
+      "Thin Wall": {
+       "type": "BOOLEAN",
+       "value": false
+      },
+      "Normal": {
+       "type": "VECTOR",
+       "value": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "Diffuse Roughness": {
+       "type": "VALUE",
+       "value": 0.0
+      },
+      "Subsurface Weight": {
+       "type": "VALUE",
+       "value": 0.0
+      },
+      "Subsurface Radius": {
+       "type": "VECTOR",
+       "value": [
+        1.0,
+        0.2,
+        0.1
+       ]
+      },
+      "Subsurface Scale": {
+       "type": "VALUE",
+       "value": 0.005
+      },
+      "Subsurface Anisotropy": {
+       "type": "VALUE",
+       "value": 0.0
+      },
+      "Specular IOR Level": {
+       "type": "VALUE",
+       "value": 0.5
+      },
+      "Specular Tint": {
+       "type": "RGBA",
+       "value": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+       ]
+      },
+      "Anisotropic": {
+       "type": "VALUE",
+       "value": 0.0
+      },
+      "Anisotropic Rotation": {
+       "type": "VALUE",
+       "value": 0.0
+      },
+      "Tangent": {
+       "type": "VECTOR",
+       "value": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "Transmission Weight": {
+       "type": "VALUE",
+       "value": 0.0
+      },
+      "Coat Weight": {
+       "type": "VALUE",
+       "value": 0.0
+      },
+      "Coat Roughness": {
+       "type": "VALUE",
+       "value": 0.03
+      },
+      "Coat IOR": {
+       "type": "VALUE",
+       "value": 1.5
+      },
+      "Coat Tint": {
+       "type": "RGBA",
+       "value": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+       ]
+      },
+      "Coat Normal": {
+       "type": "VECTOR",
+       "value": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "Sheen Weight": {
+       "type": "VALUE",
+       "value": 0.0
+      },
+      "Sheen Roughness": {
+       "type": "VALUE",
+       "value": 0.5
+      },
+      "Sheen Tint": {
+       "type": "RGBA",
+       "value": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+       ]
+      },
+      "Emission Color": {
+       "type": "RGBA",
+       "value": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+       ]
+      },
+      "Emission Strength": {
+       "type": "VALUE",
+       "value": 0.0
+      },
+      "Thin Film Thickness": {
+       "type": "VALUE",
+       "value": 0.0
+      },
+      "Thin Film IOR": {
+       "type": "VALUE",
+       "value": 1.33
+      }
+     }
+    },
+    {
+     "name": "Material Output",
+     "type": "ShaderNodeOutputMaterial",
+     "props": {
+      "target": "ALL"
+     },
+     "inputs": {
+      "Volume": {
+       "type": "SHADER"
+      },
+      "Displacement": {
+       "type": "VECTOR",
+       "value": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "Thickness": {
+       "type": "VALUE",
+       "value": 0.0
+      }
+     }
+    },
+    {
+     "name": "Value",
+     "type": "ShaderNodeValue",
+     "props": {},
+     "inputs": {},
+     "outputs": {
+      "Value": {
+       "type": "VALUE",
+       "value": 0.5
+      }
+     }
+    },
+    {
+     "name": "Color",
+     "type": "ShaderNodeRGB",
+     "props": {},
+     "inputs": {},
+     "outputs": {
+      "Color": {
+       "type": "RGBA",
+       "value": [
+        0.1,
+        0.2,
+        0.3,
+        1.0
+       ]
+      }
+     }
+    },
+    {
+     "name": "Group",
+     "type": "ShaderNodeGroup",
+     "props": {
+      "group": "Tint"
+     },
+     "inputs": {
+      "Amount": {
+       "type": "VALUE",
+       "value": 0.0
+      }
+     }
+    }
+   ],
+   "links": [
+    {
+     "from": [
+      "Principled BSDF",
+      "BSDF"
+     ],
+     "to": [
+      "Material Output",
+      "Surface"
+     ]
+    },
+    {
+     "from": [
+      "Value",
+      "Value"
+     ],
+     "to": [
+      "Principled BSDF",
+      "Roughness"
+     ]
+    },
+    {
+     "from": [
+      "Color",
+      "Color"
+     ],
+     "to": [
+      "Principled BSDF",
+      "Base Color"
+     ]
+    }
+   ],
+   "exposed": [],
+   "groups_used": [
+    "Tint"
+   ]
+  }
+ ],
+ "groups": [
+  {
+   "name": "Tint",
+   "nodes": [],
+   "links": [],
+   "inputs": [
+    {
+     "name": "Amount",
+     "identifier": "Socket_0",
+     "type": "VALUE",
+     "default": 0.0
+    }
+   ],
+   "outputs": [
+    {
+     "name": "Result",
+     "identifier": "Socket_1",
+     "type": "RGBA",
+     "default": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+     ]
+    }
+   ]
+  }
+ ]
+}

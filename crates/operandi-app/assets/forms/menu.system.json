@@ -1,0 +1,9 @@
+{
+  "version": 1,
+  "id": "menu.system",
+  "label": "System",
+  "style": "menu",
+  "controls": [
+    { "command": "layout.window hash:formEditor", "label": "Form Editor" }
+  ]
+}

@@ -1,0 +1,17 @@
+[package]
+name = "operandi-preset-convert"
+version = "0.1.0"
+edition = "2024"
+license = "GPL-3.0-or-later"
+description = "Turns a texture-set folder (and an optional exported node graph) into an Operandi material preset"
+
+[[bin]]
+name = "operandi-preset-convert"
+path = "src/main.rs"
+
+[dependencies]
+operandi-core = { path = "../operandi-core" }
+serde_json.workspace = true
+base64 = "0.22"
+# Reading picture sizes and the base-colour thumbnail (same pin as the app).
+image = { version = "=0.25.10", default-features = false, features = ["png", "jpeg", "exr", "tiff", "hdr", "bmp", "tga"] }

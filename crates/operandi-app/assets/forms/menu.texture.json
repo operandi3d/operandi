@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "id": "menu.texture",
+  "label": "Texture",
+  "style": "menu",
+  "controls": [
+    { "command": "Open UV Editor", "label": "Open UV Editor", "shortcut": "Open UV Editor" },
+    { "divider": "" },
+    { "command": "operandi.uv.atlas", "label": "Atlas Unwrap..." },
+    { "divider": "" },
+    { "command": "Export UVs to SVG...", "label": "Export UVs to SVG..." },
+    { "command": "Export UVs to EPS...", "label": "Export UVs to EPS..." },
+    { "command": "operandi.uv.toMesh", "label": "Convert UVs to Mesh" },
+    { "command": "operandi.uv.transfer", "label": "Transfer UVs" },
+    { "divider": "" },
+    { "command": "operandi.bake.curvature", "label": "Bake Curvature..." },
+    { "command": "operandi.bake.thickness", "label": "Bake Thickness..." },
+    { "command": "operandi.bake.padImage", "label": "Pad Texture to UVs..." }
+  ]
+}

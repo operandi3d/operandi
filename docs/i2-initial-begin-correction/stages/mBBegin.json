@@ -1,0 +1,32 @@
+{
+  "stage_key": 2,
+  "component_scope": "D0/item1/generation1",
+  "roots": {
+    "base": {
+      "graph": "G2",
+      "identity": "I1",
+      "session": "mArm"
+    },
+    "begun": {
+      "graph": "AM_B1",
+      "identity": "AM_B2I",
+      "session": "mB0"
+    }
+  },
+  "local_entries": [
+    {
+      "role": "Begin",
+      "before_root": "base",
+      "after_root": "begun",
+      "label": "Begin Extrude"
+    }
+  ],
+  "local_cursor": 1,
+  "has_ever_parked": false,
+  "anchor_binding": "state.selected_anchor",
+  "snapshot_root_pairs": 2,
+  "component_identity_not_reallocated_by_resume": true,
+  "stored_eligibility": null,
+  "OS_capture": null,
+  "roles": "BafterMoved"
+}

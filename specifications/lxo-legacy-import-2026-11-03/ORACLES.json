@@ -1,0 +1,357 @@
+{
+ "modo_version": "17.1v1",
+ "observed": "2026-11-03",
+ "oracles": [
+  {
+   "id": "LEG-O-01",
+   "fixture": "fixtures/LG-01-v40-appv9-tail70.lxo",
+   "description": "Format 4.0, APPV (9,900,0,0), 20-byte LAYR rest, unflagged CHAN types, CHNV type 0x02. Parent quad pair with UV seam and tags; transform ITEMs hold a deliberately wrong position (9,9,9); the setup action has the real values; the child's edit action overrides its setup position. Bare polyRender item.",
+   "input": {
+    "LegacyParent": {
+     "points": [
+      [
+       0,
+       0,
+       0
+      ],
+      [
+       1,
+       0,
+       0
+      ],
+      [
+       1,
+       1,
+       0
+      ],
+      [
+       0,
+       1,
+       0
+      ],
+      [
+       2,
+       0,
+       0
+      ],
+      [
+       2,
+       1,
+       0
+      ]
+     ],
+     "polygons": [
+      [
+       0,
+       1,
+       2,
+       3
+      ],
+      [
+       1,
+       4,
+       5,
+       2
+      ]
+     ],
+     "setup": {
+      "pos": [
+       3,
+       -2,
+       5
+      ],
+      "rot_deg": [
+       30,
+       45,
+       60
+      ],
+      "scl": [
+       1,
+       2,
+       0.5
+      ]
+     },
+     "item_chnv_pos": [
+      9,
+      9,
+      9
+     ],
+     "uv": "Texture u=x/2, v=y; polygon 1 point 1 = (0.9,0.1)",
+     "material": "Steel",
+     "part": "Body"
+    },
+    "LegacyChild": {
+     "points": [
+      [
+       0.25,
+       0.5,
+       0.75
+      ],
+      [
+       2.25,
+       0.5,
+       0.75
+      ],
+      [
+       0.25,
+       3.5,
+       1.75
+      ]
+     ],
+     "polygons": [
+      [
+       0,
+       1,
+       2
+      ]
+     ],
+     "parent": "LegacyParent",
+     "setup_pos": [
+      1,
+      0,
+      0
+     ],
+     "edit_pos": [
+      1.5,
+      0.25,
+      0
+     ]
+    }
+   },
+   "expected": {
+    "meshes": [
+     {
+      "name": "LegacyParent",
+      "world_points": [
+       [
+        3.0,
+        -2.0,
+        5.0
+       ],
+       [
+        3.65974,
+        -1.25,
+        4.952633
+       ],
+       [
+        2.788548,
+        -0.383975,
+        6.530931
+       ],
+       [
+        2.128809,
+        -1.133975,
+        6.578298
+       ],
+       [
+        4.319479,
+        -0.5,
+        4.905266
+       ],
+       [
+        3.448288,
+        0.366025,
+        6.483564
+       ]
+      ],
+      "pos": [
+       3.0,
+       -2.0,
+       5.0
+      ],
+      "rot": [
+       0.523599,
+       0.785398,
+       1.047198
+      ],
+      "scl": [
+       1.0,
+       2.0,
+       0.5
+      ],
+      "parent": null,
+      "poly_material": [
+       "Steel",
+       "Steel"
+      ],
+      "poly_part": [
+       "Body",
+       "Body"
+      ],
+      "uv": {
+       "Texture": [
+        [
+         [
+          0.0,
+          0.0
+         ],
+         [
+          0.5,
+          0.0
+         ],
+         [
+          0.5,
+          1.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ],
+        [
+         [
+          0.9,
+          0.1
+         ],
+         [
+          1.0,
+          0.0
+         ],
+         [
+          1.0,
+          1.0
+         ],
+         [
+          0.5,
+          1.0
+         ]
+        ]
+       ]
+      }
+     },
+     {
+      "name": "LegacyChild",
+      "world_points": [
+       [
+        3.73079,
+        -0.225481,
+        6.330471
+       ],
+       [
+        5.05027,
+        1.274519,
+        6.235737
+       ],
+       [
+        1.423402,
+        2.122595,
+        11.371552
+       ]
+      ],
+      "pos": [
+       1.5,
+       0.25,
+       0.0
+      ],
+      "rot": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "scl": [
+       1.0,
+       1.0,
+       1.0
+      ],
+      "parent": "LegacyParent",
+      "poly_material": [
+       "Default"
+      ],
+      "poly_part": [
+       null
+      ],
+      "uv": {
+       "Texture": [
+        [
+         [
+          0.0,
+          0.0
+         ],
+         [
+          0.0,
+          0.0
+         ],
+         [
+          0.0,
+          0.0
+         ]
+        ]
+       ]
+      }
+     }
+    ],
+    "note": "The child's 'Texture' map in Modo's readback is added by Modo on load (LEG-07); the importer must not create it."
+   },
+   "tolerance": 1e-05
+  },
+  {
+   "id": "LEG-O-02",
+   "fixture": "fixtures/LG-02-v40-noappv-tail68-ngon1100.lxo",
+   "description": "Format 4.0 without APPV, STAG 'APPV800.0.0', 18-byte LAYR rest, one FACE polygon with 1,100 corners (unit circle, point i at angle 2*pi*i/1100). Bare polyRender item.",
+   "expected": {
+    "n_points": 1100,
+    "n_polygons": 1,
+    "polygon_0_corner_count": 1100,
+    "polygon_0_corner_order": "0,1,2,…,1099",
+    "point_1": [
+     0.999984,
+     0.005712,
+     0.0
+    ]
+   },
+   "tolerance": 1e-05
+  },
+  {
+   "id": "LEG-O-03",
+   "fixture": "fixtures/LG-03-v41-appv10-tail74.lxo",
+   "description": "Format 4.1, APPV (10,1011,0,0), 24-byte LAYR rest, triangle. Without the bare polyRender item this file crashed Modo 17.1v1.",
+   "expected": {
+    "name": "Tail74",
+    "world_points": [
+     [
+      0.25,
+      0.5,
+      0.75
+     ],
+     [
+      2.25,
+      0.5,
+      0.75
+     ],
+     [
+      0.25,
+      3.5,
+      1.75
+     ]
+    ]
+   },
+   "tolerance": 1e-05
+  },
+  {
+   "id": "LEG-O-04",
+   "fixture": "fixtures/LG-04-v40-tail120.lxo",
+   "description": "Format 4.0, APPV (9,900,0,0), 70-byte LAYR rest, triangle.",
+   "expected": {
+    "name": "Tail120",
+    "world_points": [
+     [
+      0.25,
+      0.5,
+      0.75
+     ],
+     [
+      2.25,
+      0.5,
+      0.75
+     ],
+     [
+      0.25,
+      3.5,
+      1.75
+     ]
+    ]
+   },
+   "tolerance": 1e-05
+  }
+ ]
+}

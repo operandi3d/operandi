@@ -1,0 +1,1143 @@
+{
+ "spec": "bevel-drag-2026-11-06",
+ "comparison_rule": "Interactive: compare that each drag adds a bevel ring and that later setting changes don't re-apply; amounts are this drag's.",
+ "cases": [
+  {
+   "id": "G1",
+   "description": "Polygon Bevel (reset), drag the handle up",
+   "input": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      7,
+      6,
+      5,
+      4
+     ],
+     [
+      0,
+      4,
+      5,
+      1
+     ],
+     [
+      1,
+      5,
+      6,
+      2
+     ],
+     [
+      2,
+      6,
+      7,
+      3
+     ],
+     [
+      3,
+      7,
+      4,
+      0
+     ]
+    ],
+    "selection_mode": "polygon",
+    "selected_polygons": [
+     1
+    ]
+   },
+   "action": "drag the blue handle up",
+   "observed_summary": "shift 0.042; 12/10.",
+   "expected": {
+    "after": {
+     "meshes": {
+      "Cube": {
+       "points": [
+        [
+         -0.5,
+         -0.5,
+         -0.5
+        ],
+        [
+         0.5,
+         -0.5,
+         -0.5
+        ],
+        [
+         0.5,
+         -0.5,
+         0.5
+        ],
+        [
+         -0.5,
+         -0.5,
+         0.5
+        ],
+        [
+         -0.5,
+         0.5,
+         -0.5
+        ],
+        [
+         0.5,
+         0.5,
+         -0.5
+        ],
+        [
+         0.5,
+         0.5,
+         0.5
+        ],
+        [
+         -0.5,
+         0.5,
+         0.5
+        ],
+        [
+         -0.5,
+         0.542,
+         -0.5
+        ],
+        [
+         0.5,
+         0.542,
+         -0.5
+        ],
+        [
+         0.5,
+         0.542,
+         0.5
+        ],
+        [
+         -0.5,
+         0.542,
+         0.5
+        ]
+       ],
+       "polygons": [
+        [
+         0,
+         1,
+         2,
+         3
+        ],
+        [
+         11,
+         10,
+         9,
+         8
+        ],
+        [
+         0,
+         4,
+         5,
+         1
+        ],
+        [
+         1,
+         5,
+         6,
+         2
+        ],
+        [
+         2,
+         6,
+         7,
+         3
+        ],
+        [
+         3,
+         7,
+         4,
+         0
+        ],
+        [
+         7,
+         6,
+         10,
+         11
+        ],
+        [
+         6,
+         5,
+         9,
+         10
+        ],
+        [
+         5,
+         4,
+         8,
+         9
+        ],
+        [
+         4,
+         7,
+         11,
+         8
+        ]
+       ],
+       "polygon_types": [
+        "face",
+        "face",
+        "face",
+        "face",
+        "face",
+        "face",
+        "face",
+        "face",
+        "face",
+        "face"
+       ],
+       "selected_points": [],
+       "selected_edges": [],
+       "selected_polygons": [
+        1
+       ]
+      }
+     },
+     "selection_mode": "polygon",
+     "tool_on": [
+      "Polygon Bevel"
+     ],
+     "action_center": [
+      "Automatic"
+     ],
+     "tool_settings": {
+      "Polygon Bevel": {
+       "shift": 0.04200000000000004,
+       "srand": 0.0,
+       "inset": 0.0,
+       "irand": 0.0,
+       "edges": "inner",
+       "useMat": 0,
+       "matName": "",
+       "group": 1,
+       "uvs": "none",
+       "segs": 1,
+       "reversex": 0,
+       "reversey": 0,
+       "aspect": 1,
+       "autoWeld": 0,
+       "thicken": 0,
+       "square": 0,
+       "edgeRail": 0,
+       "offsetEven": 1,
+       "profRotate": 0,
+       "sideUVs": 0,
+       "sideUVMapName": "",
+       "maxAngle": 1.5690509975429023,
+       "useVertexNormalMap": 0,
+       "openBound": 0,
+       "weldRange": 0.0001,
+       "falloffAveraged": "averaged",
+       "falloffInset": 1,
+       "falloffShift": 1
+      }
+     }
+    }
+   }
+  },
+  {
+   "id": "G2",
+   "description": "Continue: drag the handle again",
+   "input": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      7,
+      6,
+      5,
+      4
+     ],
+     [
+      0,
+      4,
+      5,
+      1
+     ],
+     [
+      1,
+      5,
+      6,
+      2
+     ],
+     [
+      2,
+      6,
+      7,
+      3
+     ],
+     [
+      3,
+      7,
+      4,
+      0
+     ]
+    ],
+    "selection_mode": "polygon",
+    "selected_polygons": [
+     1
+    ]
+   },
+   "action": "drag the handle again",
+   "observed_summary": "a SECOND bevel was added (16/14; shift 0.0235 on top of the first, tops at y 0.542 and 0.566). Each handle drag after release commits the previous one.",
+   "expected": {
+    "after": {
+     "meshes": {
+      "Cube": {
+       "points": [
+        [
+         -0.5,
+         -0.5,
+         -0.5
+        ],
+        [
+         0.5,
+         -0.5,
+         -0.5
+        ],
+        [
+         0.5,
+         -0.5,
+         0.5
+        ],
+        [
+         -0.5,
+         -0.5,
+         0.5
+        ],
+        [
+         -0.5,
+         0.5,
+         -0.5
+        ],
+        [
+         0.5,
+         0.5,
+         -0.5
+        ],
+        [
+         0.5,
+         0.5,
+         0.5
+        ],
+        [
+         -0.5,
+         0.5,
+         0.5
+        ],
+        [
+         -0.5,
+         0.542,
+         -0.5
+        ],
+        [
+         0.5,
+         0.542,
+         -0.5
+        ],
+        [
+         0.5,
+         0.542,
+         0.5
+        ],
+        [
+         -0.5,
+         0.542,
+         0.5
+        ],
+        [
+         -0.5,
+         0.5655,
+         -0.5
+        ],
+        [
+         0.5,
+         0.5655,
+         -0.5
+        ],
+        [
+         0.5,
+         0.5655,
+         0.5
+        ],
+        [
+         -0.5,
+         0.5655,
+         0.5
+        ]
+       ],
+       "polygons": [
+        [
+         0,
+         1,
+         2,
+         3
+        ],
+        [
+         15,
+         14,
+         13,
+         12
+        ],
+        [
+         0,
+         4,
+         5,
+         1
+        ],
+        [
+         1,
+         5,
+         6,
+         2
+        ],
+        [
+         2,
+         6,
+         7,
+         3
+        ],
+        [
+         3,
+         7,
+         4,
+         0
+        ],
+        [
+         7,
+         6,
+         10,
+         11
+        ],
+        [
+         6,
+         5,
+         9,
+         10
+        ],
+        [
+         5,
+         4,
+         8,
+         9
+        ],
+        [
+         4,
+         7,
+         11,
+         8
+        ],
+        [
+         11,
+         10,
+         14,
+         15
+        ],
+        [
+         10,
+         9,
+         13,
+         14
+        ],
+        [
+         9,
+         8,
+         12,
+         13
+        ],
+        [
+         8,
+         11,
+         15,
+         12
+        ]
+       ],
+       "polygon_types": [
+        "face",
+        "face",
+        "face",
+        "face",
+        "face",
+        "face",
+        "face",
+        "face",
+        "face",
+        "face",
+        "face",
+        "face",
+        "face",
+        "face"
+       ],
+       "selected_points": [],
+       "selected_edges": [],
+       "selected_polygons": [
+        1
+       ]
+      }
+     },
+     "selection_mode": "polygon",
+     "tool_on": [
+      "Polygon Bevel"
+     ],
+     "action_center": [
+      "Automatic"
+     ],
+     "tool_settings": {
+      "Polygon Bevel": {
+       "shift": 0.0235,
+       "srand": 0.0,
+       "inset": 0.0,
+       "irand": 0.0,
+       "edges": "inner",
+       "useMat": 0,
+       "matName": "",
+       "group": 1,
+       "uvs": "none",
+       "segs": 1,
+       "reversex": 0,
+       "reversey": 0,
+       "aspect": 1,
+       "autoWeld": 0,
+       "thicken": 0,
+       "square": 0,
+       "edgeRail": 0,
+       "offsetEven": 1,
+       "profRotate": 0,
+       "sideUVs": 0,
+       "sideUVMapName": "",
+       "maxAngle": 1.5690509975429023,
+       "useVertexNormalMap": 0,
+       "openBound": 0,
+       "weldRange": 0.0001,
+       "falloffAveraged": "averaged",
+       "falloffInset": 1,
+       "falloffShift": 1
+      }
+     }
+    }
+   }
+  },
+  {
+   "id": "G3",
+   "description": "Continue: change Inset to 0.05 in the panel, then drop",
+   "input": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      7,
+      6,
+      5,
+      4
+     ],
+     [
+      0,
+      4,
+      5,
+      1
+     ],
+     [
+      1,
+      5,
+      6,
+      2
+     ],
+     [
+      2,
+      6,
+      7,
+      3
+     ],
+     [
+      3,
+      7,
+      4,
+      0
+     ]
+    ],
+    "selection_mode": "polygon",
+    "selected_polygons": [
+     1
+    ]
+   },
+   "action": "inset 0.05 by script, then 60 mm typed in the panel's Inset field",
+   "observed_summary": "tool setting changes, but the mesh did NOT re-apply; dropped mesh = G2 result.",
+   "expected": {
+    "after": {
+     "meshes": {
+      "Cube": {
+       "points": [
+        [
+         -0.5,
+         -0.5,
+         -0.5
+        ],
+        [
+         0.5,
+         -0.5,
+         -0.5
+        ],
+        [
+         0.5,
+         -0.5,
+         0.5
+        ],
+        [
+         -0.5,
+         -0.5,
+         0.5
+        ],
+        [
+         -0.5,
+         0.5,
+         -0.5
+        ],
+        [
+         0.5,
+         0.5,
+         -0.5
+        ],
+        [
+         0.5,
+         0.5,
+         0.5
+        ],
+        [
+         -0.5,
+         0.5,
+         0.5
+        ],
+        [
+         -0.5,
+         0.542,
+         -0.5
+        ],
+        [
+         0.5,
+         0.542,
+         -0.5
+        ],
+        [
+         0.5,
+         0.542,
+         0.5
+        ],
+        [
+         -0.5,
+         0.542,
+         0.5
+        ],
+        [
+         -0.5,
+         0.5655,
+         -0.5
+        ],
+        [
+         0.5,
+         0.5655,
+         -0.5
+        ],
+        [
+         0.5,
+         0.5655,
+         0.5
+        ],
+        [
+         -0.5,
+         0.5655,
+         0.5
+        ]
+       ],
+       "polygons": [
+        [
+         0,
+         1,
+         2,
+         3
+        ],
+        [
+         15,
+         14,
+         13,
+         12
+        ],
+        [
+         0,
+         4,
+         5,
+         1
+        ],
+        [
+         1,
+         5,
+         6,
+         2
+        ],
+        [
+         2,
+         6,
+         7,
+         3
+        ],
+        [
+         3,
+         7,
+         4,
+         0
+        ],
+        [
+         7,
+         6,
+         10,
+         11
+        ],
+        [
+         6,
+         5,
+         9,
+         10
+        ],
+        [
+         5,
+         4,
+         8,
+         9
+        ],
+        [
+         4,
+         7,
+         11,
+         8
+        ],
+        [
+         11,
+         10,
+         14,
+         15
+        ],
+        [
+         10,
+         9,
+         13,
+         14
+        ],
+        [
+         9,
+         8,
+         12,
+         13
+        ],
+        [
+         8,
+         11,
+         15,
+         12
+        ]
+       ],
+       "polygon_types": [
+        "face",
+        "face",
+        "face",
+        "face",
+        "face",
+        "face",
+        "face",
+        "face",
+        "face",
+        "face",
+        "face",
+        "face",
+        "face",
+        "face"
+       ],
+       "selected_points": [],
+       "selected_edges": [],
+       "selected_polygons": [
+        1
+       ]
+      }
+     },
+     "selection_mode": "polygon",
+     "tool_on": [
+      "Polygon Bevel"
+     ],
+     "action_center": [
+      "Automatic"
+     ],
+     "tool_settings": {
+      "Polygon Bevel": {
+       "shift": 0.0235,
+       "srand": 0.0,
+       "inset": 0.05,
+       "irand": 0.0,
+       "edges": "inner",
+       "useMat": 0,
+       "matName": "",
+       "group": 1,
+       "uvs": "none",
+       "segs": 1,
+       "reversex": 0,
+       "reversey": 0,
+       "aspect": 1,
+       "autoWeld": 0,
+       "thicken": 0,
+       "square": 0,
+       "edgeRail": 0,
+       "offsetEven": 1,
+       "profRotate": 0,
+       "sideUVs": 0,
+       "sideUVMapName": "",
+       "maxAngle": 1.5690509975429023,
+       "useVertexNormalMap": 0,
+       "openBound": 0,
+       "weldRange": 0.0001,
+       "falloffAveraged": "averaged",
+       "falloffInset": 1,
+       "falloffShift": 1
+      }
+     }
+    },
+    "after_drop": {
+     "meshes": {
+      "Cube": {
+       "points": [
+        [
+         -0.5,
+         -0.5,
+         -0.5
+        ],
+        [
+         0.5,
+         -0.5,
+         -0.5
+        ],
+        [
+         0.5,
+         -0.5,
+         0.5
+        ],
+        [
+         -0.5,
+         -0.5,
+         0.5
+        ],
+        [
+         -0.5,
+         0.5,
+         -0.5
+        ],
+        [
+         0.5,
+         0.5,
+         -0.5
+        ],
+        [
+         0.5,
+         0.5,
+         0.5
+        ],
+        [
+         -0.5,
+         0.5,
+         0.5
+        ],
+        [
+         -0.5,
+         0.542,
+         -0.5
+        ],
+        [
+         0.5,
+         0.542,
+         -0.5
+        ],
+        [
+         0.5,
+         0.542,
+         0.5
+        ],
+        [
+         -0.5,
+         0.542,
+         0.5
+        ],
+        [
+         -0.5,
+         0.5655,
+         -0.5
+        ],
+        [
+         0.5,
+         0.5655,
+         -0.5
+        ],
+        [
+         0.5,
+         0.5655,
+         0.5
+        ],
+        [
+         -0.5,
+         0.5655,
+         0.5
+        ]
+       ],
+       "polygons": [
+        [
+         0,
+         1,
+         2,
+         3
+        ],
+        [
+         15,
+         14,
+         13,
+         12
+        ],
+        [
+         0,
+         4,
+         5,
+         1
+        ],
+        [
+         1,
+         5,
+         6,
+         2
+        ],
+        [
+         2,
+         6,
+         7,
+         3
+        ],
+        [
+         3,
+         7,
+         4,
+         0
+        ],
+        [
+         7,
+         6,
+         10,
+         11
+        ],
+        [
+         6,
+         5,
+         9,
+         10
+        ],
+        [
+         5,
+         4,
+         8,
+         9
+        ],
+        [
+         4,
+         7,
+         11,
+         8
+        ],
+        [
+         11,
+         10,
+         14,
+         15
+        ],
+        [
+         10,
+         9,
+         13,
+         14
+        ],
+        [
+         9,
+         8,
+         12,
+         13
+        ],
+        [
+         8,
+         11,
+         15,
+         12
+        ]
+       ],
+       "polygon_types": [
+        "face",
+        "face",
+        "face",
+        "face",
+        "face",
+        "face",
+        "face",
+        "face",
+        "face",
+        "face",
+        "face",
+        "face",
+        "face",
+        "face"
+       ],
+       "selected_points": [],
+       "selected_edges": [],
+       "selected_polygons": [
+        1
+       ]
+      }
+     },
+     "selection_mode": "polygon",
+     "tool_on": [],
+     "action_center": [
+      "Automatic"
+     ],
+     "tool_settings": {}
+    }
+   }
+  }
+ ]
+}

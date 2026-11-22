@@ -1,0 +1,26 @@
+name: Spec question
+description: A spec in specifications/ doesn't answer something you need to build.
+labels: [spec-question]
+body:
+  - type: input
+    id: spec
+    attributes:
+      label: Spec ID and file
+    validations:
+      required: true
+  - type: textarea
+    id: state
+    attributes:
+      label: Starting state and actions
+    validations:
+      required: true
+  - type: textarea
+    id: unclear
+    attributes:
+      label: What's unclear, and the reading you built as provisional
+    validations:
+      required: true
+  - type: markdown
+    attributes:
+      value: |
+        The maintainer takes the question to the study side, and the answer comes back as an updated spec (docs/CLEAN_ROOM.md).

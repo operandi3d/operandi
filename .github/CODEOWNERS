@@ -1,0 +1,14 @@
+# Jason reviews everything. Changes to the clean-room, licence and spec
+# files below especially need his review (with branch protection's
+# "Require review from Code Owners" on).
+*                       @manfriday
+/specifications/        @manfriday
+/LICENSE                @manfriday
+/LICENSES/              @manfriday
+/CONTRIBUTING.md        @manfriday
+/docs/CLEAN_ROOM.md     @manfriday
+/docs/DEPENDENCIES.md   @manfriday
+/AGENTS.md              @manfriday
+/CLAUDE.md              @manfriday
+/.claude/               @manfriday
+/.github/               @manfriday

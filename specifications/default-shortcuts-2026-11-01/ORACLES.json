@@ -1,0 +1,5705 @@
+{
+ "modo_version": "17.1v1",
+ "observed": "2026-11-02\u20132026-11-03",
+ "oracles": [
+  {
+   "id": "KEY-O-KEY-P01",
+   "description": "Physical macOS shortcut activation: w in polygon",
+   "input": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      0.5,
+      0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      3,
+      2,
+      1
+     ],
+     [
+      4,
+      5,
+      6,
+      7
+     ],
+     [
+      0,
+      1,
+      5,
+      4
+     ],
+     [
+      3,
+      7,
+      6,
+      2
+     ],
+     [
+      0,
+      4,
+      7,
+      3
+     ],
+     [
+      1,
+      2,
+      6,
+      5
+     ]
+    ]
+   },
+   "settings": {
+    "selection_mode": "polygon"
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": [
+     1
+    ]
+   },
+   "gesture": {
+    "key": "w",
+    "modifiers": [],
+    "view": "Front orthographic",
+    "px_per_m": 624
+   },
+   "expected": {
+    "result_ui_name": "Move",
+    "mesh": {
+     "points": [
+      [
+       -0.5,
+       -0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       -0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       0.5,
+       -0.5
+      ],
+      [
+       -0.5,
+       0.5,
+       -0.5
+      ],
+      [
+       -0.5,
+       -0.5,
+       0.5
+      ],
+      [
+       0.5,
+       -0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       -0.5,
+       0.5,
+       0.5
+      ]
+     ],
+     "polygons": [
+      [
+       0,
+       3,
+       2,
+       1
+      ],
+      [
+       4,
+       5,
+       6,
+       7
+      ],
+      [
+       0,
+       1,
+       5,
+       4
+      ],
+      [
+       3,
+       7,
+       6,
+       2
+      ],
+      [
+       0,
+       4,
+       7,
+       3
+      ],
+      [
+       1,
+       2,
+       6,
+       5
+      ]
+     ],
+     "n_points": 8,
+     "n_polygons": 6,
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": [
+      1
+     ]
+    },
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": [
+      1
+     ]
+    },
+    "message": null
+   },
+   "tolerance": 1e-05
+  },
+  {
+   "id": "KEY-O-KEY-P02",
+   "description": "Physical macOS shortcut activation: e in polygon",
+   "input": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      0.5,
+      0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      3,
+      2,
+      1
+     ],
+     [
+      4,
+      5,
+      6,
+      7
+     ],
+     [
+      0,
+      1,
+      5,
+      4
+     ],
+     [
+      3,
+      7,
+      6,
+      2
+     ],
+     [
+      0,
+      4,
+      7,
+      3
+     ],
+     [
+      1,
+      2,
+      6,
+      5
+     ]
+    ]
+   },
+   "settings": {
+    "selection_mode": "polygon"
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": [
+     1
+    ]
+   },
+   "gesture": {
+    "key": "e",
+    "modifiers": [],
+    "view": "Front orthographic",
+    "px_per_m": 624
+   },
+   "expected": {
+    "result_ui_name": "Rotate",
+    "mesh": {
+     "points": [
+      [
+       -0.5,
+       -0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       -0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       0.5,
+       -0.5
+      ],
+      [
+       -0.5,
+       0.5,
+       -0.5
+      ],
+      [
+       -0.5,
+       -0.5,
+       0.5
+      ],
+      [
+       0.5,
+       -0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       -0.5,
+       0.5,
+       0.5
+      ]
+     ],
+     "polygons": [
+      [
+       0,
+       3,
+       2,
+       1
+      ],
+      [
+       4,
+       5,
+       6,
+       7
+      ],
+      [
+       0,
+       1,
+       5,
+       4
+      ],
+      [
+       3,
+       7,
+       6,
+       2
+      ],
+      [
+       0,
+       4,
+       7,
+       3
+      ],
+      [
+       1,
+       2,
+       6,
+       5
+      ]
+     ],
+     "n_points": 8,
+     "n_polygons": 6,
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": [
+      1
+     ]
+    },
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": [
+      1
+     ]
+    },
+    "message": null
+   },
+   "tolerance": 1e-05
+  },
+  {
+   "id": "KEY-O-KEY-P03",
+   "description": "Physical macOS shortcut activation: r in polygon",
+   "input": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      0.5,
+      0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      3,
+      2,
+      1
+     ],
+     [
+      4,
+      5,
+      6,
+      7
+     ],
+     [
+      0,
+      1,
+      5,
+      4
+     ],
+     [
+      3,
+      7,
+      6,
+      2
+     ],
+     [
+      0,
+      4,
+      7,
+      3
+     ],
+     [
+      1,
+      2,
+      6,
+      5
+     ]
+    ]
+   },
+   "settings": {
+    "selection_mode": "polygon"
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": [
+     1
+    ]
+   },
+   "gesture": {
+    "key": "r",
+    "modifiers": [],
+    "view": "Front orthographic",
+    "px_per_m": 624
+   },
+   "expected": {
+    "result_ui_name": "Scale",
+    "mesh": {
+     "points": [
+      [
+       -0.5,
+       -0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       -0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       0.5,
+       -0.5
+      ],
+      [
+       -0.5,
+       0.5,
+       -0.5
+      ],
+      [
+       -0.5,
+       -0.5,
+       0.5
+      ],
+      [
+       0.5,
+       -0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       -0.5,
+       0.5,
+       0.5
+      ]
+     ],
+     "polygons": [
+      [
+       0,
+       3,
+       2,
+       1
+      ],
+      [
+       4,
+       5,
+       6,
+       7
+      ],
+      [
+       0,
+       1,
+       5,
+       4
+      ],
+      [
+       3,
+       7,
+       6,
+       2
+      ],
+      [
+       0,
+       4,
+       7,
+       3
+      ],
+      [
+       1,
+       2,
+       6,
+       5
+      ]
+     ],
+     "n_points": 8,
+     "n_polygons": 6,
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": [
+      1
+     ]
+    },
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": [
+      1
+     ]
+    },
+    "message": null
+   },
+   "tolerance": 1e-05
+  },
+  {
+   "id": "KEY-O-KEY-P05",
+   "description": "Physical macOS shortcut activation: y in polygon",
+   "input": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      0.5,
+      0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      3,
+      2,
+      1
+     ],
+     [
+      4,
+      5,
+      6,
+      7
+     ],
+     [
+      0,
+      1,
+      5,
+      4
+     ],
+     [
+      3,
+      7,
+      6,
+      2
+     ],
+     [
+      0,
+      4,
+      7,
+      3
+     ],
+     [
+      1,
+      2,
+      6,
+      5
+     ]
+    ]
+   },
+   "settings": {
+    "selection_mode": "polygon"
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": [
+     1
+    ]
+   },
+   "gesture": {
+    "key": "y",
+    "modifiers": [],
+    "view": "Front orthographic",
+    "px_per_m": 624
+   },
+   "expected": {
+    "result_ui_name": "Transform",
+    "mesh": {
+     "points": [
+      [
+       -0.5,
+       -0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       -0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       0.5,
+       -0.5
+      ],
+      [
+       -0.5,
+       0.5,
+       -0.5
+      ],
+      [
+       -0.5,
+       -0.5,
+       0.5
+      ],
+      [
+       0.5,
+       -0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       -0.5,
+       0.5,
+       0.5
+      ]
+     ],
+     "polygons": [
+      [
+       0,
+       3,
+       2,
+       1
+      ],
+      [
+       4,
+       5,
+       6,
+       7
+      ],
+      [
+       0,
+       1,
+       5,
+       4
+      ],
+      [
+       3,
+       7,
+       6,
+       2
+      ],
+      [
+       0,
+       4,
+       7,
+       3
+      ],
+      [
+       1,
+       2,
+       6,
+       5
+      ]
+     ],
+     "n_points": 8,
+     "n_polygons": 6,
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": [
+      1
+     ]
+    },
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": [
+      1
+     ]
+    },
+    "message": null
+   },
+   "tolerance": 1e-05
+  },
+  {
+   "id": "KEY-O-KEY-P06",
+   "description": "Physical macOS shortcut activation: t in polygon",
+   "input": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      0.5,
+      0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      3,
+      2,
+      1
+     ],
+     [
+      4,
+      5,
+      6,
+      7
+     ],
+     [
+      0,
+      1,
+      5,
+      4
+     ],
+     [
+      3,
+      7,
+      6,
+      2
+     ],
+     [
+      0,
+      4,
+      7,
+      3
+     ],
+     [
+      1,
+      2,
+      6,
+      5
+     ]
+    ]
+   },
+   "settings": {
+    "selection_mode": "polygon"
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": [
+     1
+    ]
+   },
+   "gesture": {
+    "key": "t",
+    "modifiers": [],
+    "view": "Front orthographic",
+    "px_per_m": 624
+   },
+   "expected": {
+    "result_ui_name": "Element Move",
+    "mesh": {
+     "points": [
+      [
+       -0.5,
+       -0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       -0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       0.5,
+       -0.5
+      ],
+      [
+       -0.5,
+       0.5,
+       -0.5
+      ],
+      [
+       -0.5,
+       -0.5,
+       0.5
+      ],
+      [
+       0.5,
+       -0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       -0.5,
+       0.5,
+       0.5
+      ]
+     ],
+     "polygons": [
+      [
+       0,
+       3,
+       2,
+       1
+      ],
+      [
+       4,
+       5,
+       6,
+       7
+      ],
+      [
+       0,
+       1,
+       5,
+       4
+      ],
+      [
+       3,
+       7,
+       6,
+       2
+      ],
+      [
+       0,
+       4,
+       7,
+       3
+      ],
+      [
+       1,
+       2,
+       6,
+       5
+      ]
+     ],
+     "n_points": 8,
+     "n_polygons": 6,
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": [
+      1
+     ]
+    },
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": [
+      1
+     ]
+    },
+    "message": null
+   },
+   "tolerance": 1e-05
+  },
+  {
+   "id": "KEY-O-KEY-P07",
+   "description": "Physical macOS shortcut activation: b in polygon",
+   "input": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      0.5,
+      0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      3,
+      2,
+      1
+     ],
+     [
+      4,
+      5,
+      6,
+      7
+     ],
+     [
+      0,
+      1,
+      5,
+      4
+     ],
+     [
+      3,
+      7,
+      6,
+      2
+     ],
+     [
+      0,
+      4,
+      7,
+      3
+     ],
+     [
+      1,
+      2,
+      6,
+      5
+     ]
+    ]
+   },
+   "settings": {
+    "selection_mode": "polygon"
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": [
+     1
+    ]
+   },
+   "gesture": {
+    "key": "b",
+    "modifiers": [],
+    "view": "Front orthographic",
+    "px_per_m": 624
+   },
+   "expected": {
+    "result_ui_name": "Polygon Bevel",
+    "mesh": {
+     "points": [
+      [
+       -0.5,
+       -0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       -0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       0.5,
+       -0.5
+      ],
+      [
+       -0.5,
+       0.5,
+       -0.5
+      ],
+      [
+       -0.5,
+       -0.5,
+       0.5
+      ],
+      [
+       0.5,
+       -0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       -0.5,
+       0.5,
+       0.5
+      ],
+      [
+       -0.5,
+       -0.5,
+       0.5
+      ],
+      [
+       0.5,
+       -0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       -0.5,
+       0.5,
+       0.5
+      ]
+     ],
+     "polygons": [
+      [
+       0,
+       3,
+       2,
+       1
+      ],
+      [
+       8,
+       9,
+       10,
+       11
+      ],
+      [
+       0,
+       1,
+       5,
+       4
+      ],
+      [
+       3,
+       7,
+       6,
+       2
+      ],
+      [
+       0,
+       4,
+       7,
+       3
+      ],
+      [
+       1,
+       2,
+       6,
+       5
+      ],
+      [
+       4,
+       5,
+       9,
+       8
+      ],
+      [
+       5,
+       6,
+       10,
+       9
+      ],
+      [
+       6,
+       7,
+       11,
+       10
+      ],
+      [
+       7,
+       4,
+       8,
+       11
+      ]
+     ],
+     "n_points": 12,
+     "n_polygons": 10,
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": [
+      1
+     ]
+    },
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": [
+      1
+     ]
+    },
+    "message": null
+   },
+   "tolerance": 1e-05
+  },
+  {
+   "id": "KEY-O-KEY-P13",
+   "description": "Physical macOS shortcut activation: s in polygon",
+   "input": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      0.5,
+      0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      3,
+      2,
+      1
+     ],
+     [
+      4,
+      5,
+      6,
+      7
+     ],
+     [
+      0,
+      1,
+      5,
+      4
+     ],
+     [
+      3,
+      7,
+      6,
+      2
+     ],
+     [
+      0,
+      4,
+      7,
+      3
+     ],
+     [
+      1,
+      2,
+      6,
+      5
+     ]
+    ]
+   },
+   "settings": {
+    "selection_mode": "polygon"
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": [
+     1
+    ]
+   },
+   "gesture": {
+    "key": "s",
+    "modifiers": [],
+    "view": "Front orthographic",
+    "px_per_m": 624
+   },
+   "expected": {
+    "result_ui_name": "Slide unavailable for one selected polygon",
+    "mesh": {
+     "points": [
+      [
+       -0.5,
+       -0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       -0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       0.5,
+       -0.5
+      ],
+      [
+       -0.5,
+       0.5,
+       -0.5
+      ],
+      [
+       -0.5,
+       -0.5,
+       0.5
+      ],
+      [
+       0.5,
+       -0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       -0.5,
+       0.5,
+       0.5
+      ]
+     ],
+     "polygons": [
+      [
+       0,
+       3,
+       2,
+       1
+      ],
+      [
+       4,
+       5,
+       6,
+       7
+      ],
+      [
+       0,
+       1,
+       5,
+       4
+      ],
+      [
+       3,
+       7,
+       6,
+       2
+      ],
+      [
+       0,
+       4,
+       7,
+       3
+      ],
+      [
+       1,
+       2,
+       6,
+       5
+      ]
+     ],
+     "n_points": 8,
+     "n_polygons": 6,
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": [
+      1
+     ]
+    },
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": [
+      1
+     ]
+    },
+    "message": "Command disabled."
+   },
+   "tolerance": 1e-05
+  },
+  {
+   "id": "KEY-O-KEY-P14",
+   "description": "Physical macOS shortcut activation: b in edge",
+   "input": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      0.5,
+      0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      3,
+      2,
+      1
+     ],
+     [
+      4,
+      5,
+      6,
+      7
+     ],
+     [
+      0,
+      1,
+      5,
+      4
+     ],
+     [
+      3,
+      7,
+      6,
+      2
+     ],
+     [
+      0,
+      4,
+      7,
+      3
+     ],
+     [
+      1,
+      2,
+      6,
+      5
+     ]
+    ]
+   },
+   "settings": {
+    "selection_mode": "edge"
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [
+     [
+      4,
+      5
+     ]
+    ],
+    "sel_polygons": []
+   },
+   "gesture": {
+    "key": "b",
+    "modifiers": [],
+    "view": "Front orthographic",
+    "px_per_m": 624
+   },
+   "expected": {
+    "result_ui_name": "Edge Bevel",
+    "mesh": {
+     "points": [
+      [
+       -0.5,
+       -0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       -0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       0.5,
+       -0.5
+      ],
+      [
+       -0.5,
+       0.5,
+       -0.5
+      ],
+      [
+       -0.5,
+       -0.5,
+       0.5
+      ],
+      [
+       0.5,
+       -0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       -0.5,
+       0.5,
+       0.5
+      ]
+     ],
+     "polygons": [
+      [
+       0,
+       3,
+       2,
+       1
+      ],
+      [
+       4,
+       5,
+       6,
+       7
+      ],
+      [
+       0,
+       1,
+       5,
+       4
+      ],
+      [
+       3,
+       7,
+       6,
+       2
+      ],
+      [
+       0,
+       4,
+       7,
+       3
+      ],
+      [
+       1,
+       2,
+       6,
+       5
+      ]
+     ],
+     "n_points": 8,
+     "n_polygons": 6,
+     "sel_vertices": [],
+     "sel_edges": [
+      [
+       4,
+       5
+      ]
+     ],
+     "sel_polygons": []
+    },
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [
+      [
+       4,
+       5
+      ]
+     ],
+     "sel_polygons": []
+    },
+    "message": null
+   },
+   "tolerance": 1e-05
+  },
+  {
+   "id": "KEY-O-KEY-P15",
+   "description": "Physical macOS shortcut activation: s in edge",
+   "input": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      0.5,
+      0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      3,
+      2,
+      1
+     ],
+     [
+      4,
+      5,
+      6,
+      7
+     ],
+     [
+      0,
+      1,
+      5,
+      4
+     ],
+     [
+      3,
+      7,
+      6,
+      2
+     ],
+     [
+      0,
+      4,
+      7,
+      3
+     ],
+     [
+      1,
+      2,
+      6,
+      5
+     ]
+    ]
+   },
+   "settings": {
+    "selection_mode": "edge"
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [
+     [
+      4,
+      5
+     ]
+    ],
+    "sel_polygons": []
+   },
+   "gesture": {
+    "key": "s",
+    "modifiers": [],
+    "view": "Front orthographic",
+    "px_per_m": 624
+   },
+   "expected": {
+    "result_ui_name": "Slide (Edge)",
+    "mesh": {
+     "points": [
+      [
+       -0.5,
+       -0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       -0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       0.5,
+       -0.5
+      ],
+      [
+       -0.5,
+       0.5,
+       -0.5
+      ],
+      [
+       -0.5,
+       -0.5,
+       0.5
+      ],
+      [
+       0.5,
+       -0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       -0.5,
+       0.5,
+       0.5
+      ]
+     ],
+     "polygons": [
+      [
+       0,
+       3,
+       2,
+       1
+      ],
+      [
+       4,
+       5,
+       6,
+       7
+      ],
+      [
+       0,
+       1,
+       5,
+       4
+      ],
+      [
+       3,
+       7,
+       6,
+       2
+      ],
+      [
+       0,
+       4,
+       7,
+       3
+      ],
+      [
+       1,
+       2,
+       6,
+       5
+      ]
+     ],
+     "n_points": 8,
+     "n_polygons": 6,
+     "sel_vertices": [],
+     "sel_edges": [
+      [
+       4,
+       5
+      ]
+     ],
+     "sel_polygons": []
+    },
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [
+      [
+       4,
+       5
+      ]
+     ],
+     "sel_polygons": []
+    },
+    "message": null
+   },
+   "tolerance": 1e-05
+  },
+  {
+   "id": "KEY-O-KEY-P16",
+   "description": "Physical macOS shortcut activation: b in vertex",
+   "input": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      0.5,
+      0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      3,
+      2,
+      1
+     ],
+     [
+      4,
+      5,
+      6,
+      7
+     ],
+     [
+      0,
+      1,
+      5,
+      4
+     ],
+     [
+      3,
+      7,
+      6,
+      2
+     ],
+     [
+      0,
+      4,
+      7,
+      3
+     ],
+     [
+      1,
+      2,
+      6,
+      5
+     ]
+    ]
+   },
+   "settings": {
+    "selection_mode": "vertex"
+   },
+   "selection": {
+    "sel_vertices": [
+     4
+    ],
+    "sel_edges": [],
+    "sel_polygons": []
+   },
+   "gesture": {
+    "key": "b",
+    "modifiers": [],
+    "view": "Front orthographic",
+    "px_per_m": 624
+   },
+   "expected": {
+    "result_ui_name": "Vertex Bevel",
+    "mesh": {
+     "points": [
+      [
+       -0.5,
+       -0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       -0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       0.5,
+       -0.5
+      ],
+      [
+       -0.5,
+       0.5,
+       -0.5
+      ],
+      [
+       -0.5,
+       -0.5,
+       0.5
+      ],
+      [
+       0.5,
+       -0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       -0.5,
+       0.5,
+       0.5
+      ]
+     ],
+     "polygons": [
+      [
+       0,
+       3,
+       2,
+       1
+      ],
+      [
+       4,
+       5,
+       6,
+       7
+      ],
+      [
+       0,
+       1,
+       5,
+       4
+      ],
+      [
+       3,
+       7,
+       6,
+       2
+      ],
+      [
+       0,
+       4,
+       7,
+       3
+      ],
+      [
+       1,
+       2,
+       6,
+       5
+      ]
+     ],
+     "n_points": 8,
+     "n_polygons": 6,
+     "sel_vertices": [
+      4
+     ],
+     "sel_edges": [],
+     "sel_polygons": []
+    },
+    "selection_after": {
+     "sel_vertices": [
+      4
+     ],
+     "sel_edges": [],
+     "sel_polygons": []
+    },
+    "message": null
+   },
+   "tolerance": 1e-05
+  },
+  {
+   "id": "KEY-O-KEY-P17",
+   "description": "Physical macOS shortcut activation: s in vertex",
+   "input": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      0.5,
+      0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      3,
+      2,
+      1
+     ],
+     [
+      4,
+      5,
+      6,
+      7
+     ],
+     [
+      0,
+      1,
+      5,
+      4
+     ],
+     [
+      3,
+      7,
+      6,
+      2
+     ],
+     [
+      0,
+      4,
+      7,
+      3
+     ],
+     [
+      1,
+      2,
+      6,
+      5
+     ]
+    ]
+   },
+   "settings": {
+    "selection_mode": "vertex"
+   },
+   "selection": {
+    "sel_vertices": [
+     4
+    ],
+    "sel_edges": [],
+    "sel_polygons": []
+   },
+   "gesture": {
+    "key": "s",
+    "modifiers": [],
+    "view": "Front orthographic",
+    "px_per_m": 624
+   },
+   "expected": {
+    "result_ui_name": "Slide (Vertex)",
+    "mesh": {
+     "points": [
+      [
+       -0.5,
+       -0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       -0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       0.5,
+       -0.5
+      ],
+      [
+       -0.5,
+       0.5,
+       -0.5
+      ],
+      [
+       -0.5,
+       -0.5,
+       0.5
+      ],
+      [
+       0.5,
+       -0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       -0.5,
+       0.5,
+       0.5
+      ]
+     ],
+     "polygons": [
+      [
+       0,
+       3,
+       2,
+       1
+      ],
+      [
+       4,
+       5,
+       6,
+       7
+      ],
+      [
+       0,
+       1,
+       5,
+       4
+      ],
+      [
+       3,
+       7,
+       6,
+       2
+      ],
+      [
+       0,
+       4,
+       7,
+       3
+      ],
+      [
+       1,
+       2,
+       6,
+       5
+      ]
+     ],
+     "n_points": 8,
+     "n_polygons": 6,
+     "sel_vertices": [
+      4
+     ],
+     "sel_edges": [],
+     "sel_polygons": []
+    },
+    "selection_after": {
+     "sel_vertices": [
+      4
+     ],
+     "sel_edges": [],
+     "sel_polygons": []
+    },
+    "message": null
+   },
+   "tolerance": 1e-05
+  },
+  {
+   "id": "KEY-O-KEY-P18",
+   "description": "Physical macOS shortcut activation: 1 in polygon",
+   "input": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      0.5,
+      0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      3,
+      2,
+      1
+     ],
+     [
+      4,
+      5,
+      6,
+      7
+     ],
+     [
+      0,
+      1,
+      5,
+      4
+     ],
+     [
+      3,
+      7,
+      6,
+      2
+     ],
+     [
+      0,
+      4,
+      7,
+      3
+     ],
+     [
+      1,
+      2,
+      6,
+      5
+     ]
+    ]
+   },
+   "settings": {
+    "selection_mode": "polygon"
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": [
+     1
+    ]
+   },
+   "gesture": {
+    "key": "1",
+    "modifiers": [],
+    "view": "Front orthographic",
+    "px_per_m": 624
+   },
+   "expected": {
+    "result_ui_name": "Vertex selection mode",
+    "mesh": {
+     "points": [
+      [
+       -0.5,
+       -0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       -0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       0.5,
+       -0.5
+      ],
+      [
+       -0.5,
+       0.5,
+       -0.5
+      ],
+      [
+       -0.5,
+       -0.5,
+       0.5
+      ],
+      [
+       0.5,
+       -0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       -0.5,
+       0.5,
+       0.5
+      ]
+     ],
+     "polygons": [
+      [
+       0,
+       3,
+       2,
+       1
+      ],
+      [
+       4,
+       5,
+       6,
+       7
+      ],
+      [
+       0,
+       1,
+       5,
+       4
+      ],
+      [
+       3,
+       7,
+       6,
+       2
+      ],
+      [
+       0,
+       4,
+       7,
+       3
+      ],
+      [
+       1,
+       2,
+       6,
+       5
+      ]
+     ],
+     "n_points": 8,
+     "n_polygons": 6,
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": [
+      1
+     ]
+    },
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": [
+      1
+     ]
+    },
+    "message": null,
+    "active_selection_mode": "Vertex"
+   },
+   "tolerance": 1e-05
+  },
+  {
+   "id": "KEY-O-KEY-P19",
+   "description": "Physical macOS shortcut activation: 2 in polygon",
+   "input": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      0.5,
+      0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      3,
+      2,
+      1
+     ],
+     [
+      4,
+      5,
+      6,
+      7
+     ],
+     [
+      0,
+      1,
+      5,
+      4
+     ],
+     [
+      3,
+      7,
+      6,
+      2
+     ],
+     [
+      0,
+      4,
+      7,
+      3
+     ],
+     [
+      1,
+      2,
+      6,
+      5
+     ]
+    ]
+   },
+   "settings": {
+    "selection_mode": "polygon"
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": [
+     1
+    ]
+   },
+   "gesture": {
+    "key": "2",
+    "modifiers": [],
+    "view": "Front orthographic",
+    "px_per_m": 624
+   },
+   "expected": {
+    "result_ui_name": "Edge selection mode",
+    "mesh": {
+     "points": [
+      [
+       -0.5,
+       -0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       -0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       0.5,
+       -0.5
+      ],
+      [
+       -0.5,
+       0.5,
+       -0.5
+      ],
+      [
+       -0.5,
+       -0.5,
+       0.5
+      ],
+      [
+       0.5,
+       -0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       -0.5,
+       0.5,
+       0.5
+      ]
+     ],
+     "polygons": [
+      [
+       0,
+       3,
+       2,
+       1
+      ],
+      [
+       4,
+       5,
+       6,
+       7
+      ],
+      [
+       0,
+       1,
+       5,
+       4
+      ],
+      [
+       3,
+       7,
+       6,
+       2
+      ],
+      [
+       0,
+       4,
+       7,
+       3
+      ],
+      [
+       1,
+       2,
+       6,
+       5
+      ]
+     ],
+     "n_points": 8,
+     "n_polygons": 6,
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": [
+      1
+     ]
+    },
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": [
+      1
+     ]
+    },
+    "message": null,
+    "active_selection_mode": "Edge"
+   },
+   "tolerance": 1e-05
+  },
+  {
+   "id": "KEY-O-KEY-P20",
+   "description": "Physical macOS shortcut activation: 3 in vertex",
+   "input": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      0.5,
+      0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      3,
+      2,
+      1
+     ],
+     [
+      4,
+      5,
+      6,
+      7
+     ],
+     [
+      0,
+      1,
+      5,
+      4
+     ],
+     [
+      3,
+      7,
+      6,
+      2
+     ],
+     [
+      0,
+      4,
+      7,
+      3
+     ],
+     [
+      1,
+      2,
+      6,
+      5
+     ]
+    ]
+   },
+   "settings": {
+    "selection_mode": "vertex"
+   },
+   "selection": {
+    "sel_vertices": [
+     4
+    ],
+    "sel_edges": [],
+    "sel_polygons": []
+   },
+   "gesture": {
+    "key": "3",
+    "modifiers": [],
+    "view": "Front orthographic",
+    "px_per_m": 624
+   },
+   "expected": {
+    "result_ui_name": "Polygon selection mode",
+    "mesh": {
+     "points": [
+      [
+       -0.5,
+       -0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       -0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       0.5,
+       -0.5
+      ],
+      [
+       -0.5,
+       0.5,
+       -0.5
+      ],
+      [
+       -0.5,
+       -0.5,
+       0.5
+      ],
+      [
+       0.5,
+       -0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       -0.5,
+       0.5,
+       0.5
+      ]
+     ],
+     "polygons": [
+      [
+       0,
+       3,
+       2,
+       1
+      ],
+      [
+       4,
+       5,
+       6,
+       7
+      ],
+      [
+       0,
+       1,
+       5,
+       4
+      ],
+      [
+       3,
+       7,
+       6,
+       2
+      ],
+      [
+       0,
+       4,
+       7,
+       3
+      ],
+      [
+       1,
+       2,
+       6,
+       5
+      ]
+     ],
+     "n_points": 8,
+     "n_polygons": 6,
+     "sel_vertices": [
+      4
+     ],
+     "sel_edges": [],
+     "sel_polygons": []
+    },
+    "selection_after": {
+     "sel_vertices": [
+      4
+     ],
+     "sel_edges": [],
+     "sel_polygons": []
+    },
+    "message": null,
+    "active_selection_mode": "Polygon"
+   },
+   "tolerance": 1e-05
+  },
+  {
+   "id": "KEY-O-KEY-P21",
+   "description": "Physical macOS shortcut activation: 5 in polygon",
+   "input": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      0.5,
+      0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      3,
+      2,
+      1
+     ],
+     [
+      4,
+      5,
+      6,
+      7
+     ],
+     [
+      0,
+      1,
+      5,
+      4
+     ],
+     [
+      3,
+      7,
+      6,
+      2
+     ],
+     [
+      0,
+      4,
+      7,
+      3
+     ],
+     [
+      1,
+      2,
+      6,
+      5
+     ]
+    ]
+   },
+   "settings": {
+    "selection_mode": "polygon"
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": [
+     1
+    ]
+   },
+   "gesture": {
+    "key": "5",
+    "modifiers": [],
+    "view": "Front orthographic",
+    "px_per_m": 624
+   },
+   "expected": {
+    "result_ui_name": "Items selection mode",
+    "mesh": {
+     "points": [
+      [
+       -0.5,
+       -0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       -0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       0.5,
+       -0.5
+      ],
+      [
+       -0.5,
+       0.5,
+       -0.5
+      ],
+      [
+       -0.5,
+       -0.5,
+       0.5
+      ],
+      [
+       0.5,
+       -0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       -0.5,
+       0.5,
+       0.5
+      ]
+     ],
+     "polygons": [
+      [
+       0,
+       3,
+       2,
+       1
+      ],
+      [
+       4,
+       5,
+       6,
+       7
+      ],
+      [
+       0,
+       1,
+       5,
+       4
+      ],
+      [
+       3,
+       7,
+       6,
+       2
+      ],
+      [
+       0,
+       4,
+       7,
+       3
+      ],
+      [
+       1,
+       2,
+       6,
+       5
+      ]
+     ],
+     "n_points": 8,
+     "n_polygons": 6,
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": [
+      1
+     ]
+    },
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": [
+      1
+     ]
+    },
+    "message": null,
+    "active_selection_mode": "Items"
+   },
+   "tolerance": 1e-05
+  },
+  {
+   "id": "KEY-O-KEY-P22",
+   "description": "Physical macOS shortcut activation: Up in polygon",
+   "input": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      0.5,
+      0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      3,
+      2,
+      1
+     ],
+     [
+      4,
+      5,
+      6,
+      7
+     ],
+     [
+      0,
+      1,
+      5,
+      4
+     ],
+     [
+      3,
+      7,
+      6,
+      2
+     ],
+     [
+      0,
+      4,
+      7,
+      3
+     ],
+     [
+      1,
+      2,
+      6,
+      5
+     ]
+    ]
+   },
+   "settings": {
+    "selection_mode": "polygon"
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": [
+     1
+    ]
+   },
+   "gesture": {
+    "key": "Up",
+    "modifiers": [],
+    "view": "Front orthographic",
+    "px_per_m": 624
+   },
+   "expected": {
+    "result_ui_name": "More selection refusal",
+    "mesh": {
+     "points": [
+      [
+       -0.5,
+       -0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       -0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       0.5,
+       -0.5
+      ],
+      [
+       -0.5,
+       0.5,
+       -0.5
+      ],
+      [
+       -0.5,
+       -0.5,
+       0.5
+      ],
+      [
+       0.5,
+       -0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       -0.5,
+       0.5,
+       0.5
+      ]
+     ],
+     "polygons": [
+      [
+       0,
+       3,
+       2,
+       1
+      ],
+      [
+       4,
+       5,
+       6,
+       7
+      ],
+      [
+       0,
+       1,
+       5,
+       4
+      ],
+      [
+       3,
+       7,
+       6,
+       2
+      ],
+      [
+       0,
+       4,
+       7,
+       3
+      ],
+      [
+       1,
+       2,
+       6,
+       5
+      ]
+     ],
+     "n_points": 8,
+     "n_polygons": 6,
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": [
+      1
+     ]
+    },
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": [
+      1
+     ]
+    },
+    "message": "Need to directly select at least two geometric elements."
+   },
+   "tolerance": 1e-05
+  },
+  {
+   "id": "KEY-O-KEY-P23",
+   "description": "Physical macOS shortcut activation: c in polygon",
+   "input": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      0.5,
+      0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      3,
+      2,
+      1
+     ],
+     [
+      4,
+      5,
+      6,
+      7
+     ],
+     [
+      0,
+      1,
+      5,
+      4
+     ],
+     [
+      3,
+      7,
+      6,
+      2
+     ],
+     [
+      0,
+      4,
+      7,
+      3
+     ],
+     [
+      1,
+      2,
+      6,
+      5
+     ]
+    ]
+   },
+   "settings": {
+    "selection_mode": "polygon"
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": [
+     1
+    ]
+   },
+   "gesture": {
+    "key": "c",
+    "modifiers": [],
+    "view": "Front orthographic",
+    "px_per_m": 624
+   },
+   "expected": {
+    "result_ui_name": "Channel Haul",
+    "mesh": {
+     "points": [
+      [
+       -0.5,
+       -0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       -0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       0.5,
+       -0.5
+      ],
+      [
+       -0.5,
+       0.5,
+       -0.5
+      ],
+      [
+       -0.5,
+       -0.5,
+       0.5
+      ],
+      [
+       0.5,
+       -0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       -0.5,
+       0.5,
+       0.5
+      ]
+     ],
+     "polygons": [
+      [
+       0,
+       3,
+       2,
+       1
+      ],
+      [
+       4,
+       5,
+       6,
+       7
+      ],
+      [
+       0,
+       1,
+       5,
+       4
+      ],
+      [
+       3,
+       7,
+       6,
+       2
+      ],
+      [
+       0,
+       4,
+       7,
+       3
+      ],
+      [
+       1,
+       2,
+       6,
+       5
+      ]
+     ],
+     "n_points": 8,
+     "n_polygons": 6,
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": [
+      1
+     ]
+    },
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": [
+      1
+     ]
+    },
+    "message": null
+   },
+   "tolerance": 1e-05
+  },
+  {
+   "id": "KEY-O-KEY-P24",
+   "description": "Physical macOS shortcut activation: z in edge",
+   "input": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      0.5,
+      0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      3,
+      2,
+      1
+     ],
+     [
+      4,
+      5,
+      6,
+      7
+     ],
+     [
+      0,
+      1,
+      5,
+      4
+     ],
+     [
+      3,
+      7,
+      6,
+      2
+     ],
+     [
+      0,
+      4,
+      7,
+      3
+     ],
+     [
+      1,
+      2,
+      6,
+      5
+     ]
+    ]
+   },
+   "settings": {
+    "selection_mode": "edge"
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [
+     [
+      4,
+      5
+     ]
+    ],
+    "sel_polygons": []
+   },
+   "gesture": {
+    "key": "z",
+    "modifiers": [],
+    "view": "Front orthographic",
+    "px_per_m": 624
+   },
+   "expected": {
+    "result_ui_name": "Edge Extend",
+    "mesh": {
+     "points": [
+      [
+       -0.5,
+       -0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       -0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       0.5,
+       -0.5
+      ],
+      [
+       -0.5,
+       0.5,
+       -0.5
+      ],
+      [
+       -0.5,
+       -0.5,
+       0.5
+      ],
+      [
+       0.5,
+       -0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       -0.5,
+       0.5,
+       0.5
+      ]
+     ],
+     "polygons": [
+      [
+       0,
+       3,
+       2,
+       1
+      ],
+      [
+       4,
+       5,
+       6,
+       7
+      ],
+      [
+       0,
+       1,
+       5,
+       4
+      ],
+      [
+       3,
+       7,
+       6,
+       2
+      ],
+      [
+       0,
+       4,
+       7,
+       3
+      ],
+      [
+       1,
+       2,
+       6,
+       5
+      ]
+     ],
+     "n_points": 8,
+     "n_polygons": 6,
+     "sel_vertices": [],
+     "sel_edges": [
+      [
+       4,
+       5
+      ]
+     ],
+     "sel_polygons": []
+    },
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [
+      [
+       4,
+       5
+      ]
+     ],
+     "sel_polygons": []
+    },
+    "message": null
+   },
+   "tolerance": 1e-05
+  },
+  {
+   "id": "KEY-O-KEY-P25",
+   "description": "Physical macOS shortcut activation: d in polygon",
+   "input": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      0.5,
+      0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      3,
+      2,
+      1
+     ],
+     [
+      4,
+      5,
+      6,
+      7
+     ],
+     [
+      0,
+      1,
+      5,
+      4
+     ],
+     [
+      3,
+      7,
+      6,
+      2
+     ],
+     [
+      0,
+      4,
+      7,
+      3
+     ],
+     [
+      1,
+      2,
+      6,
+      5
+     ]
+    ]
+   },
+   "settings": {
+    "selection_mode": "polygon"
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": [
+     1
+    ]
+   },
+   "gesture": {
+    "key": "d",
+    "modifiers": [],
+    "view": "Front orthographic",
+    "px_per_m": 624
+   },
+   "expected": {
+    "result_ui_name": "Subdivide",
+    "mesh": {
+     "points": [
+      [
+       -0.5,
+       -0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       -0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       0.5,
+       -0.5
+      ],
+      [
+       -0.5,
+       0.5,
+       -0.5
+      ],
+      [
+       -0.375,
+       -0.375,
+       0.5
+      ],
+      [
+       0.375,
+       -0.375,
+       0.5
+      ],
+      [
+       0.375,
+       0.375,
+       0.5
+      ],
+      [
+       -0.375,
+       0.375,
+       0.5
+      ],
+      [
+       0.0,
+       -0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.0,
+       0.5
+      ],
+      [
+       0.0,
+       0.5,
+       0.5
+      ],
+      [
+       -0.5,
+       0.0,
+       0.5
+      ],
+      [
+       0.0,
+       0.0,
+       0.5
+      ]
+     ],
+     "polygons": [
+      [
+       0,
+       3,
+       2,
+       1
+      ],
+      [
+       4,
+       8,
+       12,
+       11
+      ],
+      [
+       8,
+       5,
+       9,
+       12
+      ],
+      [
+       12,
+       9,
+       6,
+       10
+      ],
+      [
+       11,
+       12,
+       10,
+       7
+      ],
+      [
+       0,
+       1,
+       5,
+       8,
+       4
+      ],
+      [
+       3,
+       7,
+       10,
+       6,
+       2
+      ],
+      [
+       0,
+       4,
+       11,
+       7,
+       3
+      ],
+      [
+       1,
+       2,
+       6,
+       9,
+       5
+      ]
+     ],
+     "n_points": 13,
+     "n_polygons": 9,
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": [
+      1,
+      2,
+      3,
+      4
+     ]
+    },
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": [
+      1,
+      2,
+      3,
+      4
+     ]
+    },
+    "message": null
+   },
+   "tolerance": 1e-05
+  },
+  {
+   "id": "KEY-O-KEY-P28",
+   "description": "Physical macOS shortcut activation: l in edge",
+   "input": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      0.5,
+      0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      3,
+      2,
+      1
+     ],
+     [
+      4,
+      5,
+      6,
+      7
+     ],
+     [
+      0,
+      1,
+      5,
+      4
+     ],
+     [
+      3,
+      7,
+      6,
+      2
+     ],
+     [
+      0,
+      4,
+      7,
+      3
+     ],
+     [
+      1,
+      2,
+      6,
+      5
+     ]
+    ]
+   },
+   "settings": {
+    "selection_mode": "edge"
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [
+     [
+      4,
+      5
+     ]
+    ],
+    "sel_polygons": []
+   },
+   "gesture": {
+    "key": "l",
+    "modifiers": [],
+    "view": "Front orthographic",
+    "px_per_m": 624
+   },
+   "expected": {
+    "result_ui_name": "Select Loop",
+    "mesh": {
+     "points": [
+      [
+       -0.5,
+       -0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       -0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       0.5,
+       -0.5
+      ],
+      [
+       -0.5,
+       0.5,
+       -0.5
+      ],
+      [
+       -0.5,
+       -0.5,
+       0.5
+      ],
+      [
+       0.5,
+       -0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       -0.5,
+       0.5,
+       0.5
+      ]
+     ],
+     "polygons": [
+      [
+       0,
+       3,
+       2,
+       1
+      ],
+      [
+       4,
+       5,
+       6,
+       7
+      ],
+      [
+       0,
+       1,
+       5,
+       4
+      ],
+      [
+       3,
+       7,
+       6,
+       2
+      ],
+      [
+       0,
+       4,
+       7,
+       3
+      ],
+      [
+       1,
+       2,
+       6,
+       5
+      ]
+     ],
+     "n_points": 8,
+     "n_polygons": 6,
+     "sel_vertices": [],
+     "sel_edges": [
+      [
+       4,
+       5
+      ],
+      [
+       4,
+       7
+      ],
+      [
+       5,
+       6
+      ],
+      [
+       6,
+       7
+      ]
+     ],
+     "sel_polygons": []
+    },
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [
+      [
+       4,
+       5
+      ],
+      [
+       4,
+       7
+      ],
+      [
+       5,
+       6
+      ],
+      [
+       6,
+       7
+      ]
+     ],
+     "sel_polygons": []
+    },
+    "message": null
+   },
+   "tolerance": 1e-05
+  },
+  {
+   "id": "KEY-O-KEY-P29",
+   "description": "Physical macOS shortcut activation: bracketleft in polygon",
+   "input": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      0.5,
+      0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      3,
+      2,
+      1
+     ],
+     [
+      4,
+      5,
+      6,
+      7
+     ],
+     [
+      0,
+      1,
+      5,
+      4
+     ],
+     [
+      3,
+      7,
+      6,
+      2
+     ],
+     [
+      0,
+      4,
+      7,
+      3
+     ],
+     [
+      1,
+      2,
+      6,
+      5
+     ]
+    ]
+   },
+   "settings": {
+    "selection_mode": "polygon"
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": [
+     1
+    ]
+   },
+   "gesture": {
+    "key": "bracketleft",
+    "modifiers": [],
+    "view": "Front orthographic",
+    "px_per_m": 624
+   },
+   "expected": {
+    "result_ui_name": "Invert Selection",
+    "mesh": {
+     "points": [
+      [
+       -0.5,
+       -0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       -0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       0.5,
+       -0.5
+      ],
+      [
+       -0.5,
+       0.5,
+       -0.5
+      ],
+      [
+       -0.5,
+       -0.5,
+       0.5
+      ],
+      [
+       0.5,
+       -0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       -0.5,
+       0.5,
+       0.5
+      ]
+     ],
+     "polygons": [
+      [
+       0,
+       3,
+       2,
+       1
+      ],
+      [
+       4,
+       5,
+       6,
+       7
+      ],
+      [
+       0,
+       1,
+       5,
+       4
+      ],
+      [
+       3,
+       7,
+       6,
+       2
+      ],
+      [
+       0,
+       4,
+       7,
+       3
+      ],
+      [
+       1,
+       2,
+       6,
+       5
+      ]
+     ],
+     "n_points": 8,
+     "n_polygons": 6,
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": [
+      0,
+      2,
+      3,
+      4,
+      5
+     ]
+    },
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": [
+      0,
+      2,
+      3,
+      4,
+      5
+     ]
+    },
+    "message": null
+   },
+   "tolerance": 1e-05
+  },
+  {
+   "id": "KEY-O-KEY-P30",
+   "description": "Physical macOS shortcut activation: bracketright in polygon",
+   "input": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      0.5,
+      0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      3,
+      2,
+      1
+     ],
+     [
+      4,
+      5,
+      6,
+      7
+     ],
+     [
+      0,
+      1,
+      5,
+      4
+     ],
+     [
+      3,
+      7,
+      6,
+      2
+     ],
+     [
+      0,
+      4,
+      7,
+      3
+     ],
+     [
+      1,
+      2,
+      6,
+      5
+     ]
+    ]
+   },
+   "settings": {
+    "selection_mode": "polygon"
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": [
+     1
+    ]
+   },
+   "gesture": {
+    "key": "bracketright",
+    "modifiers": [],
+    "view": "Front orthographic",
+    "px_per_m": 624
+   },
+   "expected": {
+    "result_ui_name": "Select Connected",
+    "mesh": {
+     "points": [
+      [
+       -0.5,
+       -0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       -0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       0.5,
+       -0.5
+      ],
+      [
+       -0.5,
+       0.5,
+       -0.5
+      ],
+      [
+       -0.5,
+       -0.5,
+       0.5
+      ],
+      [
+       0.5,
+       -0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       -0.5,
+       0.5,
+       0.5
+      ]
+     ],
+     "polygons": [
+      [
+       0,
+       3,
+       2,
+       1
+      ],
+      [
+       4,
+       5,
+       6,
+       7
+      ],
+      [
+       0,
+       1,
+       5,
+       4
+      ],
+      [
+       3,
+       7,
+       6,
+       2
+      ],
+      [
+       0,
+       4,
+       7,
+       3
+      ],
+      [
+       1,
+       2,
+       6,
+       5
+      ]
+     ],
+     "n_points": 8,
+     "n_polygons": 6,
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": [
+      1,
+      0,
+      2,
+      3,
+      4,
+      5
+     ]
+    },
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": [
+      1,
+      0,
+      2,
+      3,
+      4,
+      5
+     ]
+    },
+    "message": null
+   },
+   "tolerance": 1e-05
+  },
+  {
+   "id": "KEY-O-KEY-P31",
+   "description": "Physical macOS shortcut activation: q in polygon",
+   "input": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      0.5,
+      0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      3,
+      2,
+      1
+     ],
+     [
+      4,
+      5,
+      6,
+      7
+     ],
+     [
+      0,
+      1,
+      5,
+      4
+     ],
+     [
+      3,
+      7,
+      6,
+      2
+     ],
+     [
+      0,
+      4,
+      7,
+      3
+     ],
+     [
+      1,
+      2,
+      6,
+      5
+     ]
+    ]
+   },
+   "settings": {
+    "selection_mode": "polygon"
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": [
+     1
+    ]
+   },
+   "gesture": {
+    "key": "q",
+    "modifiers": [],
+    "view": "Front orthographic",
+    "px_per_m": 624
+   },
+   "expected": {
+    "result_ui_name": "Drop Tool",
+    "mesh": {
+     "points": [
+      [
+       -0.5,
+       -0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       -0.5,
+       -0.5
+      ],
+      [
+       0.5,
+       0.5,
+       -0.5
+      ],
+      [
+       -0.5,
+       0.5,
+       -0.5
+      ],
+      [
+       -0.5,
+       -0.5,
+       0.5
+      ],
+      [
+       0.5,
+       -0.5,
+       0.5
+      ],
+      [
+       0.5,
+       0.5,
+       0.5
+      ],
+      [
+       -0.5,
+       0.5,
+       0.5
+      ]
+     ],
+     "polygons": [
+      [
+       0,
+       3,
+       2,
+       1
+      ],
+      [
+       4,
+       5,
+       6,
+       7
+      ],
+      [
+       0,
+       1,
+       5,
+       4
+      ],
+      [
+       3,
+       7,
+       6,
+       2
+      ],
+      [
+       0,
+       4,
+       7,
+       3
+      ],
+      [
+       1,
+       2,
+       6,
+       5
+      ]
+     ],
+     "n_points": 8,
+     "n_polygons": 6,
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": [
+      1
+     ]
+    },
+    "selection_after": {
+     "sel_vertices": [],
+     "sel_edges": [],
+     "sel_polygons": [
+      1
+     ]
+    },
+    "message": null
+   },
+   "tolerance": 1e-05
+  },
+  {
+   "id": "KEY-O-H2-shift-c",
+   "description": "Physical Shift+C in the measured selected-Polygon cube context",
+   "input": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      0.5
+     ],
+     [
+      0.5,
+      0.5,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      2,
+      3,
+      1
+     ],
+     [
+      4,
+      5,
+      7,
+      6
+     ],
+     [
+      0,
+      1,
+      5,
+      4
+     ],
+     [
+      2,
+      6,
+      7,
+      3
+     ],
+     [
+      0,
+      4,
+      6,
+      2
+     ],
+     [
+      1,
+      3,
+      7,
+      5
+     ]
+    ]
+   },
+   "settings": {
+    "selection_mode": "Polygon",
+    "key": "Shift+C",
+    "configuration": "Current active configuration; no factory reset",
+    "gesture": "Single physical keypress, pointer over viewport cube; no subsequent click/drag requested"
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": [
+     1
+    ]
+   },
+   "expected": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      0.5
+     ],
+     [
+      0.5,
+      0.5,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      2,
+      3,
+      1
+     ],
+     [
+      4,
+      5,
+      7,
+      6
+     ],
+     [
+      0,
+      1,
+      5,
+      4
+     ],
+     [
+      2,
+      6,
+      7,
+      3
+     ],
+     [
+      0,
+      4,
+      6,
+      2
+     ],
+     [
+      1,
+      3,
+      7,
+      5
+     ]
+    ],
+    "n_points": 8,
+    "n_polygons": 6,
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": [
+     1
+    ],
+    "observed_tool_ui_name": "Polygon Slice"
+   },
+   "tolerance": 1e-05
+  },
+  {
+   "id": "KEY-O-H2-option-c",
+   "description": "Physical Option+C in the measured selected-Polygon cube context",
+   "input": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      0.5
+     ],
+     [
+      0.5,
+      0.5,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      2,
+      3,
+      1
+     ],
+     [
+      4,
+      5,
+      7,
+      6
+     ],
+     [
+      0,
+      1,
+      5,
+      4
+     ],
+     [
+      2,
+      6,
+      7,
+      3
+     ],
+     [
+      0,
+      4,
+      6,
+      2
+     ],
+     [
+      1,
+      3,
+      7,
+      5
+     ]
+    ]
+   },
+   "settings": {
+    "selection_mode": "Polygon",
+    "key": "Option+C",
+    "configuration": "Current active configuration; no factory reset",
+    "gesture": "Single physical keypress, pointer over viewport cube; no subsequent click/drag requested",
+    "retained_tool_options": {
+     "Edit": "Move",
+     "Mode": "Free",
+     "Count": 1,
+     "Inset m": 0,
+     "Select New Polygons": true,
+     "Draw Sliced Edges": true
+    }
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": [
+     1
+    ]
+   },
+   "expected": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      0.5
+     ],
+     [
+      0.5,
+      0.5,
+      0.5
+     ],
+     [
+      0.0,
+      0.5,
+      -0.5
+     ],
+     [
+      0.0,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.0,
+      -0.5,
+      0.5
+     ],
+     [
+      0.0,
+      0.5,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      4,
+      6,
+      2
+     ],
+     [
+      1,
+      3,
+      7,
+      5
+     ],
+     [
+      9,
+      0,
+      2,
+      8
+     ],
+     [
+      8,
+      3,
+      1,
+      9
+     ],
+     [
+      11,
+      6,
+      4,
+      10
+     ],
+     [
+      10,
+      5,
+      7,
+      11
+     ],
+     [
+      10,
+      4,
+      0,
+      9
+     ],
+     [
+      9,
+      1,
+      5,
+      10
+     ],
+     [
+      8,
+      2,
+      6,
+      11
+     ],
+     [
+      11,
+      7,
+      3,
+      8
+     ]
+    ],
+    "n_points": 12,
+    "n_polygons": 10,
+    "sel_vertices": [
+     8,
+     9,
+     10,
+     11
+    ],
+    "sel_edges": [
+     [
+      8,
+      9
+     ],
+     [
+      8,
+      11
+     ],
+     [
+      9,
+      10
+     ],
+     [
+      10,
+      11
+     ]
+    ],
+    "sel_polygons": [
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9
+    ],
+    "observed_tool_ui_name": "Loop Slice",
+    "readback_state": "Active tool with live cut preview; commit state not established"
+   },
+   "tolerance": 1e-05
+  },
+  {
+   "id": "KEY-O-H2-control-e",
+   "description": "Physical Control+E in the measured selected-Polygon cube context",
+   "input": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      0.5
+     ],
+     [
+      0.5,
+      0.5,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      2,
+      3,
+      1
+     ],
+     [
+      4,
+      5,
+      7,
+      6
+     ],
+     [
+      0,
+      1,
+      5,
+      4
+     ],
+     [
+      2,
+      6,
+      7,
+      3
+     ],
+     [
+      0,
+      4,
+      6,
+      2
+     ],
+     [
+      1,
+      3,
+      7,
+      5
+     ]
+    ]
+   },
+   "settings": {
+    "selection_mode": "Polygon",
+    "key": "Control+E",
+    "configuration": "Current active configuration; no factory reset",
+    "gesture": "Single physical keypress, pointer over viewport cube; no subsequent click/drag requested",
+    "retained_tool_options": {
+     "Angle degrees": 0,
+     "Spine m": [
+      0,
+      1,
+      0
+     ]
+    }
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": [
+     1
+    ]
+   },
+   "expected": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      0.5
+     ],
+     [
+      0.5,
+      0.5,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      2,
+      3,
+      1
+     ],
+     [
+      4,
+      5,
+      7,
+      6
+     ],
+     [
+      0,
+      1,
+      5,
+      4
+     ],
+     [
+      2,
+      6,
+      7,
+      3
+     ],
+     [
+      0,
+      4,
+      6,
+      2
+     ],
+     [
+      1,
+      3,
+      7,
+      5
+     ]
+    ],
+    "n_points": 8,
+    "n_polygons": 6,
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": [
+     1
+    ],
+    "observed_tool_ui_name": "Bend"
+   },
+   "tolerance": 1e-05
+  },
+  {
+   "id": "KEY-O-H2-command-e",
+   "description": "Physical Command+E in the measured selected-Polygon cube context",
+   "input": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      0.5
+     ],
+     [
+      0.5,
+      0.5,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      2,
+      3,
+      1
+     ],
+     [
+      4,
+      5,
+      7,
+      6
+     ],
+     [
+      0,
+      1,
+      5,
+      4
+     ],
+     [
+      2,
+      6,
+      7,
+      3
+     ],
+     [
+      0,
+      4,
+      6,
+      2
+     ],
+     [
+      1,
+      3,
+      7,
+      5
+     ]
+    ]
+   },
+   "settings": {
+    "selection_mode": "Polygon",
+    "key": "Command+E",
+    "configuration": "Current active configuration; no factory reset",
+    "gesture": "Single physical keypress, pointer over viewport cube; no subsequent click/drag requested"
+   },
+   "selection": {
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": [
+     1
+    ]
+   },
+   "expected": {
+    "points": [
+     [
+      -0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5,
+      -0.5
+     ],
+     [
+      -0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      0.5,
+      -0.5,
+      0.5
+     ],
+     [
+      -0.5,
+      0.5,
+      0.5
+     ],
+     [
+      0.5,
+      0.5,
+      0.5
+     ]
+    ],
+    "polygons": [
+     [
+      0,
+      2,
+      3,
+      1
+     ],
+     [
+      4,
+      5,
+      7,
+      6
+     ],
+     [
+      0,
+      1,
+      5,
+      4
+     ],
+     [
+      2,
+      6,
+      7,
+      3
+     ],
+     [
+      0,
+      4,
+      6,
+      2
+     ],
+     [
+      1,
+      3,
+      7,
+      5
+     ]
+    ],
+    "n_points": 8,
+    "n_polygons": 6,
+    "sel_vertices": [],
+    "sel_edges": [],
+    "sel_polygons": [
+     1
+    ],
+    "observed_tool_ui_name": null,
+    "scope": "No visible tool activation or mesh/selection change observed; does not establish an unbound key or absence of other effects"
+   },
+   "tolerance": 1e-05
+  }
+ ]
+}

@@ -1,0 +1,62 @@
+{
+  "version": 1,
+  "name": "UV",
+  "order": 1,
+  "starred": true,
+  "open_command": "operandi.toolbox.tab uv",
+  "frame": {
+    "type": "split",
+    "dir": "row",
+    "children": [
+      {
+        "fraction": 0.1694444,
+        "frame": {
+          "type": "split",
+          "dir": "column",
+          "children": [
+            { "fraction": 0.6, "frame": { "type": "panel", "kind": "Toolbox" } },
+            { "fraction": 0.4, "frame": { "type": "panel", "kind": "Tool Properties" } }
+          ]
+        }
+      },
+      {
+        "fraction": 0.6222223,
+        "frame": {
+          "type": "split",
+          "dir": "row",
+          "children": [
+            { "fraction": 0.5, "frame": { "type": "panel", "kind": "UV View" } },
+            { "fraction": 0.5, "frame": { "type": "panel", "kind": "3D View" } }
+          ]
+        }
+      },
+      {
+        "fraction": 0.2083333,
+        "frame": {
+          "type": "split",
+          "dir": "column",
+          "children": [
+            {
+              "fraction": 0.5,
+              "frame": {
+                "type": "tabs",
+                "tabs": [
+                  { "kind": "Items" },
+                  { "kind": "Shader Tree" },
+                  { "kind": "Groups" },
+                  { "kind": "Mesh Stack" },
+                  { "kind": "UV Maps" }
+                ],
+                "active": 4
+              }
+            },
+            {
+              "fraction": 0.5,
+              "frame": { "type": "tabs", "tabs": [{ "kind": "Properties" }], "active": 0 }
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

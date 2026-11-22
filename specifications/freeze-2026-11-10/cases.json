@@ -1,0 +1,121 @@
+[
+  {
+    "id": "FRZ-C01",
+    "description": "One-span open Bezier frozen as Faces: one 37-point Face; the two anchors are kept, the two handles removed",
+    "source": "observed (FRZ-04, FRZ-05)",
+    "input": {"points": [[0,0,0],[1,1,0],[2,0,0],[3,1,0]], "polygons": [{"type": "bezier", "closed": false, "points": [0,1,2,3]}], "note": "Bezier order a0, out0, in1, a1"},
+    "settings": {"curves_as": "Faces", "fixed_spans": true, "tessellation": true, "mode": "item"},
+    "expected": {"polygons": 1, "type": "face", "face_vertex_count": 37, "points": 37, "kept_points": [[0,0,0],[3,1,0]], "removed_points": [[1,1,0],[2,0,0]]},
+    "tolerance": 1e-5
+  },
+  {
+    "id": "FRZ-C02",
+    "description": "Same Bezier frozen as Polylines: one open straight polyline of 37 points",
+    "source": "observed (FRZ-04)",
+    "input": "as FRZ-C01",
+    "settings": {"curves_as": "Polylines", "fixed_spans": true, "mode": "item"},
+    "expected": {"polygons": 1, "type": "polyline", "closed": false, "polyline_points": 37, "points": 37},
+    "tolerance": 1e-5
+  },
+  {
+    "id": "FRZ-C03",
+    "description": "Same Bezier frozen as 2 Point Polygons",
+    "source": "build guess (FRZ-04, FRZ-Q2)",
+    "input": "as FRZ-C01",
+    "settings": {"curves_as": "2 Point Polygons", "fixed_spans": true, "mode": "item"},
+    "expected": {"two_point_polygons": 36, "points": 37},
+    "tolerance": 0
+  },
+  {
+    "id": "FRZ-C04",
+    "description": "Bezier samples in order along the curve, equal parameter steps",
+    "source": "observed (FRZ-05)",
+    "input": "as FRZ-C01",
+    "settings": {"curves_as": "Polylines", "fixed_spans": true, "mode": "item"},
+    "expected": {"sample_0": [0,0,0], "sample_1": [0.083333,0.078789,0], "sample_18": [1.5,0.5,0], "sample_35": [2.916667,0.921211,0], "sample_36": [3,1,0]},
+    "tolerance": 1e-5
+  },
+  {
+    "id": "FRZ-C05",
+    "description": "Curve through four points as Polylines: 3 spans, 109 samples, all four points kept as samples",
+    "source": "observed (FRZ-04, FRZ-05, DRW-11)",
+    "input": {"points": [[0,0,0],[1,1,0],[2,0,0],[3,1,0]], "polygons": [{"type": "curve", "closed": false, "points": [0,1,2,3]}]},
+    "settings": {"curves_as": "Polylines", "fixed_spans": true, "mode": "item"},
+    "expected": {"polygons": 1, "polyline_points": 109, "points": 109, "samples_0_36_72_108": [[0,0,0],[1,1,0],[2,0,0],[3,1,0]], "sample_18": [0.5,0.702254,0]},
+    "tolerance": 1e-5
+  },
+  {
+    "id": "FRZ-C06",
+    "description": "Straight Curve on four collinear points as Faces: still 36 steps per span, one flat 109-point Face",
+    "source": "observed (FRZ-04, FRZ-05)",
+    "input": {"points": [[0,0,0],[1,0,0],[2,0,0],[3,0,0]], "polygons": [{"type": "curve", "closed": false, "points": [0,1,2,3]}]},
+    "settings": {"curves_as": "Faces", "fixed_spans": true, "mode": "item"},
+    "expected": {"polygons": 1, "type": "face", "face_vertex_count": 109, "points": 109},
+    "tolerance": 1e-5
+  },
+  {
+    "id": "FRZ-C07",
+    "description": "Bezier start point shared with a Face triangle: the point stays shared, the triangle is unchanged",
+    "source": "observed (FRZ-04)",
+    "input": {"points": [[0,0,0],[1,1,0],[2,0,0],[3,1,0],[-1,0,0],[-1,-1,0]], "polygons": [{"type": "bezier", "closed": false, "points": [0,1,2,3]}, {"type": "face", "points": [0,4,5]}]},
+    "settings": {"curves_as": "Faces", "fixed_spans": true, "mode": "item"},
+    "expected": {"polygons": 2, "triangle": [[0,0,0],[-1,0,0],[-1,-1,0]], "frozen_face_vertex_count": 37, "points": 39},
+    "tolerance": 1e-5
+  },
+  {
+    "id": "FRZ-C08",
+    "description": "Two Beziers (lower one as FRZ-C01, upper one moved +3 in Y); Polygon mode, only the upper one selected",
+    "source": "observed (FRZ-01)",
+    "input": {"points": [[0,0,0],[1,1,0],[2,0,0],[3,1,0],[0,3,0],[1,4,0],[2,3,0],[3,4,0]], "polygons": [{"type": "bezier", "closed": false, "points": [0,1,2,3]}, {"type": "bezier", "closed": false, "points": [4,5,6,7]}]},
+    "settings": {"curves_as": "Faces", "mode": "polygon", "selected_polygons": [1]},
+    "expected": {"lower": "unchanged Bezier", "upper": "37-point Face", "points": 41, "selected_after": []},
+    "tolerance": 1e-5
+  },
+  {
+    "id": "FRZ-C09",
+    "description": "Same two Beziers: Item mode freezes both; Vertex mode with point 0 selected freezes nothing",
+    "source": "observed (FRZ-01)",
+    "input": "as FRZ-C08",
+    "settings_and_expected": [
+      {"settings": {"curves_as": "Faces", "mode": "item"}, "expected": {"faces": 2, "points": 74}},
+      {"settings": {"curves_as": "Faces", "mode": "vertex", "selected_points": [0]}, "expected": {"changed": false, "selected_points_after": [0]}}
+    ],
+    "tolerance": 1e-5
+  },
+  {
+    "id": "FRZ-C10",
+    "description": "Tessellation off: nothing changes, neither a lone Bezier nor a subdivision cube with a Bezier",
+    "source": "observed (FRZ-07)",
+    "input": {"a": "as FRZ-C01", "b": "unit cube of 6 subdivision quads plus the FRZ-C01 Bezier moved +3 in X, one mesh"},
+    "settings": {"tessellation": false, "curves_as": "Faces", "mode": "item"},
+    "expected": {"changed": false, "undo_steps": 0},
+    "tolerance": 0
+  },
+  {
+    "id": "FRZ-C11",
+    "description": "Subdivision cube plus Bezier, Tessellation on: cube freezes per SDV-12, curve per FRZ-C01, one step",
+    "source": "observed (FRZ-07); one undo step is a build guess",
+    "input": "as FRZ-C10 b",
+    "settings": {"tessellation": true, "curves_as": "Faces", "mode": "item"},
+    "expected": {"cube": "SDV-12 result at the display level", "curve": "37-point Face", "undo_steps": 1, "undo_label": "Freeze"},
+    "tolerance": 1e-5
+  },
+  {
+    "id": "FRZ-C12",
+    "description": "Nothing to freeze: a Face quad and a plain 3-point polyline stay as they are",
+    "source": "observed (FRZ-02, FRZ-09); status text is an Operandi choice",
+    "input": {"points": [[0,0,0],[1,0,0],[1,1,0],[0,1,0],[3,0,0],[4,1,0],[5,0,0]], "polygons": [{"type": "face", "points": [0,1,2,3]}, {"type": "polyline", "closed": false, "points": [4,5,6]}]},
+    "settings": {"curves_as": "Faces", "tessellation": true, "mode": "item"},
+    "expected": {"changed": false, "undo_steps": 0, "status": "says there is nothing to freeze"},
+    "tolerance": 0
+  },
+  {
+    "id": "FRZ-C13",
+    "description": "Fixed Spans off (Option A, pending decision FRZ-Q5): a straight Bezier span gives one segment; the curved FRZ-C01 span gives more at 2 degrees than at 20 degrees, and no turn between neighbouring segments exceeds the angle",
+    "source": "Operandi choice (FRZ-06). The reference gave one segment at every angle.",
+    "input": {"straight": {"points": [[0,0,0],[1,0,0],[2,0,0],[3,0,0]], "polygons": [{"type": "bezier", "closed": false, "points": [0,1,2,3]}]}, "curved": "as FRZ-C01"},
+    "settings": {"curves_as": "Polylines", "fixed_spans": false},
+    "expected": {"straight_at_5deg": {"polyline_points": 2}, "curved": "segments at 2° > segments at 20° >= 2"},
+    "tolerance": 1e-5
+  }
+]

@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "id": "menu.select.polygonTagType",
+  "label": "Polygon Tag Type",
+  "style": "menu",
+  "controls": [
+    {
+      "command": "operandi.select.polygonTagType type:material",
+      "label": "Material"
+    },
+    {
+      "command": "operandi.select.polygonTagType type:part",
+      "label": "Part"
+    },
+    {
+      "command": "operandi.select.polygonTagType type:smoothingGroup",
+      "label": "Smoothing Group (no smoothing group tags yet)"
+    },
+    {
+      "command": "operandi.select.polygonTagType type:selectionSet",
+      "label": "Selection Set"
+    }
+  ]
+}

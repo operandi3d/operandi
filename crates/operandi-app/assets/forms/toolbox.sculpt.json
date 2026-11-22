@@ -1,0 +1,244 @@
+{
+  "version": 1,
+  "id": "toolbox.sculpt",
+  "label": "Sculpt",
+  "exported": true,
+  "controls": [
+    {
+      "divider": "Sculpt Tools",
+      "id": "sculpt-tools"
+    },
+    {
+      "form": {
+        "style": "horizontal",
+        "controls": [
+          {
+            "command": "Sculpt Push",
+            "label": "Push",
+            "icon": "sculpt-push",
+            "tooltip": "Push · sculpt.push · {chord}\nPushes the surface out along its normal.\nCtrl: push in · Shift: smooth"
+          },
+          {
+            "command": "Sculpt Inflate",
+            "label": "Inflate",
+            "icon": "sculpt-inflate",
+            "tooltip": "Inflate · sculpt.inflate · {chord}\nSwells the surface along each point's own normal.\nCtrl: deflate · Shift: smooth"
+          }
+        ]
+      }
+    },
+    {
+      "form": {
+        "style": "horizontal",
+        "controls": [
+          {
+            "command": "Sculpt Fold",
+            "label": "Fold",
+            "icon": "sculpt-fold",
+            "tooltip": "Fold · sculpt.fold · {chord}\nFolds the surface into a hill and a valley.\nCtrl: bump with a trough · Shift: smooth"
+          },
+          {
+            "command": "Sculpt Clay",
+            "label": "Clay",
+            "icon": "sculpt-clay",
+            "tooltip": "Clay · sculpt.clay · {chord}\nBuilds the surface up to a set level.\nCtrl: cut down to the level · Shift: smooth"
+          }
+        ]
+      }
+    },
+    {
+      "form": {
+        "style": "horizontal",
+        "controls": [
+          {
+            "command": "Sculpt Smooth",
+            "label": "Smooth",
+            "icon": "sculpt-smooth",
+            "tooltip": "Smooth · sculpt.smooth · {chord}\nRelaxes the surface.\nCtrl: keep volume · Shift: smooth"
+          },
+          {
+            "command": "Sculpt Smudge",
+            "label": "Smudge",
+            "icon": "sculpt-smudge",
+            "tooltip": "Smudge · sculpt.smudge · {chord}\nDrags points along with the brush, smearing the surface.\nCtrl: slide the other way · Shift: smooth"
+          }
+        ]
+      }
+    },
+    {
+      "form": {
+        "style": "horizontal",
+        "controls": [
+          {
+            "command": "Sculpt Carve",
+            "label": "Carve",
+            "icon": "sculpt-carve",
+            "tooltip": "Carve · sculpt.carve · {chord}\nPushes points sharply inward.\nCtrl: raise a ridge · Shift: smooth"
+          },
+          {
+            "command": "Sculpt Scar",
+            "label": "Scar",
+            "icon": "sculpt-scar",
+            "tooltip": "Scar · sculpt.scar · {chord}\nCuts a pinched gash into the surface.\nCtrl: raised welt · Shift: smooth"
+          }
+        ]
+      }
+    },
+    {
+      "form": {
+        "style": "horizontal",
+        "controls": [
+          {
+            "command": "Sculpt Flatten",
+            "label": "Flatten",
+            "icon": "sculpt-flatten",
+            "tooltip": "Flatten · sculpt.flatten · {chord}\nFlattens the surface to a plane.\nCtrl: push up · Shift: smooth"
+          },
+          {
+            "widget": "sculpt.pinchSlot"
+          }
+        ]
+      }
+    },
+    {
+      "form": {
+        "style": "horizontal",
+        "controls": [
+          {
+            "command": "Sculpt Emboss",
+            "label": "Emboss",
+            "icon": "sculpt-emboss",
+            "tooltip": "Emboss · sculpt.emboss · {chord}\nMoves the area under the brush in or out along its normals by a set amount.\nCtrl: reverse direction · Shift: smooth"
+          },
+          {
+            "command": "Sculpt Attenuate",
+            "label": "Attenuate",
+            "icon": "sculpt-attenuate",
+            "tooltip": "Attenuate · sculpt.shrink · {chord}\nFades stored sculpt detail back toward the unsculpted shape.\nCtrl: nothing · Shift: smooth"
+          }
+        ]
+      }
+    },
+    {
+      "form": {
+        "style": "horizontal",
+        "controls": [
+          {
+            "command": "Sculpt Spin",
+            "label": "Spin",
+            "icon": "sculpt-spin",
+            "tooltip": "Spin · sculpt.spin · {chord}\nSwirls points around the brush centre.\nCtrl: spin the other way · Shift: smooth"
+          },
+          {
+            "command": "Sculpt Move",
+            "label": "Move",
+            "icon": "sculpt-move",
+            "tooltip": "Move · sculpt.move · {chord}\nGrabs the surface under the brush and drags it.\nCtrl: opposite direction · Shift: smooth"
+          }
+        ]
+      }
+    },
+    {
+      "space": 6
+    },
+    {
+      "heading": "Vertex Map Tools",
+      "look": "weak"
+    },
+    {
+      "command": "Vertex Map Paint",
+      "label": "Paint",
+      "icon": "vmap-paint",
+      "tooltip": "Paint · sculpt.vmapPaint · {chord}\nRaises the selected weight map toward 100 %.\nCtrl: lower toward 0 · Shift: smooth"
+    },
+    {
+      "command": "Vertex Map Smooth",
+      "label": "Smooth",
+      "icon": "vmap-smooth",
+      "tooltip": "Smooth · sculpt.vmapSmooth · {chord}\nBlurs the selected weight map's values.\nCtrl: sharpen · Shift: smooth"
+    },
+    {
+      "command": "Vertex Map Scale Down",
+      "label": "Scale Down",
+      "icon": "vmap-scale-down",
+      "tooltip": "Scale Down · sculpt.vmapScale · {chord}\nPulls the selected weight map's values toward 0.\nCtrl: scale up · Shift: smooth"
+    },
+    {
+      "divider": ""
+    },
+    {
+      "command": "Vertex Map Erase",
+      "label": "Erase",
+      "icon": "vmap-erase",
+      "tooltip": "Erase · sculpt.vmapErase · {chord}\nRemoves the selected weight map's values.\nCtrl: erase · Shift: smooth"
+    },
+    {
+      "command": "Vertex Map Set Value",
+      "label": "Set Value",
+      "icon": "vmap-set-value",
+      "tooltip": "Set Value · sculpt.vmapSetVal · {chord}\nWrites exactly Value into the selected weight map.\nCtrl: erase · Shift: smooth"
+    },
+    {
+      "command": "sculpt.liveWeightEdit",
+      "label": "Live Deformers",
+      "look": "check",
+      "tooltip": "sculpt.liveWeightEdit · update what the map drives during a stroke; off updates on release"
+    },
+    {
+      "widget": "sculpt.weightMap"
+    },
+    {
+      "widget": "sculpt.newWeightMap"
+    },
+    {
+      "space": 4
+    },
+    {
+      "command": "sculpt.remesh",
+      "label": "Remesh...",
+      "shortcut": "Remesh",
+      "tooltip": "Remesh...{binding} · Rebuild the mesh as an even quad skin to sculpt on; overlaps join and holes close · sculpt.remesh"
+    },
+    {
+      "space": 4
+    },
+    {
+      "heading": "Tips",
+      "look": "weak"
+    },
+    {
+      "form": {
+        "style": "horizontal",
+        "controls": [
+          {
+            "command": "brush.smooth",
+            "label": "Smooth Tip",
+            "look": "centered",
+            "tooltip": "Smooth Tip · brush.smooth · Soft airbrush falloff with a Shape"
+          },
+          {
+            "command": "brush.hard",
+            "label": "Hard Tip",
+            "look": "centered",
+            "tooltip": "Hard Tip · brush.hard · Full strength across the circle with a soft border"
+          }
+        ]
+      }
+    },
+    {
+      "space": 4
+    },
+    {
+      "command": "sculpt.borderLock",
+      "label": "Lock Borders",
+      "look": "check",
+      "tooltip": "sculpt.borderLock · points on open edges never move"
+    },
+    {
+      "command": "sculpt.cornerLock",
+      "label": "Lock Corners",
+      "look": "check",
+      "tooltip": "sculpt.cornerLock · border points used by one polygon never move"
+    }
+  ]
+}

@@ -1,0 +1,268 @@
+--- src/lib.rs.orig
++++ src/lib.rs
+@@ -82,6 +82,9 @@
+     start_time: web_time::Instant,
+     egui_input: egui::RawInput,
+     pointer_pos_in_points: Option<egui::Pos2>,
++    /// Operandi: the last pointer position, kept after the pointer leaves
++    /// the window, so a release out there still reaches egui.
++    last_pointer_pos_in_points: Option<egui::Pos2>,
+     any_pointer_button_down: bool,
+     current_cursor_icon: Option<egui::CursorIcon>,
+ 
+@@ -131,6 +134,7 @@
+             start_time: web_time::Instant::now(),
+             egui_input,
+             pointer_pos_in_points: None,
++            last_pointer_pos_in_points: None,
+             any_pointer_button_down: false,
+             current_cursor_icon: None,
+ 
+@@ -599,7 +603,12 @@
+         state: winit::event::ElementState,
+         button: winit::event::MouseButton,
+     ) {
+-        if let Some(pos) = self.pointer_pos_in_points
++        // Operandi: a release after the pointer left the window (with no
++        // move since) used to be dropped, leaving the button held in egui.
++        let released = state == winit::event::ElementState::Released;
++        if let Some(pos) = self
++            .pointer_pos_in_points
++            .or(self.last_pointer_pos_in_points.filter(|_| released))
+             && let Some(button) = translate_mouse_button(button)
+         {
+             let pressed = state == winit::event::ElementState::Pressed;
+@@ -651,6 +660,7 @@
+             pos_in_pixels.y as f32 / pixels_per_point,
+         );
+         self.pointer_pos_in_points = Some(pos_in_points);
++        self.last_pointer_pos_in_points = Some(pos_in_points);
+ 
+         if self.simulate_touch_screen {
+             if self.any_pointer_button_down {
+@@ -797,7 +807,27 @@
+             None
+         };
+ 
+-        let logical_key = key_from_winit_key(winit_logical_key);
++        let mut logical_key = key_from_winit_key(winit_logical_key);
++
++        // OPERANDI PATCH (see vendor/egui-winit/OPERANDI-PATCH.md): egui has
++        // one key per digit, so it folds the keypad into the main row. Record
++        // which one this was (by scan code) for the app, and keep keypad
++        // digits digits even with NumLock off, where they would read as
++        // End, arrows and so on.
++        if let winit::keyboard::PhysicalKey::Code(code) = event.physical_key {
++            if let Some((digit, keypad)) = operandi_keys::number(code) {
++                operandi_keys::record(digit, keypad, pressed);
++                if keypad {
++                    logical_key = Some(if digit == 10 {
++                        egui::Key::Period
++                    } else {
++                        physical_key.unwrap_or(egui::Key::Num0)
++                    });
++                }
++            } else if code == winit::keyboard::KeyCode::NumpadEnter && pressed {
++                operandi_keys::record_keypad_enter();
++            }
++        }
+ 
+         // Helpful logging to enable when adding new key support
+         log::trace!(
+@@ -821,12 +851,14 @@
+                     self.egui_input.events.push(egui::Event::Copy);
+                     return;
+                 } else if is_paste_command(self.egui_input.modifiers, active_key) {
+-                    if let Some(contents) = self.clipboard.get() {
+-                        let contents = contents.replace("\r\n", "\n");
+-                        if !contents.is_empty() {
+-                            self.egui_input.events.push(egui::Event::Paste(contents));
+-                        }
+-                    }
++                    // OPERANDI PATCH: always report the paste, with empty
++                    // text when the system clipboard holds none (an image,
++                    // a file, or nothing). Upstream dropped the key then,
++                    // so the app never saw Cmd+V and couldn't paste its own
++                    // clipboard (copied polygons). Text fields ignore an
++                    // empty paste.
++                    let contents = paste_text(self.clipboard.get());
++                    self.egui_input.events.push(egui::Event::Paste(contents));
+                     return;
+                 }
+             }
+@@ -947,6 +979,16 @@
+     }
+ 
+     fn set_cursor_icon(&mut self, window: &Window, cursor_icon: egui::CursorIcon) {
++        // OPERANDI PATCH (stuck I-beam, 2026-11-21): see `operandi_cursor`.
++        #[cfg(target_os = "macos")]
++        if operandi_cursor::should_unstick(
++            cursor_icon,
++            self.pointer_pos_in_points.is_some(),
++            self.current_cursor_icon,
++        ) {
++            operandi_cursor::unstick_ibeam();
++        }
++
+         if self.current_cursor_icon == Some(cursor_icon) {
+             // Prevent flickering near frame boundary when Windows OS tries to control cursor icon for window resizing.
+             // On other platforms: just early-out to save CPU.
+@@ -1920,3 +1962,158 @@
+         WindowEvent::PanGesture { .. } => "WindowEvent::PanGesture",
+     }
+ }
++
++/// OPERANDI PATCH: which physical key each digit came from. See
++/// `OPERANDI-PATCH.md` next to this crate's `Cargo.toml`.
++pub mod operandi_keys {
++    use std::sync::Mutex;
++    use std::sync::atomic::{AtomicUsize, Ordering};
++    use winit::keyboard::KeyCode;
++
++    /// A digit key event: `digit` 0-9, or 10 for the decimal point.
++    #[derive(Clone, Copy, Debug, PartialEq, Eq)]
++    pub struct NumberKey {
++        pub digit: u8,
++        pub keypad: bool,
++        pub pressed: bool,
++    }
++
++    /// Far more than one frame's worth; past it the queue is dropped so a
++    /// stalled app can't grow it forever.
++    const LIMIT: usize = 256;
++    static NUMBERS: Mutex<Vec<NumberKey>> = Mutex::new(Vec::new());
++    static KEYPAD_ENTERS: AtomicUsize = AtomicUsize::new(0);
++
++    pub(crate) fn number(code: KeyCode) -> Option<(u8, bool)> {
++        use KeyCode::*;
++        let main = [Digit0, Digit1, Digit2, Digit3, Digit4, Digit5, Digit6, Digit7, Digit8, Digit9];
++        let pad = [
++            Numpad0, Numpad1, Numpad2, Numpad3, Numpad4, Numpad5, Numpad6, Numpad7, Numpad8,
++            Numpad9,
++        ];
++        match code {
++            Period => Some((10, false)),
++            NumpadDecimal => Some((10, true)),
++            _ => main
++                .iter()
++                .position(|&k| k == code)
++                .map(|d| (d as u8, false))
++                .or_else(|| pad.iter().position(|&k| k == code).map(|d| (d as u8, true))),
++        }
++    }
++
++    pub(crate) fn record(digit: u8, keypad: bool, pressed: bool) {
++        if let Ok(mut numbers) = NUMBERS.lock() {
++            if numbers.len() >= LIMIT {
++                numbers.clear();
++            }
++            numbers.push(NumberKey {
++                digit,
++                keypad,
++                pressed,
++            });
++        }
++    }
++
++    pub(crate) fn record_keypad_enter() {
++        KEYPAD_ENTERS.fetch_add(1, Ordering::AcqRel);
++    }
++
++    /// The digit key events since the last call, oldest first.
++    pub fn take_numbers() -> Vec<NumberKey> {
++        NUMBERS
++            .lock()
++            .map(|mut numbers| std::mem::take(&mut *numbers))
++            .unwrap_or_default()
++    }
++
++    /// Keypad Enter presses since the last call.
++    pub fn take_keypad_enters() -> usize {
++        KEYPAD_ENTERS.swap(0, Ordering::AcqRel)
++    }
++
++    #[cfg(test)]
++    mod tests {
++        use super::*;
++        #[test]
++        fn keypad_and_main_row_digits_are_distinct() {
++            assert_eq!(number(KeyCode::Digit1), Some((1, false)));
++            assert_eq!(number(KeyCode::Numpad1), Some((1, true)));
++            assert_eq!(number(KeyCode::Numpad0), Some((0, true)));
++            assert_eq!(number(KeyCode::Period), Some((10, false)));
++            assert_eq!(number(KeyCode::NumpadDecimal), Some((10, true)));
++            assert_eq!(number(KeyCode::KeyA), None);
++        }
++
++        #[test]
++        fn paste_without_clipboard_text_still_reports_a_paste() {
++            assert_eq!(crate::paste_text(None), "");
++            assert_eq!(crate::paste_text(Some(String::new())), "");
++            assert_eq!(crate::paste_text(Some("a\r\nb".into())), "a\nb");
++        }
++    }
++}
++
++/// OPERANDI PATCH: the text a Cmd+V paste carries; empty when the system
++/// clipboard has no text, so the key still reaches the app.
++fn paste_text(clipboard: Option<String>) -> String {
++    clipboard
++        .map(|c| c.replace("\r\n", "\n"))
++        .unwrap_or_default()
++}
++
++/// OPERANDI PATCH (2026-11-21): unstick the text cursor on macOS.
++///
++/// winit sets the macOS cursor through a "cursor rect" that AppKit applies
++/// lazily. Now and then AppKit leaves the I-beam on screen after the rect
++/// has gone back to the arrow (moving quickly off a text field), and both
++/// winit and the cache above think the arrow is already showing, so nobody
++/// sets it again until the pointer leaves the window. Each frame where egui
++/// wants the plain arrow, we look at what macOS is really showing and, if it
++/// is still the I-beam, set the arrow directly.
++pub mod operandi_cursor {
++    /// True when this frame should check for a leftover I-beam: egui wants
++    /// the arrow, the pointer is in the window, and the arrow is what we
++    /// believe we already set (so the normal path would do nothing).
++    pub fn should_unstick(
++        wanted: egui::CursorIcon,
++        pointer_in_window: bool,
++        last_set: Option<egui::CursorIcon>,
++    ) -> bool {
++        wanted == egui::CursorIcon::Default
++            && pointer_in_window
++            && last_set == Some(egui::CursorIcon::Default)
++    }
++
++    /// If macOS is still showing the I-beam, put the arrow back.
++    #[cfg(target_os = "macos")]
++    #[expect(unsafe_code, reason = "AppKit's NSCursor calls are unsafe in objc2")]
++    pub fn unstick_ibeam() {
++        use objc2_app_kit::NSCursor;
++        // SAFETY: called from egui-winit's platform-output handling, which
++        // runs on the main thread like every other winit window call.
++        unsafe {
++            if NSCursor::currentCursor() == NSCursor::IBeamCursor() {
++                NSCursor::arrowCursor().set();
++            }
++        }
++    }
++
++    #[cfg(test)]
++    mod tests {
++        use super::should_unstick;
++        use egui::CursorIcon::{Default, Text};
++
++        #[test]
++        fn checks_only_when_the_arrow_is_wanted_and_already_set() {
++            assert!(should_unstick(Default, true, Some(Default)));
++            // Arrow not set yet: the normal path sets it anyway.
++            assert!(!should_unstick(Default, true, Some(Text)));
++            assert!(!should_unstick(Default, true, None));
++            // A text field really is under the pointer.
++            assert!(!should_unstick(Text, true, Some(Text)));
++            // Pointer outside the window: not ours to touch.
++            assert!(!should_unstick(Default, false, Some(Default)));
++        }
++    }
++}

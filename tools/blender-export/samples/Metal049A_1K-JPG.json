@@ -1,0 +1,1115 @@
+{
+ "format": "operandi-node-graph",
+ "format_version": 1,
+ "source": {
+  "app": "blender",
+  "app_version": "5.2.2 LTS",
+  "file": "Metal049A_1K-JPG.blend"
+ },
+ "licence": {
+  "name": "CC0-1.0",
+  "url": "https://ambientcg.com/a/Metal049A",
+  "credit": "ambientCG (ambientcg.com)"
+ },
+ "materials": [
+  {
+   "name": "Dots Stroke",
+   "output": "Material Output",
+   "nodes": [
+    {
+     "name": "Material Output",
+     "type": "ShaderNodeOutputMaterial",
+     "props": {
+      "target": "EEVEE"
+     },
+     "inputs": {
+      "Volume": {
+       "type": "SHADER"
+      },
+      "Displacement": {
+       "type": "VECTOR",
+       "value": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "Thickness": {
+       "type": "VALUE",
+       "value": 0.0
+      }
+     }
+    },
+    {
+     "name": "Principled BSDF",
+     "type": "ShaderNodeBsdfPrincipled",
+     "props": {
+      "distribution": "MULTI_GGX",
+      "subsurface_method": "RANDOM_WALK"
+     },
+     "inputs": {
+      "Base Color": {
+       "type": "RGBA",
+       "value": [
+        0.8,
+        0.8,
+        0.8,
+        1.0
+       ]
+      },
+      "Metallic": {
+       "type": "VALUE",
+       "value": 0.0
+      },
+      "Roughness": {
+       "type": "VALUE",
+       "value": 0.5
+      },
+      "IOR": {
+       "type": "VALUE",
+       "value": 1.5
+      },
+      "Alpha": {
+       "type": "VALUE",
+       "value": 1.0
+      },
+      "Thin Wall": {
+       "type": "BOOLEAN",
+       "value": false
+      },
+      "Normal": {
+       "type": "VECTOR",
+       "value": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "Diffuse Roughness": {
+       "type": "VALUE",
+       "value": 0.0
+      },
+      "Subsurface Weight": {
+       "type": "VALUE",
+       "value": 0.0
+      },
+      "Subsurface Radius": {
+       "type": "VECTOR",
+       "value": [
+        1.0,
+        0.2,
+        0.1
+       ]
+      },
+      "Subsurface Scale": {
+       "type": "VALUE",
+       "value": 0.005
+      },
+      "Subsurface Anisotropy": {
+       "type": "VALUE",
+       "value": 0.0
+      },
+      "Specular IOR Level": {
+       "type": "VALUE",
+       "value": 0.5
+      },
+      "Specular Tint": {
+       "type": "RGBA",
+       "value": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+       ]
+      },
+      "Anisotropic": {
+       "type": "VALUE",
+       "value": 0.0
+      },
+      "Anisotropic Rotation": {
+       "type": "VALUE",
+       "value": 0.0
+      },
+      "Tangent": {
+       "type": "VECTOR",
+       "value": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "Transmission Weight": {
+       "type": "VALUE",
+       "value": 0.0
+      },
+      "Coat Weight": {
+       "type": "VALUE",
+       "value": 0.0
+      },
+      "Coat Roughness": {
+       "type": "VALUE",
+       "value": 0.03
+      },
+      "Coat IOR": {
+       "type": "VALUE",
+       "value": 1.5
+      },
+      "Coat Tint": {
+       "type": "RGBA",
+       "value": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+       ]
+      },
+      "Coat Normal": {
+       "type": "VECTOR",
+       "value": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "Sheen Weight": {
+       "type": "VALUE",
+       "value": 0.0
+      },
+      "Sheen Roughness": {
+       "type": "VALUE",
+       "value": 0.5
+      },
+      "Sheen Tint": {
+       "type": "RGBA",
+       "value": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+       ]
+      },
+      "Emission Color": {
+       "type": "RGBA",
+       "value": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+       ]
+      },
+      "Emission Strength": {
+       "type": "VALUE",
+       "value": 0.0
+      },
+      "Thin Film Thickness": {
+       "type": "VALUE",
+       "value": 0.0
+      },
+      "Thin Film IOR": {
+       "type": "VALUE",
+       "value": 1.33
+      }
+     }
+    },
+    {
+     "name": "Material Output.001",
+     "type": "ShaderNodeOutputMaterial",
+     "props": {
+      "target": "CYCLES"
+     },
+     "inputs": {
+      "Volume": {
+       "type": "SHADER"
+      },
+      "Displacement": {
+       "type": "VECTOR",
+       "value": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "Thickness": {
+       "type": "VALUE",
+       "value": 0.0
+      }
+     }
+    },
+    {
+     "name": "Diffuse BSDF",
+     "type": "ShaderNodeBsdfDiffuse",
+     "props": {},
+     "inputs": {
+      "Color": {
+       "type": "RGBA",
+       "value": [
+        0.8,
+        0.8,
+        0.8,
+        1.0
+       ]
+      },
+      "Roughness": {
+       "type": "VALUE",
+       "value": 0.0
+      },
+      "Normal": {
+       "type": "VECTOR",
+       "value": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      }
+     }
+    }
+   ],
+   "links": [
+    {
+     "from": [
+      "Principled BSDF",
+      "BSDF"
+     ],
+     "to": [
+      "Material Output",
+      "Surface"
+     ]
+    },
+    {
+     "from": [
+      "Diffuse BSDF",
+      "BSDF"
+     ],
+     "to": [
+      "Material Output.001",
+      "Surface"
+     ]
+    }
+   ],
+   "exposed": [],
+   "groups_used": []
+  },
+  {
+   "name": "Metal049A_1K-JPG_DISPLACEMENT",
+   "output": "Material Output",
+   "nodes": [
+    {
+     "name": "Material Output",
+     "type": "ShaderNodeOutputMaterial",
+     "props": {
+      "target": "ALL"
+     },
+     "inputs": {
+      "Volume": {
+       "type": "SHADER"
+      },
+      "Thickness": {
+       "type": "VALUE",
+       "value": 0.0
+      }
+     }
+    },
+    {
+     "name": "Principled BSDF",
+     "type": "ShaderNodeBsdfPrincipled",
+     "props": {
+      "distribution": "MULTI_GGX",
+      "subsurface_method": "RANDOM_WALK_LEGACY"
+     },
+     "inputs": {
+      "IOR": {
+       "type": "VALUE",
+       "value": 1.5
+      },
+      "Alpha": {
+       "type": "VALUE",
+       "value": 1.0
+      },
+      "Thin Wall": {
+       "type": "BOOLEAN",
+       "value": false
+      },
+      "Normal": {
+       "type": "VECTOR",
+       "value": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "Diffuse Roughness": {
+       "type": "VALUE",
+       "value": 0.0
+      },
+      "Subsurface Weight": {
+       "type": "VALUE",
+       "value": 0.0
+      },
+      "Subsurface Radius": {
+       "type": "VECTOR",
+       "value": [
+        1.0,
+        0.2,
+        0.1
+       ]
+      },
+      "Subsurface Scale": {
+       "type": "VALUE",
+       "value": 0.05
+      },
+      "Subsurface Anisotropy": {
+       "type": "VALUE",
+       "value": 0.0
+      },
+      "Specular IOR Level": {
+       "type": "VALUE",
+       "value": 0.5
+      },
+      "Specular Tint": {
+       "type": "RGBA",
+       "value": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+       ]
+      },
+      "Anisotropic": {
+       "type": "VALUE",
+       "value": 0.0
+      },
+      "Anisotropic Rotation": {
+       "type": "VALUE",
+       "value": 0.0
+      },
+      "Tangent": {
+       "type": "VECTOR",
+       "value": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "Transmission Weight": {
+       "type": "VALUE",
+       "value": 0.0
+      },
+      "Coat Weight": {
+       "type": "VALUE",
+       "value": 0.0
+      },
+      "Coat Roughness": {
+       "type": "VALUE",
+       "value": 0.03
+      },
+      "Coat IOR": {
+       "type": "VALUE",
+       "value": 1.5
+      },
+      "Coat Tint": {
+       "type": "RGBA",
+       "value": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+       ]
+      },
+      "Coat Normal": {
+       "type": "VECTOR",
+       "value": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "Sheen Weight": {
+       "type": "VALUE",
+       "value": 0.0
+      },
+      "Sheen Roughness": {
+       "type": "VALUE",
+       "value": 0.5
+      },
+      "Sheen Tint": {
+       "type": "RGBA",
+       "value": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+       ]
+      },
+      "Emission Color": {
+       "type": "RGBA",
+       "value": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+       ]
+      },
+      "Emission Strength": {
+       "type": "VALUE",
+       "value": 0.0
+      },
+      "Thin Film Thickness": {
+       "type": "VALUE",
+       "value": 0.0
+      },
+      "Thin Film IOR": {
+       "type": "VALUE",
+       "value": 1.33
+      }
+     }
+    },
+    {
+     "name": "Image Texture",
+     "type": "ShaderNodeTexImage",
+     "props": {
+      "interpolation": "Linear",
+      "projection": "FLAT",
+      "extension": "REPEAT"
+     },
+     "image": {
+      "path": "Metal049A_1K-JPG_Color.jpg",
+      "colorspace": "sRGB",
+      "packed": false
+     },
+     "inputs": {}
+    },
+    {
+     "name": "Image Texture.001",
+     "type": "ShaderNodeTexImage",
+     "props": {
+      "interpolation": "Linear",
+      "projection": "FLAT",
+      "extension": "REPEAT"
+     },
+     "image": {
+      "path": "Metal049A_1K-JPG_Roughness.jpg",
+      "colorspace": "Non-Color",
+      "packed": false
+     },
+     "inputs": {}
+    },
+    {
+     "name": "Image Texture.002",
+     "type": "ShaderNodeTexImage",
+     "props": {
+      "interpolation": "Linear",
+      "projection": "FLAT",
+      "extension": "REPEAT"
+     },
+     "image": {
+      "path": "Metal049A_1K-JPG_Metalness.jpg",
+      "colorspace": "Non-Color",
+      "packed": false
+     },
+     "inputs": {}
+    },
+    {
+     "name": "Image Texture.003",
+     "type": "ShaderNodeTexImage",
+     "props": {
+      "interpolation": "Linear",
+      "projection": "FLAT",
+      "extension": "REPEAT"
+     },
+     "image": {
+      "path": "Metal049A_1K-JPG_Displacement.jpg",
+      "colorspace": "Non-Color",
+      "packed": false
+     },
+     "inputs": {}
+    },
+    {
+     "name": "Displacement",
+     "type": "ShaderNodeDisplacement",
+     "props": {
+      "space": "OBJECT"
+     },
+     "inputs": {
+      "Midlevel": {
+       "type": "VALUE",
+       "value": 0.5
+      },
+      "Scale": {
+       "type": "VALUE",
+       "value": 0.0
+      },
+      "Normal": {
+       "type": "VECTOR",
+       "value": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      }
+     }
+    },
+    {
+     "name": "Texture Coordinate",
+     "type": "ShaderNodeTexCoord",
+     "props": {
+      "from_instancer": false
+     },
+     "inputs": {}
+    },
+    {
+     "name": "Mapping",
+     "type": "ShaderNodeMapping",
+     "props": {
+      "vector_type": "TEXTURE"
+     },
+     "inputs": {
+      "Location": {
+       "type": "VECTOR",
+       "value": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "Rotation": {
+       "type": "VECTOR",
+       "value": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "Scale": {
+       "type": "VECTOR",
+       "value": [
+        1.0,
+        1.0,
+        1.0
+       ]
+      }
+     }
+    }
+   ],
+   "links": [
+    {
+     "from": [
+      "Principled BSDF",
+      "BSDF"
+     ],
+     "to": [
+      "Material Output",
+      "Surface"
+     ]
+    },
+    {
+     "from": [
+      "Image Texture",
+      "Color"
+     ],
+     "to": [
+      "Principled BSDF",
+      "Base Color"
+     ]
+    },
+    {
+     "from": [
+      "Image Texture.001",
+      "Color"
+     ],
+     "to": [
+      "Principled BSDF",
+      "Roughness"
+     ]
+    },
+    {
+     "from": [
+      "Image Texture.002",
+      "Color"
+     ],
+     "to": [
+      "Principled BSDF",
+      "Metallic"
+     ]
+    },
+    {
+     "from": [
+      "Image Texture.003",
+      "Color"
+     ],
+     "to": [
+      "Displacement",
+      "Height"
+     ]
+    },
+    {
+     "from": [
+      "Displacement",
+      "Displacement"
+     ],
+     "to": [
+      "Material Output",
+      "Displacement"
+     ]
+    },
+    {
+     "from": [
+      "Texture Coordinate",
+      "UV"
+     ],
+     "to": [
+      "Mapping",
+      "Vector"
+     ]
+    },
+    {
+     "from": [
+      "Mapping",
+      "Vector"
+     ],
+     "to": [
+      "Image Texture",
+      "Vector"
+     ]
+    },
+    {
+     "from": [
+      "Mapping",
+      "Vector"
+     ],
+     "to": [
+      "Image Texture.001",
+      "Vector"
+     ]
+    },
+    {
+     "from": [
+      "Mapping",
+      "Vector"
+     ],
+     "to": [
+      "Image Texture.002",
+      "Vector"
+     ]
+    },
+    {
+     "from": [
+      "Mapping",
+      "Vector"
+     ],
+     "to": [
+      "Image Texture.003",
+      "Vector"
+     ]
+    }
+   ],
+   "exposed": [],
+   "groups_used": []
+  },
+  {
+   "name": "Metal049A_1K-JPG_NORMAL",
+   "output": "Material Output",
+   "nodes": [
+    {
+     "name": "Material Output",
+     "type": "ShaderNodeOutputMaterial",
+     "props": {
+      "target": "ALL"
+     },
+     "inputs": {
+      "Volume": {
+       "type": "SHADER"
+      },
+      "Displacement": {
+       "type": "VECTOR",
+       "value": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "Thickness": {
+       "type": "VALUE",
+       "value": 0.0
+      }
+     }
+    },
+    {
+     "name": "Principled BSDF",
+     "type": "ShaderNodeBsdfPrincipled",
+     "props": {
+      "distribution": "MULTI_GGX",
+      "subsurface_method": "RANDOM_WALK_LEGACY"
+     },
+     "inputs": {
+      "IOR": {
+       "type": "VALUE",
+       "value": 1.5
+      },
+      "Alpha": {
+       "type": "VALUE",
+       "value": 1.0
+      },
+      "Thin Wall": {
+       "type": "BOOLEAN",
+       "value": false
+      },
+      "Diffuse Roughness": {
+       "type": "VALUE",
+       "value": 0.0
+      },
+      "Subsurface Weight": {
+       "type": "VALUE",
+       "value": 0.0
+      },
+      "Subsurface Radius": {
+       "type": "VECTOR",
+       "value": [
+        1.0,
+        0.2,
+        0.1
+       ]
+      },
+      "Subsurface Scale": {
+       "type": "VALUE",
+       "value": 0.05
+      },
+      "Subsurface Anisotropy": {
+       "type": "VALUE",
+       "value": 0.0
+      },
+      "Specular IOR Level": {
+       "type": "VALUE",
+       "value": 0.5
+      },
+      "Specular Tint": {
+       "type": "RGBA",
+       "value": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+       ]
+      },
+      "Anisotropic": {
+       "type": "VALUE",
+       "value": 0.0
+      },
+      "Anisotropic Rotation": {
+       "type": "VALUE",
+       "value": 0.0
+      },
+      "Tangent": {
+       "type": "VECTOR",
+       "value": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "Transmission Weight": {
+       "type": "VALUE",
+       "value": 0.0
+      },
+      "Coat Weight": {
+       "type": "VALUE",
+       "value": 0.0
+      },
+      "Coat Roughness": {
+       "type": "VALUE",
+       "value": 0.03
+      },
+      "Coat IOR": {
+       "type": "VALUE",
+       "value": 1.5
+      },
+      "Coat Tint": {
+       "type": "RGBA",
+       "value": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+       ]
+      },
+      "Coat Normal": {
+       "type": "VECTOR",
+       "value": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "Sheen Weight": {
+       "type": "VALUE",
+       "value": 0.0
+      },
+      "Sheen Roughness": {
+       "type": "VALUE",
+       "value": 0.5
+      },
+      "Sheen Tint": {
+       "type": "RGBA",
+       "value": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+       ]
+      },
+      "Emission Color": {
+       "type": "RGBA",
+       "value": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+       ]
+      },
+      "Emission Strength": {
+       "type": "VALUE",
+       "value": 0.0
+      },
+      "Thin Film Thickness": {
+       "type": "VALUE",
+       "value": 0.0
+      },
+      "Thin Film IOR": {
+       "type": "VALUE",
+       "value": 1.33
+      }
+     }
+    },
+    {
+     "name": "Image Texture",
+     "type": "ShaderNodeTexImage",
+     "props": {
+      "interpolation": "Linear",
+      "projection": "FLAT",
+      "extension": "REPEAT"
+     },
+     "image": {
+      "path": "Metal049A_1K-JPG_Color.jpg",
+      "colorspace": "sRGB",
+      "packed": false
+     },
+     "inputs": {}
+    },
+    {
+     "name": "Image Texture.001",
+     "type": "ShaderNodeTexImage",
+     "props": {
+      "interpolation": "Linear",
+      "projection": "FLAT",
+      "extension": "REPEAT"
+     },
+     "image": {
+      "path": "Metal049A_1K-JPG_Roughness.jpg",
+      "colorspace": "Non-Color",
+      "packed": false
+     },
+     "inputs": {}
+    },
+    {
+     "name": "Image Texture.002",
+     "type": "ShaderNodeTexImage",
+     "props": {
+      "interpolation": "Linear",
+      "projection": "FLAT",
+      "extension": "REPEAT"
+     },
+     "image": {
+      "path": "Metal049A_1K-JPG_Metalness.jpg",
+      "colorspace": "Non-Color",
+      "packed": false
+     },
+     "inputs": {}
+    },
+    {
+     "name": "Image Texture.003",
+     "type": "ShaderNodeTexImage",
+     "props": {
+      "interpolation": "Linear",
+      "projection": "FLAT",
+      "extension": "REPEAT"
+     },
+     "image": {
+      "path": "Metal049A_1K-JPG_NormalGL.jpg",
+      "colorspace": "Non-Color",
+      "packed": false
+     },
+     "inputs": {}
+    },
+    {
+     "name": "Normal Map",
+     "type": "ShaderNodeNormalMap",
+     "props": {
+      "space": "TANGENT",
+      "uv_map": ""
+     },
+     "inputs": {
+      "Strength": {
+       "type": "VALUE",
+       "value": 1.0
+      }
+     }
+    },
+    {
+     "name": "Texture Coordinate",
+     "type": "ShaderNodeTexCoord",
+     "props": {
+      "from_instancer": false
+     },
+     "inputs": {}
+    },
+    {
+     "name": "Mapping",
+     "type": "ShaderNodeMapping",
+     "props": {
+      "vector_type": "TEXTURE"
+     },
+     "inputs": {
+      "Location": {
+       "type": "VECTOR",
+       "value": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "Rotation": {
+       "type": "VECTOR",
+       "value": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "Scale": {
+       "type": "VECTOR",
+       "value": [
+        1.0,
+        1.0,
+        1.0
+       ]
+      }
+     }
+    }
+   ],
+   "links": [
+    {
+     "from": [
+      "Principled BSDF",
+      "BSDF"
+     ],
+     "to": [
+      "Material Output",
+      "Surface"
+     ]
+    },
+    {
+     "from": [
+      "Image Texture",
+      "Color"
+     ],
+     "to": [
+      "Principled BSDF",
+      "Base Color"
+     ]
+    },
+    {
+     "from": [
+      "Image Texture.001",
+      "Color"
+     ],
+     "to": [
+      "Principled BSDF",
+      "Roughness"
+     ]
+    },
+    {
+     "from": [
+      "Image Texture.002",
+      "Color"
+     ],
+     "to": [
+      "Principled BSDF",
+      "Metallic"
+     ]
+    },
+    {
+     "from": [
+      "Image Texture.003",
+      "Color"
+     ],
+     "to": [
+      "Normal Map",
+      "Color"
+     ]
+    },
+    {
+     "from": [
+      "Normal Map",
+      "Normal"
+     ],
+     "to": [
+      "Principled BSDF",
+      "Normal"
+     ]
+    },
+    {
+     "from": [
+      "Texture Coordinate",
+      "UV"
+     ],
+     "to": [
+      "Mapping",
+      "Vector"
+     ]
+    },
+    {
+     "from": [
+      "Mapping",
+      "Vector"
+     ],
+     "to": [
+      "Image Texture",
+      "Vector"
+     ]
+    },
+    {
+     "from": [
+      "Mapping",
+      "Vector"
+     ],
+     "to": [
+      "Image Texture.001",
+      "Vector"
+     ]
+    },
+    {
+     "from": [
+      "Mapping",
+      "Vector"
+     ],
+     "to": [
+      "Image Texture.002",
+      "Vector"
+     ]
+    },
+    {
+     "from": [
+      "Mapping",
+      "Vector"
+     ],
+     "to": [
+      "Image Texture.003",
+      "Vector"
+     ]
+    }
+   ],
+   "exposed": [],
+   "groups_used": []
+  }
+ ],
+ "groups": []
+}

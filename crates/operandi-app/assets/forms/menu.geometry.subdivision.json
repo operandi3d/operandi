@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "id": "menu.geometry.subdivision",
+  "label": "Subdivision",
+  "style": "menu",
+  "controls": [
+    {
+      "command": "Toggle Subdivision",
+      "label": "Toggle Subdivision",
+      "shortcut": "Toggle Subdivision"
+    },
+    {
+      "command": "Toggle Catmull-Clark",
+      "label": "Toggle Catmull-Clark",
+      "shortcut": "Toggle Catmull-Clark"
+    },
+    {
+      "command": "Freeze",
+      "label": "Freeze",
+      "shortcut": "Freeze"
+    }
+  ]
+}

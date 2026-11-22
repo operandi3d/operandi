@@ -1,0 +1,254 @@
+{
+ "spec": "new-scene-2026-11-05",
+ "comparison_rule": "Create a new scene with default preferences and compare its items and default values.",
+ "cases": [
+  {
+   "id": "NS01",
+   "description": "What a new scene (scene.new) contains, Modo 17.1v1 with this machine's preferences",
+   "expected": {
+    "items": [
+     {
+      "name": "Mesh",
+      "type": "mesh",
+      "parent": null,
+      "selected": true,
+      "n_points": 0,
+      "n_polygons": 0
+     },
+     {
+      "name": "Camera",
+      "type": "camera",
+      "parent": null,
+      "selected": false,
+      "focalLen": 0.05,
+      "apertureX": 0.036,
+      "apertureY": 0.024
+     },
+     {
+      "name": "Directional Light",
+      "type": "sunLight",
+      "parent": null,
+      "selected": false,
+      "radiance": 3.0
+     },
+     {
+      "name": "Render",
+      "type": "polyRender",
+      "parent": null,
+      "selected": false
+     },
+     {
+      "name": "Environment",
+      "type": "environment",
+      "parent": null,
+      "selected": false
+     },
+     {
+      "name": "Bake Items",
+      "type": "shaderFolder",
+      "parent": null,
+      "selected": false
+     },
+     {
+      "name": "Lights",
+      "type": "shaderFolder",
+      "parent": null,
+      "selected": false
+     },
+     {
+      "name": "Environments",
+      "type": "shaderFolder",
+      "parent": null,
+      "selected": false
+     },
+     {
+      "name": "Nodes",
+      "type": "shaderFolder",
+      "parent": null,
+      "selected": false
+     },
+     {
+      "name": "Library",
+      "type": "shaderFolder",
+      "parent": null,
+      "selected": false
+     },
+     {
+      "name": "Base Material",
+      "type": "advancedMaterial",
+      "parent": "Render",
+      "selected": false
+     },
+     {
+      "name": "Base Shader",
+      "type": "defaultShader",
+      "parent": "Render",
+      "selected": false
+     },
+     {
+      "name": "Final Color Output",
+      "type": "renderOutput",
+      "parent": "Render",
+      "selected": false
+     },
+     {
+      "name": "Alpha Output",
+      "type": "renderOutput",
+      "parent": "Render",
+      "selected": false
+     },
+     {
+      "name": "Light Material",
+      "type": "lightMaterial",
+      "parent": "Directional Light",
+      "selected": false
+     },
+     {
+      "name": "Environment Material",
+      "type": "envMaterial",
+      "parent": "Environment",
+      "selected": false
+     },
+     {
+      "name": "Position (Mesh)",
+      "type": "translation",
+      "parent": null,
+      "selected": false
+     },
+     {
+      "name": "Position (Camera)",
+      "type": "translation",
+      "parent": null,
+      "selected": false
+     },
+     {
+      "name": "Position (Directional Light)",
+      "type": "translation",
+      "parent": null,
+      "selected": false
+     },
+     {
+      "name": "Rotation (Mesh)",
+      "type": "rotation",
+      "parent": null,
+      "selected": false
+     },
+     {
+      "name": "Rotation (Camera)",
+      "type": "rotation",
+      "parent": null,
+      "selected": false
+     },
+     {
+      "name": "Rotation (Directional Light)",
+      "type": "rotation",
+      "parent": null,
+      "selected": false
+     },
+     {
+      "name": "Scale (Mesh)",
+      "type": "scale",
+      "parent": null,
+      "selected": false
+     },
+     {
+      "name": "Scale (Camera)",
+      "type": "scale",
+      "parent": null,
+      "selected": false
+     },
+     {
+      "name": "Scale (Directional Light)",
+      "type": "scale",
+      "parent": null,
+      "selected": false
+     },
+     {
+      "name": "Scene",
+      "type": "scene",
+      "parent": null,
+      "selected": false
+     }
+    ],
+    "selection_mode": [
+     "item"
+    ],
+    "selected_items": [
+     "Mesh"
+    ]
+   }
+  },
+  {
+   "id": "NS02",
+   "description": "Transforms and key settings of the default items in a new scene",
+   "expected": {
+    "transforms": {
+     "Position (Mesh)": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "Position (Camera)": [
+      0.0,
+      0.75,
+      4.0
+     ],
+     "Position (Directional Light)": [
+      -2.0,
+      2.0,
+      2.0
+     ],
+     "Rotation (Mesh)": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "Rotation (Mesh) order": "zxy",
+     "Rotation (Camera)": [
+      -0.08726646259971647,
+      0.0,
+      0.0
+     ],
+     "Rotation (Camera) order": "zxy",
+     "Rotation (Directional Light)": [
+      -0.5235987755982988,
+      -0.7853981633974483,
+      0.0
+     ],
+     "Rotation (Directional Light) order": "zxy",
+     "Scale (Mesh)": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "Scale (Camera)": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "Scale (Directional Light)": [
+      1.0,
+      1.0,
+      1.0
+     ]
+    },
+    "camera": {
+     "focalLen": 0.05,
+     "apertureX": 0.036,
+     "apertureY": 0.024,
+     "projType": "persp"
+    },
+    "light": {
+     "radiance": 3.0,
+     "shadType": "raytrace"
+    },
+    "render": {
+     "resX": 1920,
+     "resY": 1080,
+     "first": 1,
+     "last": 150
+    }
+   }
+  }
+ ]
+}

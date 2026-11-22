@@ -1,0 +1,46 @@
+#usda 1.0
+(
+    defaultPrim = "root"
+    metersPerUnit = 1
+    upAxis = "Y"
+    renderSettingsPrimPath = "/Render/Settings"
+    doc = "Operandi regression fixture (written by hand): two cameras, as Blender writes them (an Xform holding a Camera), and RenderSettings naming the second as the camera to render through (USD-IQ21)."
+)
+
+def Xform "root"
+{
+    def Mesh "Floor"
+    {
+        int[] faceVertexCounts = [4]
+        int[] faceVertexIndices = [0, 1, 2, 3]
+        point3f[] points = [(-1, 0, 1), (1, 0, 1), (1, 0, -1), (-1, 0, -1)]
+    }
+
+    def Xform "Front"
+    {
+        double3 xformOp:translate = (0, 1, 5)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+
+        def Camera "Front"
+        {
+        }
+    }
+
+    def Xform "Side"
+    {
+        double3 xformOp:translate = (5, 1, 0)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+
+        def Camera "Side"
+        {
+        }
+    }
+}
+
+def Scope "Render"
+{
+    def RenderSettings "Settings"
+    {
+        rel camera = </root/Side/Side>
+    }
+}

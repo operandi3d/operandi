@@ -1,0 +1,410 @@
+{
+  "version": 1,
+  "id": "toolbox.duplicate",
+  "label": "Duplicate",
+  "exported": true,
+  "controls": [
+    {
+      "divider": "Duplicate Tools",
+      "id": "duplicate-tools"
+    },
+    {
+      "heading": "Extend",
+      "id": "Duplicate Extend"
+    },
+    {
+      "command": "Radial Sweep",
+      "label": "Radial Sweep",
+      "look": "flat"
+    },
+    {
+      "command": "Bridge",
+      "label": "Bridge",
+      "icon": "bridge",
+      "look": "flat",
+      "noShortcut": true
+    },
+    {
+      "form": {
+        "style": "flyout",
+        "controls": [
+          {
+            "command": "Curve Extrude",
+            "label": "Curve Extrude",
+            "icon": "curve-extrude",
+            "tooltip": "Curve Extrude{binding} · extrude the selected polygons along a smooth curve you click out\n{variants}",
+            "variants": {
+              "ctrl": {
+                "line": "Bezier Extrude",
+                "label": "Bezier Extrude",
+                "tooltip": "Bezier Extrude{binding} · extrude the selected polygons along a Bezier path with handles\n{variants}"
+              }
+            }
+          },
+          {
+            "command": "Bezier Extrude",
+            "label": "Bezier Extrude",
+            "icon": "bezier-extrude"
+          },
+          {
+            "command": "B-Spline Extrude",
+            "label": "B-Spline Extrude",
+            "icon": "bspline-extrude"
+          },
+          {
+            "command": "Pen Extrude",
+            "label": "Pen Extrude",
+            "icon": "pen-extrude"
+          }
+        ]
+      },
+      "id": "Curve Extrude"
+    },
+    {
+      "heading": "Clone",
+      "id": "Duplicate Clone"
+    },
+    {
+      "form": {
+        "style": "flyout",
+        "controls": [
+          {
+            "command": "Clone",
+            "label": "Clone",
+            "tooltip": "Clone{binding} · copies in a line\n{variants}",
+            "variants": {
+              "alt": {
+                "line": "Instance Clone",
+                "label": "Instance Clone",
+                "icon": "instance-clone",
+                "tooltip": "Instance Clone{binding} · the same placement, making instances that share the source's mesh\n{variants}"
+              }
+            }
+          },
+          {
+            "command": "Instance Clone",
+            "label": "Instance Clone",
+            "icon": "instance-clone"
+          },
+          {
+            "command": "Replica Clone",
+            "label": "Replica Clone",
+            "icon": "replica-clone"
+          }
+        ]
+      },
+      "id": "Clone"
+    },
+    {
+      "form": {
+        "style": "flyout",
+        "controls": [
+          {
+            "command": "Curve Clone",
+            "label": "Curve Clone",
+            "icon": "curve-clone",
+            "tooltip": "Curve Clone{binding} · copies along a smooth curve you click out\n{variants}",
+            "variants": {
+              "alt": {
+                "line": "Curve Instance",
+                "label": "Curve Instance",
+                "icon": "curve-instance",
+                "tooltip": "Curve Instance{binding} · the same placement, making instances that share the source's mesh\n{variants}"
+              }
+            }
+          },
+          {
+            "command": "Curve Instance",
+            "label": "Curve Instance",
+            "icon": "curve-instance"
+          },
+          {
+            "command": "Curve Replica",
+            "label": "Curve Replica",
+            "icon": "curve-replica"
+          },
+          {
+            "command": "Curve Transform",
+            "label": "Curve Transform"
+          },
+          {
+            "command": "Bezier Clone",
+            "label": "Bezier Clone",
+            "icon": "bezier-clone"
+          },
+          {
+            "command": "Bezier Instance",
+            "label": "Bezier Instance",
+            "icon": "bezier-instance"
+          },
+          {
+            "command": "Bezier Replica",
+            "label": "Bezier Replica",
+            "icon": "bezier-replica"
+          },
+          {
+            "command": "Bezier Transform",
+            "label": "Bezier Transform"
+          },
+          {
+            "command": "B-Spline Clone",
+            "label": "B-Spline Clone",
+            "icon": "bspline-clone"
+          },
+          {
+            "command": "B-Spline Instance",
+            "label": "B-Spline Instance",
+            "icon": "bspline-instance"
+          },
+          {
+            "command": "B-Spline Replica",
+            "label": "B-Spline Replica",
+            "icon": "bspline-replica"
+          },
+          {
+            "command": "B-Spline Transform",
+            "label": "B-Spline Transform"
+          },
+          {
+            "command": "Pen Clone",
+            "label": "Pen Clone",
+            "icon": "pen-clone"
+          },
+          {
+            "command": "Pen Instance",
+            "label": "Pen Instance",
+            "icon": "pen-instance"
+          },
+          {
+            "command": "Pen Replicate",
+            "label": "Pen Replicate",
+            "icon": "pen-replicate"
+          },
+          {
+            "command": "Transform Pen",
+            "label": "Transform Pen"
+          }
+        ]
+      },
+      "id": "Curve Clone"
+    },
+    {
+      "form": {
+        "style": "flyout",
+        "controls": [
+          {
+            "command": "Scatter Clone",
+            "label": "Scatter Clone",
+            "icon": "scatter-clone",
+            "tooltip": "Scatter Clone{binding} · copies scattered at random in a box\n{variants}",
+            "variants": {
+              "alt": {
+                "line": "Instance Scatter",
+                "label": "Instance Scatter",
+                "icon": "instance-scatter",
+                "tooltip": "Instance Scatter{binding} · the same placement, making instances that share the source's mesh\n{variants}"
+              }
+            }
+          },
+          {
+            "command": "Instance Scatter",
+            "label": "Instance Scatter",
+            "icon": "instance-scatter"
+          },
+          {
+            "command": "Replica Scatter",
+            "label": "Replica Scatter",
+            "icon": "replica-scatter"
+          },
+          {
+            "command": "Transform Scatter",
+            "label": "Transform Scatter"
+          }
+        ]
+      },
+      "id": "Scatter Clone"
+    },
+    {
+      "command": "Mesh Paint",
+      "label": "Mesh Paint",
+      "icon": "mesh-paint",
+      "tooltip": "Mesh Paint{binding} · paint copies of a background mesh onto the selected mesh: click, stroke, line, grid or ring\n{variants}",
+      "variants": {
+        "alt": {
+          "line": "Mesh Paint Instance",
+          "label": "Mesh Paint Instance",
+          "icon": "mesh-paint-instance",
+          "tooltip": "Mesh Paint Instance{binding} · the same, making instance items of the background mesh\n{variants}"
+        },
+        "ctrl": {
+          "line": "Mesh Paint Replica",
+          "label": "Mesh Paint Replica",
+          "icon": "mesh-paint-replica",
+          "tooltip": "Mesh Paint Replica{binding} · the same, each stroke making one Replicator of the background meshes\n{variants}"
+        }
+      }
+    },
+    {
+      "heading": "Array",
+      "id": "Duplicate Array"
+    },
+    {
+      "form": {
+        "style": "flyout",
+        "controls": [
+          {
+            "command": "Array",
+            "label": "Array",
+            "tooltip": "Array{binding} · copies in a 3D grid\n{variants}",
+            "variants": {
+              "alt": {
+                "line": "Instance Array",
+                "label": "Instance Array",
+                "icon": "instance-array",
+                "tooltip": "Instance Array{binding} · the same placement, making instances that share the source's mesh\n{variants}"
+              }
+            }
+          },
+          {
+            "command": "Instance Array",
+            "label": "Instance Array",
+            "icon": "instance-array"
+          },
+          {
+            "command": "Replica Array",
+            "label": "Replica Array",
+            "icon": "replica-array"
+          },
+          {
+            "command": "Transform Array",
+            "label": "Transform Array"
+          }
+        ]
+      },
+      "id": "Array"
+    },
+    {
+      "form": {
+        "style": "flyout",
+        "controls": [
+          {
+            "command": "Radial Array",
+            "label": "Radial Array",
+            "tooltip": "Radial Array{binding} · copies round an axis\n{variants}",
+            "variants": {
+              "alt": {
+                "line": "Instance Radial Array",
+                "label": "Instance Radial Array",
+                "icon": "instance-radial-array",
+                "tooltip": "Instance Radial Array{binding} · the same placement, making instances that share the source's mesh\n{variants}"
+              }
+            }
+          },
+          {
+            "command": "Instance Radial Array",
+            "label": "Instance Radial Array",
+            "icon": "instance-radial-array"
+          },
+          {
+            "command": "Replica Radial Array",
+            "label": "Replica Radial Array",
+            "icon": "replica-radial-array"
+          },
+          {
+            "command": "Transform Radial Array",
+            "label": "Transform Radial Array"
+          }
+        ]
+      },
+      "id": "Radial Array"
+    },
+    {
+      "heading": "Duplicate",
+      "id": "Duplicate Duplicate"
+    },
+    {
+      "form": {
+        "style": "flyout",
+        "controls": [
+          {
+            "command": "Mirror",
+            "label": "Mirror",
+            "tooltip": "Mirror{binding} · a mirror copy across a plane\n{variants}",
+            "variants": {
+              "alt": {
+                "line": "Instance Mirror",
+                "label": "Instance Mirror",
+                "icon": "instance-mirror",
+                "tooltip": "Instance Mirror{binding} · the same placement, making instances that share the source's mesh\n{variants}"
+              }
+            }
+          },
+          {
+            "command": "Instance Mirror",
+            "label": "Instance Mirror",
+            "icon": "instance-mirror"
+          },
+          {
+            "command": "Replica Mirror",
+            "label": "Replica Mirror",
+            "icon": "replica-mirror"
+          }
+        ]
+      },
+      "id": "Mirror"
+    },
+    {
+      "command": "Symmetrize",
+      "label": "Symmetrize",
+      "look": "flat",
+      "icon": "symmetrize"
+    },
+    {
+      "command": "Draw Patch",
+      "label": "Patch Curves",
+      "look": "flat",
+      "icon": "draw-patch",
+      "tooltip": "Patch Curves · click three or four curves around a loop, then the first again{andBinding}"
+    },
+    {
+      "divider": ""
+    },
+    {
+      "command": "Tack Tool",
+      "label": "Tack Tool",
+      "look": "flat",
+      "noShortcut": true
+    },
+    {
+      "command": "Paste Tool",
+      "label": "Paste",
+      "icon": "paste-tool",
+      "look": "flat",
+      "noShortcut": true,
+      "tooltip": "Paste Tool · each viewport click adds a copy of the clipboard there{andBinding}"
+    },
+    {
+      "heading": "Commands",
+      "id": "Duplicate Commands"
+    },
+    {
+      "form": {
+        "style": "horizontal",
+        "controls": [
+          {
+            "command": "Duplicate Item",
+            "label": "Duplicate",
+            "look": "centered",
+            "tooltip": "Duplicate{binding} · a copy of the selected item in place, named Name (2); its children stay behind"
+          },
+          {
+            "command": "Duplicate Hierarchy",
+            "label": "Duplicate Hierarchy",
+            "look": "centered",
+            "tooltip": "Duplicate Hierarchy{binding} · a copy of each selected item with all its children, links kept"
+          }
+        ]
+      }
+    }
+  ]
+}
