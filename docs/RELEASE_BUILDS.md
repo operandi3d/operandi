@@ -81,3 +81,10 @@ The result is `~/Developer/Operandi-Builds/Operandi <branch> <commit> Windows.zi
   safe and makes the next build start from scratch.
 - Rendering is CPU only on Windows and Linux for now (GPU back ends are
   switched off in `scripts/build-cycles.sh`).
+
+## Animation in test builds
+
+Animation is hidden by default until launch. Testers turn it on with
+Preferences > Defaults > Application > Experimental > Animation (preview),
+or by starting the app with `OPERANDI_ANIMATION=1` (see SETUP.md,
+"Animation (preview, hidden by default)").

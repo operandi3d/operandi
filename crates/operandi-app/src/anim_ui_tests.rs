@@ -319,3 +319,48 @@ fn graph_editor_window_keeps_its_size() {
     // Its place is remembered as the window reports it.
     assert!(a.palettes.places.contains_key("graphEditor"));
 }
+
+/// The animation switch (anim_switch.rs) off: no Animate layout, menu,
+/// timeline, graph editor or animation keys; keys in a scene still play
+/// and save, and the commands still run.
+#[test]
+fn the_animation_switch_off_hides_the_ui_but_keeps_the_data() {
+    crate::anim_switch::set_for_test(false);
+    let ctx = Context::default();
+    let (mut a, id) = items_app();
+    frames(&mut a, &ctx, 2);
+    assert!(!a.layouts.names().iter().any(|n| n == "Animate"));
+    assert!(!a.menu_model(&ctx).iter().any(|m| m.title == "Animate"));
+    // Shift+W keeps no animation meaning.
+    key(&mut a, &ctx, Key::W, Modifiers::SHIFT);
+    assert!(a.editor.scene.animation.channels.is_empty());
+    // The strip and the graph editor don't draw, even asked for.
+    a.execute("operandi.anim.timeline open:tall");
+    a.execute("operandi.graph.open");
+    frames(&mut a, &ctx, 2);
+    assert_eq!(a.timeline.rect, Rect::NOTHING);
+    assert!(a.graph.graph_rect.is_none());
+    // Commands (scripts, the MCP bridge) still animate, and the pose plays.
+    let y = format!("{id}:pos.Y");
+    a.execute(&format!("operandi.key.add channel:{y} frame:0 value:0"));
+    a.execute(&format!("operandi.key.add channel:{y} frame:10 value:5"));
+    a.execute("operandi.time.set frame:10");
+    assert!((a.editor.scene.items[0].transform.translation.y - 5.).abs() < 1e-9);
+    // Saved and reopened with the switch off, the keys are all there.
+    let bytes = operandi_core::persistence::encode(&a.editor.scene).unwrap();
+    let back = operandi_core::persistence::decode(&bytes).unwrap();
+    assert_eq!(back.animation, a.editor.scene.animation);
+    crate::anim_switch::set_for_test(true);
+}
+
+#[test]
+fn the_animation_switch_on_shows_the_ui() {
+    crate::anim_switch::set_for_test(true);
+    let ctx = Context::default();
+    let (mut a, _) = items_app();
+    frames(&mut a, &ctx, 2);
+    assert!(a.layouts.names().iter().any(|n| n == "Animate"));
+    assert!(a.menu_model(&ctx).iter().any(|m| m.title == "Animate"));
+    key(&mut a, &ctx, Key::W, Modifiers::SHIFT);
+    assert!(!a.editor.scene.animation.channels.is_empty());
+}

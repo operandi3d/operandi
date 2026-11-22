@@ -2,6 +2,7 @@ mod about;
 mod absolute_scaling_ui;
 mod add_browser;
 mod anim_keys;
+mod anim_switch;
 mod anim_ui;
 #[cfg(test)]
 mod anim_ui_tests;
@@ -1203,6 +1204,8 @@ impl Operandi {
         app.preferences_ui.scheme = scheme;
         app.undo_autosave =
             undo_autosave::UndoAutosavePreferences::load(&app.environment.paths().undo_autosave());
+        // The animation switch reads its preference before the layouts load.
+        anim_switch::set_preference(app.undo_autosave.animation_preview);
         app.view_presets = view_display::Presets::load(&app.environment.paths().viewport_presets());
         // Layouts (layouts.rs): the one open at quit, or the old layout
         // files read once as the Model layout.
