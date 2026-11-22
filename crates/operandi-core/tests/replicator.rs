@@ -330,3 +330,32 @@ fn mesh_paint_replica_makes_one_replicator_per_stroke() {
         "{names:?}"
     );
 }
+
+/// Hidden-limits A4: a Replicator past its copy limit says how many points
+/// get no copy instead of dropping them silently.
+#[test]
+fn copies_left_out_counts_the_points_past_the_limit() {
+    let mut e = editor();
+    run(&mut e, Tool::Array, |d| d.array.count = [3, 1, 2]).unwrap();
+    let rep = rep_id(&e);
+    assert_eq!(replicator::copies_left_out(&e.scene, rep), 0);
+    assert_eq!(
+        replicator::copies_left_out(&e.scene, 999),
+        0,
+        "not a Replicator"
+    );
+}
+
+/// Opt-in (about 400 MB): a cloud three points over the limit.
+/// `cargo test --locked --workspace -- replicator::copies_left_out_past --ignored`
+#[test]
+#[ignore]
+fn copies_left_out_past_the_real_limit() {
+    let mut e = editor();
+    run(&mut e, Tool::Array, |d| d.array.count = [3, 1, 2]).unwrap();
+    let rep = rep_id(&e);
+    let cloud_id = cloud(&e).id;
+    let item = e.scene.items.iter_mut().find(|i| i.id == cloud_id).unwrap();
+    item.mesh.vertices = vec![DVec3::ZERO; replicator::MAX_COPIES + 3];
+    assert_eq!(replicator::copies_left_out(&e.scene, rep), 3);
+}
