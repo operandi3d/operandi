@@ -559,6 +559,9 @@ impl Operandi {
                 self.tag_mode_controls(ui);
                 ui.separator();
                 self.context_bar(ui);
+                ui.separator();
+                // TK-70: the timeline's clock button.
+                self.timeline_toggle_button(ui);
             })
             .response
             .rect;

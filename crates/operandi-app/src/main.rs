@@ -1,6 +1,9 @@
 mod about;
 mod absolute_scaling_ui;
 mod add_browser;
+mod anim_ui;
+#[cfg(test)]
+mod anim_ui_tests;
 mod collapse_line;
 mod command_history;
 mod command_history_ui;
@@ -879,6 +882,9 @@ struct Operandi {
     /// Palettes and the app's floating windows (layouts stage 6,
     /// palettes.rs).
     palettes: palettes::Palettes,
+    /// The timeline strip (timeline.rs) and the animation jobs (anim_ui.rs).
+    timeline: timeline::Timeline,
+    anim_ui: anim_ui::AnimUi,
     /// The Form Editor (layouts stage 7, form_editor.rs).
     form_editor: form_editor::State,
     field_rects: BTreeMap<String, Rect>,
@@ -1527,6 +1533,8 @@ impl Operandi {
             drawing_view: 0,
             view_passive: false,
             palettes: Default::default(),
+            timeline: Default::default(),
+            anim_ui: Default::default(),
             form_editor: Default::default(),
             field_rects: BTreeMap::new(),
             text_editors: Default::default(),
@@ -3258,7 +3266,10 @@ impl Operandi {
         // Decided once per frame: the dock tree is out of `views` while it
         // draws, so panels drawn inside it can't ask the tree themselves.
         self.layouts.message_line_here = self.message_line_in_tool_properties();
+        // Playback, the rows' key requests and frame jobs (anim_ui.rs).
+        self.anim_frame(ctx);
         self.toolbar(ctx);
+        self.timeline_panel(ctx);
         // The workbench row along the top, when shown (LAY-82).
         self.workbench_top_bar(ctx);
         self.dock_work_area(ctx);
@@ -3564,6 +3575,7 @@ mod preview;
 mod preview_ui;
 mod primitive_panel;
 mod render_ui;
+mod timeline;
 mod vertex_normal_ui;
 mod view_display;
 mod view_display_ui;
