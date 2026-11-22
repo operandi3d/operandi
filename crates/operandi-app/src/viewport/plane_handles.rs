@@ -1,12 +1,12 @@
 //! Two-axis plane handles on Move, Scale and Transform's move part
 //! (plane-handle spec v1, Jason 2026-11-08 after his hand test; PH-xx
-//! rules). A circle lies flat in its world plane at the outer corner of its
-//! two arrows; dragging it moves (Scale: scales) along those two axes only.
+//! rules). A circle lies flat in the plane of its two arrows, at their outer
+//! corner; dragging it moves (Scale: scales) along those two axes only.
 //! Scale also gets a larger circle at its center for uniform scale.
 use super::*;
 use operandi_core::ExtendPlane;
 
-/// Handle ids: `PLANE_HANDLE_BASE + n` is the circle whose plane has world
+/// Handle ids: `PLANE_HANDLE_BASE + n` is the circle whose plane has handle
 /// axis `n` as its normal (0: YZ, 1: XZ, 2: XY). Clear of every other id.
 pub(crate) const PLANE_HANDLE_BASE: usize = 13;
 /// PH-08: circle diameter as a share of the arrow length (about 1/6),
@@ -45,7 +45,7 @@ fn plane_axes_of(id: usize) -> (usize, usize, usize) {
 fn plane_name(id: usize) -> &'static str {
     ["YZ", "XZ", "XY"][id - PLANE_HANDLE_BASE]
 }
-/// PH-21: the circles stay world-aligned whatever the action axis.
+/// The world axes, for handles whose arrows aren't a frame.
 fn world_axis(axis: usize) -> DVec3 {
     [DVec3::X, DVec3::Y, DVec3::Z][axis]
 }
@@ -136,12 +136,28 @@ impl Operandi {
     pub(crate) fn scale_center_size(&self) -> f32 {
         self.arrow_pixels() * SCALE_CENTER_DIAMETER * self.handle_preferences.plane_ratio
     }
+    /// PH-21 (FG-Q01, Jason 2026-11-22): the circles turn with the arrows.
+    /// A circle lies in the plane of the two arrows it sits between, so
+    /// under a Local or Selection action axis it stays with its gizmo
+    /// rather than lying in a world plane. The handle's axes when they
+    /// make a frame (Move, Scale, Transform), the world's otherwise.
+    fn plane_axes(&self) -> [DVec3; 3] {
+        let axes = [0, 1, 2].map(|k| self.handle_axis(k));
+        let unit = axes.iter().all(|v| (v.length() - 1.).abs() < 1e-6);
+        let square = (0..3).all(|k| axes[k].dot(axes[(k + 1) % 3]).abs() < 1e-6);
+        if unit && square {
+            axes
+        } else {
+            [0, 1, 2].map(world_axis)
+        }
+    }
     /// PH-07/07a: circle `id` as drawn: centered at the outer corner of its
-    /// two arrows, lying flat in its world plane. `None` when the plane is
+    /// two arrows, lying flat in its arrows' plane (PH-21). `None` when the plane is
     /// nearly edge-on to the view (PH-11) or an axis is out of view.
     pub(crate) fn plane_ellipse(&self, id: usize, r: Rect) -> Option<PlaneEllipse> {
         let (normal, a, b) = plane_axes_of(id);
-        if world_axis(normal).dot(self.camera.basis().3).abs() < PLANE_HANDLE_EDGE_ON {
+        let axes = self.plane_axes();
+        if axes[normal].dot(self.camera.basis().3).abs() < PLANE_HANDLE_EDGE_ON {
             return None;
         }
         let center = self.transform_handle_center();
@@ -166,7 +182,7 @@ impl Operandi {
         // The circle's radius along each world axis, as the camera sees it.
         let radius = (self.plane_handle_size() / 2.) as f64 * per_pixel;
         let along = |axis: usize| -> Option<Vec2> {
-            let (p, _) = self.camera.project(center + world_axis(axis) * radius, r)?;
+            let (p, _) = self.camera.project(center + axes[axis] * radius, r)?;
             Some(p - origin)
         };
         Some(PlaneEllipse {
@@ -254,7 +270,7 @@ impl Operandi {
         }
     }
     /// PH-20 (Move, Transform) and PH-31 (Scale): one sample of a circle
-    /// drag (UIC-76 hauling). Move follows the pointer in the circle's world
+    /// drag (UIC-76 hauling). Move follows the pointer in the circle's
     /// plane, always on both axes: Ctrl and other modifiers change nothing
     /// here (PH-22). Scale grows its two axes by one factor (right or up
     /// enlarges, like the center).
@@ -282,9 +298,8 @@ impl Operandi {
             return;
         }
         if tool == Tool::Scale {
-            // Provisional: Scale's values are per action axis, so with a
-            // Local action axis the circle scales the action axes with the
-            // same indices as its world plane.
+            // Scale's values are per handle axis: the circle scales the
+            // two arrows it sits between (PH-21).
             let pixels = ((p.x - start.x) - (p.y - start.y)) as f64;
             let factor = (1. + pixels * 0.01).max(1e-3);
             params.delta[a] = (params.delta[a] * factor).max(0.001);
@@ -296,7 +311,7 @@ impl Operandi {
             return;
         };
         let center = self.transform_handle_center();
-        let plane_normal = world_axis(normal);
+        let plane_normal = self.plane_axes()[normal];
         let hit = |q: Pos2| {
             let (origin, direction) = self.camera.ray(q, r);
             let along = direction.dot(plane_normal);
@@ -306,12 +321,15 @@ impl Operandi {
         let (Some(from), Some(to)) = (hit(start), hit(p)) else {
             return;
         };
-        let mut world = to - from;
-        // Exactly in the world plane: no rounding creeps off it.
-        world[normal] = 0.;
-        // Move's values are along the action axes (PH-21: those may be
-        // Local while the circle stays world-aligned).
-        params.delta += frame.basis.transpose() * world;
+        // Move's values are along the handle's axes (Local's cluster
+        // frame under Local), the circle's own two among them.
+        let basis = self
+            .transform_handle_frame()
+            .map_or(frame.basis, |f| f.basis);
+        let mut along = basis.transpose() * (to - from);
+        // Exactly in the circle's plane: no rounding creeps off it.
+        along[normal] = 0.;
+        params.delta += along;
         let params = self.snap_move(tool, params, None, r);
         self.publish_handle_params(tool, params);
     }

@@ -264,6 +264,8 @@ mod light_properties_tier2;
 mod light_properties_tier3;
 #[path = "light_type_convert.rs"]
 mod light_type_convert;
+#[path = "local_tunnel_rings.rs"]
+mod local_tunnel_rings;
 #[path = "lock_hide.rs"]
 mod lock_hide;
 #[path = "loop_ngon_rim.rs"]
