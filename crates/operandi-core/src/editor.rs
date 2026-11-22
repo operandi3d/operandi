@@ -566,6 +566,12 @@ impl PartialEq for FreeMemory {
 
 #[derive(Clone, Default, PartialEq)]
 pub struct Editor {
+    /// The undo memory budget in bytes; `None` is `UNDO_MEMORY_BUDGET`.
+    pub undo_memory_budget: Option<usize>,
+    /// Set while a multi-mesh command records one step per mesh that it
+    /// then joins into one (multi_tools.rs): trimming in between would
+    /// shift the steps it is about to join (Astra P9-001).
+    pub undo_trim_paused: bool,
     /// While set, undo steps recorded under this gesture id fold into one
     /// (a colour drag across several items and frames is one step). The
     /// app sets it around a gesture's commands and clears it after.
@@ -5731,7 +5737,10 @@ impl Editor {
     /// of a 100,000-item scene were about 35 GB). Provisional
     /// (scene-budget, 2026-11-20).
     pub(crate) fn trim_undo_memory(&mut self) {
-        self.trim_undo_memory_to(UNDO_MEMORY_BUDGET);
+        if self.undo_trim_paused {
+            return;
+        }
+        self.trim_undo_memory_to(self.undo_memory_budget.unwrap_or(UNDO_MEMORY_BUDGET));
     }
     /// `trim_undo_memory` with another budget, in bytes.
     pub fn trim_undo_memory_to(&mut self, budget: usize) {

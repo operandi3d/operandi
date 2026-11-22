@@ -186,8 +186,10 @@ impl Editor {
         let tool_steps = self.tool_steps;
         let max_undo = self.history.max_undo_level;
         let fold = self.undo_fold.take();
-        // No trimming or folding until the runs are one step.
+        // No trimming or folding until the runs are one step: the steps
+        // from `undo_len` on are joined below (Astra P9-001).
         self.history.max_undo_level = usize::MAX;
+        let paused = std::mem::replace(&mut self.undo_trim_paused, true);
         let result = (|| {
             let mut first_error = None;
             let mut done = 0;
@@ -219,8 +221,11 @@ impl Editor {
         })();
         self.history.max_undo_level = max_undo;
         self.undo_fold = fold;
+        self.undo_trim_paused = paused;
         result?;
-        let mut steps = self.undo.drain(undo_len..);
+        // Nothing trims while paused, so the runs' steps start at
+        // `undo_len`; `min` only keeps a later mistake from panicking.
+        let mut steps = self.undo.drain(undo_len.min(self.undo.len())..);
         let first = steps.next().map(std::sync::Arc::unwrap_or_clone);
         let mut records = first
             .as_ref()
