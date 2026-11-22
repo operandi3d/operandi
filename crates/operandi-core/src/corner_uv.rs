@@ -15,6 +15,19 @@ pub(crate) type UvRows = Vec<Vec<Option<DVec2>>>;
 /// legacy per-polygon UVs, corner weights/colors/normals or typed corner
 /// maps. UV maps and their records are handled.
 pub(crate) fn has_uncarried_corner_data(mesh: &Mesh) -> bool {
+    has_uncarried_corner_data_besides_normals(mesh)
+        || mesh
+            .attributes
+            .corner_normals
+            .values()
+            .flatten()
+            .flatten()
+            .any(Option::is_some)
+}
+
+/// The same check for a tool that carries corner normal maps itself (Edge
+/// Bevel/Chamfer).
+pub(crate) fn has_uncarried_corner_data_besides_normals(mesh: &Mesh) -> bool {
     let at = &mesh.attributes;
     mesh.faces.iter().any(|f| f.uv.is_some())
         || at
@@ -25,12 +38,6 @@ pub(crate) fn has_uncarried_corner_data(mesh: &Mesh) -> bool {
             .any(Option::is_some)
         || at
             .corner_colors
-            .values()
-            .flatten()
-            .flatten()
-            .any(Option::is_some)
-        || at
-            .corner_normals
             .values()
             .flatten()
             .flatten()

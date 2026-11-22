@@ -148,6 +148,8 @@ mod duplicate_transform;
 mod edge_bevel;
 #[path = "edge_bevel_measured.rs"]
 mod edge_bevel_measured;
+#[path = "edge_bevel_normal_map.rs"]
+mod edge_bevel_normal_map;
 #[path = "edge_bevel_options.rs"]
 mod edge_bevel_options;
 #[path = "edge_commands.rs"]

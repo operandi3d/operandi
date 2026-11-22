@@ -824,6 +824,20 @@ Provisional, for Jason to take back:
   Boundary Extend, Boundary Coplanar and Reverse X/Y are shown greyed out at
   their Reset values. Each needs at least one measured case where it
   changes the result.
+- EBC-Q13 (new, forum report 2026-11-22): Edge Bevel / Edge Chamfer on a
+  mesh with a vertex normal map (any mesh with hard edges has one) used to
+  refuse every edge. *Provisional:* it now carries the map: a rebuilt
+  polygon's corners keep the normal of the corner they came from, the new
+  strip and end polygons' corners stay unassigned (as Add Loop leaves its
+  new corners). HardEdges entries for edges the bevel removes or splits are
+  dropped on Drop, so a later Recalculate treats the strip as soft. What
+  does the reference do with the normal map and with HardEdges on a
+  bevelled hard edge?
+- EBC-Q14 (new, forum report 2026-11-22): Edge Bevel of a border edge (an
+  edge with one polygon, e.g. a seam of unwelded points) is refused ("supports
+  edges between two polygons"); EBC-B3-06 covers edges that *end* on a
+  border, not border edges themselves. What does the reference make when a
+  selected edge is a border edge (strip on one side only? refused?)?
 
 ## Undo and Auto-Save preferences — 2026-11-04 (provisional readings)
 

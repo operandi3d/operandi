@@ -1,5 +1,15 @@
 # Milestone progress ledger
 
+- **Edge Bevel with hard edges (2026-11-22, branch forum-bevel-loopslice;
+  forum report):** Edge Bevel and Edge Chamfer refused every edge of a mesh
+  with a vertex normal map ("cannot yet remap ... normals"), and hardening
+  an edge always makes one, so they did nothing after Harden. They now
+  carry the map: rebuilt polygons keep their corners' normals, new
+  polygons' corners are unassigned (provisional, EBC-Q13). Bridge with its
+  defaults leaves no open edges or loose points (checked over segments,
+  modes and Remove). Still refused: border edges (EBC-Q14, no spec), corner
+  weights/colours.
+
 - **Loop Slice, Slice Selected follows the selection (2026-11-22, branch
   forum-bevel-loopslice; ported from claude/project-thread-44lm6w):** with
   Slice Selected each connected group of selected polygons is cut along its

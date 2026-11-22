@@ -213,12 +213,15 @@ pub fn edge_bevel_with(
             strip_edges: edges,
         });
     }
-    if crate::corner_uv::has_uncarried_corner_data(mesh)
+    // Vertex normal maps are carried (`edge_bevel_junctions`): a mesh with
+    // hard edges always has one, and refusing it left Edge Bevel doing
+    // nothing on such meshes (forum report, 2026-11-22).
+    if crate::corner_uv::has_uncarried_corner_data_besides_normals(mesh)
         || !mesh.attributes.polygon_sets.is_empty()
         || !mesh.attributes.extrude_edge_uses.is_empty()
     {
         return Err(format!(
-            "{what} cannot yet remap corner weights, colors, normals or polygon sets; nothing changed"
+            "{what} cannot yet remap corner weights, colors or polygon sets; nothing changed"
         ));
     }
     if weights.is_some_and(|w| w.len() != mesh.vertices.len()) {

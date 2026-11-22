@@ -599,15 +599,21 @@ pub(crate) fn general(
             })
             .unwrap_or_default()
     };
-    // Rebuild every polygon around touched points.
+    // Rebuild every polygon around touched points. `from_corner` keeps, for
+    // each rebuilt polygon, the source corner each new corner came from, so
+    // corner normal maps follow.
+    let mut from_corner: BTreeMap<usize, Vec<usize>> = BTreeMap::new();
     for (fi, face) in mesh.faces.iter().enumerate() {
         let n = face.vertices.len();
         if !face.vertices.iter().any(|v| touched.contains(v)) {
             continue;
         }
         let mut cycle = Vec::with_capacity(n + 4);
+        let sources = from_corner.entry(fi).or_default();
         for i in 0..n {
             let v = face.vertices[i];
+            // The corners added since the last step came from corner i - 1.
+            sources.resize(cycle.len(), i.saturating_sub(1));
             if !touched.contains(&v) {
                 cycle.push(v);
                 continue;
@@ -636,6 +642,7 @@ pub(crate) fn general(
                 },
             }
         }
+        sources.resize(cycle.len(), n - 1);
         out.faces[fi].vertices = cycle;
     }
     // Strips, rows from the F1 side (first) to the F2 side.
@@ -847,6 +854,21 @@ pub(crate) fn general(
         if !map.corners.is_empty() {
             map.corners = shape.iter().map(|&n| vec![None; n]).collect();
         }
+    }
+    // Vertex normal maps: a rebuilt polygon's corners keep the normal of the
+    // corner they came from; the new polygons' corners stay unassigned, as
+    // Add Loop leaves its new corners (provisional, EBC-Q13).
+    for (name, rows) in o.corner_normals.iter_mut() {
+        let source = &mesh.attributes.corner_normals[name];
+        *rows = shape
+            .iter()
+            .enumerate()
+            .map(|(fi, &n)| match (source.get(fi), from_corner.get(&fi)) {
+                (Some(old), Some(from)) => from.iter().map(|&c| old[c]).collect(),
+                (Some(old), None) => old.clone(),
+                (None, _) => vec![None; n],
+            })
+            .collect();
     }
     if !out.attributes.creases.is_empty() {
         let edges = out.edges();
