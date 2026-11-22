@@ -279,3 +279,72 @@ fn graph_editor_through_the_bridge() {
     let q = query(&mut b, json!({"channels": y}));
     assert_eq!(q["channels"][0]["keys"].as_array().unwrap().len(), 3);
 }
+
+/// The graph editor's box scale, drop copies, retime and envelope presets
+/// through the bridge (GE-44, GE-31, GE-X5, GE-83).
+#[test]
+fn graph_editor_tools_through_the_bridge() {
+    let mut b = Bridge::new();
+    let added = call(&mut b, "primitive_add", json!({"shape": "cube"})).unwrap();
+    let id = added["active"]["item"].as_u64().unwrap();
+    call(&mut b, "select", json!({"mode": "item", "item": id})).unwrap();
+    let y = format!("{id}:pos.Y");
+    for (f, v) in [(0, 2.), (12, 0.), (24, 2.)] {
+        run(
+            &mut b,
+            "operandi.key.add",
+            json!({"channel": y, "frame": f, "value": v}),
+        );
+    }
+    run(
+        &mut b,
+        "operandi.key.select",
+        json!({"keys": format!("{y}@0,{y}@12")}),
+    );
+    run(
+        &mut b,
+        "operandi.key.transform",
+        json!({"timeFactor": 0.5, "timePivot": 0, "valueFactor": 2, "valuePivot": 0}),
+    );
+    run(
+        &mut b,
+        "operandi.key.select",
+        json!({"keys": format!("{y}@0")}),
+    );
+    run(&mut b, "operandi.key.dropCopies", json!({"frames": 2}));
+    run(
+        &mut b,
+        "operandi.curve.retime",
+        json!({"channels": y, "low": 0, "high": 24, "from": 6, "to": 10}),
+    );
+    let dir = std::env::temp_dir().join(format!("operandi-bridge-env-{}", std::process::id()));
+    std::fs::create_dir_all(&dir).unwrap();
+    let path = dir.join("y.openvelope").display().to_string();
+    run(
+        &mut b,
+        "operandi.curve.saveEnvelope",
+        json!({"channels": y, "path": path}),
+    );
+    run(
+        &mut b,
+        "operandi.curve.applyEnvelope",
+        json!({"channels": format!("{id}:pos.X"), "path": path, "frame": 30}),
+    );
+    let q = query(&mut b, json!({"item": id}));
+    let chans = q["channels"].as_array().unwrap();
+    let ych = chans.iter().find(|c| c["channel"] == y).unwrap();
+    let frames: Vec<f64> = ych["keys"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|k| k["frame"].as_f64().unwrap())
+        .collect();
+    assert!(frames.contains(&10.), "retimed 6 onto 10: {frames:?}");
+    near(ych["keys"][0]["value"].as_f64().unwrap(), 4.);
+    let xch = chans
+        .iter()
+        .find(|c| c["channel"] == format!("{id}:pos.X"))
+        .unwrap();
+    assert_eq!(xch["keys"][0]["frame"], 30.);
+    let _ = std::fs::remove_dir_all(&dir);
+}

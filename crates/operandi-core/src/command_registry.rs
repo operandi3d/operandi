@@ -3139,6 +3139,74 @@ pub static COMMANDS: &[Entry] = &[
         .undo()
         .operandi()
         .example("operandi.key.offset frames:2 value:0.5"),
+    script("operandi.key.transform", Items, "Transforms the selected keys at once, one undo step: times scaled around a pivot then moved, values the same (GE-44 Box Scale, GE-40/43).")
+        .on_editor(
+            "Transforms the selected keys at once, one undo step: times scaled around a pivot then moved, values the same (GE-44 Box Scale, GE-40/43).",
+            &[
+            jopt("frames", "number", "Frames to move by (default 0)."),
+            jopt("value", "number", "Value to add (default 0)."),
+            jopt("timeFactor", "number", "Time scale (default 1)."),
+            jopt("timePivot", "number", "Frame to scale time around (default 0)."),
+            jopt("valueFactor", "number", "Value scale (default 1)."),
+            jopt("valuePivot", "number", "Value to scale around (default 0)."),
+        ],
+            crate::anim_commands::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.key.transform timeFactor:2 timePivot:0"),
+    script("operandi.key.dropCopies", Items, "Drops copies of the selected keys on every frame along a drag, values moving evenly (GE-31 Ctrl+Shift+drag).")
+        .on_editor(
+            "Drops copies of the selected keys on every frame along a drag, values moving evenly (GE-31 Ctrl+Shift+drag).",
+            &[
+            jreq("frames", "number", "Frames dragged (negative: earlier)."),
+            jopt("value", "number", "Value change at the end (default 0)."),
+        ],
+            crate::anim_commands::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.key.dropCopies frames:4"),
+    script("operandi.curve.retime", Items, "Stretches timing between two frames so one frame lands on another; keys between follow (GE-X5 retime).")
+        .on_editor(
+            "Stretches timing between two frames so one frame lands on another; keys between follow (GE-X5 retime).",
+            &[
+            jopt("channels", "string", "Channels as item:name,...; default the selected channels, else the selected keys' channels."),
+            jreq("low", "number", "Fixed frame before."),
+            jreq("high", "number", "Fixed frame after."),
+            jreq("from", "number", "The frame that moves."),
+            jreq("to", "number", "Where it lands."),
+        ],
+            crate::anim_commands::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.curve.retime low:0 high:24 from:12 to:8"),
+    script("operandi.curve.saveEnvelope", Items, "Saves channels' curves as an envelope preset file (GE-83).")
+        .on_editor(
+            "Saves channels' curves as an envelope preset file (GE-83).",
+            &[
+            jopt("channels", "string", "Channels as item:name,...; default the selected channels, else the selected keys' channels."),
+            jreq("path", "string", "The .openvelope file to write."),
+        ],
+            crate::anim_commands::run,
+        )
+        .side_effect()
+        .operandi()
+        .example("operandi.curve.saveEnvelope path:{bounce.openvelope}"),
+    script("operandi.curve.applyEnvelope", Items, "Puts an envelope preset's curves on channels from a frame (GE-83).")
+        .on_editor(
+            "Puts an envelope preset's curves on channels from a frame (GE-83).",
+            &[
+            jopt("channels", "string", "Channels as item:name,...; default the selected channels, else the selected keys' channels."),
+            jreq("path", "string", "The .openvelope file."),
+            jopt("frame", "number", "Start frame (default the current frame)."),
+        ],
+            crate::anim_commands::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.curve.applyEnvelope path:{bounce.openvelope}"),
     script("operandi.key.setValue", Items, "Sets, adds to or multiplies the selected keys' values (GE-71 Set Value).")
         .on_editor(
             "Sets, adds to or multiplies the selected keys' values (GE-71 Set Value).",
@@ -6417,7 +6485,7 @@ mod tests {
                 assert!(!json.about.is_empty(), "{}", e.name);
             }
         }
-        assert_eq!(crate::command_exec::specs().count(), 222);
+        assert_eq!(crate::command_exec::specs().count(), 227);
     }
 
     #[test]

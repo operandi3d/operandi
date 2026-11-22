@@ -83,25 +83,33 @@ impl Editor {
         let mut moved = Vec::new();
         self.anim_step(label, |e| {
             let mut changed = false;
+            // Per channel: take every selected key out first, edit them,
+            // then put them back, so a key moved onto another selected
+            // key's time never gets edited twice.
+            let mut by_channel: std::collections::BTreeMap<ChannelKey, Vec<Tick>> =
+                Default::default();
             for (k, t) in &selected {
-                let Some(c) = e.scene.animation.channels.get_mut(k) else {
+                by_channel.entry(k.clone()).or_default().push(*t);
+            }
+            for (k, times) in by_channel {
+                let Some(c) = e.scene.animation.channels.get_mut(&k) else {
                     continue;
                 };
-                let Some(i) = c.curve.key_at(*t) else {
-                    continue;
-                };
-                let mut key = c.curve.keys[i].clone();
-                edit(k, &mut key)?;
-                if !key.value.is_finite() {
-                    return Err("That gives a value that isn't a number".into());
-                }
-                if key != c.curve.keys[i] {
-                    changed = true;
-                    c.curve.keys.remove(i);
+                let (taken, kept): (Vec<Key>, Vec<Key>) = c
+                    .curve
+                    .keys
+                    .drain(..)
+                    .partition(|key| times.contains(&key.time));
+                c.curve.keys = kept;
+                for mut key in taken {
+                    let before = key.clone();
+                    edit(&k, &mut key)?;
+                    if !key.value.is_finite() {
+                        return Err("That gives a value that isn't a number".into());
+                    }
+                    changed |= key != before;
                     moved.push((k.clone(), key.time));
                     c.curve.put(key);
-                } else {
-                    moved.push((k.clone(), *t));
                 }
             }
             animation::repose(&mut e.scene);
@@ -623,7 +631,9 @@ impl Editor {
         (value_factor, value_pivot): (f64, f64),
     ) -> Result<()> {
         if !(time_factor.is_finite() && time_factor > 0.)
-            || ![dv, value_factor, value_pivot].iter().all(|v| v.is_finite())
+            || ![dv, value_factor, value_pivot]
+                .iter()
+                .all(|v| v.is_finite())
         {
             return Err("Give finite numbers, and a time factor above 0".into());
         }
@@ -633,7 +643,11 @@ impl Editor {
             let t = Tick::from_seconds(
                 time_pivot.seconds() + (key.time.seconds() - time_pivot.seconds()) * time_factor,
             ) + dt;
-            key.time = if snap { animation::nearest_frame(rate, t) } else { t };
+            key.time = if snap {
+                animation::nearest_frame(rate, t)
+            } else {
+                t
+            };
             key.value = value_pivot + (key.value - value_pivot) * value_factor + dv;
             Ok(())
         })
@@ -685,7 +699,14 @@ impl Editor {
     /// GE-X5 retime: between `low` and `high` (which stay), the timing is
     /// stretched so `from` lands on `to`; keys of `channels` between them
     /// follow, piecewise linearly. One undo step.
-    pub fn retime(&mut self, channels: Vec<ChannelKey>, low: Tick, high: Tick, from: Tick, to: Tick) -> Result<()> {
+    pub fn retime(
+        &mut self,
+        channels: Vec<ChannelKey>,
+        low: Tick,
+        high: Tick,
+        from: Tick,
+        to: Tick,
+    ) -> Result<()> {
         if !(low < from && from < high && low < to && to < high) {
             return Err("Retime needs low < from < high and low < to < high".into());
         }
@@ -741,7 +762,12 @@ impl Editor {
     /// one-channel envelope goes on every given channel; a vector one
     /// (pos.X/Y/Z…) on the given items' same-named channels. Keys inside
     /// the envelope's span are replaced. One undo step.
-    pub fn apply_envelope(&mut self, env: &Envelope, channels: &[ChannelKey], at: Tick) -> Result<()> {
+    pub fn apply_envelope(
+        &mut self,
+        env: &Envelope,
+        channels: &[ChannelKey],
+        at: Tick,
+    ) -> Result<()> {
         if env.channels.is_empty() {
             return Err("The envelope is empty".into());
         }
@@ -787,7 +813,9 @@ impl Editor {
                         },
                         rest: now,
                     });
-                c.curve.keys.retain(|key| key.time < at || key.time > at + span);
+                c.curve
+                    .keys
+                    .retain(|key| key.time < at || key.time > at + span);
                 for key in &curve.keys {
                     let mut key = key.clone();
                     key.time = at + key.time;

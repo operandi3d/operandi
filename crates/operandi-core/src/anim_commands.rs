@@ -527,6 +527,55 @@ pub fn run(e: &mut Editor, name: &str, a: &Args) -> Out {
             let linked = flag(a, "link")?.unwrap_or(false);
             e.offset_keys(dt, number(a, "value")?.unwrap_or(0.), linked)?;
         }
+        "operandi.key.transform" => {
+            let dt = frames_tick(rate, number(a, "frames")?.unwrap_or(0.));
+            let tp = animation::at_frames(rate, number(a, "timePivot")?.unwrap_or(0.));
+            e.transform_selected_keys(
+                dt,
+                number(a, "value")?.unwrap_or(0.),
+                (number(a, "timeFactor")?.unwrap_or(1.), tp),
+                (
+                    number(a, "valueFactor")?.unwrap_or(1.),
+                    number(a, "valuePivot")?.unwrap_or(0.),
+                ),
+            )?;
+        }
+        "operandi.key.dropCopies" => {
+            let f = number(a, "frames")?.ok_or("Give frames:")?;
+            e.drop_key_copies(f.round() as i64, number(a, "value")?.unwrap_or(0.))?;
+        }
+        "operandi.curve.retime" => {
+            let at = |k: &str| -> Result<Tick, String> {
+                Ok(animation::at_frames(
+                    rate,
+                    number(a, k)?.ok_or_else(|| format!("Give {k}:"))?,
+                ))
+            };
+            let (low, high, from, to) = (at("low")?, at("high")?, at("from")?, at("to")?);
+            let list = e.curve_scope(channels_arg(a)?);
+            let list = if list.is_empty() {
+                e.scene.animation.channels.keys().cloned().collect()
+            } else {
+                list
+            };
+            e.retime(list, low, high, from, to)?;
+        }
+        "operandi.curve.saveEnvelope" => {
+            let path = text(a, "path").ok_or("Give path:")?;
+            let list = e.curve_scope(channels_arg(a)?);
+            let env = e.envelope_of(&list)?;
+            let json = serde_json::to_vec_pretty(&env).map_err(|x| x.to_string())?;
+            std::fs::write(path, json).map_err(|x| format!("{path}: {x}"))?;
+        }
+        "operandi.curve.applyEnvelope" => {
+            let path = text(a, "path").ok_or("Give path:")?;
+            let bytes = std::fs::read(path).map_err(|x| format!("{path}: {x}"))?;
+            let env: crate::anim_graph::Envelope = serde_json::from_slice(&bytes)
+                .map_err(|x| format!("{path}: not an envelope ({x})"))?;
+            let list = channels_or_selected(e, a)?;
+            let t = time_arg(e, a)?.unwrap_or(e.scene.time.current);
+            e.apply_envelope(&env, &list, t)?;
+        }
         "operandi.key.setValue" => {
             let v = number(a, "value")?.ok_or("Give value:")?;
             let mode = match text(a, "mode").unwrap_or("set") {
@@ -766,10 +815,13 @@ fn query(e: &Editor, a: &Args) -> Result<String, String> {
 pub const NAMES: &[&str] = &[
     "operandi.anim.query",
     "operandi.channel.select",
+    "operandi.curve.applyEnvelope",
     "operandi.curve.behavior",
     "operandi.curve.cycle",
     "operandi.curve.eulerFilter",
     "operandi.curve.interpolation",
+    "operandi.curve.retime",
+    "operandi.curve.saveEnvelope",
     "operandi.curve.shadow",
     "operandi.curve.simplify",
     "operandi.key.add",
@@ -787,6 +839,7 @@ pub const NAMES: &[&str] = &[
     "operandi.key.copy",
     "operandi.key.cut",
     "operandi.key.delete",
+    "operandi.key.dropCopies",
     "operandi.key.discard",
     "operandi.key.invert",
     "operandi.key.items",
@@ -801,6 +854,7 @@ pub const NAMES: &[&str] = &[
     "operandi.key.set",
     "operandi.key.slope",
     "operandi.key.toggle",
+    "operandi.key.transform",
     "operandi.key.transforms",
     "operandi.marker.add",
     "operandi.marker.delete",

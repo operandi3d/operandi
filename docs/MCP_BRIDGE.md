@@ -666,6 +666,29 @@ used in the app; `primitive_add` always starts from the Reset values.
   - `frames` (number): Frames to move by (default 0).
   - `value` (number): Value to add (default 0).
   - `link` (boolean): Related keys (X/Y/Z, R/G/B) at the same times move in time too (GE-42).
+- **`operandi.key.transform`** — Transforms the selected keys at once, one undo step: times scaled around a pivot then moved, values the same (GE-44 Box Scale, GE-40/43).
+  - `frames` (number): Frames to move by (default 0).
+  - `value` (number): Value to add (default 0).
+  - `timeFactor` (number): Time scale (default 1).
+  - `timePivot` (number): Frame to scale time around (default 0).
+  - `valueFactor` (number): Value scale (default 1).
+  - `valuePivot` (number): Value to scale around (default 0).
+- **`operandi.key.dropCopies`** — Drops copies of the selected keys on every frame along a drag, values moving evenly (GE-31 Ctrl+Shift+drag).
+  - `frames` (number, required): Frames dragged (negative: earlier).
+  - `value` (number): Value change at the end (default 0).
+- **`operandi.curve.retime`** — Stretches timing between two frames so one frame lands on another; keys between follow (GE-X5 retime).
+  - `channels` (string): Channels as item:name,...; default the selected channels, else the selected keys' channels.
+  - `low` (number, required): Fixed frame before.
+  - `high` (number, required): Fixed frame after.
+  - `from` (number, required): The frame that moves.
+  - `to` (number, required): Where it lands.
+- **`operandi.curve.saveEnvelope`** — Saves channels' curves as an envelope preset file (GE-83).
+  - `channels` (string): Channels as item:name,...; default the selected channels, else the selected keys' channels.
+  - `path` (string, required): The .openvelope file to write.
+- **`operandi.curve.applyEnvelope`** — Puts an envelope preset's curves on channels from a frame (GE-83).
+  - `channels` (string): Channels as item:name,...; default the selected channels, else the selected keys' channels.
+  - `path` (string, required): The .openvelope file.
+  - `frame` (number): Start frame (default the current frame).
 - **`operandi.key.setValue`** — Sets, adds to or multiplies the selected keys' values (GE-71 Set Value).
   - `value` (number, required): The value.
   - `mode` (string): set (default), add or multiply.

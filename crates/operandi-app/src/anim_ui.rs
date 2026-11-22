@@ -50,6 +50,11 @@ const GRAPH_VIEW_ARGS: &[table::Arg] = &[
     table::opt("animatedOnly", TOGGLE, table::Unit::None, None),
     table::opt("lock", TOGGLE, table::Unit::None, None),
     table::opt("link", TOGGLE, table::Unit::None, None),
+    table::opt("boxScale", TOGGLE, table::Unit::None, None),
+    table::opt("retime", TOGGLE, table::Unit::None, None),
+    table::opt("speed", TOGGLE, table::Unit::None, None),
+    table::opt("rows", table::ArgType::Int, table::Unit::None, None),
+    table::opt("rowOffset", table::ArgType::Int, table::Unit::None, None),
 ];
 const DIALOG_ARGS: &[table::Arg] = &[table::opt(
     "kind",
@@ -94,6 +99,20 @@ pub(crate) fn register(r: &mut Commands) {
                 "open:false" => false,
                 _ => !a.graph.open,
             }
+        },
+    )
+    .unwrap_or_else(|e| panic!("{e}"));
+    r.add_host_command(
+        table::script(
+            "operandi.anim.editors",
+            Area::View,
+            "Animation Editors: opens the tall timeline (track rows) and the Graph Editor (with its channel list) together (GE-01).",
+        )
+        .operandi()
+        .ui(),
+        |a, _| {
+            a.timeline.open_tall();
+            a.graph.open = true;
         },
     )
     .unwrap_or_else(|e| panic!("{e}"));

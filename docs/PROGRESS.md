@@ -4411,4 +4411,6 @@ Design: docs/MATERIALX_GRAPHS.md (stages 1-5).
 
 - Graph Editor window: channel list with filters and Lock, curves coloured by axis, keys (broken magenta, selected accent), handles with slope and weight, cycle ghosts, shadows, Normalised, Stacked, Isolate, Velocity, time strip, toolbar (Frame/Value fields, Key, Key Keeping Shape, slope presets, Break/Unify, Pre/Post behaviours, Cycle, Set Frame/Value, Scale), right-click menu.
 - Core: weighted handles, pre/post behaviours, cycle, interpolation, Key Keeping Shape, shadows (native v61), Euler filter, Simplify, key offset/value/frame edits; all as commands the MCP bridge runs, read back by `operandi.anim.query`.
-- Provisional: GE-Q01..Q08 in SPECIFICATION_QUESTIONS.md.
+- Gaps finished (branch graph-editor-resize): Box Scale, drop copies, box zoom, Speed view, envelope presets, Stacked wheel rows, overshoot hint, retime strip, In/Out slope pop-ups, Animation Editors; each a command with a bridge test.
+- GE-X7: 100 curves x 1,000 keys pans at 16.5 ms/frame (qa build probe `graph_editor_speed_probe`), just inside 60 fps; dense views draw the curve and only selected keys.
+- Provisional: GE-Q01..Q09 in SPECIFICATION_QUESTIONS.md.

@@ -34,3 +34,10 @@ named "Operandi Animation". Each step also once typed in the command line.
 15. Shadow Copy, edit, Swap, Swap: back where it started.
 16. A, Shift+A, F, N over the graph; wheel zoom, Alt+middle-drag pan.
 17. The Graph Editor opens as its own window (native title bar), a wide short strip over the lower part of the main window. Drag it onto another screen and resize it from any edge: it stays the size you give it (it used to grow taller by itself). Close and reopen: same place and size. Shortcuts (A, F, N over the graph, Cmd+Z) still work while it's in front.
+18. Box Scale on, select keys: drag a box edge (time or value scales), Ctrl+corner (both); one undo.
+19. Ctrl+Shift+drag selected keys: copies drop where you let go; originals stay.
+20. Ctrl+Alt+right-drag a box: the view zooms to it.
+21. Speed on: a second curve shows rate of change. Stacked: Ctrl+wheel changes rows, Shift+wheel scrolls them.
+22. Retime on: click the strip to add marks, drag one: keys between marks stretch; right-click removes a mark.
+23. In ▾ / Out ▾ set slopes (Out greyed while unified). Presets ▾ ▸ Save Envelope…, then apply it to another channel.
+24. Animate menu ▸ Animation Editors: tall timeline plus the graph editor.
