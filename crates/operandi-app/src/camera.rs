@@ -21,6 +21,10 @@ const DEFAULT_DISTANCE: f64 = 7.;
 /// about it (everything but the wheel's zoom to surface).
 pub const MIN_DISTANCE: f64 = 0.03;
 pub const MAX_DISTANCE: f64 = 1e7;
+/// Radians a two-axis orbit (and look around) turns per point of drag.
+const ORBIT_SPEED: f64 = 0.008;
+/// How far a two-axis orbit tilts up or down, just short of the poles.
+pub const ORBIT_PITCH: f64 = 1.5;
 /// The perspective near clip: fixed at `NEAR_CLIP` until a wheel zoom to
 /// surface comes closer, then `NEAR_PER_DEPTH` of the surface's depth,
 /// never below `NEAR_FLOOR` (ZP-03: the surface stays visible however
@@ -366,6 +370,38 @@ impl Camera {
             self.view = View::Orthographic;
             self.set_orientation(-forward, up);
         }
+    }
+    /// Before a two-axis mouse orbit or look around: Top, Front and Right
+    /// become a free Orthographic view at the matching yaw and pitch (Top
+    /// stops just short of the pole, where the orbit's pitch clamp sits).
+    pub fn unfix_for_orbit(&mut self) {
+        let (yaw, pitch) = match self.view {
+            View::Top => (0., ORBIT_PITCH),
+            View::Front => (0., 0.),
+            View::Right => (std::f64::consts::FRAC_PI_2, 0.),
+            _ => return,
+        };
+        self.yaw = yaw;
+        self.pitch = pitch;
+        self.roll = 0.;
+        self.view = View::Orthographic;
+    }
+    /// The two-axis orbit for a drag of (`dx`, `dy`) points: the eye
+    /// circles the target, tilting no further than just short of a pole.
+    pub fn orbit_by(&mut self, dx: f64, dy: f64) {
+        self.yaw -= dx * ORBIT_SPEED;
+        self.pitch = (self.pitch + dy * ORBIT_SPEED).clamp(-ORBIT_PITCH, ORBIT_PITCH);
+    }
+    /// NAV-03 look around (Alt+right drag): the eye stays put and the view
+    /// turns about it, by the same angles a drag of (`dx`, `dy`) orbits.
+    /// Dragging right turns the view to look right, dragging up looks up;
+    /// the target swings round in front of the eye at the same distance.
+    pub fn look_around(&mut self, dx: f64, dy: f64) {
+        let (eye, ..) = self.basis();
+        self.unfix_for_orbit();
+        self.orbit_by(dx, dy);
+        let (moved, ..) = self.basis();
+        self.target += eye - moved;
     }
     /// NAV-02: bank the view about its own viewing axis. A render camera
     /// view has no roll.

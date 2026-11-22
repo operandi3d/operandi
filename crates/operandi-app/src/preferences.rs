@@ -60,7 +60,7 @@ impl NavigationPreset {
             parts.extend(
                 [
                     "Roll Alt + Middle drag",
-                    "Flick Alt + Right drag",
+                    "Look Around Alt + Right drag",
                     "Pan Up/Down Alt + Shift + Right drag",
                     "Box Zoom Alt + Ctrl + Right drag",
                 ]
@@ -75,7 +75,7 @@ impl NavigationPreset {
     pub fn navigation(self, button: PointerButton, mods: Modifiers) -> Option<NavigationKind> {
         match self {
             // NAV-01..07: left orbits/pans/zooms; middle rolls; right
-            // flicks, pans up/down or box-zooms (Cmd counts as Ctrl on Mac).
+            // looks around, pans up/down or box-zooms (Cmd counts as Ctrl on Mac).
             Self::Operandi => match button {
                 PointerButton::Primary => crate::input::navigation(mods),
                 PointerButton::Middle if mods.alt && !mods.shift && !mods.ctrl => {
@@ -86,7 +86,7 @@ impl NavigationPreset {
                 } else if mods.ctrl || mods.mac_cmd {
                     NavigationKind::BoxZoom
                 } else {
-                    NavigationKind::Flick
+                    NavigationKind::Look
                 }),
                 _ => None,
             },
@@ -1092,12 +1092,12 @@ mod tests {
         );
         assert_eq!(Operandi.navigation(Primary, Modifiers::NONE), None);
         // Middle and right buttons stay with lasso selection; with Alt they
-        // roll and flick (NAV-02/03).
+        // roll and look around (NAV-02/03).
         assert_eq!(Operandi.navigation(Middle, Modifiers::NONE), None);
         assert_eq!(Operandi.navigation(Secondary, Modifiers::NONE), None);
         assert_eq!(
             Operandi.navigation(Secondary, mods(true, false, false)),
-            Some(NavigationKind::Flick)
+            Some(NavigationKind::Look)
         );
     }
     #[test]

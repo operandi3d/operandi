@@ -34,7 +34,7 @@ Notes on near-clashes:
 | --- | --- | --- |
 | NAV-01 Alt+left orbit | exists | |
 | NAV-02 Alt+middle roll | missing | |
-| NAV-03 Alt+right flick orbit | missing | |
+| NAV-03 Alt+right flick orbit | missing | Now look around: the eye stays put and the view turns (changed 2026-11-22 from Jason's hands-on observation of the reference app; the older shortcut spec SC-034 said flick orbit, from the docs) |
 | NAV-04 Shift+Alt+left pan | exists | |
 | NAV-05 Shift+Alt+right vertical pan | missing | |
 | NAV-06 Ctrl+Alt+left zoom | differs | zooms about the view centre, not where pressed; Cmd variant orbits |

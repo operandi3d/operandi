@@ -5,8 +5,10 @@ cube, pointer over the Perspective view.
 
 ## Navigation
 1. Alt + middle drag in a circle: the view banks (rolls).
-2. Alt + right drag and let go while moving: the view keeps spinning and
-   slows to a stop in about 1–2 s. Click once while it spins: it stops.
+2. Alt + right drag: the view looks around from where it stands (the
+   eye stays put, as on a swivel stool). Drag right: it turns to look
+   right; drag up: it looks up. Letting go stops it at once. In Top view
+   and in Camera view it works the same way (the camera turns in place).
 3. Shift + Alt + right drag sideways and up/down: only the up/down part pans.
 4. Ctrl + Alt + left drag (and Cmd + Alt + left): zooms; the point you
    pressed on stays put.
