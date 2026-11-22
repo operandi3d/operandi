@@ -14,8 +14,8 @@ use super::*;
 use operandi_core::interchange::{self, UsdImportOptions, UsdMaterials};
 
 pub(super) struct UsdImportDialog {
-    path: PathBuf,
-    form: form::Dialog,
+    pub(super) path: PathBuf,
+    pub(super) form: form::Dialog,
 }
 
 /// The dialog's title (UIC-81).
