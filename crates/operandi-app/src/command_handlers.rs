@@ -2216,7 +2216,9 @@ fn tables(r: &mut Commands) {
         a.set_build_mode(!a.dots.build_mode)
     });
     // The Help menu (help_menu.rs).
-    on(r, &["operandi.help.reportBug"], |a, _| a.report_bug());
+    on_words(r, &["operandi.help.reportBug"], |a, c| {
+        a.report_bug_command(c.rest)
+    });
     on(r, &["operandi.help.documentation"], |a, _| {
         a.open_documentation()
     });

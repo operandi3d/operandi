@@ -5,9 +5,11 @@
 //! press Submit there (or don't). The bug form links to the idea form at its
 //! top, so one menu item covers both.
 //!
-//! - Help > Report Bug or Idea… (`operandi.help.reportBug`, help_menu.rs)
-//!   opens the bug form with its Environment field filled in (version,
-//!   commit, OS, GPU, the last log lines from log_ring.rs).
+//! - Help > Report Bug or Idea… (`operandi.help.reportBug`,
+//!   report_bug_dialog.rs) asks what to include, then opens the bug form
+//!   filled in with the build and system and, as ticked, a screenshot
+//!   hint, the tool and selection, recent commands and the last log lines
+//!   (bug_report_capture.rs).
 //! - A panic hook writes a crash file to `<data folder>/crashes/`. On the next
 //!   launch the app asks whether to report it; Report opens the bug form with
 //!   a summary and a trimmed backtrace and shows the full file in Finder so
@@ -260,31 +262,6 @@ fn push_lines(text: &mut String, lines: &[String]) {
         text.push_str(line);
         text.push('\n');
     }
-}
-
-/// The Environment field of a manual report: build and system, then the
-/// recent log (newest lines kept).
-pub fn bug_report_environment<'a>(env: &Environment, logs: &'a [String]) -> TrimmedBody<'a> {
-    TrimmedBody {
-        head: format!("{}\nRecent log:\n", env.text()),
-        lines: logs,
-        keep_newest: true,
-        tail: String::new(),
-    }
-}
-
-/// Help > Report Bug or Idea…'s link: the bug form with only Environment
-/// filled in (what happened, steps and expected are the user's to write).
-pub fn bug_report_url(gpu: &str) -> String {
-    let logs = log_ring::tail(LOG_LINES);
-    let env = Environment::current(gpu);
-    fit_issue_url(
-        "Bug: ",
-        &[],
-        FIELD_ENVIRONMENT,
-        &bug_report_environment(&env, &logs),
-        MAX_URL,
-    )
 }
 
 // ---------------------------------------------------------------- open / reveal
@@ -1056,6 +1033,16 @@ mod tests {
         ));
         std::fs::create_dir_all(&dir).unwrap();
         dir
+    }
+    /// Build and system, then a log (newest lines kept): the shape of a
+    /// report body the trimming tests use.
+    fn bug_report_environment<'a>(env: &Environment, logs: &'a [String]) -> TrimmedBody<'a> {
+        TrimmedBody {
+            head: format!("{}\nRecent log:\n", env.text()),
+            lines: logs,
+            keep_newest: true,
+            tail: String::new(),
+        }
     }
     fn env() -> Environment {
         Environment {

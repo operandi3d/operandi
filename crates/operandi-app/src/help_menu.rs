@@ -2,7 +2,8 @@
 //! 2026-11-20; its "…" per UIC-03, as the browser form asks for more before
 //! anything is sent), moved off the layout bar, and Documentation, greyed
 //! until the docs are published. Both run
-//! registry commands (UIC-220): `operandi.help.reportBug` and
+//! registry commands (UIC-220): `operandi.help.reportBug`
+//! (report_bug_dialog.rs: a dialog, then the pre-filled form) and
 //! `operandi.help.documentation`.
 use super::*;
 
@@ -15,20 +16,6 @@ pub const DOCS_URL: Option<&str> = None;
 pub const DOCS_COMING: &str = "Coming soon";
 
 impl Operandi {
-    /// `operandi.help.reportBug`: a pre-filled GitHub issue in the browser.
-    /// Nothing is sent; the user reads, edits and submits it there
-    /// (bug_report.rs).
-    pub(super) fn report_bug(&mut self) {
-        let url = bug_report::bug_report_url(&self.gpu);
-        self.status = match self.open_in_browser(&url) {
-            Ok(()) => "Opened a new bug report in your browser".into(),
-            Err(e) => {
-                self.copy_next = Some(url);
-                format!("Couldn't open the browser ({e}); the issue link is on the clipboard")
-            }
-        };
-    }
-
     /// `operandi.help.documentation`: the docs in the browser.
     pub(super) fn open_documentation(&mut self) {
         let Some(url) = DOCS_URL else {
@@ -45,7 +32,7 @@ impl Operandi {
     }
 
     /// Hands `url` to the default browser. Tests record it instead.
-    fn open_in_browser(&mut self, url: &str) -> std::io::Result<()> {
+    pub(super) fn open_in_browser(&mut self, url: &str) -> std::io::Result<()> {
         self.opened_url = Some(url.to_owned());
         if cfg!(test) {
             return Ok(());
@@ -87,10 +74,16 @@ mod tests {
             &ctx,
             crate::app_menu::line_action("operandi.help.reportBug"),
         );
-        let url = a.opened_url.take().expect("Report Bug opens a link");
+        // The menu runs the bare command: the capture, then the dialog,
+        // and nothing opens before OK (BUG-01).
+        assert!(a.report_bug.is_modal(), "{}", a.status);
+        assert!(a.opened_url.is_none());
+        a.report_bug = Default::default();
+        a.execute(
+            "operandi.help.reportBug screenshot:false toolState:false commands:false log:false",
+        );
+        let url = a.opened_url.take().expect("the full line opens the link");
         assert!(url.contains("issues/new"), "{url}");
-        a.execute("operandi.help.reportBug");
-        assert!(a.opened_url.take().is_some(), "the command alone works too");
 
         // Greyed Documentation: the menu does nothing, the command says why.
         a.menu_action(
