@@ -158,10 +158,74 @@ pub(super) fn differences(a: &operandi_core::Scene, b: &operandi_core::Scene) ->
     }
 }
 
+/// What kind of promise a command broke. A `KNOWN` line names the kind it
+/// expects, so a command listed for one problem can't hide a different,
+/// worse one behind it, such as a panic or a broken Undo (Astra P4-001).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub(super) enum Broken {
+    Panics,
+    InvalidMesh,
+    ExtraSteps,
+    StepWithoutChange,
+    ChangeWithoutStep,
+    Reopen,
+    Undo,
+    Redo,
+}
+
+/// One broken promise: its kind and what happened.
+#[derive(Debug)]
+pub(super) struct Failure {
+    pub kind: Broken,
+    pub text: String,
+}
+
+impl Failure {
+    fn new(kind: Broken, text: impl Into<String>) -> Self {
+        Self {
+            kind,
+            text: text.into(),
+        }
+    }
+}
+
+impl std::fmt::Display for Failure {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{} [{:?}]", self.text, self.kind)
+    }
+}
+
+/// How one `name setup` result compares with the known-failure lists.
+pub(super) enum Verdict {
+    Fine,
+    /// A new failure, or a known command failing in a different way.
+    Broken(String),
+    /// A `KNOWN` line whose command passes now.
+    Stale,
+}
+
+pub(super) fn judge(
+    key: &str,
+    line: &str,
+    result: std::result::Result<bool, Failure>,
+    known: &[(&str, Broken, &str)],
+) -> Verdict {
+    let expected = known.iter().find(|(k, _, _)| *k == key).map(|(_, b, _)| *b);
+    match (result, expected) {
+        (Ok(_), None) => Verdict::Fine,
+        (Ok(_), Some(_)) => Verdict::Stale,
+        (Err(e), None) => Verdict::Broken(format!("{key} ({line:?}): {e}")),
+        (Err(e), Some(kind)) if e.kind == kind => Verdict::Fine,
+        (Err(e), Some(kind)) => {
+            Verdict::Broken(format!("{key} ({line:?}): {e}, but KNOWN expects {kind:?}"))
+        }
+    }
+}
+
 /// What broke, as one `name setup: problem` line. Undo and redo are
 /// compared on the whole scene in memory (hidden elements too); save and
 /// reopen on the saved bytes.
-pub(super) fn check(line: &str, setup: Setup) -> std::result::Result<bool, String> {
+pub(super) fn check(line: &str, setup: Setup) -> std::result::Result<bool, Failure> {
     let mut a = setup.app();
     let before = a.editor.scene.clone();
     let steps = a.editor.undo.len();
@@ -172,30 +236,42 @@ pub(super) fn check(line: &str, setup: Setup) -> std::result::Result<bool, Strin
     }));
     let mut a = match ran {
         Ok(a) => a,
-        Err(_) => return Err("panics".into()),
+        Err(_) => return Err(Failure::new(Broken::Panics, "panics")),
     };
     for item in &a.editor.scene.items {
         if let Err(e) = item.mesh.validate() {
-            return Err(format!("leaves an invalid mesh on {:?}: {e}", item.name));
+            return Err(Failure::new(
+                Broken::InvalidMesh,
+                format!("leaves an invalid mesh on {:?}: {e}", item.name),
+            ));
         }
     }
     let after = a.editor.scene.clone();
     let added = a.editor.undo.len().saturating_sub(steps);
     if added > 1 {
-        return Err(format!("records {added} undo steps"));
+        return Err(Failure::new(
+            Broken::ExtraSteps,
+            format!("records {added} undo steps"),
+        ));
     }
     if after == before {
         // Nothing to undo; that's fine when the setup gives it nothing to
         // work on, and the step count must say so too.
         return match added {
             0 => Ok(false),
-            _ => Err("records an undo step without changing the scene".into()),
+            _ => Err(Failure::new(
+                Broken::StepWithoutChange,
+                "records an undo step without changing the scene",
+            )),
         };
     }
     if added == 0 {
-        return Err(format!(
-            "changes the scene without an undo step ({})",
-            differences(&before, &after)
+        return Err(Failure::new(
+            Broken::ChangeWithoutStep,
+            format!(
+                "changes the scene without an undo step ({})",
+                differences(&before, &after)
+            ),
         ));
     }
     let bytes = saved(&a);
@@ -203,26 +279,35 @@ pub(super) fn check(line: &str, setup: Setup) -> std::result::Result<bool, Strin
         Ok(reopened) => match persistence::encode(&reopened) {
             Ok(again) if again == bytes => {}
             _ => {
-                return Err(format!(
-                    "saves and reopens differently ({})",
-                    differences(&after, &reopened)
+                return Err(Failure::new(
+                    Broken::Reopen,
+                    format!(
+                        "saves and reopens differently ({})",
+                        differences(&after, &reopened)
+                    ),
                 ));
             }
         },
-        Err(e) => return Err(format!("doesn't reopen: {e}")),
+        Err(e) => return Err(Failure::new(Broken::Reopen, format!("doesn't reopen: {e}"))),
     }
     a.execute("Undo");
     if a.editor.scene != before {
-        return Err(format!(
-            "undo doesn't give back the scene from before ({})",
-            differences(&before, &a.editor.scene)
+        return Err(Failure::new(
+            Broken::Undo,
+            format!(
+                "undo doesn't give back the scene from before ({})",
+                differences(&before, &a.editor.scene)
+            ),
         ));
     }
     a.execute("Redo");
     if a.editor.scene != after {
-        return Err(format!(
-            "redo doesn't give back the scene from after ({})",
-            differences(&after, &a.editor.scene)
+        return Err(Failure::new(
+            Broken::Redo,
+            format!(
+                "redo doesn't give back the scene from after ({})",
+                differences(&after, &a.editor.scene)
+            ),
         ));
     }
     Ok(true)
@@ -230,126 +315,160 @@ pub(super) fn check(line: &str, setup: Setup) -> std::result::Result<bool, Strin
 
 /// Known failures as `"<command> <setup>"`, with what goes wrong. Fix the
 /// command and delete its line; the test says when a line is stale.
-pub(super) const KNOWN: &[(&str, &str)] = &[
+pub(super) const KNOWN: &[(&str, Broken, &str)] = &[
     (
         "Vertices polygons",
+        Broken::ChangeWithoutStep,
         "registry marks it undoable, but a mode switch records no undo step",
     ),
     (
         "Vertices edges",
+        Broken::ChangeWithoutStep,
         "registry marks it undoable, but a mode switch records no undo step",
     ),
     (
         "Vertices nothing",
+        Broken::ChangeWithoutStep,
         "registry marks it undoable, but a mode switch records no undo step",
     ),
     (
         "Edges polygons",
+        Broken::ChangeWithoutStep,
         "registry marks it undoable, but a mode switch records no undo step",
     ),
     (
         "Edges points",
+        Broken::ChangeWithoutStep,
         "registry marks it undoable, but a mode switch records no undo step",
     ),
     (
         "Edges nothing",
+        Broken::ChangeWithoutStep,
         "registry marks it undoable, but a mode switch records no undo step",
     ),
     (
         "Polygons edges",
+        Broken::ChangeWithoutStep,
         "registry marks it undoable, but a mode switch records no undo step",
     ),
     (
         "Polygons points",
+        Broken::ChangeWithoutStep,
         "registry marks it undoable, but a mode switch records no undo step",
     ),
     (
         "Items polygons",
+        Broken::ChangeWithoutStep,
         "registry marks it undoable, but a mode switch records no undo step",
     ),
     (
         "Items edges",
+        Broken::ChangeWithoutStep,
         "registry marks it undoable, but a mode switch records no undo step",
     ),
     (
         "Items points",
+        Broken::ChangeWithoutStep,
         "registry marks it undoable, but a mode switch records no undo step",
     ),
     (
         "Items nothing",
+        Broken::ChangeWithoutStep,
         "registry marks it undoable, but a mode switch records no undo step",
     ),
     (
         "Materials polygons",
+        Broken::ChangeWithoutStep,
         "registry marks it undoable, but a mode switch records no undo step",
     ),
     (
         "Materials edges",
+        Broken::ChangeWithoutStep,
         "registry marks it undoable, but a mode switch records no undo step",
     ),
     (
         "Materials points",
+        Broken::ChangeWithoutStep,
         "registry marks it undoable, but a mode switch records no undo step",
     ),
     (
         "Materials nothing",
+        Broken::ChangeWithoutStep,
         "registry marks it undoable, but a mode switch records no undo step",
     ),
     (
         "select.nextMode polygons",
+        Broken::ChangeWithoutStep,
         "registry marks it undoable, but a mode switch records no undo step",
     ),
     (
         "select.nextMode edges",
+        Broken::ChangeWithoutStep,
         "registry marks it undoable, but a mode switch records no undo step",
     ),
     (
         "select.nextMode points",
+        Broken::ChangeWithoutStep,
         "registry marks it undoable, but a mode switch records no undo step",
     ),
     (
         "select.nextMode nothing",
+        Broken::ChangeWithoutStep,
         "registry marks it undoable, but a mode switch records no undo step",
     ),
     (
         "vert.merge polygons",
+        Broken::ChangeWithoutStep,
         "changes the selection with no undo step when there are no points to merge",
     ),
     (
         "vert.merge edges",
+        Broken::ChangeWithoutStep,
         "changes the selection with no undo step when there are no points to merge",
     ),
     (
         "edge.subdivide edges",
+        Broken::Redo,
         "redo restores the geometry but not the selection the first run left",
     ),
     (
         "Edge Subdivide edges",
+        Broken::Redo,
         "redo restores the geometry but not the selection the first run left",
     ),
     (
         "poly.make points",
+        Broken::Redo,
         "redo restores the geometry but not the selection the first run left",
     ),
     (
         "Make points",
+        Broken::Redo,
         "redo restores the geometry but not the selection the first run left",
     ),
     (
         "edge.split points",
+        Broken::ChangeWithoutStep,
         "changes the selection with no undo step when the points split nothing",
     ),
     (
         "Edge Split points",
+        Broken::ChangeWithoutStep,
         "changes the selection with no undo step when the points split nothing",
     ),
-    ("edge.addPoint edges", "records 2 undo steps"),
+    (
+        "edge.addPoint edges",
+        Broken::ExtraSteps,
+        "records 2 undo steps",
+    ),
     (
         "cmds.batch polygons",
+        Broken::StepWithoutChange,
         "not a bug: the registry example flips twice, so the scene ends as it began",
     ),
     (
         "cmds.batch nothing",
+        Broken::StepWithoutChange,
         "not a bug: the registry example flips twice, so the scene ends as it began",
     ),
 ];
@@ -369,7 +488,6 @@ pub(super) const SLOW: &[&str] = &["uv.pack"];
 
 /// Every fourth command from `part`, in every setup.
 fn sweep(part: usize) {
-    let known: BTreeSet<&str> = KNOWN.iter().map(|(k, _)| *k).collect();
     let mut failures = Vec::new();
     let mut stale = Vec::new();
     let mut edited = BTreeSet::new();
@@ -385,10 +503,10 @@ fn sweep(part: usize) {
             if let Ok(true) | Err(_) = result {
                 edited.insert(name);
             }
-            match (result, known.contains(key.as_str())) {
-                (Err(e), false) => failures.push(format!("{key} ({line:?}): {e}")),
-                (Ok(_), true) => stale.push(key),
-                _ => {}
+            match judge(&key, &line, result, KNOWN) {
+                Verdict::Fine => {}
+                Verdict::Broken(e) => failures.push(e),
+                Verdict::Stale => stale.push(key),
             }
         }
     }
@@ -429,4 +547,38 @@ fn every_command_keeps_the_undo_redo_save_contract_part_3() {
 #[test]
 fn every_command_keeps_the_undo_redo_save_contract_part_4() {
     sweep(3);
+}
+
+/// A `KNOWN` line covers only the problem it names (Astra P4-001): the
+/// same command panicking, or breaking Undo, is still a failure.
+#[test]
+fn a_known_line_does_not_hide_a_different_failure() {
+    let known = &[("x.cmd polygons", Broken::ChangeWithoutStep, "listed")][..];
+    let fails = |kind| Err(Failure::new(kind, "boom"));
+    assert!(matches!(
+        judge(
+            "x.cmd polygons",
+            "x.cmd",
+            fails(Broken::ChangeWithoutStep),
+            known
+        ),
+        Verdict::Fine
+    ));
+    for kind in [Broken::Panics, Broken::Undo, Broken::InvalidMesh] {
+        assert!(
+            matches!(
+                judge("x.cmd polygons", "x.cmd", fails(kind), known),
+                Verdict::Broken(_)
+            ),
+            "{kind:?} hid behind the KNOWN line"
+        );
+    }
+    assert!(matches!(
+        judge("x.cmd polygons", "x.cmd", Ok(true), known),
+        Verdict::Stale
+    ));
+    assert!(matches!(
+        judge("y.cmd polygons", "y.cmd", fails(Broken::Redo), known),
+        Verdict::Broken(_)
+    ));
 }

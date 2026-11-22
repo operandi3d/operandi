@@ -2,7 +2,7 @@
 //! monkey sessions on a box with a live patch beside it, so a command that
 //! meets a patch polygon keeps undo, redo and save/reopen agreeing and the
 //! mesh valid.
-use super::command_contract_tests::{KNOWN, SLOW, Setup, check, commands};
+use super::command_contract_tests::{Broken, KNOWN, SLOW, Setup, Verdict, check, commands, judge};
 use super::*;
 use operandi_core::PolygonRepresentation;
 
@@ -61,41 +61,50 @@ pub(super) fn add_live_patch(a: &mut Operandi) {
 
 /// Known failures on the patch setup, the same ones the box setups list in
 /// `KNOWN` (command_contract_tests.rs), with what goes wrong.
-const PATCH_KNOWN: &[(&str, &str)] = &[
+const PATCH_KNOWN: &[(&str, Broken, &str)] = &[
     (
         "cmds.batch patch",
+        Broken::StepWithoutChange,
         "not a bug: the registry example flips twice, so the scene ends as it began",
     ),
     (
         "edge.split patch",
+        Broken::ChangeWithoutStep,
         "changes the selection with no undo step when the selection splits nothing",
     ),
     (
         "Edge Split patch",
+        Broken::ChangeWithoutStep,
         "changes the selection with no undo step when the selection splits nothing",
     ),
     (
         "vert.merge patch",
+        Broken::ChangeWithoutStep,
         "changes the selection with no undo step when there are no points to merge",
     ),
     (
         "Vertices patch",
+        Broken::ChangeWithoutStep,
         "registry marks it undoable, but a mode switch records no undo step",
     ),
     (
         "Edges patch",
+        Broken::ChangeWithoutStep,
         "registry marks it undoable, but a mode switch records no undo step",
     ),
     (
         "Items patch",
+        Broken::ChangeWithoutStep,
         "registry marks it undoable, but a mode switch records no undo step",
     ),
     (
         "Materials patch",
+        Broken::ChangeWithoutStep,
         "registry marks it undoable, but a mode switch records no undo step",
     ),
     (
         "select.nextMode patch",
+        Broken::ChangeWithoutStep,
         "registry marks it undoable, but a mode switch records no undo step",
     ),
 ];
@@ -103,8 +112,7 @@ const PATCH_KNOWN: &[(&str, &str)] = &[
 /// Every registry command, run on the patch setup, keeps the contract.
 #[test]
 fn every_command_keeps_the_contract_on_a_live_patch() {
-    let known: std::collections::BTreeSet<&str> =
-        KNOWN.iter().chain(PATCH_KNOWN).map(|(k, _)| *k).collect();
+    let known: Vec<(&str, Broken, &str)> = KNOWN.iter().chain(PATCH_KNOWN).copied().collect();
     let mut failures = Vec::new();
     let mut stale = Vec::new();
     for (name, line) in commands() {
@@ -112,10 +120,10 @@ fn every_command_keeps_the_contract_on_a_live_patch() {
             continue;
         }
         let key = format!("{name} patch");
-        match (check(&line, Setup::Patch), known.contains(key.as_str())) {
-            (Err(e), false) => failures.push(format!("{key} ({line:?}): {e}")),
-            (Ok(_), true) => stale.push(key),
-            _ => {}
+        match judge(&key, &line, check(&line, Setup::Patch), &known) {
+            Verdict::Fine => {}
+            Verdict::Broken(e) => failures.push(e),
+            Verdict::Stale => stale.push(key),
         }
     }
     assert!(
