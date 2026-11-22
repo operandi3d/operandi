@@ -636,7 +636,7 @@ fn every_rotation_order_exports_as_the_same_orientation() {
 fn more_mesh_layers_than_the_format_holds_are_refused() {
     let mut scene = scene_of(vec![("Bolt", triangle())]);
     let base = scene.items[0].clone();
-    let mut add = |scene: &mut Scene, count: usize| {
+    let add = |scene: &mut Scene, count: usize| {
         for _ in 0..count {
             let mut item = base.clone();
             item.id = scene.next_id;
