@@ -3681,12 +3681,20 @@ mod viewport;
 mod viewport_buttons;
 mod viewport_properties;
 mod views;
+/// The launch arguments as text, for the command-line modes below. A
+/// file name that isn't valid Unicode (possible on Linux) is kept as it is
+/// for opening (`AppEnvironment::document_argument`) and only shown lossily
+/// here; `std::env::args` would panic on it (Astra P8-007).
+fn command_line_words(raw: impl Iterator<Item = std::ffi::OsString>) -> Vec<String> {
+    raw.map(|a| a.to_string_lossy().into_owned()).collect()
+}
+
 fn main() -> eframe::Result {
     let environment = app_environment::AppEnvironment::capture();
     // Crash files go to <data folder>/crashes (OPERANDI_DEV_DATA for QA apps).
     bug_report::install_panic_hook(environment.paths().crashes());
     // Bulk thumbnail re-render (PB-114 look change): no window opens.
-    let args: Vec<String> = std::env::args().skip(1).collect();
+    let args = command_line_words(std::env::args_os().skip(1));
     if args.first().map(String::as_str) == Some("--rerender-thumbnails") {
         std::process::exit(preset_thumbs::rerender_command(&args[1..]));
     }

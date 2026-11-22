@@ -110,14 +110,10 @@ impl AppEnvironment {
             scratch: None,
         }
     }
+    /// The file named after the program, kept as the OS gave it: a name
+    /// that isn't valid Unicode opens like any other (Astra P8-007).
     pub fn document_argument(&self) -> Option<PathBuf> {
-        let mut arguments = self.arguments.iter().map(|s| {
-            s.clone()
-                .into_string()
-                .expect("process argument is not valid Unicode")
-        });
-        let _ = arguments.next();
-        arguments.next().map(PathBuf::from)
+        self.arguments.get(1).map(PathBuf::from)
     }
 }
 
@@ -592,19 +588,20 @@ mod tests {
         assert_eq!(app.paths.data_root, PathBuf::from(raw));
         assert_eq!(app.title, "Operandi Rust Dev");
     }
+    /// Astra P8-007: a file name that isn't valid Unicode used to crash
+    /// the launch; it now names the file to open, byte for byte.
     #[cfg(unix)]
     #[test]
-    #[should_panic(expected = "process argument is not valid Unicode")]
-    fn e07_01_non_unicode_argument_remains_a_delayed_error() {
+    fn e07_01_non_unicode_argument_opens_as_given() {
         use std::os::unix::ffi::OsStringExt;
-        let app = AppEnvironment::from_inputs(
-            None,
-            None,
-            vec!["app".into(), OsString::from_vec(vec![0xff])],
-            MANIFEST,
-        );
+        let name = OsString::from_vec(vec![b's', 0xff, b'.', b'o', b'b', b'j']);
+        let app =
+            AppEnvironment::from_inputs(None, None, vec!["app".into(), name.clone()], MANIFEST);
         assert_eq!(app.title, "Operandi Rust Dev");
-        app.document_argument();
+        assert_eq!(app.document_argument(), Some(PathBuf::from(name.clone())));
+        let words = crate::command_line_words(vec![name, "--render-matcap".into()].into_iter());
+        assert_eq!(words[1], "--render-matcap");
+        assert!(words[0].starts_with('s'));
     }
     #[test]
     fn e07_02_app_context_survives_new_and_failed_open() {
