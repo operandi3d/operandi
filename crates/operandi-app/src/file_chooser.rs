@@ -629,7 +629,7 @@ impl super::Operandi {
             Purpose::UvLayout(eps) => self.export_uv_layout(&path, eps),
             Purpose::PresetBrowserThumbnail => {
                 if let Some(target) = self.preset_browser.thumb_target.take() {
-                    match image::open(&path) {
+                    match crate::image_decode::open(&path) {
                         Ok(picture) => self.set_entry_thumbnail(&target, picture),
                         Err(e) => self.status = format!("Can't read {}: {e}", path.display()),
                     }

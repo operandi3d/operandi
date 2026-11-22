@@ -86,8 +86,22 @@ pub fn load(path: &Path) -> Result<PaintImage> {
     if FileType::of(path).is_some_and(FileType::is_psd) {
         return Err("Photoshop files load through their layers (psd::read)".into());
     }
-    let decoded = image::open(path).map_err(|e| format!("Cannot read {}: {e}", path.display()))?;
+    let decoded = open_picture(path).map_err(|e| format!("Cannot read {}: {e}", path.display()))?;
     Ok(from_dynamic(decoded))
+}
+
+/// The most memory one decoded picture may take (as the app's
+/// `image_decode::MOST_BYTES`): the `image` crate's own default, 512 MiB,
+/// refused 16K textures and 8K float EXRs (hidden-limits sweep A3).
+pub const MOST_PICTURE_BYTES: u64 = 16 << 30;
+
+/// `image::open` with the limit above.
+pub fn open_picture(path: &Path) -> image::ImageResult<DynamicImage> {
+    let mut reader = image::ImageReader::open(path)?.with_guessed_format()?;
+    let mut limits = image::Limits::no_limits();
+    limits.max_alloc = Some(MOST_PICTURE_BYTES);
+    reader.limits(limits);
+    reader.decode()
 }
 
 fn from_dynamic(d: DynamicImage) -> PaintImage {

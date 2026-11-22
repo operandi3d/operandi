@@ -120,6 +120,7 @@ mod help_menu;
 mod i2_route;
 mod icon_studio_cli;
 mod icons;
+mod image_decode;
 mod image_viewer;
 mod image_viewer_ui;
 mod import;
