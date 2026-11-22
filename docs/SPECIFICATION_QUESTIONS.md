@@ -7018,6 +7018,16 @@ Builder's provisional readings; the spec's own questions are in
   polygon sharing three or more sides with the rest (a T, a 2x3 or 3x3
   block) has no single middle line. Built *provisional:* that group is left
   uncut. What does the reference do?
+- **LS-Q19 (new, forum report 2026-11-22) A lone polygon with Slice
+  Selected off.** LS-01 needs two neighbouring polygons; a lone selected
+  polygon (the default, Slice Selected off) gave no cut, which read as
+  "Loop Slice refuses to cut on faces". Built *provisional:* each selected
+  polygon that shares no side with another names the ring through its
+  first side (point 0 to 1, as LS-75 does with Slice Selected on), and the
+  cut runs on round that ring. Does the reference cut there, and across
+  which side? Also open: a click on a polygon's middle (not near an edge)
+  while Loop Slice is live only says "click an edge" (LS-03 covers edge
+  clicks only).
 - **LS-B09 Slices keep creation order (LS-71).** Free mode no longer sorts
   positions; Current, the bar's highlighted triangle and the middle-drag
   stepping follow the order the slices were added. Uniform and Symmetry

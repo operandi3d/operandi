@@ -1970,19 +1970,34 @@ pub(crate) fn start(tool: Tool, scene: &Scene, preset: &SliceParameters) -> Slic
     if tool == Tool::LoopSlice {
         p.loop_slice.rings = rings_from_selection(scene);
         // Slice Selected cuts even a lone selected polygon (LS-75): name
-        // its first side so the tool starts with a ring.
+        // its first side so the tool starts with a ring. With Slice
+        // Selected off, each selected polygon that shares no side with
+        // another names its first side too, and the cut runs on round that
+        // ring (provisional, LS-Q19: before, a lone polygon gave no cut).
         if p.loop_slice.rings.is_empty()
-            && p.loop_slice.slice_selected
             && scene.selection.mode == Mode::Polygon
             && let Some(item) = scene.active()
-            && let Some(f) = scene
+        {
+            let take = if p.loop_slice.slice_selected {
+                1
+            } else {
+                usize::MAX
+            };
+            let mut rings: Vec<(u32, u32)> = Vec::new();
+            for f in scene
                 .selection
                 .faces
-                .first()
-                .and_then(|&f| item.mesh.faces.get(f as usize))
-            && f.vertices.len() >= 2
-        {
-            p.loop_slice.rings = vec![edge_key(f.vertices[0], f.vertices[1])];
+                .iter()
+                .filter_map(|&f| item.mesh.faces.get(f as usize))
+                .filter(|f| f.vertices.len() >= 2)
+                .take(take)
+            {
+                let e = edge_key(f.vertices[0], f.vertices[1]);
+                if !rings.contains(&e) {
+                    rings.push(e);
+                }
+            }
+            p.loop_slice.rings = rings;
         }
     }
     p

@@ -21,6 +21,10 @@
   on round the ring. Provisional: a branching group is left uncut (LS-Q18);
   a 2x2 block with Slice Selected off is unchanged (LS-Q17, open). Current
   stops at the last slice instead of refusing a nudge ("from 0 to 0").
+  Forum report: with Slice Selected off (the default) a lone selected
+  polygon now cuts round the ring through its first side (provisional,
+  LS-Q19). Rings still stop at triangles, odd n-gons and (Slice N-gon off)
+  n-gons, so a lone n-gon or a pair beside one can still give no cut.
 
 - **Colour numbers in display space (2026-11-21, branch
   colour-swatch-raw):** Display Color Values in Display Space is on by

@@ -161,6 +161,27 @@ fn a_lone_polygon_is_cut_across_its_first_side() {
 }
 
 #[test]
+fn a_lone_polygon_with_slice_selected_off_cuts_round_its_ring() {
+    // Forum report 2026-11-22: a lone selected polygon gave no cut with
+    // Slice Selected off (the default). It names its first side's ring,
+    // and the cut runs on round it (provisional, LS-Q19).
+    let e = editor(grid(5, 3), &[at(2, 1)], false);
+    assert!(!ring_of(&e).is_empty(), "starts with a ring");
+    assert!((0..=5).all(|x| has_point(mesh(&e), x as f64, 1.5)));
+    assert_eq!(sides(mesh(&e)), [(4, 20)].into());
+}
+
+#[test]
+fn separate_lone_polygons_with_slice_selected_off_each_cut_their_ring() {
+    let e = editor(grid(5, 3), &[at(0, 0), at(3, 2)], false);
+    assert_eq!(ring_of(&e).len(), 2);
+    for z in [0.5, 2.5] {
+        assert!((0..=5).all(|x| has_point(mesh(&e), x as f64, z)), "row {z}");
+    }
+    assert_eq!(sides(mesh(&e)), [(4, 25)].into());
+}
+
+#[test]
 fn pick_order_doesnt_matter() {
     let l = [at(0, 1), at(1, 1), at(1, 0)];
     let picked = editor(grid(5, 3), &l, true);
