@@ -71,6 +71,23 @@ fn old_no_handles(tool: Tool) -> bool {
         || matches!(tool, Tool::CurveExtrude | Tool::CurveClone | Tool::ScatterClone)
         // Symmetrize: fields only (DX-41), no handles.
         || tool == Tool::Symmetrize
+        // The Slice and Duplicate tools draw their own handles
+        // (slice_view.rs, duplicate_view.rs); stray-gizmo-fix 2026-11-22.
+        || matches!(
+            tool,
+            Tool::LoopSlice
+                | Tool::EdgeSlice
+                | Tool::PolygonSlice
+                | Tool::CurveSlice
+                | Tool::PrimitiveSlice
+                | Tool::AxisSlice
+                | Tool::PenSlice
+                | Tool::Mirror
+                | Tool::Array
+                | Tool::Lathe
+                | Tool::Clone
+                | Tool::RadialArray
+        )
         // The UV tab's tools (2026-11-18): fields, clicks and drags only.
         || matches!(
             tool,
@@ -253,5 +270,76 @@ fn handle_cards_match_the_old_viewport_lists() {
             old_snap_move(t),
             "{name} snap"
         );
+    }
+}
+
+/// The transform gizmo look (axis arrows at the action centre) belongs to
+/// the transform tools and Edge Extend, whose pipe moves, rotates and
+/// scales. Any other tool showing it would draw arrows that do nothing, or
+/// something other than what they look like (UIC-05).
+#[test]
+fn only_transform_tools_show_the_move_gizmo() {
+    use operandi_core::tool_card::Family;
+    for card in operandi_core::tool_card::cards() {
+        let h = card.handles;
+        let gizmo = matches!(h.kind, HandleKind::Axes | HandleKind::Combined)
+            && h.anchor == HandleAnchor::ActionCentre;
+        if gizmo {
+            assert!(
+                card.family == Family::Transform || card.tool == Tool::EdgeExtend,
+                "{} shows the Move gizmo but isn't a transform tool",
+                card.tool.label()
+            );
+        }
+    }
+}
+
+/// In the app: with a cube and a polygon selected, the Slice and Duplicate
+/// tools show no generic handles; they draw their own (slice_view.rs,
+/// duplicate_view.rs). Before stray-gizmo-fix they drew three dead Move
+/// arrows at the action centre (UIC-05).
+#[test]
+fn slice_and_duplicate_tools_draw_no_move_gizmo() {
+    use crate::egui::{Context, vec2};
+    use crate::tests::draw;
+    use crate::{Command, Operandi, View, theme};
+    use glam::DVec3;
+    use operandi_core::Mode;
+    let ctx = Context::default();
+    theme::install(&ctx);
+    let size = vec2(1440., 900.);
+    for tool in [
+        Tool::LoopSlice,
+        Tool::EdgeSlice,
+        Tool::PolygonSlice,
+        Tool::CurveSlice,
+        Tool::PrimitiveSlice,
+        Tool::AxisSlice,
+        Tool::PenSlice,
+        Tool::Mirror,
+        Tool::Array,
+        Tool::Lathe,
+        Tool::Clone,
+        Tool::RadialArray,
+    ] {
+        let mut a = Operandi::empty();
+        a.run(Command::NewMesh);
+        a.editor.scene.active_mut().unwrap().mesh =
+            operandi_core::Mesh::box_mesh(DVec3::ZERO, DVec3::ONE * 2., 1)
+                .unwrap()
+                .into();
+        a.editor.scene.selection.mode = Mode::Polygon;
+        a.editor.scene.selection.faces = vec![1];
+        a.camera.view = View::Front;
+        a.activate(tool);
+        draw(&mut a, &ctx, size, vec![]);
+        assert_eq!(
+            a.editor.live.as_ref().map(|l| l.tool),
+            Some(tool),
+            "{} didn't start",
+            tool.label()
+        );
+        let r = a.viewport_rect;
+        assert!(a.handles(r).is_empty(), "{} shows handles", tool.label());
     }
 }

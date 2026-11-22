@@ -11,6 +11,16 @@
 #   scripts/release.sh v0.1.0 --platforms mac,linux
 #                                         only some platforms
 #
+# OPERANDI_WINDOWS_SSH=user@host builds Windows over ssh on that machine
+# instead of through the workflow: it copies the tagged commit there with a
+# git bundle, runs scripts/build-release.sh in its checkout
+# (OPERANDI_WINDOWS_SSH_REPO, default Developer/Operandi under its home
+# folder) and copies the zip back. That checkout keeps its Cycles build, so
+# the machine needs no second copy (docs/RELEASE_BUILDS.md).
+#
+# A Mac disk image already built for the same commit by an earlier run that
+# stopped later on (in release-<tag>/upload) is reused, not rebuilt.
+#
 # This is the ONLY thing that publishes a release. Normal builds
 # (scripts/bundle-dev.sh, scripts/release-macos.sh, scripts/build-release.sh)
 # just leave files in ~/Developer/Operandi-Builds and never upload.
@@ -148,6 +158,17 @@ if [ "$WANT_LINUX" = 1 ] || [ "$WANT_WINDOWS" = 1 ]; then
         say "   note: couldn't ask GitHub which build machines are online; if one is off, its build waits until it's on."
     fi
 fi
+# Windows over ssh instead of the workflow (see the top of this file).
+WIN_SSH="${OPERANDI_WINDOWS_SSH:-}"
+WIN_REPO="${OPERANDI_WINDOWS_SSH_REPO:-Developer/Operandi}"
+CI_WINDOWS=$WANT_WINDOWS
+if [ -n "$WIN_SSH" ] && [ "$WANT_WINDOWS" = 1 ]; then
+    CI_WINDOWS=0
+    ssh -o ConnectTimeout=10 -o BatchMode=yes "$WIN_SSH" "cd $WIN_REPO && git rev-parse --git-dir" >/dev/null 2>&1 ||
+        stop "Can't reach the Windows machine $WIN_SSH over ssh, or it has no checkout at $WIN_REPO."
+    say "   Windows: building over ssh on $WIN_SSH"
+fi
+
 [ "$WANT_MAC$WANT_LINUX$WANT_WINDOWS" != 000 ] || stop "Nothing left to build."
 
 INCLUDED=""
@@ -172,14 +193,27 @@ scripts/test-all.sh || stop "Tests failed, so no release. Nothing was tagged or 
 # ---- Tag (undone again if anything below fails)
 OUT="${OPERANDI_RELEASE_OUTPUT:-$HOME/Developer/Operandi-Builds}/release-$TAG"
 ASSETS="$OUT/upload"
+MAC_FILE="Operandi-$VERSION-macOS.dmg"
+# Keep a Mac disk image an earlier, failed run already built from this
+# same commit: signing and notarizing it again only costs time.
+REUSE_MAC=0
+if [ "$WANT_MAC" = 1 ] && [ -f "$ASSETS/$MAC_FILE" ] && [ "$(cat "$OUT/mac.sha" 2>/dev/null)" = "$(git rev-parse HEAD)" ]; then
+    REUSE_MAC=1
+    KEEP="$(mktemp -d)"
+    mv "$ASSETS/$MAC_FILE" "$OUT/mac.sha" "$KEEP/"
+fi
 rm -rf "$OUT"
 mkdir -p "$ASSETS"
+if [ "$REUSE_MAC" = 1 ]; then
+    mv "$KEEP/$MAC_FILE" "$ASSETS/" && mv "$KEEP/mac.sha" "$OUT/" && rmdir "$KEEP"
+fi
 TAG_PUSHED=0
 RUN_ID=""
 RELEASED=0
 cleanup() {
     status=$?
     [ "$RELEASED" = 1 ] && return
+    [ -z "${WIN_PID:-}" ] || kill "$WIN_PID" 2>/dev/null || true
     if [ -n "$RUN_ID" ]; then
         gh run cancel "$RUN_ID" >/dev/null 2>&1 || true
     fi
@@ -200,13 +234,13 @@ TAG_PUSHED=1
 git push --quiet origin "refs/tags/$TAG"
 
 # ---- Linux and Windows start on their machines while the Mac builds here
-if [ "$WANT_LINUX" = 1 ] || [ "$WANT_WINDOWS" = 1 ]; then
+if [ "$WANT_LINUX" = 1 ] || [ "$CI_WINDOWS" = 1 ]; then
     say
     say "== Starting the Linux/Windows builds on GitHub"
     REQUEST="$(date +%Y%m%d%H%M%S)-$$"
     bool() { [ "$1" = 1 ] && echo true || echo false; }
     gh workflow run "$WORKFLOW" --ref main -f tag="$TAG" \
-        -f linux="$(bool "$WANT_LINUX")" -f windows="$(bool "$WANT_WINDOWS")" \
+        -f linux="$(bool "$WANT_LINUX")" -f windows="$(bool "$CI_WINDOWS")" \
         -f request_id="$REQUEST" >/dev/null
     tries=0
     while [ -z "$RUN_ID" ]; do
@@ -219,16 +253,70 @@ if [ "$WANT_LINUX" = 1 ] || [ "$WANT_WINDOWS" = 1 ]; then
     say "   run: $(gh run view "$RUN_ID" --json url -q .url)"
 fi
 
+# ---- Windows over ssh, in the background while the Mac builds
+WIN_PID=""
+if [ -n "$WIN_SSH" ] && [ "$WANT_WINDOWS" = 1 ]; then
+    say
+    say "== Starting the Windows build over ssh on $WIN_SSH (log: $OUT/windows.log)"
+    mkdir -p "$OUT/windows"
+    git bundle create "$OUT/windows/release.bundle" "refs/tags/$TAG" 2>/dev/null
+    # cmd quoting mangles inline bash, so the build steps go over as a file.
+    cat > "$OUT/windows/operandi-release-windows.sh" <<EOF
+#!/bin/bash
+set -eu
+rm -f ~/operandi-release-windows.zip
+# Visual Studio's CMake and Python aren't on the ssh PATH by default.
+export PATH="/c/Program Files/Python312:\$HOME/.cargo/bin:\$PATH"
+cd ~/$WIN_REPO
+git fetch -q ~/operandi-release.bundle "+refs/tags/$TAG:refs/tags/$TAG"
+git checkout -q --detach "refs/tags/$TAG"
+rm -f ~/operandi-release.bundle
+OUT=~/operandi-release-out
+rm -rf "\$OUT" && mkdir -p "\$OUT"
+OPERANDI_RELEASE_OUTPUT="\$OUT" scripts/build-release.sh
+# A fixed name to copy back: scp from Windows doesn't expand wildcards.
+cp "\$OUT"/*.zip ~/operandi-release-windows.zip
+EOF
+    (
+        set -e
+        scp -q "$OUT/windows/release.bundle" "$WIN_SSH:operandi-release.bundle"
+        scp -q "$OUT/windows/operandi-release-windows.sh" "$WIN_SSH:operandi-release-windows.sh"
+        ssh "$WIN_SSH" '"C:\Program Files\Git\bin\bash.exe" -l operandi-release-windows.sh'
+        scp -q "$WIN_SSH:operandi-release-windows.zip" "$OUT/windows/Operandi-Windows.zip"
+    ) > "$OUT/windows.log" 2>&1 &
+    WIN_PID=$!
+fi
+
 # ---- macOS
 if [ "$WANT_MAC" = 1 ]; then
     say
-    say "== macOS (scripts/release-macos.sh)"
-    # The script's last line is the disk image's path; its log is kept too.
-    OPERANDI_RELEASE_OUTPUT="$OUT/mac" scripts/release-macos.sh 2>&1 | tee "$OUT/mac.log"
-    DMG="$(tail -1 "$OUT/mac.log")"
-    case "$DMG" in *.dmg) ;; *) DMG="" ;; esac
-    [ -n "$DMG" ] && [ -f "$DMG" ] || stop "The Mac build failed (its log: $OUT/mac.log)."
-    cp "$DMG" "$ASSETS/Operandi-$VERSION-macOS.dmg"
+    if [ "$REUSE_MAC" = 1 ]; then
+        say "== macOS: reusing the disk image an earlier run built from this commit"
+    else
+        say "== macOS (scripts/release-macos.sh)"
+        # The script's last line is the disk image's path; its log is kept too.
+        OPERANDI_RELEASE_OUTPUT="$OUT/mac" scripts/release-macos.sh 2>&1 | tee "$OUT/mac.log"
+        DMG="$(tail -1 "$OUT/mac.log")"
+        case "$DMG" in *.dmg) ;; *) DMG="" ;; esac
+        [ -n "$DMG" ] && [ -f "$DMG" ] || stop "The Mac build failed (its log: $OUT/mac.log)."
+        cp "$DMG" "$ASSETS/$MAC_FILE"
+        git rev-parse HEAD > "$OUT/mac.sha"
+    fi
+fi
+
+# ---- Wait for Windows over ssh
+if [ -n "$WIN_PID" ]; then
+    say
+    say "== Waiting for the Windows build on $WIN_SSH"
+    if ! wait "$WIN_PID"; then
+        WIN_PID=""
+        tail -30 "$OUT/windows.log" >&2
+        stop "The Windows build failed (above; whole log: $OUT/windows.log). The Mac disk image is kept, so a rerun skips it."
+    fi
+    WIN_PID=""
+    f="$(find "$OUT/windows" -name '*.zip' | head -1)"
+    [ -n "$f" ] || stop "The Windows build finished but no zip came back (log: $OUT/windows.log)."
+    cp "$f" "$ASSETS/Operandi-$VERSION-Windows-x64.zip"
 fi
 
 # ---- Wait for Linux and Windows, then fetch their files
@@ -245,7 +333,7 @@ if [ -n "$RUN_ID" ]; then
         [ -n "$f" ] || stop "The Linux build finished but left no AppImage."
         cp "$f" "$ASSETS/Operandi-$VERSION-Linux-x86_64.AppImage"
     fi
-    if [ "$WANT_WINDOWS" = 1 ]; then
+    if [ "$CI_WINDOWS" = 1 ]; then
         f="$(find "$OUT/ci" -name '*.zip' | head -1)"
         [ -n "$f" ] || stop "The Windows build finished but left no zip."
         cp "$f" "$ASSETS/Operandi-$VERSION-Windows-x64.zip"
