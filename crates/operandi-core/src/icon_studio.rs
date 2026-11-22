@@ -587,10 +587,24 @@ pub enum Sample {
     Velocity,
     /// Link Related: two keys joined by a link.
     LinkRelated,
+    /// Box Scale: keys inside a selected box with corner handles.
+    BoxScale,
+    /// Retime: keys on a curve over a two-way time arrow.
+    Retime,
+    /// Speed: a dial with a cyan-tipped needle.
+    CurveSpeed,
+    /// In slope: a key with its incoming handle selected.
+    InSlope,
+    /// Out slope: a key with its outgoing handle selected.
+    OutSlope,
+    /// Presets: three stacked cards with curve shapes.
+    CurvePresets,
+    /// Animation Editors: a panel with a curve above a row of keys.
+    AnimationEditors,
 }
 
 impl Sample {
-    pub const ALL: [Sample; 149] = [
+    pub const ALL: [Sample; 156] = [
         Sample::Cube,
         Sample::SelectedFace,
         Sample::Sphere,
@@ -740,6 +754,13 @@ impl Sample {
         Sample::IsolateCurve,
         Sample::Velocity,
         Sample::LinkRelated,
+        Sample::BoxScale,
+        Sample::Retime,
+        Sample::CurveSpeed,
+        Sample::InSlope,
+        Sample::OutSlope,
+        Sample::CurvePresets,
+        Sample::AnimationEditors,
     ];
 
     /// File stem and icon slug.
@@ -894,6 +915,13 @@ impl Sample {
             Sample::IsolateCurve => "isolate-curve",
             Sample::Velocity => "velocity",
             Sample::LinkRelated => "link-related",
+            Sample::BoxScale => "box-scale",
+            Sample::Retime => "retime",
+            Sample::CurveSpeed => "curve-speed",
+            Sample::InSlope => "in-slope",
+            Sample::OutSlope => "out-slope",
+            Sample::CurvePresets => "curve-presets",
+            Sample::AnimationEditors => "animation-editors",
         }
     }
 
@@ -3527,6 +3555,117 @@ fn sample_mesh(sample: Sample) -> Result<Mesh> {
                 let b = DVec3::new(0.32, 0.12, 0.08);
                 let (t0, t1) = (0.22 + k * 0.1, 0.22 + (k + 1.) * 0.1);
                 parts.push(tube(&[a.lerp(b, t0), a.lerp(b, t1)], 0.035, 8, "Ink")?);
+            }
+            symbol(parts)?
+        }
+        Sample::BoxScale => {
+            let (w, h) = (0.42, 0.3);
+            let mut parts = vec![
+                graph_curve(-0.3, 0.3, |x| 0.18 * (x * 6.).sin(), 0.035, "Ink")?,
+                key(-0.3, 0.18 * (-1.8f64).sin(), 0.18)?,
+                key(0.3, 0.18 * (1.8f64).sin(), 0.18)?,
+            ];
+            for (a, b) in [
+                ((-w, -h), (w, -h)),
+                ((w, -h), (w, h)),
+                ((w, h), (-w, h)),
+                ((-w, h), (-w, -h)),
+            ] {
+                parts.push(bar(a.0, a.1, b.0, b.1, 0.035, 0.04, "Selected")?);
+            }
+            for (x, y) in [(-w, -h), (w, -h), (w, h), (-w, h)] {
+                parts.push(slab(
+                    &[
+                        (x - 0.07, y - 0.07),
+                        (x + 0.07, y - 0.07),
+                        (x + 0.07, y + 0.07),
+                        (x - 0.07, y + 0.07),
+                    ],
+                    0.1,
+                    "Selected",
+                )?);
+            }
+            symbol(parts)?
+        }
+        Sample::Retime => symbol(vec![
+            graph_curve(-0.5, 0.5, |x| 0.2 * (x * 4.).sin() + 0.15, 0.035, "Ink")?,
+            key(-0.5, 0.2 * (-2f64).sin() + 0.15, 0.2)?,
+            key(0.5, 0.2 * (2f64).sin() + 0.15, 0.2)?,
+            two_way(
+                DVec3::new(-0.52, -0.3, 0.06),
+                DVec3::new(0.52, -0.3, 0.06),
+                0.04,
+                "New",
+            )?,
+        ])?,
+        Sample::CurveSpeed => {
+            let arc: Vec<DVec3> = (0..=24)
+                .map(|k| {
+                    let a = std::f64::consts::PI * f64::from(k) / 24.;
+                    DVec3::new(0.5 * a.cos(), 0.5 * a.sin() - 0.2, 0.)
+                })
+                .collect();
+            let tip = DVec3::new(0.28, 0.2, 0.06);
+            let hub = DVec3::new(0., -0.2, 0.06);
+            symbol(vec![
+                tube(&arc, 0.05, 10, CLAY)?,
+                tube(&[hub, tip], 0.04, 8, "Ink")?,
+                ball(tip, 0.07, "New")?,
+                ball(hub, 0.08, "Ink")?,
+            ])?
+        }
+        Sample::InSlope | Sample::OutSlope => {
+            let out = sample == Sample::OutSlope;
+            let wave = |x: f64| 0.12 * x - 0.25 * x * x;
+            let (sel, other) = if out {
+                (0.35, std::f64::consts::PI + 0.35)
+            } else {
+                (std::f64::consts::PI + 0.35, 0.35)
+            };
+            let mut parts = vec![
+                graph_curve(-0.55, 0.55, wave, 0.035, "Ink")?,
+                key(0., 0., 0.3)?,
+            ];
+            let len = 0.5;
+            let s_end = DVec3::new(len * sel.cos(), len * sel.sin(), 0.06);
+            parts.push(tube(
+                &[DVec3::new(0., 0., 0.06), s_end],
+                0.04,
+                8,
+                "Selected",
+            )?);
+            parts.push(ball(s_end, 0.08, "Selected")?);
+            let o_end = DVec3::new(len * other.cos(), len * other.sin(), 0.06);
+            parts.push(tube(&[DVec3::new(0., 0., 0.06), o_end], 0.025, 8, CLAY)?);
+            parts.push(ball(o_end, 0.055, CLAY)?);
+            symbol(parts)?
+        }
+        Sample::CurvePresets => {
+            // A list of three presets, each a tile with its curve shape:
+            // ease in, linear, ease out (the last one picked, cyan).
+            let mut parts = Vec::new();
+            let shapes: [fn(f64) -> f64; 3] = [|t| t * t, |t| t, |t| 1. - (1. - t) * (1. - t)];
+            for (k, f) in shapes.into_iter().enumerate() {
+                let cy = 0.36 - 0.36 * k as f64;
+                parts.push(frame_tile(0., cy, 0.5, 0.15)?);
+                parts.push(graph_curve(
+                    -0.4,
+                    0.4,
+                    move |x| cy - 0.1 + 0.2 * f((x + 0.4) / 0.8),
+                    0.035,
+                    if k == 2 { "New" } else { "Ink" },
+                )?);
+            }
+            symbol(parts)?
+        }
+        Sample::AnimationEditors => {
+            let mut parts = vec![
+                frame_tile(0., 0., 0.55, 0.45)?,
+                graph_curve(-0.45, 0.45, |x| 0.12 * (x * 5.).sin() + 0.18, 0.035, "Ink")?,
+                bar(-0.5, -0.08, 0.5, -0.08, 0.03, 0.04, CLAY)?,
+            ];
+            for x in [-0.32, 0.02, 0.3] {
+                parts.push(key(x, -0.27, 0.18)?);
             }
             symbol(parts)?
         }

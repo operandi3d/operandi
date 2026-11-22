@@ -382,6 +382,13 @@ pub enum Icon {
     IsolateCurve,
     Velocity,
     LinkRelated,
+    BoxScale,
+    Retime,
+    CurveSpeed,
+    InSlope,
+    OutSlope,
+    CurvePresets,
+    AnimationEditors,
 }
 /// One table: each icon's file in assets/icons (named as in the generator's
 /// output) and its embedded artwork. Add Loop uses the Loop Cut artwork;
@@ -803,6 +810,13 @@ icon_files! {
     IsolateCurve => "isolate-curve",
     Velocity => "velocity",
     LinkRelated => "link-related",
+    BoxScale => "box-scale",
+    Retime => "retime",
+    CurveSpeed => "curve-speed",
+    InSlope => "in-slope",
+    OutSlope => "out-slope",
+    CurvePresets => "curve-presets",
+    AnimationEditors => "animation-editors",
 }
 
 fn rasterize(icon: Icon, pixels: u32) -> Result<ColorImage, String> {
