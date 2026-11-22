@@ -396,7 +396,9 @@ pub mod viewport {
     /// values): a cool blue rising to the selection orange.
     pub const FALLOFF_COOL: Color32 = Color32::from_rgb(70, 120, 235);
     pub const FALLOFF_WARM: Color32 = SELECTION;
-    // Component-edge backing retained; face outlines intentionally have no halo.
+    // Selected and pre-highlighted edges have no dark backing either (Jason
+    // 2026-11-22: it read as a wireframe outline around the selection); the
+    // colour now only backs tool-handle lines.
     pub const EDGE_BACKING: Color32 = Color32::from_rgb(41, 44, 49);
     pub const LABEL: Color32 = Color32::from_gray(210);
     /// Viewport display styles (view_display.rs); Operandi's own choices.
