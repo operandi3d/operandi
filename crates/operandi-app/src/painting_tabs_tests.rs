@@ -161,3 +161,28 @@ fn close_scene_waits_for_its_image_save_panels() {
     assert_eq!(written.width, red_pixels.width, "the closed scene's pixels");
     assert_eq!(written.pixels, red_pixels.pixels);
 }
+
+/// Astra P7-004: saving an image under a new name after the scene was
+/// saved leaves the scene unsaved (its file still names the old image)
+/// until the scene is saved again; reopening it then finds the new file.
+#[test]
+fn image_save_as_keeps_the_scene_unsaved_until_it_names_the_file() {
+    let mut a = app();
+    a.painting.prefs.also_save_images = false;
+    let image = new_image(&mut a, "TabsRename");
+    a.execute("operandi.image.save");
+    let scene_file = scratch("rename.opscene");
+    assert!(a.save(scene_file.clone()));
+    assert!(!a.dirty());
+    let renamed = scratch("TabsRenamed-new.png");
+    a.execute(&format!(
+        "operandi.image.saveAs filename:{}",
+        renamed.display()
+    ));
+    assert!(renamed.is_file(), "{}", a.status);
+    assert!(a.dirty(), "the scene file still names the old image");
+    assert!(a.save(scene_file.clone()));
+    let reopened = operandi_core::persistence::load(&scene_file).unwrap();
+    let path = &reopened.images.iter().find(|i| i.id == image).unwrap().path;
+    assert!(path.ends_with("TabsRenamed-new.png"), "{path}");
+}

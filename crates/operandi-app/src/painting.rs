@@ -79,6 +79,11 @@ pub(crate) struct Painting {
     /// What waits for the open scene's image save panels to finish: Close
     /// Scene or the quit doesn't go on while one is open (Astra P8-001).
     pub(crate) after_images: Option<AfterImages>,
+    /// A scene save also saved images: write the scene again once they're
+    /// saved, so it names their files (Astra P7-004).
+    resave_scene: bool,
+    /// That second scene save is running (it doesn't start another).
+    resaving_scene: bool,
     /// The open scene's own image state; each parked tab keeps its own
     /// (`SceneState::images`, swapped by `exchange`; Astra P9-004/P9-005).
     pub(crate) doc: DocImages,
@@ -1267,13 +1272,16 @@ impl Operandi {
         match self.editor.save_image(image, &path) {
             Ok(()) => {
                 // Saving an image isn't a scene change of its own: the
-                // saved-scene record takes the new file name and pixels.
-                if let Some(i) = self.editor.scene.images.iter().find(|i| i.id == image) {
-                    let i = i.clone();
-                    match self.saved.images.iter_mut().find(|s| s.id == image) {
-                        Some(s) => *s = i,
-                        None => self.saved.images.push(i),
-                    }
+                // saved-scene record takes its pixels. Its file name only
+                // when the scene file already names that file: a new name
+                // isn't in the scene file yet, so the scene stays unsaved
+                // until it is (Astra P7-004; a scene save that saved new
+                // images writes the scene again, `finish_image_saves`).
+                if let Some(i) = self.editor.scene.images.iter().find(|i| i.id == image)
+                    && let Some(s) = self.saved.images.iter_mut().find(|s| s.id == image)
+                    && s.path == i.path
+                {
+                    *s = i.clone();
                 }
                 if let Some(b) = self.editor.scene.paint.buffers.get(&image) {
                     self.saved.paint.buffers.insert(image, b.clone());
@@ -1338,6 +1346,7 @@ impl Operandi {
 
     /// Every queued image save finished: carry on with what waited.
     fn finish_image_saves(&mut self) {
+        self.resave_scene_for_images();
         match self.painting.after_images.take() {
             None => {}
             Some(AfterImages::Quit) => {
@@ -1356,6 +1365,7 @@ impl Operandi {
     /// and the scene and its images stay open as they were.
     pub(crate) fn cancel_image_saves(&mut self) {
         self.painting.doc.save_queue.clear();
+        self.painting.resave_scene = false;
         if self.painting.after_images.take().is_some() {
             self.painting.quit_decided.clear();
             self.status = "Images not saved; the scene stays open".into();
@@ -1384,9 +1394,30 @@ impl Operandi {
     }
 
     /// After a scene save (PNT-33): also save changed images, when on.
+    /// Images saved under new names make the scene file out of date, so
+    /// once they are all saved the scene is written again.
     pub(crate) fn after_scene_save(&mut self) {
+        if self.painting.resaving_scene {
+            return;
+        }
         if self.painting.prefs.also_save_images && !self.editor.changed_images().is_empty() {
+            self.painting.resave_scene = true;
             self.save_all_images();
+            if !self.image_saves_pending() {
+                self.resave_scene_for_images();
+            }
+        }
+    }
+
+    /// The scene save that names the images just saved (Astra P7-004).
+    fn resave_scene_for_images(&mut self) {
+        if !std::mem::take(&mut self.painting.resave_scene) || !self.dirty() {
+            return;
+        }
+        if let Some(path) = self.path.clone() {
+            self.painting.resaving_scene = true;
+            self.save(path);
+            self.painting.resaving_scene = false;
         }
     }
 
