@@ -559,10 +559,38 @@ pub enum Sample {
     DiscardKeys,
     /// Auto Key: a cyan key ringed by a turning arrow.
     AutoKey,
+    /// Graph Editor: a dark curve with cyan keys on a tile.
+    GraphEditor,
+    /// Key Keeping Shape: a new cyan key set on a curve that keeps its shape.
+    KeyKeepingShape,
+    /// Break: a key whose two selected handles point apart.
+    BreakTangents,
+    /// Unify: a key whose selected handles line up.
+    UnifyTangents,
+    /// Pre behaviour: a curve repeated before its first key.
+    PreBehaviour,
+    /// Post behaviour: a curve repeated after its last key.
+    PostBehaviour,
+    /// Cycle: a wave with a turning arrow.
+    CycleCurve,
+    /// Shadow copy: a curve and its grey shadow.
+    ShadowCopy,
+    /// Shadow swap: a curve and its shadow with a two-way arrow.
+    ShadowSwap,
+    /// Normalised: a wave held between two bars.
+    Normalised,
+    /// Stacked: three curves one above another.
+    Stacked,
+    /// Isolate: one cyan curve among grey ones.
+    IsolateCurve,
+    /// Velocity: a curve with an arrow along its slope.
+    Velocity,
+    /// Link Related: two keys joined by a link.
+    LinkRelated,
 }
 
 impl Sample {
-    pub const ALL: [Sample; 135] = [
+    pub const ALL: [Sample; 149] = [
         Sample::Cube,
         Sample::SelectedFace,
         Sample::Sphere,
@@ -698,6 +726,20 @@ impl Sample {
         Sample::ApplyKeys,
         Sample::DiscardKeys,
         Sample::AutoKey,
+        Sample::GraphEditor,
+        Sample::KeyKeepingShape,
+        Sample::BreakTangents,
+        Sample::UnifyTangents,
+        Sample::PreBehaviour,
+        Sample::PostBehaviour,
+        Sample::CycleCurve,
+        Sample::ShadowCopy,
+        Sample::ShadowSwap,
+        Sample::Normalised,
+        Sample::Stacked,
+        Sample::IsolateCurve,
+        Sample::Velocity,
+        Sample::LinkRelated,
     ];
 
     /// File stem and icon slug.
@@ -838,6 +880,20 @@ impl Sample {
             Sample::ApplyKeys => "apply-keys",
             Sample::DiscardKeys => "discard-keys",
             Sample::AutoKey => "auto-key",
+            Sample::GraphEditor => "graph-editor",
+            Sample::KeyKeepingShape => "key-keeping-shape",
+            Sample::BreakTangents => "break-tangents",
+            Sample::UnifyTangents => "unify-tangents",
+            Sample::PreBehaviour => "pre-behaviour",
+            Sample::PostBehaviour => "post-behaviour",
+            Sample::CycleCurve => "cycle-curve",
+            Sample::ShadowCopy => "shadow-copy",
+            Sample::ShadowSwap => "shadow-swap",
+            Sample::Normalised => "normalised",
+            Sample::Stacked => "stacked",
+            Sample::IsolateCurve => "isolate-curve",
+            Sample::Velocity => "velocity",
+            Sample::LinkRelated => "link-related",
         }
     }
 
@@ -1771,6 +1827,40 @@ fn frame_tile(cx: f64, cy: f64, w: f64, h: f64) -> Result<Mesh> {
 fn symbol(parts: Vec<Mesh>) -> Result<Mesh> {
     let q = symbol_frame();
     Ok(deformed(merge(parts)?, |v| q * v))
+}
+
+/// A curve in the symbol plane: `y = f(x)` from `x0` to `x1`, as a tube
+/// raised a little off any tile behind it.
+fn graph_curve(x0: f64, x1: f64, f: impl Fn(f64) -> f64, radius: f64, tag: &str) -> Result<Mesh> {
+    let pts: Vec<DVec3> = (0..=32)
+        .map(|k| {
+            let x = x0 + (x1 - x0) * f64::from(k) / 32.;
+            DVec3::new(x, f(x), 0.04)
+        })
+        .collect();
+    tube(&pts, radius, 10, tag)
+}
+
+/// The graph editor's sample curve: an S from low left to high right.
+fn s_curve(x: f64) -> f64 {
+    0.28 * (x * 4.2).sin() + 0.1 * x
+}
+
+/// A key with two selected tangent handles at `left` and `right`
+/// (angles, radians, from +X), `len` long.
+fn key_handles(cx: f64, cy: f64, left: f64, right: f64, len: f64) -> Result<Vec<Mesh>> {
+    let mut parts = vec![key(cx, cy, 0.3)?];
+    for a in [left, right] {
+        let end = DVec3::new(cx + len * a.cos(), cy + len * a.sin(), 0.06);
+        parts.push(tube(
+            &[DVec3::new(cx, cy, 0.06), end],
+            0.035,
+            8,
+            "Selected",
+        )?);
+        parts.push(ball(end, 0.07, "Selected")?);
+    }
+    Ok(parts)
 }
 
 /// The geometry of a sample, inside the icon box.
@@ -3311,6 +3401,134 @@ fn sample_mesh(sample: Sample) -> Result<Mesh> {
                     CLAY,
                 )?,
             ])?
+        }
+        Sample::GraphEditor => symbol(vec![
+            frame_tile(0., 0., 0.55, 0.45)?,
+            graph_curve(-0.45, 0.45, s_curve, 0.04, "Ink")?,
+            key(-0.45, s_curve(-0.45), 0.2)?,
+            key(0., s_curve(0.), 0.2)?,
+            key(0.45, s_curve(0.45), 0.2)?,
+        ])?,
+        Sample::KeyKeepingShape => symbol(vec![
+            graph_curve(-0.55, 0.55, s_curve, 0.045, "Ink")?,
+            key(-0.55, s_curve(-0.55), 0.2)?,
+            key(0.55, s_curve(0.55), 0.2)?,
+            deformed(key(0.18, s_curve(0.18), 0.32)?, |v| v + DVec3::Z * 0.06),
+        ])?,
+        Sample::BreakTangents => {
+            let mut parts = vec![graph_curve(
+                -0.55,
+                0.55,
+                |x| -0.3 * x * x * 2.,
+                0.035,
+                "Ink",
+            )?];
+            parts.extend(key_handles(0., 0., 2.4, 0.35, 0.5)?);
+            symbol(parts)?
+        }
+        Sample::UnifyTangents => {
+            let mut parts = vec![graph_curve(-0.55, 0.55, |x| 0.35 * x, 0.035, "Ink")?];
+            parts.extend(key_handles(0., 0., std::f64::consts::PI + 0.3, 0.3, 0.5)?);
+            symbol(parts)?
+        }
+        Sample::PreBehaviour | Sample::PostBehaviour => {
+            // The curve between its keys, dark; its repeat outside them,
+            // grey; a cyan arrow pointing the way the repeat runs.
+            let post = sample == Sample::PostBehaviour;
+            let side = if post { 1. } else { -1. };
+            let wave = |x: f64| 0.22 * (x * 7.).sin() - 0.1;
+            let (main, rep) = if post {
+                ((-0.55, 0.), (0., 0.55))
+            } else {
+                ((0., 0.55), (-0.55, 0.))
+            };
+            symbol(vec![
+                graph_curve(main.0, main.1, wave, 0.045, "Ink")?,
+                graph_curve(rep.0, rep.1, wave, 0.03, CLAY)?,
+                bar(0., -0.42, 0., 0.42, 0.04, 0.05, CLAY)?,
+                arrow(
+                    DVec3::new(side * 0.08, 0.38, 0.08),
+                    DVec3::new(side * 0.55, 0.38, 0.08),
+                    0.04,
+                    "New",
+                )?,
+            ])?
+        }
+        Sample::CycleCurve => {
+            let arc: Vec<DVec3> = (0..=24)
+                .map(|k| {
+                    let a = 0.6 + std::f64::consts::TAU * 0.75 * f64::from(k) / 24.;
+                    DVec3::new(0.3 * a.cos(), 0.3 * a.sin() + 0.12, 0.08)
+                })
+                .collect();
+            let n = arc.len();
+            symbol(vec![
+                graph_curve(-0.55, 0.55, |x| 0.18 * (x * 8.).sin() - 0.3, 0.04, "Ink")?,
+                tube(&arc[..n - 2], 0.04, 10, "New")?,
+                arrow(
+                    arc[n - 3],
+                    arc[n - 1] + (arc[n - 1] - arc[n - 3]),
+                    0.04,
+                    "New",
+                )?,
+            ])?
+        }
+        Sample::ShadowCopy => symbol(vec![
+            graph_curve(-0.5, 0.5, |x| s_curve(x) - 0.18, 0.05, CLAY)?,
+            graph_curve(-0.5, 0.5, |x| s_curve(x) + 0.12, 0.04, "Ink")?,
+        ])?,
+        Sample::ShadowSwap => symbol(vec![
+            graph_curve(-0.55, 0.3, |x| s_curve(x) - 0.2, 0.05, CLAY)?,
+            graph_curve(-0.55, 0.3, |x| s_curve(x) + 0.12, 0.04, "Ink")?,
+            two_way(
+                DVec3::new(0.45, -0.35, 0.08),
+                DVec3::new(0.45, 0.4, 0.08),
+                0.035,
+                "New",
+            )?,
+        ])?,
+        Sample::Normalised => symbol(vec![
+            bar(-0.55, 0.35, 0.55, 0.35, 0.05, 0.05, "New")?,
+            bar(-0.55, -0.35, 0.55, -0.35, 0.05, 0.05, "New")?,
+            graph_curve(-0.5, 0.5, |x| 0.3 * (x * 6.).sin(), 0.04, "Ink")?,
+        ])?,
+        Sample::Stacked => {
+            let mut parts = Vec::new();
+            for y in [-0.36, 0., 0.36] {
+                parts.push(graph_curve(
+                    -0.5,
+                    0.5,
+                    move |x| y + 0.1 * (x * 6. + y * 5.).sin(),
+                    0.04,
+                    "Ink",
+                )?);
+            }
+            symbol(parts)?
+        }
+        Sample::IsolateCurve => symbol(vec![
+            graph_curve(-0.5, 0.5, |x| 0.3 * (x * 4.).sin() + 0.15, 0.025, CLAY)?,
+            graph_curve(-0.5, 0.5, |x| -0.25 * (x * 3.).cos(), 0.025, CLAY)?,
+            graph_curve(-0.5, 0.5, s_curve, 0.055, "New")?,
+        ])?,
+        Sample::Velocity => {
+            let x = -0.05;
+            let slope = (s_curve(x + 0.01) - s_curve(x - 0.01)) / 0.02;
+            let d = DVec3::new(1., slope, 0.).normalize();
+            let p = DVec3::new(x, s_curve(x), 0.1);
+            symbol(vec![
+                graph_curve(-0.55, 0.55, s_curve, 0.04, "Ink")?,
+                arrow(p, p + d * 0.55, 0.045, "New")?,
+            ])?
+        }
+        Sample::LinkRelated => {
+            let mut parts = vec![key(-0.32, -0.12, 0.34)?, key(0.32, 0.12, 0.34)?];
+            for k in [0., 2., 4.] {
+                let a = DVec3::new(-0.32, -0.12, 0.08);
+                let b = DVec3::new(0.32, 0.12, 0.08);
+                let (t0, t1) = (0.22 + k * 0.1, 0.22 + (k + 1.) * 0.1);
+                parts.push(tube(&[a.lerp(b, t0), a.lerp(b, t1)], 0.035, 8, "Ink")?);
+            }
+            symbol(parts)?
         }
         Sample::LoopSlice => {
             let mut parts = vec![sample_mesh(Sample::Cube)?];
