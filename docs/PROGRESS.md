@@ -4375,3 +4375,8 @@ Design: docs/MATERIALX_GRAPHS.md (stages 1-5).
 - Time and keys: scene time settings, key curves with Smooth Flat (TK-13 values to 1e-4), slope types, keys on transforms and item channels, status lights, S / Shift+S / Shift+W/E/R/Y, right-click key menu, Auto Key Off/Animated/All, edited-not-keyed lights with Apply/Discard, playback and stepping, Cycles renders the current pose.
 - Timeline: ruler, range bar, key time, markers and range markers, track row with key select/move/scale/copy/paste/slopes, Animate layout and menu, Render Frame Range and Playblast, USD export of animated transforms, cameras and lights as time samples. Every action is a command the MCP bridge can run; `operandi.anim.query` reads everything back.
 - Provisional: see SPECIFICATION_QUESTIONS.md, "Animation phases 1-2". Graph editor, rigs and USD import of animation are later phases.
+
+## 2026-11-22 — Forum wireframe fix (branch forum-wireframe-gizmo)
+
+- Wire edges no longer vanish near the camera: an edge with one end behind the near clip is cut there instead of dropped, on the GPU wire (`edge_out_fading`) and the CPU overlay lines (`Camera::project_segment`). After a wheel zoom to a surface the near clip now scales with the view distance, so moving far away again keeps depth precision (the wire stayed sunk in its polygons before).
+- Not changed: the gizmo report needs a design choice (FG-Q01, FG-Q02).

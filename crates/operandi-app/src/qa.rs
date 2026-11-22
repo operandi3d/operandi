@@ -101,6 +101,17 @@ pub fn offscreen(environment: app_environment::AppEnvironment) -> Result<()> {
             *value = text.parse().map_err(|_| "Invalid QA camera number")?;
         }
     }
+    // The orbit centre as "x,y,z" (with DISTANCE, puts the eye anywhere).
+    if let Ok(text) = std::env::var("OPERANDI_QA_TARGET") {
+        let v: Vec<f64> = text
+            .split(',')
+            .filter_map(|s| s.trim().parse().ok())
+            .collect();
+        let [x, y, z] = v[..] else {
+            return Err("QA target must be x,y,z".into());
+        };
+        app.camera.target = DVec3::new(x, y, z);
+    }
     if let Ok(plane) = std::env::var("OPERANDI_QA_FIXED_PLANE") {
         app.editor.scene.workplane.fixed = true;
         app.editor.scene.workplane.plane = plane.parse().map_err(|_| "Invalid QA plane")?;

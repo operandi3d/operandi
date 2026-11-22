@@ -9593,3 +9593,8 @@ Built from BEHAVIOR-TOPOLOGY-PEN (2026-11-20) on branch topology-pen. These are 
 - TL-Q06 USD: TL-83's Animation option is a `scene.saveAs animation:on|off|current` argument; the File > Export dialog has no control for it yet (always on). Lights export intensity and colour samples; cameras focal length, apertures, f-stop and focus distance.
 - TL-Q07 The Animate layout uses the Model toolbox set; an animation toolbox set (UIC-197) waits for its icons.
 - Command names are Operandi's own (`operandi.time.*`, `operandi.key.*`, `operandi.marker.*`, `operandi.channel.select`, `operandi.anim.*`, `operandi.render.frameRange`, `operandi.view.playblast`): the name map has none (UIC-165).
+
+## Forum gizmo report (2026-11-22)
+
+- FG-Q01 Plane circles under a non-World action axis: the arrows follow the action axis but the circles stay flat in world planes (PH-21, provisional), placed at the arrows' corners, so they look skewed or edge-on away from the gizmo (forum screenshot). Options: (a) circles lie in their two arrows' plane and drag along those arrows; (b) world circles at the world-axis corners; (c) hide the circles unless the axis is World.
+- FG-Q02 Selection and Local axes on a ring around a hole (a tunnel loop): the polygons' normals nearly cancel, and the small leftover picks the in-plane axes, so with uneven segments the gizmo spins around the tunnel direction by an arbitrary angle (an arch ring: 125°). Should a vote whose normals mostly cancel count as "no common normal" (Local: axes from the ring's shape; Selection: its current "indeterminate" message), and below what share?

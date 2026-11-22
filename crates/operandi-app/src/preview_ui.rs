@@ -245,6 +245,7 @@ fn orbit_from(view: &operandi_cycles::View, distance: f64) -> Camera {
         through_item: None,
         light: None,
         near_depth: f64::INFINITY,
+        near_distance: f64::INFINITY,
     }
 }
 

@@ -568,6 +568,7 @@ fn lay40_view_cameras_survive_restart_and_layout_switching() {
         // An Alt+Shift+wheel field of view is the view's own and stays.
         lens: 1.125,
         near_depth: 0.004,
+        near_distance: 0.02,
         ..Camera::default()
     };
     let top = Camera {
