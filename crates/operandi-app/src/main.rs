@@ -891,6 +891,8 @@ struct Operandi {
     palettes: palettes::Palettes,
     /// The timeline strip (timeline.rs) and the animation jobs (anim_ui.rs).
     timeline: timeline::Timeline,
+    /// The graph editor window (graph_editor.rs).
+    graph: graph_editor::GraphEditor,
     anim_ui: anim_ui::AnimUi,
     /// The Form Editor (layouts stage 7, form_editor.rs).
     form_editor: form_editor::State,
@@ -1544,6 +1546,7 @@ impl Operandi {
             view_passive: false,
             palettes: Default::default(),
             timeline: Default::default(),
+            graph: Default::default(),
             anim_ui: Default::default(),
             form_editor: Default::default(),
             field_rects: BTreeMap::new(),
@@ -3569,6 +3572,7 @@ mod floating;
 mod form_editor;
 #[cfg(test)]
 mod form_editor_tests;
+mod graph_editor;
 mod guides_ui;
 mod matcap_render;
 mod materialx_ui;

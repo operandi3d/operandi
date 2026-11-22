@@ -323,6 +323,70 @@ pub struct Animation {
     pub settings: TimeSettings,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub markers: Vec<Marker>,
+    /// GE-80: shadow copies of curves, by channel (saved; native v61).
+    #[serde(
+        default,
+        skip_serializing_if = "BTreeMap::is_empty",
+        with = "shadow_list"
+    )]
+    pub shadows: BTreeMap<ChannelKey, Curve>,
+}
+
+mod shadow_list {
+    use super::ChannelKey;
+    use crate::anim_curve::Curve;
+    use serde::{Deserialize, Deserializer, Serialize, Serializer};
+    use std::collections::BTreeMap;
+
+    #[derive(Serialize, Deserialize)]
+    #[serde(deny_unknown_fields)]
+    struct Entry {
+        item: u64,
+        channel: String,
+        curve: Curve,
+    }
+    pub fn serialize<S: Serializer>(
+        map: &BTreeMap<ChannelKey, Curve>,
+        s: S,
+    ) -> Result<S::Ok, S::Error> {
+        map.iter()
+            .map(|(k, c)| Entry {
+                item: k.item,
+                channel: k.channel.clone(),
+                curve: c.clone(),
+            })
+            .collect::<Vec<_>>()
+            .serialize(s)
+    }
+    pub fn deserialize<'de, D: Deserializer<'de>>(
+        d: D,
+    ) -> Result<BTreeMap<ChannelKey, Curve>, D::Error> {
+        Ok(Vec::<Entry>::deserialize(d)?
+            .into_iter()
+            .map(|e| {
+                (
+                    ChannelKey {
+                        item: e.item,
+                        channel: e.channel,
+                    },
+                    e.curve,
+                )
+            })
+            .collect())
+    }
+}
+
+impl Animation {
+    /// Anything phase 3 added to the file (behaviours, cycles, shadows):
+    /// saved as native version 61. Weights, manual and broken handles were
+    /// already in version 60's keys.
+    pub fn has_graph_editor_data(&self) -> bool {
+        !self.shadows.is_empty()
+            || self
+                .channels
+                .values()
+                .any(|c| !c.curve.pre.is_constant() || !c.curve.post.is_constant() || c.curve.cycle)
+    }
 }
 
 fn is_default_settings(s: &TimeSettings) -> bool {
@@ -1146,6 +1210,7 @@ impl crate::Editor {
                         curve: Curve {
                             keys: Vec::new(),
                             stepped,
+                            ..Default::default()
                         },
                         rest: old,
                     });

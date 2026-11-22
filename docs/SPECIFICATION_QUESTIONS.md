@@ -9643,3 +9643,13 @@ Built from BEHAVIOR-TOPOLOGY-PEN (2026-11-20) on branch topology-pen. These are 
 
 - FG-Q01 Plane circles under a non-World action axis: the arrows follow the action axis but the circles stay flat in world planes (PH-21, provisional), placed at the arrows' corners, so they look skewed or edge-on away from the gizmo (forum screenshot). Options: (a) circles lie in their two arrows' plane and drag along those arrows; (b) world circles at the world-axis corners; (c) hide the circles unless the axis is World.
 - FG-Q02 Selection and Local axes on a ring around a hole (a tunnel loop): the polygons' normals nearly cancel, and the small leftover picks the in-plane axes, so with uneven segments the gizmo spins around the tunnel direction by an arbitrary angle (an arch ring: 125°). Should a vote whose normals mostly cancel count as "no common normal" (Local: axes from the ring's shape; Selection: its current "indeterminate" message), and below what share?
+
+## Graph editor, phase 3 (BEHAVIOR-GRAPH-EDITOR) — 2026-11-22 (branch animation-held, provisional)
+- GE-Q01 Weighted handles: a weight scales the handle to `weight × a third of the segment` in time; weight 1 is exactly the plain (Hermite) curve. Weights run 0.01-3.
+- GE-Q02 Slopes in commands and the query are per frame (`operandi.key.handle slope:`), as the graph shows them; curves store them per second.
+- GE-Q03 Constant Smooth, Oscillate Smooth and Offset Repeat Smooth behave as their plain versions until the spec says how they differ. Linear extends along the end key's slope.
+- GE-Q04 Cycle (GE-62) forces the last key to the first key's value and gives it the first key's out slope as its in slope.
+- GE-Q05 Key Keeping Shape sets the new key and its two neighbours to Manual slopes (today's values), which keeps a cubic curve exactly.
+- GE-Q06 Set Frame (absolute) moves the earliest selected key to the frame and keeps the others' spacing; ripple and per-channel linking aren't built.
+- GE-Q07 Shown curves: the selected channels; with none selected, the listed items' animated channels. Normalised and Stacked map each curve's key range; Isolate shows the first selected key's curve.
+- GE-Q08 Not built yet: Box Scale tool (GE-44), Ctrl+Shift+drag copies (GE-31), Ctrl+Alt+right box zoom, Link related keys (GE-42), Speed view (GE-81), envelope presets (GE-83), stacked-row wheel stepping, clamped hint (GE-X4), retime tool (GE-X5), the in/out slope pop-ups (the menu and presets cover them).

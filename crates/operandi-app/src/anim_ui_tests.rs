@@ -225,3 +225,56 @@ fn playblast_frames_encode_to_a_movie() {
     assert!(!frames.exists(), "the frames folder goes");
     let _ = std::fs::remove_dir_all(&dir);
 }
+
+/// GE-01..93 in the app: the graph editor opens from its command, draws
+/// the ball's curve, its keys select the same keys as the track row, a
+/// drag is one undo step, and its view lines work.
+#[test]
+fn graph_editor_opens_draws_and_shares_the_selection() {
+    let ctx = Context::default();
+    let (mut a, id) = items_app();
+    frames(&mut a, &ctx, 1);
+    let y = format!("{id}:pos.Y");
+    for (f, v) in [(0, 2.), (12, 0.), (24, 2.)] {
+        a.execute(&format!("operandi.key.add channel:{y} frame:{f} value:{v}"));
+    }
+    a.execute("operandi.graph.open");
+    a.execute(&format!("operandi.channel.select channel:{y}"));
+    frames(&mut a, &ctx, 3);
+    assert!(a.graph.open);
+    let rect = a.graph.graph_rect.expect("the graph drew");
+    assert!(rect.width() > 100.);
+    // GE-91: the selection is the track row's.
+    a.execute(&format!("operandi.key.select keys:{y}@12"));
+    a.execute("operandi.anim.timeline open:tall");
+    frames(&mut a, &ctx, 2);
+    assert_eq!(a.editor.live_selected_keys().len(), 1);
+    // A drag's result is one command, one undo step (GE-45).
+    let steps = a.editor.undo.len();
+    a.execute("operandi.key.offset frames:1 value:0.5");
+    assert_eq!(a.editor.undo.len(), steps + 1);
+    for line in [
+        "operandi.graph.view fit:all",
+        "operandi.graph.view normalise:toggle stacked:toggle isolate:toggle",
+        "operandi.graph.view velocity:true shadow:true",
+        "operandi.curve.shadow action:copy",
+        "operandi.curve.behavior post:repeat",
+    ] {
+        a.execute(line);
+        frames(&mut a, &ctx, 1);
+    }
+    assert!(a.graph.normalised && a.graph.stacked && a.graph.isolate);
+    a.execute("operandi.graph.open open:false");
+    frames(&mut a, &ctx, 1);
+    assert!(a.graph.graph_rect.is_none());
+}
+
+#[test]
+fn graph_keys_go_through_the_routing_seam() {
+    let lines: Vec<&str> = crate::anim_keys::GRAPH_KEYS
+        .iter()
+        .map(|(_, _, l)| *l)
+        .collect();
+    assert!(lines.contains(&"operandi.graph.view fit:all"));
+    assert!(lines.contains(&"operandi.graph.view normalise:toggle"));
+}

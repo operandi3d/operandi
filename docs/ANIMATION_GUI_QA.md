@@ -24,3 +24,12 @@ named "Operandi Animation". Each step also once typed in the command line.
 9. Animate > Export USD Animation…: open the file in Blender, the ball
    bounces the same way.
 10. Undo walks back each key step; scrubbing never appears in Undo.
+
+## Graph editor (phase 3)
+
+11. Animate > Graph Editor: the ball's Y curve shows sharp contacts and eased tops. Click a key: it's selected in the track row too.
+12. Drag the top key up: the arc is higher; Undo takes it back in one step. Middle-drag moves values only, right-drag times only.
+13. Select the contact key, Break, drag its out handle: the bounce changes, the key shows magenta.
+14. Post menu > Repeat: the curve repeats past the last key; Cycle: the last key snaps to the first, a ghost square shows its own value.
+15. Shadow Copy, edit, Swap, Swap: back where it started.
+16. A, Shift+A, F, N over the graph; wheel zoom, Alt+middle-drag pan.

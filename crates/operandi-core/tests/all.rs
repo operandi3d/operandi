@@ -42,6 +42,8 @@ mod action_centers;
 mod active_task;
 #[path = "add_loop_slide_options.rs"]
 mod add_loop_slide_options;
+#[path = "animation_graph.rs"]
+mod animation_graph;
 #[path = "animation_time_keys.rs"]
 mod animation_time_keys;
 #[path = "animation_timeline.rs"]

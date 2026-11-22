@@ -281,6 +281,7 @@ impl Editor {
                         curve: Curve {
                             keys: Vec::new(),
                             stepped,
+                            ..Default::default()
                         },
                         rest: v,
                     });
@@ -458,6 +459,7 @@ impl Editor {
                 let mut curve = Curve {
                     keys: Vec::new(),
                     stepped,
+                    ..Default::default()
                 };
                 for f in fa..=fb {
                     let t = rate.tick_of(f);
@@ -812,6 +814,7 @@ impl Editor {
                         curve: Curve {
                             keys: Vec::new(),
                             stepped,
+                            ..Default::default()
                         },
                         rest: now,
                     });
