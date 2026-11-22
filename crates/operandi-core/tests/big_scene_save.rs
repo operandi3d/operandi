@@ -157,7 +157,7 @@ fn a_failed_save_keeps_the_old_file_and_leaves_no_temporary() {
     // Unwritable: a folder that doesn't exist.
     let missing = dir.join("no-such-folder").join("Big.opscene");
     let error = persistence::save(&missing, &grid_scene(100, 1)).unwrap_err();
-    assert!(error.contains("Cannot create save temporary"), "{error}");
+    assert!(error.contains("Cannot create a temporary file"), "{error}");
     // Replacing a file whose name is taken by a folder fails at the rename.
     let blocked = dir.join("Blocked.opscene");
     std::fs::create_dir(&blocked).unwrap();
@@ -167,7 +167,7 @@ fn a_failed_save_keeps_the_old_file_and_leaves_no_temporary() {
     let leftovers: Vec<_> = std::fs::read_dir(&dir)
         .unwrap()
         .filter_map(|e| e.ok())
-        .filter(|e| e.file_name().to_string_lossy().ends_with(".tmp"))
+        .filter(|e| e.file_name().to_string_lossy().ends_with("tmp"))
         .collect();
     assert!(leftovers.is_empty(), "{leftovers:?}");
     std::fs::remove_dir_all(&dir).unwrap();

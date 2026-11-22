@@ -1210,6 +1210,12 @@ pub fn save(path: &Path, scene: &Scene) -> Result<()> {
     let data = encode(relative.as_ref().unwrap_or(scene))?;
     write_atomic(path, &data)
 }
+/// Tests: the next save on this thread fails before writing anything
+/// (`operandi_files::refuse_next_write_on_this_thread`).
+#[doc(hidden)]
+pub fn refuse_next_save_on_this_thread() {
+    operandi_files::refuse_next_write_on_this_thread();
+}
 pub(crate) fn write_atomic(path: &Path, data: &[u8]) -> Result<()> {
     path.file_name().ok_or("Choose a scene file path")?;
     operandi_files::write_atomic(path, data)

@@ -22,6 +22,18 @@ use std::sync::atomic::{AtomicU64, Ordering};
 
 static NEXT: AtomicU64 = AtomicU64::new(0);
 
+thread_local! {
+    static REFUSE_NEXT: std::cell::Cell<bool> = const { std::cell::Cell::new(false) };
+}
+
+/// Tests: the next write on this thread fails as if its temporary file
+/// couldn't be created, so a test can check what a failed save leaves.
+/// (Temporary names are unique, so a planted file can't cause it.)
+#[doc(hidden)]
+pub fn refuse_next_write_on_this_thread() {
+    REFUSE_NEXT.with(|r| r.set(true));
+}
+
 /// A temporary name beside `path` that no other call or process uses. The
 /// destination's own extension stays last, for tools watching the folder.
 fn temporary_beside(path: &Path) -> Result<PathBuf, String> {
@@ -53,6 +65,12 @@ pub fn write_atomic_with(
     fill: impl FnOnce(&Path) -> Result<(), String>,
 ) -> Result<(), String> {
     let temp = temporary_beside(path)?;
+    if REFUSE_NEXT.with(|r| r.replace(false)) {
+        return Err(format!(
+            "Cannot create a temporary file beside {}: refused for a test",
+            path.display()
+        ));
+    }
     OpenOptions::new()
         .write(true)
         .create_new(true)

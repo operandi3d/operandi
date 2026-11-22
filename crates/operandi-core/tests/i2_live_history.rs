@@ -595,6 +595,9 @@ fn actual_temp_collision_preserves_v0_blocker_and_both_stage_owners() {
             begin(&mut e);
         }
         let before = e.clone();
+        // The planted temporary no longer collides (unique names), so the
+        // failure is injected.
+        operandi_core::persistence::refuse_next_save_on_this_thread();
         assert!(e.save_committed(&path).is_err());
         assert!(e == before);
         assert_eq!(std::fs::read(&path).unwrap(), original);
