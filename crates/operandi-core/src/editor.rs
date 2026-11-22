@@ -548,9 +548,8 @@ pub struct Checkpoint {
     /// The command lines that made this step (UIC-226).
     pub records: crate::StepRecords,
 }
-/// Most memory the undo history's item copies take (`trim_undo_memory`):
-/// 4 GiB, about 12 steps of a 100,000-item scene and every step of one
-/// under 10,000 items.
+/// Most memory the undo history takes (`trim_undo_memory`), counting the
+/// mesh data each step alone keeps (undo_memory.rs).
 pub const UNDO_MEMORY_BUDGET: usize = 4 << 30;
 /// Merge Tool's Distance after Reset (recorded, VTO-D0-05).
 pub const MERGE_TOOL_DISTANCE: f64 = 0.001;
@@ -5743,17 +5742,32 @@ impl Editor {
         self.trim_undo_memory_to(self.undo_memory_budget.unwrap_or(UNDO_MEMORY_BUDGET));
     }
     /// `trim_undo_memory` with another budget, in bytes.
+    /// The history counts the mesh data each step alone keeps alive
+    /// (undo_memory.rs, limits sweep A1), and is held to at most half of
+    /// the memory free beside it, when a free-memory source is set. The
+    /// newest step is always kept.
     pub fn trim_undo_memory_to(&mut self, budget: usize) {
-        let size = |c: &Checkpoint| {
-            (c.before.items.len() + c.after.items.len()) * std::mem::size_of::<crate::Item>()
+        let costs = crate::undo_memory::step_costs(&self.scene, &self.undo, &self.redo);
+        let mut total: usize = costs.iter().sum();
+        let budget = match self.free_memory {
+            crate::FreeMemory(Some(free)) => {
+                let free = usize::try_from(free()).unwrap_or(usize::MAX);
+                budget.min(total.saturating_add(free) / 2)
+            }
+            crate::FreeMemory(None) => budget,
         };
-        let mut total: usize = self.undo.iter().map(|c| size(c)).sum();
         let mut excess = 0;
         while total > budget && excess + 1 < self.undo.len() {
-            total -= size(&self.undo[excess]);
+            total -= costs[excess];
             excess += 1;
         }
         self.undo.drain(..excess);
+    }
+    /// The bytes the undo history holds beyond the scene and redo list.
+    pub fn undo_memory_bytes(&self) -> usize {
+        crate::undo_memory::step_costs(&self.scene, &self.undo, &self.redo)
+            .iter()
+            .sum()
     }
     /// Action frame of a tool session, resolved against world-space positions
     /// for component editing (shared by the editor and viewport handles).

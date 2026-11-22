@@ -302,6 +302,7 @@ pub mod persistence;
 pub mod preset;
 pub mod primitive;
 pub mod transform_repeat;
+mod undo_memory;
 pub use primitive::*;
 pub mod primitive_uv;
 pub mod project;

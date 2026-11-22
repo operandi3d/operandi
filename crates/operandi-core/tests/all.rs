@@ -618,6 +618,8 @@ mod tweak_oracles;
 mod twist_bevel;
 #[path = "undo_fold.rs"]
 mod undo_fold;
+#[path = "undo_memory_budget.rs"]
+mod undo_memory_budget;
 #[path = "unit_primitive_clean_spec.rs"]
 mod unit_primitive_clean_spec;
 #[path = "unit_primitives.rs"]

@@ -78,6 +78,11 @@ impl<T> Shared<T> {
     pub fn same(a: &Self, b: &Self) -> bool {
         Arc::ptr_eq(&a.0, &b.0)
     }
+    /// The allocation's address: an identity while the handle is alive
+    /// (undo_memory.rs counts each allocation once).
+    pub(crate) fn addr(&self) -> usize {
+        Arc::as_ptr(&self.0) as *const () as usize
+    }
     /// Runs `check` unless it already passed for this exact allocation.
     /// Callers must always pass the same pure check for a given `T`.
     pub(crate) fn checked(&self, check: impl FnOnce(&T) -> crate::Result<()>) -> crate::Result<()> {
