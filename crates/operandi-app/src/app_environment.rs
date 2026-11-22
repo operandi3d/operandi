@@ -410,6 +410,15 @@ impl AppPaths {
     pub fn crashes(&self) -> PathBuf {
         self.data_root.join(crate::bug_report::CRASH_FOLDER)
     }
+    /// Report Bug's window screenshots (bug_report_capture.rs).
+    pub fn reports(&self) -> PathBuf {
+        self.data_root
+            .join(crate::bug_report_capture::REPORTS_FOLDER)
+    }
+    /// One-time tips already shown (report_bug_dialog.rs, BUG-24).
+    pub fn tips(&self) -> PathBuf {
+        self.data_root.join("tips.json")
+    }
     /// Main window size, place and maximised/fullscreen state (window_state.rs).
     pub fn main_window(&self) -> PathBuf {
         self.data_root.join("main-window.json")

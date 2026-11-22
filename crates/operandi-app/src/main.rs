@@ -40,6 +40,7 @@ mod boolean_dialog;
 mod branding;
 mod bridge_panel;
 mod bug_report;
+mod bug_report_capture;
 mod button_variants;
 mod camera;
 mod camera_light_handles;
@@ -218,6 +219,7 @@ mod replica_rows;
 #[cfg(test)]
 mod replica_safety_tests;
 mod replicator_ui;
+mod report_bug_dialog;
 mod resource_write;
 mod scale_offset_dialog;
 mod scenes;
@@ -535,6 +537,10 @@ struct Operandi {
     /// The USD import options dialog (docs/BEHAVIOR-USD-IMPORT.md).
     usd_import: Option<usd_import_dialog::UsdImportDialog>,
     flip_it: Option<flip_it_dialog::FlipItDialog>,
+    /// Help > Report Bug or Idea…'s capture and dialog (report_bug_dialog.rs).
+    report_bug: report_bug_dialog::ReportBug,
+    /// The last file shown in Finder by Report Bug (tests read it).
+    revealed_path: Option<PathBuf>,
     /// Edit tab Subdivide/UnSubdivide/Freeze dialogs and saved settings.
     subdivide_ui: subdivide_ui::SubdivideUi,
     unify_count: Option<usize>,
@@ -1107,6 +1113,7 @@ impl Operandi {
             app.set_mcp(&cc.egui_ctx, true);
         }
         let _ = std::fs::create_dir_all(app.environment.paths().data_root());
+        app.first_run_tip();
         app.viewport_preferences = viewport_preferences::ViewportPreferences::load(
             &app.environment.paths().viewport_display(),
         );
@@ -1315,6 +1322,8 @@ impl Operandi {
             unify: None,
             usd_import: None,
             flip_it: None,
+            report_bug: Default::default(),
+            revealed_path: None,
             subdivide_ui: Default::default(),
             unify_count: None,
             scene_fraction: 0.5,
@@ -2574,6 +2583,7 @@ impl Operandi {
             (self.file_error.is_some(), "file error"),
             (self.unify.is_some(), "Unify dialog"),
             (self.flip_it.is_some(), "Flip It dialog"),
+            (self.report_bug.is_modal(), "Report Bug or Idea dialog"),
             (self.unify_count.is_some(), "Unify result"),
             (self.preset_dialog.is_some(), "preset dialog"),
             (self.subdivide_ui.open(), "Subdivide dialog"),
@@ -3327,6 +3337,7 @@ impl Operandi {
         self.unify_dialog(ctx);
         self.usd_import_dialog(ctx);
         self.flip_it_dialog(ctx);
+        self.report_bug_frame(ctx);
         self.subdivide_dialogs(ctx);
         self.detriangulate_dialog(ctx);
         self.curves_color_dialog(ctx);

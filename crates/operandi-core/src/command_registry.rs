@@ -3824,8 +3824,17 @@ pub static COMMANDS: &[Entry] = &[
         .example("operandi.toolbox.tab uv")
         .ui(),
     // The Help menu (Jason 2026-11-16): Report Bug moved off the layout bar.
-    script("operandi.help.reportBug", Help, "Opens the bug report form on GitHub in the browser, its Environment filled in with this build, the system and recent log lines; the form links to the idea form. Nothing is sent until you submit it there.")
+    // Report Bug's capture (BUG-19): bare opens the dialog; all four
+    // options skip it (UIC-162).
+    script("operandi.help.reportBug", Help, "Opens the bug report form on GitHub in the browser, filled in with this build and system and, as chosen, the tool and selection, recent commands and recent log; a screenshot of the window is saved in the reports folder and put on the clipboard to paste in. The form links to the idea form. Nothing is sent until you submit it there. Give all four options to skip the dialog.")
         .operandi()
+        .args(&[
+            opt("screenshot", BOOL, N, Some("true")),
+            opt("toolState", BOOL, N, Some("true")),
+            opt("commands", BOOL, N, Some("true")),
+            opt("log", BOOL, N, Some("true")),
+        ])
+        .example("operandi.help.reportBug screenshot:false toolState:true commands:true log:true")
         .ui().side_effect(),
     script("operandi.help.documentation", Help, "Opens Operandi's documentation in the browser. Not available until the documentation is published.")
         .operandi()
