@@ -242,6 +242,103 @@ fn every_open_scene_has_its_own_journal_and_all_are_recovered() {
     assert_eq!(b.editor.scene, first);
 }
 
+/// A new run on `a`'s data folder that has read the journals, as at launch.
+fn relaunch(a: &Operandi) -> Operandi {
+    let mut b = Operandi::with_environment(a.environment.clone());
+    b.initialize_new_document();
+    b.read_recovery();
+    b
+}
+
+/// Astra P7-001: Cancel on Recover Scene keeps the journals for the next
+/// launch, and closing or quitting this session must not delete them.
+#[test]
+fn cancelled_recovery_survives_close_scene_and_quit() {
+    let mut a = app();
+    edit(&mut a);
+    a.journal();
+    let first = a.editor.scene.clone();
+    a.request_file(FileAction::New);
+    edit(&mut a);
+    a.journal();
+    let second = a.editor.scene.clone();
+    assert_eq!(scenes::journal_files(&a.environment).len(), 2);
+
+    // Cancel, then Close Scene on the (clean) new scene.
+    let mut b = relaunch(&a);
+    b.keep_journals();
+    b.close_active_scene();
+    assert_eq!(scenes::journal_files(&b.environment).len(), 2);
+    // Cancel, then edit, discard and quit.
+    let mut c = relaunch(&a);
+    c.keep_journals();
+    edit(&mut c);
+    c.continue_quit();
+    assert!(c.allow_close);
+    assert_eq!(scenes::journal_files(&c.environment).len(), 2);
+    // Both journals are still offered.
+    let d = relaunch(&a);
+    assert_eq!(d.recovery.as_ref(), Some(&first));
+    assert_eq!(d.recovery_more, vec![second]);
+}
+
+/// Astra P7-002: a damaged first journal doesn't hide the healthy ones,
+/// and Recover or Discard never deletes a journal that couldn't be read.
+#[test]
+fn a_damaged_journal_neither_hides_healthy_ones_nor_gets_deleted() {
+    let mut a = app();
+    edit(&mut a);
+    a.journal();
+    a.request_file(FileAction::New);
+    edit(&mut a);
+    a.journal();
+    let second = a.editor.scene.clone();
+    let files = scenes::journal_files(&a.environment);
+    assert_eq!(files.len(), 2);
+    std::fs::write(&files[0], b"{ not a scene").unwrap();
+
+    let mut b = relaunch(&a);
+    let warning = b
+        .recovery_warning
+        .clone()
+        .expect("the damaged one is reported");
+    assert!(warning.contains("Diagnostic copy"), "{warning}");
+    assert_eq!(
+        b.recovery.as_ref(),
+        Some(&second),
+        "the healthy one is offered"
+    );
+    assert!(b.recovery_more.is_empty());
+    b.recovery_warning = None; // OK on the notice
+    b.recover_journals();
+    assert_eq!(b.editor.scene, second);
+    // The recovered scene journals under the open tab's slot; the second
+    // slot's old journal went with the recovery.
+    assert!(b.journal_path().exists());
+    assert!(!files[1].exists(), "the recovered journal was replaced");
+    let copies = std::fs::read_dir(files[0].parent().unwrap())
+        .unwrap()
+        .flatten()
+        .filter(|e| e.file_name().to_string_lossy().contains("-corrupt-"))
+        .count();
+    assert_eq!(copies, 1, "the damaged journal was copied aside");
+
+    // Discard deletes only what it read: a damaged second journal stays.
+    let mut c = app();
+    edit(&mut c);
+    c.journal();
+    c.request_file(FileAction::New);
+    edit(&mut c);
+    c.journal();
+    let files = scenes::journal_files(&c.environment);
+    std::fs::write(&files[1], b"garbage").unwrap();
+    let mut d = relaunch(&c);
+    assert!(d.recovery.is_some() && d.recovery_warning.is_some());
+    d.discard_journals();
+    assert!(!files[0].exists());
+    assert!(files[1].exists(), "an unreadable journal is never deleted");
+}
+
 #[test]
 fn command_w_closes_the_scene_not_the_app() {
     let events = [Event::Key {

@@ -962,6 +962,10 @@ struct Operandi {
     /// Journals of further scenes open at the crash, restored with
     /// `recovery` into their own tabs.
     recovery_more: Vec<Scene>,
+    /// The journal files `recovery` and `recovery_more` were read from.
+    /// Recover and Discard delete only these; a journal that couldn't be
+    /// read is never deleted (Astra P7-002).
+    recovery_paths: Vec<PathBuf>,
     /// The open scenes (scenes.rs); the edited one's state is in the fields
     /// above.
     scenes: scenes::OpenScenes,
@@ -1581,6 +1585,7 @@ impl Operandi {
             held_tab: Vec::new(),
             recovery: None,
             recovery_more: Vec::new(),
+            recovery_paths: Vec::new(),
             scenes: Default::default(),
             journaled: None,
             journal_written: None,
@@ -1621,45 +1626,109 @@ impl Operandi {
             env!("CARGO_MANIFEST_DIR"),
         ))
     }
+    /// Reads every recovery journal on its own (Astra P7-002): each healthy
+    /// one is offered, in slot order, and a damaged one neither hides the
+    /// others nor gets deleted. A damaged journal is copied aside for
+    /// diagnosis first; if that copy fails, recovery writes stay off this
+    /// session so nothing overwrites the original.
     fn read_recovery(&mut self) {
-        // Journals of further scenes; one that doesn't load is left alone.
-        let path = self.environment.paths().recovery();
-        self.recovery_more = scenes::journal_files(&self.environment)
-            .into_iter()
-            .filter(|p| *p != path)
-            .filter_map(|p| persistence::load(&p).ok())
-            .collect();
-        if !path.exists() {
-            if !self.recovery_more.is_empty() {
-                self.recovery = Some(self.recovery_more.remove(0));
-            }
-            return;
-        }
-        match persistence::load(&path) {
-            Ok(scene) => self.recovery = Some(scene),
-            Err(e) => {
-                let stamp = std::time::SystemTime::now()
-                    .duration_since(std::time::UNIX_EPOCH)
-                    .map(|d| d.as_nanos())
-                    .unwrap_or(0);
-                let backup = path.with_file_name(format!("recovery-corrupt-{stamp}.opscene"));
-                match std::fs::copy(&path, &backup) {
-                    Ok(_) => {
-                        self.recovery_warning = Some(format!(
+        let mut scenes = Vec::new();
+        let mut paths = Vec::new();
+        let mut problems = Vec::new();
+        let stamp = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .map(|d| d.as_nanos())
+            .unwrap_or(0);
+        for path in scenes::journal_files(&self.environment) {
+            match persistence::load(&path) {
+                Ok(scene) => {
+                    scenes.push(scene);
+                    paths.push(path);
+                }
+                Err(e) => {
+                    let stem = path
+                        .file_stem()
+                        .map(|s| s.to_string_lossy().into_owned())
+                        .unwrap_or_else(|| "recovery".into());
+                    let backup = path.with_file_name(format!("{stem}-corrupt-{stamp}.opscene"));
+                    match std::fs::copy(&path, &backup) {
+                        Ok(_) => problems.push(format!(
                             "{e}. Diagnostic copy preserved at {}",
                             backup.display()
-                        ))
-                    }
-                    Err(copy) => {
-                        self.journal_blocked = true;
-                        self.recovery_warning = Some(format!(
-                            "{e}; backup failed: {copy}. Original journal is preserved at {}; recovery writes disabled for this session",
-                            path.display()
-                        ));
+                        )),
+                        Err(copy) => {
+                            self.journal_blocked = true;
+                            problems.push(format!(
+                                "{e}; backup failed: {copy}. Original journal is preserved at {}; recovery writes disabled for this session",
+                                path.display()
+                            ));
+                        }
                     }
                 }
             }
         }
+        self.recovery_warning = (!problems.is_empty()).then(|| problems.join("\n\n"));
+        self.recovery_paths = paths;
+        let mut scenes = scenes.into_iter();
+        self.recovery = scenes.next();
+        self.recovery_more = scenes.collect();
+    }
+    /// Recover Scene, OK: the first journal's scene replaces the new one
+    /// and each further one opens in its own tab. The journals that were
+    /// read are replaced by the recovered tabs' own; the first is written
+    /// at once so the work is never only in memory.
+    fn recover_journals(&mut self) {
+        let Some(scene) = self.recovery.take() else {
+            return;
+        };
+        let more = std::mem::take(&mut self.recovery_more);
+        let first = self.journal_path();
+        for path in std::mem::take(&mut self.recovery_paths) {
+            if path != first {
+                let _ = std::fs::remove_file(path);
+            }
+        }
+        self.editor = Editor {
+            scene,
+            ..Default::default()
+        };
+        self.name = self
+            .editor
+            .scene
+            .active()
+            .map(|i| i.name.clone())
+            .unwrap_or_default();
+        self.path = None;
+        self.saved = Scene::default();
+        self.clear_fields();
+        self.status = "Recovered unsaved scene; Save As to preserve it".into();
+        self.frame(false);
+        self.journal();
+        if !more.is_empty() {
+            let count = more.len() + 1;
+            self.recover_extra_scenes(more);
+            self.status = format!("Recovered {count} unsaved scenes; Save As to preserve them");
+        }
+    }
+    /// Recover Scene, Discard: deletes the journals that were read (never
+    /// one that couldn't be read).
+    fn discard_journals(&mut self) {
+        self.recovery = None;
+        self.recovery_more.clear();
+        for path in std::mem::take(&mut self.recovery_paths) {
+            let _ = std::fs::remove_file(path);
+        }
+    }
+    /// Recover Scene, Cancel: keeps every journal for the next launch. No
+    /// recovery writes or journal deletions happen this session (UIC-96),
+    /// so Close Scene and Quit leave them too (Astra P7-001).
+    fn keep_journals(&mut self) {
+        self.recovery = None;
+        self.recovery_more.clear();
+        self.recovery_paths.clear();
+        self.journal_blocked = true;
+        self.status =
+            "Recovery journal kept for the next launch; this session isn't journaled".into();
     }
     fn clear_fields(&mut self) {
         self.bridge_ui = Default::default();

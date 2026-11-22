@@ -378,7 +378,11 @@ impl Operandi {
         if let Some(job) = self.journal_job.take() {
             let _ = job.join();
         }
-        let _ = std::fs::remove_file(self.journal_path());
+        // A blocked session keeps the earlier session's journals on disk
+        // (Recover Scene, Cancel); closing must not delete them (P7-001).
+        if !self.journal_blocked {
+            let _ = std::fs::remove_file(self.journal_path());
+        }
         self.journaled = None;
         if self.scenes.tabs.len() == 1 {
             self.initialize_new_document();
@@ -428,8 +432,12 @@ impl Operandi {
         if let Some(job) = self.journal_job.take() {
             let _ = job.join();
         }
-        for tab in &self.scenes.tabs {
-            let _ = std::fs::remove_file(slot_path(&self.environment, tab.slot));
+        // Unless the journals on disk belong to an earlier session the
+        // user chose to keep (Recover Scene, Cancel; Astra P7-001).
+        if !self.journal_blocked {
+            for tab in &self.scenes.tabs {
+                let _ = std::fs::remove_file(slot_path(&self.environment, tab.slot));
+            }
         }
         self.journaled = None;
         self.allow_close = true;
