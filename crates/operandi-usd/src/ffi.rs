@@ -17,7 +17,7 @@ use std::sync::OnceLock;
 
 /// Must equal OU_ABI_VERSION in bridge/operandi_usd.h. Bump both whenever a
 /// shared struct, enum value or function changes.
-pub const OU_ABI_VERSION: u32 = 9;
+pub const OU_ABI_VERSION: u32 = 10;
 
 #[repr(C)]
 pub struct OuXform {
@@ -218,6 +218,21 @@ unsafe extern "C" {
     ) -> *mut OuStage;
     fn ou_stage_open(path: *const c_char, error: *mut c_char, error_len: usize) -> *mut OuStage;
     fn ou_stage_free(stage: *mut OuStage);
+    fn ou_stage_set_time(
+        stage: *mut OuStage,
+        fps: f64,
+        start: f64,
+        end: f64,
+        error: *mut c_char,
+        error_len: usize,
+    ) -> i32;
+    fn ou_set_samples(
+        stage: *mut OuStage,
+        path: *const c_char,
+        json: *const c_char,
+        error: *mut c_char,
+        error_len: usize,
+    ) -> i32;
     fn ou_stage_set_metadata(
         stage: *mut OuStage,
         up_axis: c_char,
@@ -503,6 +518,23 @@ impl Stage {
                 error,
                 TEXT_LEN,
             )
+        })
+    }
+
+    /// TL-80: `framesPerSecond`, `timeCodesPerSecond`, start and end time
+    /// codes.
+    pub fn set_time(&self, fps: f64, start: f64, end: f64) -> Result<()> {
+        // SAFETY: live stage, TEXT_LEN error buffer.
+        self.call(|error| unsafe { ou_stage_set_time(self.0, fps, start, end, error, TEXT_LEN) })
+    }
+
+    /// TL-81: time samples on the Xform at `path` (anim_usd::json).
+    pub fn set_samples(&self, path: &str, json: &str) -> Result<()> {
+        let path = c_string(path);
+        let json = c_string(json);
+        // SAFETY: live stage, valid C strings, TEXT_LEN error buffer.
+        self.call(|error| unsafe {
+            ou_set_samples(self.0, path.as_ptr(), json.as_ptr(), error, TEXT_LEN)
         })
     }
 
@@ -983,6 +1015,7 @@ pub fn write(
         light: None,
         children: Vec::new(),
         instancers: Vec::new(),
+        anim: None,
     };
     let root_path = stage.define_xform("/", &root, plan.root_matrix)?;
     let scope = format!("{root_path}/_materials");
@@ -1042,6 +1075,10 @@ pub fn write(
     ))?;
     // Operandi works in metres.
     stage.set_metadata(plan.up_axis, 1.0, &root_path)?;
+    // TL-80: frame rate and time range for the samples.
+    if let Some(t) = plan.time {
+        stage.set_time(t.fps, t.start, t.end)?;
+    }
     stage.save()
 }
 
@@ -1061,6 +1098,7 @@ fn plain_xform(name: &str, visible: bool) -> XformPrim {
         light: None,
         children: Vec::new(),
         instancers: Vec::new(),
+        anim: None,
     }
 }
 
@@ -1109,14 +1147,23 @@ fn write_prim(
         let holder = stage.define_xform(&path, &plain_xform(&prim.name, instance.visible), None)?;
         stage.make_instance(&holder, prototype)?;
     }
+    let mut child = None;
     if let Some(camera) = &prim.camera {
         let at = stage.define_camera(&path, &prim.name, camera)?;
         if camera.render {
-            *written.render_camera.borrow_mut() = Some(at);
+            *written.render_camera.borrow_mut() = Some(at.clone());
         }
+        child = Some(at);
     }
     if let Some(light) = &prim.light {
-        stage.define_light(&path, &prim.name, light, None)?;
+        child = Some(stage.define_light(&path, &prim.name, light, None)?);
+    }
+    // TL-81: the item's time samples, on its ops and its camera or light.
+    if let Some(samples) = &prim.anim {
+        stage.set_samples(
+            &path,
+            &crate::anim_usd::json(samples, prim.order as u32, child.as_deref()),
+        )?;
     }
     for child in &prim.children {
         write_prim(stage, &path, child, written, depth + 1)?;

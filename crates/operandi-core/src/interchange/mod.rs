@@ -445,6 +445,31 @@ pub struct IoOptions {
     /// written Y-up (glTF's rule, and the common one for OBJ and STL), so
     /// another up axis turns geometry on the way in and out.
     pub up_axis: u8,
+    /// TL-83: USD export of animation.
+    pub usd_animation: UsdAnimation,
+}
+
+/// TL-83: what a USD export writes of the scene's animation.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub enum UsdAnimation {
+    /// Time samples once a frame across the scene range (TL-80..82).
+    #[default]
+    On,
+    /// No time samples: the scene as it stands now.
+    Off,
+    /// No time samples, and the stage's range is the current frame.
+    CurrentFrame,
+}
+
+impl UsdAnimation {
+    pub fn parse(word: &str) -> Option<Self> {
+        match word.to_ascii_lowercase().as_str() {
+            "on" | "true" => Some(Self::On),
+            "off" | "false" => Some(Self::Off),
+            "current" | "currentframe" => Some(Self::CurrentFrame),
+            _ => None,
+        }
+    }
 }
 impl IoOptions {
     /// The turn from a Y-up file to the scene.
@@ -472,6 +497,7 @@ impl Default for IoOptions {
             gltf_tangents: false,
             gltf_short_indices: false,
             up_axis: 1,
+            usd_animation: UsdAnimation::On,
         }
     }
 }

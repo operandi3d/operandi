@@ -94,6 +94,8 @@ impl FileIoPreferences {
             gltf_tangents: self.gltf_tangents,
             gltf_short_indices: self.gltf_short_indices,
             up_axis: crate::camera::up_axis(),
+            // TL-83: animation on; scene.saveAs animation: picks per export.
+            usd_animation: Default::default(),
         });
     }
     pub fn image(&self) -> ImageOptions {

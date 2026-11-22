@@ -76,6 +76,9 @@ pub struct Plan {
     pub instancers: Vec<crate::point_instancer::InstancerPrim>,
     /// The Render item as UsdRender settings (render_usd.rs).
     pub render: crate::render_usd::RenderPlan,
+    /// The stage's frame rate and time range when animation is written
+    /// (anim_usd.rs, TL-80).
+    pub time: Option<crate::anim_usd::StageTime>,
     pub notes: Vec<String>,
 }
 
@@ -114,6 +117,9 @@ pub struct XformPrim {
     pub children: Vec<XformPrim>,
     /// Scatters of child Mesh Instances (point_instancer.rs).
     pub instancers: Vec<crate::point_instancer::InstancerPrim>,
+    /// Time samples of its animated transform, camera or light values
+    /// (anim_usd.rs, TL-81).
+    pub anim: Option<Box<crate::anim_usd::Samples>>,
 }
 
 /// One USD mesh: an item's plain polygons, or its subdivision polygons.
@@ -171,6 +177,7 @@ pub fn plan(scene: &Scene, options: &IoOptions) -> Result<Plan> {
         prototypes: Vec::new(),
         instancers: Vec::new(),
         render: crate::render_usd::plan(scene),
+        time: crate::anim_usd::stage_time(scene, options.usd_animation),
         notes: Vec::new(),
     };
     let ids: BTreeSet<u64> = scene.items.iter().map(|i| i.id).collect();
@@ -184,6 +191,7 @@ pub fn plan(scene: &Scene, options: &IoOptions) -> Result<Plan> {
     }
     let mut skipped = Skipped::default();
     let mut notes = Notes::new(scene);
+    notes.frames = crate::anim_usd::frames(scene, options.usd_animation);
     notes.instances = instance_groups(scene);
     notes.mesh_lights = crate::mesh_lights::carried(scene, &mut notes.lights);
     let (scattered, instancers) =
@@ -461,6 +469,10 @@ fn item_prim(
         light,
         children: kids,
         instancers,
+        anim: notes
+            .frames
+            .as_ref()
+            .and_then(|f| crate::anim_usd::item_samples(f, scene, item.id)),
     }))
 }
 
@@ -556,6 +568,7 @@ pub(crate) fn instance_prototype(
         light: None,
         children: Vec::new(),
         instancers: Vec::new(),
+        anim: None,
     });
     let k = plan.prototypes.len() - 1;
     notes.prototype_of.insert(source_id, k);
@@ -586,12 +599,15 @@ pub(crate) struct Notes<'s> {
     extra_normal_maps: usize,
     /// Mesh lights their prototype's mesh carries (mesh_lights.rs).
     mesh_lights: BTreeMap<u64, crate::mesh_lights::Carried>,
+    /// The scene posed at each animation sample time (anim_usd.rs).
+    frames: Option<crate::anim_usd::Frames>,
 }
 impl<'s> Notes<'s> {
     fn new(scene: &'s Scene) -> Self {
         Self {
             materials: crate::materials::Collector::new(scene),
             mesh_lights: BTreeMap::new(),
+            frames: None,
             lights: Vec::new(),
             polylines: 0,
             scattered: 0,

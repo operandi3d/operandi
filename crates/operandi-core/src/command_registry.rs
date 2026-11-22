@@ -4614,12 +4614,18 @@ pub static COMMANDS: &[Entry] = &[
                 "boolean",
                 "Accepted; here scene.saveAs always exports.",
             ),
+            jopt(
+                "animation",
+                "string",
+                "USD: on (default; time samples once a frame over the scene range), off, or current (the current frame only).",
+            ),
         ],
         )
         .args(&[
             opt("filename", ArgType::Path, N, None),
             opt("format", EXPORT_FORMATS, N, None),
             opt("export", BOOL, N, Some("false")),
+            opt("animation", ArgType::Choice(&["on", "off", "current"]), N, None),
         ]).side_effect(),
     script("scene.close", Files, "Closes the current scene (asks first when it has unsaved changes).").side_effect(),
     script("scene.closeAll", Files, "Asks to close every open scene.").side_effect(),
