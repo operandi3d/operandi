@@ -9,6 +9,8 @@ description = "Operandi's paintable images: pixel buffers, image commands and fi
 # operandi-core/painting); release and tester builds leave it out.
 
 [dependencies]
+# The one safe file writer (fsync, then rename; Astra P9-003).
+operandi-files = { path = "../operandi-files" }
 # Reading and writing PNG, TGA, TIFF, JPEG and OpenEXR images; already in
 # the build through operandi-app, same version and features.
 image = { version = "=0.25.10", default-features = false, features = ["png", "jpeg", "exr", "tiff", "tga"] }

@@ -1,10 +1,6 @@
 use crate::{Result, Scene};
 use serde::{Deserialize, Serialize};
-use std::{
-    fs::{self, File, OpenOptions},
-    io::{Read, Write},
-    path::Path,
-};
+use std::{fs::File, io::Read, path::Path};
 /// Largest scene file read. Writing has no limit. This was a fixed 64 MiB
 /// for writing and reading alike, which refused scenes of a few hundred
 /// thousand polygons; reading is now checked section by section instead
@@ -1206,8 +1202,9 @@ fn relative_preset_images(path: &Path, preset: &crate::preset::Preset) -> Option
     }
     Some(scene)
 }
-/// Same-directory create-new temporary, flush+sync, atomic rename. Errors retain
-/// the previous destination. No existing temporary is overwritten.
+/// Written through the one safe file writer (`operandi_files`): a unique
+/// temporary beside the file, synced, then renamed over it. Errors keep
+/// the previous file; no existing temporary is overwritten.
 ///
 /// Files inside the project enclosing `path` are written project-relative
 /// (`project_paths`); the scene in memory is left as it is.
@@ -1219,29 +1216,8 @@ pub fn save(path: &Path, scene: &Scene) -> Result<()> {
     write_atomic(path, &data)
 }
 pub(crate) fn write_atomic(path: &Path, data: &[u8]) -> Result<()> {
-    let name = path
-        .file_name()
-        .ok_or("Choose a scene file path")?
-        .to_string_lossy();
-    let temp = path.with_file_name(format!(".{name}.{}.tmp", std::process::id()));
-    let mut created = false;
-    let result = (|| {
-        let mut file = OpenOptions::new()
-            .write(true)
-            .create_new(true)
-            .open(&temp)
-            .map_err(|e| format!("Cannot create save temporary: {e}"))?;
-        created = true;
-        file.write_all(data)
-            .and_then(|_| file.sync_all())
-            .map_err(|e| format!("Cannot write scene: {e}"))?;
-        fs::rename(&temp, path).map_err(|e| format!("Cannot replace scene: {e}"))?;
-        Ok(())
-    })();
-    if result.is_err() && created {
-        let _ = fs::remove_file(&temp);
-    }
-    result
+    path.file_name().ok_or("Choose a scene file path")?;
+    operandi_files::write_atomic(path, data)
 }
 
 /// Check extension and source identity before creating any output temporary.

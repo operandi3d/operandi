@@ -243,21 +243,10 @@ pub fn save(image: &PaintImage, path: &Path) -> Result<()> {
 
 /// Runs `write` on a temporary file beside `path`, then renames it over.
 pub fn write_atomic(path: &Path, write: impl FnOnce(&Path) -> Result<()>) -> Result<()> {
-    let name = path
-        .file_name()
-        .map(|n| n.to_string_lossy().into_owned())
-        .unwrap_or_else(|| "image".into());
-    // Keep the extension last: the encoders pick nothing from it, but
-    // other tools watching the folder do.
-    let temp = path.with_file_name(format!(".{name}.operandi-tmp"));
-    if let Err(e) = write(&temp) {
-        let _ = std::fs::remove_file(&temp);
-        return Err(e);
-    }
-    std::fs::rename(&temp, path).map_err(|e| {
-        let _ = std::fs::remove_file(&temp);
-        format!("Cannot write {}: {e}", path.display())
-    })
+    // A unique temporary, synced before the rename (Astra P9-003): image
+    // writes used a fixed temporary name and never reached the disk before
+    // replacing a good file.
+    operandi_files::write_atomic_with(path, write)
 }
 
 #[cfg(test)]

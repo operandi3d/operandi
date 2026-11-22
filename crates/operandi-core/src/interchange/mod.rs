@@ -745,31 +745,8 @@ fn write_atomic(path: &Path, data: &[u8]) -> Result<()> {
 /// empty first so an existing file is never taken over.
 fn write_atomic_with(path: &Path, fill: impl FnOnce(&Path) -> Result<()>) -> Result<()> {
     refuse_scene_file(path)?;
-    let name = path
-        .file_name()
-        .ok_or("Choose a file to export to")?
-        .to_string_lossy();
-    let temp = path.with_file_name(format!(".{name}.{}.tmp", std::process::id()));
-    let mut created = false;
-    let result = (|| {
-        OpenOptions::new()
-            .write(true)
-            .create_new(true)
-            .open(&temp)
-            .map_err(|e| format!("Cannot create export temporary: {e}"))?;
-        created = true;
-        fill(&temp)?;
-        OpenOptions::new()
-            .write(true)
-            .open(&temp)
-            .and_then(|f| f.sync_all())
-            .map_err(|e| format!("Cannot write export: {e}"))?;
-        fs::rename(&temp, path).map_err(|e| format!("Cannot replace {}: {e}", path.display()))
-    })();
-    if result.is_err() && created {
-        let _ = fs::remove_file(&temp);
-    }
-    result
+    path.file_name().ok_or("Choose a file to export to")?;
+    operandi_files::write_atomic_with(path, fill)
 }
 
 /// Export never replaces an Operandi scene.

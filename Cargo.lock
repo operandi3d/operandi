@@ -2844,6 +2844,7 @@ dependencies = [
  "gltf",
  "manifold-csg",
  "operandi-alembic",
+ "operandi-files",
  "operandi-paint",
  "operandi-remesh",
  "operandi-uv",
@@ -2867,6 +2868,10 @@ dependencies = [
  "operandi-core",
  "serde_json",
 ]
+
+[[package]]
+name = "operandi-files"
+version = "0.1.0"
 
 [[package]]
 name = "operandi-layout"
@@ -2895,6 +2900,7 @@ version = "0.1.0"
 dependencies = [
  "craft-psd",
  "image",
+ "operandi-files",
 ]
 
 [[package]]
