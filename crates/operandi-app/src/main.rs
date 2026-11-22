@@ -1,6 +1,7 @@
 mod about;
 mod absolute_scaling_ui;
 mod add_browser;
+mod anim_keys;
 mod anim_ui;
 #[cfg(test)]
 mod anim_ui_tests;

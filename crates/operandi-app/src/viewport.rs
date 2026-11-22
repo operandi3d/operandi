@@ -1756,52 +1756,56 @@ impl Operandi {
                     Color32::WHITE,
                 );
             }
-            self.draw_backdrop_outline(&painter, r);
-            self.draw_locators(&painter, r);
-            self.draw_selection_normals(&painter, r);
-            self.draw_item_labels(&painter, r);
-            self.draw_item_extras(&painter, r);
-            // CP-A06: the hovered item's Tooltip.
-            if self
-                .editor
-                .scene
-                .items
-                .iter()
-                .any(|i| !i.common.extras.tooltip.is_empty())
-                && self.navigation.is_none()
-                && let Some(p) = ctx.pointer_hover_pos().filter(|p| r.contains(*p))
-                && let Some(tip) = self.item_tooltip(p, r)
-            {
-                let galley = painter.layout_no_wrap(
-                    tip,
-                    FontId::proportional(12.),
-                    theme::viewport::selection(),
-                );
-                let at = p + vec2(14., 14.);
-                painter.rect_filled(
-                    Rect::from_min_size(at, galley.size()).expand(3.),
-                    3.,
-                    theme::viewport::colored_wire(),
-                );
-                painter.galley(at, galley, theme::viewport::selection());
-            }
-            self.draw_item_handles(&painter, r);
-            self.draw_camera_overlay(&painter, r);
-            self.draw_render_frame(&painter, r);
-            self.draw_overlays(&painter, r);
-            // Window > Frame Time, or while an orbit benchmark runs.
-            if self.show_frame_time || self.orbit_bench.is_some() {
-                painter.text(
-                    r.right_top() + vec2(-10., 10.),
-                    Align2::RIGHT_TOP,
-                    format!(
-                        "{}\n{}",
-                        self.frame_stats.label(),
-                        self.frame_stats.rebuilds_label()
-                    ),
-                    FontId::monospace(12.),
-                    theme::text(),
-                );
+            // TL-71: a playblast records the view without its overlays.
+            let hud = !self.playblasting();
+            if hud {
+                self.draw_backdrop_outline(&painter, r);
+                self.draw_locators(&painter, r);
+                self.draw_selection_normals(&painter, r);
+                self.draw_item_labels(&painter, r);
+                self.draw_item_extras(&painter, r);
+                // CP-A06: the hovered item's Tooltip.
+                if self
+                    .editor
+                    .scene
+                    .items
+                    .iter()
+                    .any(|i| !i.common.extras.tooltip.is_empty())
+                    && self.navigation.is_none()
+                    && let Some(p) = ctx.pointer_hover_pos().filter(|p| r.contains(*p))
+                    && let Some(tip) = self.item_tooltip(p, r)
+                {
+                    let galley = painter.layout_no_wrap(
+                        tip,
+                        FontId::proportional(12.),
+                        theme::viewport::selection(),
+                    );
+                    let at = p + vec2(14., 14.);
+                    painter.rect_filled(
+                        Rect::from_min_size(at, galley.size()).expand(3.),
+                        3.,
+                        theme::viewport::colored_wire(),
+                    );
+                    painter.galley(at, galley, theme::viewport::selection());
+                }
+                self.draw_item_handles(&painter, r);
+                self.draw_camera_overlay(&painter, r);
+                self.draw_render_frame(&painter, r);
+                self.draw_overlays(&painter, r);
+                // Window > Frame Time, or while an orbit benchmark runs.
+                if self.show_frame_time || self.orbit_bench.is_some() {
+                    painter.text(
+                        r.right_top() + vec2(-10., 10.),
+                        Align2::RIGHT_TOP,
+                        format!(
+                            "{}\n{}",
+                            self.frame_stats.label(),
+                            self.frame_stats.rebuilds_label()
+                        ),
+                        FontId::monospace(12.),
+                        theme::text(),
+                    );
+                }
             }
             let hovered_component = if self.editor.live.is_none() && self.rollovers_on() {
                 response
@@ -1812,7 +1816,10 @@ impl Operandi {
             };
             // Every shown active mesh draws its points and edges
             // (multi_active.rs).
-            let shown_active = self.editor.scene.shown_active_meshes();
+            let mut shown_active = self.editor.scene.shown_active_meshes();
+            if !hud {
+                shown_active.clear();
+            }
             for item in self
                 .editor
                 .scene

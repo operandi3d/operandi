@@ -442,13 +442,108 @@ impl Animation {
 /// transform axis, or a number, on/off, choice or colour component channel
 /// of its `item.channel` tables whose setter posing can apply.
 pub fn keyable(scene: &Scene, id: u64, name: &str) -> bool {
-    read(scene, &ChannelKey::new(id, name)).is_some() && {
-        let k = ChannelKey::new(id, name);
-        transform_part(name).is_some() || {
-            let mut probe = scene.clone();
-            read(scene, &k).is_some_and(|v| write(&mut probe, &k, v).is_ok())
-        }
+    if transform_part(name).is_some() {
+        return read(scene, &ChannelKey::new(id, name)).is_some();
     }
+    let (base, part) = split_component(name);
+    let target = Target::Item(id);
+    let Some(channel) = channels::find(scene, target, base) else {
+        return false;
+    };
+    let numeric = match (channel.ty, part) {
+        (ChannelType::Colour, Some(_)) => true,
+        (ChannelType::Text | ChannelType::ItemRef | ChannelType::Colour, _) | (_, Some(_)) => false,
+        _ => true,
+    };
+    // Its setter's command is one posing can apply (`apply_quietly`).
+    numeric
+        && (channel.get)(scene, target)
+            .and_then(|v| (channel.set)(scene, target, v).ok())
+            .is_some_and(|c| posable(&c))
+}
+
+/// The commands posing writes straight into the scene.
+fn posable(c: &crate::Command) -> bool {
+    use crate::Command;
+    matches!(
+        c,
+        Command::ItemTransform { .. }
+            | Command::EditLight { .. }
+            | Command::EditCamera { .. }
+            | Command::EditItemCommon { .. }
+    )
+}
+
+/// The keyable channel a property row's edit `command` sets (UIC-112):
+/// the item and channel name (a colour gives its three components). The
+/// app's shared row helpers ask this so every keyable row gets its light.
+pub fn channel_of_command(scene: &Scene, command: &crate::Command) -> Option<(u64, Vec<String>)> {
+    use crate::Command;
+    let item = match command {
+        Command::EditLight { item, .. } | Command::EditCamera { item, .. } => *item,
+        Command::EditItemCommon { items, .. } => *items.first()?,
+        _ => return None,
+    };
+    // A setter's command and the row's are the same edit when their debug
+    // text matches up to the edit's value.
+    // The edit's variant path (`Extra/DrawOptions/Enable`, `Intensity`):
+    // the names that open a bracket, values left out.
+    fn path(debug: &str) -> String {
+        let mut out = Vec::new();
+        let mut word = String::new();
+        for ch in debug.chars() {
+            if ch.is_alphanumeric() || ch == '_' {
+                word.push(ch);
+                continue;
+            }
+            if (ch == '(' || ch == '{') && word.starts_with(|c: char| c.is_uppercase()) {
+                out.push(std::mem::take(&mut word));
+            } else if ch != ' ' {
+                if !word.is_empty() && out.is_empty() {
+                    // A bare unit variant: its own name.
+                    out.push(std::mem::take(&mut word));
+                }
+                if ch != ' ' && !out.is_empty() && !word.is_empty() {
+                    break;
+                }
+            }
+            word.clear();
+        }
+        if out.is_empty() && !word.is_empty() {
+            out.push(word);
+        }
+        out.join("/")
+    }
+    let shape = |c: &Command| match c {
+        Command::EditLight { edit, .. } => Some(format!("light/{}", path(&format!("{edit:?}")))),
+        Command::EditCamera { edit, .. } => Some(format!("camera/{}", path(&format!("{edit:?}")))),
+        Command::EditItemCommon { edit, .. } => {
+            Some(format!("item/{}", path(&format!("{edit:?}"))))
+        }
+        _ => None,
+    };
+    let wanted = shape(command)?;
+    let target = Target::Item(item);
+    channels::TABLES
+        .iter()
+        .flat_map(|t| t.iter())
+        .filter(|c| (c.applies)(scene, target))
+        .find(|c| {
+            (c.get)(scene, target)
+                .and_then(|v| (c.set)(scene, target, v).ok())
+                .is_some_and(|cmd| shape(&cmd).as_ref() == Some(&wanted))
+        })
+        .and_then(|c| {
+            let names = if c.ty == ChannelType::Colour {
+                ["r", "g", "b"].map(|p| format!("{}.{p}", c.name)).to_vec()
+            } else {
+                vec![c.name.to_string()]
+            };
+            names
+                .iter()
+                .all(|n| keyable(scene, item, n))
+                .then_some((item, names))
+        })
 }
 
 /// Every keyable channel of item `id`, transforms first.
@@ -933,6 +1028,9 @@ pub enum AnimRequest {
         name: String,
         /// Open the result in the system player.
         open: bool,
+        /// A movie file (frames encoded after); false keeps the PNG
+        /// sequence.
+        movie: bool,
     },
     /// Stop the running job.
     Cancel,

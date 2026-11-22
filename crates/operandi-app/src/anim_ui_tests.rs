@@ -40,7 +40,7 @@ fn items_app() -> (Operandi, u64) {
 #[test]
 fn animation_keys_are_items_mode_only_and_the_map_is_valid() {
     assert!(input::bindings_valid(&input::default_bindings()));
-    for (action, _, _) in crate::anim_ui::ACTIONS {
+    for (action, _, _) in crate::anim_keys::ACTIONS {
         assert!(input::available(action, Mode::Item, false), "{action}");
         assert!(!input::available(action, Mode::Edge, false), "{action}");
     }
@@ -200,4 +200,28 @@ fn render_frame_range_and_playblast_queue_their_jobs() {
     frames(&mut a, &ctx, 1);
     assert!(a.anim_ui.job.is_none());
     assert!(a.editor.anim.progress.is_none());
+}
+
+/// TL-71: a playblast's frames become an .mp4 through ffmpeg (skipped
+/// when ffmpeg isn't installed), and the frames folder goes.
+#[test]
+fn playblast_frames_encode_to_a_movie() {
+    if crate::anim_ui::ffmpeg().is_none() {
+        eprintln!("no ffmpeg here; movie encode skipped");
+        return;
+    }
+    let dir = std::env::temp_dir().join(format!("operandi-movie-{}", std::process::id()));
+    let frames = dir.join(".Ball-frames");
+    let _ = std::fs::remove_dir_all(&dir);
+    std::fs::create_dir_all(&frames).unwrap();
+    for f in 0..4u8 {
+        let img = image::RgbaImage::from_pixel(33, 21, image::Rgba([f * 60, 100, 200, 255]));
+        img.save(crate::anim_ui::frame_path(&frames, "Ball", f as i64))
+            .unwrap();
+    }
+    let movie = dir.join("Ball.mp4");
+    let out = crate::anim_ui::encode_movie(&frames, "Ball", 0, 24., &movie).unwrap();
+    assert!(std::fs::metadata(&out).unwrap().len() > 0);
+    assert!(!frames.exists(), "the frames folder goes");
+    let _ = std::fs::remove_dir_all(&dir);
 }

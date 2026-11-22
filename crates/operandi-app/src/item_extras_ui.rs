@@ -38,6 +38,16 @@ impl Operandi {
         let values = self.common_values();
         let mixed = values.iter().skip(1).any(changes);
         crate::form::rows::status(changes(&ItemCommon::default()));
+        // UIC-112: a keyable item channel gets its key light.
+        if let Some(item) = self.editor.scene.selection.item {
+            self.anim_row_for(
+                &Command::EditItemCommon {
+                    items: vec![item],
+                    edit: edit.clone(),
+                },
+                changes(&ItemCommon::default()),
+            );
+        }
         mixed
     }
 
@@ -722,7 +732,7 @@ impl Operandi {
         // (TK-63; egui's consume_key would also take them with Shift).
         if self.editor.scene.selection.mode != Mode::Item
             || self.editor.live.is_some()
-            || ctx.input(|i| !i.modifiers.is_none())
+            || ctx.input(|i| crate::anim_keys::owns_arrow(i.modifiers))
         {
             return false;
         }
