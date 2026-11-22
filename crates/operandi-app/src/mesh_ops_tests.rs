@@ -426,3 +426,62 @@ fn the_add_browser_drags_by_its_title_bar_and_the_circle_pins_it() {
         assert!(r.right() <= w.right() + 1., "{t} {r:?} outside {w:?}");
     }
 }
+
+/// Bug report #5: in Item mode the Add Mesh Operation browser vanished on
+/// the first click inside it. On the shipped Model layout the 3D view is
+/// drawn before the Mesh Stack panel, so the view read the press before the
+/// panel's browser claimed the pointer that frame (`menu_owned_input`): the
+/// click in the search field deselected the mesh under the browser, and the
+/// Mesh Stack (and its browser) went away. A press on any window above a
+/// view belongs to that window, whatever order things are drawn in.
+#[test]
+fn a_click_in_the_add_operator_browser_over_a_view_stays_in_the_browser() {
+    let root = crate::layouts_tests::data_root();
+    let ctx = Context::default();
+    let mut a = crate::layouts_tests::launch(&root, &ctx);
+    a.execute("layout.restore Model");
+    assert!(a.layouts.mixed_dock, "the view draws before the dock panel");
+    let id = a.editor.scene.items[0].id;
+    a.run(Command::Mode(Mode::Item));
+    let page = a
+        .upper_frame
+        .tabs
+        .iter()
+        .position(|k| *k == panel_registry::PanelKind::MeshOps)
+        .expect("the Mesh Stack tab is in the Model layout");
+    a.upper_frame.show_page(page);
+    for _ in 0..3 {
+        draw(&mut a, &ctx, SIZE, vec![]);
+    }
+    assert!(a.editor.scene.active().is_some_and(|i| i.id == id));
+    // Opened from a button on the right, so it opens to its left, over the view.
+    let anchor = egui::Rect::from_min_size(pos2(1300., 200.), vec2(90., 20.));
+    a.add_browsers
+        .entry(crate::mesh_ops_ui::ADD_OPERATOR)
+        .or_insert_with(|| (Default::default(), anchor))
+        .0
+        .open = true;
+    crate::add_browser::RECTS.with(|r| r.borrow_mut().clear());
+    draw(&mut a, &ctx, SIZE, vec![]);
+    draw(&mut a, &ctx, SIZE, vec![]);
+    let field = crate::add_browser::RECTS.with(|r| {
+        r.borrow()
+            .iter()
+            .rev()
+            .find(|(t, _)| t == "search")
+            .map(|(_, r)| *r)
+            .expect("the browser drew its search field")
+    });
+    // The reporter clicked in the search field, over the 3D view.
+    let at = pos2(field.left() + 30., field.center().y);
+    assert!(a.viewport_rect.contains(at), "{at:?} {:?}", a.viewport_rect);
+    click(&mut a, &ctx, at);
+    assert!(
+        a.editor.scene.active().is_some_and(|i| i.id == id),
+        "the mesh under the browser stays selected"
+    );
+    assert!(
+        a.add_browsers[crate::mesh_ops_ui::ADD_OPERATOR].0.open,
+        "the browser stays open"
+    );
+}
