@@ -1039,7 +1039,14 @@ fn newell(world: &[DVec3], vertices: &[u32]) -> DVec3 {
 }
 
 impl Target {
-    fn new(scene: &Scene, id: u64, setup: &StrokeSetup) -> Result<Option<Self>> {
+    /// `allowed`: with a component selection in force (SCS-01), the points
+    /// a brush may move; every other point is frozen.
+    fn new(
+        scene: &Scene,
+        id: u64,
+        setup: &StrokeSetup,
+        allowed: Option<&[bool]>,
+    ) -> Result<Option<Self>> {
         let Some(item) = scene.items.iter().find(|i| i.id == id && i.is_mesh()) else {
             return Ok(None);
         };
@@ -1104,6 +1111,10 @@ impl Target {
         for v in 0..world.len() {
             // Loose points (no polygon) have no surface to sculpt.
             frozen[v] |= !used[v];
+            // SCS-01/04/08: unselected points join what is frozen.
+            if let Some(a) = allowed {
+                frozen[v] |= !a.get(v).copied().unwrap_or(false);
+            }
             if border[v] {
                 let corner = point_faces.of(v as u32).len() <= 1;
                 frozen[v] |= setup.lock_borders || (setup.lock_corners && corner);
@@ -1621,6 +1632,54 @@ const TAUBIN_MU: f64 = 1.04;
 /// (provisional, PTQ-03).
 pub const LOW_PRESSURE: f64 = 0.35;
 
+/// SCS-01..03: in Vertex, Edge or Polygon mode, when any of the meshes
+/// `items` has components of that mode selected, each mesh's points the
+/// brush may move (one flag per point, by `items` index): the selected
+/// vertices, both ends of each selected edge, every corner of each
+/// selected polygon. A mesh with nothing selected gets none. `None` (the
+/// whole mesh is sculpted) in Item mode or with nothing selected.
+fn selection_masks(scene: &Scene, items: &[u64]) -> Option<Vec<Vec<bool>>> {
+    use crate::Mode;
+    let sel = &scene.selection;
+    let mode = sel.mode;
+    let selected = |id: u64| crate::ComponentSelection {
+        vertices: match mode {
+            Mode::Vertex => sel.vertices_of(id).to_vec(),
+            _ => Vec::new(),
+        },
+        edges: match mode {
+            Mode::Edge => sel.edges_of(id).to_vec(),
+            _ => Vec::new(),
+        },
+        faces: match mode {
+            Mode::Polygon => sel.faces_of(id).to_vec(),
+            _ => Vec::new(),
+        },
+    };
+    if mode == Mode::Item || items.iter().all(|&id| selected(id).count(mode) == 0) {
+        return None;
+    }
+    Some(
+        items
+            .iter()
+            .map(|&id| {
+                let Some(mesh) = scene.item(id).map(|i| &i.mesh) else {
+                    return Vec::new();
+                };
+                let mut mask = vec![false; mesh.vertices.len()];
+                let points =
+                    crate::selection_inference::points_from(mesh, mode, &selected(id), |_| true);
+                for v in points {
+                    if let Some(m) = mask.get_mut(v as usize) {
+                        *m = true;
+                    }
+                }
+                mask
+            })
+            .collect(),
+    )
+}
+
 impl Stroke {
     /// Starts a stroke on the active meshes `items` (SC-03). `None` when
     /// none of them has anything to sculpt.
@@ -1634,13 +1693,20 @@ impl Stroke {
         if !(setup.radius.is_finite() && setup.radius > 0.) {
             return Err("The brush has no size here".into());
         }
+        let allowed = selection_masks(scene, items);
         let mut targets = Vec::new();
-        for &id in items {
-            if let Some(t) = Target::new(scene, id, &setup)? {
+        for (k, &id) in items.iter().enumerate() {
+            let mask = allowed.as_ref().map(|m| m[k].as_slice());
+            if let Some(t) = Target::new(scene, id, &setup, mask)? {
                 targets.push(t);
             }
         }
         if targets.is_empty() {
+            return Ok(None);
+        }
+        // A selection whose points are all locked, hidden or loose leaves
+        // nothing to sculpt.
+        if allowed.is_some() && targets.iter().all(|t| t.frozen.iter().all(|&f| f)) {
             return Ok(None);
         }
         if setup.brush.is_vertex_map() && setup.weight_map.is_none() {

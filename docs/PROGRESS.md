@@ -4412,3 +4412,8 @@ Design: docs/MATERIALX_GRAPHS.md (stages 1-5).
 - Graph Editor window: channel list with filters and Lock, curves coloured by axis, keys (broken magenta, selected accent), handles with slope and weight, cycle ghosts, shadows, Normalised, Stacked, Isolate, Velocity, time strip, toolbar (Frame/Value fields, Key, Key Keeping Shape, slope presets, Break/Unify, Pre/Post behaviours, Cycle, Set Frame/Value, Scale), right-click menu.
 - Core: weighted handles, pre/post behaviours, cycle, interpolation, Key Keeping Shape, shadows (native v61), Euler filter, Simplify, key offset/value/frame edits; all as commands the MCP bridge runs, read back by `operandi.anim.query`.
 - Provisional: GE-Q01..Q08 in SPECIFICATION_QUESTIONS.md.
+
+## 2026-11-22 — Sculpt respects the selection (branch sculpt-selection, issue #4)
+
+- In Vertex, Edge or Polygon mode with components selected, every sculpt brush (Shift-smooth, Ctrl, Move/Emboss, symmetry, Vertex Map brushes) moves only the selection's points; unselected points join the frozen set, so locks and hidden points work as before (SCS-01..09). Nothing selected or Item mode sculpts the whole mesh; with several active meshes, one without a selection is left alone.
+- A selection of nothing but locked or hidden points starts no stroke ("nothing to sculpt on the active meshes").

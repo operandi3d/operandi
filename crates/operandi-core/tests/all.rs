@@ -496,6 +496,8 @@ mod scene_budget;
 mod scene_transfer;
 #[path = "sculpt_brush_engine.rs"]
 mod sculpt_brush_engine;
+#[path = "sculpt_selection.rs"]
+mod sculpt_selection;
 #[path = "select_tools.rs"]
 mod select_tools;
 #[path = "selection_continuation_m15.rs"]
