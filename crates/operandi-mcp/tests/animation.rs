@@ -206,3 +206,76 @@ fn render_range_and_playblast_need_the_app() {
     .unwrap_err();
     assert!(e.contains("movie or images"), "{e}");
 }
+
+/// Graph editor (BEHAVIOR-GRAPH-EDITOR check 7): every GE edit through the
+/// bridge, read back with the query.
+#[test]
+fn graph_editor_through_the_bridge() {
+    let mut b = Bridge::new();
+    let added = call(&mut b, "primitive_add", json!({"shape": "sphere"})).unwrap();
+    let id = added["active"]["item"].as_u64().unwrap();
+    call(&mut b, "select", json!({"mode": "item", "item": id})).unwrap();
+    let y = format!("{id}:pos.Y");
+    for (f, v) in [(0, 2.), (12, 0.), (24, 2.)] {
+        run(
+            &mut b,
+            "operandi.key.add",
+            json!({"channel": y, "frame": f, "value": v}),
+        );
+    }
+    run(
+        &mut b,
+        "operandi.key.select",
+        json!({"keys": format!("{y}@12")}),
+    );
+    run(&mut b, "operandi.key.slope", json!({"type": "linear"}));
+    run(&mut b, "operandi.key.break", json!({}));
+    run(
+        &mut b,
+        "operandi.key.handle",
+        json!({"side": "out", "slope": 0.3, "weight": 1.5}),
+    );
+    run(
+        &mut b,
+        "operandi.key.select",
+        json!({"keys": format!("{y}@0")}),
+    );
+    run(
+        &mut b,
+        "operandi.key.setValue",
+        json!({"value": 0.5, "mode": "add"}),
+    );
+    run(
+        &mut b,
+        "operandi.curve.behavior",
+        json!({"channels": y, "post": "repeat"}),
+    );
+    run(&mut b, "operandi.curve.cycle", json!({"channels": y}));
+    run(
+        &mut b,
+        "operandi.curve.shadow",
+        json!({"channels": y, "action": "copy"}),
+    );
+    run(
+        &mut b,
+        "operandi.key.keepShape",
+        json!({"channels": y, "frame": 6}),
+    );
+    let q = query(&mut b, json!({"channels": y, "frames": "0,24,48"}));
+    let ch = &q["channels"][0];
+    assert_eq!(ch["post"], "repeat");
+    assert_eq!(ch["cycle"], true);
+    assert_eq!(ch["shadow"], true);
+    assert_eq!(ch["keys"].as_array().unwrap().len(), 4);
+    assert_eq!(ch["keys"][2]["broken"], true);
+    near(ch["values"]["0"].as_f64().unwrap(), 2.5);
+    near(ch["values"]["24"].as_f64().unwrap(), 2.5);
+    near(ch["values"]["48"].as_f64().unwrap(), 2.5);
+    run(
+        &mut b,
+        "operandi.curve.shadow",
+        json!({"channels": y, "action": "swap"}),
+    );
+    let q = query(&mut b, json!({"channels": y}));
+    assert_eq!(q["channels"][0]["keys"].as_array().unwrap().len(), 3);
+}

@@ -105,6 +105,61 @@ pub(crate) const TIMELINE_KEYS: &[(Modifiers, Key, &str)] = &[
     (Modifiers::COMMAND, Key::V, "operandi.key.paste"),
 ];
 
+/// Keys over the graph editor (GE-21, SC-253/254, GE-70/72): fits,
+/// Normalise, delete, copy/cut/paste. The fits are the graph's own view
+/// lines; the rest are commands. Only while the pointer is over it.
+pub(crate) const GRAPH_KEYS: &[(Modifiers, Key, &str)] = &[
+    (Modifiers::SHIFT, Key::A, "operandi.graph.view fit:selected"),
+    (Modifiers::NONE, Key::A, "operandi.graph.view fit:all"),
+    (Modifiers::SHIFT, Key::F, "operandi.graph.view fit:values"),
+    (
+        Modifiers::COMMAND,
+        Key::F,
+        "operandi.graph.view fit:visible",
+    ),
+    (Modifiers::NONE, Key::F, "operandi.graph.view fit:time"),
+    (
+        Modifiers::NONE,
+        Key::N,
+        "operandi.graph.view normalise:toggle",
+    ),
+    (Modifiers::NONE, Key::Delete, "operandi.key.delete"),
+    (Modifiers::NONE, Key::Backspace, "operandi.key.delete"),
+    (Modifiers::COMMAND, Key::C, "operandi.key.copy"),
+    (Modifiers::COMMAND, Key::X, "operandi.key.cut"),
+    (
+        Modifiers::COMMAND.plus(Modifiers::SHIFT),
+        Key::V,
+        "operandi.key.paste mode:insert",
+    ),
+    (
+        Modifiers::COMMAND.plus(Modifiers::ALT),
+        Key::V,
+        "operandi.key.paste mode:replace",
+    ),
+    (Modifiers::COMMAND, Key::V, "operandi.key.paste"),
+];
+
+/// Takes this frame's keys from `table` (one line per key; more specific
+/// chords first).
+pub(crate) fn take_keys(
+    input: &mut eframe::egui::InputState,
+    table: &[(Modifiers, Key, &'static str)],
+) -> Vec<&'static str> {
+    let mut out = Vec::new();
+    let mut taken: Vec<Key> = Vec::new();
+    for (mods, key, line) in table {
+        if taken.contains(key) {
+            continue;
+        }
+        if input.consume_key(*mods, *key) {
+            taken.push(*key);
+            out.push(*line);
+        }
+    }
+    out
+}
+
 /// Takes this frame's timeline keys (pointer over the strip, no text
 /// field focused) and gives the lines they run.
 pub(crate) fn take_timeline_keys(input: &mut eframe::egui::InputState) -> Vec<&'static str> {

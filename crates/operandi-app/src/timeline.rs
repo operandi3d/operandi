@@ -312,7 +312,6 @@ impl Operandi {
         }
         self.timeline_buttons(ui, buttons);
         self.timeline_keys(ui, full);
-        self.timeline_dialog(ui.ctx());
         // TL-16 Auto Pan: keep the line in a zoomed view while playing.
         if self.timeline.auto_pan
             && self.editor.anim.playing.is_some()
@@ -1396,7 +1395,7 @@ impl Operandi {
         ui.checkbox(&mut self.timeline.by_type, "Group by Channel Type");
     }
 
-    fn timeline_dialog(&mut self, ctx: &Context) {
+    pub(super) fn timeline_dialog(&mut self, ctx: &Context) {
         let Some(mut d) = self.timeline.dialog.take() else {
             return;
         };
@@ -1437,6 +1436,21 @@ impl Operandi {
             Some(false) => {}
             None => self.timeline.dialog = Some(d),
         }
+    }
+
+    /// A one-value dialog (UIC-80): OK runs `line` with `{}` replaced.
+    pub(super) fn open_value_dialog(
+        &mut self,
+        title: &'static str,
+        label: &'static str,
+        line: &str,
+    ) {
+        self.timeline.dialog = Some(ValueDialog {
+            title,
+            label,
+            text: String::new(),
+            line: line.to_owned(),
+        });
     }
 
     // ------------------------------------------------------------ buttons
@@ -1659,6 +1673,7 @@ impl Operandi {
                 "Key Scale",
                 "operandi.key.transforms type:scale",
             );
+            self.tb(ui, "Graph", "Graph Editor", "", "operandi.graph.open");
         }
         // TK-41: Apply / Discard while edits are pending.
         let pending = animation::pending(&self.editor.scene).len();

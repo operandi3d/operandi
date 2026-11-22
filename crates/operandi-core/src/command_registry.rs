@@ -3125,6 +3125,197 @@ pub static COMMANDS: &[Entry] = &[
         .side_effect()
         .operandi()
         .example("operandi.view.playblast scale:0.5"),
+    // Graph editor (BEHAVIOR-GRAPH-EDITOR; anim_graph.rs, anim_commands.rs).
+    script("operandi.key.offset", Items, "Moves the selected keys by frames and by a value at once, one undo step (GE-40/45: a graph editor drag's result).")
+        .on_editor(
+            "Move the selected keys by frames in time and by value, one undo step (GE-40/45).",
+            &[
+            jopt("frames", "number", "Frames to move by (default 0)."),
+            jopt("value", "number", "Value to add (default 0)."),
+            jopt("link", "boolean", "Related keys (X/Y/Z, R/G/B) at the same times move in time too (GE-42)."),
+        ],
+            crate::anim_commands::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.key.offset frames:2 value:0.5"),
+    script("operandi.key.setValue", Items, "Sets, adds to or multiplies the selected keys' values (GE-71 Set Value).")
+        .on_editor(
+            "Sets, adds to or multiplies the selected keys' values (GE-71 Set Value).",
+            &[
+            jreq("value", "number", "The value."),
+            jopt("mode", "string", "set (default), add or multiply."),
+        ],
+            crate::anim_commands::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.key.setValue value:2"),
+    script("operandi.key.scaleValue", Items, "Scales the selected keys' values around a value (GE-43).")
+        .on_editor(
+            "Scales the selected keys' values around a value (GE-43).",
+            &[
+            jreq("factor", "number", "Factor."),
+            jopt("pivot", "number", "The value to scale around (default 0)."),
+        ],
+            crate::anim_commands::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.key.scaleValue factor:1.5"),
+    script("operandi.key.setFrame", Items, "Puts the selected keys at a frame (the earliest there, spacing kept), or moves them by frames (GE-71 Set Frame).")
+        .on_editor(
+            "Puts the selected keys at a frame (the earliest there, spacing kept), or moves them by frames (GE-71 Set Frame).",
+            &[
+            jreq("frame", "number", "Frame (or frames to move by with relative)."),
+            jopt("relative", "boolean", "Move by frame instead of to it."),
+        ],
+            crate::anim_commands::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.key.setFrame frame:10"),
+    script("operandi.key.handle", Items, "Sets the selected keys' in or out handle: slope (value per frame) and/or weight; that side becomes Manual, a unified key's other side follows the slope (GE-50/53).")
+        .on_editor(
+            "Sets the selected keys' in or out handle: slope (value per frame) and/or weight; that side becomes Manual, a unified key's other side follows the slope (GE-50/53).",
+            &[
+            jopt("side", "string", "in or out (default out)."),
+            jopt("slope", "number", "Slope, value per frame."),
+            jopt("weight", "number", "Weight 0.01-3 (1 is the plain length)."),
+        ],
+            crate::anim_commands::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.key.handle side:out slope:0.1"),
+    script("operandi.key.break", Items, "Breaks the selected keys' handles so each side moves alone (GE-51).")
+        .on_editor(
+            "Breaks the selected keys' handles so each side moves alone (GE-51).",
+            &[],
+            crate::anim_commands::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.key.break"),
+    script("operandi.key.unify", Items, "Unifies the selected keys' handles into one line (GE-51).")
+        .on_editor(
+            "Unifies the selected keys' handles into one line (GE-51).",
+            &[],
+            crate::anim_commands::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.key.unify"),
+    script("operandi.key.autoHandles", Items, "Puts the selected keys' handle weights back to Auto; with slopes:true their slopes too (GE-51/52).")
+        .on_editor(
+            "Puts the selected keys' handle weights back to Auto; with slopes:true their slopes too (GE-51/52).",
+            &[
+            jopt("slopes", "boolean", "Slopes back to Auto as well."),
+        ],
+            crate::anim_commands::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.key.autoHandles slopes:true"),
+    script("operandi.key.add", Items, "Adds a key on a channel at a time and value (GE-31); the curve's own value when value is left out.")
+        .on_editor(
+            "Adds a key on a channel at a time and value (GE-31); the curve's own value when value is left out.",
+            &[
+            jreq("channel", "string", "item:name."),
+            jopt("frame", "number", "Time in frames."),
+            jopt("time", "number", "Time in seconds (instead of frame)."),
+            jopt("value", "number", "The key's value."),
+        ],
+            crate::anim_commands::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.key.add channel:1:pos.Y frame:6 value:1"),
+    script("operandi.key.keepShape", Items, "Keys channels at a time without changing their curves (GE-32 Key Keeping Shape).")
+        .on_editor(
+            "Keys channels at a time without changing their curves (GE-32 Key Keeping Shape).",
+            &[
+            jopt("channels", "string", "Channels as item:name,...; default the selected channels, else the selected keys' channels."),
+            jopt("frame", "number", "Time in frames."),
+            jopt("time", "number", "Time in seconds (instead of frame)."),
+        ],
+            crate::anim_commands::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.key.keepShape channels:1:pos.Y frame:6"),
+    script("operandi.curve.behavior", Items, "Sets curves' behaviour before the first key and/or after the last (GE-61).")
+        .on_editor(
+            "Sets curves' behaviour before the first key and/or after the last (GE-61).",
+            &[
+            jopt("channels", "string", "Channels as item:name,...; default the selected channels, else the selected keys' channels."),
+            jopt("pre", "string", "constant, constantSmooth, linear, repeat, oscillate, oscillateSmooth, offsetRepeat, offsetRepeatSmooth or reset."),
+            jopt("post", "string", "As pre."),
+        ],
+            crate::anim_commands::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.curve.behavior post:repeat"),
+    script("operandi.curve.interpolation", Items, "Sets curves' interpolation: every key's slopes (GE-60).")
+        .on_editor(
+            "Sets curves' interpolation: every key's slopes (GE-60).",
+            &[
+            jopt("channels", "string", "Channels as item:name,...; default the selected channels, else the selected keys' channels."),
+            jreq("type", "string", "curve, linear or stepped."),
+        ],
+            crate::anim_commands::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.curve.interpolation type:linear"),
+    script("operandi.curve.cycle", Items, "Turns the cycle option on or off: the last key matches the first (GE-62).")
+        .on_editor(
+            "Turns the cycle option on or off: the last key matches the first (GE-62).",
+            &[
+            jopt("channels", "string", "Channels as item:name,...; default the selected channels, else the selected keys' channels."),
+            jopt("on", "boolean", "On (default true)."),
+        ],
+            crate::anim_commands::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.curve.cycle on:true"),
+    script("operandi.curve.shadow", Items, "Copy to Shadow, Replace with Shadow, Swap or Clear Shadow (GE-80).")
+        .on_editor(
+            "Copy to Shadow, Replace with Shadow, Swap or Clear Shadow (GE-80).",
+            &[
+            jopt("channels", "string", "Channels as item:name,...; default the selected channels, else the selected keys' channels."),
+            jopt("action", "string", "copy (default), replace, swap or clear."),
+        ],
+            crate::anim_commands::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.curve.shadow action:copy"),
+    script("operandi.curve.eulerFilter", Items, "Unwraps rotation curves that jump by whole turns (GE-X1).")
+        .on_editor(
+            "Unwraps rotation curves that jump by whole turns (GE-X1).",
+            &[
+            jopt("channels", "string", "Channels as item:name,...; default the selected channels, else the selected keys' channels."),
+        ],
+            crate::anim_commands::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.curve.eulerFilter"),
+    script("operandi.curve.simplify", Items, "Removes keys that change the curve by no more than a tolerance (GE-X2).")
+        .on_editor(
+            "Removes keys that change the curve by no more than a tolerance (GE-X2).",
+            &[
+            jopt("channels", "string", "Channels as item:name,...; default the selected channels, else the selected keys' channels."),
+            jopt("tolerance", "number", "Largest change allowed (default 0.001)."),
+        ],
+            crate::anim_commands::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.curve.simplify tolerance:0.01"),
     script("operandi.time.set", Items, "Sets the current time (TK-01); not an undo step (TK-05). Snaps to a frame with Time Snap on.")
         .on_editor(
             "Sets the current time (TK-01); not an undo step (TK-05). Snaps to a frame with Time Snap on.",
@@ -6226,7 +6417,7 @@ mod tests {
                 assert!(!json.about.is_empty(), "{}", e.name);
             }
         }
-        assert_eq!(crate::command_exec::specs().count(), 206);
+        assert_eq!(crate::command_exec::specs().count(), 222);
     }
 
     #[test]

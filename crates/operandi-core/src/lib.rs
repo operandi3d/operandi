@@ -227,6 +227,7 @@ pub mod anim_camera_channels;
 pub mod anim_commands;
 pub mod anim_curve;
 pub mod anim_edit;
+pub mod anim_graph;
 pub mod animation;
 pub mod boolean;
 pub mod click_select;

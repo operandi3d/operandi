@@ -4406,3 +4406,9 @@ Design: docs/MATERIALX_GRAPHS.md (stages 1-5).
 
 - Wire edges no longer vanish near the camera: an edge with one end behind the near clip is cut there instead of dropped, on the GPU wire (`edge_out_fading`) and the CPU overlay lines (`Camera::project_segment`). After a wheel zoom to a surface the near clip now scales with the view distance, so moving far away again keeps depth precision (the wire stayed sunk in its polygons before).
 - Not changed: the gizmo report needs a design choice (FG-Q01, FG-Q02).
+
+## 2026-11-22 — Animation phase 3: graph editor (branch animation-held)
+
+- Graph Editor window: channel list with filters and Lock, curves coloured by axis, keys (broken magenta, selected accent), handles with slope and weight, cycle ghosts, shadows, Normalised, Stacked, Isolate, Velocity, time strip, toolbar (Frame/Value fields, Key, Key Keeping Shape, slope presets, Break/Unify, Pre/Post behaviours, Cycle, Set Frame/Value, Scale), right-click menu.
+- Core: weighted handles, pre/post behaviours, cycle, interpolation, Key Keeping Shape, shadows (native v61), Euler filter, Simplify, key offset/value/frame edits; all as commands the MCP bridge runs, read back by `operandi.anim.query`.
+- Provisional: GE-Q01..Q08 in SPECIFICATION_QUESTIONS.md.

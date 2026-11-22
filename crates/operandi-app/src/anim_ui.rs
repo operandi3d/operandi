@@ -28,6 +28,29 @@ const TIMELINE_ARGS: &[table::Arg] = &[table::opt(
     table::Unit::None,
     None,
 )];
+const GRAPH_OPEN_ARGS: &[table::Arg] = &[table::opt(
+    "open",
+    table::ArgType::Choice(&["true", "false"]),
+    table::Unit::None,
+    None,
+)];
+const TOGGLE: table::ArgType = table::ArgType::Choice(&["toggle", "true", "false"]);
+const GRAPH_VIEW_ARGS: &[table::Arg] = &[
+    table::opt(
+        "fit",
+        table::ArgType::Choice(&["all", "selected", "time", "values", "visible"]),
+        table::Unit::None,
+        None,
+    ),
+    table::opt("normalise", TOGGLE, table::Unit::None, None),
+    table::opt("stacked", TOGGLE, table::Unit::None, None),
+    table::opt("isolate", TOGGLE, table::Unit::None, None),
+    table::opt("velocity", TOGGLE, table::Unit::None, None),
+    table::opt("shadow", TOGGLE, table::Unit::None, None),
+    table::opt("animatedOnly", TOGGLE, table::Unit::None, None),
+    table::opt("lock", TOGGLE, table::Unit::None, None),
+    table::opt("link", TOGGLE, table::Unit::None, None),
+];
 const DIALOG_ARGS: &[table::Arg] = &[table::opt(
     "kind",
     table::ArgType::Choice(&["ranges", "settings", "render", "playblast"]),
@@ -54,6 +77,36 @@ pub(crate) fn register(r: &mut Commands) {
             "open:false" => a.timeline.open = false,
             _ => a.timeline.open = !a.timeline.open,
         },
+    )
+    .unwrap_or_else(|e| panic!("{e}"));
+    r.add_host_command(
+        table::script(
+            "operandi.graph.open",
+            Area::View,
+            "Opens or closes the Graph Editor (GE-01).",
+        )
+        .args(GRAPH_OPEN_ARGS)
+        .operandi()
+        .ui(),
+        |a, c| {
+            a.graph.open = match c.rest.trim() {
+                "open:true" => true,
+                "open:false" => false,
+                _ => !a.graph.open,
+            }
+        },
+    )
+    .unwrap_or_else(|e| panic!("{e}"));
+    r.add_host_command(
+        table::script(
+            "operandi.graph.view",
+            Area::View,
+            "The Graph Editor's view: fit (all, selected, time, values, visible; GE-21), Normalised, Stacked (GE-82), Isolate (GE-X6), Velocity (GE-81), Shadow, Animated Only and Lock (GE-11).",
+        )
+        .args(GRAPH_VIEW_ARGS)
+        .operandi()
+        .ui(),
+        |a, c| a.graph_view(c.rest),
     )
     .unwrap_or_else(|e| panic!("{e}"));
     r.add_host_command(
@@ -262,6 +315,9 @@ impl Operandi {
         self.run_job(ctx);
         self.poll_encoding();
         self.anim_dialog(ctx);
+        // The timeline's and graph editor's one-value dialogs.
+        self.timeline_dialog(ctx);
+        self.graph_editor_window(ctx);
     }
 
     /// TK-60/61/64: advance playback; no undo steps, and only the final

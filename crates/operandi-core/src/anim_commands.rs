@@ -8,8 +8,10 @@
 //!
 //! Times are given in frames (`frame:`) or seconds (`time:`); channels as
 //! `item:name` lists (`3:pos.Y,3:scl.Y`).
+use crate::anim_curve::Behavior;
 use crate::anim_curve::Slope;
 use crate::anim_edit::{KeyJump, KeySelect, PasteMode, Side};
+use crate::anim_graph::{Interpolation, ShadowAction, ValueMode};
 use crate::animation::{self, AutoKey, ChannelKey, EndBehavior, MarkerShape, TimeDisplay};
 use crate::time_tick::{FrameRate, Tick};
 use crate::{Command, Editor};
@@ -519,6 +521,109 @@ pub fn run(e: &mut Editor, name: &str, a: &Args) -> Out {
             }
         }
         "operandi.render.cancelRange" => e.anim.requests.push(animation::AnimRequest::Cancel),
+        // ---------------------------------------------------- graph editor
+        "operandi.key.offset" => {
+            let dt = frames_tick(rate, number(a, "frames")?.unwrap_or(0.));
+            let linked = flag(a, "link")?.unwrap_or(false);
+            e.offset_keys(dt, number(a, "value")?.unwrap_or(0.), linked)?;
+        }
+        "operandi.key.setValue" => {
+            let v = number(a, "value")?.ok_or("Give value:")?;
+            let mode = match text(a, "mode").unwrap_or("set") {
+                "set" => ValueMode::Set,
+                "add" => ValueMode::Add,
+                "multiply" => ValueMode::Multiply,
+                o => return Err(format!("mode is set, add or multiply, not {o}")),
+            };
+            e.set_key_values(v, mode)?;
+        }
+        "operandi.key.scaleValue" => {
+            let factor = number(a, "factor")?.ok_or("Give factor:")?;
+            e.scale_key_values(factor, number(a, "pivot")?.unwrap_or(0.))?;
+        }
+        "operandi.key.setFrame" => {
+            let relative = flag(a, "relative")?.unwrap_or(false);
+            let f = number(a, "frame")?.ok_or("Give frame:")?;
+            e.set_key_frames(frames_tick(rate, f), relative)?;
+        }
+        "operandi.key.handle" => {
+            let incoming = match text(a, "side").unwrap_or("out") {
+                "in" => true,
+                "out" => false,
+                o => return Err(format!("side is in or out, not {o}")),
+            };
+            // Slopes are given per frame, as the graph shows them.
+            let slope = number(a, "slope")?.map(|s| s * rate.as_f64());
+            let weight = number(a, "weight")?;
+            if slope.is_none() && weight.is_none() {
+                return Err("Give slope: and/or weight:".into());
+            }
+            e.set_key_handles(incoming, slope, weight)?;
+        }
+        "operandi.key.break" => e.set_keys_broken(true)?,
+        "operandi.key.unify" => e.set_keys_broken(false)?,
+        "operandi.key.autoHandles" => e.reset_key_handles(flag(a, "slopes")?.unwrap_or(false))?,
+        "operandi.key.add" => {
+            let k = ChannelKey::parse(text(a, "channel").ok_or("Give channel:item:name")?)?;
+            let t = time_arg(e, a)?.unwrap_or(e.scene.time.current);
+            e.add_key_at(&k, t, number(a, "value")?)?;
+        }
+        "operandi.key.keepShape" => {
+            let list = channels_or_selected(e, a)?;
+            let t = time_arg(e, a)?.unwrap_or(e.scene.time.current);
+            e.key_keeping_shape(&list, t)?;
+        }
+        "operandi.curve.behavior" => {
+            let word = |k: &str| -> Result<Option<Behavior>, String> {
+                text(a, k)
+                    .map(|w| {
+                        Behavior::parse(w).ok_or_else(|| {
+                            format!("{k} is constant, constantSmooth, linear, repeat, oscillate, oscillateSmooth, offsetRepeat, offsetRepeatSmooth or reset, not {w}")
+                        })
+                    })
+                    .transpose()
+            };
+            let (pre, post) = (word("pre")?, word("post")?);
+            if pre.is_none() && post.is_none() {
+                return Err("Give pre: and/or post:".into());
+            }
+            let list = e.curve_scope(channels_arg(a)?);
+            e.set_curve_behavior(list, pre, post)?;
+        }
+        "operandi.curve.interpolation" => {
+            let kind = match text(a, "type").ok_or("Give type:")? {
+                "curve" => Interpolation::Curve,
+                "linear" => Interpolation::Linear,
+                "stepped" => Interpolation::Stepped,
+                o => return Err(format!("type is curve, linear or stepped, not {o}")),
+            };
+            let list = e.curve_scope(channels_arg(a)?);
+            e.set_curve_interpolation(list, kind)?;
+        }
+        "operandi.curve.cycle" => {
+            let list = e.curve_scope(channels_arg(a)?);
+            let on = flag(a, "on")?.unwrap_or(true);
+            e.set_curve_cycle(list, on)?;
+        }
+        "operandi.curve.shadow" => {
+            let action = match text(a, "action").unwrap_or("copy") {
+                "copy" => ShadowAction::Copy,
+                "replace" => ShadowAction::Replace,
+                "swap" => ShadowAction::Swap,
+                "clear" => ShadowAction::Clear,
+                o => return Err(format!("action is copy, replace, swap or clear, not {o}")),
+            };
+            let list = e.curve_scope(channels_arg(a)?);
+            e.shadow(list, action)?;
+        }
+        "operandi.curve.eulerFilter" => {
+            let list = e.curve_scope(channels_arg(a)?);
+            e.euler_filter(list)?;
+        }
+        "operandi.curve.simplify" => {
+            let list = e.curve_scope(channels_arg(a)?);
+            e.simplify_curves(list, number(a, "tolerance")?.unwrap_or(0.001))?;
+        }
         // Answered by `answer` (a query changes nothing).
         "operandi.anim.query" => {}
         other => return Err(format!("Unknown animation command {other}")),
@@ -579,6 +684,11 @@ fn query(e: &Editor, a: &Args) -> Result<String, String> {
                         "value": key.value,
                         "in": key.slope_in.name(),
                         "out": key.slope_out.name(),
+                        "inSlope": c.curve.key_at(key.time).map(|i| c.curve.slope(i, true) / rate.as_f64()),
+                        "outSlope": c.curve.key_at(key.time).map(|i| c.curve.slope(i, false) / rate.as_f64()),
+                        "inWeight": key.weight_in,
+                        "outWeight": key.weight_out,
+                        "broken": key.broken,
                     })
                 })
                 .collect();
@@ -595,6 +705,10 @@ fn query(e: &Editor, a: &Args) -> Result<String, String> {
                 "channel": k.text(),
                 "rest": c.rest,
                 "stepped": c.curve.stepped,
+                "pre": c.curve.pre.name(),
+                "post": c.curve.post.name(),
+                "cycle": c.curve.cycle,
+                "shadow": s.animation.shadows.contains_key(k),
                 "now": animation::read(s, k),
                 "pending": animation::is_pending(s, k),
                 "keys": keys,
@@ -652,7 +766,22 @@ fn query(e: &Editor, a: &Args) -> Result<String, String> {
 pub const NAMES: &[&str] = &[
     "operandi.anim.query",
     "operandi.channel.select",
+    "operandi.curve.behavior",
+    "operandi.curve.cycle",
+    "operandi.curve.eulerFilter",
+    "operandi.curve.interpolation",
+    "operandi.curve.shadow",
+    "operandi.curve.simplify",
+    "operandi.key.add",
     "operandi.key.apply",
+    "operandi.key.autoHandles",
+    "operandi.key.break",
+    "operandi.key.handle",
+    "operandi.key.keepShape",
+    "operandi.key.scaleValue",
+    "operandi.key.setFrame",
+    "operandi.key.setValue",
+    "operandi.key.unify",
     "operandi.key.autoKey",
     "operandi.key.bake",
     "operandi.key.copy",
@@ -662,6 +791,7 @@ pub const NAMES: &[&str] = &[
     "operandi.key.invert",
     "operandi.key.items",
     "operandi.key.move",
+    "operandi.key.offset",
     "operandi.key.paste",
     "operandi.key.remove",
     "operandi.key.removeAnimation",

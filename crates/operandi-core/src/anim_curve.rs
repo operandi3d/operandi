@@ -128,6 +128,83 @@ pub struct Curve {
     /// A choice or on/off channel: always stepped (TK-14).
     #[serde(default, skip_serializing_if = "std::ops::Not::not")]
     pub stepped: bool,
+    /// GE-61: what the curve does before its first key.
+    #[serde(default, skip_serializing_if = "Behavior::is_constant")]
+    pub pre: Behavior,
+    /// GE-61: what the curve does after its last key.
+    #[serde(default, skip_serializing_if = "Behavior::is_constant")]
+    pub post: Behavior,
+    /// GE-62: the last key takes the first key's value and slope, so a
+    /// loop is seamless (its own value is kept, shown as a ghost).
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub cycle: bool,
+}
+
+/// GE-61: a curve's behaviour outside its keys.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash, Serialize, Deserialize)]
+pub enum Behavior {
+    /// Hold the end key's value (TK-13).
+    #[default]
+    Constant,
+    /// As Constant (provisional, GE-Q03).
+    ConstantSmooth,
+    /// Carry on along the end key's slope.
+    Linear,
+    /// Play the keys again.
+    Repeat,
+    /// Play them backwards and forwards.
+    Oscillate,
+    /// As Oscillate (provisional, GE-Q03).
+    OscillateSmooth,
+    /// Repeat, each time starting from where the last ended.
+    OffsetRepeat,
+    /// As Offset Repeat (provisional, GE-Q03).
+    OffsetRepeatSmooth,
+    /// Zero.
+    Reset,
+}
+
+impl Behavior {
+    pub const NAMES: [(&'static str, Behavior); 9] = [
+        ("constant", Behavior::Constant),
+        ("constantSmooth", Behavior::ConstantSmooth),
+        ("linear", Behavior::Linear),
+        ("repeat", Behavior::Repeat),
+        ("oscillate", Behavior::Oscillate),
+        ("oscillateSmooth", Behavior::OscillateSmooth),
+        ("offsetRepeat", Behavior::OffsetRepeat),
+        ("offsetRepeatSmooth", Behavior::OffsetRepeatSmooth),
+        ("reset", Behavior::Reset),
+    ];
+    pub fn is_constant(&self) -> bool {
+        *self == Behavior::Constant
+    }
+    pub fn parse(word: &str) -> Option<Behavior> {
+        Self::NAMES
+            .iter()
+            .find(|(n, _)| n.eq_ignore_ascii_case(word))
+            .map(|(_, b)| *b)
+    }
+    pub fn name(self) -> &'static str {
+        Self::NAMES
+            .iter()
+            .find(|(_, b)| *b == self)
+            .map_or("constant", |(n, _)| n)
+    }
+    /// "Offset Repeat".
+    pub fn label(self) -> &'static str {
+        match self {
+            Behavior::Constant => "Constant",
+            Behavior::ConstantSmooth => "Constant Smooth",
+            Behavior::Linear => "Linear",
+            Behavior::Repeat => "Repeat",
+            Behavior::Oscillate => "Oscillate",
+            Behavior::OscillateSmooth => "Oscillate Smooth",
+            Behavior::OffsetRepeat => "Offset Repeat",
+            Behavior::OffsetRepeatSmooth => "Offset Repeat Smooth",
+            Behavior::Reset => "Reset",
+        }
+    }
 }
 
 impl Curve {
@@ -179,17 +256,124 @@ impl Curve {
 
     /// The value at time `t` (seconds as ticks).
     pub fn value_at(&self, t: Tick) -> f64 {
+        if self.cycle && self.keys.len() >= 2 {
+            return self.cycled().value_inside_or_outside(t);
+        }
+        self.value_inside_or_outside(t)
+    }
+
+    /// GE-62: the curve with its last key forced to the first key's value
+    /// and slope.
+    pub fn cycled(&self) -> Curve {
+        let mut c = self.clone();
+        c.cycle = false;
+        if c.keys.len() >= 2 {
+            let slope = c.side_slope(0, c.keys[0].slope_out, false);
+            let first = c.keys[0].value;
+            let last = c.keys.len() - 1;
+            let k = &mut c.keys[last];
+            k.value = first;
+            k.slope_in = Slope::Manual;
+            k.manual_in = slope;
+        }
+        c
+    }
+
+    fn value_inside_or_outside(&self, t: Tick) -> f64 {
         let keys = &self.keys;
         let Some(first) = keys.first() else {
             return 0.;
         };
-        if t <= first.time {
+        let last = keys.last().unwrap_or(first);
+        if t < first.time {
+            return self.outside(t, true);
+        }
+        if t > last.time {
+            return self.outside(t, false);
+        }
+        if t == first.time {
             return first.value;
         }
-        let last = keys.last().unwrap_or(first);
-        if t >= last.time {
+        if t == last.time {
             return last.value;
         }
+        self.inside(t)
+    }
+
+    /// GE-61: the value before the first key (`before`) or after the last.
+    fn outside(&self, t: Tick, before: bool) -> f64 {
+        let keys = &self.keys;
+        let (first, last) = (&keys[0], &keys[keys.len() - 1]);
+        let behavior = if before { self.pre } else { self.post };
+        let span = (last.time - first.time).seconds();
+        let ts = t.seconds();
+        let f0 = first.time.seconds();
+        match behavior {
+            Behavior::Constant | Behavior::ConstantSmooth => {
+                if before {
+                    first.value
+                } else {
+                    last.value
+                }
+            }
+            Behavior::Reset => 0.,
+            Behavior::Linear => {
+                if before {
+                    let m = self.side_slope(0, first.slope_out, false);
+                    first.value + m * (ts - f0)
+                } else {
+                    let n = keys.len() - 1;
+                    let m = self.side_slope(n, last.slope_in, true);
+                    last.value + m * (ts - last.time.seconds())
+                }
+            }
+            _ if span <= 0. || keys.len() < 2 => {
+                if before {
+                    first.value
+                } else {
+                    last.value
+                }
+            }
+            Behavior::Repeat
+            | Behavior::OffsetRepeat
+            | Behavior::OffsetRepeatSmooth
+            | Behavior::Oscillate
+            | Behavior::OscillateSmooth => {
+                let cycles = ((ts - f0) / span).floor();
+                let local = ts - f0 - cycles * span;
+                let oscillate = matches!(behavior, Behavior::Oscillate | Behavior::OscillateSmooth);
+                let local = if oscillate && (cycles as i64).rem_euclid(2) == 1 {
+                    span - local
+                } else {
+                    local
+                };
+                let v = self.inside_or_end(Tick::from_seconds(f0 + local));
+                if matches!(
+                    behavior,
+                    Behavior::OffsetRepeat | Behavior::OffsetRepeatSmooth
+                ) {
+                    v + cycles * (last.value - first.value)
+                } else {
+                    v
+                }
+            }
+        }
+    }
+
+    fn inside_or_end(&self, t: Tick) -> f64 {
+        let keys = &self.keys;
+        if t <= keys[0].time {
+            keys[0].value
+        } else if t >= keys[keys.len() - 1].time {
+            keys[keys.len() - 1].value
+        } else {
+            self.inside(t)
+        }
+    }
+
+    /// The value strictly between the first and last keys.
+    fn inside(&self, t: Tick) -> f64 {
+        let keys = &self.keys;
         // The segment [i, i+1] holding t.
         let i = match keys.binary_search_by(|k| k.time.cmp(&t)) {
             Ok(i) => return keys[i].value,
@@ -202,7 +386,30 @@ impl Curve {
         let h = (b.time - a.time).seconds();
         let s = (t - a.time).seconds() / h;
         let (m0, m1) = self.segment_slopes(i);
+        // GE-50: weighted handles make the segment a Bezier in time and
+        // value; plain weights (1) are the same curve as Hermite.
+        let (w0, w1) = (a.weight_out, b.weight_in);
+        if (w0 - 1.).abs() > 1e-9 || (w1 - 1.).abs() > 1e-9 {
+            return weighted(a.value, b.value, m0 * h, m1 * h, w0, w1, s);
+        }
         hermite(a.value, b.value, m0 * h, m1 * h, s)
+    }
+
+    /// The slope (value per second) on key `i`'s in or out side, as the
+    /// curve uses it (GE-50 handles draw it).
+    pub fn slope(&self, i: usize, incoming: bool) -> f64 {
+        let k = &self.keys[i];
+        let slope = if incoming { k.slope_in } else { k.slope_out };
+        self.side_slope(i, slope, incoming)
+    }
+
+    /// The curve's rate of change at `t` (GE-81 Velocity, Key Keeping
+    /// Shape), per second.
+    pub fn derivative(&self, t: Tick) -> f64 {
+        let e = 1e-4;
+        let s = t.seconds();
+        (self.value_at(Tick::from_seconds(s + e)) - self.value_at(Tick::from_seconds(s - e)))
+            / (2. * e)
     }
 
     /// The slopes (value per second) leaving key `i` and arriving at key
@@ -289,6 +496,30 @@ impl Curve {
 
 fn same(a: f64, b: f64) -> bool {
     (a - b).abs() <= 1e-9 * a.abs().max(b.abs()).max(1.)
+}
+
+/// A weighted segment (GE-50): the Bezier with handles `w/3` of the
+/// segment long along tangents `m0`, `m1` (scaled to the segment), solved
+/// for the point at time fraction `s`.
+fn weighted(p0: f64, p1: f64, m0: f64, m1: f64, w0: f64, w1: f64, s: f64) -> f64 {
+    let (w0, w1) = (w0.clamp(0.01, 3.), w1.clamp(0.01, 3.));
+    let (x1, x2) = (w0 / 3., 1. - w1 / 3.);
+    let (y1, y2) = (p0 + m0 * w0 / 3., p1 - m1 * w1 / 3.);
+    let bez = |a: f64, b: f64, c: f64, d: f64, u: f64| {
+        let v = 1. - u;
+        v * v * v * a + 3. * v * v * u * b + 3. * v * u * u * c + u * u * u * d
+    };
+    // x(u) is monotone for weights up to 3: bisection.
+    let (mut lo, mut hi) = (0f64, 1f64);
+    for _ in 0..60 {
+        let mid = 0.5 * (lo + hi);
+        if bez(0., x1, x2, 1., mid) < s {
+            lo = mid;
+        } else {
+            hi = mid;
+        }
+    }
+    bez(p0, y1, y2, p1, 0.5 * (lo + hi))
 }
 
 /// Cubic Hermite from `p0` to `p1` with end tangents `m0`, `m1` (already

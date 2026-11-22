@@ -662,6 +662,54 @@ used in the app; `primitive_add` always starts from the Reset values.
   - `name` (string): File name before the frame number (default Playblast).
   - `open` (boolean): Open the result in the system player after (default true).
   - `format` (string): movie (default: an .mp4, through ffmpeg when it is installed; else the images) or images (a PNG sequence).
+- **`operandi.key.offset`** — Move the selected keys by frames in time and by value, one undo step (GE-40/45).
+  - `frames` (number): Frames to move by (default 0).
+  - `value` (number): Value to add (default 0).
+  - `link` (boolean): Related keys (X/Y/Z, R/G/B) at the same times move in time too (GE-42).
+- **`operandi.key.setValue`** — Sets, adds to or multiplies the selected keys' values (GE-71 Set Value).
+  - `value` (number, required): The value.
+  - `mode` (string): set (default), add or multiply.
+- **`operandi.key.scaleValue`** — Scales the selected keys' values around a value (GE-43).
+  - `factor` (number, required): Factor.
+  - `pivot` (number): The value to scale around (default 0).
+- **`operandi.key.setFrame`** — Puts the selected keys at a frame (the earliest there, spacing kept), or moves them by frames (GE-71 Set Frame).
+  - `frame` (number, required): Frame (or frames to move by with relative).
+  - `relative` (boolean): Move by frame instead of to it.
+- **`operandi.key.handle`** — Sets the selected keys' in or out handle: slope (value per frame) and/or weight; that side becomes Manual, a unified key's other side follows the slope (GE-50/53).
+  - `side` (string): in or out (default out).
+  - `slope` (number): Slope, value per frame.
+  - `weight` (number): Weight 0.01-3 (1 is the plain length).
+- **`operandi.key.break`** — Breaks the selected keys' handles so each side moves alone (GE-51). No arguments.
+- **`operandi.key.unify`** — Unifies the selected keys' handles into one line (GE-51). No arguments.
+- **`operandi.key.autoHandles`** — Puts the selected keys' handle weights back to Auto; with slopes:true their slopes too (GE-51/52).
+  - `slopes` (boolean): Slopes back to Auto as well.
+- **`operandi.key.add`** — Adds a key on a channel at a time and value (GE-31); the curve's own value when value is left out.
+  - `channel` (string, required): item:name.
+  - `frame` (number): Time in frames.
+  - `time` (number): Time in seconds (instead of frame).
+  - `value` (number): The key's value.
+- **`operandi.key.keepShape`** — Keys channels at a time without changing their curves (GE-32 Key Keeping Shape).
+  - `channels` (string): Channels as item:name,...; default the selected channels, else the selected keys' channels.
+  - `frame` (number): Time in frames.
+  - `time` (number): Time in seconds (instead of frame).
+- **`operandi.curve.behavior`** — Sets curves' behaviour before the first key and/or after the last (GE-61).
+  - `channels` (string): Channels as item:name,...; default the selected channels, else the selected keys' channels.
+  - `pre` (string): constant, constantSmooth, linear, repeat, oscillate, oscillateSmooth, offsetRepeat, offsetRepeatSmooth or reset.
+  - `post` (string): As pre.
+- **`operandi.curve.interpolation`** — Sets curves' interpolation: every key's slopes (GE-60).
+  - `channels` (string): Channels as item:name,...; default the selected channels, else the selected keys' channels.
+  - `type` (string, required): curve, linear or stepped.
+- **`operandi.curve.cycle`** — Turns the cycle option on or off: the last key matches the first (GE-62).
+  - `channels` (string): Channels as item:name,...; default the selected channels, else the selected keys' channels.
+  - `on` (boolean): On (default true).
+- **`operandi.curve.shadow`** — Copy to Shadow, Replace with Shadow, Swap or Clear Shadow (GE-80).
+  - `channels` (string): Channels as item:name,...; default the selected channels, else the selected keys' channels.
+  - `action` (string): copy (default), replace, swap or clear.
+- **`operandi.curve.eulerFilter`** — Unwraps rotation curves that jump by whole turns (GE-X1).
+  - `channels` (string): Channels as item:name,...; default the selected channels, else the selected keys' channels.
+- **`operandi.curve.simplify`** — Removes keys that change the curve by no more than a tolerance (GE-X2).
+  - `channels` (string): Channels as item:name,...; default the selected channels, else the selected keys' channels.
+  - `tolerance` (number): Largest change allowed (default 0.001).
 - **`operandi.time.set`** — Sets the current time (TK-01); not an undo step (TK-05). Snaps to a frame with Time Snap on.
   - `frame` (number): Time in frames.
   - `time` (number): Time in seconds (instead of frame).
