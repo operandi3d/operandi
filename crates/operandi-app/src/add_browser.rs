@@ -425,6 +425,7 @@ fn body(ui: &mut Ui, c: &Catalog, s: &mut State, out: &mut Outcome) {
                     }
                 });
             }
+            record("search", field.rect);
             crate::numeric_tab::register(ui, &field, Some(&s.search));
         });
     }

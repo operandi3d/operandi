@@ -190,6 +190,16 @@ fn selected_vertex_mask(count: usize, selected: &[u32]) -> Vec<bool> {
     }
     mask
 }
+
+/// Whether `pos` is on a window (an egui area that takes the pointer) drawn
+/// above the layer `ui` draws on: what the user clicks there is that window.
+fn over_window_above(ui: &Ui, pos: Pos2) -> bool {
+    let own = ui.layer_id();
+    ui.ctx()
+        .layer_id_at(pos)
+        .is_some_and(|top| top != own && top.order >= own.order)
+}
+
 impl Operandi {
     pub(super) fn sketch_plane_point(
         camera: &Camera,
@@ -4672,6 +4682,16 @@ impl Operandi {
                 };
                 // N03: a popover's title bar must not drive the active tool.
                 if self.overlay_rects.iter().any(|rect| rect.contains(pos)) {
+                    return false;
+                }
+                // UIC-61/181: a press on a window drawn above this view (a
+                // popover such as the Add browser, a floating panel, a
+                // menu) is that window's. A panel drawn after this view
+                // claims the pointer (`menu_owned_input`) too late for
+                // this frame, so ask egui which layer is on top instead: in
+                // Item mode the press deselected the mesh, which closed the
+                // Mesh Stack's Add Operator browser (bug report #5).
+                if over_window_above(ui, pos) {
                     return false;
                 }
                 let over_grip = grip.is_some_and(|rect| rect.contains(pos));
