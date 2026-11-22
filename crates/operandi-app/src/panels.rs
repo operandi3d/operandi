@@ -497,6 +497,22 @@ impl Operandi {
     }
 
     pub(super) fn toolbar(&mut self, ctx: &Context) {
+        // Jason, 2026-11-22: on Windows and Linux the menu bar (File…Help)
+        // has its own row at the very top of the window, with the tool set
+        // bar below it (UIC-11: under the menu bar sits the layout bar).
+        // Shown first, so it sits above "top". It stays when the tool set
+        // bar is collapsed (UIC-16): a Windows menu bar doesn't hide.
+        if !self.menus_in_system_bar() {
+            let panel = TopBottomPanel::top("menu-bar").show(ctx, |ui| {
+                ui.horizontal(|ui| self.in_window_menu_bar(ui, ctx));
+            });
+            #[cfg(test)]
+            {
+                self.layouts.menu_bar_rect = Some(panel.response.rect);
+            }
+            #[cfg(not(test))]
+            let _ = panel;
+        }
         // Collapsed with nothing else in it, the bar is just the thin line,
         // as thin as the side columns' (Jason, 2026-11-19: the panel's own
         // margins left a wider empty band).
@@ -524,7 +540,7 @@ impl Operandi {
                 }
             } else {
                 self.layouts.strip_rect = None;
-                self.top_bar_row(ui, ctx);
+                self.top_bar_row(ui);
             }
             if !self.layouts.mode_bar_bottom {
                 self.mode_bar(ui);
@@ -669,7 +685,7 @@ impl Operandi {
     }
     /// D-08: the fixed tool set bar. The owner approved moving the set
     /// controls here (UIC-197); layout switches still run layout.restore.
-    fn top_bar_row(&mut self, ui: &mut Ui, ctx: &Context) {
+    fn top_bar_row(&mut self, ui: &mut Ui) {
         #[cfg(test)]
         self.layouts.tool_set_rects.clear();
         ui.horizontal(|ui| {
@@ -694,9 +710,9 @@ impl Operandi {
                 }
             }
             ui.separator();
+            // Save, Undo and Redo stay on this row; the menus have their
+            // own row above it (`toolbar`).
             if !self.menus_in_system_bar() {
-                self.in_window_menu_bar(ui, ctx);
-                ui.separator();
                 if ui.button("Save").clicked() {
                     self.save_current();
                 }
@@ -1188,6 +1204,57 @@ mod history_widget_tests {
             .unwrap();
         a.editor.dispatch(Command::BeginExtrude).unwrap();
         a
+    }
+    /// Jason, 2026-11-22 (UIC-11, UIC-16): on Windows and Linux the menu
+    /// bar is its own row above the tool set bar, and stays when that bar
+    /// is collapsed to its thin line.
+    #[test]
+    fn in_window_menu_bar_has_its_own_row_above_the_tool_sets() {
+        let mut a = app();
+        a.menus_in_system_bar = false;
+        let ctx = context();
+        let texts = toolbar(&mut a, &ctx, 0., vec![]);
+        let menu = a.layouts.menu_bar_rect.expect("menu bar row shown");
+        let file = texts
+            .iter()
+            .find(|(t, _)| t == "File")
+            .expect("File menu")
+            .1;
+        assert!(menu.contains(file), "File sits in the menu row");
+        let logo = a.layouts.logo_rect.expect("logo shown");
+        let (_, model) = a.layouts.tool_set_rects[0];
+        assert!(
+            menu.bottom() <= logo.top(),
+            "menu {menu:?} above logo {logo:?}"
+        );
+        assert!(
+            menu.bottom() <= model.top(),
+            "menu {menu:?} above {model:?}"
+        );
+        // Save/Undo/Redo stay on the tool set row.
+        let save = texts.iter().find(|(t, _)| t == "Save").expect("Save").1;
+        assert!(save.y > menu.bottom() && save.y < logo.bottom());
+
+        // Collapsed by the logo (UIC-16): the menu row stays, the thin
+        // line sits under it.
+        for mode_bar_bottom in [false, true] {
+            a.layouts.top_collapsed = true;
+            a.layouts.mode_bar_bottom = mode_bar_bottom;
+            a.layouts.menu_bar_rect = None;
+            let texts = toolbar(&mut a, &ctx, 1., vec![]);
+            let menu = a.layouts.menu_bar_rect.expect("menu row while collapsed");
+            assert!(texts.iter().any(|(t, _)| t == "File"));
+            assert!(a.layouts.logo_rect.is_none());
+            let line = a.layouts.strip_rect.expect("collapsed line");
+            assert!(menu.bottom() <= line.top(), "menu {menu:?} above {line:?}");
+        }
+
+        // macOS: the menus are in the system bar, so no in-window row.
+        let mut mac = app();
+        mac.menus_in_system_bar = true;
+        let texts = toolbar(&mut mac, &context(), 0., vec![]);
+        assert!(mac.layouts.menu_bar_rect.is_none());
+        assert!(!texts.iter().any(|(t, _)| t == "File"));
     }
     #[test]
     fn hw_c01_armed_surface_widget_agrees_with_authoritative_undo() {

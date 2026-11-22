@@ -52,7 +52,7 @@ Agreed by Jason, 2026-11-20. One line each on where the name comes from.
 | # | Name | Source |
 |---|---|---|
 | 1 | Logo | The app mark; no name in the rules or code. |
-| 2 | Layout bar | The rules' name (UIC-11); in this build its tabs share the menu bar's row. |
+| 2 | Layout bar | The rules' name (UIC-11); on Windows and Linux it sits on its own row under the menu bar (Jason, 2026-11-22); on macOS the menus are in the system menu bar. |
 | 4 | Save, Undo and Redo | The three button labels; no group name elsewhere. |
 | 5 | Selection modes | Left part of the code's **mode bar**; the state buttons of UIC-24. |
 | 6 | Modelling aids | The set UIC-63 lists (action centre, symmetry, falloff, snapping, work plane). |

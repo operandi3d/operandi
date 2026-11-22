@@ -285,6 +285,9 @@ pub(super) struct Layouts {
     state_saved: String,
     #[cfg(test)]
     pub tool_set_rects: Vec<(toolbox::ToolSet, Rect)>,
+    /// The in-window menu bar's row last frame (tests).
+    #[cfg(test)]
+    pub(crate) menu_bar_rect: Option<Rect>,
     /// The message line's text rect last frame, when it sat under Tool
     /// Properties (tests).
     pub message_line_rect: Option<Rect>,
@@ -504,6 +507,8 @@ impl Layouts {
             state_saved: String::new(),
             #[cfg(test)]
             tool_set_rects: Vec::new(),
+            #[cfg(test)]
+            menu_bar_rect: None,
             message_line_rect: None,
             message_line_here: false,
             logo_rect: None,

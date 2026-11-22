@@ -253,6 +253,9 @@ fn choose_mode(a: &mut Operandi, ctx: &Context, entry: &str) {
         // menu. The popup opens above the combo when it doesn't fit below
         // (with Linux's fallback font the panel sits lower), so don't require it to be below.
         .filter(|r| r.left() < rect(&combo).right() && r.right() > rect(&combo).left())
+        // The menu bar has its own row now (2026-11-22), so its Texture
+        // menu can line up with the combo too.
+        .filter(|r| !a.layouts.menu_bar_rect.is_some_and(|m| m.intersects(*r)))
         .collect();
     assert_eq!(
         entries.len(),
@@ -547,6 +550,9 @@ fn choose_uv_map(a: &mut Operandi, ctx: &Context, entry: &str) {
         // menu. The popup opens above the combo when it doesn't fit below
         // (with Linux's fallback font the panel sits lower), so don't require it to be below.
         .filter(|r| r.left() < rect(&combo).right() && r.right() > rect(&combo).left())
+        // The menu bar has its own row now (2026-11-22), so its Texture
+        // menu can line up with the combo too.
+        .filter(|r| !a.layouts.menu_bar_rect.is_some_and(|m| m.intersects(*r)))
         .collect();
     assert_eq!(entries.len(), 1, "{entry}: one popup entry");
     click_at(a, ctx, entries[0].center());
