@@ -368,6 +368,20 @@ pub enum Icon {
     ApplyKeys,
     DiscardKeys,
     AutoKey,
+    GraphEditor,
+    KeyKeepingShape,
+    BreakTangents,
+    UnifyTangents,
+    PreBehaviour,
+    PostBehaviour,
+    CycleCurve,
+    ShadowCopy,
+    ShadowSwap,
+    Normalised,
+    Stacked,
+    IsolateCurve,
+    Velocity,
+    LinkRelated,
 }
 /// One table: each icon's file in assets/icons (named as in the generator's
 /// output) and its embedded artwork. Add Loop uses the Loop Cut artwork;
@@ -775,6 +789,20 @@ icon_files! {
     ApplyKeys => "apply-keys",
     DiscardKeys => "discard-keys",
     AutoKey => "auto-key",
+    GraphEditor => "graph-editor",
+    KeyKeepingShape => "key-keeping-shape",
+    BreakTangents => "break-tangents",
+    UnifyTangents => "unify-tangents",
+    PreBehaviour => "pre-behaviour",
+    PostBehaviour => "post-behaviour",
+    CycleCurve => "cycle-curve",
+    ShadowCopy => "shadow-copy",
+    ShadowSwap => "shadow-swap",
+    Normalised => "normalised",
+    Stacked => "stacked",
+    IsolateCurve => "isolate-curve",
+    Velocity => "velocity",
+    LinkRelated => "link-related",
 }
 
 fn rasterize(icon: Icon, pixels: u32) -> Result<ColorImage, String> {
