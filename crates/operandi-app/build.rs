@@ -9,6 +9,7 @@
 fn main() {
     stamp_git_commit();
     embed_shipped_layouts();
+    set_windows_main_stack();
     println!("cargo:rerun-if-env-changed=DEP_OPERANDI_CYCLES_ROOT");
     println!("cargo:rerun-if-env-changed=DEP_OPERANDI_USD_ROOT");
     // The USD bridge (`--features usd`) is found the same way as Cycles.
@@ -28,6 +29,21 @@ fn main() {
                 println!("cargo:rustc-link-arg=-Wl,-rpath,{dir}");
             }
         }
+    }
+}
+
+/// Windows gives a program's main thread only 1 MB of stack (Mac and Linux
+/// give 8 MB). The app runs on the main thread (the window event loop must
+/// live there on the Mac) and its state is big, so debug builds overflowed
+/// on the first click. Ask the linker for the same 8 MB everywhere.
+fn set_windows_main_stack() {
+    if std::env::var("CARGO_CFG_TARGET_OS").as_deref() != Ok("windows") {
+        return;
+    }
+    match std::env::var("CARGO_CFG_TARGET_ENV").as_deref() {
+        Ok("msvc") => println!("cargo:rustc-link-arg-bins=/STACK:8388608"),
+        Ok("gnu") => println!("cargo:rustc-link-arg-bins=-Wl,--stack,8388608"),
+        _ => {}
     }
 }
 
