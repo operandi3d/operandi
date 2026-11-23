@@ -806,6 +806,23 @@ used in the app; `primitive_add` always starts from the Reset values.
   - `preserveAlignment` (boolean): Keep orientations instead of re-aiming (default false).
 - **`operandi.skel.query`** — Read joints as JSON: id, name, parent, firstChild, children, position, boneLength, axes X/Y/Z. root limits it to that joint's chain, depth first.
   - `root` (integer): Only this joint's chain.
+- **`operandi.skin.bakeWeights`** — Write the effective weights (after normalise, limit, threshold, sharpness, smooth influences) into the joints' weight maps and reset those options, one undo step.
+  - `item` (integer): The bound mesh (default the selected one).
+- **`operandi.skin.query`** — Read the skin as JSON: item, op, interpolation, limitSources, maxSources, threshold, sharpness, world, joints (joint, name, map, enable, influence, missing). With vertex: weights (map: effective weight), rest and position (deformed, at time seconds, default now).
+  - `item` (integer): The bound mesh (default the selected one).
+  - `vertex` (integer): A point index.
+  - `time` (number): Seconds (default the current time).
+- **`operandi.skin.set`** — Change the skin of a bound mesh, one undo step: interpolation local/linear/dualQuaternion, limitSources, maxSources 1-8, threshold 0-1, sharpness, world; with joint, that influence's enable and influence linear/smooth.
+  - `item` (integer): The bound mesh (default the selected one).
+  - `interpolation` (string): local (default), linear or dualQuaternion.
+  - `limitSources` (boolean): Keep only the strongest maxSources joints a point.
+  - `maxSources` (integer): 1 to 8 (default 3).
+  - `threshold` (number): Ignore weights below this (0-1).
+  - `sharpness` (number): Positive binds harder to the strongest joint, negative spreads.
+  - `world` (boolean): Joints act in world space (default true).
+  - `joint` (integer): One influence's joint, for enable and influence.
+  - `enable` (boolean): That influence on or off.
+  - `influence` (string): That influence's weights: linear or smooth.
 - **`operandi.eval.graph`** — Read the evaluation graph as JSON: nodes (id, kind time/channel/field/transform/shownMesh, item, name, label, dirty) and edges [from, to] (to reads from). item limits it to one item's nodes and the edges touching them.
   - `item` (integer): Only this item's nodes.
 - **`operandi.render.frameRange`** — Render frames start..end (default the current range) with Cycles into folder (default the project's renders/) as <name>_0000.png; needs the running app. operandi.anim.query reports progress (job).

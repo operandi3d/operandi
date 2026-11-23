@@ -1163,6 +1163,25 @@ pub enum AnimRequest {
 /// The channels of the items `before` and the scene share whose values an
 /// edit changed, with their new values. `all`: every keyable channel of
 /// the edited (selected) items, else only animated ones.
+/// SK-01: in Setup mode, every channel the edit from `before` changed
+/// takes the new value as its setup value.
+pub(crate) fn setup_edit(before: &Scene, scene: &mut Scene) {
+    let touched: Vec<(ChannelKey, f64)> = scene
+        .animation
+        .channels
+        .keys()
+        .filter_map(|k| match (read(before, k), read(scene, k)) {
+            (Some(old), Some(new)) if differs(old, new) => Some((k.clone(), new)),
+            _ => None,
+        })
+        .collect();
+    for (k, new) in touched {
+        if let Some(c) = scene.animation.channels.get_mut(&k) {
+            c.rest = new;
+        }
+    }
+}
+
 fn changed_channels(before: &Scene, after: &Scene, all: bool) -> Vec<(ChannelKey, f64, f64)> {
     let mut out = Vec::new();
     for (k, c) in &after.animation.channels {
@@ -1235,12 +1254,9 @@ impl crate::Editor {
         }
         // SK-01: in Setup mode an edit changes the setup values of the
         // animated channels it touched; nothing is keyed.
+        // Setup channels with no keys (a bound joint's, skin.rs) count too.
         if scene.animation.setup {
-            for (k, _, new) in changed_channels(before, scene, false) {
-                if let Some(c) = scene.animation.channels.get_mut(&k) {
-                    c.rest = new;
-                }
-            }
+            setup_edit(before, scene);
             return;
         }
         let mode = scene.animation.settings.auto_key;

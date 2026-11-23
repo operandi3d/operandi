@@ -86,6 +86,9 @@ pub struct Source {
     pub to_local: DMat4,
     /// Source local → world.
     pub world: DMat4,
+    /// Source local → this item's local in the source's setup (rest)
+    /// pose (ACS-API-31): the skin's bind pose (skin.rs).
+    pub rest: DMat4,
 }
 impl Source {
     /// The source's mesh moved into the reading item's space. Vertex
@@ -123,6 +126,7 @@ impl Linked {
                             Shared::same(&x.mesh, &y.mesh)
                                 && x.to_local == y.to_local
                                 && x.world == y.world
+                                && x.rest == y.rest
                         }
                         (Err(x), Err(y)) => x == y,
                         _ => false,

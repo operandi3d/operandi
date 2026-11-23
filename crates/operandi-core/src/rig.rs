@@ -39,6 +39,10 @@ pub struct Rig {
     /// made from, for exports that evaluate other times. Never saved.
     #[serde(skip)]
     pub source: Option<std::sync::Arc<crate::Scene>>,
+    /// On an evaluated copy: the setup-pose local matrix of every item
+    /// the rig moved, from before it moved them (skin.rs bind pose).
+    #[serde(skip)]
+    pub setup_locals: BTreeMap<u64, glam::DMat4>,
 }
 
 /// A user channel's value type (RG-53).

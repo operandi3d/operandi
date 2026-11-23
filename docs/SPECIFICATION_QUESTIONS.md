@@ -9688,3 +9688,6 @@ Built from BEHAVIOR-TOPOLOGY-PEN (2026-11-20) on branch topology-pen. These are 
 - SK-Q03 SK-15 numbering: the number counts per name and side (Joint1, Joint1_L, Joint1_R); a mirrored pair shares its number. A joint on the mirror plane gets no suffix and no mirror. Provisional.
 - SK-Q04 SK-16 the Axis (roll) is chosen as near as it can be to perpendicular to world up (Z up when the bone is vertical); a leaf keeps its orientation. Provisional.
 - SK-Q05 SK-10 a drag after the click moves the joint in the plane through it facing the view; SK-18 shape: three rings a tenth of the bone long (a fixed screen size for leaves) and a four-sided bone. Provisional.
+- SK-Q06 The skin's MeshOp id is Operandi's own (`operandi.skin.item`); the name map has none. Provisional.
+- SK-Q07 Bind pose = the joints' setup pose, read from their channels' setup values (bound joints get setup channels with no keys); constraints and targets don't count in it; the mesh item's own placement is today's, so moving the mesh item alone doesn't deform it. World off is stored but acts as on. Provisional.
+- SK-Q08 Sharpness raises each weight (relative to the point's strongest) to the power 2^Sharpness before normalising; a Smooth influence curves its weight with 3w²−2w³. Provisional.

@@ -252,6 +252,8 @@ pub mod rig_schematic;
 pub mod scene_time;
 pub mod script_mesh;
 pub mod skeleton;
+pub mod skin;
+pub mod skin_commands;
 pub mod time_tick;
 pub use boolean::{BooleanOp, BooleanOptions, BooleanProblem, DriveMesh};
 pub use drill::{DrillAxis, DrillKind, DrillOp, DrillOptions};

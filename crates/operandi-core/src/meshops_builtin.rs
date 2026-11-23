@@ -766,5 +766,6 @@ pub(crate) fn builtin() -> Vec<Arc<dyn OpDef>> {
     table.extend(crate::meshops_deform::entries());
     table.extend(crate::curve_ops::entries());
     table.extend(crate::generator_ops::entries());
+    table.extend(crate::skin::entries());
     table
 }

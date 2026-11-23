@@ -110,6 +110,10 @@ impl Editor {
         let result = edit(self);
         match result {
             Ok(true) => {
+                // Setup mode: what the step changed becomes setup values.
+                if self.scene.animation.setup {
+                    crate::animation::setup_edit(&before, &mut self.scene);
+                }
                 if let Err(e) = self.scene.validate() {
                     self.scene = before;
                     self.anim.quiet = false;

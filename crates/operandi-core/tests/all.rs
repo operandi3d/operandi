@@ -568,6 +568,8 @@ mod skeleton;
 mod sketch_extrude_clean_spec;
 #[path = "sketch_extrude_drag_clean_spec.rs"]
 mod sketch_extrude_drag_clean_spec;
+#[path = "skin.rs"]
+mod skin;
 #[path = "slice_tools.rs"]
 mod slice_tools;
 #[path = "smooth_shading.rs"]

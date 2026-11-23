@@ -3577,6 +3577,49 @@ pub static COMMANDS: &[Entry] = &[
         .quiet()
         .operandi()
         .example("operandi.skel.query"),
+    script("operandi.skin.bakeWeights", Items, "Bake Weights (SK-34): the skin's effective weights go into its weight maps and its options back to neutral.")
+        .on_editor(
+            "Write the effective weights (after normalise, limit, threshold, sharpness, smooth influences) into the joints' weight maps and reset those options, one undo step.",
+            &[jopt("item", "integer", "The bound mesh (default the selected one).")],
+            crate::skin_commands::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.skin.bakeWeights"),
+    script("operandi.skin.query", Items, "Reads a bound mesh's skin as JSON (UIC-163): channels and joints; with vertex, its weights and deformed position at a time.")
+        .on_editor(
+            "Read the skin as JSON: item, op, interpolation, limitSources, maxSources, threshold, sharpness, world, joints (joint, name, map, enable, influence, missing). With vertex: weights (map: effective weight), rest and position (deformed, at time seconds, default now).",
+            &[
+            jopt("item", "integer", "The bound mesh (default the selected one)."),
+            jopt("vertex", "integer", "A point index."),
+            jopt("time", "number", "Seconds (default the current time)."),
+        ],
+            crate::skin_commands::run,
+        )
+        .query()
+        .quiet()
+        .operandi()
+        .example("operandi.skin.query vertex:0"),
+    script("operandi.skin.set", Items, "Sets the skin's channels (SK-31) or one joint influence's Enable and Interpolation (SK-35).")
+        .on_editor(
+            "Change the skin of a bound mesh, one undo step: interpolation local/linear/dualQuaternion, limitSources, maxSources 1-8, threshold 0-1, sharpness, world; with joint, that influence's enable and influence linear/smooth.",
+            &[
+            jopt("item", "integer", "The bound mesh (default the selected one)."),
+            jopt("interpolation", "string", "local (default), linear or dualQuaternion."),
+            jopt("limitSources", "boolean", "Keep only the strongest maxSources joints a point."),
+            jopt("maxSources", "integer", "1 to 8 (default 3)."),
+            jopt("threshold", "number", "Ignore weights below this (0-1)."),
+            jopt("sharpness", "number", "Positive binds harder to the strongest joint, negative spreads."),
+            jopt("world", "boolean", "Joints act in world space (default true)."),
+            jopt("joint", "integer", "One influence's joint, for enable and influence."),
+            jopt("enable", "boolean", "That influence on or off."),
+            jopt("influence", "string", "That influence's weights: linear or smooth."),
+        ],
+            crate::skin_commands::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.skin.set interpolation:dualQuaternion"),
     script("operandi.eval.graph", Items, "Reads the scene's evaluation graph (who reads whom: time, channels, fields, transforms, shown meshes) as JSON nodes and edges (UIC-163; the Schematic's data).")
         .on_editor(
             "Read the evaluation graph as JSON: nodes (id, kind time/channel/field/transform/shownMesh, item, name, label, dirty) and edges [from, to] (to reads from). item limits it to one item's nodes and the edges touching them.",
@@ -6993,7 +7036,7 @@ mod tests {
                 assert!(!json.about.is_empty(), "{}", e.name);
             }
         }
-        assert_eq!(crate::command_exec::specs().count(), 266);
+        assert_eq!(crate::command_exec::specs().count(), 269);
     }
 
     #[test]

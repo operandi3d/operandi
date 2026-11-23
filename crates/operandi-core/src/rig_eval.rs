@@ -652,6 +652,20 @@ pub fn apply(scene: &Scene, result: &RigResult, keep_source: bool) -> Option<Sce
         return None;
     }
     let mut out = scene.clone();
+    // The skin's bind pose reads these (skin.rs): what the rig moves keeps
+    // its setup pose from before.
+    let moved = result
+        .placed
+        .iter()
+        .copied()
+        .chain(result.driven.iter().map(|(k, _)| k.item));
+    for id in moved {
+        out.animation
+            .rig
+            .setup_locals
+            .entry(id)
+            .or_insert_with(|| crate::skin::setup_local(scene, id));
+    }
     for (k, v) in &result.driven {
         let _ = crate::animation::write(&mut out, k, *v);
     }
