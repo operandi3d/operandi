@@ -1,13 +1,13 @@
-//! Replays the 2026-11-18 Action Center and MeshOps check cases against
+//! Replays the 2026-11-18 Action Center and Mesh Stack check cases against
 //! their exact inputs (`specifications/checks-ac-meshops-2026-11-18`):
 //! AC-rotate-Selection, AC-scale-Local, AC-rotate-Local,
 //! MOP-MM-M03_useWorld0 and MOP-MM-M04_both0. The cases give behaviour in
 //! words; the expected points here follow those words, computed apart from
 //! the tools. Pivot cases are left out (Pivot is not built).
 use glam::{DMat3, DMat4, DQuat, DVec3, EulerRot};
-use operandi_core::meshops::OpStatus;
-use operandi_core::meshops_editor::OpRef;
-use operandi_core::meshops_items::MERGE_MESHES_OP;
+use operandi_core::mesh_stack::OpStatus;
+use operandi_core::mesh_stack_editor::OpRef;
+use operandi_core::mesh_stack_items::MERGE_MESHES_OP;
 use operandi_core::*;
 use serde_json::{Value, json};
 
@@ -272,13 +272,21 @@ fn merge_case(case: &str, options: Value) -> Mesh {
         .unwrap();
     let op = OpRef {
         item: target,
-        op: e.scene.item(target).unwrap().mesh_ops.as_ref().unwrap().ops[0].id,
+        op: e
+            .scene
+            .item(target)
+            .unwrap()
+            .mesh_stack
+            .as_ref()
+            .unwrap()
+            .ops[0]
+            .id,
     };
     let mut values = options.as_object().unwrap().clone();
     values.insert("sources".into(), json!([ids["S1"]]));
     e.dispatch(Command::MeshOpSet { op, values }).unwrap();
     let r = e
-        .meshops
+        .mesh_stack
         .current(&e.scene, e.scene.item(target).unwrap())
         .unwrap();
     assert_eq!(r.statuses, [OpStatus::Ok], "{case}");

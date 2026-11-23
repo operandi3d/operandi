@@ -882,7 +882,7 @@ impl crate::Editor {
         *self = next;
         Ok(())
     }
-    /// The tool pipe's constraint layer (MC-08), after the tool's own
+    /// The tool chain's constraint layer (MC-08), after the tool's own
     /// change, so after snapping too (snapping steers the tool's input):
     /// every foreground point the tool moved goes onto the background.
     /// Tools whose card leaves the layer out, and tools that add or

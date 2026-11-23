@@ -1,6 +1,6 @@
 ## empty: Item
 Create Environment
-Freeze Replicator
+Freeze Instancer
 > Transform
   Reset Position (greyed: Select an item)
   Reset Rotation (greyed: Select an item)
@@ -29,7 +29,7 @@ Freeze Replicator
   Plane in New Mesh
 ## mesh: Item
 Create Environment
-Freeze Replicator
+Freeze Instancer
 > Transform
   Reset Position
   Reset Rotation
@@ -58,7 +58,7 @@ Freeze Replicator
   Plane in New Mesh
 ## scenes: Item
 Create Environment
-Freeze Replicator
+Freeze Instancer
 > Transform
   Reset Position
   Reset Rotation
@@ -87,7 +87,7 @@ Freeze Replicator
   Plane in New Mesh
 ## tool: Item
 Create Environment
-Freeze Replicator
+Freeze Instancer
 > Transform
   Reset Position (greyed: Drop or Cancel the active tool first)
   Reset Rotation (greyed: Drop or Cancel the active tool first)
@@ -116,7 +116,7 @@ Freeze Replicator
   Plane in New Mesh
 ## item: Item
 Create Environment
-Freeze Replicator
+Freeze Instancer
 > Transform
   Reset Position
   Reset Rotation
@@ -145,7 +145,7 @@ Freeze Replicator
   Plane in New Mesh
 ## session: Item
 Create Environment
-Freeze Replicator
+Freeze Instancer
 > Transform
   Reset Position
   Reset Rotation
@@ -174,7 +174,7 @@ Freeze Replicator
   Plane in New Mesh
 ## modal: Item
 Create Environment (greyed: Finish the open dialog, menu or drag first)
-Freeze Replicator (greyed: Finish the open dialog, menu or drag first)
+Freeze Instancer (greyed: Finish the open dialog, menu or drag first)
 > Transform
   Reset Position (greyed: Finish the open dialog, menu or drag first)
   Reset Rotation (greyed: Finish the open dialog, menu or drag first)
@@ -203,7 +203,7 @@ Freeze Replicator (greyed: Finish the open dialog, menu or drag first)
   Plane in New Mesh (greyed: Finish the open dialog, menu or drag first)
 ## bound: Item
 Create Environment
-Freeze Replicator
+Freeze Instancer
 > Transform
   Reset Position
   Reset Rotation

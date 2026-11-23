@@ -19,7 +19,7 @@ use crate::eval_graph::{EvalGraph, NodeKey};
 use std::hash::{Hash, Hasher};
 
 /// What a node holds: a channel's or field's number, or a change counter
-/// for nodes whose value lives elsewhere (a shown mesh in the MeshOps
+/// for nodes whose value lives elsewhere (a shown mesh in the Mesh Stack
 /// cache).
 #[derive(Clone, Debug, PartialEq)]
 pub enum Value {
@@ -42,7 +42,7 @@ fn transform_channel(name: &str) -> bool {
     ["pos.", "rot.", "scl."].iter().any(|p| name.starts_with(p))
 }
 
-/// The scene's graph. Fails only on a dependency loop, which MeshOps
+/// The scene's graph. Fails only on a dependency loop, which Mesh Stack
 /// already refuses when made (SAFE-07); a loaded loop is left out.
 pub fn build(scene: &Scene) -> SceneGraph {
     let mut g = SceneGraph::new();
@@ -88,7 +88,7 @@ pub fn build(scene: &Scene) -> SceneGraph {
         }
     }
     for item in &scene.items {
-        let Some(stack) = &item.mesh_ops else {
+        let Some(stack) = &item.mesh_stack else {
             continue;
         };
         let shown = g.node(NodeKey::ShownMesh(item.id));
@@ -134,7 +134,7 @@ pub fn structure(scene: &Scene) -> u64 {
         p.refs.hash(&mut h);
     }
     for item in &scene.items {
-        if let Some(stack) = &item.mesh_ops {
+        if let Some(stack) = &item.mesh_stack {
             item.id.hash(&mut h);
             for op in stack.ops.iter().filter(|op| op.enabled) {
                 op.kind.def().is_some_and(|d| d.uses_time()).hash(&mut h);

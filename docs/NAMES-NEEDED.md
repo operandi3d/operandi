@@ -88,7 +88,7 @@ name map, so placeholders:
 | `operandi.workbench.edit` (`on:`, `form:`) | Edit Workbench: shows or hides a workbench's edit tools |
 | `operandi.workbench.pick` (`on:`) | Pick to Add |
 | `operandi.workbench.add` / `.addProperty` / `.addDivider` | Add a button, a Tool Properties row, a divider |
-| `operandi.workbench.addPipe` (`as:` preset, macro or script) | Add the current tool pipe as a preset |
+| `operandi.workbench.addChain` (`as:` preset, macro or script) | Add the current tool chain as a preset |
 | `operandi.workbench.move` / `.set` / `.chooseIcon` | Reorder; set a right-click property; Custom Icon... |
 | `operandi.workbench.duplicate` / `.delete` / `.undo` | Duplicate, Delete, Undo Edit |
 | `operandi.workbench.topBar` (`on:`) | Show or hide the workbench row along the top |

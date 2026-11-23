@@ -1,5 +1,5 @@
-//! Curve MeshOps (modelling-parity specs, CURVE-COMMANDS-2D-SHAPES v1
-//! CC-70..75; CURVE-EXTRUDE-PEN-CLONE v1; MeshOps TYPE-IDS):
+//! Curve ops in the Mesh Stack (modelling-parity specs, CURVE-COMMANDS-2D-SHAPES v1
+//! CC-70..75; CURVE-EXTRUDE-PEN-CLONE v1; Mesh Stack TYPE-IDS):
 //!
 //! - The six 2D curve shapes (Create › Curves): Circle, Ellipse,
 //!   Rectangle, Diamond, N-Sided and Star, each one closed curve in a
@@ -224,7 +224,7 @@ macro_rules! shape_op {
         impl TypedOp for $name {
             fn run(&self, ctx: &OpContext) -> Result<Mesh> {
                 let $s = self;
-                crate::meshops_builtin::finite(&[$s.pos_x, $s.pos_y], "Position")?;
+                crate::mesh_stack_builtin::finite(&[$s.pos_x, $s.pos_y], "Position")?;
                 if $s.axis > 2 {
                     return Err("Axis must be 0 (X), 1 (Y) or 2 (Z)".into());
                 }

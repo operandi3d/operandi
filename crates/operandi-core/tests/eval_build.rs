@@ -3,7 +3,7 @@
 //! its links, and the structure fingerprint changes only with structure.
 use operandi_core::eval_build::{build, structure};
 use operandi_core::eval_graph::NodeKey;
-use operandi_core::meshops_editor::OpRef;
+use operandi_core::mesh_stack_editor::OpRef;
 use operandi_core::*;
 
 fn ok(e: &mut Editor, text: &str) {
@@ -67,7 +67,7 @@ fn a_mesh_stack_reads_its_links_and_their_transforms() {
     e.scene.select_item(Some(b));
     e.dispatch(Command::MeshOpCreate("boolean.meshop.item".into()))
         .unwrap();
-    let op = e.scene.item(b).unwrap().mesh_ops.as_ref().unwrap().ops[0].id;
+    let op = e.scene.item(b).unwrap().mesh_stack.as_ref().unwrap().ops[0].id;
     let mut values = serde_json::Map::new();
     values.insert("driver".into(), a.into());
     e.dispatch(Command::MeshOpSet {

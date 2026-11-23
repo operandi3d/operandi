@@ -140,7 +140,7 @@ impl import::Assets for FileAssets {
 /// `path` only when complete, so a failed export leaves no file.
 ///
 /// `scene` is what gets written, mesh by mesh: callers pass the evaluated
-/// scene (`Editor::evaluated(Purpose::Final)`), so MeshOps results are
+/// scene (`Editor::evaluated(Purpose::Final)`), so Mesh Stack results are
 /// exported rather than their Base Meshes, as every entry point does.
 pub fn export(path: &Path, scene: &Scene, format: ExportFormat) -> Result<ExportReport> {
     if !format.is_usd() {

@@ -25,7 +25,7 @@ fn replica_app() -> Operandi {
         .items
         .iter()
         .find(|i| i.replicator.is_some())
-        .expect("a Replicator")
+        .expect("an Instancer")
         .id;
     a.editor.scene.select_item(Some(rep));
     a.editor.undo.clear();
@@ -103,7 +103,7 @@ fn every_command_keeps_the_contract_on_a_replicator() {
         .collect();
     assert!(
         failures.is_empty(),
-        "\nBroken on a Replicator:\n{}\n",
+        "\nBroken on an Instancer:\n{}\n",
         failures.join("\n")
     );
 }

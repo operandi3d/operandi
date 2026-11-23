@@ -341,7 +341,7 @@ impl<T: TypedOp> OpDef for Typed<T> {
 }
 
 static TABLE: LazyLock<RwLock<Vec<Arc<dyn OpDef>>>> =
-    LazyLock::new(|| RwLock::new(crate::meshops_builtin::builtin()));
+    LazyLock::new(|| RwLock::new(crate::mesh_stack_builtin::builtin()));
 
 fn table() -> std::sync::RwLockReadGuard<'static, Vec<Arc<dyn OpDef>>> {
     TABLE.read().unwrap_or_else(|e| e.into_inner())

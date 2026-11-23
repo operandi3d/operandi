@@ -24,7 +24,7 @@
 // Point-indexed loops read several parallel arrays at once.
 #![allow(clippy::needless_range_loop)]
 use crate::bake::bvh::Bvh;
-use crate::meshops::{MeshOp, MeshOpStack, OpKind};
+use crate::mesh_stack::{MeshOp, MeshStack, OpKind};
 use crate::skin::{self, SKIN_OP, SkinValues};
 use crate::skin_commands::{skin_op, write_skin};
 use crate::{Command, Editor, Mesh, Mode, Result, Scene};
@@ -726,10 +726,10 @@ pub fn run(e: &mut Editor, name: &str, a: &Args) -> Result<Option<Command>> {
                 for &m in &meshes {
                     let (op, v) = skin_op(&e.scene, m)?;
                     let item = e.scene.item_mut(m).expect("checked");
-                    if let Some(stack) = item.mesh_ops.as_mut() {
+                    if let Some(stack) = item.mesh_stack.as_mut() {
                         stack.ops.retain(|o| o.id != op);
                         if stack.ops.is_empty() {
-                            item.mesh_ops = None;
+                            item.mesh_stack = None;
                         }
                     }
                     if !keep {
@@ -845,7 +845,7 @@ fn bind_mesh(
 /// (SK-36: morphs, then the skin, then other deformers).
 pub fn insert_skin(scene: &mut Scene, m: u64, values: &SkinValues) -> Result<()> {
     let item = scene.item_mut(m).ok_or("No mesh")?;
-    let stack = item.mesh_ops.get_or_insert_with(MeshOpStack::default);
+    let stack = item.mesh_stack.get_or_insert_with(MeshStack::default);
     let id = stack.next_id;
     stack.next_id += 1;
     stack.ops.insert(

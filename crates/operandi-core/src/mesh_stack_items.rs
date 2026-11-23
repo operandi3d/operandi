@@ -1,4 +1,4 @@
-//! MeshOps that read other mesh items: Boolean (BOOL-32, BOP-xx) and
+//! Mesh Stack that read other mesh items: Boolean (BOOL-32, BOP-xx) and
 //! Merge Meshes (MM-xx), from specifications meshops-specs-2026-11-17.
 //! Both link items through the op table's `Item` / `Items` fields, so the
 //! stack evaluates those items first and hands over their results with

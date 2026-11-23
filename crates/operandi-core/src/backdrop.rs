@@ -468,7 +468,7 @@ impl Scene {
             common: Default::default(),
             elements: Default::default(),
             hides_children: false,
-            mesh_ops: None,
+            mesh_stack: None,
             kit: None,
             instance_of: None,
             replicator: None,

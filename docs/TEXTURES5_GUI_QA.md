@@ -19,7 +19,7 @@ Viewport.
    the locator: axes and a unit cube (Solid). Projection Planar → a square
    at Size across the axis with a dotted arrow; Cylindrical → a cylinder;
    Spherical → three rings. Deselect → it disappears.
-6. Texture Locator tab: Real World Size X/Y, Texture Replicator, Projection
+6. Texture Locator tab: Real World Size X/Y, Texture Instancer, Projection
    Camera rows (hover: stored only). Set them, save, reopen → kept.
 7. Move the plane item → the viewport pattern moves with it (World
    Coordinates off).

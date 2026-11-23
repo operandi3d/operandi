@@ -65,7 +65,7 @@ impl Editor {
         swap(&mut a.falloff_element, &mut b.falloff_element);
         swap(&mut a.falloff_stamps, &mut b.falloff_stamps);
         swap(&mut a.background_cache, &mut b.background_cache);
-        swap(&mut a.meshops, &mut b.meshops);
+        swap(&mut a.mesh_stack, &mut b.mesh_stack);
         swap(&mut a.eval, &mut b.eval);
         swap(&mut a.base_edit, &mut b.base_edit);
         swap(&mut a.meshop_row, &mut b.meshop_row);
@@ -117,7 +117,7 @@ fn every_field_is_sorted(e: Editor) {
         falloff_element: _,
         falloff_stamps: _,
         background_cache: _,
-        meshops: _,
+        mesh_stack: _,
         eval: _,
         base_edit: _,
         meshop_row: _,

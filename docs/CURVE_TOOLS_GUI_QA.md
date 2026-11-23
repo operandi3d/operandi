@@ -48,7 +48,7 @@ should come back with one Cmd+Z after the tool drops.
 14. The Offset and Convert rows and Bezier Tangent say "not built" (they
     wait for the hands-on batch).
 
-## 2D shapes (MeshOps)
+## 2D shapes (Mesh Stack)
 
 15. Curve tab > Shapes > **Circle**: a Circle op appears in the Mesh
     Operations list with Radius 0.5 on the XZ plane. Change Radius, Type
@@ -61,7 +61,7 @@ should come back with one Cmd+Z after the tool drops.
 17. Select a small cube, Duplicate tab > **Scatter Clone**, click in the
     view: 8 cubes (the original counts) scattered within ±1 m. Change
     Seed: a different set; Range Y 0: all on the ground. Space drops it.
-18. MeshOps: add **Scatter Clone** to a small cube's stack, Count 9: nine
+18. Mesh Stack: add **Scatter Clone** to a small cube's stack, Count 9: nine
     cubes spread evenly over a 1 × 1 square from the origin.
 19. Make a floor plane and a wall grid above it. Add **Surface Constraint**
     to the wall, pick the floor as Constraint Surface, turn on Invert:

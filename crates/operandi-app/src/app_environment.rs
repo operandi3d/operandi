@@ -350,7 +350,7 @@ impl AppPaths {
     pub fn drop_action(&self) -> PathBuf {
         self.data_root.join("drop-action.json")
     }
-    /// Items list Add Item Recent and Show unsupported (item_list_ui.rs).
+    /// Items list Add Item Recent (item_list_ui.rs).
     pub fn item_list(&self) -> PathBuf {
         self.data_root.join("item-list.json")
     }

@@ -283,7 +283,9 @@ impl Editor {
         let creating = self.creating_shape();
         let result = (|| {
             if let Err(error) = staged.dispatch_inner(cmd, report) {
-                return Err(staged.explain_mesh_ops_error(error, stack_command || history_command));
+                return Err(
+                    staged.explain_mesh_stack_error(error, stack_command || history_command)
+                );
             }
             if !history_command {
                 staged.scene.prune_component_selections_keeping(
@@ -300,11 +302,11 @@ impl Editor {
             if !history_command {
                 staged.protect_elements(&initial_scene)?;
             }
-            // MeshOps (meshops_editor.rs): SAFE-05/06 for every command.
+            // Mesh Stack (mesh_stack_editor.rs): SAFE-05/06 for every command.
             if !history_command {
-                staged.guard_mesh_ops(&initial_scene, stack_command)?;
+                staged.guard_mesh_stack(&initial_scene, stack_command)?;
             } else {
-                staged.settle_mesh_ops();
+                staged.settle_mesh_stack();
             }
             staged.settle_preset();
             staged.track_tweak(

@@ -7,19 +7,18 @@ the report, on a throwaway scene. Each line: do this → expect that.
    Sel, Notes (greyed), F at the right (the funnel replaced Text, UIC-132).
    There is no Item button.
 2. Click Add Item (the label) → menu: find field, Recent ▸, Backdrop Item,
-   Camera, Mesh, separator, Lights ▸, separator, Show unsupported. The ⏷
-   opens the same menu.
+   Camera, Mesh, separator, Lights ▸, Locators ▸ and nothing else: no
+   greyed entries, no Show unsupported (IL-Q4). The ⏷ opens the same menu.
 3. Recent ▸ on a fresh data folder → one greyed "(none)".
 4. Select the first mesh, Add Item > Mesh → "Mesh (2)" appears directly
    under the first mesh, alone selected. Cmd+Z removes it in one step.
 5. Lights ▸ → Area, Cylinder, Directional, Dome, Mesh Light, Photometric,
-   Point, Portal, Spot, all enabled. Tick Show unsupported, Forces ▸ →
-   greyed entries; hovering one says "Not yet in Operandi"; clicking it
-   does nothing.
+   Point, Portal, Spot, all enabled. Locators ▸ → Group Locator only.
 6. Type "spot" in the find field → only Spot Light; Enter adds it. Recent
    now lists Spot Light first, then Mesh. Quit and relaunch → Recent is
    the same.
-7. Tick Show unsupported → Deformers … Other appear, all entries greyed.
+7. Type "vortex" in the find field → "(no match)": types Operandi can't
+   make aren't listed.
 8. Select popover: Pattern `cam*`, Select → the camera(s) selected. Pattern
    `m?sh*`, Hide → meshes hidden; Cmd+Z brings them back in one step.
    Group, By Color and Color are greyed.

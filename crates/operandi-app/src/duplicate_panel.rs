@@ -92,7 +92,7 @@ impl Operandi {
             _ => return,
         }
         if d.copies(tool).is_some() && operandi_core::duplicate_items::replicating(d) {
-            f.section("Replica", false, crate::replica_rows::replica_rows());
+            f.section("Instancer", false, crate::replica_rows::replica_rows());
         } else if d.copies(tool).is_some() {
             let (get, get_mut) = copies_lens(tool);
             let instancing = operandi_core::duplicate_items::instancing(d);

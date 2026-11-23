@@ -534,7 +534,7 @@ impl Editor {
             return Err(e);
         }
         let label = if s.replicas {
-            "Mesh Paint Replica"
+            "Mesh Paint Instancer"
         } else if s.instances {
             "Mesh Paint Instance"
         } else {

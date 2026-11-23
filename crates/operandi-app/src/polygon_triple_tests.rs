@@ -454,7 +454,7 @@ fn retopo_edge_lock_and_flow_add_the_selection_to_their_sets() {
         .mesh
         .attributes
         .polygon_sets;
-    for name in ["RetopoEdgeLock", "RetopoFlow"] {
+    for name in ["RetopoEdgeLock", "RetopoEdgeFlow"] {
         let set = sets
             .get(name)
             .unwrap_or_else(|| panic!("{name}: {}", a.status));
@@ -464,4 +464,46 @@ fn retopo_edge_lock_and_flow_add_the_selection_to_their_sets() {
     a.editor.scene.selection.faces.clear();
     a.execute("retopo edge lock");
     assert!(a.status.contains("select"), "{}", a.status);
+}
+
+/// The Edge Flow set was "RetopoFlow" before 2026-11-23: in an older scene
+/// Retopo Edge Flow takes that set's members into RetopoEdgeFlow, in one
+/// undo step, so the mesh keeps one set.
+#[test]
+fn retopo_edge_flow_takes_over_the_old_retopoflow_set() {
+    let mut a = super::tests::box_app();
+    a.run(Command::Mode(Mode::Polygon));
+    let sets = |a: &Operandi| {
+        a.editor
+            .scene
+            .active()
+            .unwrap()
+            .mesh
+            .attributes
+            .polygon_sets
+            .clone()
+    };
+    a.editor
+        .scene
+        .active_mut()
+        .unwrap()
+        .mesh
+        .attributes
+        .polygon_sets
+        .insert("RetopoFlow".into(), [2].into_iter().collect());
+    a.editor.scene.selection.faces = vec![0, 1];
+    a.execute("retopo edge flow");
+    let now = sets(&a);
+    assert!(!now.contains_key("RetopoFlow"), "{now:?}");
+    assert_eq!(
+        now["RetopoEdgeFlow"].iter().copied().collect::<Vec<_>>(),
+        vec![0, 1, 2]
+    );
+    a.run(Command::Undo);
+    let back = sets(&a);
+    assert!(!back.contains_key("RetopoEdgeFlow"), "{back:?}");
+    assert_eq!(
+        back["RetopoFlow"].iter().copied().collect::<Vec<_>>(),
+        vec![2]
+    );
 }

@@ -19,7 +19,7 @@ pub(super) fn replica_rows() -> Vec<tf::Item<Parameters>> {
         |p| p.duplicate.replica.source,
         |p, s| p.duplicate.replica.source = s,
     )
-    .tip("What gets replicated: the selected item (each selected item makes its own Replicator)");
+    .tip("What gets instanced: the selected item (each selected item makes its own Instancer)");
     for (i, s) in ReplicaSource::ALL.iter().enumerate() {
         if !s.built() {
             source = source.greyed_option(i, "Not built yet (RP-Q4); Active Item works");
@@ -34,7 +34,7 @@ pub(super) fn replica_rows() -> Vec<tf::Item<Parameters>> {
             |p| p.duplicate.replica.parent,
             |p, m| p.duplicate.replica.parent = m,
         )
-        .tip("Scene: the Replicator's group goes at the root. Selected: under the replicated item"),
+        .tip("Scene: the Instancer's group goes at the root. Selected: under the instanced item"),
     );
     f.items
 }

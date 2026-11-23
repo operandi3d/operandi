@@ -1,6 +1,6 @@
 //! Selection inference (spec selection-inference-2026-11-15 v1.1): a point
 //! or edge tool started from another selection mode works out its elements
-//! from the current selection. It is the first layer of the tool pipe,
+//! from the current selection. It is the first layer of the tool chain,
 //! ahead of the action centre, falloff and symmetry: the converted set is
 //! written into the tool's own element list (selected points or edges) of
 //! every active mesh, and every later layer reads it as a native one.

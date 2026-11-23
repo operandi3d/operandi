@@ -362,7 +362,7 @@ fn symmetry_turned_on_mid_sketch_twins_only_new_nodes() {
     assert!(n[2].twin.is_some());
 }
 
-/// Tool pipe (Jason, 2026-11-14): Symmetry toggled with the tool still
+/// Tool chain (Jason, 2026-11-14): Symmetry toggled with the tool still
 /// open applies to the next node, without dropping the sketch.
 #[test]
 fn symmetry_toggled_with_the_sketch_open_applies_to_new_nodes() {

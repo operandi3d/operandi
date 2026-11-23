@@ -1,4 +1,4 @@
-//! The snapping layer of the tool pipe (architecture review 2026-11-14,
+//! The snapping layer of the tool chain (architecture review 2026-11-14,
 //! pick B; Jason: each tool reads one shared stack of layers, action
 //! centre, falloff, symmetry, snapping, then the tool itself, instead of
 //! rolling its own). Every snap asks here: tool handles and Tweak

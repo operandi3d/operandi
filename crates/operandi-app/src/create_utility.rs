@@ -387,7 +387,7 @@ impl Utility {
             Self::QuickAlign(_) => "Quick Align",
             Self::Tack(_) => "Tack Tool",
             Self::RetopoSketch => "Retopo Sketch",
-            Self::MeshPaint(s) if s.replicas => "Mesh Paint Replica",
+            Self::MeshPaint(s) if s.replicas => "Mesh Paint Instancer",
             Self::MeshPaint(s) if s.instances => "Mesh Paint Instance",
             Self::MeshPaint(_) => "Mesh Paint",
             Self::Guides(_) => "Guides",
@@ -528,7 +528,8 @@ impl Operandi {
                 })
             }
             // G8 RP-7: every background mesh can be picked, one per dab.
-            "mesh paint replica" => {
+            // "Mesh Paint Replica": its name before 2026-11-23.
+            "mesh paint instancer" | "mesh paint replica" => {
                 Utility::MeshPaint(operandi_core::mesh_paint::MeshPaintSettings {
                     replicas: true,
                     ..Default::default()

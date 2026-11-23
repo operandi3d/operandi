@@ -218,10 +218,12 @@ pub struct Item {
         skip_serializing_if = "crate::element_state::ElementState::nothing_saved"
     )]
     pub elements: crate::element_state::ElementState,
-    /// MeshOps (meshops.rs): the procedural stack on top of `mesh`, which
+    /// Mesh Stack (mesh_stack.rs): the procedural stack on top of `mesh`, which
     /// is then the Base Mesh (MO-01). Native version 37.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub mesh_ops: Option<crate::meshops::MeshOpStack>,
+    /// Saved as `mesh_ops`, its name before 2026-11-23, so files open in
+    /// older and newer builds alike.
+    #[serde(rename = "mesh_ops", default, skip_serializing_if = "Option::is_none")]
+    pub mesh_stack: Option<crate::mesh_stack::MeshStack>,
     /// Set for an item of a kind a kit adds (kit_item.rs, KIT-1): it loads
     /// and saves back unchanged even when the kit is missing; its mesh
     /// stays empty. Native version 49.
@@ -506,7 +508,7 @@ impl Scene {
             common: Default::default(),
             elements: Default::default(),
             hides_children: false,
-            mesh_ops: None,
+            mesh_stack: None,
             kit: None,
             instance_of: None,
             replicator: None,
@@ -610,18 +612,18 @@ impl Scene {
             if i.id == 0 || i.id >= self.next_id || !ids.insert(i.id) || i.name.len() > 1_048_576 {
                 return Err("Invalid item identity or name".into());
             }
-            if let Some(stack) = &i.mesh_ops {
+            if let Some(stack) = &i.mesh_stack {
                 stack.validate()?;
             }
             if let Some(rep) = &i.replicator {
                 rep.validate()?;
-                if !i.mesh.vertices.is_empty() || i.mesh_ops.is_some() {
-                    return Err("A Replicator holds no mesh or Mesh Stack".into());
+                if !i.mesh.vertices.is_empty() || i.mesh_stack.is_some() {
+                    return Err("An Instancer holds no mesh or Mesh Stack".into());
                 }
             }
             if let Some(kit) = &i.kit {
                 kit.validate()?;
-                if !i.mesh.vertices.is_empty() || i.mesh_ops.is_some() {
+                if !i.mesh.vertices.is_empty() || i.mesh_stack.is_some() {
                     return Err("A kit item holds no mesh or Mesh Stack".into());
                 }
             }

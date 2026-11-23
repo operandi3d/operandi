@@ -2,10 +2,10 @@
 //! one step that turns the document scene into what gets drawn, rendered,
 //! exported and picked.
 //!
-//! Today that is MeshOps results (meshops.rs): an item with a stack shows
+//! Today that is Mesh Stack results (mesh_stack.rs): an item with a stack shows
 //! its result instead of its Base Mesh. Later the same step applies
 //! deformers, rigs and sims at the given time (AR-05 order: base mesh →
-//! MeshOps → morphs → skinning → deformers → sim cache). Everyone who
+//! Mesh Stack → morphs → skinning → deformers → sim cache). Everyone who
 //! needs the shown scene asks here, through [`crate::Editor::evaluated`],
 //! so those later layers land in one place.
 //!
@@ -38,7 +38,7 @@ pub enum Purpose {
 /// it yet). Borrowed when nothing differs from the document scene.
 pub fn evaluate<'a>(
     scene: &'a Scene,
-    meshops: &crate::meshops::Runtime,
+    mesh_stack: &crate::mesh_stack::Runtime,
     eval: &crate::eval_state::EvalState,
     time: crate::time_tick::Tick,
     purpose: Purpose,
@@ -47,7 +47,7 @@ pub fn evaluate<'a>(
     let _ = time;
     // Rig pieces first (RG-01; eval graph steps 4, 6): constrained and
     // parented items at their evaluated worlds, for every purpose (a
-    // constrained item is picked where it shows). MeshOps links then read
+    // constrained item is picked where it shows). Mesh Stack links then read
     // the rigged worlds.
     let rigged = if scene.animation.rig.pieces.is_empty() {
         None
@@ -56,8 +56,8 @@ pub fn evaluate<'a>(
     };
     let base = rigged.as_ref().unwrap_or(scene);
     let shown = match purpose {
-        Purpose::Display { base_edit } => meshops.display_scene(base, base_edit),
-        Purpose::Final => meshops.result_scene(base),
+        Purpose::Display { base_edit } => mesh_stack.display_scene(base, base_edit),
+        Purpose::Final => mesh_stack.result_scene(base),
         Purpose::Pick => None,
     };
     let shown = shown.or(rigged);
@@ -84,7 +84,7 @@ pub fn evaluate<'a>(
 }
 
 /// Live patches (G7 PC-7) shown as their tessellation; `None` when no mesh
-/// has one. Picking keeps the patch polygon (provisional, as for MeshOps).
+/// has one. Picking keeps the patch polygon (provisional, as for Mesh Stack results).
 fn with_patches(scene: &Scene) -> Option<Scene> {
     let cells = |i: &crate::Item| {
         i.subdivision
@@ -117,7 +117,7 @@ impl crate::Editor {
     pub fn evaluated(&self, purpose: Purpose) -> Cow<'_, Scene> {
         evaluate(
             &self.scene,
-            &self.meshops,
+            &self.mesh_stack,
             &self.eval,
             self.scene.time.current,
             purpose,
@@ -143,7 +143,7 @@ impl crate::Editor {
             .or_else(|| ok(self.cone_preview_scene()))
     }
     /// Everything the viewport shows when it isn't the document scene: an
-    /// open tool's preview, else the MeshOps result. Drawing and view
+    /// open tool's preview, else the Mesh Stack result. Drawing and view
     /// framing (Frame All / Frame Selection) both read this, so framing
     /// always takes in what the active tool is previewing (Jason,
     /// 2026-11-21).

@@ -1,9 +1,9 @@
-//! MeshOps commands on the editor: add, delete, move, enable, set values,
-//! select rows, Select by Index, Freeze, Edit Base Mesh (meshops.rs has the
+//! Mesh Stack commands on the editor: add, delete, move, enable, set values,
+//! select rows, Select by Index, Freeze, Edit Base Mesh (mesh_stack.rs has the
 //! data and evaluation). Every stack edit is one undo step of recipe and
 //! Base Mesh (SAFE-13); evaluation never records undo.
+use crate::mesh_stack::{MeshOp, MeshStack, OpKind, OpStatus, SelectByIndex};
 use crate::meshop_selection::{SelKind, SelOp};
-use crate::meshops::{MeshOp, MeshOpStack, OpKind, OpStatus, SelectByIndex};
 use crate::{Editor, Mode, Result};
 
 /// An op in a stack: its mesh item and its id there. Scripts write it
@@ -77,19 +77,19 @@ impl Editor {
     }
     fn op_index(&self, r: OpRef) -> Result<usize> {
         self.stack_item(r.item)?
-            .mesh_ops
+            .mesh_stack
             .as_ref()
             .and_then(|s| s.index_of(r.op))
             .ok_or_else(|| "That mesh operation doesn't exist".to_string())
     }
-    fn stack_mut(&mut self, item: u64) -> &mut MeshOpStack {
+    fn stack_mut(&mut self, item: u64) -> &mut MeshStack {
         let item = self.scene.item_mut(item).expect("checked by the caller");
-        item.mesh_ops.get_or_insert_with(Default::default)
+        item.mesh_stack.get_or_insert_with(Default::default)
     }
     /// MO-23, SAFE-07: an edit whose op links would make a loop is undone
     /// (the scene goes back to `before`) and refused.
     fn refuse_loop(&mut self, before: &crate::Scene) -> Result<()> {
-        let Some((item, _)) = crate::meshops::find_loop(&self.scene) else {
+        let Some((item, _)) = crate::mesh_stack::find_loop(&self.scene) else {
             return Ok(());
         };
         let name = self
@@ -104,9 +104,9 @@ impl Editor {
     /// An empty stack is no stack: the mesh is a plain mesh again.
     fn drop_empty_stack(&mut self, item: u64) {
         if let Some(i) = self.scene.item_mut(item)
-            && i.mesh_ops.as_ref().is_some_and(|s| s.ops.is_empty())
+            && i.mesh_stack.as_ref().is_some_and(|s| s.ops.is_empty())
         {
-            i.mesh_ops = None;
+            i.mesh_stack = None;
         }
     }
 
@@ -122,11 +122,11 @@ impl Editor {
             .filter(|i| i.is_mesh())
             .ok_or("Select a mesh item to add a mesh operation to")?;
         let id = item.id;
-        let len = item.mesh_ops.as_ref().map_or(0, |s| s.ops.len());
+        let len = item.mesh_stack.as_ref().map_or(0, |s| s.ops.len());
         let at = match self.meshop_row.filter(|r| r.item == id) {
             Some(OpRow { op: None, .. }) => 0,
             Some(OpRow { op: Some(op), .. }) => item
-                .mesh_ops
+                .mesh_stack
                 .as_ref()
                 .and_then(|s| s.index_of(op))
                 .map_or(len, |i| i + 1),
@@ -275,7 +275,7 @@ impl Editor {
         let i = self.op_index(r)?;
         let next = self
             .stack_item(r.item)?
-            .mesh_ops
+            .mesh_stack
             .as_ref()
             .expect("checked")
             .ops[i]
@@ -299,7 +299,7 @@ impl Editor {
             let item = self.stack_item(row.item)?;
             if let Some(op) = row.op
                 && item
-                    .mesh_ops
+                    .mesh_stack
                     .as_ref()
                     .and_then(|s| s.index_of(op))
                     .is_none()
@@ -320,7 +320,7 @@ impl Editor {
         let i = self.op_index(r)?;
         let op = &self
             .stack_item(r.item)?
-            .mesh_ops
+            .mesh_stack
             .as_ref()
             .expect("checked")
             .ops[i];
@@ -364,7 +364,11 @@ impl Editor {
     pub(crate) fn meshop_selop(&mut self, r: OpRef, edit: SelOpEdit) -> Result<()> {
         self.require_idle()?;
         let i = self.op_index(r)?;
-        let stack = self.stack_item(r.item)?.mesh_ops.as_ref().expect("checked");
+        let stack = self
+            .stack_item(r.item)?
+            .mesh_stack
+            .as_ref()
+            .expect("checked");
         let op = &stack.ops[i];
         if !op.kind.takes_selection() {
             return Err(format!("{} has no Selection input", op.kind.label()));
@@ -422,17 +426,17 @@ impl Editor {
         self.require_idle()?;
         let i = self.op_index(r)?;
         let item = self.stack_item(r.item)?.clone();
-        let stack = item.mesh_ops.as_ref().expect("checked");
-        let below = MeshOpStack {
+        let stack = item.mesh_stack.as_ref().expect("checked");
+        let below = MeshStack {
             ops: stack.ops[..=i].to_vec(),
             next_id: stack.next_id,
         };
         let probe = crate::Item {
-            mesh_ops: Some(below),
+            mesh_stack: Some(below),
             ..item.clone()
         };
         let evaluated = self
-            .meshops
+            .mesh_stack
             .current(&self.scene, &probe)
             .ok_or("Freeze couldn't evaluate the stack")?;
         if let Some((n, reason)) =
@@ -452,7 +456,7 @@ impl Editor {
         }
         let above: Vec<MeshOp> = stack.ops[i + 1..].to_vec();
         let next_id = stack.next_id;
-        let rest = (!above.is_empty()).then_some(MeshOpStack {
+        let rest = (!above.is_empty()).then_some(MeshStack {
             ops: above,
             next_id,
         });
@@ -471,7 +475,7 @@ impl Editor {
                 id,
                 name,
                 mesh: evaluated.mesh.clone().into(),
-                mesh_ops: rest,
+                mesh_stack: rest,
                 elements: Default::default(),
                 source_id: None,
                 ..item.clone()
@@ -491,7 +495,7 @@ impl Editor {
         } else {
             let target = self.scene.item_mut(r.item).expect("checked");
             target.mesh = evaluated.mesh.clone().into();
-            target.mesh_ops = rest;
+            target.mesh_stack = rest;
             // The frozen mesh is new topology; lock and hide sets numbered
             // the old Base Mesh.
             target.elements = Default::default();
@@ -516,7 +520,7 @@ impl Editor {
             .active()
             .ok_or("Select a mesh with a Mesh Stack to freeze")?;
         let top = item
-            .mesh_ops
+            .mesh_stack
             .as_ref()
             .and_then(|s| s.ops.last())
             .ok_or("This mesh has no Mesh Stack to freeze")?;
@@ -531,7 +535,7 @@ impl Editor {
         self.scene
             .items
             .iter()
-            .any(|i| i.id == item && i.mesh_ops.is_some())
+            .any(|i| i.id == item && i.mesh_stack.is_some())
     }
 
     /// `deformer.selectBaseMesh item:<id> select:<bool>` (MO-27): direct
@@ -558,11 +562,11 @@ impl Editor {
 
     /// A failed command on a mesh shown by its stack's result: the tool
     /// saw the Base Mesh, so say how to reach it (SAFE-05).
-    pub(crate) fn explain_mesh_ops_error(&self, error: String, stack_command: bool) -> String {
+    pub(crate) fn explain_mesh_stack_error(&self, error: String, stack_command: bool) -> String {
         let procedural = self
             .scene
             .active()
-            .is_some_and(|i| i.mesh_ops.is_some() && self.base_edit != Some(i.id));
+            .is_some_and(|i| i.mesh_stack.is_some() && self.base_edit != Some(i.id));
         if stack_command || !procedural || error.contains(DIRECT_EDIT_REFUSED) {
             error
         } else {
@@ -575,7 +579,7 @@ impl Editor {
     /// with a stack, unless that item is in Edit Base Mesh. SAFE-06: items
     /// shown by their result keep no component selection. Stale list and
     /// Edit Base Mesh state is cleared.
-    pub(crate) fn guard_mesh_ops(
+    pub(crate) fn guard_mesh_stack(
         &mut self,
         initial: &crate::Scene,
         stack_command: bool,
@@ -585,7 +589,7 @@ impl Editor {
                 let Some(old) = initial.item(item.id) else {
                     continue;
                 };
-                let procedural = item.mesh_ops.is_some() || old.mesh_ops.is_some();
+                let procedural = item.mesh_stack.is_some() || old.mesh_stack.is_some();
                 if procedural
                     && self.base_edit != Some(item.id)
                     && !crate::Shared::same(old.mesh.shared(), item.mesh.shared())
@@ -598,13 +602,13 @@ impl Editor {
                 }
             }
         }
-        self.settle_mesh_ops();
+        self.settle_mesh_stack();
         Ok(())
     }
 
     /// Clears list and Edit Base Mesh state that no longer fits the scene,
     /// and component selection of items shown by their result.
-    pub(crate) fn settle_mesh_ops(&mut self) {
+    pub(crate) fn settle_mesh_stack(&mut self) {
         if let Some(id) = self.base_edit
             && !self.scene_has_stack(id)
         {
@@ -615,7 +619,7 @@ impl Editor {
                 i.id == row.item
                     && i.is_mesh()
                     && row.op.is_none_or(|op| {
-                        i.mesh_ops
+                        i.mesh_stack
                             .as_ref()
                             .is_some_and(|s| s.index_of(op).is_some())
                     })
@@ -628,10 +632,10 @@ impl Editor {
             .scene
             .items
             .iter()
-            .filter(|i| i.mesh_ops.is_some() && Some(i.id) != self.base_edit)
+            .filter(|i| i.mesh_stack.is_some() && Some(i.id) != self.base_edit)
             // A skin keeps every point: its points stay selectable for the
             // weight tools (SK-42).
-            .filter(|i| !i.mesh_ops.as_ref().is_some_and(crate::skin::only_skin))
+            .filter(|i| !i.mesh_stack.as_ref().is_some_and(crate::skin::only_skin))
             .map(|i| i.id)
             .collect();
         for id in shown_by_result {
@@ -646,7 +650,7 @@ impl Editor {
     }
 }
 
-/// Scripts (command_exec.rs): the MeshOps commands, and the item commands
+/// Scripts (command_exec.rs): the Mesh Stack commands, and the item commands
 /// the registry reuses for ops (`item.delete`, `item.parent`,
 /// `item.channel`, `select.item` with `item:op:<item>:<op>`). `None` lets
 /// the ordinary item command run.
@@ -798,7 +802,7 @@ pub(crate) fn script_command(
                     .item(op.item)
                     .ok_or("That mesh item doesn't exist")?;
                 let current = item
-                    .mesh_ops
+                    .mesh_stack
                     .as_ref()
                     .and_then(|s| s.index_of(op.op).map(|i| &s.ops[i]))
                     .and_then(|o| o.selops.get(n))
@@ -842,14 +846,19 @@ mod tests {
     fn ops(e: &Editor, id: u64) -> Vec<String> {
         e.scene
             .item(id)
-            .and_then(|i| i.mesh_ops.as_ref())
+            .and_then(|i| i.mesh_stack.as_ref())
             .map_or_else(Vec::new, |s| {
                 s.ops.iter().map(|o| o.kind.type_id().to_string()).collect()
             })
     }
     fn result_faces(e: &Editor, id: u64) -> usize {
         let item = e.scene.item(id).unwrap();
-        e.meshops.current(&e.scene, item).unwrap().mesh.faces.len()
+        e.mesh_stack
+            .current(&e.scene, item)
+            .unwrap()
+            .mesh
+            .faces
+            .len()
     }
     fn create(e: &mut Editor, t: &str) {
         e.dispatch(Command::MeshOpCreate(t.into())).unwrap();
@@ -858,7 +867,7 @@ mod tests {
         let item = e.scene.item(id).unwrap();
         OpRef {
             item: id,
-            op: item.mesh_ops.as_ref().unwrap().ops.last().unwrap().id,
+            op: item.mesh_stack.as_ref().unwrap().ops.last().unwrap().id,
         }
     }
 
@@ -904,7 +913,7 @@ mod tests {
         );
         let (mut e, _) = editor_with_mesh();
         assert!(e.dispatch(Command::MeshOpCreate("no.such".into())).is_err());
-        assert!(e.scene.items[0].mesh_ops.is_none());
+        assert!(e.scene.items[0].mesh_stack.is_none());
     }
 
     #[test]
@@ -965,7 +974,7 @@ mod tests {
             duplicate: false,
         })
         .unwrap();
-        assert!(e.scene.items[0].mesh_ops.is_none());
+        assert!(e.scene.items[0].mesh_stack.is_none());
         assert_eq!(e.scene.items[0].mesh.faces.len(), full);
     }
 
@@ -982,7 +991,7 @@ mod tests {
         assert_eq!(e.scene.items.len(), 2);
         assert_eq!(ops(&e, id), ["prim.cube.item"]);
         let copy = &e.scene.items[1];
-        assert!(copy.mesh_ops.is_none());
+        assert!(copy.mesh_stack.is_none());
         assert_eq!(copy.mesh.faces.len(), 6);
         assert_eq!(e.scene.selection.item, Some(copy.id));
     }
@@ -1047,7 +1056,7 @@ mod tests {
         e.scene.selection.faces = vec![3, 1];
         create(&mut e, "pmodel.triangulate.item");
         let item = &e.scene.items[0];
-        let op = &item.mesh_ops.as_ref().unwrap().ops[0];
+        let op = &item.mesh_stack.as_ref().unwrap().ops[0];
         assert_eq!(op.selection.as_ref().unwrap().polygons, vec![1, 3]);
         assert_eq!(result_faces(&e, id), 8);
         // The mesh now shows its result: no component selection (SAFE-06).
@@ -1067,7 +1076,7 @@ mod tests {
         );
         let mirror = OpRef {
             item: id,
-            op: e.scene.items[0].mesh_ops.as_ref().unwrap().ops[1].id,
+            op: e.scene.items[0].mesh_stack.as_ref().unwrap().ops[1].id,
         };
         for (name, value) in [("axis", "1"), ("dist", "0.01")] {
             let mut a = serde_json::Map::new();
@@ -1076,7 +1085,7 @@ mod tests {
             a.insert("item".into(), mirror.text().into());
             crate::command_exec::run(&mut e, "item.channel", &a).unwrap();
         }
-        let op = &e.scene.items[0].mesh_ops.as_ref().unwrap().ops[1];
+        let op = &e.scene.items[0].mesh_stack.as_ref().unwrap().ops[1];
         assert_eq!(op.kind.type_id(), "mirror.clone.item");
         assert_eq!(op.kind.values()["axis"], 1);
         assert_eq!(op.kind.values()["dist"], 0.01);
@@ -1099,7 +1108,7 @@ mod tests {
         .unwrap();
         assert_eq!(ops(&e, id), ["pmodel.triangulate.item", "prim.cube.item"]);
         e.dispatch(Command::MeshOpDelete(vec![tri, cube])).unwrap();
-        assert!(e.scene.items[0].mesh_ops.is_none());
+        assert!(e.scene.items[0].mesh_stack.is_none());
         e.dispatch(Command::Undo).unwrap();
         assert_eq!(ops(&e, id), ["pmodel.triangulate.item", "prim.cube.item"]);
     }
@@ -1113,8 +1122,8 @@ mod tests {
         let bytes = crate::persistence::encode(&e.scene).unwrap();
         let back = crate::persistence::decode(&bytes).unwrap();
         assert_eq!(back, e.scene);
-        let a = e.meshops.current(&e.scene, &e.scene.items[0]).unwrap();
-        let fresh = crate::meshops::Runtime::default();
+        let a = e.mesh_stack.current(&e.scene, &e.scene.items[0]).unwrap();
+        let fresh = crate::mesh_stack::Runtime::default();
         let b = fresh.current(&back, back.item(id).unwrap()).unwrap();
         assert_eq!(*a.mesh, *b.mesh);
         // Mirror is a Clone Effector with a generator: native version 40.

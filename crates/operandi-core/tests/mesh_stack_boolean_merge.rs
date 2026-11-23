@@ -1,12 +1,12 @@
-//! MeshOps suite batch 2: the Boolean and Merge Meshes ops (BOOL-32,
+//! Mesh Stack suite batch 2: the Boolean and Merge Meshes ops (BOOL-32,
 //! BOP-xx, MM-xx), reading other items through links (SAFE-07..09).
 //!
 //! Boolean reference geometry as in BOOLEANS.md: target cube A from -1 to
 //! 1 (the Base Mesh of the item with the stack), driver cube B from 0 to 2.
 use glam::{DMat4, DVec3};
-use operandi_core::meshops::{OpStatus, Runtime};
-use operandi_core::meshops_editor::OpRef;
-use operandi_core::meshops_items::{BOOLEAN_OP, MERGE_MESHES_OP, MergeMeshesOp};
+use operandi_core::mesh_stack::{OpStatus, Runtime};
+use operandi_core::mesh_stack_editor::OpRef;
+use operandi_core::mesh_stack_items::{BOOLEAN_OP, MERGE_MESHES_OP, MergeMeshesOp};
 use operandi_core::{BooleanOp, BooleanOptions, Command, DriveMesh, Editor, Mesh, persistence};
 use serde_json::{Value, json};
 
@@ -43,7 +43,7 @@ fn add(e: &mut Editor, item: u64, type_id: &str, values: Value) -> OpRef {
             .scene
             .item(item)
             .unwrap()
-            .mesh_ops
+            .mesh_stack
             .as_ref()
             .unwrap()
             .ops
@@ -58,13 +58,13 @@ fn set(e: &mut Editor, op: OpRef, values: Value) -> operandi_core::Result<()> {
     let values = values.as_object().unwrap().clone();
     e.dispatch(Command::MeshOpSet { op, values })
 }
-fn result(e: &Editor, item: u64) -> operandi_core::meshops::Evaluated {
-    e.meshops
+fn result(e: &Editor, item: u64) -> operandi_core::mesh_stack::Evaluated {
+    e.mesh_stack
         .current(&e.scene, e.scene.item(item).unwrap())
         .unwrap()
 }
 fn op_value(e: &Editor, op: OpRef, key: &str) -> bool {
-    let stack = e.scene.item(op.item).unwrap().mesh_ops.as_ref().unwrap();
+    let stack = e.scene.item(op.item).unwrap().mesh_stack.as_ref().unwrap();
     let row = stack.ops.iter().find(|o| o.id == op.op).unwrap();
     row.kind.values()[key].as_bool().unwrap()
 }
@@ -488,14 +488,14 @@ fn merge_then_boolean_in_one_stack_saves_reopens_and_freezes() {
     assert_eq!(*theirs.mesh, *ours.mesh);
     let top = OpRef {
         item: a,
-        op: e.scene.item(a).unwrap().mesh_ops.as_ref().unwrap().ops[1].id,
+        op: e.scene.item(a).unwrap().mesh_stack.as_ref().unwrap().ops[1].id,
     };
     e.dispatch(Command::MeshOpFreeze {
         op: top,
         duplicate: false,
     })
     .unwrap();
-    assert!(e.scene.item(a).unwrap().mesh_ops.is_none());
+    assert!(e.scene.item(a).unwrap().mesh_stack.is_none());
     assert_eq!(*e.scene.item(a).unwrap().mesh, *ours.mesh);
 }
 
@@ -506,7 +506,7 @@ fn bop_10_the_other_selected_mesh_becomes_the_driver() {
     e.scene.selection.also.push(b);
     e.dispatch(Command::MeshOpCreate(BOOLEAN_OP.into()))
         .unwrap();
-    let op = &e.scene.item(a).unwrap().mesh_ops.as_ref().unwrap().ops[0];
+    let op = &e.scene.item(a).unwrap().mesh_stack.as_ref().unwrap().ops[0];
     assert_eq!(op.kind.values()["driver"], b);
     assert_eq!(result(&e, a).mesh.faces.len(), 12, "Union by default");
 }

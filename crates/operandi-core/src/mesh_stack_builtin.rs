@@ -1,6 +1,6 @@
-//! Operandi's own MeshOp types (MeshOps v1, SCOPE Stage 0 first batch):
+//! Operandi's own MeshOp types (Mesh Stack v1, SCOPE Stage 0 first batch):
 //! their values and how they run. Each is a [`TypedOp`] with a table entry
-//! in [`builtin`]; the stack itself lives in `meshops.rs`.
+//! in [`builtin`]; the stack itself lives in `mesh_stack.rs`.
 //!
 //! The ops call the direct tools' kernels (`bevel_geometry_applied`,
 //! `smooth_shift_geometry`, `copy_faces` ...), never their live sessions.
@@ -753,17 +753,17 @@ pub(crate) fn builtin() -> Vec<Arc<dyn OpDef>> {
         ),
     ];
     // Ops that read other items (Boolean, Merge Meshes).
-    table.extend(crate::meshops_items::entries());
-    // Direct tools as ops, by group (meshops_tools.rs).
-    table.extend(crate::meshops_tools::polygon_entries());
-    table.extend(crate::meshops_tools::edge_entries());
-    table.extend(crate::meshops_tools::vertex_entries());
-    table.extend(crate::meshops_tools::duplicate_entries());
-    table.extend(crate::meshops_tools::edit_entries());
-    table.extend(crate::meshops_tools::deform_entries());
-    table.extend(crate::meshops_tools::uv_entries());
-    // The Deform finish tools' ops (meshops_deform.rs).
-    table.extend(crate::meshops_deform::entries());
+    table.extend(crate::mesh_stack_items::entries());
+    // Direct tools as ops, by group (mesh_stack_tools.rs).
+    table.extend(crate::mesh_stack_tools::polygon_entries());
+    table.extend(crate::mesh_stack_tools::edge_entries());
+    table.extend(crate::mesh_stack_tools::vertex_entries());
+    table.extend(crate::mesh_stack_tools::duplicate_entries());
+    table.extend(crate::mesh_stack_tools::edit_entries());
+    table.extend(crate::mesh_stack_tools::deform_entries());
+    table.extend(crate::mesh_stack_tools::uv_entries());
+    // The Deform finish tools' ops (mesh_stack_deform.rs).
+    table.extend(crate::mesh_stack_deform::entries());
     table.extend(crate::curve_ops::entries());
     table.extend(crate::generator_ops::entries());
     table.extend(crate::skin::entries());

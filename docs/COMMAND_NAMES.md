@@ -106,7 +106,7 @@ map commands; unchanged), toolbox config (labels only).
 | viewport.split / viewport.detach (new, menus as forms) | viewport.split / viewport.detach | **match** (their arguments aren't read yet) | – |
 | operandi.layout.togglePalettes (new, layouts stage 6) | no match | **placeholder**, see NAMES-NEEDED.md; class "ui" | – |
 | operandi.layout.setKey / clearKeys (new, layouts stage 5); operandi.layout.revert `keys:` | no match | **placeholders**, see NAMES-NEEDED.md; class "ui" | action, key, layout; layout; keys |
-| operandi.workbench.edit / pick / add / addProperty / addDivider / addPipe / move / set / chooseIcon / duplicate / delete / undo / topBar (new, layouts stage 4) | no match | **placeholders**, see NAMES-NEEDED.md; all class "ui" | on, form; line, label; property; as; from, to; index, attr, value |
+| operandi.workbench.edit / pick / add / addProperty / addDivider / addChain / move / set / chooseIcon / duplicate / delete / undo / topBar (new, layouts stage 4) | no match | **placeholders**, see NAMES-NEEDED.md; all class "ui" | on, form; line, label; property; as; from, to; index, attr, value |
 | operandi.view3d.matcap | no match (Operandi own: the Matcap style's matcap choice, 2026-11-10) | kept | name, image, bgmesh |
 | view3d.shadingStyle value Reflection | shown as Matcap (VS-N01, Jason 2026-11-10) | Reflection still accepted | value |
 | poly.subdivide (new) | same | **new**, map name | `type` (positional or `type:`; `ccsds`, `flat`, `smooth`, `sds`), `fractal` (fraction), `maxangle` (radians), `linear`, `bound`, `bgCons`, `noEdgeWeight`; bare `poly.subdivide` opens the dialog (SUBT-Q01) |
@@ -177,7 +177,7 @@ and degrees. The conversion happens where arguments are parsed
    tooltip says `tool.set vert.merge on`).
 6. Toolbox labels and shortcuts are unchanged (Element Move stays T).
 
-## MeshOps v1 (registry thread, MESHOPS-NAMES rev 2, 2026-11-11)
+## Mesh Stack v1 (registry thread, MESHOPS-NAMES rev 2, 2026-11-11)
 
 | Name | Operandi | Notes |
 |---|---|---|
@@ -195,14 +195,14 @@ and degrees. The conversion happens where arguments are parsed
 Op types (saved): prim.cube.item, prim.sphere.item, prim.cylinder.item,
 poly.bevel.item, poly.smshift.item, subdivide.tool.item,
 pmodel.triangulate.item, mirror.clone.item, array.clone.item;
-Select by Index index.selop.item. One mapping: `meshops::OP_TYPES`.
+Select by Index index.selop.item. One mapping: `mesh_stack::OP_TYPES`.
 
 ## Curve tab commands (2026-11-17)
 
 `poly.makeCurveOpen`, `poly.makeCurveClosed`, `poly.makeCurveFill`,
 `curve.winding merge:<bool> reverse:<bool>` and `curves.setColor
 override:<bool> color:"r g b"` take the names the curve commands spec
-lists (CURVE_COMMANDS_ACCEPTANCE). The 2D shapes are MeshOps
+lists (CURVE_COMMANDS_ACCEPTANCE). The 2D shapes are Mesh Stack
 (`meshop.create type:curve.circle.item`, `curve.ellipse.item`,
 `curve.rectangle.item`, `curve.diamond.item`, `curve.nsided.item`,
 `curve.star.item`).

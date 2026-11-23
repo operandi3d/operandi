@@ -1,13 +1,13 @@
-//! MeshOps framework: the op type table kits add to (KIT-1, K7) and item
+//! Mesh Stack framework: the op type table kits add to (KIT-1, K7) and item
 //! links between stacks (SAFE-07..09). A test op type registered here the
 //! way a kit would register one, `test.gather.item`, appends its linked
 //! items' meshes, placed in its own item's space.
 use glam::DVec3;
+use operandi_core::mesh_stack::{MISSING_INPUT, OpKind, OpStatus, Runtime, find_loop};
+use operandi_core::mesh_stack_editor::OpRef;
 use operandi_core::meshop_types::{
     Field, FieldKind, OpContext, Typed, TypedOp, field_links, op_def, register,
 };
-use operandi_core::meshops::{MISSING_INPUT, OpKind, OpStatus, Runtime, find_loop};
-use operandi_core::meshops_editor::OpRef;
 use operandi_core::{Command, Editor, Mesh, Result, persistence};
 use serde::{Deserialize, Serialize};
 use std::sync::{Arc, Once};
@@ -64,7 +64,7 @@ fn top(e: &Editor, item: u64) -> OpRef {
             .scene
             .item(item)
             .unwrap()
-            .mesh_ops
+            .mesh_stack
             .as_ref()
             .unwrap()
             .ops
@@ -85,8 +85,8 @@ fn gather_on(e: &mut Editor, item: u64, ids: &[u64]) -> OpRef {
     link(e, op, ids).unwrap();
     op
 }
-fn result(e: &Editor, item: u64) -> operandi_core::meshops::Evaluated {
-    e.meshops
+fn result(e: &Editor, item: u64) -> operandi_core::mesh_stack::Evaluated {
+    e.mesh_stack
         .current(&e.scene, e.scene.item(item).unwrap())
         .unwrap()
 }
@@ -152,9 +152,9 @@ fn editing_the_source_reruns_the_reader_and_nothing_else_does() {
     let (mut e, a, b) = two_meshes();
     gather_on(&mut e, b, &[a]);
     result(&e, b);
-    let runs = e.meshops.op_runs();
+    let runs = e.mesh_stack.op_runs();
     result(&e, b);
-    assert_eq!(e.meshops.op_runs(), runs, "cached");
+    assert_eq!(e.mesh_stack.op_runs(), runs, "cached");
     // A's cube gets bigger: A's op and B's gather re-run.
     let cube = top(&e, a);
     let mut v = serde_json::Map::new();
@@ -165,7 +165,7 @@ fn editing_the_source_reruns_the_reader_and_nothing_else_does() {
     })
     .unwrap();
     let r = result(&e, b);
-    assert_eq!(e.meshops.op_runs(), runs + 2);
+    assert_eq!(e.mesh_stack.op_runs(), runs + 2);
     let x = r.mesh.vertices.iter().map(|p| p.x).fold(f64::MIN, f64::max);
     assert!((x - 1.5).abs() < 1e-9, "{x}");
     // Moving A moves what B reads.
@@ -218,7 +218,7 @@ fn a_file_with_a_loop_opens_with_the_closing_op_turned_off() {
     e.dispatch(Command::MeshOpCreate(GATHER.into())).unwrap();
     let op = top(&e, a);
     // A hand-edited file: force the loop past the editor.
-    let stack = e.scene.item_mut(a).unwrap().mesh_ops.as_mut().unwrap();
+    let stack = e.scene.item_mut(a).unwrap().mesh_stack.as_mut().unwrap();
     let i = stack.index_of(op.op).unwrap();
     stack.ops[i].kind = OpKind::from_raw(GATHER, 1, serde_json::json!({ "sources": [b] }));
     assert!(find_loop(&e.scene).is_some());
@@ -228,7 +228,7 @@ fn a_file_with_a_loop_opens_with_the_closing_op_turned_off() {
     let off = back
         .items
         .iter()
-        .flat_map(|i| i.mesh_ops.iter().flat_map(|s| &s.ops))
+        .flat_map(|i| i.mesh_stack.iter().flat_map(|s| &s.ops))
         .filter(|o| !o.enabled)
         .count();
     assert_eq!(off, 1);
@@ -303,14 +303,14 @@ fn an_op_of_an_unknown_type_runs_once_its_kit_registers() {
     let json = format!(
         r#"{{"type":"{LATE}","version":1,"id":0,"enabled":true,"values":{{"sources":[]}}}}"#
     );
-    let op: operandi_core::meshops::MeshOp = serde_json::from_str(&json).unwrap();
+    let op: operandi_core::mesh_stack::MeshOp = serde_json::from_str(&json).unwrap();
     assert!(matches!(op.kind, OpKind::Placeholder { .. }));
-    let stack = operandi_core::meshops::MeshOpStack {
+    let stack = operandi_core::mesh_stack::MeshStack {
         ops: vec![op.clone()],
         next_id: 1,
     };
     let base = operandi_core::Shared::new(Mesh::default());
-    let before = operandi_core::meshops::evaluate_stack(&base, &stack);
+    let before = operandi_core::mesh_stack::evaluate_stack(&base, &stack);
     assert!(matches!(before.statuses[0], OpStatus::Failed(_)));
     register(Arc::new(Typed::<Gather>::new(
         LATE,
@@ -320,7 +320,7 @@ fn an_op_of_an_unknown_type_runs_once_its_kit_registers() {
         vec![Field::new("sources", "Source", FieldKind::Items)],
     )))
     .unwrap();
-    let after = operandi_core::meshops::evaluate_stack(&base, &stack);
+    let after = operandi_core::mesh_stack::evaluate_stack(&base, &stack);
     assert_eq!(after.statuses[0], OpStatus::Ok);
     // Its saved form is untouched (SAFE-12).
     assert_eq!(
@@ -347,7 +347,7 @@ fn random_links_never_loop_panic_or_change_on_reopen() {
         };
         let mut e = Editor::default();
         if seed % 2 == 0 {
-            e.meshops.set_background(true, None);
+            e.mesh_stack.set_background(true, None);
         }
         let mut ids = Vec::new();
         for _ in 0..3 {
@@ -362,7 +362,7 @@ fn random_links_never_loop_panic_or_change_on_reopen() {
                 .scene
                 .items
                 .iter()
-                .filter(|i| i.mesh_ops.is_some())
+                .filter(|i| i.mesh_stack.is_some())
                 .map(|i| i.id)
                 .collect();
             if live.is_empty() {
@@ -373,7 +373,7 @@ fn random_links_never_loop_panic_or_change_on_reopen() {
                 .scene
                 .item(item)
                 .unwrap()
-                .mesh_ops
+                .mesh_stack
                 .as_ref()
                 .unwrap()
                 .ops
@@ -418,19 +418,19 @@ fn random_links_never_loop_panic_or_change_on_reopen() {
             }
             assert!(find_loop(&e.scene).is_none(), "seed {seed} step {step}");
             for i in &e.scene.items {
-                let _ = e.meshops.result(&e.scene, i);
+                let _ = e.mesh_stack.result(&e.scene, i);
             }
         }
-        e.meshops.wait();
+        e.mesh_stack.wait();
         let bytes = persistence::encode(&e.scene).unwrap();
         let back = persistence::decode(&bytes).unwrap();
         assert_eq!(back, e.scene, "seed {seed}");
         let fresh = Runtime::default();
         for (a, b) in e.scene.items.iter().zip(&back.items) {
-            if a.mesh_ops.is_none() {
+            if a.mesh_stack.is_none() {
                 continue;
             }
-            let ours = e.meshops.current(&e.scene, a).unwrap();
+            let ours = e.mesh_stack.current(&e.scene, a).unwrap();
             let theirs = fresh.current(&back, b).unwrap();
             assert_eq!(*ours.mesh, *theirs.mesh, "seed {seed}");
             assert_eq!(ours.statuses, theirs.statuses, "seed {seed}");

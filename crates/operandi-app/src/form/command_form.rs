@@ -140,7 +140,7 @@ pub(crate) const WIDGETS: &[(&str, &str)] = &[
     (
         "workbench.tools",
         "Edit Workbench and the edit tools (Pick to Add, Add Divider, Add \
-         Divider with Label, Add Tool Pipe, Undo Edit, Revert): their lines \
+         Divider with Label, Add Tool Chain, Undo Edit, Revert): their lines \
          name the workbench being drawn, which a shipped form can't (a \
          {form} placeholder in form lines would retire it)",
     ),

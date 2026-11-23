@@ -202,10 +202,10 @@ impl Operandi {
     pub(super) fn shading_tab(&self) -> bool {
         self.front_panel(panel_registry::PanelKind::ShaderTree)
     }
-    /// The Mesh Ops tab is in front with an op of the active mesh selected:
+    /// The Mesh Stack tab is in front with an op of the active mesh selected:
     /// Properties shows that op (MO-10, MO-19).
     pub(super) fn mesh_op_tab(&self) -> bool {
-        self.front_panel(panel_registry::PanelKind::MeshOps) && self.selected_mesh_op().is_some()
+        self.front_panel(panel_registry::PanelKind::MeshStack) && self.selected_mesh_op().is_some()
     }
     /// Is `kind` the front tab of either panel group?
     pub(super) fn front_panel(&self, kind: panel_registry::PanelKind) -> bool {
@@ -443,7 +443,7 @@ impl Operandi {
     pub(super) fn property_tabs(&self) -> Vec<&'static str> {
         use operandi_core::shader_tree::NodeKind;
         if self.mesh_op_tab() {
-            return vec![crate::mesh_ops_ui::MESH_OP_TAB];
+            return vec![crate::mesh_stack_ui::MESH_OP_TAB];
         }
         if self.shading_tab() {
             use crate::environment_ui::{

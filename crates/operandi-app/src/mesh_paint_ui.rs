@@ -260,7 +260,7 @@ impl Operandi {
             self.status = format!(
                 "{}: {count} placed",
                 if s.replicas {
-                    "Mesh Paint Replica"
+                    "Mesh Paint Instancer"
                 } else if s.instances {
                     "Mesh Paint Instance"
                 } else {
@@ -585,12 +585,12 @@ pub(super) fn mesh_paint_form(f: &mut ToolForm<Utility>, s: &MeshPaintSettings) 
     .field(
         tf::check(
             "mp_replicas",
-            "Create Replicator",
+            "Create Instancer",
             |u: &Utility| read(u).replicas,
             |u, on| edit(u, |s| s.replicas = on),
         )
         .tip(
-            "Each stroke makes one Replicator: a point per copy of the background meshes (G8 RP-7)",
+            "Each stroke makes one Instancer: a point per copy of the background meshes (G8 RP-7)",
         ),
     )
     .field(

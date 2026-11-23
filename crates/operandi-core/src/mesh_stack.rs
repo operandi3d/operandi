@@ -1,7 +1,7 @@
-//! MeshOps v1: a procedural stack of operations on a mesh item
+//! Mesh Stack v1: a procedural stack of operations on a mesh item
 //! (specifications/meshops-2026-11-11, MO-nn behaviour, SAFE-nn safety).
 //!
-//! The data model. `Item::mesh` stays the **Base Mesh**; `Item::mesh_ops`
+//! The data model. `Item::mesh` stays the **Base Mesh**; `Item::mesh_stack`
 //! holds the stack (MO-01). What the viewport, render and export show is
 //! the stack's result, computed here and held by `Runtime`, outside the
 //! scene: never in undo checkpoints, `PartialEq` or files (SAFE-03, MO-05).
@@ -16,7 +16,7 @@
 //! always gives the same mesh (SAFE-01, SAFE-11).
 //!
 //! Op types. Each type is an entry in the op table (`meshop_types.rs`):
-//! Operandi's own in `meshops_builtin.rs`, kits' added at run time. This
+//! Operandi's own in `mesh_stack_builtin.rs`, kits' added at run time. This
 //! module never names a particular op type.
 //!
 //! Links. An op can read other mesh items (Merge Meshes, Boolean): its
@@ -41,7 +41,7 @@ use std::sync::{Arc, Mutex};
 /// Mesh; the list shows them the other way up (top = last evaluated).
 #[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
-pub struct MeshOpStack {
+pub struct MeshStack {
     pub ops: Vec<MeshOp>,
     /// Next op id. Ids name rows for commands and the list; they are never
     /// reused within a stack.
@@ -406,7 +406,7 @@ impl<'de> Deserialize<'de> for MeshOp {
     }
 }
 
-impl MeshOpStack {
+impl MeshStack {
     pub fn index_of(&self, op: u64) -> Option<usize> {
         self.ops.iter().position(|o| o.id == op)
     }
@@ -531,7 +531,7 @@ pub fn find_loop(scene: &crate::Scene) -> Option<(u64, u64)> {
     // Item → (op, linked item) for every enabled op with links.
     let mut edges: HashMap<u64, Vec<(u64, u64)>> = HashMap::new();
     for item in &scene.items {
-        for op in item.mesh_ops.iter().flat_map(|s| &s.ops) {
+        for op in item.mesh_stack.iter().flat_map(|s| &s.ops) {
             if op.enabled {
                 for to in op.kind.links(scene) {
                     edges.entry(item.id).or_default().push((op.id, to));
@@ -581,7 +581,7 @@ pub fn break_loops(scene: &mut crate::Scene) -> Vec<String> {
         let Some(i) = scene.item_mut(item) else { break };
         let name = i.name.clone();
         let Some(o) = i
-            .mesh_ops
+            .mesh_stack
             .as_mut()
             .and_then(|s| s.ops.iter_mut().find(|o| o.id == op))
         else {
@@ -721,15 +721,11 @@ fn run_chain(
 /// Evaluates a stack from scratch, synchronously, with no cache and no
 /// scene: item links are missing inputs. Tests, the stress harness and
 /// determinism checks use it; [`Runtime::current`] evaluates with links.
-pub fn evaluate_stack(base: &Shared<Mesh>, stack: &MeshOpStack) -> Evaluated {
+pub fn evaluate_stack(base: &Shared<Mesh>, stack: &MeshStack) -> Evaluated {
     evaluate_stack_within(base, stack, Limits::default())
 }
 /// `evaluate_stack` with other output limits.
-pub fn evaluate_stack_within(
-    base: &Shared<Mesh>,
-    stack: &MeshOpStack,
-    limits: Limits,
-) -> Evaluated {
+pub fn evaluate_stack_within(base: &Shared<Mesh>, stack: &MeshStack, limits: Limits) -> Evaluated {
     let no_scene = crate::Scene::default();
     let inputs: Vec<OpInputs> = stack
         .ops
@@ -812,7 +808,7 @@ impl PartialEq for Runtime {
 }
 impl std::fmt::Debug for Runtime {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.write_str("meshops::Runtime")
+        f.write_str("mesh_stack::Runtime")
     }
 }
 impl Runtime {
@@ -878,7 +874,7 @@ impl Runtime {
         else {
             return fail(MISSING_INPUT);
         };
-        let mesh = if source.mesh_ops.is_some() {
+        let mesh = if source.mesh_stack.is_some() {
             visiting.push(reader);
             let result = match want {
                 Want::Display => self.result_in(scene, source, visiting),
@@ -956,7 +952,7 @@ impl Runtime {
         item: &crate::Item,
         visiting: &mut Vec<u64>,
     ) -> Option<Evaluated> {
-        let stack = item.mesh_ops.as_ref()?;
+        let stack = item.mesh_stack.as_ref()?;
         let last = |s: &State| s.chains.get(&item.id).map(|c| evaluated(c, false));
         let Some(inputs) = self.inputs_for(scene, item, &stack.ops, Want::Display, visiting) else {
             // A linked item is still evaluating: keep the last result.
@@ -1010,7 +1006,7 @@ impl Runtime {
             let (runtime, id, base, ops) =
                 (self.clone(), item.id, item.mesh.clone(), stack.ops.clone());
             let spawned = std::thread::Builder::new()
-                .name("meshops".into())
+                .name("mesh_stack".into())
                 .spawn(move || {
                     let chain = run_chain(
                         base.shared(),
@@ -1070,7 +1066,7 @@ impl Runtime {
         item: &crate::Item,
         visiting: &mut Vec<u64>,
     ) -> Option<Evaluated> {
-        let stack = item.mesh_ops.as_ref()?;
+        let stack = item.mesh_stack.as_ref()?;
         let inputs = self.inputs_for(scene, item, &stack.ops, Want::Final, visiting)?;
         let (reuse, limits) = {
             let s = self.lock();
@@ -1105,7 +1101,7 @@ impl Runtime {
             scene
                 .items
                 .iter()
-                .any(|i| i.id == *id && i.mesh_ops.is_some())
+                .any(|i| i.id == *id && i.mesh_stack.is_some())
         };
         s.chains.retain(|id, _| live(id));
         let gone: Vec<u64> = s.jobs.keys().copied().filter(|id| !live(id)).collect();
@@ -1143,19 +1139,19 @@ impl Runtime {
         if !scene
             .items
             .iter()
-            .any(|i| i.mesh_ops.is_some() && Some(i.id) != base_edit)
+            .any(|i| i.mesh_stack.is_some() && Some(i.id) != base_edit)
         {
             return None;
         }
         self.retain(scene);
         let mut out = scene.clone();
         for (index, item) in out.items.iter_mut().enumerate() {
-            if item.mesh_ops.is_none() || Some(item.id) == base_edit {
+            if item.mesh_stack.is_none() || Some(item.id) == base_edit {
                 continue;
             }
             let original = &scene.items[index];
             if original
-                .mesh_ops
+                .mesh_stack
                 .as_ref()
                 .is_some_and(crate::skin::only_skin)
             {
@@ -1198,9 +1194,9 @@ mod tests {
             selops: Vec::new(),
         }
     }
-    fn stack(kinds: Vec<OpKind>) -> MeshOpStack {
+    fn stack(kinds: Vec<OpKind>) -> MeshStack {
         let n = kinds.len() as u64;
-        MeshOpStack {
+        MeshStack {
             ops: kinds
                 .into_iter()
                 .enumerate()
@@ -1327,7 +1323,7 @@ mod tests {
             back,
             serde_json::from_str::<serde_json::Value>(json).unwrap()
         );
-        let s = MeshOpStack {
+        let s = MeshStack {
             ops: vec![op],
             next_id: 1,
         };
@@ -1395,7 +1391,7 @@ mod tests {
         let mut scene = crate::Scene::default();
         scene.new_mesh().unwrap();
         let mut item = scene.items[0].clone();
-        item.mesh_ops = Some(stack(vec![
+        item.mesh_stack = Some(stack(vec![
             OpKind::new("prim.cube.item").unwrap(),
             OpKind::new("subdivide.tool.item").unwrap(),
             OpKind::new("poly.bevel.item").unwrap(),
@@ -1405,7 +1401,7 @@ mod tests {
         runtime.result(&scene, &item).unwrap();
         assert_eq!(runtime.op_runs(), 3, "cached");
         set(
-            &mut item.mesh_ops.as_mut().unwrap().ops[2].kind,
+            &mut item.mesh_stack.as_mut().unwrap().ops[2].kind,
             "inset",
             0.05,
         );
@@ -1420,12 +1416,12 @@ mod tests {
         let mut scene = crate::Scene::default();
         scene.new_mesh().unwrap();
         let mut item = scene.items[0].clone();
-        item.mesh_ops = Some(stack(vec![OpKind::new("prim.cube.item").unwrap()]));
+        item.mesh_stack = Some(stack(vec![OpKind::new("prim.cube.item").unwrap()]));
         let first = runtime.result(&scene, &item);
         assert!(first.is_none_or(|e| !e.current));
         // A newer recipe before the first finishes.
         for k in ["sizeX", "sizeY", "sizeZ"] {
-            set(&mut item.mesh_ops.as_mut().unwrap().ops[0].kind, k, 2.);
+            set(&mut item.mesh_stack.as_mut().unwrap().ops[0].kind, k, 2.);
         }
         runtime.result(&scene, &item);
         runtime.wait();

@@ -873,7 +873,7 @@ until then the current behaviour stays. 1: UIC-190, 191, 195, 196, 198,
 - **UIC-212** Workbench: Edit Workbench, Pick to Add (click any button,
   property, preset or command-history line), drag to reorder, right-click
   to set label, tooltip, icon, width, style, proficiency; dividers with
-  labels make collapsible sections; add the current tool pipe as a preset.
+  labels make collapsible sections; add the current tool chain as a preset.
   Any form can be made a workbench. [ref]
 - **UIC-213** Form Editor (System > Form Editor): tree of groups, forms and
   controls; search; Find Form by clicking the UI; properties; preview; save

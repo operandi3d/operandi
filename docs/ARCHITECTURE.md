@@ -60,7 +60,7 @@ builds) and `fixtures/` (original test scenes).
   inside the tool). Cancel restores the start. Tool Properties panels are
   field lists driven by the same parameters (`tool_form.rs`,
   `NumericSession`).
-- **Tool cards and the tool pipe.** Every tool is a stack of shared layers
+- **Tool cards and the tool chain.** Every tool is a stack of shared layers
   (action centre, falloff, symmetry, snapping), then its own geometry.
   `operandi-core/src/tool_card.rs` gives each tool one card: its family,
   starting modes, which layers it uses, its handle layout and anchor,
@@ -85,7 +85,7 @@ builds) and `fixtures/` (original test scenes).
   the shader tree, images and selection.
 - **Modelling operations**: one module or folder per tool family (bevel,
   extrude, slice, subdivide, booleans with Manifold, drills, duplicate,
-  deformers and falloffs, sculpt brushes, vertex maps, freeze, MeshOps
+  deformers and falloffs, sculpt brushes, vertex maps, freeze, Mesh Stack
   procedural stack).
 - **Shading** (`shader_tree.rs`, `material.rs`, `node_material.rs`,
   `shader_eval.rs`, `shader_wgsl.rs`): the layered shader tree and node
