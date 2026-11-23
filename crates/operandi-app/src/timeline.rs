@@ -1759,21 +1759,50 @@ impl Operandi {
                 }
             };
             egui::Popup::menu(&ik).show(|ui| {
-                for (label, line) in [
-                    ("Apply IK (Two-Bone)", "operandi.ik.applyTwoBone"),
-                    ("Apply IK (Chain)", "operandi.ik.applyChain"),
-                    ("Create IK Up Vector", "operandi.ik.pole mode:create"),
-                    ("Remove Up Vector", "operandi.ik.pole mode:remove"),
-                    (switch_label, "operandi.ik.switch"),
-                    ("IK/FK: Set Keys", "operandi.ik.setKeys"),
-                    ("IK/FK: Delete Keys", "operandi.ik.setKeys delete:true"),
-                    ("Select Switch Channels", "operandi.ik.selectSwitch"),
-                    ("Select IK Solvers", "operandi.ik.selectSolvers"),
-                    ("Match Goal to Joint", "operandi.ik.match"),
-                    ("Update Rest Pose (All)", "operandi.ik.updateRest all:true"),
-                    ("Disable IK", "operandi.ik.disable"),
+                // Rendered icons on the apply, pole and goal entries.
+                for (icon, label, line) in [
+                    (
+                        Some(Icon::IkTwoBone),
+                        "Apply IK (Two-Bone)",
+                        "operandi.ik.applyTwoBone",
+                    ),
+                    (
+                        Some(Icon::IkChain),
+                        "Apply IK (Chain)",
+                        "operandi.ik.applyChain",
+                    ),
+                    (
+                        Some(Icon::IkUpVector),
+                        "Create IK Up Vector",
+                        "operandi.ik.pole mode:create",
+                    ),
+                    (None, "Remove Up Vector", "operandi.ik.pole mode:remove"),
+                    (None, switch_label, "operandi.ik.switch"),
+                    (None, "IK/FK: Set Keys", "operandi.ik.setKeys"),
+                    (
+                        None,
+                        "IK/FK: Delete Keys",
+                        "operandi.ik.setKeys delete:true",
+                    ),
+                    (None, "Select Switch Channels", "operandi.ik.selectSwitch"),
+                    (None, "Select IK Solvers", "operandi.ik.selectSolvers"),
+                    (
+                        Some(Icon::IkGoal),
+                        "Match Goal to Joint",
+                        "operandi.ik.match",
+                    ),
+                    (
+                        None,
+                        "Update Rest Pose (All)",
+                        "operandi.ik.updateRest all:true",
+                    ),
+                    (None, "Disable IK", "operandi.ik.disable"),
                 ] {
-                    if ui.button(label).on_hover_text(line).clicked() {
+                    let button = match icon {
+                        Some(icon) => crate::icons::button(ui, icon, label),
+                        None => egui::Button::new(label),
+                    };
+                    if ui.add(button).on_hover_text(line).clicked() {
                         ik_lines.push(line);
                         ui.close();
                     }
