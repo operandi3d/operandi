@@ -1103,6 +1103,10 @@ impl Operandi {
         // The user's colours first, so the very first frame draws with them.
         let scheme = color_theme::load(&environment.paths().color_theme());
         theme::install(&cc.egui_ctx);
+        // Interface Scale (Preferences > Defaults > UI) is the one way to
+        // zoom the interface; egui's own Cmd/Ctrl +/- zoom would fight it
+        // every frame and isn't saved.
+        cc.egui_ctx.options_mut(|o| o.zoom_with_keyboard = false);
         native::install(cc.egui_ctx.clone());
         open_documents::connect(cc.egui_ctx.clone());
         let gpu = cc
@@ -3547,7 +3551,10 @@ impl eframe::App for Operandi {
             let ctx = ctx.clone();
             std::sync::Arc::new(move || ctx.request_repaint())
         });
-        ctx.input(|i| self.main_window.observe(i.viewport()));
+        // Interface Scale (ui_preferences.rs) before anything is laid out.
+        ui_preferences::sync_zoom(ctx);
+        let zoom = ctx.zoom_factor();
+        ctx.input(|i| self.main_window.observe_zoomed(i.viewport(), zoom));
         colour_field::begin_frame();
         self.sync_tag_shader_selection();
         self.take_picker_color_units();
