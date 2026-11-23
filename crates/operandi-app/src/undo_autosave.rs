@@ -485,6 +485,8 @@ impl super::Operandi {
         }
         ui.add_space(8.);
         self.application_defaults_ui(ui);
+        ui.add_space(8.);
+        self.updates_preferences_ui(ui);
     }
     /// Preferences > Defaults > Auto-Save.
     pub(super) fn autosave_page(&mut self, ui: &mut egui::Ui) {
