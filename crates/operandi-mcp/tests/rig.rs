@@ -490,9 +490,9 @@ fn mirror_and_transfer_through_the_bridge() {
     );
     let before = weight(&mut b, json!({"item": mesh, "map": "Joint1_R"}))["values"].clone();
     run(&mut b, "operandi.weight.mirror", json!({"item": mesh}));
-    assert_eq!(
-        weight(&mut b, json!({"item": mesh, "map": "Joint1_R"}))["values"],
-        before
+    same_weights(
+        &weight(&mut b, json!({"item": mesh, "map": "Joint1_R"}))["values"],
+        &before,
     );
     let copy = cube(&mut b, [0., 0., 0.]);
     run(
@@ -500,8 +500,28 @@ fn mirror_and_transfer_through_the_bridge() {
         "operandi.weight.transfer",
         json!({"item": copy, "from": mesh}),
     );
-    assert_eq!(
-        weight(&mut b, json!({"item": copy, "map": "Joint1_R"}))["values"],
-        before
+    same_weights(
+        &weight(&mut b, json!({"item": copy, "map": "Joint1_R"}))["values"],
+        &before,
     );
+}
+
+/// The same points weighted the same, to the last digit or so: the bind
+/// computes each side's weights on its own, and mirrored joints' float
+/// maths rounds differently on some CPUs (x86_64 CI), so the two sides
+/// can differ in the last bit (1e-12 absolute covers only that).
+fn same_weights(got: &Value, want: &Value) {
+    let (g, w) = (
+        got.as_object().expect("values"),
+        want.as_object().expect("values"),
+    );
+    let mut gk: Vec<&String> = g.keys().collect();
+    let mut wk: Vec<&String> = w.keys().collect();
+    gk.sort();
+    wk.sort();
+    assert_eq!(gk, wk, "the same weighted points");
+    for (k, v) in w {
+        let (a, b) = (g[k].as_f64().unwrap(), v.as_f64().unwrap());
+        assert!((a - b).abs() <= 1e-12, "point {k}: {a} vs {b}");
+    }
 }
