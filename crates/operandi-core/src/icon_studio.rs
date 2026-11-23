@@ -601,10 +601,20 @@ pub enum Sample {
     CurvePresets,
     /// Animation Editors: a panel with a curve above a row of keys.
     AnimationEditors,
+    /// Constrain: a cyan cone aimed at a cube along a dashed line.
+    Constrain,
+    /// Hierarchy: a parent cube above two children, joined by dark links.
+    Hierarchy,
+    /// Channel Links: two channel sliders joined by a cyan link.
+    ChannelLinks,
+    /// Schematic: three node tiles wired together in cyan.
+    Schematic,
+    /// Bake: a curve set with a cyan key at every frame.
+    BakeKeys,
 }
 
 impl Sample {
-    pub const ALL: [Sample; 156] = [
+    pub const ALL: [Sample; 161] = [
         Sample::Cube,
         Sample::SelectedFace,
         Sample::Sphere,
@@ -761,6 +771,11 @@ impl Sample {
         Sample::OutSlope,
         Sample::CurvePresets,
         Sample::AnimationEditors,
+        Sample::Constrain,
+        Sample::Hierarchy,
+        Sample::ChannelLinks,
+        Sample::Schematic,
+        Sample::BakeKeys,
     ];
 
     /// File stem and icon slug.
@@ -922,6 +937,11 @@ impl Sample {
             Sample::OutSlope => "out-slope",
             Sample::CurvePresets => "curve-presets",
             Sample::AnimationEditors => "animation-editors",
+            Sample::Constrain => "constrain",
+            Sample::Hierarchy => "hierarchy",
+            Sample::ChannelLinks => "channel-links",
+            Sample::Schematic => "schematic",
+            Sample::BakeKeys => "bake-keys",
         }
     }
 
@@ -3666,6 +3686,99 @@ fn sample_mesh(sample: Sample) -> Result<Mesh> {
             ];
             for x in [-0.32, 0.02, 0.3] {
                 parts.push(key(x, -0.27, 0.18)?);
+            }
+            symbol(parts)?
+        }
+        Sample::Constrain => {
+            let across = DVec3::new(1., 0., -1.).normalize();
+            let target = across * 0.35 - DVec3::Y * 0.1;
+            let from = -across * 0.4 + DVec3::Y * 0.25;
+            let dir = (target - from).normalize();
+            let mut cone = revolve(&[(0., -0.2), (0.17, -0.2), (0., 0.25)], 32, false, "New")?;
+            let turn = glam::DQuat::from_rotation_arc(DVec3::Y, dir);
+            cone = deformed(cone, |v| from + turn * v);
+            let mut parts = vec![cube_at(target, 0.42, CLAY)?, cone];
+            for k in [0., 2., 4.] {
+                let (t0, t1) = (0.35 + k * 0.08, 0.35 + (k + 1.) * 0.08);
+                parts.push(tube(
+                    &[from.lerp(target, t0), from.lerp(target, t1)],
+                    0.025,
+                    8,
+                    "Ink",
+                )?);
+            }
+            merge(parts)?
+        }
+        Sample::Hierarchy => {
+            let across = DVec3::new(1., 0., -1.).normalize();
+            let top = DVec3::Y * 0.3;
+            let kids = [
+                across * -0.38 - DVec3::Y * 0.3,
+                across * 0.38 - DVec3::Y * 0.3,
+            ];
+            let mut parts = vec![cube_at(top, 0.32, "Selected")?];
+            for k in kids {
+                parts.push(cube_at(k, 0.28, CLAY)?);
+                parts.push(tube(
+                    &[top - DVec3::Y * 0.16, k + DVec3::Y * 0.14],
+                    0.03,
+                    8,
+                    "Ink",
+                )?);
+            }
+            merge(parts)?
+        }
+        Sample::ChannelLinks => {
+            let (a, b) = ((-0.15, 0.25), (0.2, -0.25));
+            symbol(vec![
+                bar(-0.5, 0.25, 0.5, 0.25, 0.07, 0.06, CLAY)?,
+                bar(-0.5, -0.25, 0.5, -0.25, 0.07, 0.06, CLAY)?,
+                ball(DVec3::new(a.0, a.1, 0.), 0.1, "Selected")?,
+                ball(DVec3::new(b.0, b.1, 0.), 0.1, "Selected")?,
+                tube(
+                    &through(
+                        &[
+                            DVec3::new(a.0, a.1, 0.06),
+                            DVec3::new(0.1, 0.05, 0.12),
+                            DVec3::new(b.0, b.1, 0.06),
+                        ],
+                        10,
+                    ),
+                    0.035,
+                    8,
+                    "New",
+                )?,
+            ])?
+        }
+        Sample::Schematic => {
+            let nodes = [(-0.32, 0.25), (-0.32, -0.25), (0.32, 0.)];
+            let mut parts = Vec::new();
+            for &(x, y) in &nodes {
+                parts.push(frame_tile(x, y, 0.2, 0.13)?);
+            }
+            for &(x, y) in &nodes[..2] {
+                parts.push(tube(
+                    &through(
+                        &[
+                            DVec3::new(x + 0.2, y, -0.05),
+                            DVec3::new(0.0, y * 0.6, -0.05),
+                            DVec3::new(0.12, 0., -0.05),
+                        ],
+                        10,
+                    ),
+                    0.035,
+                    8,
+                    "New",
+                )?);
+            }
+            symbol(parts)?
+        }
+        Sample::BakeKeys => {
+            let f = |x: f64| 0.3 * (x * 4.).sin();
+            let mut parts = vec![graph_curve(-0.55, 0.55, f, 0.03, "Ink")?];
+            for k in 0..8 {
+                let x = -0.5 + f64::from(k) / 7.;
+                parts.push(key(x, f(x), 0.15)?);
             }
             symbol(parts)?
         }
