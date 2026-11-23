@@ -81,7 +81,7 @@ impl Editor {
     // ------------------------------------------------------------ steps
 
     /// Drops a live item transform tool, returning it to start again.
-    fn settle_tool(&mut self) -> Option<Tool> {
+    pub(crate) fn settle_tool(&mut self) -> Option<Tool> {
         let tool = self.live.as_ref().map(|l| l.tool)?;
         if !tool.is_transform() {
             return None;
@@ -89,7 +89,7 @@ impl Editor {
         self.dispatch(Command::Drop).ok()?;
         Some(tool)
     }
-    fn resume_tool(&mut self, tool: Option<Tool>) {
+    pub(crate) fn resume_tool(&mut self, tool: Option<Tool>) {
         if let Some(tool) = tool
             && self.live.is_none()
         {

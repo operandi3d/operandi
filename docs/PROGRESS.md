@@ -4437,3 +4437,7 @@ Design: docs/MATERIALX_GRAPHS.md (stages 1-5).
 - Script Console (floating window), System > Run Script…, Scripts folder, commands operandi.python.console/run/runScript/stop and operandi.mesh.setData; MCP `python_run`.
 - Hidden behind Preferences > Experimental > Python scripting (preview) or OPERANDI_PYTHON=1 (python_switch.rs, off by default).
 - Bundled CPython: scripts/fetch-python.sh + bundle-dev.sh/macos-app-bundle.sh; release signing, Windows and Linux not done (docs/PYTHON_SCRIPTING.md). Provisional: PY-Q01..Q04.
+
+## 2026-11-23 — Rig phase 5 (branch graph-editor-resize)
+
+- Step 1 (SK-01..03): Setup mode (`operandi.anim.setup`, Animate > Setup, timeline toggle, yellow view outline): items show setup values, keys are ignored, edits change setup values; Item to Setup and Restore Setup. Provisional: SK-Q01/Q02.

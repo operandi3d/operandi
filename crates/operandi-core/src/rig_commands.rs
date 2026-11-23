@@ -1308,6 +1308,77 @@ pub fn run(e: &mut Editor, name: &str, a: &Args) -> Out {
             })?;
             Ok(None)
         }
+        "operandi.anim.setup" => {
+            // SK-01: a view state (UI class): no undo step.
+            let on = match a.get("on").and_then(Value::as_str) {
+                None | Some("toggle") => !e.scene.animation.setup,
+                Some(s) => crate::command_args::boolean("on", s)?,
+            };
+            if on != e.scene.animation.setup {
+                let tool = e.settle_tool();
+                e.scene.animation.setup = on;
+                let now = e.scene.time.current;
+                animation::pose(&mut e.scene, now);
+                e.resume_tool(tool);
+            }
+            Ok(None)
+        }
+        "operandi.anim.itemToSetup" | "operandi.anim.restoreSetup" => {
+            // SK-03: per item, and per channel with channels:.
+            let to_setup = name == "operandi.anim.itemToSetup";
+            let items = ids(a, "items")?
+                .or(ids(a, "item")?)
+                .unwrap_or_else(|| e.scene.selected_items());
+            let only: Option<Vec<String>> = text_arg(a, "channels")?.map(|c| {
+                c.split(',')
+                    .map(|s| s.trim().to_owned())
+                    .filter(|s| !s.is_empty())
+                    .collect()
+            });
+            if items.is_empty() {
+                return Err("Select the items".into());
+            }
+            let keys: Vec<ChannelKey> = e
+                .scene
+                .animation
+                .channels
+                .keys()
+                .filter(|k| items.contains(&k.item))
+                .filter(|k| only.as_ref().is_none_or(|o| o.contains(&k.channel)))
+                .cloned()
+                .collect();
+            if keys.is_empty() {
+                return Err("No animated channels to change".into());
+            }
+            e.anim_step(
+                if to_setup {
+                    "Item to Setup"
+                } else {
+                    "Restore Setup"
+                },
+                |e| {
+                    for k in &keys {
+                        let now = animation::read(&e.scene, k);
+                        let Some(c) = e.scene.animation.channels.get_mut(k) else {
+                            continue;
+                        };
+                        if to_setup {
+                            // The current (edit) value becomes the setup value.
+                            if let Some(v) = now {
+                                c.rest = v;
+                            }
+                        } else {
+                            // The edit values go: no keys, the setup value back.
+                            let rest = c.rest;
+                            e.scene.animation.channels.remove(k);
+                            let _ = animation::write(&mut e.scene, k, rest);
+                        }
+                    }
+                    Ok(true)
+                },
+            )?;
+            Ok(None)
+        }
         _ => Err(format!("Unknown rig command {name}")),
     }
 }

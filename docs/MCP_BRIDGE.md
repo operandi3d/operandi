@@ -761,6 +761,14 @@ used in the app; `primitive_add` always starts from the Reset values.
 - **`operandi.rig.unwire`** — Delete the wire at piece's port (a link: the link; a modifier: that input, or out; a constraint or dynamic parent: that target, the piece with its last), one undo step.
   - `piece` (integer, required): The rig piece id.
   - `port` (string, required): The piece's port (A, driver, target 2, out...).
+- **`operandi.anim.setup`** — Turn Setup mode on or off (on: toggle, true or false). A view state: not an undo step.
+  - `on` (string): toggle (default), true or false.
+- **`operandi.anim.itemToSetup`** — Copy the current (edit) values of the items' animated channels into their setup values, one undo step. channels limits it to names such as pos.Y.
+  - `items` (string): Item ids (default the selection).
+  - `channels` (string): Only these channels, comma separated.
+- **`operandi.anim.restoreSetup`** — Throw away the edit values (the keys) of the items' animated channels and put back their setup values, one undo step. channels limits it to names such as pos.Y.
+  - `items` (string): Item ids (default the selection).
+  - `channels` (string): Only these channels, comma separated.
 - **`operandi.eval.graph`** — Read the evaluation graph as JSON: nodes (id, kind time/channel/field/transform/shownMesh, item, name, label, dirty) and edges [from, to] (to reads from). item limits it to one item's nodes and the edges touching them.
   - `item` (integer): Only this item's nodes.
 - **`operandi.render.frameRange`** — Render frames start..end (default the current range) with Cycles into folder (default the project's renders/) as <name>_0000.png; needs the running app. operandi.anim.query reports progress (job).

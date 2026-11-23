@@ -9680,3 +9680,8 @@ Built from BEHAVIOR-TOPOLOGY-PEN (2026-11-20) on branch topology-pen. These are 
 - PY-Q02 `operandi.run` reports what the line's Command History record says (`ok` and its message). Commands that report a failure only on the status line (not `last_failure`) read as success; the hardening branch's undo-reporting work covers the same gap.
 - PY-Q03 In the running app, `python_run` (MCP) runs on the bridge's headless path (headless commands, all-or-nothing like other bridge calls); the console and Run Script… use the app's full typed-line path.
 - PY-Q04 The Script Console is a floating window (UIC-183) from System > Script Console; no shortcut yet. Console lines are one statement (echoes its value) or a block.
+
+## Rig phase 5 (2026-11-23, branch graph-editor-resize)
+
+- SK-Q01 Setup mode is a view state of the scene (`Animation::setup`, never saved); undo and redo keep it as it is, like the current time. Setup values are each animated channel's `rest`; unanimated channels' own values are their setup values. Constraints still evaluate in setup mode; the skin shows the rest shape (SK-51).
+- SK-Q02 SK-03 Restore Setup throws away the channel's keys (its edit values) and puts the setup value back; Item to Setup copies the value shown now into the setup value. Provisional.

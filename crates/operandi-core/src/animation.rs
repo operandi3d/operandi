@@ -330,6 +330,12 @@ pub struct Animation {
         with = "shadow_list"
     )]
     pub shadows: BTreeMap<ChannelKey, Curve>,
+    /// SK-01 Setup mode: items show their setup (rest) values, keys are
+    /// ignored for display and transform edits change setup values. A view
+    /// state, not document data: never saved, and undo and redo keep it as
+    /// it is (`keep_time`).
+    #[serde(skip)]
+    pub setup: bool,
     /// Phase 4: rig pieces and pivots (rig.rs; saved, native v62).
     #[serde(default, skip_serializing_if = "crate::rig::Rig::is_default")]
     pub rig: crate::rig::Rig,
@@ -456,7 +462,12 @@ mod channel_list {
 
 impl Animation {
     pub fn is_default(&self) -> bool {
-        *self == Animation::default()
+        // Setup mode is a view state, not data.
+        let plain = Animation {
+            setup: false,
+            ..self.clone()
+        };
+        plain == Animation::default()
     }
     /// The channels of item `id` that have keys.
     pub fn item_channels(&self, id: u64) -> impl Iterator<Item = (&ChannelKey, &AnimChannel)> {
@@ -803,12 +814,23 @@ pub fn pose(scene: &mut Scene, time: Tick) {
     if scene.animation.channels.is_empty() {
         return;
     }
+    // SK-01: in Setup mode every animated channel shows its setup value.
+    let setup = scene.animation.setup;
     let values: Vec<(ChannelKey, f64)> = scene
         .animation
         .channels
         .iter()
         .filter(|(_, c)| !c.curve.is_empty())
-        .map(|(k, c)| (k.clone(), c.curve.value_at(time)))
+        .map(|(k, c)| {
+            (
+                k.clone(),
+                if setup {
+                    c.rest
+                } else {
+                    c.curve.value_at(time)
+                },
+            )
+        })
         .collect();
     for (k, v) in values {
         // A channel whose item went away (or can't be posed) is skipped.
@@ -851,6 +873,10 @@ pub fn pending(scene: &Scene) -> Vec<ChannelKey> {
 
 /// Whether channel `key` holds a pending edit.
 pub fn is_pending(scene: &Scene, key: &ChannelKey) -> bool {
+    // Setup mode edits the setup values directly: nothing is pending.
+    if scene.animation.setup {
+        return false;
+    }
     scene.animation.channels.get(key).is_some_and(|c| {
         !c.curve.is_empty()
             && read(scene, key).is_some_and(|v| differs(v, c.curve.value_at(scene.time.current)))
@@ -866,8 +892,10 @@ pub(crate) fn differs(a: f64, b: f64) -> bool {
 /// when the restored step was made at another time (TK-05).
 pub fn keep_time(left: &Scene, restored: &mut Scene) {
     let now = left.time.current;
-    if restored.time.current != now {
+    let setup = left.animation.setup;
+    if restored.time.current != now || restored.animation.setup != setup {
         restored.time.current = now;
+        restored.animation.setup = setup;
         pose(restored, now);
     }
 }
@@ -1204,6 +1232,16 @@ impl crate::Editor {
             for k in gone {
                 scene.animation.channels.remove(&k);
             }
+        }
+        // SK-01: in Setup mode an edit changes the setup values of the
+        // animated channels it touched; nothing is keyed.
+        if scene.animation.setup {
+            for (k, _, new) in changed_channels(before, scene, false) {
+                if let Some(c) = scene.animation.channels.get_mut(&k) {
+                    c.rest = new;
+                }
+            }
+            return;
         }
         let mode = scene.animation.settings.auto_key;
         if scene.animation.channels.is_empty() && mode != AutoKey::All {

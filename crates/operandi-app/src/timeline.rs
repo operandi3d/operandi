@@ -1691,6 +1691,15 @@ impl Operandi {
                 "",
                 "operandi.anim.editors",
             );
+            // SK-01: the Setup toggle (lit while on).
+            let on = self.editor.scene.animation.setup;
+            if ui
+                .selectable_label(on, "Setup")
+                .on_hover_text("Setup: show and edit the setup (rest) pose; keys are ignored\noperandi.anim.setup")
+                .clicked()
+            {
+                self.execute("operandi.anim.setup");
+            }
             // Rig phase 4: Constrain and Hierarchy pop-ups (the Animate
             // menu's), Channel Links, Schematic and Bake Selected.
             let constrain = self.tbi(

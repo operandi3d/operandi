@@ -3456,6 +3456,39 @@ pub static COMMANDS: &[Entry] = &[
         .undo()
         .operandi()
         .example("operandi.rig.unwire piece:7 port:A"),
+    script("operandi.anim.setup", Items, "Setup mode (SK-01): items show their setup (rest) pose, keys are ignored and transform edits change setup values.")
+        .on_editor(
+            "Turn Setup mode on or off (on: toggle, true or false). A view state: not an undo step.",
+            &[jopt("on", "string", "toggle (default), true or false.")],
+            crate::rig_commands::run,
+        )
+        .ui()
+        .operandi()
+        .example("operandi.anim.setup on:true"),
+    script("operandi.anim.itemToSetup", Items, "Item to Setup (SK-03): the items' current values become their setup values.")
+        .on_editor(
+            "Copy the current (edit) values of the items' animated channels into their setup values, one undo step. channels limits it to names such as pos.Y.",
+            &[
+            jopt("items", "string", "Item ids (default the selection)."),
+            jopt("channels", "string", "Only these channels, comma separated."),
+        ],
+            crate::rig_commands::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.anim.itemToSetup items:3"),
+    script("operandi.anim.restoreSetup", Items, "Restore Setup (SK-03): the items' edit values go and their setup values come back.")
+        .on_editor(
+            "Throw away the edit values (the keys) of the items' animated channels and put back their setup values, one undo step. channels limits it to names such as pos.Y.",
+            &[
+            jopt("items", "string", "Item ids (default the selection)."),
+            jopt("channels", "string", "Only these channels, comma separated."),
+        ],
+            crate::rig_commands::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.anim.restoreSetup items:3"),
     script("operandi.eval.graph", Items, "Reads the scene's evaluation graph (who reads whom: time, channels, fields, transforms, shown meshes) as JSON nodes and edges (UIC-163; the Schematic's data).")
         .on_editor(
             "Read the evaluation graph as JSON: nodes (id, kind time/channel/field/transform/shownMesh, item, name, label, dirty) and edges [from, to] (to reads from). item limits it to one item's nodes and the edges touching them.",
@@ -6872,7 +6905,7 @@ mod tests {
                 assert!(!json.about.is_empty(), "{}", e.name);
             }
         }
-        assert_eq!(crate::command_exec::specs().count(), 257);
+        assert_eq!(crate::command_exec::specs().count(), 260);
     }
 
     #[test]

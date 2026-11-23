@@ -346,7 +346,34 @@ impl Operandi {
         self.timeline_dialog(ctx);
         self.graph_editor_window(ctx);
         self.channel_links_window(ctx);
+        self.setup_outline(ctx);
         self.schematic_window(ctx);
+    }
+
+    /// SK-01: in Setup mode every 3D view gets a yellow outline.
+    fn setup_outline(&self, ctx: &Context) {
+        if !self.editor.scene.animation.setup || !crate::anim_switch::enabled() {
+            return;
+        }
+        let painter = ctx.layer_painter(egui::LayerId::new(
+            egui::Order::Foreground,
+            egui::Id::new("setup-outline"),
+        ));
+        let yellow = crate::form::status::edited_yellow();
+        for r in self
+            .view_rects
+            .values()
+            .chain(std::iter::once(&self.viewport_rect))
+        {
+            if r.is_positive() {
+                painter.rect_stroke(
+                    r.shrink(1.),
+                    0.,
+                    egui::Stroke::new(2.0f32, yellow),
+                    egui::StrokeKind::Inside,
+                );
+            }
+        }
     }
 
     /// TK-60/61/64: advance playback; no undo steps, and only the final

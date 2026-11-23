@@ -514,6 +514,8 @@ mod rig_modifiers;
 mod rig_phase4;
 #[path = "rig_schematic.rs"]
 mod rig_schematic;
+#[path = "rig_setup.rs"]
+mod rig_setup;
 #[path = "scene_budget.rs"]
 mod scene_budget;
 #[path = "scene_transfer.rs"]

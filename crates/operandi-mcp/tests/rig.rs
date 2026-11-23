@@ -251,3 +251,40 @@ fn rg51_rg52_links_through_the_bridge() {
     );
     assert!((scl_z(&mut b) - 0.5).abs() < 1e-4);
 }
+
+/// SK-01/03 through the bridge: setup mode shows and edits setup values.
+#[test]
+fn setup_mode_through_the_bridge() {
+    let mut b = Bridge::new();
+    let id = cube(&mut b, [0., 1., 0.]);
+    run(
+        &mut b,
+        "operandi.key.add",
+        json!({"channel": format!("{id}:pos.Y"), "frame": 0, "value": 0}),
+    );
+    run(
+        &mut b,
+        "operandi.key.add",
+        json!({"channel": format!("{id}:pos.Y"), "frame": 10, "value": 4}),
+    );
+    run(&mut b, "operandi.time.set", json!({"frame": 10}));
+    run(&mut b, "operandi.anim.setup", json!({"on": "true"}));
+    let pos_y = |b: &mut Bridge| query(b, id)["world"]["position"][1].as_f64().unwrap();
+    assert!((pos_y(&mut b) - 1.).abs() < 1e-9, "the setup value");
+    run(
+        &mut b,
+        "transform.channel",
+        json!({"name": "pos.Y", "value": 3, "item": id}),
+    );
+    run(&mut b, "operandi.anim.setup", json!({"on": "false"}));
+    assert!((pos_y(&mut b) - 4.).abs() < 1e-9, "the keys again");
+    run(
+        &mut b,
+        "operandi.anim.restoreSetup",
+        json!({"items": id.to_string()}),
+    );
+    assert!(
+        (pos_y(&mut b) - 3.).abs() < 1e-9,
+        "back to the edited setup value"
+    );
+}
