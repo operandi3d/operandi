@@ -33,6 +33,7 @@ pub mod import_graphs;
 pub mod import_lights;
 pub mod import_materials;
 pub mod import_mtlx_graph;
+pub mod import_skel;
 #[cfg(test)]
 mod import_tests;
 pub mod import_variants;

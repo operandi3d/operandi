@@ -834,10 +834,20 @@ fn bind_mesh(
         values.add(bones[k].joint, &names[k]);
     }
     item.mesh = mesh.into();
+    insert_skin(scene, m, &values)?;
+    for b in bones {
+        skin::ensure_setup_channels(scene, b.joint);
+    }
+    Ok(())
+}
+
+/// Puts a skin piece with `values` at the bottom of mesh `m`'s stack
+/// (SK-36: morphs, then the skin, then other deformers).
+pub fn insert_skin(scene: &mut Scene, m: u64, values: &SkinValues) -> Result<()> {
+    let item = scene.item_mut(m).ok_or("No mesh")?;
     let stack = item.mesh_ops.get_or_insert_with(MeshOpStack::default);
     let id = stack.next_id;
     stack.next_id += 1;
-    // SK-36: morphs, then the skin, then other deformers.
     stack.ops.insert(
         0,
         MeshOp {
@@ -845,14 +855,11 @@ fn bind_mesh(
             enabled: true,
             kind: OpKind::Op {
                 type_id: SKIN_OP.into(),
-                values: serde_json::to_value(&values).map_err(|e| e.to_string())?,
+                values: serde_json::to_value(values).map_err(|e| e.to_string())?,
             },
             selection: None,
             selops: Vec::new(),
         },
     );
-    for b in bones {
-        skin::ensure_setup_channels(scene, b.joint);
-    }
     Ok(())
 }

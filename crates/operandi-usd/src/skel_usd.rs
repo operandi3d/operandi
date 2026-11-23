@@ -10,6 +10,8 @@
 //! scales at every sample time (or the current pose once). `/root` becomes
 //! the SkelRoot. Joint items are not written as Xforms: the skeleton is
 //! their place in USD. Operandi's own code (not adapted from Blender).
+// Joint-indexed loops read several parallel lists at once.
+#![allow(clippy::needless_range_loop)]
 use glam::{DMat4, DVec3};
 use operandi_core::Scene;
 use operandi_core::skeleton;

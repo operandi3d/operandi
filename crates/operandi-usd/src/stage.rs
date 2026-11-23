@@ -51,8 +51,53 @@ pub struct StageData {
     /// Prims that are neither geometry nor transforms.
     #[serde(default)]
     pub skipped: Vec<Skipped>,
+    /// UsdSkelSkeletons (import_skel.rs).
+    #[serde(default)]
+    pub skeletons: Vec<SkelData>,
     #[serde(skip)]
     pub buffers: Vec<Vec<u8>>,
+}
+
+/// A UsdSkelSkeleton: joint paths, bind (skeleton-space) and rest (local)
+/// transforms, row-major in USD's row-vector convention, its world, and
+/// its SkelAnimation.
+#[derive(Clone, Debug, Default, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SkelData {
+    pub path: String,
+    pub joints: Vec<String>,
+    pub bind: Vec<[f64; 16]>,
+    pub rest: Vec<[f64; 16]>,
+    pub world: [f64; 16],
+    #[serde(default)]
+    pub anim: Option<SkelAnimData>,
+}
+
+/// A SkelAnimation's samples: per time, per joint in `joints` order.
+#[derive(Clone, Debug, Default, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SkelAnimData {
+    pub joints: Vec<String>,
+    pub times: Vec<f64>,
+    pub translations: Vec<Vec<[f64; 3]>>,
+    /// w, x, y, z.
+    pub rotations: Vec<Vec<[f64; 4]>>,
+    pub scales: Vec<Vec<[f64; 3]>>,
+}
+
+/// A mesh's UsdSkelBindingAPI skinning.
+#[derive(Clone, Debug, Default, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SkinData {
+    pub skeleton: String,
+    pub element_size: usize,
+    pub indices: BufRef,
+    pub weights: BufRef,
+    pub geom_bind: [f64; 16],
+    pub method: String,
+    /// The mesh's own skel:joints order, if it has one.
+    #[serde(default)]
+    pub joints: Vec<String>,
 }
 
 #[derive(Clone, Debug, Default, Deserialize)]
@@ -239,6 +284,9 @@ pub struct MeshData {
     /// Blend shapes bound to the mesh.
     #[serde(default)]
     pub blend_shapes: Vec<BlendShape>,
+    /// Its skinning (UsdSkelBindingAPI).
+    #[serde(default)]
+    pub skin: Option<SkinData>,
     /// What Operandi wrote in the mesh prim's customData ("operandi").
     pub custom: Option<serde_json::Value>,
     /// Set when the prim is a BasisCurves or NurbsCurves prim instead of a

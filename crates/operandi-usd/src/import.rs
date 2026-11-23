@@ -68,7 +68,15 @@ pub(crate) fn build_within(
     b.item_limit = item_limit;
     b.add_all()?;
     b.set_render_camera()?;
-    let mut render_notes = Vec::new();
+    let mut render_notes = crate::import_skel::add(
+        &mut b.scene,
+        stage,
+        crate::import_skel::Conv {
+            turn: b.turn,
+            scale: b.scale,
+        },
+        &b.skinned,
+    )?;
     if let Some(r) = &stage.render_settings {
         crate::render_usd::apply(&mut b.scene, r, &mut render_notes);
     }
@@ -207,6 +215,8 @@ struct Builder<'a> {
     camera_paths: HashMap<String, u64>,
     /// Items the import makes at most; the rest is left out and reported.
     item_limit: usize,
+    /// Mesh items with UsdSkel skinning, and their mesh data (import_skel.rs).
+    skinned: Vec<(u64, usize)>,
 }
 
 /// A PointInstancer Operandi wrote for a scatter, with no transform of
@@ -290,6 +300,7 @@ impl<'a> Builder<'a> {
             lights: options.lights,
             domes: Vec::new(),
             item_limit: ITEM_LIMIT,
+            skinned: Vec::new(),
         };
         b.tags = material_tags(stage);
         b.mark_importable();
@@ -657,6 +668,13 @@ impl<'a> Builder<'a> {
                 .new_mesh_named(Some(prim.name.clone()).filter(|n| !n.is_empty()))?;
             self.scene.items.last().expect("new_mesh added an item").id
         };
+        // UsdSkel: the skin is added once the skeletons are joints.
+        if let [only] = own_meshes.as_slice()
+            && let Some(mi) = self.stage.prims[*only].mesh
+            && self.stage.meshes.get(mi).is_some_and(|d| d.skin.is_some())
+        {
+            self.skinned.push((id, mi));
+        }
         let transform = self.transform(prim, pre, lens.is_some(), parent_is_lens);
         let (mesh, subdivision) = if own_meshes.is_empty() {
             (None, None)

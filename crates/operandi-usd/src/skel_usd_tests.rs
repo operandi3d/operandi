@@ -182,3 +182,95 @@ for binding in cache.ComputeSkelBindings(root, Usd.PrimDefaultPredicate):
         assert!(seen > 6, "{text}");
     }
 }
+
+/// §7 import: the exported arm reads back as the same joints, weights and
+/// skin, and deforms the same at frames 0, 12 and 24.
+#[test]
+fn the_arm_reads_back_the_same() {
+    for dq in [false, true] {
+        let (mut e, mesh) = arm(dq);
+        let path = out_dir().join(format!("arm-back-{dq}.usd"));
+        crate::export(
+            &path,
+            &e.evaluated(evaluate::Purpose::Final),
+            ExportFormat::Usd,
+        )
+        .unwrap();
+        let back = crate::import(&path, &Default::default()).unwrap();
+        let mut b = Editor {
+            scene: back.scene,
+            ..Default::default()
+        };
+        let joints: Vec<String> = b
+            .scene
+            .items
+            .iter()
+            .filter(|i| i.is_joint())
+            .map(|i| i.name.clone())
+            .collect();
+        assert_eq!(
+            joints,
+            ["Shoulder1", "Elbow1", "Wrist1"],
+            "{:?}",
+            back.notes
+        );
+        let m2 = b
+            .scene
+            .items
+            .iter()
+            .find(|i| i.is_mesh() && i.mesh_ops.is_some())
+            .expect("a skinned mesh")
+            .id;
+        let (_, v) = skin_commands::skin_op(&b.scene, m2).unwrap();
+        assert_eq!(v.interpolation == skin::DUAL_QUATERNION, dq);
+        let w1 = &e
+            .scene
+            .item(mesh)
+            .unwrap()
+            .mesh
+            .open()
+            .attributes
+            .point_weights;
+        let w2 = &b
+            .scene
+            .item(m2)
+            .unwrap()
+            .mesh
+            .open()
+            .attributes
+            .point_weights;
+        for name in ["Shoulder1", "Elbow1", "Wrist1"] {
+            for (p, w) in &w1[name] {
+                let got = w2[name].get(p).copied().unwrap_or(0.);
+                assert!((got - w).abs() < 1e-5, "{name} {p}: {got} vs {w}");
+            }
+        }
+        for f in [0, 12, 24] {
+            ok(&mut e, &format!("operandi.time.set frame:{f}"));
+            ok(&mut b, &format!("operandi.time.set frame:{f}"));
+            let ours = e
+                .evaluated(evaluate::Purpose::Final)
+                .item(mesh)
+                .unwrap()
+                .mesh
+                .open()
+                .vertices
+                .clone();
+            let theirs = b
+                .evaluated(evaluate::Purpose::Final)
+                .item(m2)
+                .unwrap()
+                .mesh
+                .open()
+                .vertices
+                .clone();
+            assert_eq!(ours.len(), theirs.len());
+            for (p, (a, c)) in ours.iter().zip(&theirs).enumerate() {
+                assert!(
+                    a.distance(*c) < 1e-4,
+                    "dq {dq} frame {f} point {p}: {a} vs {c}"
+                );
+            }
+        }
+    }
+}
