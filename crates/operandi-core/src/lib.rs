@@ -232,6 +232,8 @@ pub mod animation;
 pub mod boolean;
 pub mod click_select;
 pub mod drill;
+pub mod eval_build;
+pub mod eval_graph;
 pub mod evaluate;
 pub mod kit_item;
 pub mod meshop_selection;

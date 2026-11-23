@@ -180,6 +180,12 @@ mod ellipsoid_numeric;
 mod env_texture_locator;
 #[path = "environments.rs"]
 mod environments;
+#[path = "eval_build.rs"]
+mod eval_build;
+#[path = "eval_graph.rs"]
+mod eval_graph;
+#[path = "eval_probe.rs"]
+mod eval_probe;
 #[path = "extrude_clean_spec.rs"]
 mod extrude_clean_spec;
 #[path = "eye_hides_children.rs"]
