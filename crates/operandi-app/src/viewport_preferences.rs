@@ -37,6 +37,11 @@ pub const PIXEL_SIZE_RANGE: std::ops::RangeInclusive<f64> = 1e-6..=1000.;
 pub struct ViewportPreferences {
     version: u8,
     pub workplane_opacity: u8,
+    /// Show Work Plane: draw the work plane's own grid, apart from the
+    /// ground grid (Jason, 2026-11-23). Off by default; each view's Show
+    /// Work Plane row (Viewport Properties > Visibility) then decides
+    /// when it draws there.
+    pub workplane_display: bool,
     /// Grid Visibility: whether new 3D views show the ground grid.
     /// Measured: on.
     pub grid_visibility: bool,
@@ -97,6 +102,7 @@ impl Default for ViewportPreferences {
         Self {
             version: 1,
             workplane_opacity: 25,
+            workplane_display: false,
             grid_visibility: true,
             flatness: 60,
             item_draw_size: 1.,
@@ -194,6 +200,13 @@ impl super::Operandi {
         use crate::form::{Unit, rows};
         let scene_size = &mut self.editor.scene.item_draw_size;
         rows::section(ui, "Display", false, |ui| {
+            rows::check_d(
+                ui,
+                "Show Work Plane",
+                &mut v.workplane_display,
+                d.workplane_display,
+                "Draw the work plane's own grid, apart from the ground grid",
+            );
             rows::number_d(
                 ui,
                 "Work Plane Opacity",
@@ -343,6 +356,28 @@ mod tests {
         assert!(!a.viewport_preferences.show_asymmetries, "{}", a.status);
         a.execute("pref.value display.show_asymmetries ?");
         assert_eq!(a.status, "false");
+    }
+    #[test]
+    fn work_plane_display_is_off_by_default_and_saved() {
+        // Jason, 2026-11-23: the work plane has its own display switch,
+        // apart from the ground grid, and it starts off.
+        assert!(!ViewportPreferences::default().workplane_display);
+        let root =
+            std::env::temp_dir().join(format!("operandi-workplane-display-{}", std::process::id()));
+        fs::create_dir_all(&root).unwrap();
+        let path = root.join("viewport-display.json");
+        // A file saved before the switch existed loads with it off.
+        fs::write(&path, r#"{"version":1,"workplane_opacity":40}"#).unwrap();
+        let old = ViewportPreferences::load(&path);
+        assert_eq!(old.workplane_opacity, 40);
+        assert!(!old.workplane_display);
+        let on = ViewportPreferences {
+            workplane_display: true,
+            ..Default::default()
+        };
+        on.save(&path).unwrap();
+        assert!(ViewportPreferences::load(&path).workplane_display);
+        fs::remove_dir_all(root).unwrap();
     }
     use std::fs;
     #[test]

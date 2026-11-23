@@ -25,6 +25,16 @@
   accepted); `item_get` field `mesh_stack` and `mesh_get`
   `mesh_stack_status` replace `mesh_ops` / `mesh_ops_status`. Command and
   type ids (`meshop.*`, `*.meshop.item`) unchanged.
+
+- **Work plane display (2026-11-23, branch workplane-display):** the work
+  plane has its own Show Work Plane switch again (Work Plane Settings >
+  Display and Preferences > Display), off by default and saved with the
+  display preferences. Since Viewport Properties P2 (2026-11-08) the old
+  Work Plane Display check did nothing at rest, because each view's Show
+  Work Plane row defaulted to Active; that row now defaults to Always and
+  applies only while the switch is on. Show Grid's Inactive Work Plane
+  hides the floor grid only when the work plane is actually drawn.
+
 - **Toolsets and tool tabs rework (2026-11-23, branch toolsets-rework):**
   seven toolsets (Model, UV, Brush, Setup, Animation, Workbench, Game);
   each set lists its own tabs (`ToolSet::tabs`), a one-form set draws no

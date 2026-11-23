@@ -799,7 +799,6 @@ struct Operandi {
     pending: Option<FileAction>,
     allow_close: bool,
     ground_axes: bool,
-    plane_display: bool,
     /// Orbit Selected's last pivot (orbit_selected.rs).
     orbit_pivot_memo: Option<Box<orbit_selected::PivotMemo>>,
     viewport_preferences: viewport_preferences::ViewportPreferences,
@@ -1541,7 +1540,6 @@ impl Operandi {
             pending: None,
             allow_close: false,
             ground_axes: true,
-            plane_display: true,
             orbit_pivot_memo: None,
             viewport_preferences: Default::default(),
             input_preferences: Default::default(),
