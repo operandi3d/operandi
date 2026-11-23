@@ -33,11 +33,14 @@ pub fn report(dir: &Path) -> Vec<(String, String)> {
     files(dir, &mut paths);
     let mut out = Vec::new();
     for path in paths {
+        // Named with `/` on every system, so the report reads the same.
         let rel = path
             .strip_prefix(dir)
             .unwrap_or(&path)
-            .display()
-            .to_string();
+            .components()
+            .map(|c| c.as_os_str().to_string_lossy())
+            .collect::<Vec<_>>()
+            .join("/");
         let doc = match super::read(&path) {
             Ok(d) => d,
             Err(e) => {

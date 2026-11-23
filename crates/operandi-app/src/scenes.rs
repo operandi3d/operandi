@@ -654,6 +654,8 @@ impl Operandi {
 
     /// The other scene tab that has file `path` open, and whether it has
     /// unsaved changes (the MCP bridge's `scene_load`).
+    // Unused on Windows, where the bridge has no transport yet (mcp.rs).
+    #[cfg_attr(not(unix), allow(dead_code))]
     pub(super) fn parked_tab_with(&self, same: impl Fn(&Path) -> bool) -> Option<(usize, bool)> {
         self.scenes.tabs.iter().enumerate().find_map(|(i, t)| {
             let s = t.parked.as_ref()?;

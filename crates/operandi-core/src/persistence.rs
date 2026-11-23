@@ -1098,7 +1098,11 @@ pub fn load_preset(path: &Path) -> Result<crate::preset::Preset> {
                 for image in &mut scene.images {
                     let p = Path::new(&image.path);
                     if !image.path.is_empty() && p.is_relative() {
-                        image.path = folder.join(p).to_string_lossy().into_owned();
+                        // Stored with `/` (preset_image_path); rebuilding it
+                        // from its parts gives this system's separators, so
+                        // on Windows it matches the picture's native path.
+                        let rel: std::path::PathBuf = p.components().collect();
+                        image.path = folder.join(rel).to_string_lossy().into_owned();
                     }
                 }
             }
@@ -1196,7 +1200,14 @@ fn relative_preset_images(path: &Path, preset: &crate::preset::Preset) -> Option
             .strip_prefix(folder)
             .ok()
             .filter(|r| !r.as_os_str().is_empty())
-            .map(|r| r.to_string_lossy().into_owned())
+            // Stored with `/` on every system, as preset_image_path does, so
+            // a preset saved on Windows finds its maps elsewhere.
+            .map(|r| {
+                r.components()
+                    .map(|c| c.as_os_str().to_string_lossy())
+                    .collect::<Vec<_>>()
+                    .join("/")
+            })
     };
     if !preset.scene.images.iter().any(|i| rel(&i.path).is_some()) {
         return None;

@@ -132,7 +132,9 @@ fn op_v_offset(i0: u32, n: u32, r: i32) -> vec4<i32> {
   var i = i0;
   var o = vec4<i32>(0);
   for (var k = 0u; k < n; k++) {
-    o[k] = i32(i % side) - r;
+    // Component k by a lane mask, not o[k]: FXC (DirectX 12) can't write
+    // a vector component picked by a loop counter.
+    o = select(o, vec4<i32>(i32(i % side) - r), vec4<u32>(0u, 1u, 2u, 3u) == vec4<u32>(k));
     i = i / side;
   }
   return o;

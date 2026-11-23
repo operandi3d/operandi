@@ -38,6 +38,8 @@ fn native_v2_hierarchy_sparse_maps_labels_provenance_and_source_guard() {
     let source = dir.join("source.lxo");
     std::fs::write(&source, b"original-source").unwrap();
     let before = std::fs::metadata(&source).unwrap();
+    // Only Unix fills in device and inode below.
+    #[cfg_attr(not(unix), allow(unused_mut))]
     let mut provenance = ImportSource {
         path: source.display().to_string(),
         producer: "synthetic native persistence test".into(),
