@@ -63,6 +63,9 @@ mod render_usd_tests;
 mod replica_usd_tests;
 #[cfg(all(test, feature = "usd"))]
 mod rig_usd_tests;
+pub mod skel_usd;
+#[cfg(all(test, feature = "usd"))]
+mod skel_usd_tests;
 pub mod stage;
 #[cfg(all(test, feature = "usd"))]
 mod tests;

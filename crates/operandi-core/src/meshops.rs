@@ -1154,6 +1154,16 @@ impl Runtime {
                 continue;
             }
             let original = &scene.items[index];
+            if original
+                .mesh_ops
+                .as_ref()
+                .is_some_and(crate::skin::only_skin)
+            {
+                out.animation
+                    .rig
+                    .skin_bases
+                    .insert(item.id, original.mesh.clone());
+            }
             let result = if current {
                 self.current(scene, original)
             } else {

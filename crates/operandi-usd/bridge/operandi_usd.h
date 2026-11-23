@@ -27,7 +27,7 @@ extern "C" {
  * or function signature below changes, and bump OU_ABI_VERSION in
  * src/ffi.rs to match. The Rust side compares it, and every struct's size,
  * with the library it loaded before the first call. */
-#define OU_ABI_VERSION 10
+#define OU_ABI_VERSION 11
 
 /* Rotation orders, named like USD's rotate ops: OU_ROTATE_ZYX turns about
  * Z first, then Y, then X. */
@@ -336,6 +336,18 @@ OU_API int ou_define_network(OuStage *stage,
  * RenderProduct in "<scope>/Products" that the settings name. The stage's
  * renderSettingsPrimPath names the settings. */
 OU_API int ou_define_render_settings(OuStage *stage, const char *json, char *error, size_t error_len);
+
+/* Writes skeletons and skinning (ABI 11, BEHAVIOR-RIG-PHASE5 §7): the prim
+ * "skelRoot" becomes a SkelRoot; each of "skeletons" [{"path", "joints":
+ * [joint paths], "bind": [[16]...] (world, row-major, USD's row-vector
+ * convention), "rest": [[16]...] (local), "anim"?: {"path", "times": [...],
+ * "translations": [[[x,y,z] per joint] per time], "rotations": [[[w,x,y,z]
+ * ...]...], "scales": [[[x,y,z]...]...]}}] a UsdSkelSkeleton (with its
+ * SkelAnimation as animationSource); each of "bindings" [{"mesh",
+ * "skeleton", "elementSize", "indices": [...], "weights": [...],
+ * "geomBind": [16], "method": "classicLinear" | "dualQuaternion"}] binds a
+ * Mesh with UsdSkelBindingAPI. */
+OU_API int ou_define_skel(OuStage *stage, const char *json, char *error, size_t error_len);
 
 /* Defines a Camera / a light under `parent` and writes its path into
  * `path_out`. */

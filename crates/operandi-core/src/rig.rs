@@ -43,6 +43,11 @@ pub struct Rig {
     /// the rig moved, from before it moved them (skin.rs bind pose).
     #[serde(skip)]
     pub setup_locals: BTreeMap<u64, glam::DMat4>,
+    /// On an evaluated copy: the rest (Base) mesh of each item shown by
+    /// its skin, for exports that write the skin rather than its result
+    /// (UsdSkel, §7).
+    #[serde(skip)]
+    pub skin_bases: BTreeMap<u64, crate::MeshSlot>,
 }
 
 /// A user channel's value type (RG-53).
