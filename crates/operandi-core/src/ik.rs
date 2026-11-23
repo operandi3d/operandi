@@ -22,7 +22,7 @@ pub const TWO_BONE: &str = "ik.twoBone";
 pub const CHAIN: &str = "ik.chain";
 
 /// The IK kinds rig.rs evaluates.
-pub const KINDS: &[&str] = &[CHAIN, TWO_BONE];
+pub const KINDS: &[&str] = &[crate::ik_body::BODY, CHAIN, TWO_BONE];
 
 pub fn is_ik(kind: &str) -> bool {
     KINDS.contains(&kind)
@@ -32,12 +32,16 @@ pub fn label(kind: &str) -> Option<&'static str> {
     Some(match kind {
         TWO_BONE => "Two-Bone IK",
         CHAIN => "Chain IK",
+        crate::ik_body::BODY => "Full-Body IK",
         _ => return None,
     })
 }
 
 /// IK-05/07/08 and IK-17 defaults; `None` for names the kind lacks.
 pub fn default_value(kind: &str, name: &str) -> Option<f64> {
+    if kind == crate::ik_body::BODY {
+        return crate::ik_body::default_value(name);
+    }
     match (kind, name) {
         (TWO_BONE | CHAIN, "blend") => Some(1.),
         (TWO_BONE, "orient" | "soft" | "stretch") => Some(0.),
@@ -71,6 +75,7 @@ pub fn channel_names(kind: &str) -> Vec<String> {
             "rootLocked",
             "twistSpread",
         ],
+        crate::ik_body::BODY => crate::ik_body::CHANNELS,
         _ => &[],
     };
     names.iter().map(|s| s.to_string()).collect()
@@ -78,6 +83,9 @@ pub fn channel_names(kind: &str) -> Vec<String> {
 
 /// A set value brought into range.
 pub fn clamp(name: &str, value: f64) -> f64 {
+    if crate::ik_body::CHANNELS.contains(&name) && !["blend"].contains(&name) {
+        return crate::ik_body::clamp(name, value);
+    }
     match name {
         "blend" | "soft" | "stretch" | "stretchBase" | "stretchMid" | "stretchEnd" => {
             value.clamp(0., 1.)
@@ -536,6 +544,7 @@ pub fn solve(p: &Piece, root: DMat4, look: &Look, overrides: &mut HashMap<u64, D
     match p.kind.as_str() {
         TWO_BONE => two_bone(p, root, look, overrides),
         CHAIN => chain(p, root, look, overrides),
+        crate::ik_body::BODY => crate::ik_body::solve(p, root, look, overrides),
         _ => root,
     }
 }

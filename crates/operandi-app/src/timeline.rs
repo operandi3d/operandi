@@ -1777,6 +1777,21 @@ impl Operandi {
                         "operandi.ik.pole mode:create",
                     ),
                     (None, "Remove Up Vector", "operandi.ik.pole mode:remove"),
+                    (None, "Assign IK (Full Body)", "operandi.ik.assign"),
+                    (Some(Icon::IkGoal), "Add Goal", "operandi.ik.addGoal"),
+                    (
+                        None,
+                        "Add Position Task",
+                        "operandi.ik.addTask mode:position",
+                    ),
+                    (
+                        None,
+                        "Add Orientation Task",
+                        "operandi.ik.addTask mode:orientation",
+                    ),
+                    (None, "Add to Chain", "operandi.ik.addToChain"),
+                    (None, "Remove from Chain", "operandi.ik.removeFromChain"),
+                    (None, "Remove IK", "operandi.ik.remove"),
                     (None, switch_label, "operandi.ik.switch"),
                     (None, "IK/FK: Set Keys", "operandi.ik.setKeys"),
                     (

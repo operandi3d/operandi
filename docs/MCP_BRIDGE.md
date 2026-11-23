@@ -769,6 +769,36 @@ used in the app; `primitive_add` always starts from the Reset values.
 - **`operandi.anim.restoreSetup`** — Throw away the edit values (the keys) of the items' animated channels and put back their setup values, one undo step. channels limits it to names such as pos.Y.
   - `items` (string): Item ids (default the selection).
   - `channels` (string): Only these channels, comma separated.
+- **`operandi.ik.addGoal`** — Add a goal at the joint's world place and position + orientation tasks on it (mode position, rotation or both), one undo step.
+  - `joint` (integer): The joint (default the selected item).
+  - `mode` (string): position, rotation or both (default).
+- **`operandi.ik.addTask`** — Add a position or orientation task with no goal (mode), holding the joint at its world position or orientation now; one undo step.
+  - `joint` (integer): The joint (default the selected item).
+  - `mode` (string, required): position or orientation.
+- **`operandi.ik.addToChain`** — Add joints (default the selection) to the full-body IK chain above them, one undo step.
+  - `joints` (string): Joint ids, comma separated.
+  - `piece` (integer): The solver (default the one above the joints).
+- **`operandi.ik.assign`** — Make one full-body IK solver on the root joint covering its joint hierarchy (or the branches to the end joints listed after it), one undo step. Needs Setup mode; joints with scale are refused.
+  - `joints` (string): The root, then any end joints (default the selection).
+- **`operandi.ik.assignGoal`** — Wire tasks on the joint to goal (mode position, rotation or both), one undo step.
+  - `joint` (integer): The joint (default the selected item).
+  - `goal` (integer, required): The goal item.
+  - `mode` (string): position, rotation or both (default).
+- **`operandi.ik.remove`** — Remove the selected joint's (or piece's) IK solver with its tasks, joint IK settings and keys, one undo step.
+  - `piece` (integer): The solver (default the selected chain's).
+- **`operandi.ik.removeFromChain`** — Remove joints' branches (default the selection) from their full-body IK chain, one undo step.
+  - `joints` (string): Joint ids, comma separated.
+  - `piece` (integer): The solver (default the one above the joints).
+- **`operandi.ik.removeTask`** — Remove the joint's position or orientation task (kind) or both, one undo step.
+  - `joint` (integer): The joint (default the selected item).
+  - `kind` (string): position or orientation (default both).
+- **`operandi.ik.taskSet`** — Change the joint's tasks (kind, default both), one undo step: enable, weight, precision, joints (how far up the chain; -1 all).
+  - `joint` (integer): The joint (default the selected item).
+  - `kind` (string): position or orientation (default both).
+  - `enable` (boolean): On or off.
+  - `weight` (number): Pull (default 1).
+  - `precision` (number): Default 1.
+  - `joints` (number): Joints up the chain it moves (-1 all).
 - **`operandi.ik.applyChain`** — Make the chain from root to end (default the selection: root, then end) one FABRIK IK chain, one undo step. Needs Setup mode. Adds <root>_IKGoal under <root>_IKRoot.
   - `joints` (string): Root and end joint ids, comma separated.
 - **`operandi.ik.disable`** — Turn every IK solver off or on (on: toggle, true or false), one undo step. Setup mode only.

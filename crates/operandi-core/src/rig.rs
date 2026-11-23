@@ -35,6 +35,9 @@ pub struct Rig {
     /// Joints' IK settings and limits (ik_joint.rs, IK-24/40), by joint.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub joint_ik: Vec<crate::ik_joint::JointIk>,
+    /// Full-body IK tasks (ik_body.rs, IK-22/25).
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub ik_tasks: Vec<crate::ik_body::Task>,
     /// IK-33 Disable IK: no IK solver runs (saved).
     #[serde(default, skip_serializing_if = "std::ops::Not::not")]
     pub ik_disabled: bool,
@@ -247,6 +250,7 @@ impl Rig {
             && self.user.is_empty()
             && self.joint_ik.is_empty()
             && !self.ik_disabled
+            && self.ik_tasks.is_empty()
     }
     pub fn piece(&self, id: u64) -> Option<&Piece> {
         self.pieces.iter().find(|p| p.id == id)

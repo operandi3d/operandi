@@ -237,6 +237,7 @@ pub mod eval_graph;
 pub mod eval_state;
 pub mod evaluate;
 pub mod ik;
+pub mod ik_body;
 pub mod ik_commands;
 pub mod ik_joint;
 pub mod ik_switch;

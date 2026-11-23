@@ -349,6 +349,9 @@ pub fn run(e: &mut Editor, name: &str, a: &Args) -> Result<Option<Command>> {
 
 /// The chain's joints, root first.
 pub fn chain(scene: &Scene, p: &Piece) -> Vec<u64> {
+    if p.kind == crate::ik_body::BODY {
+        return crate::ik_body::covered(scene, p);
+    }
     if p.kind == CHAIN
         && let Some(end) = ik::named(p, "end")
         && let Some(c) = ik::chain_down(scene, p.item, end)
@@ -414,6 +417,19 @@ pub fn answer(e: &Editor, name: &str, a: &Args) -> Option<Result<String>> {
                     .collect();
                 let goal = p.targets.first().copied();
                 let end = *chain(&posed, p).last().expect("root");
+                if p.kind == crate::ik_body::BODY {
+                    let (tasks, met) = crate::ik_body::tasks_json(&posed, p, &world, tol);
+                    return json!({
+                        "piece": p.id,
+                        "kind": p.kind,
+                        "root": p.item,
+                        "blend": p.num("blend"),
+                        "enable": p.flag("enable"),
+                        "joints": joints,
+                        "tasks": tasks,
+                        "met": met,
+                    });
+                }
                 let left = goal.map(|g| {
                     world(g)
                         .w_axis

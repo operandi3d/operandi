@@ -3489,6 +3489,117 @@ pub static COMMANDS: &[Entry] = &[
         .undo()
         .operandi()
         .example("operandi.anim.restoreSetup items:3"),
+    script("operandi.ik.addGoal", Items, "Add Goal (IK-22): a box goal at the joint with a position and an orientation task wired to it.")
+        .on_editor(
+            "Add a goal at the joint's world place and position + orientation tasks on it (mode position, rotation or both), one undo step.",
+            &[
+            jopt("joint", "integer", "The joint (default the selected item)."),
+            jopt("mode", "string", "position, rotation or both (default)."),
+        ],
+            crate::ik_body::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.ik.addGoal joint:7"),
+    script("operandi.ik.addTask", Items, "Add Position Task / Add Orientation Task (IK-22): pins the joint where it is now.")
+        .on_editor(
+            "Add a position or orientation task with no goal (mode), holding the joint at its world position or orientation now; one undo step.",
+            &[
+            jopt("joint", "integer", "The joint (default the selected item)."),
+            jreq("mode", "string", "position or orientation."),
+        ],
+            crate::ik_body::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.ik.addTask joint:9 mode:position"),
+    script("operandi.ik.addToChain", Items, "Add to Chain (IK-26): joints (or branches) join their full-body IK chain.")
+        .on_editor(
+            "Add joints (default the selection) to the full-body IK chain above them, one undo step.",
+            &[
+            jopt("joints", "string", "Joint ids, comma separated."),
+            jopt("piece", "integer", "The solver (default the one above the joints)."),
+        ],
+            crate::ik_body::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.ik.addToChain joints:12"),
+    script("operandi.ik.assign", Items, "Assign IK (IK-20..21): the hierarchy under the root joint (or only its branches to the end joints) becomes one full-body IK chain; needs Setup mode.")
+        .on_editor(
+            "Make one full-body IK solver on the root joint covering its joint hierarchy (or the branches to the end joints listed after it), one undo step. Needs Setup mode; joints with scale are refused.",
+            &[
+            jopt("joints", "string", "The root, then any end joints (default the selection)."),
+        ],
+            crate::ik_body::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.ik.assign joints:1"),
+    script("operandi.ik.assignGoal", Items, "Assign Goal (IK-22): an existing item becomes the joint's position, rotation or both goal.")
+        .on_editor(
+            "Wire tasks on the joint to goal (mode position, rotation or both), one undo step.",
+            &[
+            jopt("joint", "integer", "The joint (default the selected item)."),
+            jreq("goal", "integer", "The goal item."),
+            jopt("mode", "string", "position, rotation or both (default)."),
+        ],
+            crate::ik_body::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.ik.assignGoal joint:7 goal:20"),
+    script("operandi.ik.remove", Items, "Remove IK (IK-26): removes an IK solver, its tasks and the IK settings of its joints.")
+        .on_editor(
+            "Remove the selected joint's (or piece's) IK solver with its tasks, joint IK settings and keys, one undo step.",
+            &[
+            jopt("piece", "integer", "The solver (default the selected chain's)."),
+        ],
+            crate::ik_body::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.ik.remove"),
+    script("operandi.ik.removeFromChain", Items, "Remove from Chain (IK-26): a branch leaves its full-body IK chain from its base.")
+        .on_editor(
+            "Remove joints' branches (default the selection) from their full-body IK chain, one undo step.",
+            &[
+            jopt("joints", "string", "Joint ids, comma separated."),
+            jopt("piece", "integer", "The solver (default the one above the joints)."),
+        ],
+            crate::ik_body::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.ik.removeFromChain joints:12"),
+    script("operandi.ik.removeTask", Items, "Removes a joint's IK tasks (one kind, or all).")
+        .on_editor(
+            "Remove the joint's position or orientation task (kind) or both, one undo step.",
+            &[
+            jopt("joint", "integer", "The joint (default the selected item)."),
+            jopt("kind", "string", "position or orientation (default both)."),
+        ],
+            crate::ik_body::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.ik.removeTask joint:9"),
+    script("operandi.ik.taskSet", Items, "Task settings (IK-25): Enable, Weight, Precision, Number of Joints.")
+        .on_editor(
+            "Change the joint's tasks (kind, default both), one undo step: enable, weight, precision, joints (how far up the chain; -1 all).",
+            &[
+            jopt("joint", "integer", "The joint (default the selected item)."),
+            jopt("kind", "string", "position or orientation (default both)."),
+            jopt("enable", "boolean", "On or off."),
+            jopt("weight", "number", "Pull (default 1)."),
+            jopt("precision", "number", "Default 1."),
+            jopt("joints", "number", "Joints up the chain it moves (-1 all)."),
+        ],
+            crate::ik_body::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.ik.taskSet joint:9 weight:2"),
     script("operandi.ik.applyChain", Items, "Apply IK (Chain) (IK-15..17): a FABRIK solver from the root to the end joint (2 to 100 joints) with a goal at the end; needs Setup mode.")
         .on_editor(
             "Make the chain from root to end (default the selection: root, then end) one FABRIK IK chain, one undo step. Needs Setup mode. Adds <root>_IKGoal under <root>_IKRoot.",
@@ -7399,7 +7510,7 @@ mod tests {
                 assert!(!json.about.is_empty(), "{}", e.name);
             }
         }
-        assert_eq!(crate::command_exec::specs().count(), 295);
+        assert_eq!(crate::command_exec::specs().count(), 304);
     }
 
     #[test]

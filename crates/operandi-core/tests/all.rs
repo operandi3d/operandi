@@ -246,6 +246,8 @@ mod i2_review_fixes;
 mod icon_studio;
 #[path = "identity_positions.rs"]
 mod identity_positions;
+#[path = "ik_body.rs"]
+mod ik_body;
 #[path = "ik_chain.rs"]
 mod ik_chain;
 #[path = "ik_limits.rs"]

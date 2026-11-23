@@ -240,3 +240,48 @@ fn ik31_switch_no_pop_through_the_bridge() {
     frame(&mut b, 24);
     same(&positions(&mut b), &before[3], "to IK, frame 24");
 }
+
+/// IK-22 through the bridge: a two-leg hierarchy with pinned feet and a
+/// goal on a raised joint.
+#[test]
+fn full_body_ik_through_the_bridge() {
+    let mut b = Bridge::new();
+    let hips = joint(&mut b, [0., 1., 0.], None);
+    let spine = joint(&mut b, [0., 1.5, 0.], Some(hips));
+    let head = joint(&mut b, [0., 2., 0.05], Some(spine));
+    let mut feet = Vec::new();
+    for x in [0.2, -0.2] {
+        let hip = joint(&mut b, [x, 1., 0.], Some(hips));
+        let knee = joint(&mut b, [x, 0.5, 0.05], Some(hip));
+        feet.push(joint(&mut b, [x, 0., 0.], Some(knee)));
+    }
+    run(&mut b, "operandi.anim.setup", json!({"on": "true"}));
+    run(
+        &mut b,
+        "operandi.ik.assign",
+        json!({"joints": hips.to_string()}),
+    );
+    for f in &feet {
+        run(
+            &mut b,
+            "operandi.ik.addTask",
+            json!({"joint": f, "mode": "position"}),
+        );
+    }
+    run(
+        &mut b,
+        "operandi.ik.addGoal",
+        json!({"joint": head, "mode": "position"}),
+    );
+    run(&mut b, "operandi.anim.setup", json!({"on": "false"}));
+    let q = read(&mut b, "operandi.ik.query", json!({}));
+    let goal = q["solvers"][0]["tasks"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find_map(|t| t["goal"].as_u64())
+        .unwrap();
+    goal_to(&mut b, goal, [0.1, 1.85, 0.2]);
+    let q = read(&mut b, "operandi.ik.query", json!({"tolerance": 0.01}));
+    assert_eq!(q["solvers"][0]["met"], true, "{q}");
+}
