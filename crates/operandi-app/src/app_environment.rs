@@ -366,6 +366,10 @@ impl AppPaths {
     pub fn vertex_normal_preferences(&self) -> PathBuf {
         self.data_root.join("vertex-normal-preferences.json")
     }
+    /// The Statistics panel's open groups (statistics_ui.rs).
+    pub fn statistics_panel(&self) -> PathBuf {
+        self.data_root.join("statistics-panel.json")
+    }
     /// Preview window place and Preview Settings (preview.rs).
     pub fn preview_window(&self) -> PathBuf {
         self.data_root.join("preview-window.json")

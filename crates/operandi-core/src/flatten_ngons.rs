@@ -76,6 +76,11 @@ pub(crate) fn flatten_normal(points: &[DVec3]) -> Option<DVec3> {
     newell.try_normalize()
 }
 
+/// How far from its plane, as a share of its bounding box's longest side,
+/// a point may be for its polygon to count as flat (PF-08). The Statistics
+/// panel's Not flat check uses the same rule (statistics.rs, Q5).
+pub(crate) const FLAT_TOLERANCE: f64 = 1e-12;
+
 /// Plan for one mesh. Pure: never mutates.
 pub(crate) fn plan_mesh(mesh: &Mesh) -> (Vec<FlattenFaceClass>, FlattenOutcome) {
     let mut classes = Vec::with_capacity(mesh.faces.len());
@@ -111,7 +116,7 @@ pub(crate) fn plan_mesh(mesh: &Mesh) -> (Vec<FlattenFaceClass>, FlattenOutcome) 
         let distance = |p: DVec3| (p - centre).dot(normal);
         if points
             .iter()
-            .all(|&p| distance(p).abs() <= 1e-12 * extent.max(1e-300))
+            .all(|&p| distance(p).abs() <= FLAT_TOLERANCE * extent.max(1e-300))
         {
             classes.push(FlattenFaceClass::Planar);
             continue;
