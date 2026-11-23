@@ -587,6 +587,12 @@ struct Operandi {
     scene_rect: Rect,
     scene_rows: BTreeMap<u64, Rect>,
     collapsed_items: std::collections::BTreeSet<u64>,
+    /// Skins opened to their joint influences in the Items list (SK-36):
+    /// (mesh, op).
+    open_skins: std::collections::BTreeSet<(u64, u64)>,
+    /// The rig row (piece, skin or influence) last clicked in the Items
+    /// list.
+    rig_row: Option<items_tree::ItemKey>,
     /// The Items list's scene root row: collapsed, and where it was drawn.
     scene_collapsed: bool,
     scene_root_rect: Option<Rect>,
@@ -1413,6 +1419,8 @@ impl Operandi {
             scene_rect: Rect::NOTHING,
             scene_rows: BTreeMap::new(),
             collapsed_items: Default::default(),
+            open_skins: Default::default(),
+            rig_row: None,
             scene_collapsed: false,
             scene_root_rect: None,
             show_plane: false,
