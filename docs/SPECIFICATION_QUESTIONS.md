@@ -4702,7 +4702,10 @@ reading). The `delete` line still has to reach
   points stay (CMD-E-01/02 measured only points that keep other edges), as
   do points on a polyline and any point whose removal would leave a polygon
   under three sides. Does the reference also take out a border point left
-  between two border edges (the strip's 1–4 case)?
+  between two border edges (the strip's 1–4 case)? Since issue #5
+  (2026-11-23, provisional): a border point left between two border edges
+  of one polygon goes when they run in a straight line (a loop cut's ends);
+  a corner stays. Edge Remove still keeps every point.
 - **ER-Q02 Delete in Polygon mode drops orphaned points** (Jason's
   leftover-points rule): unlike Remove (REM-001 keeps every point), Delete
   also drops points only the deleted polygons used. Points that were
