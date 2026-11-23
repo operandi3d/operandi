@@ -60,8 +60,8 @@
   and Help > Check for Updates (`operandi.update.check`) ask GitHub by the
   system's `curl` on a background thread and offer the newer build in an
   Update Available confirmation (OK opens its release page, Skip This
-  Build). Never downloads or installs. Linux follows releases only (no
-  test build yet). The channel is a dropdown, not joined segments (UIC-113:
+  Build). Never downloads or installs. macOS, Windows and Linux all
+  follow the chosen channel (Linux test builds, 2026-11-23). The channel is a dropdown, not joined segments (UIC-113:
   segments are for dialogs and tool properties). GUI: UPDATE_CHECK_GUI_QA.md.
 
 - **Edge Bevel with hard edges (2026-11-22, branch forum-bevel-loopslice;
