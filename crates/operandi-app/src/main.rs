@@ -1110,6 +1110,9 @@ impl Operandi {
         cc.egui_ctx.options_mut(|o| o.zoom_with_keyboard = false);
         native::install(cc.egui_ctx.clone());
         open_documents::connect(cc.egui_ctx.clone());
+        if let Some(s) = &cc.wgpu_render_state {
+            gpu_backend::watch_device_lost(&s.device);
+        }
         let gpu = cc
             .wgpu_render_state
             .as_ref()

@@ -63,6 +63,7 @@ pub fn offscreen(environment: app_environment::AppEnvironment) -> Result<()> {
         Default::default(),
     ))
     .map_err(|e| e.to_string())?;
+    crate::gpu_backend::watch_device_lost(&state.device);
     let mut app = Operandi::with_environment(environment);
     // The startup steps Operandi::new runs, in its order, so captures show
     // the shipped layout (Model) and the user's colours rather than the

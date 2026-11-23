@@ -89,6 +89,16 @@ pub fn select(
     Ok(adapters[i].clone())
 }
 
+/// Logs it when the GPU device is lost (driver reset, out of memory,
+/// removed GPU). wgpu reports a lost device only through this callback;
+/// the next call on it then fails with a bare "is invalid" panic, so
+/// without this line a crash report wouldn't say why.
+pub fn watch_device_lost(device: &wgpu::Device) {
+    device.set_device_lost_callback(|reason, message| {
+        crate::log_ring::log_line!("GPU device lost ({reason:?}): {message}");
+    });
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
