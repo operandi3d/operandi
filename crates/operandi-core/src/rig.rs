@@ -35,6 +35,9 @@ pub struct Rig {
     /// Joints' IK settings and limits (ik_joint.rs, IK-24/40), by joint.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub joint_ik: Vec<crate::ik_joint::JointIk>,
+    /// IK-33 Disable IK: no IK solver runs (saved).
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub ik_disabled: bool,
     /// User channels (RG-53), in the order added.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub user: Vec<UserChannel>,
@@ -243,6 +246,7 @@ impl Rig {
             && self.pivots.is_empty()
             && self.user.is_empty()
             && self.joint_ik.is_empty()
+            && !self.ik_disabled
     }
     pub fn piece(&self, id: u64) -> Option<&Piece> {
         self.pieces.iter().find(|p| p.id == id)

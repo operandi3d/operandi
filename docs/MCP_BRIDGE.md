@@ -771,6 +771,24 @@ used in the app; `primitive_add` always starts from the Reset values.
   - `channels` (string): Only these channels, comma separated.
 - **`operandi.ik.applyChain`** — Make the chain from root to end (default the selection: root, then end) one FABRIK IK chain, one undo step. Needs Setup mode. Adds <root>_IKGoal under <root>_IKRoot.
   - `joints` (string): Root and end joint ids, comma separated.
+- **`operandi.ik.disable`** — Turn every IK solver off or on (on: toggle, true or false), one undo step. Setup mode only.
+  - `on` (string): toggle (default), true or false.
+- **`operandi.ik.match`** — Move each solver's goal onto its end joint's world position, rotation or both (mode), one undo step.
+  - `piece` (integer): One solver (default every solver of the selected joints and goals).
+  - `mode` (string): position, rotation or both (default).
+- **`operandi.ik.selectSolvers`** — Select the root joints of the IK solvers of the selected joints and goals.
+  - `piece` (integer): One solver (default every solver of the selected joints and goals).
+- **`operandi.ik.selectSwitch`** — Select the chain's joints, goal and pole of the selected solvers (the switch channels' items).
+  - `piece` (integer): One solver (default every solver of the selected joints and goals).
+- **`operandi.ik.setKeys`** — Key (or with delete, remove the keys at the current time of) Blend, the chain's joints' position and rotation, the goal's position and rotation and the pole's position, one undo step.
+  - `piece` (integer): One solver (default every solver of the selected joints and goals).
+  - `delete` (boolean): Delete the keys instead (Shift+click).
+- **`operandi.ik.switch`** — Switch the selected chains (mode toggle by their Blend, fk or ik), one undo step. To FK: the solved pose into the joints, keyed, Blend keyed 0. To IK: the goal and pole onto the FK pose, keyed, Blend keyed 1.
+  - `piece` (integer): One solver (default every solver of the selected joints and goals).
+  - `mode` (string): toggle (default), fk or ik.
+- **`operandi.ik.updateRest`** — Re-read the rest pose of the selected solvers (or all), one undo step: the two-bone bend side and the chain's goal twist reference.
+  - `piece` (integer): One solver (default every solver of the selected joints and goals).
+  - `all` (boolean): Every solver (default the selected).
 - **`operandi.ik.applyTwoBone`** — Make three joints (root, middle, end; default the selection in pick order) a two-bone IK chain, one undo step. Needs Setup mode; the chain's bend there is the side it keeps. Adds <root>_IKGoal under <root>_IKRoot.
   - `joints` (string): Root, middle and end joint ids, comma separated.
 - **`operandi.ik.jointQuery`** — Read a joint's IK settings as JSON: active, enableLimits, limitFk, limitsAxis, maxVelocity and per axis X/Y/Z translate, translateWeight, rotate, rotateWeight, useLimits, min, max (degrees).

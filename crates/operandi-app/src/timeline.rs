@@ -1733,12 +1733,45 @@ impl Operandi {
                 "IK: apply to the selected joints, poles, query (needs Setup to apply)",
             );
             let mut ik_lines: Vec<&str> = Vec::new();
+            // IK-31: the switch is named by the selected chains' state.
+            let switch_label = {
+                let scene = &self.editor.scene;
+                let picked = scene.selected_items();
+                let states: Vec<bool> = scene
+                    .animation
+                    .rig
+                    .pieces
+                    .iter()
+                    .filter(|p| operandi_core::ik::is_ik(&p.kind))
+                    .filter(|p| {
+                        let mut touches = operandi_core::ik_commands::chain(scene, p);
+                        touches.extend(p.targets.iter().copied());
+                        picked.iter().any(|i| touches.contains(i))
+                    })
+                    .map(|p| operandi_core::ik_switch::in_ik(scene, p))
+                    .collect();
+                if !states.is_empty() && states.iter().all(|s| *s) {
+                    "Switch to FK"
+                } else if !states.is_empty() && states.iter().all(|s| !*s) {
+                    "Switch to IK"
+                } else {
+                    "Toggle IK/FK"
+                }
+            };
             egui::Popup::menu(&ik).show(|ui| {
                 for (label, line) in [
                     ("Apply IK (Two-Bone)", "operandi.ik.applyTwoBone"),
                     ("Apply IK (Chain)", "operandi.ik.applyChain"),
                     ("Create IK Up Vector", "operandi.ik.pole mode:create"),
                     ("Remove Up Vector", "operandi.ik.pole mode:remove"),
+                    (switch_label, "operandi.ik.switch"),
+                    ("IK/FK: Set Keys", "operandi.ik.setKeys"),
+                    ("IK/FK: Delete Keys", "operandi.ik.setKeys delete:true"),
+                    ("Select Switch Channels", "operandi.ik.selectSwitch"),
+                    ("Select IK Solvers", "operandi.ik.selectSolvers"),
+                    ("Match Goal to Joint", "operandi.ik.match"),
+                    ("Update Rest Pose (All)", "operandi.ik.updateRest all:true"),
+                    ("Disable IK", "operandi.ik.disable"),
                 ] {
                     if ui.button(label).on_hover_text(line).clicked() {
                         ik_lines.push(line);

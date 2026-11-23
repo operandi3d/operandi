@@ -171,3 +171,72 @@ fn ik41_limits_through_the_bridge() {
     assert!(held <= rest + 30. + 1e-6 && held < free, "{held}");
     assert_eq!(q["solvers"][0]["met"], false);
 }
+
+fn positions(b: &mut Bridge) -> Vec<[f64; 3]> {
+    let q = read(b, "operandi.ik.query", json!({}));
+    (0..3)
+        .map(|k| {
+            [0, 1, 2].map(|i| {
+                q["solvers"][0]["joints"][k]["position"][i]
+                    .as_f64()
+                    .unwrap()
+            })
+        })
+        .collect()
+}
+
+fn same(a: &[[f64; 3]], b: &[[f64; 3]], what: &str) {
+    for (x, y) in a.iter().zip(b) {
+        for i in 0..3 {
+            assert!((x[i] - y[i]).abs() < 1e-6, "{what}: {x:?} vs {y:?}");
+        }
+    }
+}
+
+/// IK-31 through the bridge: Switch to FK at 24 and back to IK at 48;
+/// scrubbing across either switch shows no pop.
+#[test]
+fn ik31_switch_no_pop_through_the_bridge() {
+    let mut b = Bridge::new();
+    let (piece, goal) = leg(&mut b);
+    let frame = |b: &mut Bridge, f: i64| run(b, "operandi.time.set", json!({"frame": f}));
+    frame(&mut b, 0);
+    goal_to(&mut b, goal, [0., 1.9, 0.]);
+    run(
+        &mut b,
+        "operandi.key.set",
+        json!({"channels": format!("{goal}:pos.X,{goal}:pos.Y,{goal}:pos.Z")}),
+    );
+    frame(&mut b, 24);
+    goal_to(&mut b, goal, [0.5, 1.2, 0.]);
+    run(
+        &mut b,
+        "operandi.key.set",
+        json!({"channels": format!("{goal}:pos.X,{goal}:pos.Y,{goal}:pos.Z")}),
+    );
+    let mut before = Vec::new();
+    for f in [0, 12, 23, 24] {
+        frame(&mut b, f);
+        before.push(positions(&mut b));
+    }
+    frame(&mut b, 24);
+    run(
+        &mut b,
+        "operandi.ik.switch",
+        json!({"piece": piece, "mode": "fk"}),
+    );
+    for (k, f) in [0, 12, 23, 24].iter().enumerate() {
+        frame(&mut b, *f);
+        same(&positions(&mut b), &before[k], &format!("to FK, frame {f}"));
+    }
+    frame(&mut b, 48);
+    let fk48 = positions(&mut b);
+    run(
+        &mut b,
+        "operandi.ik.switch",
+        json!({"piece": piece, "mode": "ik"}),
+    );
+    same(&positions(&mut b), &fk48, "to IK, frame 48");
+    frame(&mut b, 24);
+    same(&positions(&mut b), &before[3], "to IK, frame 24");
+}

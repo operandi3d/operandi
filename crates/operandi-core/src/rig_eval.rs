@@ -334,7 +334,8 @@ impl Eval<'_> {
         }
         // IK last (ik.rs): it turns the root and sets its chain below.
         let parent = item.parent.map_or(DMat4::IDENTITY, look);
-        for p in pieces.iter().filter(|p| crate::ik::is_ik(&p.kind)) {
+        let ik_on = !self.scene.animation.rig.ik_disabled;
+        for p in pieces.iter().filter(|p| ik_on && crate::ik::is_ik(&p.kind)) {
             let l = crate::ik::Look {
                 scene: self.scene,
                 world: &look,

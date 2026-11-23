@@ -250,6 +250,8 @@ mod identity_positions;
 mod ik_chain;
 #[path = "ik_limits.rs"]
 mod ik_limits;
+#[path = "ik_switch.rs"]
+mod ik_switch;
 #[path = "ik_two_bone.rs"]
 mod ik_two_bone;
 #[path = "incidence_effects.rs"]

@@ -3498,6 +3498,87 @@ pub static COMMANDS: &[Entry] = &[
         .undo()
         .operandi()
         .example("operandi.ik.applyChain joints:3,9"),
+    script("operandi.ik.disable", Items, "Disable IK (IK-33): no IK solver runs in this scene (saved); joints keep their pose. Setup mode only.")
+        .on_editor(
+            "Turn every IK solver off or on (on: toggle, true or false), one undo step. Setup mode only.",
+            &[
+            jopt("on", "string", "toggle (default), true or false."),
+        ],
+            crate::ik_switch::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.ik.disable on:true"),
+    script("operandi.ik.match", Items, "Match Position / Rotation (IK-33): moves the goal onto its end joint.")
+        .on_editor(
+            "Move each solver's goal onto its end joint's world position, rotation or both (mode), one undo step.",
+            &[
+            jopt("piece", "integer", "One solver (default every solver of the selected joints and goals)."),
+            jopt("mode", "string", "position, rotation or both (default)."),
+        ],
+            crate::ik_switch::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.ik.match mode:position"),
+    script("operandi.ik.selectSolvers", Items, "Select IK Solvers (IK-33): selects the joints the selection's IK solvers sit on.")
+        .on_editor(
+            "Select the root joints of the IK solvers of the selected joints and goals.",
+            &[
+            jopt("piece", "integer", "One solver (default every solver of the selected joints and goals)."),
+        ],
+            crate::ik_switch::run,
+        )
+        .ui()
+        .operandi()
+        .example("operandi.ik.selectSolvers"),
+    script("operandi.ik.selectSwitch", Items, "Select Switch Channels (IK-32): selects the items whose channels the IK/FK switch keys.")
+        .on_editor(
+            "Select the chain's joints, goal and pole of the selected solvers (the switch channels' items).",
+            &[
+            jopt("piece", "integer", "One solver (default every solver of the selected joints and goals)."),
+        ],
+            crate::ik_switch::run,
+        )
+        .ui()
+        .operandi()
+        .example("operandi.ik.selectSwitch"),
+    script("operandi.ik.setKeys", Items, "IK/FK: Set Keys (IK-32), or Delete Keys with delete:true, on every switch channel at the current time.")
+        .on_editor(
+            "Key (or with delete, remove the keys at the current time of) Blend, the chain's joints' position and rotation, the goal's position and rotation and the pole's position, one undo step.",
+            &[
+            jopt("piece", "integer", "One solver (default every solver of the selected joints and goals)."),
+            jopt("delete", "boolean", "Delete the keys instead (Shift+click)."),
+        ],
+            crate::ik_switch::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.ik.setKeys"),
+    script("operandi.ik.switch", Items, "Switch to FK / Switch to IK / Toggle IK/FK (IK-31): copies one pose into the other and keys it, no pop.")
+        .on_editor(
+            "Switch the selected chains (mode toggle by their Blend, fk or ik), one undo step. To FK: the solved pose into the joints, keyed, Blend keyed 0. To IK: the goal and pole onto the FK pose, keyed, Blend keyed 1.",
+            &[
+            jopt("piece", "integer", "One solver (default every solver of the selected joints and goals)."),
+            jopt("mode", "string", "toggle (default), fk or ik."),
+        ],
+            crate::ik_switch::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.ik.switch mode:fk"),
+    script("operandi.ik.updateRest", Items, "Update Rest Pose (IK-33): solvers take their bend side and twist reference from the joints as they are now.")
+        .on_editor(
+            "Re-read the rest pose of the selected solvers (or all), one undo step: the two-bone bend side and the chain's goal twist reference.",
+            &[
+            jopt("piece", "integer", "One solver (default every solver of the selected joints and goals)."),
+            jopt("all", "boolean", "Every solver (default the selected)."),
+        ],
+            crate::ik_switch::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.ik.updateRest all:true"),
     script("operandi.ik.applyTwoBone", Items, "Apply IK (Two-Bone) (IK-01..02): a goal at the end joint, a group holding it and the chain, and a two-bone solver on the root; needs Setup mode.")
         .on_editor(
             "Make three joints (root, middle, end; default the selection in pick order) a two-bone IK chain, one undo step. Needs Setup mode; the chain's bend there is the side it keeps. Adds <root>_IKGoal under <root>_IKRoot.",
@@ -7318,7 +7399,7 @@ mod tests {
                 assert!(!json.about.is_empty(), "{}", e.name);
             }
         }
-        assert_eq!(crate::command_exec::specs().count(), 288);
+        assert_eq!(crate::command_exec::specs().count(), 295);
     }
 
     #[test]
