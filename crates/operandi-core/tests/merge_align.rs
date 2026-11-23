@@ -31,7 +31,7 @@ fn merge_keeps_the_first_selected_and_world_positions() {
     let second_world = world_points(&e, ids[1]);
     e.dispatch(Command::SelectItem(Some(ids[0]))).unwrap();
     e.dispatch(Command::ToggleItemSelection(ids[1])).unwrap();
-    assert_eq!(e.scene.selected_items(), ids);
+    assert_eq!(e.scene.picked_items(), ids);
     e.dispatch(Command::MergeItems).unwrap();
     assert_eq!(e.scene.items.len(), 1);
     assert_eq!(e.scene.items[0].id, ids[0]);

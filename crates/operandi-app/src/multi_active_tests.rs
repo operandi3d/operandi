@@ -93,15 +93,16 @@ fn shift_click_in_item_mode_makes_both_meshes_active() {
     let on_left = at(&a, DVec3::new(-2., 0., 0.5), r);
     let on_right = at(&a, DVec3::new(2., 0., 0.5), r);
     a.select_at(on_left, r, Modifiers::NONE);
-    assert_eq!(a.editor.scene.selected_items(), vec![left]);
+    assert_eq!(a.editor.scene.picked_items(), vec![left]);
     a.select_at(on_right, r, Modifiers::SHIFT);
-    assert_eq!(a.editor.scene.selected_items(), vec![left, right]);
+    assert_eq!(a.editor.scene.picked_items(), vec![left, right]);
     a.run(Command::Mode(Mode::Polygon));
-    assert_eq!(a.editor.scene.active_meshes(), vec![left, right]);
+    // The primary (last picked) comes first.
+    assert_eq!(a.editor.scene.active_meshes(), vec![right, left]);
     a.run(Command::Mode(Mode::Item));
     a.select_at(on_right, r, Modifiers::CTRL);
-    assert_eq!(a.editor.scene.selected_items(), vec![left]);
+    assert_eq!(a.editor.scene.picked_items(), vec![left]);
     // Ctrl toggles: again puts it back.
     a.select_at(on_right, r, Modifiers::CTRL);
-    assert_eq!(a.editor.scene.selected_items(), vec![left, right]);
+    assert_eq!(a.editor.scene.picked_items(), vec![left, right]);
 }

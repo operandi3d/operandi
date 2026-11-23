@@ -444,6 +444,8 @@ mod pen_walls;
 mod perf_snapshot;
 #[path = "performance_invariants.rs"]
 mod performance_invariants;
+#[path = "pick_order.rs"]
+mod pick_order;
 #[path = "poly_flip_clean_spec.rs"]
 mod poly_flip_clean_spec;
 #[path = "poly_haul_clean_spec.rs"]

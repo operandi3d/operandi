@@ -467,6 +467,12 @@ impl Operandi {
                                 id,
                                 ClickHow::Range,
                             );
+                            // Pick order: the anchor first, the range, and
+                            // the clicked end last, which becomes primary
+                            // (SelectItems takes the primary first).
+                            if let Some(clicked) = selected.pop() {
+                                selected.insert(0, clicked);
+                            }
                             self.run(Command::SelectItems(selected));
                         }
                     }

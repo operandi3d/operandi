@@ -3475,8 +3475,9 @@ impl Editor {
                         // CP-X3: the other selected cameras follow; all or
                         // nothing.
                         let mut targets = vec![item];
-                        if self.scene.selection.item == Some(item) {
-                            targets.extend(self.scene.selection.also.iter().copied());
+                        let selected = self.scene.selected_items();
+                        if selected.contains(&item) {
+                            targets.extend(selected);
                         }
                         let mut next = Vec::new();
                         for (index, target) in self.scene.items.iter().enumerate() {
@@ -3571,8 +3572,9 @@ impl Editor {
                         // LP-51: the other selected lights follow; all or
                         // nothing.
                         let mut targets = vec![item];
-                        if self.scene.selection.item == Some(item) {
-                            targets.extend(self.scene.selection.also.iter().copied());
+                        let selected = self.scene.selected_items();
+                        if selected.contains(&item) {
+                            targets.extend(selected);
                         }
                         let mut next = Vec::new();
                         for (index, target) in self.scene.items.iter().enumerate() {

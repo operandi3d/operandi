@@ -727,19 +727,7 @@ fn flag(a: &Args, name: &str) -> Result<Option<bool>> {
 }
 
 fn picked(scene: &Scene) -> Vec<u64> {
-    let s = &scene.selection;
-    let mut out: Vec<u64> = s
-        .also
-        .iter()
-        .copied()
-        .filter(|i| scene.item(*i).is_some())
-        .collect();
-    if let Some(a) = s.item
-        && !out.contains(&a)
-    {
-        out.push(a);
-    }
-    out
+    scene.picked_items()
 }
 
 fn is_joint(scene: &Scene, id: u64) -> bool {

@@ -541,7 +541,9 @@ impl Scene {
         self.animation.validate()?;
         self.validate_with_range_marker(&mut false)
     }
-    /// Every selected item, first-selected first, skipping stale ids.
+    /// Every selected item, the primary (last picked) first, then the
+    /// earlier picks oldest first, skipping stale ids. `picked_items` gives
+    /// the pure pick order.
     pub fn selected_items(&self) -> Vec<u64> {
         let mut out: Vec<u64> = self.selection.item.into_iter().collect();
         // A set, not a search of `out`: thousands of items get selected.
@@ -553,17 +555,30 @@ impl Scene {
         }
         out
     }
+    /// The selected items in the order they were picked: the earlier picks
+    /// (`also`, oldest first), then the primary item, the last picked.
+    pub fn picked_items(&self) -> Vec<u64> {
+        let mut out: Vec<u64> = Vec::with_capacity(self.selection.also.len() + 1);
+        let mut seen: crate::fxhash::FxHashSet<u64> = Default::default();
+        for &id in &self.selection.also {
+            if Some(id) != self.selection.item && self.item(id).is_some() && seen.insert(id) {
+                out.push(id);
+            }
+        }
+        out.extend(self.selection.item.filter(|id| self.item(*id).is_some()));
+        out
+    }
     /// Add `id` to the item selection, or take it out if it's in already
-    /// (Ctrl/Shift-click). With nothing selected it becomes the item.
+    /// (Ctrl/Shift-click). The item picked last is the primary one (as in
+    /// the reference app and Blender); the earlier picks stay in `also` in
+    /// the order they were picked, so pick-order commands (Parent,
+    /// Constrain, Bind, IK) read them the right way round. Taking the
+    /// primary out promotes the most recent remaining pick.
     pub fn toggle_item(&mut self, id: u64) {
         if self.selection.item == Some(id) {
             let mut rest = std::mem::take(&mut self.selection.also);
             let mut others = std::mem::take(&mut self.selection.others);
-            let next = if rest.is_empty() {
-                None
-            } else {
-                Some(rest.remove(0))
-            };
+            let next = rest.pop();
             self.select_item(next);
             self.selection.also = rest;
             // The next item becomes primary with the components it had.
@@ -579,10 +594,27 @@ impl Scene {
             if !self.selection.also.contains(&id) {
                 self.selection.others.remove(&id);
             }
-        } else if self.selection.item.is_none() {
-            self.select_item(Some(id));
+        } else if let Some(previous) = self.selection.item {
+            // The newly picked item becomes primary; the previous primary
+            // joins the earlier picks with its components.
+            let s = &mut self.selection;
+            let had = crate::multi_active::ComponentSelection {
+                vertices: std::mem::take(&mut s.vertices),
+                edges: std::mem::take(&mut s.edges),
+                faces: std::mem::take(&mut s.faces),
+            };
+            if !(had.vertices.is_empty() && had.edges.is_empty() && had.faces.is_empty()) {
+                s.others.insert(previous, had);
+            }
+            s.also.push(previous);
+            s.item = Some(id);
+            if let Some(c) = s.others.remove(&id) {
+                s.vertices = c.vertices;
+                s.edges = c.edges;
+                s.faces = c.faces;
+            }
         } else {
-            self.selection.also.push(id);
+            self.select_item(Some(id));
         }
     }
     pub(crate) fn validate_for_import(&self) -> std::result::Result<(), SceneValidationError> {

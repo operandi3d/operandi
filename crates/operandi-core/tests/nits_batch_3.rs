@@ -13,7 +13,7 @@ fn three_items() -> (Editor, [u64; 3]) {
     e.dispatch(Command::Mode(Mode::Item)).unwrap();
     e.scene.select_item(Some(ids[0]));
     e.scene.toggle_item(ids[2]);
-    assert_eq!(e.scene.selected_items(), vec![ids[0], ids[2]]);
+    assert_eq!(e.scene.picked_items(), vec![ids[0], ids[2]]);
     (e, ids)
 }
 
