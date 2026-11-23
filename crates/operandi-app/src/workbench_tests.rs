@@ -88,17 +88,17 @@ fn the_shipped_layouts_have_two_empty_workbenches_and_nothing_else_changes() {
         }
     }
     assert!(!a.workbench.top_bar);
-    // The Workbench tab isn't in the strip until it is opened (Layout >
-    // Workbench), so the nine tabs keep their size (LAY-Q47).
+    // The Workbench tab is the Workbench set's only form (Jason,
+    // 2026-11-23): it is never in the Model strip, and its own set draws
+    // no strip.
     assert!(!a.toolbox_rects.contains_key("Category Workbench"));
-    // Opening it shows it last, the Edit Workbench button and an empty hint.
+    // Opening it switches to that set, with the Edit Workbench button and
+    // an empty hint.
     a.execute("operandi.toolbox.tab workbench");
     draw(&mut a, &ctx, SIZE, vec![]);
-    let last_model_tab = a.toolbox_rects["Category Curve"];
-    let workbench = a.toolbox_rects["Category Workbench"];
-    assert_eq!(workbench.top(), last_model_tab.top());
-    assert!(workbench.left() > last_model_tab.right());
-    // It stays in the strip once another tab is open.
+    assert_eq!(a.layouts.tool_set, toolbox::ToolSet::Workbench);
+    assert!(!a.toolbox_rects.contains_key("Category Workbench"));
+    assert!(!a.toolbox_rects.contains_key("Category Create"));
     a.category = toolbox::Category::Create;
     draw(&mut a, &ctx, SIZE, vec![]);
     assert!(a.workbench.tab_shown);

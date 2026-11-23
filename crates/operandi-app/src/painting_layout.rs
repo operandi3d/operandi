@@ -82,29 +82,23 @@ impl Operandi {
     /// `operandi.paint.layout`: the set for the layout showing.
     fn open_paint_set(&mut self) {
         self.painting.set_layout = Some(self.layouts.current.clone());
-        self.select_tool_set(ToolSet::Paint);
+        self.select_tool_set(ToolSet::Brush);
         // Ready to paint: Paintbrush when no paint tool is on.
         if self.painting.brush.tool.is_none() {
             self.activate_paint(operandi_core::paint_stroke::PaintTool::Paintbrush);
         }
         self.painting.brush.tab_shown = true;
-        self.category = Category::Paint;
+        self.show_toolbox_tab(Category::Paint);
         // PNT-210: paint shows in the view.
         self.display
             .set_style(crate::view_display::Style::Texture, false);
         self.status = "Paint layout: Sculpt/Paint tools".into();
     }
 
-    /// The Sculpt/Paint set's tabs, regardless of which layout is showing.
+    /// The Brush set's tabs (the old Sculpt/Paint set), regardless of
+    /// which layout is showing.
     pub(crate) fn paint_set_tabs(&self) -> Option<Vec<Category>> {
-        (self.layouts.tool_set == ToolSet::Paint).then(|| {
-            vec![
-                Category::Sculpt,
-                Category::Paint,
-                Category::VertexMaps,
-                Category::PaintUtilities,
-            ]
-        })
+        (self.layouts.tool_set == ToolSet::Brush).then(|| ToolSet::Brush.tabs())
     }
 
     /// The set's names for its tabs (PNT-211).

@@ -96,7 +96,7 @@ the Mac version only for now (it isn't built for Windows or Linux yet).
 
 ## Test builds
 
-Testers get the newest Mac and Windows apps from one page that never
+Testers get the newest Mac, Windows and Linux apps from one page that never
 changes address:
 
     https://github.com/operandi3d/operandi/releases/tag/test-build
@@ -104,21 +104,25 @@ changes address:
 To put a new test build there, run on the Mac:
 
 ```bash
-cd ~/Developer/Operandi && OPERANDI_WINDOWS_SSH=<user>@<windows machine> scripts/test-build.sh
+cd ~/Developer/Operandi && OPERANDI_WINDOWS_SSH=<user>@<windows machine> OPERANDI_LINUX_SSH=<user>@<linux machine> scripts/test-build.sh
 ```
 
-(`OPERANDI_WINDOWS_SSH` is the ssh login of the Windows build machine, the
-same one `scripts/release.sh` uses; `docs/RELEASE_BUILDS.md` sets it up.)
+(`OPERANDI_WINDOWS_SSH` and `OPERANDI_LINUX_SSH` are the ssh logins of the
+Windows and Linux build machines; `docs/RELEASE_BUILDS.md` sets them up.
+Linux builds in its checkout at `~/Development/Operandi`, or
+`OPERANDI_LINUX_SSH_REPO`, inside the older-Linux container, so it needs
+podman there.)
 
 It builds GitHub's `main` (give a branch name at the end to build a pushed
-branch instead), the Mac app here and the Windows zip on the Windows
-machine at the same time, checks neither has files that mustn't be shared,
-and replaces the two files on the page. The page is a GitHub
+branch instead): the Mac app here, and the Windows zip and Linux AppImage
+on their machines, all at the same time. It checks none of them has files that mustn't be shared, and replaces the
+files on the page. The page is a GitHub
 *pre-release* called "Test build", so it never shows up as the latest
 release, and real releases like v0.1.0 are left alone.
 
-- `--platforms mac` (or `windows`) builds and replaces just one file; the
-  page still says which commit the other one came from.
+- `--platforms mac` (or `windows`, `linux`, or a list like `mac,linux`)
+  builds and replaces just those files; the page still says which commit
+  the others came from.
 - `--no-upload` builds and checks without uploading; the files are in
   `~/Developer/Operandi-Builds/test-build/upload`.
 - It builds in its own folder, `~/Developer/Operandi-test-build`, made the

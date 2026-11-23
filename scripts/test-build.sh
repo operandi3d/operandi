@@ -1,5 +1,5 @@
 #!/bin/sh
-# Builds the Mac and Windows test apps and puts them on one rolling GitHub
+# Builds the Mac, Windows and Linux test apps and puts them on one rolling GitHub
 # pre-release, "Test build" (tag `test-build`), replacing the files that
 # were there. Testers keep one link that always has the newest build:
 #
@@ -7,18 +7,22 @@
 #
 #   scripts/test-build.sh                 build GitHub's main, upload
 #   scripts/test-build.sh <branch>        build that branch from GitHub
-#   scripts/test-build.sh --platforms mac only the Mac (or: windows)
+#   scripts/test-build.sh --platforms mac only the Mac (or windows, linux,
+#                                         or a list: mac,linux)
 #   scripts/test-build.sh --no-upload     build and check, upload nothing
 #
 # OPERANDI_WINDOWS_SSH=user@host is the Windows machine. Windows builds
 # there over ssh, in its checkout (OPERANDI_WINDOWS_SSH_REPO, default
 # Developer/Operandi under its home folder), the same way scripts/release.sh
-# does, while the Mac builds here.
+# does, while the Mac builds here. OPERANDI_LINUX_SSH=user@host is the
+# Linux machine: it builds there in its checkout (OPERANDI_LINUX_SSH_REPO,
+# default Development/Operandi) with scripts/build-release-container.sh,
+# which needs podman, so the AppImage runs on older Linux too.
 #
 # It builds what is on GitHub, never a local-only commit, so each file's
 # source is public (the GPL). The Mac app is a QA build
-# (scripts/bundle-dev.sh with Cycles), not signed or notarized. Both
-# apps are built for the "test" update channel. The build
+# (scripts/bundle-dev.sh with Cycles), not signed or notarized. All
+# three are built for the "test" update channel. The build
 # happens in its own worktree, ~/Developer/Operandi-test-build, so it
 # never switches branches in your main checkout. It never touches real
 # releases such as v0.1.0, only the `test-build` tag and its release.
@@ -36,13 +40,14 @@ TAG=test-build
 TITLE="Test build"
 MAC_FILE=Operandi-Test-macOS.zip
 WIN_FILE=Operandi-Test-Windows-x64.zip
+LINUX_FILE=Operandi-Test-Linux-x86_64.AppImage
 # File names that must never be in a public download: Sylvain's model,
 # Foundry content, Modo scenes and presets.
 FORBIDDEN='sylvain|hc02|foundry|modo|\.lx[op]$'
 
 # ---- Arguments
 BRANCH=main
-PLATFORMS=mac,windows
+PLATFORMS=mac,windows,linux
 UPLOAD=1
 GOT_BRANCH=0
 while [ $# -gt 0 ]; do
@@ -57,15 +62,16 @@ while [ $# -gt 0 ]; do
     shift
 done
 BRANCH="${BRANCH#origin/}"
-WANT_MAC=0; WANT_WINDOWS=0
+WANT_MAC=0; WANT_WINDOWS=0; WANT_LINUX=0
 for p in $(printf '%s' "$PLATFORMS" | tr ',' ' '); do
     case "$p" in
         mac | macos) WANT_MAC=1 ;;
         windows) WANT_WINDOWS=1 ;;
-        *) stop "Unknown platform \"$p\" (use mac, windows)." ;;
+        linux) WANT_LINUX=1 ;;
+        *) stop "Unknown platform \"$p\" (use mac, windows, linux)." ;;
     esac
 done
-[ "$WANT_MAC$WANT_WINDOWS" != 00 ] || stop "Nothing to build."
+[ "$WANT_MAC$WANT_WINDOWS$WANT_LINUX" != 000 ] || stop "Nothing to build."
 [ "$(uname)" = Darwin ] || stop "Run this on the Mac."
 
 # The main checkout, wherever this copy of the script lives.
@@ -78,6 +84,8 @@ TREE="$(dirname "$REPO")/Operandi-test-build"
 OUT="${OPERANDI_TEST_BUILD_OUTPUT:-$HOME/Developer/Operandi-Builds/test-build}"
 WIN_SSH="${OPERANDI_WINDOWS_SSH:-}"
 WIN_REPO="${OPERANDI_WINDOWS_SSH_REPO:-Developer/Operandi}"
+LINUX_SSH="${OPERANDI_LINUX_SSH:-}"
+LINUX_REPO="${OPERANDI_LINUX_SSH_REPO:-Development/Operandi}"
 
 # ---- Checks
 say "== Checks"
@@ -94,6 +102,12 @@ if [ "$WANT_WINDOWS" = 1 ]; then
         stop "Can't reach the Windows machine $WIN_SSH over ssh, or it has no checkout at $WIN_REPO."
     say "   Windows: $WIN_SSH is reachable"
 fi
+if [ "$WANT_LINUX" = 1 ]; then
+    [ -n "$LINUX_SSH" ] || stop "Linux builds over ssh: set OPERANDI_LINUX_SSH=user@host (or leave linux out of --platforms)."
+    ssh -o ConnectTimeout=10 -o BatchMode=yes "$LINUX_SSH" "cd $LINUX_REPO && git rev-parse --git-dir && command -v podman" >/dev/null 2>&1 ||
+        stop "Can't reach the Linux machine $LINUX_SSH over ssh, or it has no checkout at $LINUX_REPO, or no podman."
+    say "   Linux: $LINUX_SSH is reachable"
+fi
 
 git -C "$REPO" fetch --quiet origin "$BRANCH" ||
     stop "There's no branch \"$BRANCH\" on GitHub. Test builds only come from pushed branches."
@@ -105,9 +119,10 @@ SUBJECT="$(git -C "$REPO" log -1 --format=%s "$COMMIT")"
 mkdir -p "$OUT"
 LOCK="$OUT/.running"
 mkdir "$LOCK" 2>/dev/null || stop "Another test build is running (or one died: then remove $LOCK)."
-WIN_PID=""
+WIN_PID=""; LINUX_PID=""
 cleanup() {
     [ -z "$WIN_PID" ] || kill "$WIN_PID" 2>/dev/null || true
+    [ -z "$LINUX_PID" ] || kill "$LINUX_PID" 2>/dev/null || true
     rmdir "$LOCK" 2>/dev/null || true
 }
 trap cleanup EXIT
@@ -136,47 +151,84 @@ done
 
 say
 say "Plan: test build of $BRANCH at $SHORT ($SUBJECT)"
-rm -rf "$OUT/upload" "$OUT/windows"
+rm -rf "$OUT/upload" "$OUT/windows" "$OUT/linux"
 mkdir -p "$OUT/upload"
 
-# ---- Windows over ssh, in the background while the Mac builds
-if [ "$WANT_WINDOWS" = 1 ]; then
-    say
-    say "== Starting the Windows build on $WIN_SSH (log: $OUT/windows.log)"
-    mkdir -p "$OUT/windows"
-    # Send only what the Windows checkout doesn't have yet when we can.
-    THERE="$(ssh -o BatchMode=yes "$WIN_SSH" "cd $WIN_REPO && git rev-parse HEAD" 2>/dev/null | tr -d '\r' || true)"
-    if [ -n "$THERE" ] && git -C "$TREE" merge-base --is-ancestor "$THERE" HEAD 2>/dev/null && [ "$THERE" != "$COMMIT" ]; then
-        git -C "$TREE" bundle create "$OUT/windows/build.bundle" HEAD "^$THERE" 2>/dev/null
+# ---- Windows and Linux over ssh, in the background while the Mac builds
+# start_remote <key> <ssh login> <checkout> <how to run bash there> <build
+# command> <file to copy back>: sends the commit with a git bundle, builds in
+# that machine's checkout, and copies the result to $OUT/<key>/<file>, with
+# a list of the files inside it for the check below. Sets REMOTE_PID.
+start_remote() {
+    key=$1; login=$2; checkout=$3; runner=$4; build=$5; file=$6
+    mkdir -p "$OUT/$key"
+    # Send only what that checkout doesn't have yet when we can.
+    there="$(ssh -o BatchMode=yes "$login" "cd $checkout && git rev-parse HEAD" 2>/dev/null | tr -d '\r' || true)"
+    if [ -n "$there" ] && [ "$there" != "$COMMIT" ] && git -C "$TREE" merge-base --is-ancestor "$there" HEAD 2>/dev/null; then
+        git -C "$TREE" bundle create "$OUT/$key/build.bundle" HEAD "^$there" 2>/dev/null
     else
-        git -C "$TREE" bundle create "$OUT/windows/build.bundle" HEAD 2>/dev/null
+        git -C "$TREE" bundle create "$OUT/$key/build.bundle" HEAD 2>/dev/null
     fi
-    # cmd quoting mangles inline bash, so the steps go over as a file.
-    cat > "$OUT/windows/operandi-test-build.sh" <<EOF
+    # Windows' cmd mangles inline bash, so the steps go over as a file.
+    cat > "$OUT/$key/operandi-test-build.sh" <<EOF
 #!/bin/bash
 set -eu
-rm -f ~/operandi-test-build.zip
-# Visual Studio's CMake and Python aren't on the ssh PATH by default.
+rm -f ~/operandi-test-build.out ~/operandi-test-build.list
+# Visual Studio's CMake and Python aren't on Windows' ssh PATH by default.
 export PATH="/c/Program Files/Python312:\$HOME/.cargo/bin:\$PATH"
-cd ~/$WIN_REPO
+cd ~/$checkout
 git fetch -q ~/operandi-test-build.bundle HEAD
 git checkout -q --force --detach $COMMIT
 rm -f ~/operandi-test-build.bundle
 OUT=~/operandi-test-build-out
 rm -rf "\$OUT" && mkdir -p "\$OUT"
-OPERANDI_DEFAULT_UPDATE_CHANNEL=test OPERANDI_RELEASE_OUTPUT="\$OUT" scripts/build-release.sh
+OPERANDI_DEFAULT_UPDATE_CHANNEL=test OPERANDI_RELEASE_OUTPUT="\$OUT" $build
 # A fixed name to copy back: scp from Windows doesn't expand wildcards.
-cp "\$OUT"/*.zip ~/operandi-test-build.zip
+F="\$(ls "\$OUT"/*.zip "\$OUT"/*.AppImage 2>/dev/null | head -1)"
+case "\$F" in
+    *.zip) unzip -Z1 "\$F" > ~/operandi-test-build.list ;;
+    *.AppImage) (cd "\$OUT" && chmod +x "\$F" && "\$F" --appimage-extract >/dev/null && find squashfs-root) > ~/operandi-test-build.list ;;
+esac
+mv "\$F" ~/operandi-test-build.out
 rm -rf "\$OUT"
 EOF
     (
         set -e
-        scp -q "$OUT/windows/build.bundle" "$WIN_SSH:operandi-test-build.bundle"
-        scp -q "$OUT/windows/operandi-test-build.sh" "$WIN_SSH:operandi-test-build.sh"
-        ssh "$WIN_SSH" '"C:\Program Files\Git\bin\bash.exe" -l operandi-test-build.sh'
-        scp -q "$WIN_SSH:operandi-test-build.zip" "$OUT/windows/$WIN_FILE"
-    ) > "$OUT/windows.log" 2>&1 &
-    WIN_PID=$!
+        scp -q "$OUT/$key/build.bundle" "$login:operandi-test-build.bundle"
+        scp -q "$OUT/$key/operandi-test-build.sh" "$login:operandi-test-build.sh"
+        ssh "$login" "$runner operandi-test-build.sh"
+        scp -q "$login:operandi-test-build.list" "$OUT/$key/contents.list"
+        scp -q "$login:operandi-test-build.out" "$OUT/$key/$file"
+    ) > "$OUT/$key.log" 2>&1 &
+    REMOTE_PID=$!
+}
+# finish_remote <key> <name> <pid> <file>: waits, checks, moves it to upload/.
+finish_remote() {
+    say
+    say "== Waiting for the $2 build"
+    if ! wait "$3"; then
+        tail -30 "$OUT/$1.log" >&2
+        stop "The $2 build failed (above; whole log: $OUT/$1.log). Nothing was uploaded."
+    fi
+    [ -s "$OUT/$1/$4" ] || stop "The $2 build finished but nothing came back (log: $OUT/$1.log)."
+    [ -s "$OUT/$1/contents.list" ] || stop "The $2 build came back without its list of files (log: $OUT/$1.log)."
+    bad="$(grep -iE "$FORBIDDEN" "$OUT/$1/contents.list" || true)"
+    [ -z "$bad" ] || { say "$bad" >&2; stop "The $2 build has files that must not be shared (above). Nothing was uploaded."; }
+    mv "$OUT/$1/$4" "$OUT/upload/"
+    say "   $(du -h "$OUT/upload/$4" | cut -f1) $4"
+}
+if [ "$WANT_WINDOWS" = 1 ]; then
+    say
+    say "== Starting the Windows build on $WIN_SSH (log: $OUT/windows.log)"
+    start_remote windows "$WIN_SSH" "$WIN_REPO" '"C:\Program Files\Git\bin\bash.exe" -l' scripts/build-release.sh "$WIN_FILE"
+    WIN_PID=$REMOTE_PID
+fi
+if [ "$WANT_LINUX" = 1 ]; then
+    say
+    say "== Starting the Linux build on $LINUX_SSH (log: $OUT/linux.log)"
+    # In an older-Linux container, so the AppImage runs on most distros.
+    start_remote linux "$LINUX_SSH" "$LINUX_REPO" 'bash -l' scripts/build-release-container.sh "$LINUX_FILE"
+    LINUX_PID=$REMOTE_PID
 fi
 
 # ---- macOS
@@ -196,22 +248,16 @@ if [ "$WANT_MAC" = 1 ]; then
     say "   $(du -h "$OUT/upload/$MAC_FILE" | cut -f1) $MAC_FILE"
 fi
 
-# ---- Wait for Windows
+# ---- Wait for Windows and Linux
 if [ -n "$WIN_PID" ]; then
-    say
-    say "== Waiting for the Windows build"
-    if ! wait "$WIN_PID"; then
-        WIN_PID=""
-        tail -30 "$OUT/windows.log" >&2
-        stop "The Windows build failed (above; whole log: $OUT/windows.log). Nothing was uploaded."
-    fi
-    WIN_PID=""
-    [ -f "$OUT/windows/$WIN_FILE" ] || stop "The Windows build finished but no zip came back (log: $OUT/windows.log)."
-    BAD="$(unzip -Z1 "$OUT/windows/$WIN_FILE" | grep -iE "$FORBIDDEN" || true)"
-    [ -z "$BAD" ] || { say "$BAD" >&2; stop "The Windows zip has files that must not be shared (above). Nothing was uploaded."; }
-    mv "$OUT/windows/$WIN_FILE" "$OUT/upload/"
+    pid=$WIN_PID; WIN_PID=""
+    finish_remote windows Windows "$pid" "$WIN_FILE"
     WIN_BUILT="$(date +%s)"
-    say "   $(du -h "$OUT/upload/$WIN_FILE" | cut -f1) $WIN_FILE"
+fi
+if [ -n "$LINUX_PID" ]; then
+    pid=$LINUX_PID; LINUX_PID=""
+    finish_remote linux Linux "$pid" "$LINUX_FILE"
+    LINUX_BUILT="$(date +%s)"
 fi
 
 if [ "$UPLOAD" = 0 ]; then
@@ -227,13 +273,16 @@ say "== Uploading to the \"$TITLE\" pre-release"
 # from and when it was built (Unix seconds), so a Mac-only run still says
 # where the Windows file it leaves in place came from, and the app's update
 # check can compare build times:
-#   <!-- operandi-build mac=<sha> mac_time=<unix> windows=<sha> windows_time=<unix> -->
+#   <!-- operandi-build mac=<sha> mac_time=<unix> windows=<sha> windows_time=<unix>
+#        linux=<sha> linux_time=<unix> -->  (all on one line)
 OLD_BODY="$(gh release view "$TAG" --json body -q .body 2>/dev/null || true)"
 was() { printf '%s\n' "$OLD_BODY" | grep '^<!-- operandi-build ' | head -1 | tr ' ' '\n' | sed -n "s/^$1=//p"; }
 MAC_SHA="$(was mac)"; MAC_TIME="$(was mac_time)"
 WIN_SHA="$(was windows)"; WIN_TIME="$(was windows_time)"
+LINUX_SHA="$(was linux)"; LINUX_TIME="$(was linux_time)"
 [ "$WANT_MAC" = 1 ] && MAC_SHA="$COMMIT" && MAC_TIME="$MAC_BUILT"
 [ "$WANT_WINDOWS" = 1 ] && WIN_SHA="$COMMIT" && WIN_TIME="$WIN_BUILT"
+[ "$WANT_LINUX" = 1 ] && LINUX_SHA="$COMMIT" && LINUX_TIME="$LINUX_BUILT"
 URL_BASE="https://github.com/$GH_REPO"
 line() { # platform, file, sha
     [ -n "$3" ] || return 0
@@ -247,16 +296,19 @@ NOTES="$OUT/notes.md"
     say
     line macOS "$MAC_FILE" "$MAC_SHA"
     line Windows "$WIN_FILE" "$WIN_SHA"
+    line Linux "$LINUX_FILE" "$LINUX_SHA"
     say
     say "**macOS** (Apple silicon): unzip and drag the app to Applications. It isn't notarized, so the first time macOS refuses to open it: open System Settings > Privacy & Security, scroll down and click **Open Anyway**. Or run \`xattr -dr com.apple.quarantine \"/Applications/Operandi Test Build\"*.app\` in Terminal."
     say
     say "**Windows** (64-bit): unzip anywhere and run \`Operandi.exe\`. It isn't signed, so Windows may warn first (More info > Run anyway)."
     say
+    say "**Linux** (x86_64): make it runnable (\`chmod +x Operandi-Test-Linux-x86_64.AppImage\`) and open it. Rendering is CPU only."
+    say
     say "Found a bug? Use Help > Report Bug or Idea… in the app."
     say
     say "Operandi is free software under the GNU GPL v3; each file's source is the commit linked above. Not affiliated with or endorsed by Foundry."
     say
-    say "<!-- operandi-build mac=$MAC_SHA mac_time=$MAC_TIME windows=$WIN_SHA windows_time=$WIN_TIME -->"
+    say "<!-- operandi-build mac=$MAC_SHA mac_time=$MAC_TIME windows=$WIN_SHA windows_time=$WIN_TIME linux=$LINUX_SHA linux_time=$LINUX_TIME -->"
 } > "$NOTES"
 
 if gh release view "$TAG" >/dev/null 2>&1; then

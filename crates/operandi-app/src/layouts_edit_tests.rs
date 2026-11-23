@@ -272,6 +272,8 @@ fn d08_tool_set_buttons_change_tools_and_keep_the_layout() {
     let before = a.capture_layout().unwrap();
     let scene = a.editor.scene.clone();
     let active_view = a.active_view;
+    let viewports = a.views.viewports();
+    let tree = a.views.main.clone();
     let drawn = a.layouts.tool_set_rects.clone();
     assert_eq!(
         drawn.iter().map(|(set, _)| *set).collect::<Vec<_>>(),
@@ -285,23 +287,25 @@ fn d08_tool_set_buttons_change_tools_and_keep_the_layout() {
         frames(&mut a, &ctx, 2);
         assert_eq!(a.layouts.tool_set, set);
         let (category, tool) = match set {
-            ToolSet::Model => (Category::Create, "Cube"),
-            ToolSet::Uv => (Category::Uv, "Unwrap Tool"),
-            #[cfg(feature = "painting")]
-            ToolSet::Paint => (Category::Paint, "operandi.paint.paintbrush"),
+            ToolSet::Model => (Some(Category::Create), Some("Cube")),
+            ToolSet::Uv => (Some(Category::Uv), Some("Unwrap Tool")),
+            ToolSet::Brush => (Some(Category::Sculpt), Some("Vertex Map Erase")),
+            ToolSet::Setup => (Some(Category::Setup), Some("operandi.rig.parent")),
+            ToolSet::Animation => (None, None),
+            ToolSet::Workbench => (Some(Category::Workbench), None),
+            ToolSet::Game => (Some(Category::GameVertexMap), Some("Convert to Hard Edges")),
         };
-        assert_eq!(a.category, category);
-        assert!(a.form_rects.contains_key(tool), "missing {tool}");
+        assert_eq!(a.shown_category(), category, "{set:?}");
+        if let Some(tool) = tool {
+            assert!(a.form_rects.contains_key(tool), "missing {tool}");
+        }
         let after = a.capture_layout().unwrap();
         assert_eq!(after.name, before.name);
-        // Companion panels (Jason, 2026-11-19, after D-08): the UV set
-        // opens a UV view beside the view and closes it on leaving; every
-        // other change to the layout stays out of the set buttons.
-        if set == ToolSet::Uv {
-            assert!(a.layouts.companion_uv.is_some(), "the UV companion view");
-        } else {
-            assert_eq!(after.frame, before.frame);
-        }
+        // Jason, 2026-11-23: a set button never changes the layout; no
+        // view opens, closes or moves.
+        assert_eq!(after.frame, before.frame, "{set:?}");
+        assert_eq!(a.views.viewports(), viewports, "{set:?}");
+        assert_eq!(a.views.main, tree, "{set:?}");
         assert_eq!(after.windows, before.windows);
         assert_eq!(a.active_view, active_view);
         assert_eq!(a.editor.scene, scene);

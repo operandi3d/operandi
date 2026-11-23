@@ -2015,6 +2015,11 @@ fn docking_tool_tabs_legacy_layouts_keep_the_vertical_strip_and_tool_positions()
         assert!(!a.layouts.mixed_dock, "{name}");
         assert_eq!(a.layouts.tool_tabs_horizontal, None, "{name}");
         assert!(!a.views.panes().contains(&Pane::ToolTabs), "{name}");
+        // The UV set has one form, so no strip (Jason, 2026-11-23).
+        if a.layouts.tool_set == crate::toolbox::ToolSet::Uv {
+            assert!(!a.toolbox_rects.contains_key("Category UV"), "{name}");
+            continue;
+        }
         assert!(a.dots.rects.contains_key(&Dot::ToolTabs), "{name}");
         let create = a.toolbox_rects["Category Create"];
         let select = a.toolbox_rects["Category Select"];
@@ -2769,7 +2774,7 @@ fn build_mode_blocks_viewport_clicks_and_keeps_tab_clicks() {
 }
 
 #[test]
-fn tabs_show_the_grab_hand_only_in_build_mode() {
+fn tabs_show_the_grab_hand_with_or_without_build_mode() {
     let (mut a, ctx) = two_views();
     let at = a.compass_point(Dot::View(1), Zone::Center);
     drag_dot(&mut a, &ctx, Dot::View(0), at, Modifiers::NONE);
@@ -2780,7 +2785,8 @@ fn tabs_show_the_grab_hand_only_in_build_mode() {
             .platform_output
             .cursor_icon
     };
-    assert_ne!(cursor(&mut a), egui::CursorIcon::Grab);
+    // A tab reorders along its row any time (Jason, 2026-11-23).
+    assert_eq!(cursor(&mut a), egui::CursorIcon::Grab);
     enter_build_mode(&mut a, &ctx);
     assert_eq!(cursor(&mut a), egui::CursorIcon::Grab);
 }
@@ -2958,4 +2964,48 @@ fn docking_a_collapsed_column_hides_panels_docked_beside_it_and_others_still_res
         assert!((dock_leaf(&a, Pane::Toolbox).width() - toolbox).abs() < 1.5);
         check_reopen(&a);
     }
+}
+
+/// Jason, 2026-11-23: a tab reorders along its own row with UI build mode
+/// off; dragging it out of the row does nothing then (and says how).
+#[test]
+fn sidebar_tabs_reorder_without_build_mode_but_dont_drag_out() {
+    use panel_registry::PanelKind as K;
+    let (mut a, ctx) = two_views();
+    a.upper_frame.tabs = vec![K::Items, K::ShaderTree, K::Groups];
+    idle(&mut a, &ctx);
+    assert!(!a.dots.build_mode);
+    let from = a.upper_frame.rects[2].center();
+    let to = pos2(a.upper_frame.rects[0].left() + 2., from.y);
+    drag_raw(&mut a, &ctx, from, to, Modifiers::NONE);
+    assert_eq!(a.upper_frame.tabs, [K::Groups, K::Items, K::ShaderTree]);
+    let windows = a.views.windows.len();
+    let from = a.upper_frame.rects[0].center();
+    drag_raw(&mut a, &ctx, from, pos2(700., 450.), Modifiers::NONE);
+    assert_eq!(a.upper_frame.tabs, [K::Groups, K::Items, K::ShaderTree]);
+    assert_eq!(a.views.windows.len(), windows, "nothing floated");
+    assert!(a.status.contains("UI build mode"), "{}", a.status);
+}
+
+#[test]
+fn dock_tree_tabs_reorder_without_build_mode_but_dont_drag_out() {
+    let (mut a, ctx) = two_views();
+    let at = a.compass_point(Dot::View(1), Zone::Center);
+    drag_dot(&mut a, &ctx, Dot::View(0), at, Modifiers::NONE);
+    idle(&mut a, &ctx);
+    assert!(!a.dots.build_mode);
+    let row = a.views.dock_slot(Pane::Viewport(0)).unwrap();
+    let (before, _) = tab_panes(&a, Pane::Viewport(0));
+    assert_eq!(before, [Pane::Viewport(1), Pane::Viewport(0)]);
+    let from = a.dock_tree_tab_point(row, 1) + vec2(4., 0.);
+    let to = a.dock_tree_tab_point(row, 0);
+    drag_raw(&mut a, &ctx, from, to, Modifiers::NONE);
+    let (after, _) = tab_panes(&a, Pane::Viewport(0));
+    assert_eq!(after, [Pane::Viewport(0), Pane::Viewport(1)]);
+    let tree = a.views.main.clone();
+    let from = a.dock_tree_tab_point(row, 0) + vec2(4., 0.);
+    drag_raw(&mut a, &ctx, from, pos2(700., 600.), Modifiers::NONE);
+    assert_eq!(a.views.main, tree, "the dock tree is unchanged");
+    assert!(a.views.windows.is_empty(), "nothing floated");
+    assert!(a.status.contains("UI build mode"), "{}", a.status);
 }

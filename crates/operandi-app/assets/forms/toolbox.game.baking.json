@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "id": "toolbox.game.baking",
+  "label": "Baking",
+  "exported": true,
+  "controls": [
+    {
+      "divider": "Bake",
+      "id": "game-bake"
+    },
+    {
+      "command": "operandi.bake.curvature",
+      "label": "Bake Curvature…"
+    },
+    {
+      "command": "operandi.bake.thickness",
+      "label": "Bake Thickness…"
+    },
+    {
+      "command": "operandi.bake.padImage",
+      "label": "Pad Texture to UVs…"
+    }
+  ]
+}

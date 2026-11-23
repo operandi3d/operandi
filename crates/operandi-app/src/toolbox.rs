@@ -3,93 +3,164 @@
 use super::*;
 
 /// D-08, UIC-197: the set selects toolbox forms independently of docking.
+/// Picking a set never changes the layout (Jason, 2026-11-23): no view
+/// opens, closes or moves.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub(super) enum ToolSet {
     Model,
     Uv,
-    #[cfg(feature = "painting")]
-    Paint,
+    /// Sculpting and painting (was "Paint"; the old name still reads).
+    Brush,
+    Setup,
+    /// No tools yet: an empty body under the transform row.
+    Animation,
+    Workbench,
+    Game,
 }
 
 impl ToolSet {
+    /// The toolset bar's order (Jason, 2026-11-23).
     pub(super) const ALL: &[Self] = &[
         Self::Model,
         Self::Uv,
-        #[cfg(feature = "painting")]
-        Self::Paint,
+        Self::Brush,
+        Self::Setup,
+        Self::Animation,
+        Self::Workbench,
+        Self::Game,
     ];
 
     pub(super) fn label(self) -> &'static str {
         match self {
             Self::Model => "Model",
             Self::Uv => "UV",
-            #[cfg(feature = "painting")]
-            Self::Paint => "Paint",
+            Self::Brush => "Brush",
+            Self::Setup => "Setup",
+            Self::Animation => "Animation",
+            Self::Workbench => "Workbench",
+            Self::Game => "Game",
         }
     }
 
+    /// The set a command line or saved layout names; the old "Paint" set
+    /// is Brush now.
     pub(super) fn named(name: &str) -> Option<Self> {
+        let name = name.trim();
+        if name.eq_ignore_ascii_case("Paint") {
+            return Some(Self::Brush);
+        }
         Self::ALL
             .iter()
             .copied()
             .find(|set| set.label().eq_ignore_ascii_case(name))
     }
 
-    fn first_category(self) -> Category {
+    /// The set's toolbox tabs, in strip order (Jason, 2026-11-23). A set
+    /// with one tab draws no strip; a set with none shows an empty body.
+    pub(super) fn tabs(self) -> Vec<Category> {
+        // The Rig tab waits for the animation switch.
+        let rig = crate::anim_switch::enabled().then_some(Category::Rig);
         match self {
-            Self::Model => Category::Create,
-            Self::Uv => Category::Uv,
+            Self::Model => vec![
+                Category::Create,
+                Category::Select,
+                Category::Deform,
+                Category::Duplicate,
+                Category::Edit,
+                Category::Vertex,
+                Category::Edge,
+                Category::Polygon,
+                Category::Topology,
+                Category::Curve,
+            ],
+            Self::Uv => vec![Category::Uv],
             #[cfg(feature = "painting")]
-            Self::Paint => Category::Paint,
+            Self::Brush => vec![
+                Category::Sculpt,
+                Category::Paint,
+                Category::VertexMaps,
+                Category::PaintUtilities,
+            ],
+            #[cfg(not(feature = "painting"))]
+            Self::Brush => vec![Category::Sculpt],
+            // Deformers, Controls and Rename Properties are left out until
+            // commands exist to fill them.
+            Self::Setup => [
+                Category::Setup,
+                Category::Constraints,
+                Category::InverseKinematics,
+                Category::Weighting,
+            ]
+            .into_iter()
+            .chain(rig)
+            .collect(),
+            Self::Animation => Vec::new(),
+            Self::Workbench => vec![Category::Workbench],
+            // Presets is left out: there are no game presets yet.
+            Self::Game => [Category::GameVertexMap, Category::Baking]
+                .into_iter()
+                .chain(rig)
+                .collect(),
         }
+    }
+
+    pub(super) fn first_category(self) -> Option<Category> {
+        self.tabs().first().copied()
+    }
+
+    /// The first set, in bar order, with `tab` among its tabs.
+    pub(super) fn with_tab(tab: Category) -> Option<Self> {
+        Self::ALL
+            .iter()
+            .copied()
+            .find(|set| set.tabs().contains(&tab))
     }
 }
 
 impl Operandi {
     pub(super) fn select_tool_set(&mut self, set: ToolSet) {
-        let was = self.layouts.tool_set;
         self.layouts.tool_set = set;
-        self.category = set.first_category();
+        if let Some(first) = set.first_category() {
+            self.category = first;
+        }
         self.layouts.uv_tab = set == ToolSet::Uv;
-        if was != set {
-            self.companion_panels(set);
+    }
+
+    /// Open toolbox tab `tab`: in the current set when it has it, else in
+    /// the first set that does. False when no set has it.
+    pub(super) fn show_toolbox_tab(&mut self, tab: Category) -> bool {
+        if !self.layouts.tool_set.tabs().contains(&tab) {
+            let Some(set) = ToolSet::with_tab(tab) else {
+                return false;
+            };
+            self.layouts.tool_set = set;
+        }
+        self.layouts.uv_tab = tab == Category::Uv;
+        self.category = tab;
+        true
+    }
+
+    /// A tab opened by setting `category` directly (a paint tool, a test)
+    /// brings up the first set that has it. A set without tabs keeps its
+    /// empty body.
+    fn follow_tab_set(&mut self) {
+        let tabs = self.layouts.tool_set.tabs();
+        if tabs.is_empty() || tabs.contains(&self.category) {
+            return;
+        }
+        if let Some(set) = ToolSet::with_tab(self.category) {
+            self.layouts.tool_set = set;
         }
     }
 
-    /// Companion panels (Jason, 2026-11-19): a tool set with a natural
-    /// companion view opens it beside the active view when picked (the UV
-    /// tools open a UV view), and closes it on leaving the set only when
-    /// it opened it itself. A UV view already showing is used as is, and
-    /// one the user opened stays.
-    fn companion_panels(&mut self, set: ToolSet) {
-        if set == ToolSet::Uv {
-            let shown = self.views.viewports().iter().any(|&v| self.is_uv_view(v));
-            if shown || self.layouts.companion_uv.is_some() {
-                return;
-            }
-            let before = self.views.viewports();
-            let active = self.active_view;
-            // The sizes to put back when the companion closes.
-            self.layouts.companion_shares = Some(crate::views::linear_shares(&self.views.main));
-            self.split_view();
-            let Some(&new) = self.views.viewports().iter().find(|v| !before.contains(v)) else {
-                return;
-            };
-            self.uv_views.insert(new, Default::default());
-            self.layouts.companion_uv = Some(new);
-            self.activate_view(active);
-            self.status = "UV tools: a UV view opened beside the view".into();
-        } else if let Some(view) = self.layouts.companion_uv.take()
-            && self.views.viewports().contains(&view)
-            && self.is_uv_view(view)
-            && self.can_close_view(view)
-        {
-            self.close_view(view);
-            // Closing hands its room around by proportion; put the views
-            // back exactly as they were before it opened.
-            if let Some(shares) = self.layouts.companion_shares.take() {
-                crate::views::set_linear_shares(&mut self.views.main, &shares);
-            }
+    /// The tab the toolbox body draws: the current one when its set has
+    /// it, else the set's first (none for a set without tabs).
+    pub(super) fn shown_category(&self) -> Option<Category> {
+        let tabs = self.layouts.tool_set.tabs();
+        if tabs.contains(&self.category) {
+            Some(self.category)
+        } else {
+            tabs.first().copied()
         }
     }
 }
@@ -161,6 +232,16 @@ pub(super) enum Category {
     /// The user's own workbench (layouts stage 4, LAY-82): an empty form
     /// they fill with Edit Workbench (workbench.rs).
     Workbench,
+    /// The Setup set's tabs (Jason, 2026-11-23): item setup, constraints,
+    /// inverse kinematics and weighting, from existing commands
+    /// (`toolbox.setup*.json`).
+    Setup,
+    Constraints,
+    InverseKinematics,
+    Weighting,
+    /// The Game set's Vertex Map and Baking tabs (`toolbox.game.*.json`).
+    GameVertexMap,
+    Baking,
     /// Paint Tools (painting builds only, PNT-85).
     #[cfg(feature = "painting")]
     Paint,
@@ -173,7 +254,7 @@ pub(super) enum Category {
 }
 impl Category {
     #[cfg(not(feature = "painting"))]
-    pub(super) const ALL: [Self; 14] = [
+    pub(super) const ALL: [Self; 20] = [
         Self::Create,
         Self::Select,
         Self::Deform,
@@ -188,9 +269,15 @@ impl Category {
         Self::Uv,
         Self::Rig,
         Self::Workbench,
+        Self::Setup,
+        Self::Constraints,
+        Self::InverseKinematics,
+        Self::Weighting,
+        Self::GameVertexMap,
+        Self::Baking,
     ];
     #[cfg(feature = "painting")]
-    pub(super) const ALL: [Self; 17] = [
+    pub(super) const ALL: [Self; 23] = [
         Self::Create,
         Self::Select,
         Self::Deform,
@@ -208,6 +295,12 @@ impl Category {
         Self::Workbench,
         Self::VertexMaps,
         Self::PaintUtilities,
+        Self::Setup,
+        Self::Constraints,
+        Self::InverseKinematics,
+        Self::Weighting,
+        Self::GameVertexMap,
+        Self::Baking,
     ];
     /// The tab a command line names (`operandi.toolbox.tab uv`).
     pub(super) fn named(name: &str) -> Option<Self> {
@@ -231,6 +324,12 @@ impl Category {
             Self::Uv => "UV",
             Self::Rig => "Rig",
             Self::Workbench => "Workbench",
+            Self::Setup => "Setup",
+            Self::Constraints => "Constraints",
+            Self::InverseKinematics => "Inverse Kinematics",
+            Self::Weighting => "Weighting",
+            Self::GameVertexMap => "Vertex Map",
+            Self::Baking => "Baking",
             #[cfg(feature = "painting")]
             Self::Paint => "Paint",
             #[cfg(feature = "painting")]
@@ -243,6 +342,8 @@ impl Category {
 // PAR-014a–d: appearance choices calibrated at actual scale, not a conversion
 // of the handoff's approximate screenshot pixels. Preserve the old grid band.
 const CATEGORY_HIT_WIDTH: f32 = 22.;
+/// The body of a tool set with no tools yet (the Animation set).
+pub(super) const NO_TOOLS_YET: &str = "No tools in this set yet";
 /// The message line's strip under Tool Properties.
 pub(crate) const MESSAGE_LINE_HEIGHT: f32 = 18.;
 pub(super) const DOCK_PANEL_INSET: f32 = 4.;
@@ -636,6 +737,7 @@ impl Operandi {
 
     pub(super) fn toolbox(&mut self, ui: &mut Ui) {
         chrome::apply(ui);
+        self.follow_tab_set();
         let mut panel = ui.max_rect().expand(4.);
         let combined = !self.layouts.mixed_dock;
         let area = ui.available_rect_before_wrap();
@@ -695,8 +797,10 @@ impl Operandi {
             .response
             .rect;
         let body = Rect::from_min_max(pos2(area.left(), top.bottom() + 4.), area.max);
-        let categories =
-            (self.layouts.tool_tabs_horizontal.is_none()).then(|| self.tool_categories(ui));
+        // A set with one tab (or none) draws no strip (Jason, 2026-11-23).
+        let categories = (self.layouts.tool_tabs_horizontal.is_none())
+            .then(|| self.tool_categories(ui))
+            .filter(|tabs| tabs.entries.len() > 1);
         self.tool_list_min = categories
             .as_ref()
             .map_or(tool_split::LIST_MIN_HEIGHT, |tabs| {
@@ -777,11 +881,12 @@ impl Operandi {
             let scale = ui.ctx().pixels_per_point();
             list_rect.max.x = ((body.right() - CATEGORY_BAND) * scale).round() / scale;
             let edge = list_rect.right() + 0.5;
+            let shown = self.shown_category().unwrap_or(self.category);
             let open = self
                 .toolbox_rects
                 .get(&format!(
                     "Category {} surface",
-                    self.category_tab_label(self.category)
+                    self.category_tab_label(shown)
                 ))
                 .copied()
                 .unwrap_or(Rect::from_min_max(tabs.min, tabs.min));
@@ -811,7 +916,13 @@ impl Operandi {
                 Rect::from_center_size(line.center(), vec2(line.width(), 2. * layout::EDGE_GRAB));
             self.tool_divider_layer = Some(ui.layer_id());
         }
-        ui.scope_builder(UiBuilder::new().max_rect(list_rect), |ui| {
+        // A child, not a scope: a row wider than the drawer (the UV form's
+        // in the column layouts, no longer masked by the tab strip's band)
+        // must not widen the column frame after frame.
+        let mut list = ui.new_child(UiBuilder::new().id_salt("toolbox-list").max_rect(list_rect));
+        list.set_clip_rect(list.clip_rect().intersect(list_rect));
+        {
+            let ui = &mut list;
             ScrollArea::vertical()
                 .id_salt("toolbox-body")
                 .auto_shrink([false, false])
@@ -820,7 +931,15 @@ impl Operandi {
                     // Every tab is a form (layouts stage 3, toolbox_form.rs):
                     // each form draws its own section headers.
                     use crate::toolbox_form as forms;
-                    let form = match self.category {
+                    let Some(shown) = self.shown_category() else {
+                        // UIC-209 spirit: a set with no tools yet says so.
+                        ui.add_space(24.);
+                        ui.vertical_centered(|ui| {
+                            ui.label(RichText::new(NO_TOOLS_YET).color(chrome::disabled_text()));
+                        });
+                        return;
+                    };
+                    let form = match shown {
                         Category::Create => forms::CREATE_FORM,
                         Category::Select => forms::SELECT_FORM,
                         Category::Deform => forms::DEFORM_FORM,
@@ -835,6 +954,12 @@ impl Operandi {
                         Category::Edge => forms::EDGE_FORM,
                         Category::Polygon => forms::POLYGON_FORM,
                         Category::Workbench => crate::workbench::TOOLBOX_WORKBENCH,
+                        Category::Setup => forms::SETUP_FORM,
+                        Category::Constraints => forms::CONSTRAINTS_FORM,
+                        Category::InverseKinematics => forms::IK_FORM,
+                        Category::Weighting => forms::WEIGHTING_FORM,
+                        Category::GameVertexMap => forms::GAME_VERTEX_MAP_FORM,
+                        Category::Baking => forms::BAKING_FORM,
                         #[cfg(feature = "painting")]
                         Category::Paint => forms::PAINT_FORM,
                         #[cfg(feature = "painting")]
@@ -844,53 +969,15 @@ impl Operandi {
                     };
                     self.draw_form(ui, form);
                 });
-        });
+        }
         if combined {
             self.tool_properties_panel(ui, props_rect, !self.is_floating(floating::Panel::Toolbox));
         }
     }
 
     fn tool_categories(&self, ui: &Ui) -> CategoryTabs {
-        // The UV tab shows once a layout's open command opened it (the UV
-        // layout, UVT-201), so the Model layout's strip keeps its
-        // full-length tabs.
-        let uv_tab = self.layouts.uv_tab || self.category == Category::Uv;
-        let categories: Vec<Category> = [
-            Category::Create,
-            Category::Select,
-            Category::Deform,
-            Category::Sculpt,
-            #[cfg(feature = "painting")]
-            Category::Paint,
-            Category::Duplicate,
-            Category::Edit,
-            Category::Uv,
-            Category::Vertex,
-            Category::Edge,
-            Category::Polygon,
-            // TB-01: Topology and Curve follow Polygon.
-            Category::Topology,
-            Category::Curve,
-            // UIC-190: the Rig tab, in the Animate layout.
-            Category::Rig,
-            // Layouts stage 4 (LAY-82): last, so the tabs above it keep
-            // their places; shown once opened (below).
-            Category::Workbench,
-        ]
-        .into_iter()
-        .filter(|&c| c != Category::Uv || uv_tab)
-        .filter(|&c| c != Category::Rig || self.rig_tab_shows())
-        .filter(|&c| self.paint_tab_shows(c))
-        // The Workbench tab joins once opened (LAY-Q47), like UV.
-        .filter(|&c| {
-            c != Category::Workbench
-                || self.workbench.tab_shown
-                || self.category == Category::Workbench
-        })
-        .collect();
-        // PNT-211: the Sculpt/Paint set replaces the tabs.
-        #[cfg(feature = "painting")]
-        let categories = self.paint_set_tabs().unwrap_or(categories);
+        // The set decides the tabs (Jason, 2026-11-23).
+        let categories = self.layouts.tool_set.tabs();
         let entries: Vec<_> = categories
             .into_iter()
             .map(|category| {
@@ -949,7 +1036,7 @@ impl Operandi {
             };
             for (index, (category, length)) in categories.entries.iter().copied().enumerate() {
                 let label = self.category_tab_label(category);
-                let active = self.category == category;
+                let active = self.shown_category() == Some(category);
                 let height = (length + pad).max(floor);
                 let scale = ui.ctx().pixels_per_point();
                 let height = (height * scale).ceil() / scale;
@@ -1015,7 +1102,11 @@ impl Operandi {
                 CATEGORY_HIT_WIDTH + DOCK_PANEL_INSET,
             )),
         );
+        self.follow_tab_set();
         let categories = self.tool_categories(ui);
+        if categories.entries.len() <= 1 {
+            return;
+        }
         if horizontal {
             let row = Rect::from_min_max(
                 area.min,
@@ -1110,7 +1201,7 @@ impl Operandi {
             }
             let label = self.category_tab_label(category);
             let response = child.interact(hit, child.id().with(label), Sense::click());
-            let active = self.category == category;
+            let active = self.shown_category() == Some(category);
             let fill = if active {
                 chrome::background()
             } else if response.hovered() {
@@ -1154,7 +1245,7 @@ impl Operandi {
         ink: Rect,
     ) {
         let label = self.category_tab_label(category);
-        let active = self.category == category;
+        let active = self.shown_category() == Some(category);
         self.toolbox_rects.insert(format!("Category {label}"), hit);
         self.toolbox_rects
             .insert(format!("Category {label} surface"), surface);
@@ -1295,29 +1386,11 @@ impl Operandi {
 
 impl Operandi {
     /// A tab's name in the strip: a toolbox set names its own (PNT-211).
-    /// The Rig tab shows with the animation switch on, in the Animate
-    /// layout (or once opened, like UV).
-    pub(super) fn rig_tab_shows(&self) -> bool {
-        crate::anim_switch::enabled()
-            && (self.layouts.current == "Animate" || self.category == Category::Rig)
-    }
     fn category_tab_label(&self, c: Category) -> &'static str {
         #[cfg(feature = "painting")]
         if let Some(label) = self.paint_set_label(c) {
             return label;
         }
         c.label()
-    }
-    /// The Paint tab (painting builds) is not in the ordinary strip
-    /// (Jason, 2026-11-18): it is in the Paint layout's Sculpt/Paint set
-    /// (PNT-211), and shows here only while Texture > Paint Tools has it
-    /// open.
-    #[cfg(feature = "painting")]
-    fn paint_tab_shows(&self, c: Category) -> bool {
-        c != Category::Paint || self.category == Category::Paint
-    }
-    #[cfg(not(feature = "painting"))]
-    fn paint_tab_shows(&self, _: Category) -> bool {
-        true
     }
 }

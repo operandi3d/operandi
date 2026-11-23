@@ -562,7 +562,7 @@ impl Operandi {
                 }
                 self.workbench.editing = Some(id.clone());
                 if id == TOOLBOX_WORKBENCH {
-                    self.category = toolbox::Category::Workbench;
+                    self.show_toolbox_tab(toolbox::Category::Workbench);
                     self.workbench.tab_shown = true;
                 } else if id == TOP_WORKBENCH {
                     self.workbench.top_bar = true;

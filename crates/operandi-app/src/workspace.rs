@@ -645,10 +645,6 @@ impl Operandi {
                 )
                 .map(|p| format!("Driven by {}", operandi_core::rig::label(&p.kind)));
                 let current = channel(&item.transform, prefix, axis);
-                let mixed = selected
-                    .iter()
-                    .any(|i| (channel(&i.transform, prefix, axis) - current).abs() > 1e-12);
-                let default = if prefix == "scale" { 1. } else { 0. };
                 ui.gated_ui(
                     crate::unavailable::unless(
                         !driven,
@@ -657,9 +653,10 @@ impl Operandi {
                     .or(rig_driver.as_deref()),
                     |ui| {
                         ui.horizontal(|ui| {
-                            // UIC-110/112: filled once a channel leaves its
-                            // default; keys show red, and the light keys
-                            // (TK-20).
+                            // UIC-112: keys show red, and the light keys
+                            // (TK-20). Jason 2026-11-23: no
+                            // changed-from-default fill on transform rows;
+                            // animation lights cover it.
                             self.anim_row(
                                 &format!(
                                     "{}.{}",
@@ -670,7 +667,7 @@ impl Operandi {
                                     },
                                     ["X", "Y", "Z"][axis]
                                 ),
-                                mixed || (current - default).abs() > 1e-12,
+                                false,
                             );
                             // UIC-114: "Position X", then "Y", "Z".
                             let shown = if axis == 0 {

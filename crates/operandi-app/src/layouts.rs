@@ -259,13 +259,8 @@ pub(super) struct Layouts {
     /// The mode bar docks at the bottom of the window (above the command
     /// line) rather than the top (Jason, 2026-11-19).
     pub(crate) mode_bar_bottom: bool,
-    /// The UV view a tool set opened as its companion panel (closed again
-    /// when the set is left), if it is still the set's own.
-    pub(crate) companion_uv: Option<u32>,
     /// The dock tree's split sizes at the last primary press (views.rs).
     pub(crate) shares_at_press: Option<crate::views::LinearShares>,
-    /// The split sizes from before the companion view opened.
-    pub(crate) companion_shares: Option<crate::views::LinearShares>,
     /// The mode bar's grip last frame (tests) and a drag Esc cancelled.
     #[cfg(test)]
     pub(crate) mode_bar_rect: Option<Rect>,
@@ -490,9 +485,7 @@ impl Layouts {
             mixed_dock: false,
             tool_tabs_horizontal: None,
             mode_bar_bottom: false,
-            companion_uv: None,
             shares_at_press: None,
-            companion_shares: None,
             #[cfg(test)]
             mode_bar_rect: None,
             mode_bar_drag: None,
@@ -1219,7 +1212,12 @@ impl Operandi {
             && let Some(tab) = Category::named(&saved.tab)
         {
             self.layouts.tool_set = set;
-            self.category = tab;
+            // A tab its set doesn't have falls back to the set's first.
+            self.category = if set.tabs().contains(&tab) {
+                tab
+            } else {
+                set.first_category().unwrap_or(tab)
+            };
             self.layouts.uv_tab = saved.uv_tab;
         }
         Ok(())
@@ -1292,9 +1290,6 @@ impl Operandi {
         self.layouts.piece_of = live.piece_of;
         self.layouts.group_piece = live.group_piece;
         self.layouts.mode_bar_bottom = live.mode_bar_bottom;
-        // A companion view belongs to the layout it opened in; another
-        // layout starts without one (provisional).
-        self.layouts.companion_uv = None;
         let view = if self.views.views().contains(&live.active_view) {
             live.active_view
         } else {
@@ -1351,10 +1346,9 @@ impl Operandi {
     }
 
     /// Whether the screen shows layout `rest` (a `layout.restore` argument
-    /// line): it is the open layout, with its own tool set and no
-    /// companion panel a tool set opened. Highlights the layout's entry
-    /// (Jason, 2026-11-19). Panel moves save into the layout as they
-    /// happen, so they don't count as a mismatch.
+    /// line): it is the open layout, with its own tool set. Highlights the
+    /// layout's entry (Jason, 2026-11-19). Panel moves save into the
+    /// layout as they happen, so they don't count as a mismatch.
     pub(crate) fn layout_matches_screen(&self, rest: &str) -> bool {
         let Ok(args) = command::tokens(rest) else {
             return false;
@@ -1366,9 +1360,7 @@ impl Operandi {
         let Some(name) = bound[0] else {
             return false;
         };
-        name == self.layouts.current
-            && self.layouts.companion_uv.is_none()
-            && self.layouts.tool_set == self.layouts.toolbox_default.0
+        name == self.layouts.current && self.layouts.tool_set == self.layouts.toolbox_default.0
     }
 
     /// `layout.restore <name>` (LAY-30): the one way every switch goes.
@@ -1555,14 +1547,14 @@ impl Operandi {
         if !self.confirm_fields() {
             return;
         }
-        self.layouts.uv_tab = category == toolbox::Category::Uv;
-        if self.layouts.uv_tab {
-            self.layouts.tool_set = toolbox::ToolSet::Uv;
+        // The first tool set with that tab (Jason, 2026-11-23).
+        if !self.show_toolbox_tab(category) {
+            self.status = format!("No tool set has the {} tab", category.label());
+            return;
         }
         if category == toolbox::Category::Workbench {
             self.workbench.tab_shown = true;
         }
-        self.category = category;
         self.status = format!("{} tab", category.label());
     }
 
