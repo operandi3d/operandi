@@ -365,6 +365,7 @@ pub fn wgpu_configuration() -> egui_wgpu::WgpuConfiguration {
                 .max(have.max_storage_buffers_per_shader_stage);
             descriptor
         });
+        create.native_adapter_selector = Some(std::sync::Arc::new(crate::gpu_backend::select));
     }
     config
 }

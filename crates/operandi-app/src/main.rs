@@ -107,6 +107,7 @@ mod frame_stats;
 mod free_memory;
 mod gpu;
 mod gpu_arena;
+mod gpu_backend;
 mod gpu_chunks;
 mod gpu_memory;
 mod gpu_scene;
