@@ -271,6 +271,7 @@ mod snapping;
 mod solid_sketch_ui;
 mod space_mouse;
 mod spike_panel;
+mod statistics_ui;
 mod subd_gpu;
 #[cfg(test)]
 mod subd_gpu_tests;
@@ -818,6 +819,8 @@ struct Operandi {
     mesh_constraint: background_ui::MeshConstraintPreferences,
     /// Vertex Normal Tools (vertex_normal_ui.rs, G9).
     vertex_normal_tools: vertex_normal_ui::VnState,
+    /// The Statistics panel (statistics_ui.rs).
+    statistics: Box<statistics_ui::StatsState>,
     mesh_constraint_popover: Option<Pos2>,
     mesh_constraint_pinned: bool,
     mesh_constraint_entered: bool,
@@ -1545,6 +1548,7 @@ impl Operandi {
             snapping_opening: false,
             mesh_constraint: Default::default(),
             vertex_normal_tools: Default::default(),
+            statistics: Default::default(),
             mesh_constraint_popover: None,
             mesh_constraint_pinned: false,
             mesh_constraint_entered: false,
@@ -4152,6 +4156,8 @@ mod polygon_reduction_tests;
 mod flip_basic_tests;
 #[cfg(test)]
 mod gl_count_tests;
+#[cfg(test)]
+mod statistics_ui_tests;
 #[cfg(test)]
 mod subdivision_tests;
 

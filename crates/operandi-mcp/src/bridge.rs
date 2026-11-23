@@ -363,7 +363,7 @@ impl Bridge {
                 "panel_show",
                 "Running app only: bring a side panel to the front of its tab group so a viewport_capture or a screen shot shows it, as clicking its tab does; a panel that was closed is added back to its group (Properties to the lower group, the others to the upper). Panel layout only: no undo step, no scene change, never opens a dialog. Answers each group's tabs and which is in front.",
                 json!({"type": "object", "properties": {
-                    "panel": {"enum": PANEL_NAMES, "description": "items (Items list), shader_tree (Shader Tree), groups, properties, mesh_ops (Mesh Stack), preset_browser (Preset Browser), uv_maps (UV Maps), command_history (Command History), vertex_normal_tools (Vertex Normal Tools), node_view (Node View)."}
+                    "panel": {"enum": PANEL_NAMES, "description": "items (Items list), shader_tree (Shader Tree), groups, properties, mesh_ops (Mesh Stack), preset_browser (Preset Browser), uv_maps (UV Maps), command_history (Command History), vertex_normal_tools (Vertex Normal Tools), statistics (Statistics), node_view (Node View)."}
                 }, "required": ["panel"], "additionalProperties": false}),
             ),
             def(
@@ -957,7 +957,7 @@ pub const SHADING_STYLES: [&str; 10] = [
 
 /// Side panels `panel_show` names (the app's panel registry; a test there
 /// keeps the two alike).
-pub const PANEL_NAMES: [&str; 10] = [
+pub const PANEL_NAMES: [&str; 11] = [
     "items",
     "shader_tree",
     "groups",
@@ -967,6 +967,7 @@ pub const PANEL_NAMES: [&str; 10] = [
     "preset_browser",
     "command_history",
     "vertex_normal_tools",
+    "statistics",
     "node_view",
 ];
 

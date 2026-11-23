@@ -35,6 +35,9 @@ pub enum PanelKind {
     NodeView,
     /// Vertex Normal Tools (vertex_normal_ui.rs, G9 VN-0).
     VertexNormalTools,
+    /// The Statistics panel (statistics_ui.rs): counts by group, +/− to
+    /// select them.
+    Statistics,
     /// A tab whose kind a layout file names but this build doesn't have
     /// (LAY-49, UIC-209): an empty panel showing the name its group keeps
     /// at this index (`PanelGroup::missing`). Never offered by "+".
@@ -144,6 +147,12 @@ pub static REGISTRY: &[PanelType] = &[
         name: "Vertex Normal Tools",
         category: Category::Utilities,
         draw: |a, ui, _| a.vertex_normal_panel(ui),
+    },
+    PanelType {
+        kind: PanelKind::Statistics,
+        name: "Statistics",
+        category: Category::Info,
+        draw: |a, ui, rect| a.statistics_panel(ui, rect),
     },
     PanelType {
         kind: PanelKind::NodeView,
@@ -531,6 +540,7 @@ mod tests {
             PanelKind::CommandHistory,
             PanelKind::NodeView,
             PanelKind::VertexNormalTools,
+            PanelKind::Statistics,
         ] {
             assert_eq!(REGISTRY.iter().filter(|t| t.kind == kind).count(), 1);
         }
@@ -540,6 +550,7 @@ mod tests {
             [
                 Category::Properties,
                 Category::DataLists,
+                Category::Info,
                 Category::Editors,
                 Category::Utilities
             ]

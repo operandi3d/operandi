@@ -514,4 +514,6 @@ pub mod solid_sketch_editor;
 pub use solid_sketch_editor::{SketchEdit, SketchSession};
 pub mod solid_sketch_store;
 pub mod solid_sketch_symmetry;
+pub mod statistics;
+pub mod statistics_edit;
 pub use sketch_extrude::*;

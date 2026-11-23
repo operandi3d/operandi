@@ -396,6 +396,12 @@ impl super::Operandi {
     /// the views draw (MO-01). The graphics memory watch counts the same way
     /// (PREF-Q21, Jason 2026-11-13: triangles).
     pub(super) fn drawn_triangles(&self) -> u64 {
+        self.drawn_triangles_where(|_| true)
+    }
+    /// [`Self::drawn_triangles`] for the items `count` picks: the
+    /// Statistics panel's Drawn (GPU) Active and Background rows read the
+    /// same count (statistics_ui.rs).
+    pub(super) fn drawn_triangles_where(&self, count: impl Fn(u64) -> bool) -> u64 {
         // Items with Mesh Ops draw their result; that scene is only built
         // when some item has a stack.
         let shown = self
@@ -413,7 +419,7 @@ impl super::Operandi {
         scene
             .items
             .iter()
-            .filter(|i| i.visible && !display_hidden.contains(&i.id))
+            .filter(|i| i.visible && !display_hidden.contains(&i.id) && count(i.id))
             .map(|i| {
                 self.resident_cache.drawn_triangles(i).unwrap_or_else(|| {
                     operandi_core::subdivision::drawn_triangles(

@@ -9677,6 +9677,15 @@ Built from BEHAVIOR-TOPOLOGY-PEN (2026-11-20) on branch topology-pen. These are 
 - RG-Q15 RG-70..72: the Schematic is Operandi's own small node view (the shader node view is built on the shader tree's board and doesn't fit items): automatic columns (drivers, pieces, driven), nodes dragged by hand aren't saved, items appear when a piece uses them or with Add Selected Item. Constraints are wired from Animate > Constrain; the Schematic wires links and modifiers and deletes wires and pieces.
 - GE-Q08 Not built yet: Box Scale tool (GE-44), Ctrl+Shift+drag copies (GE-31), Ctrl+Alt+right box zoom, Link related keys (GE-42), Speed view (GE-81), envelope presets (GE-83), stacked-row wheel stepping, clamped hint (GE-X4), retime tool (GE-X5), the in/out slope pop-ups (the menu and presets cover them).
 
+## Statistics panel (BEHAVIOR-STATISTICS, development/specs/statistics-panel) — 2026-11-23 (branch statistics-panel, provisional)
+- STAT-Q01 Drawn (GPU) Active/Background show triangles, the GL readout's own unit (the spec says polygons; reusing the readout was asked for).
+- STAT-Q02 "Flat" edges and "Flat with a neighbour": the two polygons' Newell normals within 0.01° (they share the edge, so that puts them in one plane). Not flat uses the Flatten tools' rule (1e-12 of the extent, Q5); no preference added, since Flatten has a rule, not a setting.
+- STAT-Q03 Filter row dropped (Jason, 2026-11-23: Modo-style panel); acceptance check 7 not built.
+- STAT-Q04 Open groups are saved per user (statistics-panel.json in the data folder), not per layout.
+- STAT-Q05 Polygon and edge counts: an edge's polygon count is its distinct surface polygons (lines don't count; a two-point polygon counts once); one-point polygons have no edge. Vertex polygon counts include lines.
+- STAT-Q06 With no selected mesh in a component mode every shown mesh is counted, and + makes the meshes it selects on active. Items count every item; hidden items too.
+- STAT-Q07 Rename and Delete of parts and materials reach every mesh and the Shader Tree's group masks; sets, maps and smoothing groups only the counted meshes. Renaming onto a name in use is refused; "Default" can't be renamed or removed. Clear works on weight, UV, morph and colour maps; Normal maps refuse.
+
 ## Python scripting preview (2026-11-22, branch python-scripting)
 
 - PY-Q01 A whole script is one undo step (UIC-227), named "Script <file>" / "Console: <line>"; `undo_group` names a step inside it. Provisional: the script's lines show in the History tab as their own lines (source script), not yet as sub-commands of the script's line.
