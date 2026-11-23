@@ -125,6 +125,8 @@ pub enum GestureKind {
     /// A drag anywhere for a numeric session (Jason, 2026-11-04;
     /// DRAG-Q01), from its values at the press.
     Numeric(NumericDrag),
+    /// A Pose tool drag (IK-50..54).
+    Pose(crate::pose_tool_ui::PoseDrag),
     /// A Skeleton tool press placing or moving a joint (SK-10, SK-12).
     Skeleton(crate::skeleton_tool_ui::SkelDrag),
     /// A Create panel utility (Ruler, Protractor, Quick Align) handle.

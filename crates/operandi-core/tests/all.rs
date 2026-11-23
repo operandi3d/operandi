@@ -484,6 +484,8 @@ mod polygon_unify_basic;
 mod polygons_m17;
 #[path = "polyscale_offset_clean_spec.rs"]
 mod polyscale_offset_clean_spec;
+#[path = "pose_tool.rs"]
+mod pose_tool;
 #[path = "primitive_moved_mesh.rs"]
 mod primitive_moved_mesh;
 #[path = "primitive_settings.rs"]

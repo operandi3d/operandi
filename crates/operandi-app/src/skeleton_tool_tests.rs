@@ -187,3 +187,53 @@ fn sk40_selecting_a_bound_joint_selects_its_map() {
     let (_, map) = operandi_core::skin_weights::map_for_joint(&a.editor.scene, root).unwrap();
     assert_eq!(a.editor.selected_weight_map.as_deref(), Some(map.as_str()));
 }
+
+/// IK-50..54 in the app: drag a chain's end with the Pose tool.
+#[test]
+fn ik51_pose_tool_drag_pin_and_one_step() {
+    let mut a = tool_app();
+    a.execute("operandi.skel.tool");
+    for (k, x) in [0., 0.5, 1.0].iter().enumerate() {
+        let parent = joints(&a).last().copied();
+        let mut line = format!("operandi.skel.add position:{x},0,0 preserveAlignment:true");
+        if k > 0 {
+            line.push_str(&format!(" parent:{}", parent.unwrap()));
+        }
+        a.execute(&line);
+    }
+    let j = joints(&a);
+    a.editor.scene.select_item(Some(j[0]));
+    a.execute("operandi.pose.tool");
+    assert!(a.pose_active());
+    // Right-click the middle joint: pinned; right-click empty: released.
+    let mid = screen(&a, world(&a, j[1]));
+    a.pose_press(mid, rect(), PointerButton::Secondary, Default::default());
+    assert_eq!(a.pose.pins, vec![j[1]]);
+    a.pose_press(
+        Pos2::new(5., 5.),
+        rect(),
+        PointerButton::Secondary,
+        Default::default(),
+    );
+    assert!(a.pose.pins.is_empty());
+    let steps = a.editor.undo.len();
+    let start = screen(&a, world(&a, j[2]));
+    let Some(input::GestureKind::Pose(d)) =
+        a.pose_press(start, rect(), PointerButton::Primary, Default::default())
+    else {
+        panic!("a pose press");
+    };
+    for k in 1..=4 {
+        let to = screen(&a, DVec3::new(1.0 - 0.05 * k as f64, 0., 0.2 * k as f64));
+        a.pose_drag(&d, start, to, rect());
+    }
+    a.pose_release(&d);
+    assert_eq!(a.editor.undo.len(), steps + 1, "one step");
+    assert!(
+        world(&a, j[2]).distance(DVec3::new(1., 0., 0.)) > 0.1,
+        "{}",
+        world(&a, j[2])
+    );
+    let ctx = Context::default();
+    let _ = crate::tests::draw(&mut a, &ctx, egui::vec2(1400., 900.), vec![]);
+}

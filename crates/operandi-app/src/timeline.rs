@@ -1716,6 +1716,14 @@ impl Operandi {
             {
                 self.execute("operandi.skel.tool");
             }
+            // IK-50: the Pose tool (text until its studio icon).
+            if ui
+                .selectable_label(self.pose.on, "Pose")
+                .on_hover_text("Pose: drag the selected hierarchy's items; Ctrl world, Shift twist, middle FK, right-click pin\noperandi.pose.tool")
+                .clicked()
+            {
+                self.execute("operandi.pose.tool");
+            }
             // SK-20/24: Bind (text until its studio icon); Shift+click
             // unbinds (UIC-04 names it).
             let bind = ui

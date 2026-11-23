@@ -859,6 +859,17 @@ used in the app; `primitive_add` always starts from the Reset values.
   - `piece` (integer): Only this solver.
   - `time` (number): Seconds (default the current time).
   - `tolerance` (number): Met within this distance (default 0.001).
+- **`operandi.pose.drag`** — Pose a hierarchy, one undo step (Auto Key keys what moved). mode ik (default): joint to world position to, the chain up to the nearest pin (or the root) follows, pins hold; rigid: the whole hierarchy moves (by, or so joint reaches to); twist: the joint turns angle degrees about its bone; fk: only the joint turns, aiming its bone at to.
+  - `joint` (integer): The joint (default the selected item).
+  - `to` (string): World position x,y,z.
+  - `by` (string): Offset x,y,z (rigid).
+  - `mode` (string): ik (default), rigid, twist or fk.
+  - `angle` (number): Degrees (twist).
+  - `pins` (string): Pinned joints, comma separated.
+  - `root` (integer): The hierarchy's root (default the joint's top item).
+  - `rootWeight` (number): 0 (default) keeps the root still; above 0 it moves too.
+  - `pinWeight` (number): Position Pins weight (default 1).
+  - `pinPrecision` (number): Position Pins precision (default 1).
 - **`operandi.skel.add`** — Add a joint at a world position, as a child of parent (or a new chain's root), one undo step. symmetry X/Y/Z also adds the mirrored joint under the mirrored parent, named with the side suffixes; the parent is re-aimed at its new first child unless preserveAlignment.
   - `position` (string, required): World position x,y,z.
   - `parent` (integer): Parent joint id (none: a new root).

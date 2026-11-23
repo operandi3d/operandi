@@ -956,6 +956,8 @@ impl Operandi {
     /// selected one uses the selection colour; the camera this view looks
     /// through is not drawn.
     pub(super) fn draw_locators(&self, painter: &egui::Painter, r: Rect) {
+        // IK-50: the Pose tool's circles.
+        self.draw_pose_handles(painter, r);
         let scene = &self.editor.scene;
         let drawing = &self.display.settings.drawing;
         let through = self.camera.through.then(|| self.through_camera()).flatten();

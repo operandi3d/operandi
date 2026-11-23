@@ -16,7 +16,7 @@ fn err(e: &mut Editor, text: &str) -> String {
         .expect_err("refused")
 }
 
-/// A simple biped (hips, spine, head, legs, arms), joint ids by name.
+/// A simple biped (shared with pose_tool.rs) (hips, spine, head, legs, arms), joint ids by name.
 pub fn biped() -> (Editor, HashMap<&'static str, u64>) {
     let mut e = Editor::default();
     let mut ids: HashMap<&'static str, u64> = HashMap::new();

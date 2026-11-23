@@ -249,6 +249,7 @@ mod meshops_builtin;
 pub mod meshops_editor;
 pub mod meshops_items;
 pub mod meshops_tools;
+pub mod pose_tool;
 pub mod rig;
 pub mod rig_commands;
 pub mod rig_eval;

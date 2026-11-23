@@ -285,3 +285,34 @@ fn full_body_ik_through_the_bridge() {
     let q = read(&mut b, "operandi.ik.query", json!({"tolerance": 0.01}));
     assert_eq!(q["solvers"][0]["met"], true, "{q}");
 }
+
+/// IK-50..52 through the bridge: the scripted pose drag; the pinned
+/// joint holds while the end reaches.
+#[test]
+fn pose_drag_through_the_bridge() {
+    let mut b = Bridge::new();
+    let mut ids = Vec::new();
+    for k in 0..4 {
+        let id = joint(&mut b, [0., k as f64 * 0.5, 0.], ids.last().copied());
+        ids.push(id);
+    }
+    let pos = |b: &mut Bridge, id: u64| -> [f64; 3] {
+        let q = read(b, "operandi.skel.query", json!({}));
+        let j = q["joints"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|j| j["id"] == id)
+            .unwrap()
+            .clone();
+        [0, 1, 2].map(|i| j["position"][i].as_f64().unwrap())
+    };
+    let pinned = pos(&mut b, ids[1]);
+    run(
+        &mut b,
+        "operandi.pose.drag",
+        json!({"joint": ids[3], "to": [0.6, 1.2, 0.], "pins": ids[1].to_string()}),
+    );
+    near(&json!(pos(&mut b, ids[3])), [0.6, 1.2, 0.]);
+    near(&json!(pos(&mut b, ids[1])), pinned);
+}

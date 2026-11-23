@@ -363,6 +363,7 @@ impl Operandi {
     pub(super) fn skeleton_window(&mut self, ctx: &Context) {
         self.bind_dialog(ctx);
         self.joint_selects_its_map();
+        self.pose_window(ctx);
         if !self.skeleton_active() {
             return;
         }

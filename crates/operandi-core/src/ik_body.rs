@@ -108,6 +108,10 @@ pub struct Task {
     /// How far up the chain it reaches; −1 = all (IK-25).
     #[serde(default = "all")]
     pub joints: i64,
+    /// A goal-less task that still yields to the pins (the Pose tool's
+    /// dragged joint).
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub second: bool,
 }
 
 /// The joints a body solver covers, parents first: the root's joint
@@ -147,7 +151,17 @@ pub fn covered(scene: &Scene, p: &Piece) -> Vec<u64> {
     let mut k = 0;
     while k < out.len() {
         let j = out[k];
-        for c in crate::skeleton::children(scene, j) {
+        let kids: Vec<u64> = if p.names.contains_key("any") {
+            scene
+                .items
+                .iter()
+                .filter(|i| i.parent == Some(j))
+                .map(|i| i.id)
+                .collect()
+        } else {
+            crate::skeleton::children(scene, j)
+        };
+        for c in kids {
             if !owned.contains(&c) && !excluded.contains(&c) && on_path(c) {
                 out.push(c);
             }
@@ -369,7 +383,10 @@ pub fn solve(
         .collect();
     // Pins (tasks with no goal) come first; goals work in what the pins
     // leave free (IK-Q08), so a far goal can't drag a planted foot.
-    let pinned: Vec<bool> = my_tasks.iter().map(|t| t.goal.is_none()).collect();
+    let pinned: Vec<bool> = my_tasks
+        .iter()
+        .map(|t| t.goal.is_none() && !t.second)
+        .collect();
     let strength = p.num("taskStrength");
     let lambda = 0.1 / p.num("precision").max(0.01);
     let tol = if p.flag("specifyTolerance") {
@@ -918,6 +935,7 @@ pub fn run(e: &mut Editor, name: &str, a: &Args) -> Result<Option<Command>> {
                         weight: 1.,
                         precision: 1.,
                         joints: -1,
+                        second: false,
                     });
                 }
                 sync_targets(&mut e.scene, piece);

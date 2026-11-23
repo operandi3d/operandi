@@ -1858,6 +1858,7 @@ fn phrases(r: &mut Commands) {
     crate::anim_ui::register(r);
     crate::channel_links_ui::register(r);
     crate::schematic_ui::register(r);
+    crate::pose_tool_ui::register(r);
     crate::skeleton_tool_ui::register(r);
     crate::bind_dialog_ui::register(r);
     crate::python_ui::register(r);

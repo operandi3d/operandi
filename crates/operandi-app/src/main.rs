@@ -203,6 +203,7 @@ mod polygon_align;
 mod polygon_material_dialog;
 mod polygon_part_dialog;
 mod polygon_unify_dialog;
+mod pose_tool_ui;
 mod preferences;
 #[cfg(test)]
 mod preferences_tier1_tests;
@@ -916,6 +917,8 @@ struct Operandi {
     schematic: schematic_ui::SchematicView,
     /// The Skeleton tool (skeleton_tool_ui.rs, SK-10).
     skeleton: skeleton_tool_ui::SkeletonTool,
+    /// The Pose tool (pose_tool_ui.rs, IK-50).
+    pose: pose_tool_ui::PoseTool,
     /// The Script Console and the running script (python_ui.rs).
     python: python_ui::PythonConsole,
     anim_ui: anim_ui::AnimUi,
@@ -1588,6 +1591,7 @@ impl Operandi {
             links: Default::default(),
             schematic: Default::default(),
             skeleton: Default::default(),
+            pose: Default::default(),
             python: Default::default(),
             anim_ui: Default::default(),
             form_editor: Default::default(),

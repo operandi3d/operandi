@@ -3773,6 +3773,26 @@ pub static COMMANDS: &[Entry] = &[
         .quiet()
         .operandi()
         .example("operandi.ik.query"),
+    script("operandi.pose.drag", Items, "Pose tool drag (IK-50..54), scripted: a joint to a position with the chain up to the nearest pin following; or move the hierarchy, twist a joint, or turn one joint (FK).")
+        .on_editor(
+            "Pose a hierarchy, one undo step (Auto Key keys what moved). mode ik (default): joint to world position to, the chain up to the nearest pin (or the root) follows, pins hold; rigid: the whole hierarchy moves (by, or so joint reaches to); twist: the joint turns angle degrees about its bone; fk: only the joint turns, aiming its bone at to.",
+            &[
+            jopt("joint", "integer", "The joint (default the selected item)."),
+            jopt("to", "string", "World position x,y,z."),
+            jopt("by", "string", "Offset x,y,z (rigid)."),
+            jopt("mode", "string", "ik (default), rigid, twist or fk."),
+            jopt("angle", "number", "Degrees (twist)."),
+            jopt("pins", "string", "Pinned joints, comma separated."),
+            jopt("root", "integer", "The hierarchy's root (default the joint's top item)."),
+            jopt("rootWeight", "number", "0 (default) keeps the root still; above 0 it moves too."),
+            jopt("pinWeight", "number", "Position Pins weight (default 1)."),
+            jopt("pinPrecision", "number", "Position Pins precision (default 1)."),
+        ],
+            crate::pose_tool::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.pose.drag joint:9 to:0,1.6,0.3 pins:5,7"),
     script("operandi.skel.add", Items, "Adds a skeleton joint (SK-10): a child of parent, or a new root, with symmetry and naming (SK-14/15).")
         .on_editor(
             "Add a joint at a world position, as a child of parent (or a new chain's root), one undo step. symmetry X/Y/Z also adds the mirrored joint under the mirrored parent, named with the side suffixes; the parent is re-aimed at its new first child unless preserveAlignment.",
@@ -7510,7 +7530,7 @@ mod tests {
                 assert!(!json.about.is_empty(), "{}", e.name);
             }
         }
-        assert_eq!(crate::command_exec::specs().count(), 304);
+        assert_eq!(crate::command_exec::specs().count(), 305);
     }
 
     #[test]
