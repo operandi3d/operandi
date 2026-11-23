@@ -28,6 +28,8 @@ pub(super) enum Choose {
     EnvironmentImage { folder: PathBuf },
     /// A node graph file (JSON) to import as Node Materials (NM-05).
     NodeGraph { folder: PathBuf },
+    /// A Python script to run (Run Script…).
+    Script { folder: PathBuf },
     /// A JSON colour scheme to import.
     LoadColorScheme { folder: PathBuf },
     /// Where to export the current colours as JSON.
@@ -135,6 +137,8 @@ pub(super) enum Purpose {
     /// Import Node Material…: placed as Add Layer places a layer next to
     /// this selected shader tree layer.
     ImportNodeGraph(Option<operandi_core::shader_tree::NodeId>),
+    /// Run Script…: run the chosen .py file.
+    RunScript,
     /// File > Import MaterialX…: new layers go directly above layer `0`,
     /// or at the top of the shader tree.
     ImportMaterialX(Option<operandi_core::shader_tree::NodeId>),
@@ -272,6 +276,14 @@ pub(super) fn start(request: Choose, purpose: Purpose) -> Pending {
                     .set_title("Load Photometry File")
                     .set_directory(folder)
                     .add_filter("IES photometry", &["ies", "IES"])
+                    .pick_file();
+                Box::pin(async move { path(f.await) })
+            }
+            Choose::Script { folder } => {
+                let f = D::new()
+                    .set_title("Run Script")
+                    .set_directory(folder)
+                    .add_filter("Python scripts", &["py", "PY"])
                     .pick_file();
                 Box::pin(async move { path(f.await) })
             }
@@ -577,6 +589,7 @@ impl super::Operandi {
             }
             Purpose::LoadPreset(group) => self.load_preset_from(path, group, true),
             Purpose::ImportNodeGraph(selected) => self.import_node_graph_from(&path, selected),
+            Purpose::RunScript => self.python_run_file(&path),
             Purpose::ImportMaterialX(beside) => self.import_materialx_from(&path, beside),
             Purpose::ExportMaterialX(node) => self.export_materialx_to(path, node),
             Purpose::PresetBrowserRoot => {

@@ -443,6 +443,10 @@ used in the app; `primitive_add` always starts from the Reset values.
   - `offset` (number, required): Metres.
 - **`@ppi_flatten_ngons.py`** — Flatten the selected polygons of more than four sides. No arguments.
 - **`operandi.mesh.fixBlackDots`** — Fix Black Dots (MT2): every pair of polygons sharing two or more edges in a row (inner points used by those two only) becomes one polygon; the inner points are kept unused and selected with the run's ends, Vertex mode, one undo step. 'No black dots found.' when there are none. No arguments.
+- **`operandi.mesh.setData`** — Set Mesh Data (K9): sets a mesh item's points (a list of [x, y, z] in item space, metres) and, when polygons is given, its polygons (lists of point indices; the mesh is rebuilt and its UV maps, vertex maps and component selection go). Points alone must keep the point count. One undo step; a bad mesh is refused and nothing changes.
+  - `item` (integer): Mesh item id; default the active item.
+  - `points` (array, required): Points as [x, y, z] lists.
+  - `polygons` (array): Polygons as lists of point indices.
 - **`operandi.edge.zip`** — Edge Zip (MT3): each selected edge needs a quad on each side; its points and the points across those quads weld at their average, the quads collapse, one undo step, nothing selected afterwards. No arguments.
 - **`operandi.poly.diagonalRedirect`** — Diagonal Re-Direct (MT4): two selected quads touching at one corner split along the diagonal through it; each side quad off the border gets a centre point and is rebuilt so the diagonal is an edge loop, one undo step. No arguments.
 - **`poly.split`** — Split the selected polygons along selected vertices. No arguments.

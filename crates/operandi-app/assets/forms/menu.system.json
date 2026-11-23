@@ -4,6 +4,8 @@
   "label": "System",
   "style": "menu",
   "controls": [
-    { "command": "layout.window hash:formEditor", "label": "Form Editor" }
+    { "command": "layout.window hash:formEditor", "label": "Form Editor" },
+    { "command": "operandi.python.console", "label": "Script Console" },
+    { "command": "operandi.python.runScript", "label": "Run Script…" }
   ]
 }

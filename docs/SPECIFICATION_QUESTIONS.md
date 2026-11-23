@@ -9653,3 +9653,10 @@ Built from BEHAVIOR-TOPOLOGY-PEN (2026-11-20) on branch topology-pen. These are 
 - GE-Q06 Set Frame (absolute) moves the earliest selected key to the frame and keeps the others' spacing; ripple and per-channel linking aren't built.
 - GE-Q07 Shown curves: the selected channels; with none selected, the listed items' animated channels. Normalised and Stacked map each curve's key range; Isolate shows the first selected key's curve.
 - GE-Q08 Not built yet: Box Scale tool (GE-44), Ctrl+Shift+drag copies (GE-31), Ctrl+Alt+right box zoom, Link related keys (GE-42), Speed view (GE-81), envelope presets (GE-83), stacked-row wheel stepping, clamped hint (GE-X4), retime tool (GE-X5), the in/out slope pop-ups (the menu and presets cover them).
+
+## Python scripting preview (2026-11-22, branch python-scripting)
+
+- PY-Q01 A whole script is one undo step (UIC-227), named "Script <file>" / "Console: <line>"; `undo_group` names a step inside it. Provisional: the script's lines show in the History tab as their own lines (source script), not yet as sub-commands of the script's line.
+- PY-Q02 `operandi.run` reports what the line's Command History record says (`ok` and its message). Commands that report a failure only on the status line (not `last_failure`) read as success; the hardening branch's undo-reporting work covers the same gap.
+- PY-Q03 In the running app, `python_run` (MCP) runs on the bridge's headless path (headless commands, all-or-nothing like other bridge calls); the console and Run Script… use the app's full typed-line path.
+- PY-Q04 The Script Console is a floating window (UIC-183) from System > Script Console; no shortcut yet. Console lines are one statement (echoes its value) or a block.

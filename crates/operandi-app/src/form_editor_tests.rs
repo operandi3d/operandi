@@ -169,7 +169,12 @@ fn lay83_system_form_editor_opens_the_floating_form_editor() {
     let system = menu(&a, &ctx, "System");
     assert_eq!(
         rows(&system),
-        vec![("Form Editor".to_owned(), true, None, false)]
+        vec![
+            ("Form Editor".to_owned(), true, None, false),
+            // Python scripting (preview), shown while its switch is on.
+            ("Script Console".to_owned(), true, None, false),
+            ("Run Script…".to_owned(), true, None, false),
+        ]
     );
     let action = system.leaves()[0].action;
     a.menu_action(&ctx, action);

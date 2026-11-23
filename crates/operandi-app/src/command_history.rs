@@ -137,6 +137,17 @@ fn moves_undo_pointer(line: &str) -> bool {
 impl Operandi {
     /// Runs `text` as a line from `source` and records it (UIC-224).
     pub(super) fn execute_from(&mut self, source: Source, text: &str) {
+        let _ = self.execute_reporting(source, text);
+    }
+
+    /// [`Self::execute_from`] with the line's own result, as its record
+    /// says: `Err` with the command's message when it refused or failed.
+    /// Scripts report this; nothing is read from the undo list.
+    pub(super) fn execute_reporting(
+        &mut self,
+        source: Source,
+        text: &str,
+    ) -> std::result::Result<(), String> {
         if self.history.depth > 0 {
             // A line run by a line: one of its sub-commands (UIC-227).
             let cap = self.editor.history.max_sub_commands;
@@ -147,11 +158,14 @@ impl Operandi {
             self.history.depth += 1;
             self.execute_line(text);
             self.history.depth -= 1;
-            return;
+            return match &self.last_failure {
+                Some(e) => Err(e.clone()),
+                None => Ok(()),
+            };
         }
         if text.trim().is_empty() {
             self.execute_line(text);
-            return;
+            return Ok(());
         }
         // Values changed by the panel or a drag since the last record go
         // before this line (the reference's order).
@@ -178,10 +192,11 @@ impl Operandi {
         if let Some(current) = self.history.current.take() {
             record = current;
         }
-        match self.last_failure.take() {
+        let failure = self.last_failure.take();
+        match &failure {
             Some(message) => {
                 record.ok = false;
-                record.message = short(&message);
+                record.message = short(message);
             }
             None if self.status != status_before || source == Source::Typed => {
                 record.message = short(&self.status);
@@ -225,6 +240,10 @@ impl Operandi {
         // What the line itself set is recorded by the line (`tool.attr`,
         // Reset): start comparing afresh.
         self.record_tool_values(false);
+        match failure {
+            Some(e) => Err(e),
+            None => Ok(()),
+        }
     }
 
     /// The step this line made keeps the line's final record (with its

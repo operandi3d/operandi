@@ -147,6 +147,15 @@ impl Operandi {
         if !crate::anim_switch::enabled() {
             menus.retain(|m| m.id != "menu.animate");
         }
+        // The scripting switch (python_switch.rs): no script entries while off.
+        if !crate::python_switch::enabled() {
+            for m in &mut menus {
+                m.entries.retain(|e| {
+                    !matches!(e, Entry::Item(Item { action: Action::Line(n), .. })
+                        if action_line(*n).is_some_and(|l| l.starts_with("operandi.python.")))
+                });
+            }
+        }
         #[cfg(feature = "painting")]
         self.painting_menus(&mut menus, &item);
         menus

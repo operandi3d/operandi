@@ -4412,3 +4412,11 @@ Design: docs/MATERIALX_GRAPHS.md (stages 1-5).
 - Graph Editor window: channel list with filters and Lock, curves coloured by axis, keys (broken magenta, selected accent), handles with slope and weight, cycle ghosts, shadows, Normalised, Stacked, Isolate, Velocity, time strip, toolbar (Frame/Value fields, Key, Key Keeping Shape, slope presets, Break/Unify, Pre/Post behaviours, Cycle, Set Frame/Value, Scale), right-click menu.
 - Core: weighted handles, pre/post behaviours, cycle, interpolation, Key Keeping Shape, shadows (native v61), Euler filter, Simplify, key offset/value/frame edits; all as commands the MCP bridge runs, read back by `operandi.anim.query`.
 - Provisional: GE-Q01..Q08 in SPECIFICATION_QUESTIONS.md.
+
+## 2026-11-22 — Python scripting preview (branch python-scripting)
+
+- Embedded CPython (PyO3 0.30.1, crate operandi-python, feature `python`), one Python thread; scripts call back into the app between frames, so the window stays live and Stop works. Errors end the script with a traceback, never the app.
+- `operandi` module: run (the command's own result, CommandError on failure), query, undo_group, mesh_get/mesh_set (lists or buffers of doubles), set_time/set_channel/set_key. A script is one undo step (UIC-227).
+- Script Console (floating window), System > Run Script…, Scripts folder, commands operandi.python.console/run/runScript/stop and operandi.mesh.setData; MCP `python_run`.
+- Hidden behind Preferences > Experimental > Python scripting (preview) or OPERANDI_PYTHON=1 (python_switch.rs, off by default).
+- Bundled CPython: scripts/fetch-python.sh + bundle-dev.sh/macos-app-bundle.sh; release signing, Windows and Linux not done (docs/PYTHON_SCRIPTING.md). Provisional: PY-Q01..Q04.

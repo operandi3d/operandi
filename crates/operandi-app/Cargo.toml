@@ -11,6 +11,8 @@ operandi-layout = { path = "../operandi-layout" }
 operandi-mcp = { path = "../operandi-mcp" }
 # File > Render Viewport (Cycles); links Cycles only with the `cycles` feature.
 operandi-cycles = { path = "../operandi-cycles" }
+# Python scripting (preview); embeds CPython only with the `python` feature.
+operandi-python = { path = "../operandi-python" }
 # File > Export ▸ USD; links OpenUSD only with the `usd` feature.
 operandi-usd = { path = "../operandi-usd" }
 egui_tiles = { version = "=0.14.1", default-features = false, features = ["serde"] }
@@ -63,6 +65,8 @@ version = "=0.8.9"
 qa = []
 # Include the Cycles renderer (run scripts/build-cycles.sh first).
 cycles = ["operandi-cycles/cycles"]
+# Python scripting: embed CPython (scripts/fetch-python.sh, or PYO3_PYTHON).
+python = ["operandi-python/python", "operandi-mcp/python"]
 # Include USD export (run scripts/build-usd.sh first).
 usd = ["operandi-usd/usd"]
 # 3D painting (PNT): New Image, paint textures, image commands, PSD/PSB.

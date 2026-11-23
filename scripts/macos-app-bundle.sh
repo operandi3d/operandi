@@ -12,7 +12,10 @@
 # Contents/Resources/cycles. With USD_INSTALL set (scripts/build-usd.sh's
 # development/usd/install), the USD bridge, OpenUSD and its libraries go
 # into Contents/Frameworks too, and OpenUSD's plugin descriptions into
-# Contents/Resources/usd. Nothing here signs: each caller signs the way
+# Contents/Resources/usd. With PYTHON_INSTALL set (scripts/fetch-python.sh's
+# development/python/python), libpython goes into Contents/Frameworks and
+# the standard library into Contents/Resources/python (Python scripting;
+# embed.rs finds it there). Nothing here signs: each caller signs the way
 # it needs to (ad hoc for QA, Developer ID for releases).
 
 assemble_app() {
@@ -107,6 +110,25 @@ PLIST
         # Not in Frameworks: code signing allows only code there. The app
         # registers this folder itself (operandi-usd ffi::plugin_folder).
         cp -R "$USD_INSTALL/lib/usd" "$app/Contents/Resources/usd"
+    fi
+
+    if [ -n "${PYTHON_INSTALL:-}" ]; then
+        py_minor=$("$PYTHON_INSTALL/bin/python3" -c 'import sys; print(f"{sys.version_info[0]}.{sys.version_info[1]}")')
+        py_lib="libpython$py_minor.dylib"
+        mkdir -p "$app/Contents/Frameworks" "$app/Contents/Resources/python/lib"
+        cp "$PYTHON_INSTALL/lib/$py_lib" "$app/Contents/Frameworks/"
+        install_name_tool -id "@executable_path/../Frameworks/$py_lib" "$app/Contents/Frameworks/$py_lib"
+        install_name_tool -change "$(otool -D "$PYTHON_INSTALL/lib/$py_lib" | tail -1)" \
+            "@executable_path/../Frameworks/$py_lib" "$app/Contents/MacOS/operandi-app"
+        # The standard library without its tests, IDLE, Tk and pip.
+        rsync -a --exclude test --exclude tests --exclude idlelib --exclude tkinter \
+            --exclude turtledemo --exclude ensurepip --exclude __pycache__ \
+            --exclude site-packages --exclude 'config-*' \
+            "$PYTHON_INSTALL/lib/python$py_minor" "$app/Contents/Resources/python/lib/"
+        mkdir -p "$app/Contents/Resources/python/lib/python$py_minor/site-packages"
+        mkdir -p "$app/Contents/Resources/licenses/python"
+        cp "$PYTHON_INSTALL/lib/python$py_minor/LICENSE.txt" "$app/Contents/Resources/licenses/python/"
+        [ -f development/python/RELEASE ] && cp development/python/RELEASE "$app/Contents/Resources/licenses/python/"
     fi
 
     # Licence texts and credits (GPL v3 asks that they travel with the app).

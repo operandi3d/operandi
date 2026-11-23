@@ -242,6 +242,7 @@ pub mod meshops_editor;
 pub mod meshops_items;
 pub mod meshops_tools;
 pub mod scene_time;
+pub mod script_mesh;
 pub mod time_tick;
 pub use boolean::{BooleanOp, BooleanOptions, BooleanProblem, DriveMesh};
 pub use drill::{DrillAxis, DrillKind, DrillOp, DrillOptions};
