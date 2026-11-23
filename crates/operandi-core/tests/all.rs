@@ -176,6 +176,8 @@ mod editor_color;
 mod ellipsoid_clean_spec;
 #[path = "ellipsoid_numeric.rs"]
 mod ellipsoid_numeric;
+#[path = "empty_mesh_item_transform.rs"]
+mod empty_mesh_item_transform;
 #[path = "env_texture_locator.rs"]
 mod env_texture_locator;
 #[path = "environments.rs"]
