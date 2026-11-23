@@ -256,6 +256,155 @@ pub(crate) fn group_locator_marks(world: glam::DMat4, size: f64) -> Vec<Mark> {
     marks
 }
 
+/// IK-43: for each limited axis, a thin fan from Min to Max about that
+/// axis of the joint's parent space, through the joint.
+pub(crate) fn limit_fan_marks(
+    parent: glam::DMat4,
+    at: DVec3,
+    ik: &operandi_core::ik_joint::JointIk,
+    size: f64,
+) -> Vec<Mark> {
+    let mut marks = Vec::new();
+    let axes = [
+        parent.x_axis.truncate().normalize_or(DVec3::X),
+        parent.y_axis.truncate().normalize_or(DVec3::Y),
+        parent.z_axis.truncate().normalize_or(DVec3::Z),
+    ];
+    for (k, a) in ik.axes.iter().enumerate().filter(|(_, a)| a.use_limits) {
+        let axis = axes[k];
+        let start = axes[(k + 1) % 3] * size;
+        let at_angle = |t: f64| at + glam::DQuat::from_axis_angle(axis, t) * start;
+        const STEPS: usize = 16;
+        let (lo, hi) = (a.min.min(a.max), a.min.max(a.max));
+        marks.push(Mark::Line([at, at_angle(lo)]));
+        marks.push(Mark::Line([at, at_angle(hi)]));
+        for i in 0..STEPS {
+            let t0 = lo + (hi - lo) * i as f64 / STEPS as f64;
+            let t1 = lo + (hi - lo) * (i + 1) as f64 / STEPS as f64;
+            marks.push(Mark::Dotted([at_angle(t0), at_angle(t1)]));
+        }
+    }
+    marks
+}
+
+/// IK-02: an IK goal's box is 10% of its chain's first bone.
+fn ik_goal_size(scene: &operandi_core::Scene, goal: u64) -> f64 {
+    let pos = |id: u64| scene.world_matrix(id).map(|m| m.w_axis.truncate()).ok();
+    scene
+        .animation
+        .rig
+        .pieces
+        .iter()
+        .filter(|p| operandi_core::ik::is_ik(&p.kind) && p.targets.contains(&goal))
+        .find_map(|p| {
+            let first = operandi_core::ik::named(p, "mid")
+                .or_else(|| operandi_core::ik::named(p, "end"))?;
+            Some(pos(p.item)?.distance(pos(first)?) * 0.1)
+        })
+        .filter(|s| *s > 1e-9)
+        .unwrap_or(0.1)
+}
+
+/// IK-02 colours: +X green, −X red, on the centre line blue (the axis
+/// colours).
+fn ik_goal_color(scene: &operandi_core::Scene, goal: u64) -> Color32 {
+    let x = scene.world_matrix(goal).map_or(0., |m| m.w_axis.x);
+    let [red, green, blue] = theme::viewport::grid_axes();
+    if x > 1e-4 {
+        green
+    } else if x < -1e-4 {
+        red
+    } else {
+        blue
+    }
+}
+
+/// A solid box `size` across in the goal's own axes.
+pub(crate) fn ik_goal_marks(world: glam::DMat4, size: f64) -> Vec<Mark> {
+    let h = size * 0.5;
+    let p = |x: f64, y: f64, z: f64| world.transform_point3(DVec3::new(x * h, y * h, z * h));
+    let faces: [[(f64, f64, f64); 4]; 6] = [
+        [
+            (-1., -1., -1.),
+            (1., -1., -1.),
+            (1., 1., -1.),
+            (-1., 1., -1.),
+        ],
+        [(-1., -1., 1.), (1., -1., 1.), (1., 1., 1.), (-1., 1., 1.)],
+        [
+            (-1., -1., -1.),
+            (1., -1., -1.),
+            (1., -1., 1.),
+            (-1., -1., 1.),
+        ],
+        [(-1., 1., -1.), (1., 1., -1.), (1., 1., 1.), (-1., 1., 1.)],
+        [
+            (-1., -1., -1.),
+            (-1., 1., -1.),
+            (-1., 1., 1.),
+            (-1., -1., 1.),
+        ],
+        [(1., -1., -1.), (1., 1., -1.), (1., 1., 1.), (1., -1., 1.)],
+    ];
+    faces
+        .iter()
+        .map(|f| Mark::Fill(f.iter().map(|&(x, y, z)| p(x, y, z)).collect()))
+        .collect()
+}
+
+/// A joint's viewport shape (SK-17/18): a wire sphere (three rings in
+/// its own axes) and, to its first child, a solid bone (four edges out to
+/// a square a sixth of the way along, then in to the child); other
+/// children get thin dotted lines. The sphere scales with the bone
+/// (a tenth of its length); a leaf uses `leaf` (a constant screen size).
+pub(crate) fn joint_marks(world: glam::DMat4, children: &[DVec3], leaf: f64) -> Vec<Mark> {
+    let at = world.w_axis.truncate();
+    let bone = children
+        .first()
+        .map(|c| c.distance(at))
+        .filter(|l| *l > 1e-9);
+    let radius = bone.map_or(leaf, |l| l * 0.1);
+    let axes = [
+        world.x_axis.truncate().normalize_or(DVec3::X),
+        world.y_axis.truncate().normalize_or(DVec3::Y),
+        world.z_axis.truncate().normalize_or(DVec3::Z),
+    ];
+    let mut marks = Vec::new();
+    const SEGMENTS: usize = 16;
+    for (u, v) in [(0, 1), (1, 2), (2, 0)] {
+        let ring = |k: usize| {
+            let t = k as f64 / SEGMENTS as f64 * std::f64::consts::TAU;
+            at + (axes[u] * t.cos() + axes[v] * t.sin()) * radius
+        };
+        for k in 0..SEGMENTS {
+            marks.push(Mark::Line([ring(k), ring(k + 1)]));
+        }
+    }
+    if let (Some(&tip), Some(len)) = (children.first(), bone) {
+        let d = (tip - at) / len;
+        // Two directions across the bone.
+        let side = if d.cross(axes[0]).length_squared() > 1e-6 {
+            axes[0]
+        } else {
+            axes[1]
+        };
+        let a = d.cross(side).normalize();
+        let b = d.cross(a);
+        let base = at + d * len / 6.;
+        let w = len * 0.08;
+        let square = [base + a * w, base + b * w, base - a * w, base - b * w];
+        for k in 0..4 {
+            marks.push(Mark::Line([at + d * radius, square[k]]));
+            marks.push(Mark::Line([square[k], tip]));
+            marks.push(Mark::Line([square[k], square[(k + 1) % 4]]));
+        }
+    }
+    for &c in children.iter().skip(1) {
+        marks.push(Mark::Dotted([at, c]));
+    }
+    marks
+}
+
 /// One mark of a camera or light glyph, in world space.
 #[derive(Clone, Debug, PartialEq)]
 pub(crate) enum Mark {
@@ -807,6 +956,8 @@ impl Operandi {
     /// selected one uses the selection colour; the camera this view looks
     /// through is not drawn.
     pub(super) fn draw_locators(&self, painter: &egui::Painter, r: Rect) {
+        // IK-50: the Pose tool's circles.
+        self.draw_pose_handles(painter, r);
         let scene = &self.editor.scene;
         let drawing = &self.display.settings.drawing;
         let through = self.camera.through.then(|| self.through_camera()).flatten();
@@ -971,6 +1122,44 @@ impl Operandi {
                         light_marks(world, &grown, selected)
                     }
                 }
+                _ if item.locator == Some(operandi_core::locator::LocatorKind::IkGoal) => {
+                    let Ok(world) = scene.world_matrix(item.id) else {
+                        continue;
+                    };
+                    ik_goal_marks(world, ik_goal_size(scene, item.id))
+                }
+                _ if item.is_joint() => {
+                    let Ok(world) = scene.world_matrix(item.id) else {
+                        continue;
+                    };
+                    let at = world.w_axis.truncate();
+                    let Some(mpp) = self.camera.metres_per_pixel(at, r) else {
+                        continue;
+                    };
+                    let kids: Vec<DVec3> = operandi_core::skeleton::children(scene, item.id)
+                        .into_iter()
+                        .filter_map(|c| scene.world_matrix(c).ok())
+                        .map(|m| m.w_axis.truncate())
+                        .collect();
+                    let mut marks = joint_marks(
+                        world,
+                        &kids,
+                        mpp * defaults::GROUP_LOCATOR_GLYPH_POINTS * 0.5 * grow,
+                    );
+                    // IK-43: a selected limited joint shows its allowed arcs.
+                    if selected
+                        && let Some(ik) = operandi_core::ik_joint::settings(scene, item.id)
+                            .filter(|j| j.limited())
+                    {
+                        let size = kids.first().map_or(mpp * 30., |c| c.distance(at) * 0.4);
+                        let parent = item
+                            .parent
+                            .and_then(|p| scene.world_matrix(p).ok())
+                            .unwrap_or(glam::DMat4::IDENTITY);
+                        marks.extend(limit_fan_marks(parent, at, ik, size));
+                    }
+                    marks
+                }
                 _ if item.is_group_locator() => {
                     let Ok(world) = scene.world_matrix(item.id) else {
                         continue;
@@ -992,6 +1181,13 @@ impl Operandi {
                 crate::item_extras_ui::draw_options_color(item)
                     .unwrap_or_else(theme::viewport::locator)
             };
+            // IK-02: a goal is coloured by its side of X.
+            let color =
+                if !selected && item.locator == Some(operandi_core::locator::LocatorKind::IkGoal) {
+                    ik_goal_color(scene, item.id)
+                } else {
+                    color
+                };
             let stroke = Stroke::new(if selected { 1.5f32 } else { 1.0 }, color);
             let project = |a: DVec3, b: DVec3| match (projector.project(a), projector.project(b)) {
                 (Some((a, _)), Some((b, _))) => Some([a, b]),
@@ -2292,6 +2488,47 @@ mod tests {
         assert!((span(&two) / span(&one) - 2.0).abs() < 1e-9);
         // Hidden by default (Jason, 2026-11-05).
         assert!(!a.display.settings.drawing.cameras && !a.display.settings.drawing.lights);
+    }
+
+    /// IK-43: a fan per limited axis, its edges at Min and Max.
+    #[test]
+    fn limit_fan_spans_min_to_max() {
+        let mut ik = operandi_core::ik_joint::JointIk::new(1);
+        ik.enable_limits = true;
+        ik.axes[2].use_limits = true;
+        ik.axes[2].min = 0.;
+        ik.axes[2].max = std::f64::consts::FRAC_PI_2;
+        let marks = limit_fan_marks(glam::DMat4::IDENTITY, DVec3::ZERO, &ik, 1.);
+        assert_eq!(marks.len(), 2 + 16);
+        let Mark::Line([_, hi]) = &marks[1] else {
+            panic!()
+        };
+        assert!(hi.distance(DVec3::Y) < 1e-9, "Z from X round to Y: {hi}");
+    }
+
+    /// SK-17/18: a joint draws a sphere sized by its bone, a solid bone
+    /// to its first child and dotted lines to the others.
+    #[test]
+    fn joint_marks_follow_the_first_child() {
+        let kids = [DVec3::new(0., 2., 0.), DVec3::new(1., 0., 0.)];
+        let marks = joint_marks(glam::DMat4::IDENTITY, &kids, 0.05);
+        let lines = marks.iter().filter(|m| matches!(m, Mark::Line(_))).count();
+        assert_eq!(lines, 3 * 16 + 12);
+        assert_eq!(
+            marks
+                .iter()
+                .filter(|m| matches!(m, Mark::Dotted(_)))
+                .count(),
+            1
+        );
+        // The sphere's radius is a tenth of the bone.
+        let Mark::Line([p, _]) = &marks[0] else {
+            panic!()
+        };
+        assert!((p.length() - 0.2).abs() < 1e-9);
+        // A leaf: rings only, at the given size.
+        let leaf = joint_marks(glam::DMat4::IDENTITY, &[], 0.05);
+        assert_eq!(leaf.len(), 48);
     }
 
     /// GL-10..12: a Group Locator's row glyph, viewport marks and Show

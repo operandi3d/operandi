@@ -198,6 +198,13 @@ impl Bridge {
                 }, "required": ["path"]}),
             ),
             def(
+                "python_run",
+                "Run a Python script (Python scripting preview, kits plan K3). It imports operandi: operandi.run(line) runs any command (raises operandi.CommandError with the command's own message on failure), operandi.query(line) answers a query (JSON answers as Python values), with operandi.undo_group(name): folds steps into one, operandi.mesh_get()/mesh_set(points, polygons) read and write a mesh in bulk. The whole script is one undo step (UIC-227). Returns what it printed; a Python exception is an error with its traceback and leaves the scene as it was. In the running app it needs Python scripting (preview) on.",
+                json!({"type": "object", "properties": {
+                    "code": {"type": "string", "description": "The script's Python source."}
+                }, "required": ["code"], "additionalProperties": false}),
+            ),
+            def(
                 "select",
                 "Set the selection mode and select components by index, as one undo step. Replaces the selection unless add is true. item makes that item the active one in any mode (the mesh later tools and primitive_add work on). The echoed selection gives the mode and every mode's own list; tools work on the current mode's.",
                 json!({"type": "object", "properties": {
@@ -550,6 +557,23 @@ impl Bridge {
                         group,
                     })
                 })
+            }
+            "python_run" => {
+                let code = req_str(args, "code")?.to_owned();
+                let mut printed = String::new();
+                let mut out = self.staged(|e| {
+                    let outcome = operandi_python::run_blocking(
+                        &mut operandi_python::EditorHost(e),
+                        operandi_python::Source::file_text(code, "<bridge>"),
+                    );
+                    printed = outcome.output;
+                    match outcome.error {
+                        None => Ok(()),
+                        Some(tb) => Err(format!("{printed}{tb}")),
+                    }
+                })?;
+                out["output"] = json!(printed);
+                Ok(out)
             }
             "select" => self.staged(|e| select(e, args)),
             "selection_op" => self.staged(|e| selection_op(e, args)),

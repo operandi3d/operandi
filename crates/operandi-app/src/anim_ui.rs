@@ -50,6 +50,11 @@ const GRAPH_VIEW_ARGS: &[table::Arg] = &[
     table::opt("animatedOnly", TOGGLE, table::Unit::None, None),
     table::opt("lock", TOGGLE, table::Unit::None, None),
     table::opt("link", TOGGLE, table::Unit::None, None),
+    table::opt("boxScale", TOGGLE, table::Unit::None, None),
+    table::opt("retime", TOGGLE, table::Unit::None, None),
+    table::opt("speed", TOGGLE, table::Unit::None, None),
+    table::opt("rows", table::ArgType::Int, table::Unit::None, None),
+    table::opt("rowOffset", table::ArgType::Int, table::Unit::None, None),
 ];
 const DIALOG_ARGS: &[table::Arg] = &[table::opt(
     "kind",
@@ -94,6 +99,20 @@ pub(crate) fn register(r: &mut Commands) {
                 "open:false" => false,
                 _ => !a.graph.open,
             }
+        },
+    )
+    .unwrap_or_else(|e| panic!("{e}"));
+    r.add_host_command(
+        table::script(
+            "operandi.anim.editors",
+            Area::View,
+            "Animation Editors: opens the tall timeline (track rows) and the Graph Editor (with its channel list) together (GE-01).",
+        )
+        .operandi()
+        .ui(),
+        |a, _| {
+            a.timeline.open_tall();
+            a.graph.open = true;
         },
     )
     .unwrap_or_else(|e| panic!("{e}"));
@@ -307,6 +326,14 @@ impl Operandi {
         for request in crate::form::rows::take_anim_requests() {
             self.execute(&request);
         }
+        // RG-24's one-off hint, and Compensation kept in the preferences.
+        if let Some(note) = self.editor.anim.note.take() {
+            self.status = note;
+        }
+        if self.editor.rig_compensation != self.undo_autosave.rig_compensation {
+            self.undo_autosave.rig_compensation = self.editor.rig_compensation;
+            self.save_undo_autosave();
+        }
         self.tick_playback(ctx);
         let requests = std::mem::take(&mut self.editor.anim.requests);
         for r in requests {
@@ -318,6 +345,36 @@ impl Operandi {
         // The timeline's and graph editor's one-value dialogs.
         self.timeline_dialog(ctx);
         self.graph_editor_window(ctx);
+        self.channel_links_window(ctx);
+        self.setup_outline(ctx);
+        self.schematic_window(ctx);
+        self.skeleton_window(ctx);
+    }
+
+    /// SK-01: in Setup mode every 3D view gets a yellow outline.
+    fn setup_outline(&self, ctx: &Context) {
+        if !self.editor.scene.animation.setup || !crate::anim_switch::enabled() {
+            return;
+        }
+        let painter = ctx.layer_painter(egui::LayerId::new(
+            egui::Order::Foreground,
+            egui::Id::new("setup-outline"),
+        ));
+        let yellow = crate::form::status::edited_yellow();
+        for r in self
+            .view_rects
+            .values()
+            .chain(std::iter::once(&self.viewport_rect))
+        {
+            if r.is_positive() {
+                painter.rect_stroke(
+                    r.shrink(1.),
+                    0.,
+                    egui::Stroke::new(2.0f32, yellow),
+                    egui::StrokeKind::Inside,
+                );
+            }
+        }
     }
 
     /// TK-60/61/64: advance playback; no undo steps, and only the final
@@ -675,6 +732,10 @@ impl Operandi {
         let now = s.time.current;
         let at = self.editor.key_time();
         let state = |k: &ChannelKey| match s.animation.channels.get(k) {
+            // RG-04: a rig piece drives it, or it feeds one.
+            _ if operandi_core::rig::driven_by(s, k.item, &k.channel).is_some() => {
+                ChannelStatus::Driven
+            }
             Some(c) if !c.curve.is_empty() => {
                 if animation::is_pending(s, k) {
                     ChannelStatus::Edited

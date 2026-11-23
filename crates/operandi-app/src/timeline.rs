@@ -1474,7 +1474,8 @@ impl Operandi {
         let tip = format!("{name}{}\n{line}", self.shortcut(action));
         let button = crate::icons::button(ui, icon, "").min_size(vec2(22., 20.));
         let r = ui.add(button).on_hover_text(tip);
-        if r.clicked() {
+        // An empty line: a pop-up button the caller opens.
+        if r.clicked() && !line.is_empty() {
             self.execute(line);
         }
         r
@@ -1682,6 +1683,253 @@ impl Operandi {
                 "Graph Editor",
                 "",
                 "operandi.graph.open",
+            );
+            self.tbi(
+                ui,
+                Icon::AnimationEditors,
+                "Animation Editors: the tall timeline and the Graph Editor together",
+                "",
+                "operandi.anim.editors",
+            );
+            // SK-01: the Setup toggle (lit while on).
+            let on = self.editor.scene.animation.setup;
+            if ui
+                .add(
+                    crate::icons::button(ui, Icon::SetupPose, "")
+                        .selected(on)
+                        .min_size(vec2(22., 20.)),
+                )
+                .on_hover_text("Setup: show and edit the setup (rest) pose; keys are ignored\noperandi.anim.setup")
+                .clicked()
+            {
+                self.execute("operandi.anim.setup");
+            }
+            // SK-10: the Skeleton tool.
+            if ui
+                .add(
+                    crate::icons::button(ui, Icon::SkeletonTool, "")
+                        .selected(self.skeleton.on)
+                        .min_size(vec2(22., 20.)),
+                )
+                .on_hover_text("Skeleton: click to draw joints; Shift+click starts a new chain\noperandi.skel.tool")
+                .clicked()
+            {
+                self.execute("operandi.skel.tool");
+            }
+            // IK-50: the Pose tool.
+            if ui
+                .add(
+                    crate::icons::button(ui, Icon::PoseTool, "")
+                        .selected(self.pose.on)
+                        .min_size(vec2(22., 20.)),
+                )
+                .on_hover_text("Pose: drag the selected hierarchy's items; Ctrl world, Shift twist, middle FK, right-click pin\noperandi.pose.tool")
+                .clicked()
+            {
+                self.execute("operandi.pose.tool");
+            }
+            // SK-20/24: Bind (text until its studio icon); Shift+click
+            // unbinds (UIC-04 names it).
+            let bind = ui
+                .button("Bind")
+                .on_hover_text("Bind the selected meshes to the selected root joint (needs Setup)\nShift+click: Unbind\noperandi.skin.bindDialog");
+            if bind.clicked() {
+                if ui.input(|i| i.modifiers.shift) {
+                    self.execute("operandi.skin.unbind");
+                } else {
+                    self.execute("operandi.skin.bindDialog");
+                }
+            }
+            // Phase 6 IK (text until their studio icons, UIC-190).
+            let ik = ui.button("IK").on_hover_text(
+                "IK: apply to the selected joints, poles, query (needs Setup to apply)",
+            );
+            let mut ik_lines: Vec<&str> = Vec::new();
+            // IK-31: the switch is named by the selected chains' state.
+            let switch_label = {
+                let scene = &self.editor.scene;
+                let picked = scene.selected_items();
+                let states: Vec<bool> = scene
+                    .animation
+                    .rig
+                    .pieces
+                    .iter()
+                    .filter(|p| operandi_core::ik::is_ik(&p.kind))
+                    .filter(|p| {
+                        let mut touches = operandi_core::ik_commands::chain(scene, p);
+                        touches.extend(p.targets.iter().copied());
+                        picked.iter().any(|i| touches.contains(i))
+                    })
+                    .map(|p| operandi_core::ik_switch::in_ik(scene, p))
+                    .collect();
+                if !states.is_empty() && states.iter().all(|s| *s) {
+                    "Switch to FK"
+                } else if !states.is_empty() && states.iter().all(|s| !*s) {
+                    "Switch to IK"
+                } else {
+                    "Toggle IK/FK"
+                }
+            };
+            egui::Popup::menu(&ik).show(|ui| {
+                // Rendered icons on the apply, pole and goal entries.
+                for (icon, label, line) in [
+                    (
+                        Some(Icon::IkTwoBone),
+                        "Apply IK (Two-Bone)",
+                        "operandi.ik.applyTwoBone",
+                    ),
+                    (
+                        Some(Icon::IkChain),
+                        "Apply IK (Chain)",
+                        "operandi.ik.applyChain",
+                    ),
+                    (
+                        Some(Icon::IkUpVector),
+                        "Create IK Up Vector",
+                        "operandi.ik.pole mode:create",
+                    ),
+                    (None, "Remove Up Vector", "operandi.ik.pole mode:remove"),
+                    (
+                        Some(Icon::IkFullBody),
+                        "Assign IK (Full Body)",
+                        "operandi.ik.assign",
+                    ),
+                    (Some(Icon::IkGoal), "Add Goal", "operandi.ik.addGoal"),
+                    (
+                        None,
+                        "Add Position Task",
+                        "operandi.ik.addTask mode:position",
+                    ),
+                    (
+                        None,
+                        "Add Orientation Task",
+                        "operandi.ik.addTask mode:orientation",
+                    ),
+                    (None, "Add to Chain", "operandi.ik.addToChain"),
+                    (None, "Remove from Chain", "operandi.ik.removeFromChain"),
+                    (None, "Remove IK", "operandi.ik.remove"),
+                    (Some(Icon::IkFkSwitch), switch_label, "operandi.ik.switch"),
+                    (None, "IK/FK: Set Keys", "operandi.ik.setKeys"),
+                    (
+                        None,
+                        "IK/FK: Delete Keys",
+                        "operandi.ik.setKeys delete:true",
+                    ),
+                    (None, "Select Switch Channels", "operandi.ik.selectSwitch"),
+                    (None, "Select IK Solvers", "operandi.ik.selectSolvers"),
+                    (
+                        Some(Icon::IkGoal),
+                        "Match Goal to Joint",
+                        "operandi.ik.match",
+                    ),
+                    (
+                        None,
+                        "Update Rest Pose (All)",
+                        "operandi.ik.updateRest all:true",
+                    ),
+                    (None, "Disable IK", "operandi.ik.disable"),
+                ] {
+                    let button = match icon {
+                        Some(icon) => crate::icons::button(ui, icon, label),
+                        None => egui::Button::new(label),
+                    };
+                    if ui.add(button).on_hover_text(line).clicked() {
+                        ik_lines.push(line);
+                        ui.close();
+                    }
+                }
+            });
+            for l in ik_lines {
+                self.execute(l);
+            }
+            // SK-42: the weight tools on the selected map (text menu until
+            // icons).
+            let weights = ui
+                .button("Weights")
+                .on_hover_text("Weight tools for the selected weight map (a joint's, once bound)");
+            let mut weight_lines: Vec<&str> = Vec::new();
+            egui::Popup::menu(&weights).show(|ui| {
+                for (label, line) in [
+                    ("Isolate Weights", "operandi.weight.isolate"),
+                    ("Smooth Selected", "operandi.weight.smooth"),
+                    ("Normalize Weights", "operandi.weight.normalize"),
+                    ("Mirror Weights", "operandi.weight.mirror"),
+                    ("Split Left/Right", "operandi.weight.split"),
+                    ("Bake Weights", "operandi.skin.bakeWeights"),
+                ] {
+                    if ui.button(label).on_hover_text(line).clicked() {
+                        weight_lines.push(line);
+                        ui.close();
+                    }
+                }
+            });
+            for l in weight_lines {
+                self.execute(l);
+            }
+            // Rig phase 4: Constrain and Hierarchy pop-ups (the Animate
+            // menu's), Channel Links, Schematic and Bake Selected.
+            let constrain = self.tbi(
+                ui,
+                Icon::Constrain,
+                "Constrain: the first selected item follows the others",
+                "",
+                "",
+            );
+            let mut lines: Vec<String> = Vec::new();
+            egui::Popup::menu(&constrain).show(|ui| {
+                for kind in operandi_core::rig::CONSTRAINTS {
+                    if ui.button(operandi_core::rig::label(kind)).clicked() {
+                        lines.push(format!("operandi.rig.constrain kind:{kind}"));
+                        ui.close();
+                    }
+                }
+            });
+            let hierarchy = self.tbi(
+                ui,
+                Icon::Hierarchy,
+                "Hierarchy: parent, unparent, insert, extract, dynamic parents, Compensation",
+                "",
+                "",
+            );
+            egui::Popup::menu(&hierarchy).show(|ui| {
+                for (label, line) in [
+                    ("Parent", "operandi.rig.parent"),
+                    ("Unparent", "operandi.rig.unparent"),
+                    ("Insert", "operandi.rig.insert"),
+                    ("Extract", "operandi.rig.extract"),
+                    ("Add Parent", "operandi.rig.dynamicParentAdd"),
+                    ("Remove Dynamic Parent", "operandi.rig.dynamicParentRemove"),
+                    ("Compensation", "operandi.rig.compensation"),
+                ] {
+                    if ui.button(label).on_hover_text(line).clicked() {
+                        lines.push(line.into());
+                        ui.close();
+                    }
+                }
+            });
+            for l in lines {
+                self.execute(&l);
+            }
+            self.tbi(
+                ui,
+                Icon::ChannelLinks,
+                "Channel Links (RG-50)",
+                "",
+                "operandi.rig.links",
+            );
+            self.tbi(
+                ui,
+                Icon::Schematic,
+                "Schematic (RG-70)",
+                "",
+                "operandi.rig.schematicView",
+            );
+            self.tbi(
+                ui,
+                Icon::BakeKeys,
+                "Bake Selected: the evaluated motion as keys, rig pieces off",
+                "",
+                "operandi.rig.bake",
             );
         }
         // TK-41: Apply / Discard while edits are pending.

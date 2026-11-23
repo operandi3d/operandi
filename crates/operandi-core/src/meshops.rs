@@ -871,7 +871,11 @@ impl Runtime {
         if id == reader || visiting.contains(&id) {
             return fail(LOOP_INPUT);
         }
-        let Some(source) = scene.item(id).filter(|i| i.is_mesh() && i.kit.is_none()) else {
+        // Joints link too, for the skin (skin.rs): their mesh is empty.
+        let Some(source) = scene
+            .item(id)
+            .filter(|i| (i.is_mesh() || i.is_joint()) && i.kit.is_none())
+        else {
             return fail(MISSING_INPUT);
         };
         let mesh = if source.mesh_ops.is_some() {
@@ -889,10 +893,11 @@ impl Runtime {
             source.mesh.shared().clone()
         };
         let place = scene.world_matrix(id).and_then(|world| {
-            let to_local = scene.world_to_local(reader)? * world;
-            Ok((to_local, world))
+            let into = scene.world_to_local(reader)?;
+            let rest = crate::skin::setup_world(scene, id).map_or(into * world, |w| into * w);
+            Ok((into * world, world, rest))
         });
-        let (to_local, world) = match place {
+        let (to_local, world, rest) = match place {
             Ok(m) => m,
             Err(e) => return fail(&e),
         };
@@ -904,6 +909,7 @@ impl Runtime {
                 mesh,
                 to_local,
                 world,
+                rest,
             }),
         })
     }
@@ -1148,6 +1154,16 @@ impl Runtime {
                 continue;
             }
             let original = &scene.items[index];
+            if original
+                .mesh_ops
+                .as_ref()
+                .is_some_and(crate::skin::only_skin)
+            {
+                out.animation
+                    .rig
+                    .skin_bases
+                    .insert(item.id, original.mesh.clone());
+            }
             let result = if current {
                 self.current(scene, original)
             } else {

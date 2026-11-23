@@ -713,6 +713,9 @@ pub struct Editor {
     /// The document's key time, channel/key selections and playback
     /// (animation.rs; per scene tab).
     pub anim: crate::animation::AnimSession,
+    /// RG-11/RG-30 Compensation: rig edits keep items where they are in
+    /// world space (off by default; the app keeps it in its preferences).
+    pub rig_compensation: bool,
     /// Undo and redo steps, shared: the editor is copied for every command
     /// (identity_editor.rs stages each one), and copying each step's two
     /// scenes made a command in a 100,000-item scene take seconds. Change a
@@ -832,6 +835,9 @@ pub struct Editor {
     /// MeshOps results (meshops.rs): a cache shared by clones, never part
     /// of the scene (SAFE-03).
     pub meshops: crate::meshops::Runtime,
+    /// The scene's evaluation graph (eval_state.rs): a cache, never part
+    /// of the scene or undo (AR-04, AR-15).
+    pub eval: crate::eval_state::EvalState,
     /// The mesh in Edit Base Mesh (MO-27): direct tools edit its Base Mesh.
     pub base_edit: Option<u64>,
     /// The selected row of the Mesh Operations list.
@@ -3832,8 +3838,11 @@ impl Editor {
                         if name.trim().is_empty() || name.len() > 1024 {
                             return Err("Name must contain 1–1024 bytes".into());
                         }
-                        self.scene.active_mut().ok_or("Select an item")?.name =
-                            name.trim().to_owned();
+                        let item = self.scene.active_mut().ok_or("Select an item")?;
+                        let (id, old) = (item.id, item.name.clone());
+                        item.name = name.trim().to_owned();
+                        // SK-23: a joint's weight maps follow its name.
+                        crate::skin_weights::follow_rename(&mut self.scene, id, &old);
                         "Rename Mesh"
                     }
                     Command::SetParent {
@@ -4021,6 +4030,26 @@ impl Editor {
             .active()
             .ok_or("Select a mesh; use New Mesh before creating a primitive")?;
         let item_transform = self.scene.selection.mode == Mode::Item && t.transforms_items();
+        // RG-04: a rig piece drives the transform the tool would change;
+        // dragging it would only edit the hidden own value.
+        if item_transform {
+            let groups: &[&str] = match t {
+                Tool::Move => &["pos"],
+                Tool::Rotate => &["rot"],
+                Tool::Scale => &["scl"],
+                _ => &["pos", "rot", "scl"],
+            };
+            for id in self.scene.selected_items() {
+                for g in groups {
+                    for a in ["X", "Y", "Z"] {
+                        if let Some(p) = crate::rig::driven_by(&self.scene, id, &format!("{g}.{a}"))
+                        {
+                            return Err(format!("Driven by {}", crate::rig::label(&p.kind)));
+                        }
+                    }
+                }
+            }
+        }
         // Other tools have no geometry to edit on a Backdrop.
         if item.backdrop.is_some() && !item_transform {
             return Err(BACKDROP_NO_GEOMETRY.into());
@@ -5828,6 +5857,12 @@ impl Editor {
         // resolves its frame against world-space positions.
         let transform = tool.transforms_items();
         if scene.selection.mode == Mode::Item && tool != Tool::Extrude && !tool.is_smooth_shift() {
+            // The handle sits where rigged items show (RG-01), not at
+            // their own unconstrained place.
+            let rigged = (!scene.animation.rig.pieces.is_empty())
+                .then(|| crate::rig_eval::apply(scene, &crate::rig_eval::evaluate(scene), false))
+                .flatten();
+            let scene = rigged.as_ref().unwrap_or(scene);
             let frame = context.resolve(scene)?;
             // Several items: the handle at their shared pivot.
             if transform

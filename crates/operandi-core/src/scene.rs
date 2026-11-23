@@ -867,6 +867,20 @@ impl Scene {
     pub fn item_mut(&mut self, id: u64) -> Option<&mut Item> {
         self.item_index(id).map(|i| &mut self.items[i])
     }
+    /// Whether `id` names something with channels: an item or a rig piece
+    /// (rig.rs).
+    pub fn owns_channels(&self, id: u64) -> bool {
+        self.item(id).is_some() || self.animation.rig.piece(id).is_some()
+    }
+    /// An item's local matrix, rotating and scaling about its pivot
+    /// (RG-14, rig.rs).
+    pub fn local_matrix(&self, item: &Item) -> DMat4 {
+        let m = item.transform.matrix();
+        match self.animation.rig.pivots.get(&item.id) {
+            Some(p) => p.apply(m),
+            None => m,
+        }
+    }
     pub(crate) fn world_matrix_aimed(&self, id: u64, aim_depth: u32) -> Result<DMat4> {
         let mut chain: Vec<&Item> = Vec::new();
         let mut next = Some(id);
@@ -880,7 +894,7 @@ impl Scene {
         }
         let mut matrix = DMat4::IDENTITY;
         for item in chain.iter().rev() {
-            matrix *= item.transform.matrix();
+            matrix *= self.local_matrix(item);
             // A target or a Physical Sun turns the item in world space
             // (LP-04, LP-SUN-01); its children follow.
             if let Some(rotation) = self.driven_rotation(item, matrix, aim_depth) {

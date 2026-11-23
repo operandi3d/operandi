@@ -587,10 +587,54 @@ pub enum Sample {
     Velocity,
     /// Link Related: two keys joined by a link.
     LinkRelated,
+    /// Box Scale: keys inside a selected box with corner handles.
+    BoxScale,
+    /// Retime: keys on a curve over a two-way time arrow.
+    Retime,
+    /// Speed: a dial with a cyan-tipped needle.
+    CurveSpeed,
+    /// In slope: a key with its incoming handle selected.
+    InSlope,
+    /// Out slope: a key with its outgoing handle selected.
+    OutSlope,
+    /// Presets: three stacked cards with curve shapes.
+    CurvePresets,
+    /// Animation Editors: a panel with a curve above a row of keys.
+    AnimationEditors,
+    /// Constrain: a cyan cone aimed at a cube along a dashed line.
+    Constrain,
+    /// Hierarchy: a parent cube above two children, joined by dark links.
+    Hierarchy,
+    /// Channel Links: two channel sliders joined by a cyan link.
+    ChannelLinks,
+    /// Schematic: three node tiles wired together in cyan.
+    Schematic,
+    /// Bake: a curve set with a cyan key at every frame.
+    BakeKeys,
+    /// Setup: a skeleton standing in its straight rest pose on a selected base.
+    SetupPose,
+    /// Skeleton: a joint chain with its newest bone and joint cyan.
+    SkeletonTool,
+    /// Skin: a bent mesh tube bound to the cyan bones beside it.
+    SkinMesh,
+    /// Apply IK (Two-Bone): a bent two-bone limb reaching a cyan goal.
+    IkTwoBone,
+    /// Apply IK (Chain): a curving bone chain reaching a cyan goal.
+    IkChain,
+    /// IK Up Vector: a bent limb whose knee points at a selected pole.
+    IkUpVector,
+    /// IK Goal: a cyan target with a bone tip in it.
+    IkGoal,
+    /// Pose tool: a limb pinned at its root, its tip dragged by a cyan arrow.
+    PoseTool,
+    /// Assign IK (full body): a figure with cyan goals at its hands and feet.
+    IkFullBody,
+    /// Switch IK/FK: a limb with a cyan IK goal at its tip and a selected FK turn at its root.
+    IkFkSwitch,
 }
 
 impl Sample {
-    pub const ALL: [Sample; 149] = [
+    pub const ALL: [Sample; 171] = [
         Sample::Cube,
         Sample::SelectedFace,
         Sample::Sphere,
@@ -740,6 +784,28 @@ impl Sample {
         Sample::IsolateCurve,
         Sample::Velocity,
         Sample::LinkRelated,
+        Sample::BoxScale,
+        Sample::Retime,
+        Sample::CurveSpeed,
+        Sample::InSlope,
+        Sample::OutSlope,
+        Sample::CurvePresets,
+        Sample::AnimationEditors,
+        Sample::Constrain,
+        Sample::Hierarchy,
+        Sample::ChannelLinks,
+        Sample::Schematic,
+        Sample::BakeKeys,
+        Sample::SetupPose,
+        Sample::SkeletonTool,
+        Sample::SkinMesh,
+        Sample::IkTwoBone,
+        Sample::IkChain,
+        Sample::IkUpVector,
+        Sample::IkGoal,
+        Sample::PoseTool,
+        Sample::IkFullBody,
+        Sample::IkFkSwitch,
     ];
 
     /// File stem and icon slug.
@@ -894,6 +960,28 @@ impl Sample {
             Sample::IsolateCurve => "isolate-curve",
             Sample::Velocity => "velocity",
             Sample::LinkRelated => "link-related",
+            Sample::BoxScale => "box-scale",
+            Sample::Retime => "retime",
+            Sample::CurveSpeed => "curve-speed",
+            Sample::InSlope => "in-slope",
+            Sample::OutSlope => "out-slope",
+            Sample::CurvePresets => "curve-presets",
+            Sample::AnimationEditors => "animation-editors",
+            Sample::Constrain => "constrain",
+            Sample::Hierarchy => "hierarchy",
+            Sample::ChannelLinks => "channel-links",
+            Sample::Schematic => "schematic",
+            Sample::BakeKeys => "bake-keys",
+            Sample::SetupPose => "setup-pose",
+            Sample::SkeletonTool => "skeleton-tool",
+            Sample::SkinMesh => "skin-mesh",
+            Sample::IkTwoBone => "ik-two-bone",
+            Sample::IkChain => "ik-chain",
+            Sample::IkUpVector => "ik-up-vector",
+            Sample::IkGoal => "ik-goal",
+            Sample::PoseTool => "pose-tool",
+            Sample::IkFullBody => "ik-full-body",
+            Sample::IkFkSwitch => "ik-fk-switch",
         }
     }
 
@@ -1859,6 +1947,59 @@ fn key_handles(cx: f64, cy: f64, left: f64, right: f64, len: f64) -> Result<Vec<
             "Selected",
         )?);
         parts.push(ball(end, 0.07, "Selected")?);
+    }
+    Ok(parts)
+}
+
+/// A bone from joint `a` to joint `b`: a four-sided spindle, widest a
+/// fifth of the way along.
+fn bone(a: DVec3, b: DVec3, width: f64, tag: &str) -> Result<Mesh> {
+    let len = a.distance(b);
+    let mut m = revolve(&[(0., 0.), (width, len * 0.2), (0., len)], 4, false, tag)?;
+    let turn = glam::DQuat::from_rotation_arc(DVec3::Y, (b - a).normalize());
+    m = deformed(m, |v| a + turn * v);
+    Ok(m)
+}
+
+/// A joint chain: a ball at each joint, a bone between each pair.
+fn chain(joints: &[DVec3], bone_tag: &str, joint_tag: &str) -> Result<Vec<Mesh>> {
+    let mut parts = Vec::new();
+    for w in joints.windows(2) {
+        parts.push(bone(w[0], w[1], 0.09, bone_tag)?);
+    }
+    for &j in joints {
+        parts.push(ball(j, 0.075, joint_tag)?);
+    }
+    Ok(parts)
+}
+
+/// A point in the picture's plane through the origin: `x` across, `y` up.
+fn flat(x: f64, y: f64) -> DVec3 {
+    DVec3::new(1., 0., -1.).normalize() * x + DVec3::Y * y
+}
+
+/// An IK goal: a cyan ring in the picture's plane round a cyan dot.
+fn ik_target(centre: DVec3, radius: f64) -> Result<Vec<Mesh>> {
+    let ring: Vec<DVec3> = (0..=40)
+        .map(|k| {
+            let a = std::f64::consts::TAU * f64::from(k) / 40.;
+            centre + flat(radius * a.cos(), radius * a.sin())
+        })
+        .collect();
+    Ok(vec![
+        tube(&ring, 0.045, 10, "New")?,
+        ball(centre, 0.07, "New")?,
+    ])
+}
+
+/// A thick joint chain for small icons: fat bones, big joints.
+fn thick_chain(joints: &[DVec3], tag: &str) -> Result<Vec<Mesh>> {
+    let mut parts = Vec::new();
+    for w in joints.windows(2) {
+        parts.push(bone(w[0], w[1], 0.13, tag)?);
+    }
+    for &j in joints {
+        parts.push(ball(j, 0.1, tag)?);
     }
     Ok(parts)
 }
@@ -3529,6 +3670,369 @@ fn sample_mesh(sample: Sample) -> Result<Mesh> {
                 parts.push(tube(&[a.lerp(b, t0), a.lerp(b, t1)], 0.035, 8, "Ink")?);
             }
             symbol(parts)?
+        }
+        Sample::BoxScale => {
+            let (w, h) = (0.42, 0.3);
+            let mut parts = vec![
+                graph_curve(-0.3, 0.3, |x| 0.18 * (x * 6.).sin(), 0.035, "Ink")?,
+                key(-0.3, 0.18 * (-1.8f64).sin(), 0.18)?,
+                key(0.3, 0.18 * (1.8f64).sin(), 0.18)?,
+            ];
+            for (a, b) in [
+                ((-w, -h), (w, -h)),
+                ((w, -h), (w, h)),
+                ((w, h), (-w, h)),
+                ((-w, h), (-w, -h)),
+            ] {
+                parts.push(bar(a.0, a.1, b.0, b.1, 0.035, 0.04, "Selected")?);
+            }
+            for (x, y) in [(-w, -h), (w, -h), (w, h), (-w, h)] {
+                parts.push(slab(
+                    &[
+                        (x - 0.07, y - 0.07),
+                        (x + 0.07, y - 0.07),
+                        (x + 0.07, y + 0.07),
+                        (x - 0.07, y + 0.07),
+                    ],
+                    0.1,
+                    "Selected",
+                )?);
+            }
+            symbol(parts)?
+        }
+        Sample::Retime => symbol(vec![
+            graph_curve(-0.5, 0.5, |x| 0.2 * (x * 4.).sin() + 0.15, 0.035, "Ink")?,
+            key(-0.5, 0.2 * (-2f64).sin() + 0.15, 0.2)?,
+            key(0.5, 0.2 * (2f64).sin() + 0.15, 0.2)?,
+            two_way(
+                DVec3::new(-0.52, -0.3, 0.06),
+                DVec3::new(0.52, -0.3, 0.06),
+                0.04,
+                "New",
+            )?,
+        ])?,
+        Sample::CurveSpeed => {
+            let arc: Vec<DVec3> = (0..=24)
+                .map(|k| {
+                    let a = std::f64::consts::PI * f64::from(k) / 24.;
+                    DVec3::new(0.5 * a.cos(), 0.5 * a.sin() - 0.2, 0.)
+                })
+                .collect();
+            let tip = DVec3::new(0.28, 0.2, 0.06);
+            let hub = DVec3::new(0., -0.2, 0.06);
+            symbol(vec![
+                tube(&arc, 0.05, 10, CLAY)?,
+                tube(&[hub, tip], 0.04, 8, "Ink")?,
+                ball(tip, 0.07, "New")?,
+                ball(hub, 0.08, "Ink")?,
+            ])?
+        }
+        Sample::InSlope | Sample::OutSlope => {
+            let out = sample == Sample::OutSlope;
+            let wave = |x: f64| 0.12 * x - 0.25 * x * x;
+            let (sel, other) = if out {
+                (0.35, std::f64::consts::PI + 0.35)
+            } else {
+                (std::f64::consts::PI + 0.35, 0.35)
+            };
+            let mut parts = vec![
+                graph_curve(-0.55, 0.55, wave, 0.035, "Ink")?,
+                key(0., 0., 0.3)?,
+            ];
+            let len = 0.5;
+            let s_end = DVec3::new(len * sel.cos(), len * sel.sin(), 0.06);
+            parts.push(tube(
+                &[DVec3::new(0., 0., 0.06), s_end],
+                0.04,
+                8,
+                "Selected",
+            )?);
+            parts.push(ball(s_end, 0.08, "Selected")?);
+            let o_end = DVec3::new(len * other.cos(), len * other.sin(), 0.06);
+            parts.push(tube(&[DVec3::new(0., 0., 0.06), o_end], 0.025, 8, CLAY)?);
+            parts.push(ball(o_end, 0.055, CLAY)?);
+            symbol(parts)?
+        }
+        Sample::CurvePresets => {
+            // A list of three presets, each a tile with its curve shape:
+            // ease in, linear, ease out (the last one picked, cyan).
+            let mut parts = Vec::new();
+            let shapes: [fn(f64) -> f64; 3] = [|t| t * t, |t| t, |t| 1. - (1. - t) * (1. - t)];
+            for (k, f) in shapes.into_iter().enumerate() {
+                let cy = 0.36 - 0.36 * k as f64;
+                parts.push(frame_tile(0., cy, 0.5, 0.15)?);
+                parts.push(graph_curve(
+                    -0.4,
+                    0.4,
+                    move |x| cy - 0.1 + 0.2 * f((x + 0.4) / 0.8),
+                    0.035,
+                    if k == 2 { "New" } else { "Ink" },
+                )?);
+            }
+            symbol(parts)?
+        }
+        Sample::AnimationEditors => {
+            let mut parts = vec![
+                frame_tile(0., 0., 0.55, 0.45)?,
+                graph_curve(-0.45, 0.45, |x| 0.12 * (x * 5.).sin() + 0.18, 0.035, "Ink")?,
+                bar(-0.5, -0.08, 0.5, -0.08, 0.03, 0.04, CLAY)?,
+            ];
+            for x in [-0.32, 0.02, 0.3] {
+                parts.push(key(x, -0.27, 0.18)?);
+            }
+            symbol(parts)?
+        }
+        Sample::Constrain => {
+            let across = DVec3::new(1., 0., -1.).normalize();
+            let target = across * 0.35 - DVec3::Y * 0.1;
+            let from = -across * 0.4 + DVec3::Y * 0.25;
+            let dir = (target - from).normalize();
+            let mut cone = revolve(&[(0., -0.2), (0.17, -0.2), (0., 0.25)], 32, false, "New")?;
+            let turn = glam::DQuat::from_rotation_arc(DVec3::Y, dir);
+            cone = deformed(cone, |v| from + turn * v);
+            let mut parts = vec![cube_at(target, 0.42, CLAY)?, cone];
+            for k in [0., 2., 4.] {
+                let (t0, t1) = (0.35 + k * 0.08, 0.35 + (k + 1.) * 0.08);
+                parts.push(tube(
+                    &[from.lerp(target, t0), from.lerp(target, t1)],
+                    0.025,
+                    8,
+                    "Ink",
+                )?);
+            }
+            merge(parts)?
+        }
+        Sample::Hierarchy => {
+            let across = DVec3::new(1., 0., -1.).normalize();
+            let top = DVec3::Y * 0.3;
+            let kids = [
+                across * -0.38 - DVec3::Y * 0.3,
+                across * 0.38 - DVec3::Y * 0.3,
+            ];
+            let mut parts = vec![cube_at(top, 0.32, "Selected")?];
+            for k in kids {
+                parts.push(cube_at(k, 0.28, CLAY)?);
+                parts.push(tube(
+                    &[top - DVec3::Y * 0.16, k + DVec3::Y * 0.14],
+                    0.03,
+                    8,
+                    "Ink",
+                )?);
+            }
+            merge(parts)?
+        }
+        Sample::ChannelLinks => {
+            let (a, b) = ((-0.15, 0.25), (0.2, -0.25));
+            symbol(vec![
+                bar(-0.5, 0.25, 0.5, 0.25, 0.07, 0.06, CLAY)?,
+                bar(-0.5, -0.25, 0.5, -0.25, 0.07, 0.06, CLAY)?,
+                ball(DVec3::new(a.0, a.1, 0.), 0.1, "Selected")?,
+                ball(DVec3::new(b.0, b.1, 0.), 0.1, "Selected")?,
+                tube(
+                    &through(
+                        &[
+                            DVec3::new(a.0, a.1, 0.06),
+                            DVec3::new(0.1, 0.05, 0.12),
+                            DVec3::new(b.0, b.1, 0.06),
+                        ],
+                        10,
+                    ),
+                    0.035,
+                    8,
+                    "New",
+                )?,
+            ])?
+        }
+        Sample::Schematic => {
+            let nodes = [(-0.32, 0.25), (-0.32, -0.25), (0.32, 0.)];
+            let mut parts = Vec::new();
+            for &(x, y) in &nodes {
+                parts.push(frame_tile(x, y, 0.2, 0.13)?);
+            }
+            for &(x, y) in &nodes[..2] {
+                parts.push(tube(
+                    &through(
+                        &[
+                            DVec3::new(x + 0.2, y, -0.05),
+                            DVec3::new(0.0, y * 0.6, -0.05),
+                            DVec3::new(0.12, 0., -0.05),
+                        ],
+                        10,
+                    ),
+                    0.035,
+                    8,
+                    "New",
+                )?);
+            }
+            symbol(parts)?
+        }
+        Sample::BakeKeys => {
+            let f = |x: f64| 0.3 * (x * 4.).sin();
+            let mut parts = vec![graph_curve(-0.55, 0.55, f, 0.03, "Ink")?];
+            for k in 0..8 {
+                let x = -0.5 + f64::from(k) / 7.;
+                parts.push(key(x, f(x), 0.15)?);
+            }
+            symbol(parts)?
+        }
+        Sample::SetupPose => {
+            // A T-pose seen square on: spine, arms straight out, legs down.
+            let across = DVec3::new(1., 0., -1.).normalize();
+            let at = |x: f64, y: f64| across * x * 1.3 + DVec3::Y * (y * 1.25 + 0.02);
+            let mut parts = vec![box_by_normal(
+                DVec3::new(-0.22, -0.6, -0.22),
+                DVec3::new(0.22, -0.54, 0.22),
+                |n| if n == DVec3::Y { "Selected" } else { CLAY },
+            )?];
+            parts.extend(chain(
+                &[at(0., -0.05), at(0., 0.25), at(0., 0.45)],
+                CLAY,
+                CLAY,
+            )?);
+            parts.extend(chain(
+                &[at(-0.48, 0.25), at(-0.22, 0.25), at(0., 0.25)],
+                CLAY,
+                CLAY,
+            )?);
+            parts.extend(chain(
+                &[at(0., 0.25), at(0.22, 0.25), at(0.48, 0.25)],
+                CLAY,
+                CLAY,
+            )?);
+            parts.extend(chain(
+                &[
+                    at(-0.12, -0.5),
+                    at(-0.12, -0.05),
+                    at(0.12, -0.05),
+                    at(0.12, -0.5),
+                ],
+                CLAY,
+                CLAY,
+            )?);
+            merge(parts)?
+        }
+        Sample::SkeletonTool => {
+            let across = DVec3::new(1., 0., -1.).normalize();
+            let at = |x: f64, y: f64| across * x + DVec3::Y * y;
+            let joints = [at(-0.45, -0.45), at(-0.15, -0.05), at(0.05, 0.3)];
+            let mut parts = chain(&joints, CLAY, CLAY)?;
+            let new_joint = at(0.45, 0.4);
+            parts.push(bone(joints[2], new_joint, 0.09, "New")?);
+            parts.push(ball(new_joint, 0.09, "New")?);
+            merge(parts)?
+        }
+        Sample::SkinMesh => {
+            let across = DVec3::new(1., 0., -1.).normalize();
+            let at = |x: f64, y: f64| across * x + DVec3::Y * y;
+            let joints = [at(-0.45, -0.35), at(0.05, -0.2), at(0.4, 0.35)];
+            let path = through(&joints, 12);
+            let toward = DVec3::ONE.normalize();
+            // The mesh sits behind; the bones it is bound to just in front.
+            let behind = |v: DVec3| v - toward * 0.12;
+            let mut parts = vec![deformed(tube_with(&path, |_| 0.16, 24, CLAY)?, behind)];
+            let front: Vec<DVec3> = joints.iter().map(|&j| j + toward * 0.3).collect();
+            parts.extend(chain(&front, "New", "New")?);
+            merge(parts)?
+        }
+        Sample::IkTwoBone => {
+            let goal = flat(0.4, -0.3);
+            let mut parts = thick_chain(&[flat(-0.45, -0.3), flat(-0.05, 0.38), goal], CLAY)?;
+            parts.extend(ik_target(goal, 0.2)?);
+            merge(parts)?
+        }
+        Sample::IkChain => {
+            let goal = flat(0.45, 0.35);
+            let mut parts = thick_chain(
+                &[
+                    flat(-0.5, -0.4),
+                    flat(-0.25, 0.05),
+                    flat(0.05, 0.2),
+                    flat(0.28, 0.1),
+                    goal,
+                ],
+                CLAY,
+            )?;
+            parts.extend(ik_target(goal, 0.18)?);
+            merge(parts)?
+        }
+        Sample::IkUpVector => {
+            let knee = flat(-0.1, 0.2);
+            let pole = flat(-0.1, 0.55) + DVec3::ONE.normalize() * 0.15;
+            let mut parts = thick_chain(&[flat(-0.5, -0.4), knee, flat(0.35, -0.4)], CLAY)?;
+            parts.push(ball(pole, 0.12, "Selected")?);
+            for k in [0., 2.] {
+                let (t0, t1) = (0.25 + k * 0.17, 0.25 + (k + 1.) * 0.17);
+                parts.push(tube(
+                    &[knee.lerp(pole, t0), knee.lerp(pole, t1)],
+                    0.035,
+                    8,
+                    "Ink",
+                )?);
+            }
+            merge(parts)?
+        }
+        Sample::IkGoal => {
+            let goal = flat(0.12, 0.08);
+            let mut parts = ik_target(goal, 0.36)?;
+            parts.push(bone(flat(-0.5, -0.45), goal, 0.13, CLAY)?);
+            parts.push(ball(flat(-0.5, -0.45), 0.1, CLAY)?);
+            merge(parts)?
+        }
+        Sample::PoseTool => {
+            let root = flat(-0.45, -0.4);
+            let tip = flat(0.25, 0.3);
+            let mut parts = thick_chain(&[root, flat(-0.1, 0.05), tip], CLAY)?;
+            // The pin: a selected pin head standing on the root joint.
+            parts.push(tube(&[root, root + DVec3::Y * 0.3], 0.035, 8, "Ink")?);
+            parts.push(ball(root + DVec3::Y * 0.3, 0.1, "Selected")?);
+            parts.push(arrow(
+                tip + flat(0.05, 0.02),
+                tip + flat(0.38, 0.12),
+                0.05,
+                "New",
+            )?);
+            merge(parts)?
+        }
+        Sample::IkFullBody => {
+            let hip = flat(0., -0.1);
+            let neck = flat(0., 0.3);
+            let (lh, rh) = (flat(-0.5, 0.15), flat(0.5, 0.15));
+            let (lf, rf) = (flat(-0.25, -0.55), flat(0.25, -0.55));
+            let mut parts = thick_chain(&[hip, neck], CLAY)?;
+            parts.extend(thick_chain(
+                &[lh, flat(-0.22, 0.32), neck, flat(0.22, 0.32), rh],
+                CLAY,
+            )?);
+            parts.extend(thick_chain(
+                &[lf, flat(-0.15, -0.32), hip, flat(0.15, -0.32), rf],
+                CLAY,
+            )?);
+            parts.push(ball(neck + DVec3::Y * 0.2, 0.14, CLAY)?);
+            for g in [lh, rh, lf, rf] {
+                parts.extend(ik_target(g, 0.13)?);
+            }
+            merge(parts)?
+        }
+        Sample::IkFkSwitch => {
+            let root = flat(-0.4, -0.35);
+            let tip = flat(0.42, -0.2);
+            let mut parts = thick_chain(&[root, flat(0.0, 0.3), tip], CLAY)?;
+            parts.extend(ik_target(tip, 0.18)?);
+            let arc: Vec<DVec3> = (0..=16)
+                .map(|k| {
+                    let a = 0.3 + 1.9 * f64::from(k) / 16.;
+                    root + flat(0.3 * a.cos(), 0.3 * a.sin())
+                })
+                .collect();
+            let n = arc.len();
+            parts.push(tube(&arc[..n - 2], 0.045, 10, "Selected")?);
+            parts.push(arrow(
+                arc[n - 3],
+                arc[n - 1] + (arc[n - 1] - arc[n - 3]),
+                0.045,
+                "Selected",
+            )?);
+            merge(parts)?
         }
         Sample::LoopSlice => {
             let mut parts = vec![sample_mesh(Sample::Cube)?];

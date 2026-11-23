@@ -199,6 +199,7 @@ fn link(m: Mesh) -> Linked {
             mesh: Shared::new(m),
             to_local: DMat4::IDENTITY,
             world: DMat4::IDENTITY,
+            rest: DMat4::IDENTITY,
         }),
     }
 }

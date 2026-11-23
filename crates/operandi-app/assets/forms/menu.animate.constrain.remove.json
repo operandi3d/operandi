@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "id": "menu.animate.constrain.remove",
+  "label": "Remove",
+  "style": "menu",
+  "controls": [
+    { "command": "operandi.rig.unconstrain kind:position", "label": "Remove Position" },
+    { "command": "operandi.rig.unconstrain kind:rotation", "label": "Remove Rotation" },
+    { "command": "operandi.rig.unconstrain kind:scale", "label": "Remove Scale" },
+    { "command": "operandi.rig.unconstrain kind:transform", "label": "Remove Transform" },
+    { "command": "operandi.rig.unconstrain kind:direction", "label": "Remove Direction" },
+    { "command": "operandi.rig.unconstrain kind:distance", "label": "Remove Distance" },
+    { "command": "operandi.rig.unconstrain kind:path", "label": "Remove Path" },
+    { "command": "operandi.rig.unconstrain kind:pathPosition", "label": "Remove Path Position" },
+    { "command": "operandi.rig.unconstrain kind:pathNormal", "label": "Remove Path Normal" }
+  ]
+}

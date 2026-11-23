@@ -443,6 +443,10 @@ used in the app; `primitive_add` always starts from the Reset values.
   - `offset` (number, required): Metres.
 - **`@ppi_flatten_ngons.py`** — Flatten the selected polygons of more than four sides. No arguments.
 - **`operandi.mesh.fixBlackDots`** — Fix Black Dots (MT2): every pair of polygons sharing two or more edges in a row (inner points used by those two only) becomes one polygon; the inner points are kept unused and selected with the run's ends, Vertex mode, one undo step. 'No black dots found.' when there are none. No arguments.
+- **`operandi.mesh.setData`** — Set Mesh Data (K9): sets a mesh item's points (a list of [x, y, z] in item space, metres) and, when polygons is given, its polygons (lists of point indices; the mesh is rebuilt and its UV maps, vertex maps and component selection go). Points alone must keep the point count. One undo step; a bad mesh is refused and nothing changes.
+  - `item` (integer): Mesh item id; default the active item.
+  - `points` (array, required): Points as [x, y, z] lists.
+  - `polygons` (array): Polygons as lists of point indices.
 - **`operandi.edge.zip`** — Edge Zip (MT3): each selected edge needs a quad on each side; its points and the points across those quads weld at their average, the quads collapse, one undo step, nothing selected afterwards. No arguments.
 - **`operandi.poly.diagonalRedirect`** — Diagonal Re-Direct (MT4): two selected quads touching at one corner split along the diagonal through it; each side quad off the border gets a centre point and is rebuilt so the diagonal is an edge loop, one undo step. No arguments.
 - **`poly.split`** — Split the selected polygons along selected vertices. No arguments.
@@ -642,6 +646,358 @@ used in the app; `primitive_add` always starts from the Reset values.
   - `channels` (string): Only these channels, item:name,...
   - `item` (integer): Only this item's channels.
   - `frames` (string): Frames to read each curve at, comma separated.
+- **`operandi.rig.query`** — Read rig pieces as JSON: id, kind, label, item, targets, refs, channels (name: value), missing, broken, inputs, outputs; with item, also its evaluated world (position, rotation XYZ radians, scale, axes), driven channels, whether it drives a piece, and its pivot.
+  - `item` (integer): Only this item's pieces, plus its evaluated world.
+- **`operandi.rig.compensation`** — Turn Compensation on or off (on: toggle, true or false). Rig commands default to it.
+  - `on` (string): toggle (default), true or false.
+- **`operandi.rig.constrain`** — Apply a constraint, one undo step. kind: position, rotation, scale, transform, direction, distance, path, pathPosition or pathNormal. items and targets as id lists (default the selection: first picked = item, the rest = targets; multiple:true = every item but the last gets its own constraint on the last). compensate keeps the item where it is (default Compensation).
+  - `kind` (string, required): Constraint kind.
+  - `items` (string): Constrained item ids, comma separated.
+  - `targets` (string): Target item ids (curve items for paths), comma separated.
+  - `multiple` (boolean): Each item gets its own constraint on the last selected.
+  - `compensate` (boolean): Keep the item where it is (default Compensation).
+- **`operandi.rig.unconstrain`** — Remove constraints of kind from items (default the selection), one undo step.
+  - `kind` (string, required): Constraint kind.
+  - `items` (string): Item ids, comma separated.
+- **`operandi.rig.remove`** — Delete a rig piece (its keys go too), one undo step; a dynamic parent with compensate keeps the item where it is.
+  - `piece` (integer, required): Rig piece id.
+  - `compensate` (boolean): Keep the item where it is (default Compensation).
+- **`operandi.rig.set`** — Set a channel of a rig piece, one undo step; Auto Key keys it as for any channel. Names as operandi.rig.query lists them (influence 0-1, weight.0, axis 0/1/2, roll radians, percent 0-1...).
+  - `piece` (integer, required): Rig piece id.
+  - `channel` (string, required): Channel name.
+  - `value` (number, required): New value.
+- **`operandi.rig.upVector`** — Up vector of a direction constraint: item (its position defines up), with axis X/Y/Z (that item's axis is up); no item removes it (back to the Up Vector channels). One undo step.
+  - `piece` (integer, required): Direction constraint id.
+  - `item` (integer): Up item id; omit to remove.
+  - `axis` (string): X, Y or Z: use that item's axis.
+- **`operandi.rig.dynamicParentAdd`** — Add dynamic parents to item (default the selection: first picked = child, the rest = parents), one undo step. Index 0 is World. compensate keeps the child where it is.
+  - `item` (integer): The child item id.
+  - `parents` (string): Parent item ids, comma separated.
+  - `compensate` (boolean): Keep the child where it is (default Compensation).
+- **`operandi.rig.dynamicParentSet`** — Set the dynamic parent index, one undo step. compensate rewrites the offsets so nothing jumps; key (default: when Parent is animated and Auto Key is on) keys the switch and its offsets, stepped.
+  - `item` (integer): The child item id.
+  - `piece` (integer): Or the dynamic parent piece id.
+  - `parent` (integer, required): 0 = World, 1.. = the parents in order.
+  - `compensate` (boolean): Keep the child where it is (default Compensation).
+  - `key` (boolean): Key the switch and offsets now.
+- **`operandi.rig.dynamicParentRemove`** — Delete the item's dynamic parent, one undo step; compensate rewrites the item's own transform so it stays where it is now.
+  - `item` (integer): The child item id (default the selection).
+  - `compensate` (boolean): Keep the item where it is (default Compensation).
+- **`operandi.rig.parent`** — Parent items to parent (default the selection: the last picked is the parent), one undo step; compensate keeps them where they are.
+  - `items` (string): Child item ids, comma separated.
+  - `parent` (integer): Parent item id.
+  - `compensate` (boolean): Keep them where they are (default Compensation).
+- **`operandi.rig.unparent`** — Unparent items (default the selection), one undo step; compensate keeps them where they are.
+  - `items` (string): Item ids, comma separated.
+  - `compensate` (boolean): Keep them where they are (default Compensation).
+- **`operandi.rig.insert`** — Insert item above child in the hierarchy, one undo step; compensate keeps them where they are.
+  - `item` (integer): The new parent.
+  - `child` (integer): The item that goes under it.
+  - `compensate` (boolean): Keep them where they are (default Compensation).
+- **`operandi.rig.extract`** — Extract item from the hierarchy, one undo step; compensate keeps everything where it is.
+  - `item` (integer): Item id (default the selection).
+  - `compensate` (boolean): Keep them where they are (default Compensation).
+- **`operandi.rig.pivot`** — Set the pivot position and/or rotation (x,y,z; metres and radians, in the item's space), one undo step; the geometry doesn't move.
+  - `item` (integer): Item id (default the active item).
+  - `position` (string): Pivot position x,y,z.
+  - `rotation` (string): Pivot rotation x,y,z (radians).
+- **`operandi.rig.linkAdd`** — Link driven (item:channel) to driver (item:channel), one undo step. mode direct (default: the raw value, no unit conversion) or relationship (through a curve keyed with operandi.rig.relationshipKey). Groups (pos, a vector user channel) link component by component; text channels are refused.
+  - `driven` (string, required): The driven channel, item:name.
+  - `driver` (string, required): The driver channel, item:name.
+  - `mode` (string): direct (default) or relationship.
+- **`operandi.rig.linkRemove`** — Remove a link by piece, or every link driving driven (item:channel, or a group), one undo step.
+  - `piece` (integer): The link piece id.
+  - `driven` (string): The driven channel, item:name.
+- **`operandi.rig.relationshipKey`** — Store a key on a relationship link's curve: driver and driven values (default the driver's current value and the driven channel's own value), smooth-flat, holding outside the keys. One undo step.
+  - `piece` (integer, required): The relationship link id.
+  - `driver` (number): Driver value.
+  - `driven` (number): Driven value.
+- **`operandi.rig.relationshipKeyRemove`** — Delete the relationship key at driver (default the driver's current value), one undo step.
+  - `piece` (integer, required): The relationship link id.
+  - `driver` (number): Driver value of the key.
+- **`operandi.rig.userChannelAdd`** — Add a user channel to item (default the active item), one undo step. type float, distance, angle, percentage, time, integer, boolean, choice, string or divider; mode scalar, xy, xyz, rgb, rgba, uv or uvw (name.X... channels); default, min, max; choices for a choice.
+  - `item` (integer): Item id (default the active item).
+  - `name` (string, required): Channel name (no spaces).
+  - `display` (string): Display name.
+  - `type` (string): Value type (default float).
+  - `mode` (string): Components (default scalar).
+  - `default` (number): Default value.
+  - `min` (number): Minimum.
+  - `max` (number): Maximum.
+  - `choices` (string): Choice names, comma separated.
+- **`operandi.rig.userChannelEdit`** — Edit a user channel, one undo step; renaming keeps its keys and links.
+  - `item` (integer): Item id (default the active item).
+  - `name` (string, required): Channel name.
+  - `rename` (string): New name.
+  - `display` (string): Display name.
+  - `min` (number): Minimum.
+  - `max` (number): Maximum.
+  - `default` (number): Default value.
+- **`operandi.rig.userChannelRemove`** — Delete a user channel, its keys and every link using it, one undo step (the status line says how many links went).
+  - `item` (integer): Item id (default the active item).
+  - `name` (string, required): Channel name.
+- **`operandi.rig.bindUserChannel`** — Add a user channel of the same kind to target (named after the channel unless name is given) and link the channel to it, one undo step; the channel becomes driven.
+  - `channel` (string, required): The channel to drive, item:name.
+  - `target` (integer, required): Item that gets the user channel.
+  - `name` (string): User channel name.
+- **`operandi.rig.modifierAdd`** — Add a modifier, one undo step. kind expression, blend, math, clamp or switch; output item:channel it drives (optional: a modifier added without one only exists until wired); inputs as name=item:channel,... (A, B, Blend, Min, Max, Index, or an expression's variable names; up to 16); expr the expression (RG-60 syntax); op for math: add, subtract, multiply, divide, min, max or power.
+  - `kind` (string, required): Modifier kind.
+  - `output` (string): The driven channel, item:name.
+  - `inputs` (string): Inputs, name=item:channel, comma separated.
+  - `expr` (string): Expression text.
+  - `op` (string): Math operation.
+  - `item` (integer): Item it belongs to when it has no output yet.
+- **`operandi.rig.modifierSet`** — Edit a modifier, one undo step: output item:channel, inputs name=item:channel,... (name= unwires), expr, op. Loops are refused.
+  - `piece` (integer, required): The modifier id.
+  - `output` (string): The driven channel, item:name.
+  - `inputs` (string): Inputs, name=item:channel, comma separated.
+  - `expr` (string): Expression text.
+  - `op` (string): Math operation.
+- **`operandi.rig.bake`** — Bake items (default the selection) over the current range (or start..end frames): their evaluated transforms become keys on every frame and their rig pieces are disabled, not deleted. One undo step.
+  - `items` (string): Item ids, comma separated.
+  - `start` (number): First frame (default the current range's).
+  - `end` (number): Last frame (default the current range's).
+- **`operandi.rig.schematic`** — Read the rig as Schematic nodes and wires: nodes (key item:<id> or piece:<id>, label, kind, inputs, outputs, broken, column) and wires (from, from_port, to, to_port, piece). No arguments.
+- **`operandi.rig.unwire`** — Delete the wire at piece's port (a link: the link; a modifier: that input, or out; a constraint or dynamic parent: that target, the piece with its last), one undo step.
+  - `piece` (integer, required): The rig piece id.
+  - `port` (string, required): The piece's port (A, driver, target 2, out...).
+- **`operandi.anim.setup`** — Turn Setup mode on or off (on: toggle, true or false). A view state: not an undo step.
+  - `on` (string): toggle (default), true or false.
+- **`operandi.anim.itemToSetup`** — Copy the current (edit) values of the items' animated channels into their setup values, one undo step. channels limits it to names such as pos.Y.
+  - `items` (string): Item ids (default the selection).
+  - `channels` (string): Only these channels, comma separated.
+- **`operandi.anim.restoreSetup`** — Throw away the edit values (the keys) of the items' animated channels and put back their setup values, one undo step. channels limits it to names such as pos.Y.
+  - `items` (string): Item ids (default the selection).
+  - `channels` (string): Only these channels, comma separated.
+- **`operandi.ik.addGoal`** — Add a goal at the joint's world place and position + orientation tasks on it (mode position, rotation or both), one undo step.
+  - `joint` (integer): The joint (default the selected item).
+  - `mode` (string): position, rotation or both (default).
+- **`operandi.ik.addTask`** — Add a position or orientation task with no goal (mode), holding the joint at its world position or orientation now; one undo step.
+  - `joint` (integer): The joint (default the selected item).
+  - `mode` (string, required): position or orientation.
+- **`operandi.ik.addToChain`** — Add joints (default the selection) to the full-body IK chain above them, one undo step.
+  - `joints` (string): Joint ids, comma separated.
+  - `piece` (integer): The solver (default the one above the joints).
+- **`operandi.ik.assign`** — Make one full-body IK solver on the root joint covering its joint hierarchy (or the branches to the end joints listed after it), one undo step. Needs Setup mode; joints with scale are refused.
+  - `joints` (string): The root, then any end joints (default the selection).
+- **`operandi.ik.assignGoal`** — Wire tasks on the joint to goal (mode position, rotation or both), one undo step.
+  - `joint` (integer): The joint (default the selected item).
+  - `goal` (integer, required): The goal item.
+  - `mode` (string): position, rotation or both (default).
+- **`operandi.ik.remove`** — Remove the selected joint's (or piece's) IK solver with its tasks, joint IK settings and keys, one undo step.
+  - `piece` (integer): The solver (default the selected chain's).
+- **`operandi.ik.removeFromChain`** — Remove joints' branches (default the selection) from their full-body IK chain, one undo step.
+  - `joints` (string): Joint ids, comma separated.
+  - `piece` (integer): The solver (default the one above the joints).
+- **`operandi.ik.removeTask`** — Remove the joint's position or orientation task (kind) or both, one undo step.
+  - `joint` (integer): The joint (default the selected item).
+  - `kind` (string): position or orientation (default both).
+- **`operandi.ik.taskSet`** — Change the joint's tasks (kind, default both), one undo step: enable, weight, precision, joints (how far up the chain; -1 all).
+  - `joint` (integer): The joint (default the selected item).
+  - `kind` (string): position or orientation (default both).
+  - `enable` (boolean): On or off.
+  - `weight` (number): Pull (default 1).
+  - `precision` (number): Default 1.
+  - `joints` (number): Joints up the chain it moves (-1 all).
+- **`operandi.ik.applyChain`** — Make the chain from root to end (default the selection: root, then end) one FABRIK IK chain, one undo step. Needs Setup mode. Adds <root>_IKGoal under <root>_IKRoot.
+  - `joints` (string): Root and end joint ids, comma separated.
+- **`operandi.ik.disable`** — Turn every IK solver off or on (on: toggle, true or false), one undo step. Setup mode only.
+  - `on` (string): toggle (default), true or false.
+- **`operandi.ik.match`** — Move each solver's goal onto its end joint's world position, rotation or both (mode), one undo step.
+  - `piece` (integer): One solver (default every solver of the selected joints and goals).
+  - `mode` (string): position, rotation or both (default).
+- **`operandi.ik.selectSolvers`** — Select the root joints of the IK solvers of the selected joints and goals.
+  - `piece` (integer): One solver (default every solver of the selected joints and goals).
+- **`operandi.ik.selectSwitch`** — Select the chain's joints, goal and pole of the selected solvers (the switch channels' items).
+  - `piece` (integer): One solver (default every solver of the selected joints and goals).
+- **`operandi.ik.setKeys`** — Key (or with delete, remove the keys at the current time of) Blend, the chain's joints' position and rotation, the goal's position and rotation and the pole's position, one undo step.
+  - `piece` (integer): One solver (default every solver of the selected joints and goals).
+  - `delete` (boolean): Delete the keys instead (Shift+click).
+- **`operandi.ik.switch`** — Switch the selected chains (mode toggle by their Blend, fk or ik), one undo step. To FK: the solved pose into the joints, keyed, Blend keyed 0. To IK: the goal and pole onto the FK pose, keyed, Blend keyed 1.
+  - `piece` (integer): One solver (default every solver of the selected joints and goals).
+  - `mode` (string): toggle (default), fk or ik.
+- **`operandi.ik.updateRest`** — Re-read the rest pose of the selected solvers (or all), one undo step: the two-bone bend side and the chain's goal twist reference.
+  - `piece` (integer): One solver (default every solver of the selected joints and goals).
+  - `all` (boolean): Every solver (default the selected).
+- **`operandi.ik.applyTwoBone`** — Make three joints (root, middle, end; default the selection in pick order) a two-bone IK chain, one undo step. Needs Setup mode; the chain's bend there is the side it keeps. Adds <root>_IKGoal under <root>_IKRoot.
+  - `joints` (string): Root, middle and end joint ids, comma separated.
+- **`operandi.ik.jointQuery`** — Read a joint's IK settings as JSON: active, enableLimits, limitFk, limitsAxis, maxVelocity and per axis X/Y/Z translate, translateWeight, rotate, rotateWeight, useLimits, min, max (degrees).
+  - `joint` (integer): The joint (default the selected item).
+- **`operandi.ik.jointSet`** — Change a joint's IK settings, one undo step: active, enableLimits, limitFk, limitsAxis X/Y/Z, maxVelocity (degrees), and per axis (X, Y, Z suffix) useLimits, min, max (degrees), translate, translateWeight, rotate, rotateWeight.
+  - `joint` (integer): The joint (default the selected item).
+  - `active` (boolean): The joint takes part in IK (default true).
+  - `enableLimits` (boolean): Use the axes' limits (default false).
+  - `limitFk` (boolean): Limits clamp FK edits too (default false).
+  - `limitsAxis` (string): The axis down the bone: X, Y or Z (default Z).
+  - `maxVelocity` (number): Degrees a solver step may turn it.
+  - `useLimitsX` (boolean): Limit X.
+  - `minX` (number): Degrees.
+  - `maxX` (number): Degrees.
+  - `translateX` (boolean): Full-body IK may move it along X.
+  - `translateWeightX` (number): Translation weight on X.
+  - `rotateX` (boolean): Full-body IK may turn it about X (default true).
+  - `rotateWeightX` (number): 0 locks, above 1 favours X.
+  - `useLimitsY` (boolean): Limit Y.
+  - `minY` (number): Degrees.
+  - `maxY` (number): Degrees.
+  - `translateY` (boolean): Full-body IK may move it along Y.
+  - `translateWeightY` (number): Translation weight on Y.
+  - `rotateY` (boolean): Full-body IK may turn it about Y (default true).
+  - `rotateWeightY` (number): 0 locks, above 1 favours Y.
+  - `useLimitsZ` (boolean): Limit Z.
+  - `minZ` (number): Degrees.
+  - `maxZ` (number): Degrees.
+  - `translateZ` (boolean): Full-body IK may move it along Z.
+  - `translateWeightZ` (number): Translation weight on Z.
+  - `rotateZ` (boolean): Full-body IK may turn it about Z (default true).
+  - `rotateWeightZ` (number): 0 locks, above 1 favours Z.
+- **`operandi.ik.pole`** — mode create (default) adds a pole locator one bone out on the bend side; assign uses pole (any item); remove goes back to Orient. One undo step.
+  - `piece` (integer): The solver (default the selected chain's).
+  - `mode` (string): create (default), assign or remove.
+  - `pole` (integer): The item, for assign.
+- **`operandi.ik.query`** — Read IK solvers as JSON: piece, kind, root, goal, pole, blend, enable, joints (joint, name, position, rotation w,x,y,z), distance (end to goal) and met (within tolerance).
+  - `piece` (integer): Only this solver.
+  - `time` (number): Seconds (default the current time).
+  - `tolerance` (number): Met within this distance (default 0.001).
+- **`operandi.pose.drag`** — Pose a hierarchy, one undo step (Auto Key keys what moved). mode ik (default): joint to world position to, the chain up to the nearest pin (or the root) follows, pins hold; rigid: the whole hierarchy moves (by, or so joint reaches to); twist: the joint turns angle degrees about its bone; fk: only the joint turns, aiming its bone at to.
+  - `joint` (integer): The joint (default the selected item).
+  - `to` (string): World position x,y,z.
+  - `by` (string): Offset x,y,z (rigid).
+  - `mode` (string): ik (default), rigid, twist or fk.
+  - `angle` (number): Degrees (twist).
+  - `pins` (string): Pinned joints, comma separated.
+  - `root` (integer): The hierarchy's root (default the joint's top item).
+  - `rootWeight` (number): 0 (default) keeps the root still; above 0 it moves too.
+  - `pinWeight` (number): Position Pins weight (default 1).
+  - `pinPrecision` (number): Position Pins precision (default 1).
+- **`operandi.skel.add`** — Add a joint at a world position, as a child of parent (or a new chain's root), one undo step. symmetry X/Y/Z also adds the mirrored joint under the mirrored parent, named with the side suffixes; the parent is re-aimed at its new first child unless preserveAlignment.
+  - `position` (string, required): World position x,y,z.
+  - `parent` (integer): Parent joint id (none: a new root).
+  - `symmetry` (string): off (default), X, Y or Z.
+  - `prefix` (string): Name prefix (SK-15).
+  - `name` (string): Base name (default Joint); a number is added.
+  - `suffixPlus` (string): Suffix on the + side of the mirror plane (default _L).
+  - `suffixMinus` (string): Suffix on the - side (default _R).
+  - `direction` (string): Axis down the bone: X, Y or Z (default Z, SK-16).
+  - `axis` (string): Axis across the bone (roll): X, Y or Z (default X).
+  - `preserveAlignment` (boolean): Keep orientations instead of re-aiming (default false).
+- **`operandi.skel.align`** — Re-aim a joint (or the selected joints), and with chain its descendants, at their first children, one undo step. Children keep their world places.
+  - `joint` (integer): The joint (default the selected joints).
+  - `chain` (boolean): Also its descendants (default true).
+  - `direction` (string): Axis down the bone: X, Y or Z (default Z, SK-16).
+  - `axis` (string): Axis across the bone (roll): X, Y or Z (default X).
+  - `preserveAlignment` (boolean): Keep orientations instead of re-aiming (default false).
+- **`operandi.skel.delete`** — Delete a joint, one undo step; its children move to its parent keeping their world places.
+  - `joint` (integer, required): The joint.
+- **`operandi.skel.insert`** — Split the bone from joint to its first child with a new joint at its middle, one undo step.
+  - `joint` (integer, required): The joint whose bone is split.
+  - `prefix` (string): Name prefix (SK-15).
+  - `name` (string): Base name (default Joint); a number is added.
+  - `suffixPlus` (string): Suffix on the + side of the mirror plane (default _L).
+  - `suffixMinus` (string): Suffix on the - side (default _R).
+  - `direction` (string): Axis down the bone: X, Y or Z (default Z, SK-16).
+  - `axis` (string): Axis across the bone (roll): X, Y or Z (default X).
+  - `preserveAlignment` (boolean): Keep orientations instead of re-aiming (default false).
+- **`operandi.skel.move`** — Move a joint to a world position, one undo step. compensate (default true) keeps its children in place; off, they move with it. The parent and the joint are re-aimed unless preserveAlignment.
+  - `joint` (integer, required): The joint.
+  - `position` (string, required): World position x,y,z.
+  - `compensate` (boolean): Children stay put (default true).
+  - `direction` (string): Axis down the bone: X, Y or Z (default Z, SK-16).
+  - `axis` (string): Axis across the bone (roll): X, Y or Z (default X).
+  - `preserveAlignment` (boolean): Keep orientations instead of re-aiming (default false).
+- **`operandi.skel.query`** — Read joints as JSON: id, name, parent, firstChild, children, position, boneLength, axes X/Y/Z. root limits it to that joint's chain, depth first.
+  - `root` (integer): Only this joint's chain.
+- **`operandi.skin.bind`** — Bind the meshes (items, default the selected meshes) to the skeleton under root (default the last selected joint), one undo step. Needs Setup mode. A failed Heat bind changes nothing and selects the points to fix.
+  - `items` (string): Mesh item ids, comma separated (default the selected meshes).
+  - `root` (integer): The root joint (default the last selected joint).
+  - `type` (string): rigid, distance, visible or heat (default heat).
+  - `falloff` (string): low, medium (default) or high.
+  - `segments` (boolean): Bind as Segments: weight along each joint's line to its children (default true).
+  - `limitWeights` (boolean): Keep at most weightsPerVertex joints a point (default false).
+  - `weightsPerVertex` (integer): 1 to 8 (default 4).
+  - `minimumWeight` (number): Drop weights below this, 0 to 1 (default 0).
+  - `dualQuaternion` (boolean): The skin blends by dual quaternions (default false).
+- **`operandi.skin.bakeWeights`** — Write the effective weights (after normalise, limit, threshold, sharpness, smooth influences) into the joints' weight maps and reset those options, one undo step.
+  - `item` (integer): The bound mesh (default the selected one).
+- **`operandi.skin.query`** — Read the skin as JSON: item, op, interpolation, limitSources, maxSources, threshold, sharpness, world, joints (joint, name, map, enable, influence, missing). With vertex: weights (map: effective weight), rest and position (deformed, at time seconds, default now).
+  - `item` (integer): The bound mesh (default the selected one).
+  - `vertex` (integer): A point index.
+  - `time` (number): Seconds (default the current time).
+- **`operandi.skin.rebind`** — Add joints (default the selected joints) not yet in the skin of the meshes (items, default the selected meshes), with empty weight maps, leaving the other weights alone; one undo step. Needs Setup mode.
+  - `items` (string): Mesh item ids (default the selected meshes).
+  - `joints` (string): Joint ids, comma separated (default the selected joints).
+- **`operandi.skin.set`** — Change the skin of a bound mesh, one undo step: interpolation local/linear/dualQuaternion, limitSources, maxSources 1-8, threshold 0-1, sharpness, world; with joint, that influence's enable and influence linear/smooth.
+  - `item` (integer): The bound mesh (default the selected one).
+  - `interpolation` (string): local (default), linear or dualQuaternion.
+  - `limitSources` (boolean): Keep only the strongest maxSources joints a point.
+  - `maxSources` (integer): 1 to 8 (default 3).
+  - `threshold` (number): Ignore weights below this (0-1).
+  - `sharpness` (number): Positive binds harder to the strongest joint, negative spreads.
+  - `world` (boolean): Joints act in world space (default true).
+  - `joint` (integer): One influence's joint, for enable and influence.
+  - `enable` (boolean): That influence on or off.
+  - `influence` (string): That influence's weights: linear or smooth.
+- **`operandi.skin.unbind`** — Remove the skin from the meshes (items, default the selected meshes), one undo step; keepMaps false deletes the joints' weight maps too. Needs Setup mode.
+  - `items` (string): Mesh item ids (default the selected meshes).
+  - `keepMaps` (boolean): Keep the weight maps (default true).
+- **`operandi.weight.adjust`** — Change a weight map over the points, one undo step: additive (default) adds weight (negative lowers), off sets it; normalize lowers the other maps so totals stay at most 100%.
+  - `item` (integer): The mesh (default the selected one).
+  - `map` (string): The weight map (default the selected one).
+  - `points` (string): Point indices, comma separated (default the selected points, else all).
+  - `weight` (number, required): The amount (0-1; negative lowers when additive).
+  - `additive` (boolean): Add (default true) or set.
+  - `normalize` (boolean): Keep totals at most 100% by lowering the other maps.
+- **`operandi.weight.isolate`** — Remove the map's values outside the points (default the selected points), one undo step.
+  - `item` (integer): The mesh (default the selected one).
+  - `map` (string): The weight map (default the selected one).
+  - `points` (string): Point indices, comma separated (default the selected points, else all).
+- **`operandi.weight.merge`** — Add map from into map into (default the selected map), capped at 1, and remove from unless remove is false; one undo step.
+  - `item` (integer): The mesh (default the selected one).
+  - `from` (string, required): The map merged in.
+  - `into` (string): The map it goes into (default the selected one).
+  - `remove` (boolean): Remove from afterwards (default true).
+- **`operandi.weight.mirror`** — Mirror every weight map (or map) across axis (default X) from the + side to the − side (from:minus the other way), matching points by position within tolerance, _L/_R maps swapped; one undo step.
+  - `item` (integer): The mesh (default the selected one).
+  - `map` (string): The weight map (default the selected one).
+  - `axis` (string): X (default), Y or Z.
+  - `from` (string): plus (default) or minus: the side copied.
+  - `tolerance` (number): Matching distance (default 0.0001).
+  - `suffixPlus` (string): Default _L.
+  - `suffixMinus` (string): Default _R.
+- **`operandi.weight.normalize`** — Scale each point's weights (the skin's joint maps on a bound mesh, else every weight map) to add up to 1, over the points (default selected, else all); one undo step.
+  - `item` (integer): The mesh (default the selected one).
+  - `map` (string): The weight map (default the selected one).
+  - `points` (string): Point indices, comma separated (default the selected points, else all).
+- **`operandi.weight.query`** — Read weight maps as JSON: item, maps, skin (its joint maps), selected; with map, values (point: weight) or with vertex its value; with vertex alone, weights (map: weight) and total.
+  - `item` (integer): The mesh (default the selected one).
+  - `map` (string): The weight map (default the selected one).
+  - `vertex` (integer): A point index.
+- **`operandi.weight.set`** — Set map's value at points to value (0-1), or erase:true removes it; normalize lowers the other maps; one undo step.
+  - `item` (integer): The mesh (default the selected one).
+  - `map` (string): The weight map (default the selected one).
+  - `points` (string, required): Point indices, comma separated.
+  - `value` (number): 0 to 1.
+  - `erase` (boolean): Remove the value (no weight at all).
+  - `normalize` (boolean): Keep totals at most 100%.
+- **`operandi.weight.smooth`** — Blur the map once over the points (default selected, else all): each moves amount (default 0.5) of the way to its neighbours' mean; one undo step.
+  - `item` (integer): The mesh (default the selected one).
+  - `map` (string): The weight map (default the selected one).
+  - `points` (string): Point indices, comma separated (default the selected points, else all).
+  - `amount` (number): 0 to 1 (default 0.5).
+- **`operandi.weight.split`** — Split map by the side of axis (default X): + side into map_L, − side into map_R, points on the plane half to each; removes the map unless remove is false; one undo step.
+  - `item` (integer): The mesh (default the selected one).
+  - `map` (string): The weight map (default the selected one).
+  - `axis` (string): X (default), Y or Z.
+  - `remove` (boolean): Remove the original (default true).
+  - `suffixPlus` (string): Default _L.
+  - `suffixMinus` (string): Default _R.
+- **`operandi.weight.transfer`** — Copy every weight map (or map) of mesh from onto this mesh's points (default selected, else all): each takes the nearest source point's weights in world space; one undo step.
+  - `item` (integer): The mesh (default the selected one).
+  - `map` (string): The weight map (default the selected one).
+  - `points` (string): Point indices, comma separated (default the selected points, else all).
+  - `from` (integer, required): The source mesh item.
+- **`operandi.eval.graph`** — Read the evaluation graph as JSON: nodes (id, kind time/channel/field/transform/shownMesh, item, name, label, dirty) and edges [from, to] (to reads from). item limits it to one item's nodes and the edges touching them.
+  - `item` (integer): Only this item's nodes.
 - **`operandi.render.frameRange`** — Render frames start..end (default the current range) with Cycles into folder (default the project's renders/) as <name>_0000.png; needs the running app. operandi.anim.query reports progress (job).
   - `start` (number): First frame (default the current range's).
   - `end` (number): Last frame (default the current range's).
@@ -666,6 +1022,29 @@ used in the app; `primitive_add` always starts from the Reset values.
   - `frames` (number): Frames to move by (default 0).
   - `value` (number): Value to add (default 0).
   - `link` (boolean): Related keys (X/Y/Z, R/G/B) at the same times move in time too (GE-42).
+- **`operandi.key.transform`** — Transforms the selected keys at once, one undo step: times scaled around a pivot then moved, values the same (GE-44 Box Scale, GE-40/43).
+  - `frames` (number): Frames to move by (default 0).
+  - `value` (number): Value to add (default 0).
+  - `timeFactor` (number): Time scale (default 1).
+  - `timePivot` (number): Frame to scale time around (default 0).
+  - `valueFactor` (number): Value scale (default 1).
+  - `valuePivot` (number): Value to scale around (default 0).
+- **`operandi.key.dropCopies`** — Drops copies of the selected keys on every frame along a drag, values moving evenly (GE-31 Ctrl+Shift+drag).
+  - `frames` (number, required): Frames dragged (negative: earlier).
+  - `value` (number): Value change at the end (default 0).
+- **`operandi.curve.retime`** — Stretches timing between two frames so one frame lands on another; keys between follow (GE-X5 retime).
+  - `channels` (string): Channels as item:name,...; default the selected channels, else the selected keys' channels.
+  - `low` (number, required): Fixed frame before.
+  - `high` (number, required): Fixed frame after.
+  - `from` (number, required): The frame that moves.
+  - `to` (number, required): Where it lands.
+- **`operandi.curve.saveEnvelope`** — Saves channels' curves as an envelope preset file (GE-83).
+  - `channels` (string): Channels as item:name,...; default the selected channels, else the selected keys' channels.
+  - `path` (string, required): The .openvelope file to write.
+- **`operandi.curve.applyEnvelope`** — Puts an envelope preset's curves on channels from a frame (GE-83).
+  - `channels` (string): Channels as item:name,...; default the selected channels, else the selected keys' channels.
+  - `path` (string, required): The .openvelope file.
+  - `frame` (number): Start frame (default the current frame).
 - **`operandi.key.setValue`** — Sets, adds to or multiplies the selected keys' values (GE-71 Set Value).
   - `value` (number, required): The value.
   - `mode` (string): set (default), add or multiply.

@@ -61,6 +61,7 @@ this page is the "which files" companion. Paths are under `crates/`.
 | Final renders (Cycles) | `operandi-cycles/src/lib.rs`, `operandi-cycles/cycles/operandi_cycles.{h,cpp}` |
 | 3D painting (painting builds only): images, image commands, PSD | `operandi-paint/src/` (pixels, blend, io, psd), `operandi-core/src/paint.rs`, `operandi-app/src/painting.rs`; vendored `vendor/craft-psd` |
 | MCP bridge | `operandi-mcp/src/bridge.rs`, `operandi-app/src/mcp.rs` |
+| Python scripting (interpreter, `operandi` module, Script Console, switch) | `operandi-python/src/` (`lib.rs`, `embed.rs`, `operandi.py`), `operandi-app/src/python_ui.rs`, `python_switch.rs`, `operandi-core/src/script_mesh.rs` |
 | Command records, History/Results logs, Command History panel (`cmds.batch`, `cmds.undoTo`, `history.*`) | `operandi-core/src/command_record.rs`, `operandi-app/src/command_history.rs`, `command_history_ui.rs` |
 
 ## Adding a tool: the usual file list

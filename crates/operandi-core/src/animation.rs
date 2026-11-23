@@ -70,7 +70,7 @@ pub const TRANSFORM_CHANNELS: [&str; 9] = [
     "pos.X", "pos.Y", "pos.Z", "rot.X", "rot.Y", "rot.Z", "scl.X", "scl.Y", "scl.Z",
 ];
 
-fn transform_part(name: &str) -> Option<(&str, usize)> {
+pub(crate) fn transform_part(name: &str) -> Option<(&str, usize)> {
     let (group, axis) = name.split_once('.')?;
     let group = ["pos", "rot", "scl"]
         .into_iter()
@@ -330,6 +330,15 @@ pub struct Animation {
         with = "shadow_list"
     )]
     pub shadows: BTreeMap<ChannelKey, Curve>,
+    /// SK-01 Setup mode: items show their setup (rest) values, keys are
+    /// ignored for display and transform edits change setup values. A view
+    /// state, not document data: never saved, and undo and redo keep it as
+    /// it is (`keep_time`).
+    #[serde(skip)]
+    pub setup: bool,
+    /// Phase 4: rig pieces and pivots (rig.rs; saved, native v62).
+    #[serde(default, skip_serializing_if = "crate::rig::Rig::is_default")]
+    pub rig: crate::rig::Rig,
 }
 
 mod shadow_list {
@@ -453,7 +462,12 @@ mod channel_list {
 
 impl Animation {
     pub fn is_default(&self) -> bool {
-        *self == Animation::default()
+        // Setup mode is a view state, not data.
+        let plain = Animation {
+            setup: false,
+            ..self.clone()
+        };
+        plain == Animation::default()
     }
     /// The channels of item `id` that have keys.
     pub fn item_channels(&self, id: u64) -> impl Iterator<Item = (&ChannelKey, &AnimChannel)> {
@@ -506,6 +520,14 @@ impl Animation {
 /// transform axis, or a number, on/off, choice or colour component channel
 /// of its `item.channel` tables whose setter posing can apply.
 pub fn keyable(scene: &Scene, id: u64, name: &str) -> bool {
+    // Rig piece and pivot channels (rig.rs).
+    // Matrix outputs (RG-63) read but don't key.
+    if name.starts_with("world.") || name.starts_with("local.") {
+        return false;
+    }
+    if let Some(v) = crate::rig::read(scene, id, name) {
+        return v.is_some();
+    }
     if transform_part(name).is_some() {
         return read(scene, &ChannelKey::new(id, name)).is_some();
     }
@@ -612,6 +634,9 @@ pub fn channel_of_command(scene: &Scene, command: &crate::Command) -> Option<(u6
 
 /// Every keyable channel of item `id`, transforms first.
 pub fn keyable_channels(scene: &Scene, id: u64) -> Vec<String> {
+    if let Some(piece) = scene.animation.rig.piece(id) {
+        return crate::rig::channel_names(piece);
+    }
     let Some(item) = scene.item(id) else {
         return Vec::new();
     };
@@ -633,6 +658,11 @@ pub fn keyable_channels(scene: &Scene, id: u64) -> Vec<String> {
             _ => out.push(c.name.to_string()),
         }
     }
+    // User channels (RG-53) and pivots (RG-14), rig.rs.
+    for u in scene.animation.rig.user.iter().filter(|u| u.item == id) {
+        out.extend(u.channel_names());
+    }
+    out.extend(crate::rig::PIVOT_CHANNELS.iter().map(|s| s.to_string()));
     out.retain(|n| transform_part(n).is_some() || keyable(scene, id, n));
     out.dedup();
     out
@@ -669,6 +699,9 @@ pub fn default_value(scene: &Scene, key: &ChannelKey) -> f64 {
 /// The value channel `key` holds now (its field: the evaluated value plus
 /// any pending edit).
 pub fn read(scene: &Scene, key: &ChannelKey) -> Option<f64> {
+    if let Some(v) = crate::rig::read(scene, key.item, &key.channel) {
+        return v;
+    }
     let item = scene.item(key.item)?;
     if let Some((group, axis)) = transform_part(&key.channel) {
         if item.environment.is_some() {
@@ -710,6 +743,9 @@ fn split_component(name: &str) -> (&str, Option<usize>) {
 pub fn write(scene: &mut Scene, key: &ChannelKey, value: f64) -> Result<()> {
     if !value.is_finite() {
         return Err("Not a number".into());
+    }
+    if let Some(r) = crate::rig::write(scene, key.item, &key.channel, value) {
+        return r;
     }
     if let Some((group, axis)) = transform_part(&key.channel) {
         let item = scene.item_mut(key.item).ok_or("Missing item")?;
@@ -778,12 +814,23 @@ pub fn pose(scene: &mut Scene, time: Tick) {
     if scene.animation.channels.is_empty() {
         return;
     }
+    // SK-01: in Setup mode every animated channel shows its setup value.
+    let setup = scene.animation.setup;
     let values: Vec<(ChannelKey, f64)> = scene
         .animation
         .channels
         .iter()
         .filter(|(_, c)| !c.curve.is_empty())
-        .map(|(k, c)| (k.clone(), c.curve.value_at(time)))
+        .map(|(k, c)| {
+            (
+                k.clone(),
+                if setup {
+                    c.rest
+                } else {
+                    c.curve.value_at(time)
+                },
+            )
+        })
         .collect();
     for (k, v) in values {
         // A channel whose item went away (or can't be posed) is skipped.
@@ -826,6 +873,10 @@ pub fn pending(scene: &Scene) -> Vec<ChannelKey> {
 
 /// Whether channel `key` holds a pending edit.
 pub fn is_pending(scene: &Scene, key: &ChannelKey) -> bool {
+    // Setup mode edits the setup values directly: nothing is pending.
+    if scene.animation.setup {
+        return false;
+    }
     scene.animation.channels.get(key).is_some_and(|c| {
         !c.curve.is_empty()
             && read(scene, key).is_some_and(|v| differs(v, c.curve.value_at(scene.time.current)))
@@ -841,8 +892,10 @@ pub(crate) fn differs(a: f64, b: f64) -> bool {
 /// when the restored step was made at another time (TK-05).
 pub fn keep_time(left: &Scene, restored: &mut Scene) {
     let now = left.time.current;
-    if restored.time.current != now {
+    let setup = left.animation.setup;
+    if restored.time.current != now || restored.animation.setup != setup {
         restored.time.current = now;
+        restored.animation.setup = setup;
         pose(restored, now);
     }
 }
@@ -1066,6 +1119,11 @@ pub struct AnimSession {
     /// The running frame render or playblast: frames done, frames in all,
     /// the folder it writes to. The app keeps it current.
     pub progress: Option<(usize, usize, String)>,
+    /// A one-off message for the status line (the app takes it), e.g.
+    /// RG-24's Compensation hint.
+    pub note: Option<String>,
+    /// RG-24: the Compensation hint was shown this session.
+    pub warned_compensation: bool,
 }
 
 /// A side-effect job only the app can run (TL-70/71).
@@ -1105,6 +1163,25 @@ pub enum AnimRequest {
 /// The channels of the items `before` and the scene share whose values an
 /// edit changed, with their new values. `all`: every keyable channel of
 /// the edited (selected) items, else only animated ones.
+/// SK-01: in Setup mode, every channel the edit from `before` changed
+/// takes the new value as its setup value.
+pub(crate) fn setup_edit(before: &Scene, scene: &mut Scene) {
+    let touched: Vec<(ChannelKey, f64)> = scene
+        .animation
+        .channels
+        .keys()
+        .filter_map(|k| match (read(before, k), read(scene, k)) {
+            (Some(old), Some(new)) if differs(old, new) => Some((k.clone(), new)),
+            _ => None,
+        })
+        .collect();
+    for (k, new) in touched {
+        if let Some(c) = scene.animation.channels.get_mut(&k) {
+            c.rest = new;
+        }
+    }
+}
+
 fn changed_channels(before: &Scene, after: &Scene, all: bool) -> Vec<(ChannelKey, f64, f64)> {
     let mut out = Vec::new();
     for (k, c) in &after.animation.channels {
@@ -1162,18 +1239,27 @@ impl crate::Editor {
         if self.anim.quiet {
             return;
         }
+        // IK-42: Limit FK joints stay inside their limits.
+        crate::ik_joint::clamp_fk(&mut self.scene);
         let scene = &mut self.scene;
         if !scene.animation.channels.is_empty() {
             let gone: Vec<ChannelKey> = scene
                 .animation
                 .channels
                 .keys()
-                .filter(|k| scene.item(k.item).is_none())
+                .filter(|k| !scene.owns_channels(k.item))
                 .cloned()
                 .collect();
             for k in gone {
                 scene.animation.channels.remove(&k);
             }
+        }
+        // SK-01: in Setup mode an edit changes the setup values of the
+        // animated channels it touched; nothing is keyed.
+        // Setup channels with no keys (a bound joint's, skin.rs) count too.
+        if scene.animation.setup {
+            setup_edit(before, scene);
+            return;
         }
         let mode = scene.animation.settings.auto_key;
         if scene.animation.channels.is_empty() && mode != AutoKey::All {

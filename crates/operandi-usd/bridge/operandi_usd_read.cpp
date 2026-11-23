@@ -43,7 +43,9 @@
 #include <pxr/usd/usdGeom/xformable.h>
 #include <pxr/usd/usdLux/lightAPI.h>
 #include <pxr/usd/usdSkel/bindingAPI.h>
+#include <pxr/usd/usdSkel/animation.h>
 #include <pxr/usd/usdSkel/blendShape.h>
+#include <pxr/usd/usdSkel/skeleton.h>
 #include <pxr/usd/usdShade/connectableAPI.h>
 #include <pxr/usd/usdShade/material.h>
 #include <pxr/usd/usdShade/materialBindingAPI.h>
@@ -685,6 +687,86 @@ struct Walker {
   std::vector<std::string> materials;
   std::map<SdfPath, int> material_of;
   std::vector<std::string> skipped;
+  /* UsdSkelSkeletons (BEHAVIOR-RIG-PHASE5 §7). */
+  std::vector<std::string> skeletons;
+
+  static std::string matrix_json(const GfMatrix4d &m)
+  {
+    std::string o = "[";
+    for (int i = 0; i < 16; i++) {
+      o += (i ? "," : "") + num(m[i / 4][i % 4]);
+    }
+    return o + "]";
+  }
+
+  /* A Skeleton: joints, bind and rest transforms, its world, and its
+   * SkelAnimation's samples. Operandi's own code. */
+  std::string skeleton_json(const UsdPrim &prim)
+  {
+    UsdSkelSkeleton skel(prim);
+    VtTokenArray joints;
+    skel.GetJointsAttr().Get(&joints);
+    VtMatrix4dArray bind, rest;
+    skel.GetBindTransformsAttr().Get(&bind);
+    skel.GetRestTransformsAttr().Get(&rest);
+    std::string j = "[", b = "[", r = "[";
+    for (size_t i = 0; i < joints.size(); i++) {
+      j += (i ? "," : "") + json_string(joints[i].GetString());
+    }
+    for (size_t i = 0; i < bind.size(); i++) {
+      b += (i ? "," : "") + matrix_json(bind[i]);
+    }
+    for (size_t i = 0; i < rest.size(); i++) {
+      r += (i ? "," : "") + matrix_json(rest[i]);
+    }
+    std::string s = "{\"path\":" + json_string(prim.GetPath().GetString()) + ",\"joints\":" + j +
+                    "],\"bind\":" + b + "],\"rest\":" + r + "],\"world\":" +
+                    matrix_json(UsdGeomXformable(prim).ComputeLocalToWorldTransform(TIME));
+    SdfPathVector sources;
+    UsdSkelBindingAPI(prim).GetAnimationSourceRel().GetForwardedTargets(&sources);
+    UsdSkelAnimation anim(sources.empty() ? UsdPrim() : prim.GetStage()->GetPrimAtPath(sources[0]));
+    if (anim) {
+      VtTokenArray order;
+      anim.GetJointsAttr().Get(&order);
+      std::vector<double> times;
+      anim.GetRotationsAttr().GetTimeSamples(&times);
+      if (times.empty()) {
+        times.push_back(UsdTimeCode::Default().GetValue());
+      }
+      std::string o = "[";
+      for (size_t i = 0; i < order.size(); i++) {
+        o += (i ? "," : "") + json_string(order[i].GetString());
+      }
+      std::string t = "[", tr = "[", ro = "[", sc = "[";
+      for (size_t k = 0; k < times.size(); k++) {
+        const UsdTimeCode code = std::isnan(times[k]) ? UsdTimeCode::Default() : UsdTimeCode(times[k]);
+        VtVec3fArray tv;
+        VtQuatfArray rv;
+        VtVec3hArray sv;
+        anim.GetTranslationsAttr().Get(&tv, code);
+        anim.GetRotationsAttr().Get(&rv, code);
+        anim.GetScalesAttr().Get(&sv, code);
+        t += (k ? "," : "") + num(std::isnan(times[k]) ? 0.0 : times[k]);
+        std::string a = "[", q = "[", c = "[";
+        for (size_t i = 0; i < tv.size(); i++) {
+          a += (i ? "," : "") + std::string("[") + num(tv[i][0]) + "," + num(tv[i][1]) + "," + num(tv[i][2]) + "]";
+        }
+        for (size_t i = 0; i < rv.size(); i++) {
+          const GfVec3f im = rv[i].GetImaginary();
+          q += (i ? "," : "") + std::string("[") + num(rv[i].GetReal()) + "," + num(im[0]) + "," + num(im[1]) + "," + num(im[2]) + "]";
+        }
+        for (size_t i = 0; i < sv.size(); i++) {
+          c += (i ? "," : "") + std::string("[") + num(float(sv[i][0])) + "," + num(float(sv[i][1])) + "," + num(float(sv[i][2])) + "]";
+        }
+        tr += (k ? "," : "") + a + "]";
+        ro += (k ? "," : "") + q + "]";
+        sc += (k ? "," : "") + c + "]";
+      }
+      s += ",\"anim\":{\"joints\":" + o + "],\"times\":" + t + "],\"translations\":" + tr +
+           "],\"rotations\":" + ro + "],\"scales\":" + sc + "]}";
+    }
+    return s + "}";
+  }
 
   int material_index(const UsdShadeMaterial &m)
   {
@@ -890,7 +972,35 @@ struct Walker {
                   operandi_custom(shape.GetPrim()) + "}";
       }
     }
-    s += ",\"blendShapes\":[" + shapes + "]" + operandi_custom(prim) + "}";
+    s += ",\"blendShapes\":[" + shapes + "]";
+    /* Skinning (UsdSkelBindingAPI, §7). */
+    if (prim.HasAPI<UsdSkelBindingAPI>()) {
+      const UsdSkelSkeleton target = skel.GetInheritedSkeleton();
+      VtIntArray joint_indices;
+      VtFloatArray joint_weights;
+      const UsdGeomPrimvar ip = skel.GetJointIndicesPrimvar();
+      const UsdGeomPrimvar wp = skel.GetJointWeightsPrimvar();
+      if (target && ip && wp && ip.Get(&joint_indices, TIME) && wp.Get(&joint_weights, TIME)) {
+        GfMatrix4d geom(1.0);
+        skel.GetGeomBindTransformAttr().Get(&geom);
+        TfToken method;
+        skel.GetSkinningMethodAttr().Get(&method);
+        std::vector<float> w(joint_weights.begin(), joint_weights.end());
+        VtTokenArray order;
+        skel.GetJointsAttr().Get(&order);
+        std::string o = "[";
+        for (size_t i = 0; i < order.size(); i++) {
+          o += (i ? "," : "") + json_string(order[i].GetString());
+        }
+        s += ",\"skin\":{\"skeleton\":" + json_string(target.GetPath().GetString()) +
+             ",\"elementSize\":" + std::to_string(ip.GetElementSize()) +
+             ",\"indices\":" + out.ints(joint_indices) + ",\"weights\":" + out.floats(w) +
+             ",\"geomBind\":" + matrix_json(geom) + ",\"method\":" +
+             json_string(method.IsEmpty() ? "classicLinear" : method.GetString()) +
+             ",\"joints\":" + o + "]}";
+      }
+    }
+    s += operandi_custom(prim) + "}";
     meshes.push_back(s);
     const int index = int(meshes.size() - 1);
     mesh_of[key] = index;
@@ -978,6 +1088,11 @@ struct Walker {
         prim.GetTypeName() == TfToken("RenderProduct") || prim.GetTypeName() == TfToken("RenderVar"))
     {
       /* Render prims are read on their own (render_settings_json). */
+      return;
+    }
+    if (prim.IsA<UsdSkelSkeleton>()) {
+      /* Read as joints (import_skel.rs), not as a transform. */
+      skeletons.push_back(skeleton_json(prim));
       return;
     }
     UsdGeomImageable img(prim);
@@ -1248,7 +1363,8 @@ struct Walker {
     s += ",\"renderCamera\":" + json_string(render_camera());
     s += render_settings_json();
     return s + ",\"prims\":" + list(prims) + ",\"meshes\":" + list(meshes) +
-           ",\"materials\":" + list(materials) + ",\"skipped\":" + list(skipped) + "}";
+           ",\"materials\":" + list(materials) + ",\"skipped\":" + list(skipped) +
+           ",\"skeletons\":" + list(skeletons) + "}";
   }
 };
 

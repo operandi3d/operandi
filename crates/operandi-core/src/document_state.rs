@@ -66,6 +66,7 @@ impl Editor {
         swap(&mut a.falloff_stamps, &mut b.falloff_stamps);
         swap(&mut a.background_cache, &mut b.background_cache);
         swap(&mut a.meshops, &mut b.meshops);
+        swap(&mut a.eval, &mut b.eval);
         swap(&mut a.base_edit, &mut b.base_edit);
         swap(&mut a.meshop_row, &mut b.meshop_row);
     }
@@ -117,10 +118,12 @@ fn every_field_is_sorted(e: Editor) {
         falloff_stamps: _,
         background_cache: _,
         meshops: _,
+        eval: _,
         base_edit: _,
         meshop_row: _,
         // Shared: settings and tool context that follow the user.
         action_context: _,
+        rig_compensation: _,
         symmetry: _,
         symmetry_resume: _,
         polygon_tag_kind: _,

@@ -1168,7 +1168,16 @@ impl Target {
                 .is_vertex_map()
                 .then_some(setup.weight_map.as_deref())
                 .flatten()
-                .map(|name| weights::WeightLayer::new(mesh, name)),
+                .map(|name| {
+                    let mut layer = weights::WeightLayer::new(mesh, name);
+                    // SK-43: a joint map normalises across its skin only.
+                    if let Some(maps) = crate::skin_weights::skin_maps(scene, id)
+                        && maps.iter().any(|m| m == name)
+                    {
+                        layer.others.retain(|(n, _, _)| maps.contains(n));
+                    }
+                    layer
+                }),
             falloff_w: match &setup.falloff {
                 Some(f) => Some(
                     f.weights(scene, id)?

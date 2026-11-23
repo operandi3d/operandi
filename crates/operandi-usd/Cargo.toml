@@ -21,3 +21,6 @@ image = { version = "=0.25.10", default-features = false, features = ["png", "jp
 # Link liboperandi_usd (built by scripts/build-usd.sh). Without it the crate
 # still builds and `export` reports that USD isn't included.
 usd = []
+# With the app's Python scripting: link the bundled libpython ahead of the
+# bridge (build.rs explains).
+python = []

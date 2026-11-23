@@ -33,6 +33,7 @@ pub mod import_graphs;
 pub mod import_lights;
 pub mod import_materials;
 pub mod import_mtlx_graph;
+pub mod import_skel;
 #[cfg(test)]
 mod import_tests;
 pub mod import_variants;
@@ -61,6 +62,11 @@ pub mod render_usd;
 mod render_usd_tests;
 #[cfg(all(test, feature = "usd"))]
 mod replica_usd_tests;
+#[cfg(all(test, feature = "usd"))]
+mod rig_usd_tests;
+pub mod skel_usd;
+#[cfg(all(test, feature = "usd"))]
+mod skel_usd_tests;
 pub mod stage;
 #[cfg(all(test, feature = "usd"))]
 mod tests;
