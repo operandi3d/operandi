@@ -16,8 +16,8 @@
 set -eu
 cd "$(dirname "$0")/.."
 # The pinned release: python-build-standalone tag and CPython version.
-PBS_TAG="${OPERANDI_PBS_TAG:-20261111}"
-PY_VERSION="${OPERANDI_PY_VERSION:-3.13.9}"
+PBS_TAG="${OPERANDI_PBS_TAG:-20261110}"
+PY_VERSION="${OPERANDI_PY_VERSION:-3.13.18}"
 case "$(uname -s)-$(uname -m)" in
     Darwin-arm64) TRIPLE=aarch64-apple-darwin ;;
     Darwin-x86_64) TRIPLE=x86_64-apple-darwin ;;
