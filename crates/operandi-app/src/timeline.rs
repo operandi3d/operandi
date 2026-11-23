@@ -1694,15 +1694,23 @@ impl Operandi {
             // SK-01: the Setup toggle (lit while on).
             let on = self.editor.scene.animation.setup;
             if ui
-                .selectable_label(on, "Setup")
+                .add(
+                    crate::icons::button(ui, Icon::SetupPose, "")
+                        .selected(on)
+                        .min_size(vec2(22., 20.)),
+                )
                 .on_hover_text("Setup: show and edit the setup (rest) pose; keys are ignored\noperandi.anim.setup")
                 .clicked()
             {
                 self.execute("operandi.anim.setup");
             }
-            // SK-10: the Skeleton tool (text until its studio icon).
+            // SK-10: the Skeleton tool.
             if ui
-                .selectable_label(self.skeleton.on, "Skeleton")
+                .add(
+                    crate::icons::button(ui, Icon::SkeletonTool, "")
+                        .selected(self.skeleton.on)
+                        .min_size(vec2(22., 20.)),
+                )
                 .on_hover_text("Skeleton: click to draw joints; Shift+click starts a new chain\noperandi.skel.tool")
                 .clicked()
             {

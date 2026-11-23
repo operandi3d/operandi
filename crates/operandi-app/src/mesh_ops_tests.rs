@@ -345,8 +345,6 @@ fn every_op_icon_name_is_a_generator_icon() {
         "meshcleanup.tool.item",
         // Relax Mesh is a small text button with no icon (DEFORM §1).
         "sculpt.relaxMesh.item",
-        // The skin (SK-36) until its studio icon is rendered.
-        "operandi.skin.item",
     ];
     for d in operandi_core::meshops::op_defs() {
         if d.id().starts_with("test.") || generic.contains(&d.id()) {

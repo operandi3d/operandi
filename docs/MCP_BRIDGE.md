@@ -839,6 +839,62 @@ used in the app; `primitive_add` always starts from the Reset values.
 - **`operandi.skin.unbind`** — Remove the skin from the meshes (items, default the selected meshes), one undo step; keepMaps false deletes the joints' weight maps too. Needs Setup mode.
   - `items` (string): Mesh item ids (default the selected meshes).
   - `keepMaps` (boolean): Keep the weight maps (default true).
+- **`operandi.weight.adjust`** — Change a weight map over the points, one undo step: additive (default) adds weight (negative lowers), off sets it; normalize lowers the other maps so totals stay at most 100%.
+  - `item` (integer): The mesh (default the selected one).
+  - `map` (string): The weight map (default the selected one).
+  - `points` (string): Point indices, comma separated (default the selected points, else all).
+  - `weight` (number, required): The amount (0-1; negative lowers when additive).
+  - `additive` (boolean): Add (default true) or set.
+  - `normalize` (boolean): Keep totals at most 100% by lowering the other maps.
+- **`operandi.weight.isolate`** — Remove the map's values outside the points (default the selected points), one undo step.
+  - `item` (integer): The mesh (default the selected one).
+  - `map` (string): The weight map (default the selected one).
+  - `points` (string): Point indices, comma separated (default the selected points, else all).
+- **`operandi.weight.merge`** — Add map from into map into (default the selected map), capped at 1, and remove from unless remove is false; one undo step.
+  - `item` (integer): The mesh (default the selected one).
+  - `from` (string, required): The map merged in.
+  - `into` (string): The map it goes into (default the selected one).
+  - `remove` (boolean): Remove from afterwards (default true).
+- **`operandi.weight.mirror`** — Mirror every weight map (or map) across axis (default X) from the + side to the − side (from:minus the other way), matching points by position within tolerance, _L/_R maps swapped; one undo step.
+  - `item` (integer): The mesh (default the selected one).
+  - `map` (string): The weight map (default the selected one).
+  - `axis` (string): X (default), Y or Z.
+  - `from` (string): plus (default) or minus: the side copied.
+  - `tolerance` (number): Matching distance (default 0.0001).
+  - `suffixPlus` (string): Default _L.
+  - `suffixMinus` (string): Default _R.
+- **`operandi.weight.normalize`** — Scale each point's weights (the skin's joint maps on a bound mesh, else every weight map) to add up to 1, over the points (default selected, else all); one undo step.
+  - `item` (integer): The mesh (default the selected one).
+  - `map` (string): The weight map (default the selected one).
+  - `points` (string): Point indices, comma separated (default the selected points, else all).
+- **`operandi.weight.query`** — Read weight maps as JSON: item, maps, skin (its joint maps), selected; with map, values (point: weight) or with vertex its value; with vertex alone, weights (map: weight) and total.
+  - `item` (integer): The mesh (default the selected one).
+  - `map` (string): The weight map (default the selected one).
+  - `vertex` (integer): A point index.
+- **`operandi.weight.set`** — Set map's value at points to value (0-1), or erase:true removes it; normalize lowers the other maps; one undo step.
+  - `item` (integer): The mesh (default the selected one).
+  - `map` (string): The weight map (default the selected one).
+  - `points` (string, required): Point indices, comma separated.
+  - `value` (number): 0 to 1.
+  - `erase` (boolean): Remove the value (no weight at all).
+  - `normalize` (boolean): Keep totals at most 100%.
+- **`operandi.weight.smooth`** — Blur the map once over the points (default selected, else all): each moves amount (default 0.5) of the way to its neighbours' mean; one undo step.
+  - `item` (integer): The mesh (default the selected one).
+  - `map` (string): The weight map (default the selected one).
+  - `points` (string): Point indices, comma separated (default the selected points, else all).
+  - `amount` (number): 0 to 1 (default 0.5).
+- **`operandi.weight.split`** — Split map by the side of axis (default X): + side into map_L, − side into map_R, points on the plane half to each; removes the map unless remove is false; one undo step.
+  - `item` (integer): The mesh (default the selected one).
+  - `map` (string): The weight map (default the selected one).
+  - `axis` (string): X (default), Y or Z.
+  - `remove` (boolean): Remove the original (default true).
+  - `suffixPlus` (string): Default _L.
+  - `suffixMinus` (string): Default _R.
+- **`operandi.weight.transfer`** — Copy every weight map (or map) of mesh from onto this mesh's points (default selected, else all): each takes the nearest source point's weights in world space; one undo step.
+  - `item` (integer): The mesh (default the selected one).
+  - `map` (string): The weight map (default the selected one).
+  - `points` (string): Point indices, comma separated (default the selected points, else all).
+  - `from` (integer, required): The source mesh item.
 - **`operandi.eval.graph`** — Read the evaluation graph as JSON: nodes (id, kind time/channel/field/transform/shownMesh, item, name, label, dirty) and edges [from, to] (to reads from). item limits it to one item's nodes and the edges touching them.
   - `item` (integer): Only this item's nodes.
 - **`operandi.render.frameRange`** — Render frames start..end (default the current range) with Cycles into folder (default the project's renders/) as <name>_0000.png; needs the running app. operandi.anim.query reports progress (job).
