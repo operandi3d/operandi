@@ -259,3 +259,51 @@ except operandi.CommandError as err:
     assert!(out.contains("isn't a query"), "{out}");
     assert_eq!(e.scene.time.current, operandi_core::time_tick::Tick::ZERO);
 }
+
+/// The standard library a script can count on (help(), inspect, json...),
+/// and help(operandi) itself (pydoc reads every function's text).
+pub(crate) const STDLIB_PROBE: &str = include_str!("../../../scripts/python-app-check.py");
+
+#[test]
+fn the_standard_library_and_help_work() {
+    let mut e = Editor::default();
+    let out = ok(&mut e, STDLIB_PROBE);
+    assert!(out.contains("missing []"), "{out}");
+    assert!(out.contains("help True"), "{out}");
+}
+
+#[test]
+fn the_try_these_lines_all_work_in_the_console() {
+    let _turn = TURN.lock().unwrap_or_else(|p| p.into_inner());
+    let mut e = Editor::default();
+    let mut host = EditorHost(&mut e);
+    let mut outputs = Vec::new();
+    for line in TRY_THESE {
+        let out = run_blocking(&mut host, Source::console(*line));
+        assert!(out.ok, "{line}\n{}{:?}", out.output, out.error);
+        outputs.push(out.output);
+    }
+    // The cube rose to 2, eased to 1 by frame 12, the nudge was undone,
+    // it has 8 points, and help lists the API.
+    assert!(outputs[4].contains('2'), "{}", outputs[4]);
+    assert_eq!(outputs[7].trim(), "1.0");
+    assert_eq!(outputs[9].trim(), "True");
+    assert_eq!(outputs[10].trim(), "8");
+    assert!(outputs[11].contains("undo_group") && outputs[11].contains("mesh_get"));
+    let id = e.scene.items.last().unwrap().id;
+    assert_eq!(
+        e.scene.item(id).unwrap().transform.translation.x,
+        0.,
+        "undone"
+    );
+}
+
+#[test]
+fn undo_and_redo_report_truthfully() {
+    let mut e = Editor::default();
+    let out = ok(
+        &mut e,
+        "import operandi\nprint(operandi.run('app.undo', check=False))\ntry:\n    operandi.redo()\nexcept operandi.CommandError as err:\n    print(err)",
+    );
+    assert_eq!(out, "False\nNothing to redo\n");
+}

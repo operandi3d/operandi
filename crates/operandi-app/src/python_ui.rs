@@ -83,6 +83,9 @@ impl Host for AppHost<'_> {
         if name.starts_with("operandi.python.") {
             return Err("A script can't start another script".into());
         }
+        if let Some(refused) = operandi_python::check_undo_redo(&self.0.editor, line) {
+            refused?;
+        }
         self.0
             .execute_reporting(operandi_core::Source::Script, line)
             .map(|()| None)
@@ -395,6 +398,16 @@ impl Operandi {
             .auto_shrink([false, false])
             .stick_to_bottom(true)
             .show(ui, |ui| {
+                // A first look: lines to try (UIC-04's usage hint, in place).
+                if self.python.log.is_empty() {
+                    ui.label(egui::RichText::new("Try these (operandi is imported):").color(weak));
+                    for line in operandi_python::TRY_THESE {
+                        ui.add(
+                            egui::Label::new(egui::RichText::new(*line).monospace().color(weak))
+                                .selectable(true),
+                        );
+                    }
+                }
                 for line in &self.python.log {
                     let (text, colour) = match line {
                         Line::Input(t) => (format!(">>> {t}"), None),

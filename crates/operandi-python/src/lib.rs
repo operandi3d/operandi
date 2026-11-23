@@ -130,12 +130,34 @@ pub fn answer_editor(e: &Editor, line: &str) -> Option<Result<String, String>> {
     command_exec::answer(e, name, &args)
 }
 
+/// `app.undo` / `app.redo` with a truthful result: refused when there is
+/// nothing to undo or redo (the step count is the editor's own list).
+/// `None` for other lines.
+pub fn check_undo_redo(e: &Editor, line: &str) -> Option<Result<(), String>> {
+    match line.split_whitespace().next()? {
+        "app.undo" | "Undo" if e.undo.is_empty() => Some(Err("Nothing to undo".into())),
+        "app.redo" | "Redo" if e.redo.is_empty() => Some(Err("Nothing to redo".into())),
+        "app.undo" | "Undo" | "app.redo" | "Redo" => Some(Ok(())),
+        _ => None,
+    }
+}
+
 /// An editor on its own as a host: headless commands only (tests, the
 /// headless MCP bridge).
 pub struct EditorHost<'a>(pub &'a mut Editor);
 
 impl Host for EditorHost<'_> {
     fn run(&mut self, line: &str) -> Result<Option<String>, String> {
+        if let Some(ok) = check_undo_redo(self.0, line) {
+            ok?;
+            let undo = line.starts_with("app.undo") || line.starts_with("Undo");
+            let cmd = if undo {
+                operandi_core::Command::Undo
+            } else {
+                operandi_core::Command::Redo
+            };
+            return self.0.dispatch(cmd).map(|_| None);
+        }
         operandi_core::command_line::run_line(self.0, line).unwrap_or_else(|| {
             let name = line.split_whitespace().next().unwrap_or(line);
             Err(format!(
@@ -159,6 +181,23 @@ pub fn available() -> Result<(), String> {
         Err(NOT_BUILT.into())
     }
 }
+
+/// Console lines to try (the Script Console shows them when empty, and
+/// docs/PYTHON_SCRIPTING.md lists them); a test runs every one.
+pub const TRY_THESE: &[&str] = &[
+    "operandi.run(\"mesh.new\")",
+    "operandi.mesh_set([(-.5,-.5,-.5),(.5,-.5,-.5),(.5,.5,-.5),(-.5,.5,-.5),(-.5,-.5,.5),(.5,-.5,.5),(.5,.5,.5),(-.5,.5,.5)], [[0,3,2,1],[4,5,6,7],[0,1,5,4],[2,3,7,6],[1,2,6,5],[0,4,7,3]])",
+    "cube = operandi.mesh_get()[\"item\"]",
+    "operandi.set_channel(cube, \"pos.Y\", 2)",
+    "operandi.query(\"transform.channel\", name=\"pos.Y\", value=\"?\", item=cube)",
+    "operandi.set_time(0); operandi.set_key(cube, \"pos.Y\")",
+    "operandi.set_time(24); operandi.set_channel(cube, \"pos.Y\", 0); operandi.set_key(cube, \"pos.Y\")",
+    "operandi.set_time(12); operandi.query(\"operandi.anim.query\", item=cube, frames=\"12\")[\"channels\"][0][\"values\"][\"12\"]",
+    "with operandi.undo_group(\"Nudge\"): operandi.set_channel(cube, \"pos.X\", 1); operandi.set_channel(cube, \"pos.Z\", 1)",
+    "operandi.undo()",
+    "len(operandi.mesh_get(cube)[\"points\"])",
+    "help(operandi)",
+];
 
 /// The refusal while another script runs.
 pub const BUSY: &str = "A script is already running";

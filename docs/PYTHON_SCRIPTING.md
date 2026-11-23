@@ -18,6 +18,26 @@ Script…** runs a `.py` file (the panel starts in the Scripts folder, the
 The build must include Python (feature `python`; see "Building" below). A
 build without it says "Python isn't in this build".
 
+## Try these
+
+Typed one at a time in the Script Console (it shows them when it opens);
+`operandi` is already imported there. A test runs every line.
+
+```python
+operandi.run("mesh.new")
+operandi.mesh_set([(-.5,-.5,-.5),(.5,-.5,-.5),(.5,.5,-.5),(-.5,.5,-.5),(-.5,-.5,.5),(.5,-.5,.5),(.5,.5,.5),(-.5,.5,.5)], [[0,3,2,1],[4,5,6,7],[0,1,5,4],[2,3,7,6],[1,2,6,5],[0,4,7,3]])
+cube = operandi.mesh_get()["item"]
+operandi.set_channel(cube, "pos.Y", 2)
+operandi.query("transform.channel", name="pos.Y", value="?", item=cube)
+operandi.set_time(0); operandi.set_key(cube, "pos.Y")
+operandi.set_time(24); operandi.set_channel(cube, "pos.Y", 0); operandi.set_key(cube, "pos.Y")
+operandi.set_time(12); operandi.query("operandi.anim.query", item=cube, frames="12")["channels"][0]["values"]["12"]
+with operandi.undo_group("Nudge"): operandi.set_channel(cube, "pos.X", 1); operandi.set_channel(cube, "pos.Z", 1)
+operandi.undo()
+len(operandi.mesh_get(cube)["points"])
+help(operandi)
+```
+
 ## The `operandi` module
 
 ```python
@@ -37,6 +57,7 @@ flat = operandi.mesh_get(flat=True)["points"]        # memoryview of doubles
 operandi.mesh_set(array.array("d", flat))            # points only, same count
 
 operandi.set_time(24); operandi.set_channel(1, "pos.Y", 0); operandi.set_key(1, "pos.Y")
+operandi.undo(); operandi.redo()                     # CommandError when there's nothing to undo/redo
 ```
 
 - `run` goes through the same path as a typed line, menus and the MCP
@@ -94,6 +115,13 @@ the switch on.
   `Contents/Frameworks` and the standard library (without tests, IDLE, Tk
   and pip) into `Contents/Resources/python`. `OPERANDI_PYTHON_BUILD=1`
   fetches first; `OPERANDI_PYTHON_BUILD=0` leaves Python out.
+- `scripts/check-bundled-python.sh <app>` checks a built app: its binary
+  binds to its own libpython (ahead of the USD bridge, which carries
+  Blender's static Python for OpenUSD), and, started briefly with its MCP
+  bridge on, the app's own interpreter imports the standard library,
+  renders help(operandi) and runs the lines above. `scripts/bundle-dev.sh`
+  runs the link check every time and the live one with
+  `OPERANDI_PYTHON_CHECK=1`.
 - `scripts/merge-check.sh` runs the Python tests with the bundled CPython
   or, failing that, the `python3` on PATH.
 

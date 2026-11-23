@@ -101,6 +101,22 @@ def mesh_set(points, polygons=None, item=None):
         raise CommandError(text)
 
 
+def undo(steps=1):
+    """Undoes the last step (or `steps` steps), as Edit > Undo does.
+    Returns True; raises CommandError when there is nothing to undo."""
+    for _ in range(steps):
+        run("app.undo")
+    return True
+
+
+def redo(steps=1):
+    """Redoes the last undone step (or `steps` steps), as Edit > Redo.
+    Returns True; raises CommandError when there is nothing to redo."""
+    for _ in range(steps):
+        run("app.redo")
+    return True
+
+
 def set_time(frame):
     """Goes to a frame (not an undo step)."""
     run("operandi.time.set", frame=frame)

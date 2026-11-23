@@ -128,4 +128,9 @@ if [ "$(cd "$OUTPUT_ROOT" && pwd -P)" != "$(cd development && pwd -P)" ]; then
         ln -s "$BUNDLE" "$LINK"
     fi
 fi
+# Python inside the app: the link order always; the live import check
+# (it opens the app briefly) with OPERANDI_PYTHON_CHECK=1.
+if [ -n "$PYTHON_INSTALL" ]; then
+    OPERANDI_PYTHON_CHECK_LIVE="${OPERANDI_PYTHON_CHECK:-0}" scripts/check-bundled-python.sh "$BUNDLE" >&2
+fi
 printf '%s\n' "$BUNDLE"
