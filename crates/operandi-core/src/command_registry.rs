@@ -4519,6 +4519,11 @@ pub static COMMANDS: &[Entry] = &[
     script("operandi.help.documentation", Help, "Opens Operandi's documentation in the browser. Not available until the documentation is published.")
         .operandi()
         .ui(),
+    // Help > Check for Updates (Jason 2026-11-23; update_check.rs): an
+    // Operandi-only feature, so an operandi.* name (UIC-165).
+    script("operandi.update.check", Help, "Asks GitHub for the newest build on the Update Channel (Preferences > Defaults > Application) and offers to open its download page when it is newer than this one. Always reports back. Nothing is downloaded or installed.")
+        .operandi()
+        .ui().side_effect(),
     // Menus as forms (follows layouts stage 7, LAY-Q66): a command for
     // every menu entry that had none, so every menu is a form and every
     // menu click is a Command History line (UIC-160). Placeholders until

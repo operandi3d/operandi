@@ -15,6 +15,16 @@
   groups counted. Not built: the Filter row and a shortcut (Jason,
   2026-11-23), the per-element Info page (Q9). Questions STAT-Q01..Q07.
 
+- **Update check (2026-11-23, branch update-check):** Preferences >
+  Defaults > Application > Updates: Update Channel (Release / Test) and
+  Check for Updates on Launch (`pref.value updates.*`). The launch check
+  and Help > Check for Updates (`operandi.update.check`) ask GitHub by the
+  system's `curl` on a background thread and offer the newer build in an
+  Update Available confirmation (OK opens its release page, Skip This
+  Build). Never downloads or installs. Linux follows releases only (no
+  test build yet). The channel is a dropdown, not joined segments (UIC-113:
+  segments are for dialogs and tool properties). GUI: UPDATE_CHECK_GUI_QA.md.
+
 - **Edge Bevel with hard edges (2026-11-22, branch forum-bevel-loopslice;
   forum report):** Edge Bevel and Edge Chamfer refused every edge of a mesh
   with a vertex normal map ("cannot yet remap ... normals"), and hardening

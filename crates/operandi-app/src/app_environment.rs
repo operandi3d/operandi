@@ -382,6 +382,10 @@ impl AppPaths {
     pub fn undo_autosave(&self) -> PathBuf {
         self.data_root.join("undo-autosave.json")
     }
+    /// Update channel, launch check and skipped build (update_check.rs).
+    pub fn update_preferences(&self) -> PathBuf {
+        self.data_root.join("update-preferences.json")
+    }
     /// View > Layout's Lock Thumb / Divider Dragging (panel_dot.rs).
     pub fn layout_locks(&self) -> PathBuf {
         self.data_root.join("layout-locks.json")

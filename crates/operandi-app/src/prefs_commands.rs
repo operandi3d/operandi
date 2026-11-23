@@ -355,6 +355,22 @@ pub(crate) static GROUPS: &[Group] = &[
         undo_autosave::UndoAutosavePreferences,
         |a, _| a.save_undo_autosave()
     ),
+    // The Application page's Updates section (update_check.rs).
+    group!(
+        "updates",
+        [Application],
+        update_check.prefs,
+        update_check::UpdatePreferences,
+        |a, _| {
+            if let Err(error) = a
+                .update_check
+                .prefs
+                .save(&a.environment.paths().update_preferences())
+            {
+                a.status = format!("Preference changed; could not save it: {error}");
+            }
+        }
+    ),
     group!(
         "meshItems",
         [MeshItems],
