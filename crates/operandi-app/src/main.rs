@@ -107,6 +107,7 @@ mod frame_stats;
 mod free_memory;
 mod gpu;
 mod gpu_arena;
+mod gpu_backend;
 mod gpu_chunks;
 mod gpu_memory;
 mod gpu_scene;
@@ -1113,6 +1114,9 @@ impl Operandi {
         cc.egui_ctx.options_mut(|o| o.zoom_with_keyboard = false);
         native::install(cc.egui_ctx.clone());
         open_documents::connect(cc.egui_ctx.clone());
+        if let Some(s) = &cc.wgpu_render_state {
+            gpu_backend::watch_device_lost(&s.device);
+        }
         let gpu = cc
             .wgpu_render_state
             .as_ref()
