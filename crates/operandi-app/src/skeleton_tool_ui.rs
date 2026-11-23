@@ -41,6 +41,8 @@ pub(crate) struct SkeletonTool {
     pub(crate) preserve: bool,
     /// The joint the next click grows from (SK-10).
     pub(crate) current: Option<u64>,
+    /// The open Bind dialog (bind_dialog_ui.rs).
+    pub(crate) bind: Option<form::Dialog>,
 }
 
 impl Default for SkeletonTool {
@@ -60,6 +62,7 @@ impl Default for SkeletonTool {
             axis: "X",
             preserve: false,
             current: None,
+            bind: None,
         }
     }
 }
@@ -339,6 +342,7 @@ impl Operandi {
 
     /// The Skeleton tool's options (SK-12..16), while it is on.
     pub(super) fn skeleton_window(&mut self, ctx: &Context) {
+        self.bind_dialog(ctx);
         if !self.skeleton_active() {
             return;
         }

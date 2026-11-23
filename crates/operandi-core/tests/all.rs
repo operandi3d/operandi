@@ -570,6 +570,8 @@ mod sketch_extrude_clean_spec;
 mod sketch_extrude_drag_clean_spec;
 #[path = "skin.rs"]
 mod skin;
+#[path = "skin_bind.rs"]
+mod skin_bind;
 #[path = "slice_tools.rs"]
 mod slice_tools;
 #[path = "smooth_shading.rs"]

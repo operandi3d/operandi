@@ -41,6 +41,7 @@ mod backdrop_gpu;
 mod backdrop_ui;
 mod background_ui;
 mod bevel_panel;
+mod bind_dialog_ui;
 mod boolean_dialog;
 mod branding;
 mod bridge_panel;

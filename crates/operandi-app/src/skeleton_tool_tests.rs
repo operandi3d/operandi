@@ -117,3 +117,53 @@ fn the_tool_window_draws() {
     a.execute("operandi.skel.tool");
     assert!(!a.skeleton_active());
 }
+
+/// The box with a two-joint chain inside it (Top view: the box is 2 m).
+fn rigged() -> (Operandi, u64) {
+    let mut a = tool_app();
+    a.execute("operandi.skel.add position:-0.5,0,0");
+    let root = joints(&a)[0];
+    a.execute(&format!("operandi.skel.add position:0.5,0,0 parent:{root}"));
+    let mesh = a
+        .editor
+        .scene
+        .items
+        .iter()
+        .find(|i| i.is_mesh())
+        .unwrap()
+        .id;
+    a.editor.scene.select_item(Some(mesh));
+    a.editor.scene.toggle_item(root);
+    (a, mesh)
+}
+
+#[test]
+fn sk02_the_bind_dialog_needs_setup() {
+    let (mut a, _) = rigged();
+    a.execute("operandi.skin.bindDialog");
+    assert!(a.skeleton.bind.is_none());
+    assert_eq!(a.status, operandi_core::skin_bind::NEEDS_SETUP);
+}
+
+#[test]
+fn sk20_the_bind_dialog_runs_one_bind_line() {
+    let (mut a, mesh) = rigged();
+    a.execute("operandi.anim.setup on:true");
+    a.execute("operandi.skin.bindDialog");
+    let d = a.skeleton.bind.as_ref().expect("open");
+    let line = skeleton_tool_ui_bind_line(d);
+    assert!(
+        line.starts_with("operandi.skin.bind type:heat falloff:medium segments:true"),
+        "{line}"
+    );
+    let steps = a.editor.undo.len();
+    a.execute(&line);
+    assert_eq!(a.editor.undo.len(), steps + 1);
+    assert!(operandi_core::skin_commands::skin_op(&a.editor.scene, mesh).is_ok());
+    let ctx = Context::default();
+    let _ = crate::tests::draw(&mut a, &ctx, egui::vec2(1400., 900.), vec![]);
+}
+
+fn skeleton_tool_ui_bind_line(d: &form::Dialog) -> String {
+    crate::bind_dialog_ui::bind_line(&d.values)
+}

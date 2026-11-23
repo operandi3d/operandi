@@ -3577,6 +3577,25 @@ pub static COMMANDS: &[Entry] = &[
         .quiet()
         .operandi()
         .example("operandi.skel.query"),
+    script("operandi.skin.bind", Items, "Bind (SK-20..23): weights for each joint under the root, one weight map per joint and a skin piece on each mesh; needs Setup mode.")
+        .on_editor(
+            "Bind the meshes (items, default the selected meshes) to the skeleton under root (default the last selected joint), one undo step. Needs Setup mode. A failed Heat bind changes nothing and selects the points to fix.",
+            &[
+            jopt("items", "string", "Mesh item ids, comma separated (default the selected meshes)."),
+            jopt("root", "integer", "The root joint (default the last selected joint)."),
+            jopt("type", "string", "rigid, distance, visible or heat (default heat)."),
+            jopt("falloff", "string", "low, medium (default) or high."),
+            jopt("segments", "boolean", "Bind as Segments: weight along each joint's line to its children (default true)."),
+            jopt("limitWeights", "boolean", "Keep at most weightsPerVertex joints a point (default false)."),
+            jopt("weightsPerVertex", "integer", "1 to 8 (default 4)."),
+            jopt("minimumWeight", "number", "Drop weights below this, 0 to 1 (default 0)."),
+            jopt("dualQuaternion", "boolean", "The skin blends by dual quaternions (default false)."),
+        ],
+            crate::skin_bind::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.skin.bind type:heat"),
     script("operandi.skin.bakeWeights", Items, "Bake Weights (SK-34): the skin's effective weights go into its weight maps and its options back to neutral.")
         .on_editor(
             "Write the effective weights (after normalise, limit, threshold, sharpness, smooth influences) into the joints' weight maps and reset those options, one undo step.",
@@ -3600,6 +3619,18 @@ pub static COMMANDS: &[Entry] = &[
         .quiet()
         .operandi()
         .example("operandi.skin.query vertex:0"),
+    script("operandi.skin.rebind", Items, "Rebind / Add Joints to Bind (SK-25): adds joints to a bound mesh's skin with empty weight maps; needs Setup mode.")
+        .on_editor(
+            "Add joints (default the selected joints) not yet in the skin of the meshes (items, default the selected meshes), with empty weight maps, leaving the other weights alone; one undo step. Needs Setup mode.",
+            &[
+            jopt("items", "string", "Mesh item ids (default the selected meshes)."),
+            jopt("joints", "string", "Joint ids, comma separated (default the selected joints)."),
+        ],
+            crate::skin_bind::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.skin.rebind joints:12"),
     script("operandi.skin.set", Items, "Sets the skin's channels (SK-31) or one joint influence's Enable and Interpolation (SK-35).")
         .on_editor(
             "Change the skin of a bound mesh, one undo step: interpolation local/linear/dualQuaternion, limitSources, maxSources 1-8, threshold 0-1, sharpness, world; with joint, that influence's enable and influence linear/smooth.",
@@ -3620,6 +3651,18 @@ pub static COMMANDS: &[Entry] = &[
         .undo()
         .operandi()
         .example("operandi.skin.set interpolation:dualQuaternion"),
+    script("operandi.skin.unbind", Items, "Unbind (SK-24): removes the skin piece; keeps the weight maps unless keepMaps is false; needs Setup mode.")
+        .on_editor(
+            "Remove the skin from the meshes (items, default the selected meshes), one undo step; keepMaps false deletes the joints' weight maps too. Needs Setup mode.",
+            &[
+            jopt("items", "string", "Mesh item ids (default the selected meshes)."),
+            jopt("keepMaps", "boolean", "Keep the weight maps (default true)."),
+        ],
+            crate::skin_bind::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.skin.unbind"),
     script("operandi.eval.graph", Items, "Reads the scene's evaluation graph (who reads whom: time, channels, fields, transforms, shown meshes) as JSON nodes and edges (UIC-163; the Schematic's data).")
         .on_editor(
             "Read the evaluation graph as JSON: nodes (id, kind time/channel/field/transform/shownMesh, item, name, label, dirty) and edges [from, to] (to reads from). item limits it to one item's nodes and the edges touching them.",
@@ -7036,7 +7079,7 @@ mod tests {
                 assert!(!json.about.is_empty(), "{}", e.name);
             }
         }
-        assert_eq!(crate::command_exec::specs().count(), 269);
+        assert_eq!(crate::command_exec::specs().count(), 272);
     }
 
     #[test]

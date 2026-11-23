@@ -1859,6 +1859,7 @@ fn phrases(r: &mut Commands) {
     crate::channel_links_ui::register(r);
     crate::schematic_ui::register(r);
     crate::skeleton_tool_ui::register(r);
+    crate::bind_dialog_ui::register(r);
     crate::python_ui::register(r);
     on_words(r, &["view.topologyMode"], |a, c| {
         a.set_topology_mode(c.rest)

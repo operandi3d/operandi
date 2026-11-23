@@ -806,12 +806,25 @@ used in the app; `primitive_add` always starts from the Reset values.
   - `preserveAlignment` (boolean): Keep orientations instead of re-aiming (default false).
 - **`operandi.skel.query`** — Read joints as JSON: id, name, parent, firstChild, children, position, boneLength, axes X/Y/Z. root limits it to that joint's chain, depth first.
   - `root` (integer): Only this joint's chain.
+- **`operandi.skin.bind`** — Bind the meshes (items, default the selected meshes) to the skeleton under root (default the last selected joint), one undo step. Needs Setup mode. A failed Heat bind changes nothing and selects the points to fix.
+  - `items` (string): Mesh item ids, comma separated (default the selected meshes).
+  - `root` (integer): The root joint (default the last selected joint).
+  - `type` (string): rigid, distance, visible or heat (default heat).
+  - `falloff` (string): low, medium (default) or high.
+  - `segments` (boolean): Bind as Segments: weight along each joint's line to its children (default true).
+  - `limitWeights` (boolean): Keep at most weightsPerVertex joints a point (default false).
+  - `weightsPerVertex` (integer): 1 to 8 (default 4).
+  - `minimumWeight` (number): Drop weights below this, 0 to 1 (default 0).
+  - `dualQuaternion` (boolean): The skin blends by dual quaternions (default false).
 - **`operandi.skin.bakeWeights`** — Write the effective weights (after normalise, limit, threshold, sharpness, smooth influences) into the joints' weight maps and reset those options, one undo step.
   - `item` (integer): The bound mesh (default the selected one).
 - **`operandi.skin.query`** — Read the skin as JSON: item, op, interpolation, limitSources, maxSources, threshold, sharpness, world, joints (joint, name, map, enable, influence, missing). With vertex: weights (map: effective weight), rest and position (deformed, at time seconds, default now).
   - `item` (integer): The bound mesh (default the selected one).
   - `vertex` (integer): A point index.
   - `time` (number): Seconds (default the current time).
+- **`operandi.skin.rebind`** — Add joints (default the selected joints) not yet in the skin of the meshes (items, default the selected meshes), with empty weight maps, leaving the other weights alone; one undo step. Needs Setup mode.
+  - `items` (string): Mesh item ids (default the selected meshes).
+  - `joints` (string): Joint ids, comma separated (default the selected joints).
 - **`operandi.skin.set`** — Change the skin of a bound mesh, one undo step: interpolation local/linear/dualQuaternion, limitSources, maxSources 1-8, threshold 0-1, sharpness, world; with joint, that influence's enable and influence linear/smooth.
   - `item` (integer): The bound mesh (default the selected one).
   - `interpolation` (string): local (default), linear or dualQuaternion.
@@ -823,6 +836,9 @@ used in the app; `primitive_add` always starts from the Reset values.
   - `joint` (integer): One influence's joint, for enable and influence.
   - `enable` (boolean): That influence on or off.
   - `influence` (string): That influence's weights: linear or smooth.
+- **`operandi.skin.unbind`** — Remove the skin from the meshes (items, default the selected meshes), one undo step; keepMaps false deletes the joints' weight maps too. Needs Setup mode.
+  - `items` (string): Mesh item ids (default the selected meshes).
+  - `keepMaps` (boolean): Keep the weight maps (default true).
 - **`operandi.eval.graph`** — Read the evaluation graph as JSON: nodes (id, kind time/channel/field/transform/shownMesh, item, name, label, dirty) and edges [from, to] (to reads from). item limits it to one item's nodes and the edges touching them.
   - `item` (integer): Only this item's nodes.
 - **`operandi.render.frameRange`** — Render frames start..end (default the current range) with Cycles into folder (default the project's renders/) as <name>_0000.png; needs the running app. operandi.anim.query reports progress (job).

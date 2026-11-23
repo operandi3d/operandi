@@ -331,3 +331,57 @@ fn sk10_sk14_skeleton_through_the_bridge() {
         2
     );
 }
+
+fn skin(b: &mut Bridge, args: Value) -> Value {
+    let out = call(
+        b,
+        "command_run",
+        json!({"command": "operandi.skin.query", "args": args}),
+    )
+    .unwrap();
+    serde_json::from_str(out["value"].as_str().unwrap()).unwrap()
+}
+
+#[test]
+fn sk02_sk22_sk30_bind_through_the_bridge() {
+    let mut b = Bridge::new();
+    let mesh = cube(&mut b, [0., 0., 0.]);
+    run(
+        &mut b,
+        "operandi.skel.add",
+        json!({"position": [0, -0.3, 0]}),
+    );
+    let root = skel(&mut b, json!({}))["joints"][0]["id"].as_u64().unwrap();
+    // SK-22: a root with two children.
+    for x in [-0.3, 0.3] {
+        run(
+            &mut b,
+            "operandi.skel.add",
+            json!({"position": [x, 0.3, 0], "parent": root}),
+        );
+    }
+    let bind = json!({"items": mesh.to_string(), "root": root, "type": "distance"});
+    let refused = call(
+        &mut b,
+        "command_run",
+        json!({"command": "operandi.skin.bind", "args": bind}),
+    )
+    .unwrap_err();
+    assert!(refused.contains("Bind needs Setup mode"), "{refused}");
+    run(&mut b, "operandi.anim.setup", json!({"on": "true"}));
+    run(&mut b, "operandi.skin.bind", bind);
+    run(&mut b, "operandi.anim.setup", json!({"on": "false"}));
+    let q = skin(&mut b, json!({"item": mesh}));
+    assert_eq!(q["joints"].as_array().unwrap().len(), 3);
+    // SK-30: every point's weights add up to 100%.
+    for p in 0..8 {
+        let w = skin(&mut b, json!({"item": mesh, "vertex": p}));
+        let total: f64 = w["weights"]
+            .as_object()
+            .unwrap()
+            .values()
+            .map(|v| v.as_f64().unwrap())
+            .sum();
+        assert!((total - 1.).abs() < 1e-6, "point {p}: {w}");
+    }
+}

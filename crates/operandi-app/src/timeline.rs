@@ -1708,6 +1708,18 @@ impl Operandi {
             {
                 self.execute("operandi.skel.tool");
             }
+            // SK-20/24: Bind (text until its studio icon); Shift+click
+            // unbinds (UIC-04 names it).
+            let bind = ui
+                .button("Bind")
+                .on_hover_text("Bind the selected meshes to the selected root joint (needs Setup)\nShift+click: Unbind\noperandi.skin.bindDialog");
+            if bind.clicked() {
+                if ui.input(|i| i.modifiers.shift) {
+                    self.execute("operandi.skin.unbind");
+                } else {
+                    self.execute("operandi.skin.bindDialog");
+                }
+            }
             // Rig phase 4: Constrain and Hierarchy pop-ups (the Animate
             // menu's), Channel Links, Schematic and Bake Selected.
             let constrain = self.tbi(
