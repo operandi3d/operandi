@@ -25,11 +25,19 @@ if [ "${OPERANDI_USD:-0}" = 1 ]; then
 fi
 # Python scripting (preview) is built in once scripts/fetch-python.sh has
 # put CPython in development/python/python; OPERANDI_PYTHON_BUILD=1 runs
-# it first, OPERANDI_PYTHON_BUILD=0 leaves Python out. (OPERANDI_PYTHON is
-# the app's run-time switch, python_switch.rs.)
+# it first, OPERANDI_PYTHON_BUILD=0 leaves Python out, and
+# OPERANDI_PYTHON_BUILD=system links the python3 on PATH without bundling
+# it (that app runs only on this Mac). (OPERANDI_PYTHON is the app's
+# run-time switch, python_switch.rs.)
 PYTHON_INSTALL=""
+if [ "${OPERANDI_PYTHON_BUILD:-}" = system ]; then
+    FEATURES="${FEATURES:+$FEATURES,}python"
+    PYO3_PYTHON="$(command -v python3)"
+    export PYO3_PYTHON
+fi
 [ "${OPERANDI_PYTHON_BUILD:-}" = 1 ] && [ ! -x development/python/python/bin/python3 ] && scripts/fetch-python.sh
-if [ "${OPERANDI_PYTHON_BUILD:-}" != 0 ] && [ -x development/python/python/bin/python3 ]; then
+if [ "${OPERANDI_PYTHON_BUILD:-}" != 0 ] && [ "${OPERANDI_PYTHON_BUILD:-}" != system ] \
+    && [ -x development/python/python/bin/python3 ]; then
     FEATURES="${FEATURES:+$FEATURES,}python"
     PYTHON_INSTALL="$(cd development/python/python && pwd -P)"
     export PYO3_PYTHON="$PYTHON_INSTALL/bin/python3"
