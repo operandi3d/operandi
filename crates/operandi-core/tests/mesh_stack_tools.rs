@@ -1,10 +1,10 @@
-//! Direct tools as MeshOps (MO-40/41, TYPE-IDS.md), group by group. Each
+//! Direct tools as Mesh Stack (MO-40/41, TYPE-IDS.md), group by group. Each
 //! op runs its direct tool's engine, so each test checks the op's result
 //! on a known mesh, and where the direct command exists, that it matches.
 use glam::DVec3;
+use operandi_core::mesh_stack::OpStatus;
+use operandi_core::mesh_stack_editor::{OpRef, SelOpEdit};
 use operandi_core::meshop_selection::{SelKind, SelOp};
-use operandi_core::meshops::OpStatus;
-use operandi_core::meshops_editor::{OpRef, SelOpEdit};
 use operandi_core::{Command, Editor, Mesh, Mode};
 use serde_json::{Value, json};
 
@@ -29,7 +29,7 @@ pub(crate) fn add(e: &mut Editor, item: u64, type_id: &str, values: Value) -> Op
             .scene
             .item(item)
             .unwrap()
-            .mesh_ops
+            .mesh_stack
             .as_ref()
             .unwrap()
             .ops
@@ -55,7 +55,7 @@ pub(crate) fn only(e: &mut Editor, op: OpRef, index: &str) {
 /// The stack's result; every op must have run cleanly.
 pub(crate) fn ok(e: &Editor, item: u64) -> Mesh {
     let r = e
-        .meshops
+        .mesh_stack
         .current(&e.scene, e.scene.item(item).unwrap())
         .unwrap();
     assert!(
@@ -373,7 +373,7 @@ fn radial_array_and_clone_copy_and_save_as_clone_effectors() {
         );
         let back = operandi_core::persistence::decode(&bytes).unwrap();
         assert_eq!(back, e.scene);
-        let theirs = operandi_core::meshops::Runtime::default()
+        let theirs = operandi_core::mesh_stack::Runtime::default()
             .current(&back, back.item(id).unwrap())
             .unwrap();
         assert_eq!(*theirs.mesh, ok(e, id));
@@ -425,9 +425,9 @@ fn saved_poly_julienne_item_loads_as_axis_slice() {
 
     let scene = operandi_core::persistence::decode(&serde_json::to_vec(&doc).unwrap()).unwrap();
     let item = scene.item(id).unwrap();
-    let op = &item.mesh_ops.as_ref().unwrap().ops[0];
+    let op = &item.mesh_stack.as_ref().unwrap().ops[0];
     assert_eq!(op.kind.label(), "Axis Slice");
-    let result = e.meshops.current(&scene, item).unwrap();
+    let result = e.mesh_stack.current(&scene, item).unwrap();
     assert_eq!(result.statuses, [OpStatus::Ok]);
     assert_eq!(result.mesh.faces.len(), 10);
 }

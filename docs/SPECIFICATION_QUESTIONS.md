@@ -2751,7 +2751,15 @@ Decided 2026-11-06 (settled defaults, not provisional):
 - **IL-Q3 Unsupported entries.** Shown disabled with the tooltip "Not yet
   in Operandi". Categories with nothing enabled are hidden unless "Show
   unsupported" (bottom of the menu, off by default, remembered) is ticked.
-  Today only Lights has enabled entries (all nine kinds).
+  Today only Lights has enabled entries (all nine kinds). Replaced by
+  IL-Q4 (2026-11-23).
+- **IL-Q4 Only what Operandi makes (Jason, 2026-11-23; deliberate
+  departure from IL-02).** Add Item lists only the types Operandi can
+  make: Backdrop Item, Camera, Mesh, Lights (nine kinds) and Locators
+  (Group Locator). IL-02's other entries and the categories left empty
+  (Deformers, Dynamics, Falloffs, Forces, Particles, Procedural, Volumes,
+  Other) are gone, and so is Show unsupported. An entry returns when
+  Operandi can make its type.
 
 Provisional:
 
@@ -3581,7 +3589,7 @@ feature behind a column doesn't exist yet:
   out: there is one kind of group and nothing to filter by yet. The funnel
   gives the search row. Delete Group and Add / Remove Selected moved from
   the old tool row onto the group's right-click menu (UIC-144).
-- **TREE-Q04 Mesh Ops** (UIC-151). Not built or registered: Operandi has no
+- **TREE-Q04 Mesh Stack** (UIC-151). Not built or registered: Operandi has no
   mesh operators. The component has everything it needs (value column "#",
   state eye); it is a registration once operators exist.
 - **TREE-Q05 Shader Tree's "one icon"** on the second tool row (UIC-152):
@@ -5025,7 +5033,7 @@ The spec's VM-Q01..Q12 stand; these are the builds chosen.
   (FAL-B2-04 samples Linear / Radial at the mirror) [provisional].
 
 
-## MeshOps v1 (specifications/meshops-2026-11-11)
+## Mesh Stack v1 (specifications/meshops-2026-11-11)
 
 - **MOQ-01 Auto-capture (MO-20).** Polygons selected on the mesh become the
   new op's Select by Index only when the op lands directly above the Base
@@ -5063,7 +5071,7 @@ The spec's VM-Q01..Q12 stand; these are the builds chosen.
   `deformer.*` commands take `op:<item>:<op>`; `op:<item>:base` selects the
   Base Mesh row. `item.parent position:` counts in evaluation order (0 runs
   first).
-- **MOQ-08 Tab and layout.** The Mesh Ops tab is the last tab of the upper
+- **MOQ-08 Tab and layout.** The Mesh Stack tab is the last tab of the upper
   side panel (MO-10 puts it beside the Items list) and shows only the
   selected mesh (MO-28). No Item List inside it, no Ghosted/Hide/Single/
   Filter buttons, no Defer/Pause, no viewport handles on ops (MO-19) and
@@ -8135,7 +8143,7 @@ CURVE-COMMANDS-2D-SHAPES v1 (CC-xx). Built provisionally as below.
 - **CX-Q6 Ids** — the buttons' tool.set ids are Operandi's own
   (`CurveExtrude`, `BezierExtrude`, `BSplineExtrude`, `CurveClone`,
   `BezierClone`, `BSplineClone`, `PenClone`); the name map has no entries.
-- **CX-Q7 MeshOps** — Curve Extrude, Curve Clone and Pen Clone ops
+- **CX-Q7 Mesh Stack** — Curve Extrude, Curve Clone and Pen Clone ops
   (`curve.extrude.item`, `curve.clone.item`, `pen.clone.item`) keep the
   path as their own points; the reference's ops read a curve item through
   `pmodel.pathGenCurve` + `gen.pathsteps.item`, which Operandi doesn't
@@ -8220,7 +8228,7 @@ Spec: SCATTER-UVRECT-TRANSFER-CONSTRAINT v1 (GO-xx). Built provisionally:
   UV Completion and Flip UVs aren't built). The command reads the first
   shown background mesh; the op reads its Source Item link. Command name
   `operandi.vertMap.transfer`.
-- **UnSubdivide op** — not registered here: the MeshOps branch
+- **UnSubdivide op** — not registered here: the Mesh Stack branch
   (claude/project-thread-fcjo2t) already has `poly.unsubdiv.item`.
 - **JD-Q1 Julienne / Dicer (EDIT.md v0)** — built as commands with a
   dialog (`operandi.julienne`, `operandi.dicer`; Edit tab rows Julienne…
@@ -8232,7 +8240,7 @@ Spec: SCATTER-UVRECT-TRANSFER-CONSTRAINT v1 (GO-xx). Built provisionally:
   shaped by Fragment Scale and its position within half the mesh's size
   of its centre; Randomness isn't built. Open meshes are refused, as
   Boolean refuses them.
-- **Curve Boolean** — not built here: the MeshOps branch's Boolean batch
+- **Curve Boolean** — not built here: the Mesh Stack branch's Boolean batch
   has the solid Boolean op; a curve boolean needs its own spec pass.
 ## Deform finish (modelling parity batch 1, DEFORM-PROBES 2026-11-17)
 
@@ -8292,7 +8300,7 @@ Spec: SCATTER-UVRECT-TRANSFER-CONSTRAINT v1 (GO-xx). Built provisionally:
   Guide. Soft Selection runs `tool.set falloff.softSelection on`.
 - **TB-20 Curve tab** — laid out as the spec: Tools, Commands (offset
   flyouts), the Convert Curves flyout, Bezier Tangent. The six 2D shapes
-  are no longer on this tab (they are MeshOps, Create › Curves in Add
+  are no longer on this tab (they are Mesh Stack, Create › Curves in Add
   Operator).
 - **CC-43 Open Curve Offset (v9 spec)** — matches: one new open curve in
   the same item, mitred inner corners, positive to the left of travel
@@ -9589,7 +9597,7 @@ Built from BEHAVIOR-TOPOLOGY-PEN (2026-11-20) on branch topology-pen. These are 
 - PC-Q1 (provisional): with three curves, the corner opposite the first picked curve collapses (the second and third curves' shared end); the row of cells touching it is triangles and the corner is one shared point.
 - PC-Q2 (provisional): Knot spacing = divisions evenly spaced in sample index of the frozen curve sampling (the same steps per span), so each span between control points gets an equal share. Read from the option name, not measured.
 - PC-Q3 (Jason, 2026-11-21: build live patches; branch patch-curves-2): Freeze is off by default. Closing the loop leaves one `Patch` polygon on the corners (each corner's two curve ends are joined into one point). The evaluated scene shows it tessellated at the mesh's Patch Subdivisions (Subdivision section of the item properties, default 16), so the viewport, Cycles and exports read the cells; saves keep the patch (native version 57); Freeze makes the cells real. With Freeze on, the frozen grid is built as before. Either way the closing click is one undo step and an option change rebuilds the last patch while it's still the last step.
-- PC-7 provisional readings: a live patch always spaces by Length and has no UVs of its own (cells blend the patch's corner UVs); Perpendicular, Parallel, Type 1/2 and Make UVs are greyed while Freeze is off. The first cell takes the patch polygon's number, the others follow the mesh's polygons; picking and component editing see the one patch polygon (as for MeshOps results), while the viewport draws the cells, so in Vertex mode the cells' points show too. Flip on a three-corner patch changes which corner collapses.
+- PC-7 provisional readings: a live patch always spaces by Length and has no UVs of its own (cells blend the patch's corner UVs); Perpendicular, Parallel, Type 1/2 and Make UVs are greyed while Freeze is off. The first cell takes the patch polygon's number, the others follow the mesh's polygons; picking and component editing see the one patch polygon (as for Mesh Stack results), while the viewport draws the cells, so in Vertex mode the cells' points show too. Flip on a three-corner patch changes which corner collapses.
 - PC-Q5 (provisional): a patch whose boundary curve was deleted (no open curve joins two neighbouring corners, by point or by position) is broken: it draws, renders and exports nothing, stays in the scene, and Freeze leaves it as it is.
 - Kept from main: ends within 0.1 mm count as shared, so drawn curves (which have their own end points) still patch; the spec's "ends that only touch build nothing" is not applied. Each corner reuses the start point of the curve that begins there. Save Boundaries isn't an option: the curves always stay.
 
@@ -9717,6 +9725,7 @@ Built from BEHAVIOR-TOPOLOGY-PEN (2026-11-20) on branch topology-pen. These are 
 - IK-Q09 Pose tool: other IK solvers are left out of the drag's solve (the hierarchy moves as plain FK, the answer written into its channels); "screen space" drags in the plane through the joint facing the view, Ctrl+drag on the work plane; Shift twist is 0.5° per pixel; each frame of a drag re-solves from the press. Provisional.
 - RG-Q90 Items list rig rows (rig-items-list): a piece row selects its item and stays marked; renaming stores the piece's own name (`operandi.rig.rename`, empty = the kind's label); the eye column is the piece's Enable; IK pieces delete with Remove IK. A skin row (SK-36) opens to its joint influences; its menu has Enable, Bake Weights, Duplicate and Freeze, Delete (Unbind, Setup only); Rename, Duplicate and plain Freeze (which must ask first) aren't there yet. Provisional.
 - RG-Q91 Flaky under load: `rig_phase4::rg06_only_items_downstream_of_a_change_are_evaluated` asserts a debug-build frame time (200 constrained items under 41.7 ms); with the Mac busy (load average ~53, 2026-11-23) it measured 45.9 and 56.6 ms and failed, and passes when the machine is quiet. Left as it is for now; the fix is to time the release build (or count evaluations instead of milliseconds). Open.
+- RG-Q92 Pick order (rig-pick-order): the last picked item is the primary and `also` holds the earlier picks oldest first (`Scene::picked_items`); rig commands read that order. Visible changes: Ctrl/Shift-click makes the clicked item active (Properties, gizmo, active mesh); Items-list Shift range makes the clicked end primary (was the anchor); removing the primary promotes the most recent pick (was the oldest); bridge `select` mode item add:true now adds (it replaced). Merge, Parent to Group Locator and New Group keep first-pick order; a light edit spreads to the selected lights whichever of them is edited. Provisional.
 
 ## LXO scene import: hierarchy, animation, rig (2026-11-23, branch lxo-animation-import, provisional)
 

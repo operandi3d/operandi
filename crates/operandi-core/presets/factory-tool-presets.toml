@@ -707,70 +707,79 @@ tooltip = "Instances of the selection scattered in a box: each shares its source
 group = "duplicate.clone"
 actor = { tool = "ScatterClone", copier = "instance" }
 
-# Duplicate tab, Replica buttons (missing-tools-g8 RP-6): the Instance
-# buttons' placement, making one Replicator (replicator.rs) instead of
+# Duplicate tab, Instancer buttons (missing-tools-g8 RP-6): the Instance
+# buttons' placement, making one Instancer (replicator.rs) instead of
 # instance items.
 
 [[preset]]
 id = "ReplicaClone"
-label = "Replica Clone"
-tooltip = "A Replicator of the selection in a line: a point per copy, drawn as boxes until shaded"
+label = "Instancer Clone"
+names = ["Replica Clone"]
+tooltip = "An Instancer of the selection in a line: a point per copy, drawn as boxes until shaded"
 group = "duplicate.clone"
 actor = { tool = "Clone", copier = "replica" }
 
 [[preset]]
 id = "CurveReplica"
-label = "Curve Replica"
-tooltip = "A Replicator of the selection along a smooth curve you click out"
+label = "Curve Instancer"
+names = ["Curve Replica"]
+tooltip = "An Instancer of the selection along a smooth curve you click out"
 group = "duplicate.clone"
 actor = { tool = "CurveClone", copier = "replica", path = { kind = "curve" } }
 
 [[preset]]
 id = "BezierReplica"
-label = "Bezier Replica"
-tooltip = "A Replicator of the selection along a Bezier path with handles"
+label = "Bezier Instancer"
+names = ["Bezier Replica"]
+tooltip = "An Instancer of the selection along a Bezier path with handles"
 group = "duplicate.clone"
 actor = { tool = "CurveClone", copier = "replica", path = { kind = "bezier" } }
 
 [[preset]]
 id = "BSplineReplica"
-label = "B-Spline Replica"
-tooltip = "A Replicator of the selection along a B-Spline path"
+label = "B-Spline Instancer"
+names = ["B-Spline Replica"]
+tooltip = "An Instancer of the selection along a B-Spline path"
 group = "duplicate.clone"
 actor = { tool = "CurveClone", copier = "replica", path = { kind = "b_spline" } }
 
 [[preset]]
 id = "PenReplicate"
-label = "Pen Replicate"
-tooltip = "A Replicator of the selection at each point of a straight-line path"
+label = "Pen Instancer"
+names = ["Pen Replicate"]
+tooltip = "An Instancer of the selection at each point of a straight-line path"
 group = "duplicate.clone"
 actor = { tool = "CurveClone", copier = "replica", path = { kind = "pen" } }
 
 [[preset]]
 id = "ReplicaScatter"
-label = "Replica Scatter"
-tooltip = "A Replicator of the selection scattered in a box"
+label = "Instancer Scatter"
+names = ["Replica Scatter"]
+tooltip = "An Instancer of the selection scattered in a box"
 group = "duplicate.clone"
 actor = { tool = "ScatterClone", copier = "replica" }
 
 [[preset]]
 id = "ReplicaArray"
-label = "Replica Array"
-tooltip = "A Replicator of the selection in a grid: a point per copy"
+label = "Instancer Array"
+names = ["Replica Array"]
+tooltip = "An Instancer of the selection in a grid: a point per copy"
 group = "duplicate.array"
 actor = { tool = "Array", copier = "replica" }
 
 [[preset]]
 id = "ReplicaRadialArray"
-label = "Replica Radial Array"
-tooltip = "A Replicator of the selection round a circle: a point per copy"
+label = "Instancer Radial Array"
+names = ["Replica Radial Array"]
+tooltip = "An Instancer of the selection round a circle: a point per copy"
 group = "duplicate.array"
 actor = { tool = "RadialArray", copier = "replica" }
 
 [[preset]]
 id = "ReplicaMirror"
-label = "Replica Mirror"
-tooltip = "A Replicator with one mirrored copy of the selection"
+label = "Instancer Mirror"
+names = ["Replica Mirror"]
+tooltip = "An Instancer with one mirrored copy of the selection"
 group = "duplicate.duplicate"
 actor = { tool = "Mirror", copier = "replica" }
 

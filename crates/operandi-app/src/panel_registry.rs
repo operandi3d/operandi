@@ -23,7 +23,10 @@ pub enum PanelKind {
     ShaderTree,
     Groups,
     Properties,
-    MeshOps,
+    /// Saved as `mesh_ops`, its name before 2026-11-23, so layouts open in
+    /// older and newer builds alike.
+    #[serde(rename = "mesh_ops")]
+    MeshStack,
     /// The preset browser (PB-100): also has its own OS window.
     PresetBrowser,
     /// The active mesh's UV maps (UVE-1 section 1, uv_edit_ui.rs).
@@ -119,10 +122,10 @@ pub static REGISTRY: &[PanelType] = &[
         draw: |a, ui, rect| a.properties_body(ui, rect, "properties-category"),
     },
     PanelType {
-        kind: PanelKind::MeshOps,
+        kind: PanelKind::MeshStack,
         name: "Mesh Stack",
         category: Category::DataLists,
-        draw: |a, ui, rect| a.mesh_ops_section(ui, rect),
+        draw: |a, ui, rect| a.mesh_stack_section(ui, rect),
     },
     PanelType {
         kind: PanelKind::UvMaps,
@@ -527,6 +530,16 @@ impl Operandi {
 mod tests {
     use super::*;
 
+    /// Saved layouts name the Mesh Stack panel `mesh_ops`, its name before
+    /// 2026-11-23, so layouts open in older and newer builds.
+    #[test]
+    fn mesh_stack_keeps_its_saved_name() {
+        let text = serde_json::to_string(&PanelKind::MeshStack).unwrap();
+        assert_eq!(text, "\"mesh_ops\"");
+        let back: PanelKind = serde_json::from_str(&text).unwrap();
+        assert_eq!(back, PanelKind::MeshStack);
+    }
+
     #[test]
     fn every_kind_is_registered_once_and_empty_categories_are_hidden() {
         for kind in [
@@ -534,7 +547,7 @@ mod tests {
             PanelKind::ShaderTree,
             PanelKind::Groups,
             PanelKind::Properties,
-            PanelKind::MeshOps,
+            PanelKind::MeshStack,
             PanelKind::PresetBrowser,
             PanelKind::UvMaps,
             PanelKind::CommandHistory,

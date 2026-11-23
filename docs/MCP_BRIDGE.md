@@ -1352,7 +1352,7 @@ used in the app; `primitive_add` always starts from the Reset values.
   `value:"?"` answered like `item.channel`.
 - `scene.saveAs` with a filename plus a format (`format:`, or an
   extension that names one) writes obj/stl/gltf/glb/geo/svg/lxo/ply/abc
-  and USD files as File > Export does, from the scene as MeshOps evaluate
+  and USD files as File > Export does, from the scene as Mesh Stacks evaluate
   it. It never changes the document's path or saved state and adds no
   history step. Without a filename, or for a plain `.opscene`, it refuses
   (use `scene_save`). USD needs the exporter the app registers: it works

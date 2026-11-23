@@ -76,7 +76,7 @@ named_enum! {
     RandomOffsets {
         None => "(none)",
         #[serde(alias = "Item")]
-        ParticlesAndReplicas => "Particles and Replicas",
+        ParticlesAndReplicas => "Particles and Instancers",
         #[serde(alias = "Part")]
         MeshParts => "Mesh Parts",
         Surfaces => "Surfaces",
@@ -562,7 +562,7 @@ impl Scene {
             common: Default::default(),
             elements: Default::default(),
             hides_children: false,
-            mesh_ops: None,
+            mesh_stack: None,
             kit: None,
             instance_of: None,
             replicator: None,

@@ -2691,7 +2691,7 @@ impl Operandi {
         .response
         .on_hover_text(STORED);
         // Stored only: the Texture Replicator.
-        crate::option_row::field_row(ui, "Texture Replicator", |ui| {
+        crate::option_row::field_row(ui, "Texture Instancer", |ui| {
             item_combo(ui, "locator-replicator", &mut s.replicator, &items);
         })
         .response

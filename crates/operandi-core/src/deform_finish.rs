@@ -7,7 +7,7 @@
 //! Every function here takes the mesh, the points it works on and an
 //! optional falloff weight per point, and returns the moved mesh. Topology
 //! never changes. The editor runs them as live tools (editor.rs) and the
-//! MeshOps stack runs the same functions (meshops_deform.rs).
+//! Mesh Stack runs the same functions (mesh_stack_deform.rs).
 use crate::{Mesh, Mode, Result, Scene};
 use glam::{DMat3, DMat4, DVec3};
 use std::collections::{BTreeMap, BTreeSet};

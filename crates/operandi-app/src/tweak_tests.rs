@@ -872,7 +872,7 @@ fn status_bar_names_the_right_drag_and_rigid_blocks_it() {
 }
 
 /// Jason 2026-11-14: Symmetry turns on and off while a tool is open, and
-/// the open tool's next drag follows it (the tool pipe: Symmetry is a layer
+/// the open tool's next drag follows it (the tool chain: Symmetry is a layer
 /// under every tool). Each drag stays one undo step.
 #[test]
 fn symmetry_toggled_with_tweak_open_applies_to_the_next_drag() {

@@ -276,7 +276,7 @@ pub(crate) fn place_items(
         g.locator = Some(crate::locator::LocatorKind::Group);
         g.instance_of = None;
         g.subdivision = None;
-        g.mesh_ops = None;
+        g.mesh_stack = None;
         g.elements = Default::default();
         g.transform = Default::default();
         g.parent = Some(id);

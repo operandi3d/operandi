@@ -44,7 +44,7 @@ only has one for part of the program.
 The counts match labels in the code by hand and by script, so treat each one
 as ±2. What's mostly missing:
 
-- **Duplicate:** the Instance and Replica variants of Clone, Array, Scatter
+- **Duplicate:** the Instance and Instancer variants of Clone, Array, Scatter
   and Radial Array, all curve- and pen-driven duplication, Scatter and Mesh
   Paint. Mirror, Clone, Array, Radial Array and Radial Sweep are built.
 - **Deform:** Flex, Bend, Vortex, Shear, Quantize, Jitter, Soft Drag/Move,
@@ -67,7 +67,7 @@ as ±2. What's mostly missing:
 | Subdivision | Sub-D polygons, levels, edge weights, crease, freeze; evaluated display and picking | Usable |
 | Sculpt and vertex maps | 11 brushes (Blender-derived maths), weight painting, vertex-map falloffs as masks | Started; masks pending |
 | UVs | Unwrap and pack (Blender port), UV view, UV map list, Move/Rotate/Scale in UV, Fit, Flip, Mirror, Align, paint and lasso select, Checker | Started (editing stage 1) |
-| Procedural (MeshOps) | A procedural stack on mesh items | Started |
+| Procedural (Mesh Stack) | A procedural stack on mesh items | Started |
 | Items and scene | Meshes, groups, locators, cameras, lights, backdrops, environments, render item, hierarchy, multiple open scenes | Broad |
 | Materials and shading | Layered shader tree (materials, gradients, procedurals, images, vertex maps, occlusion, group scale), node materials (first stage), material presets and a CC0 starter library, viewport per-pixel materials | Usable |
 | Viewport | Shaded/wire/matcap styles, split and tear-off views, header buttons, quad view, navigation presets, 3D mouse and tablet input | Broad |

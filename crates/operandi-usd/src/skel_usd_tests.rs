@@ -218,7 +218,7 @@ fn the_arm_reads_back_the_same() {
             .scene
             .items
             .iter()
-            .find(|i| i.is_mesh() && i.mesh_ops.is_some())
+            .find(|i| i.is_mesh() && i.mesh_stack.is_some())
             .expect("a skinned mesh")
             .id;
         let (_, v) = skin_commands::skin_op(&b.scene, m2).unwrap();
@@ -390,7 +390,7 @@ fn blender_round_trip() {
         .scene
         .items
         .iter()
-        .find(|i| i.is_mesh() && i.mesh_ops.is_some())
+        .find(|i| i.is_mesh() && i.mesh_stack.is_some())
         .expect("a skinned mesh")
         .id;
     for f in [0, 12, 24] {
@@ -495,7 +495,7 @@ fn an_ik_arm_exports_its_solved_pose() {
         .scene
         .items
         .iter()
-        .find(|i| i.is_mesh() && i.mesh_ops.is_some())
+        .find(|i| i.is_mesh() && i.mesh_stack.is_some())
         .unwrap()
         .id;
     for f in [0, 12, 24] {

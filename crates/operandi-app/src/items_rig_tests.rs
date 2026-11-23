@@ -62,7 +62,7 @@ fn rg01_pieces_and_the_skin_show_under_their_items() {
         .scene
         .item(cube)
         .unwrap()
-        .mesh_ops
+        .mesh_stack
         .as_ref()
         .unwrap()
         .ops[0]
@@ -168,7 +168,7 @@ fn rig_rows_select_rename_enable_and_delete() {
         .scene
         .item(cube)
         .unwrap()
-        .mesh_ops
+        .mesh_stack
         .as_ref()
         .unwrap()
         .ops[0]
@@ -186,7 +186,7 @@ fn rig_rows_select_rename_enable_and_delete() {
             .scene
             .item(cube)
             .unwrap()
-            .mesh_ops
+            .mesh_stack
             .as_ref()
             .unwrap()
             .ops[0]
@@ -223,7 +223,7 @@ fn uic60_rig_menus_are_never_empty_and_delete_works() {
         .scene
         .item(cube)
         .unwrap()
-        .mesh_ops
+        .mesh_stack
         .as_ref()
         .unwrap()
         .ops[0]
@@ -251,4 +251,75 @@ fn uic60_rig_menus_are_never_empty_and_delete_works() {
     a.execute(&format!("operandi.rig.remove piece:{piece}"));
     assert_eq!(a.editor.undo.len(), steps + 1);
     assert!(!keys(&a).contains(&ItemKey::Rig(here(&a), piece)));
+}
+
+/// rig-pick-order in the Items list: click Passenger, Cmd-click Car,
+/// Parent: the Car is the parent; a range keeps the anchor first and the
+/// clicked end primary.
+#[test]
+fn items_list_picks_keep_their_order() {
+    crate::anim_switch::set_for_test(true);
+    let mut a = crate::tests::box_app();
+    let passenger = a.editor.scene.items[0].id;
+    a.run(Command::NewMesh);
+    let car = a.editor.scene.items.last().unwrap().id;
+    a.run(Command::NewMesh);
+    let road = a.editor.scene.items.last().unwrap().id;
+    let s = here(&a);
+    event(
+        &mut a,
+        TreeEvent::Click {
+            key: ItemKey::Item(s, passenger),
+            how: ClickHow::Only,
+        },
+    );
+    event(
+        &mut a,
+        TreeEvent::Click {
+            key: ItemKey::Item(s, car),
+            how: ClickHow::Toggle,
+        },
+    );
+    assert_eq!(a.editor.scene.selection.item, Some(car));
+    a.execute("operandi.rig.parent");
+    assert_eq!(
+        a.editor.scene.item(passenger).unwrap().parent,
+        Some(car),
+        "{}",
+        a.status
+    );
+    // A range from Road (anchor) up to the top item: Road first, the
+    // clicked end last and primary.
+    a.execute("operandi.rig.unparent");
+    event(
+        &mut a,
+        TreeEvent::Click {
+            key: ItemKey::Item(s, road),
+            how: ClickHow::Only,
+        },
+    );
+    let order: Vec<u64> = vec![passenger, car, road];
+    let ctx = Context::default();
+    let mut done = false;
+    let _ = ctx.run(Default::default(), |ctx| {
+        egui::CentralPanel::default().show(ctx, |ui| {
+            if !done {
+                a.item_event(
+                    ui,
+                    TreeEvent::Click {
+                        key: ItemKey::Item(s, passenger),
+                        how: ClickHow::Range,
+                    },
+                    &order,
+                );
+                done = true;
+            }
+        });
+    });
+    assert_eq!(
+        a.editor.scene.selection.item,
+        Some(passenger),
+        "the clicked end is primary"
+    );
+    assert_eq!(a.editor.scene.picked_items(), vec![road, car, passenger]);
 }

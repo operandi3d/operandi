@@ -1,4 +1,4 @@
-//! Direct tools as MeshOps (MO-40/41; types, channels and defaults from
+//! Direct tools as Mesh Stack (MO-40/41; types, channels and defaults from
 //! specifications meshops-specs-2026-11-17 TYPE-IDS.md). Tool families:
 //! every op here runs the same engine as its direct tool, either its pure
 //! kernel or, for tools that only exist as editor commands, the command
@@ -10,8 +10,8 @@
 //! Provisional (MOQ-25..): a choice channel the reference stores as text is
 //! stored by position; Delete works on the selected polygons (Sel POLY,
 //! not VRTX, until selection ops pick points, MOQ-21).
+use crate::mesh_stack_builtin::finite;
 use crate::meshop_types::{Field, FieldKind, OpContext, OpDef, Typed, TypedOp};
-use crate::meshops_builtin::finite;
 use crate::{Command, Editor, Mesh, Mode, Result};
 use glam::DVec3;
 use serde::{Deserialize, Serialize};
@@ -1178,7 +1178,7 @@ pub(crate) fn vertex_entries() -> Vec<Arc<dyn OpDef>> {
 //
 // Radial Array and Clone, saved like Mirror and Array as a Clone Effector
 // (`effector.clone.item`: replace, flip, merge, dist) with a generator in
-// its Tool Pipe (`pmodel.helix`, `pmodel.linear`); meshops.rs turns one
+// its Tool Pipe (`pmodel.helix`, `pmodel.linear`); mesh_stack.rs turns one
 // form into the other. Their copies are `clone`, `clone1`.. (PG table).
 
 /// The Clone Effector's copy options.
@@ -1355,7 +1355,7 @@ impl TypedOp for LinearCloneOp {
             .into_iter()
             .map(|f| f as usize)
             .collect();
-        let centre = crate::meshops_builtin::faces_centre(ctx.input, &faces);
+        let centre = crate::mesh_stack_builtin::faces_centre(ctx.input, &faces);
         let transforms = crate::duplicate::clone_transforms(&c, centre)?;
         copied(ctx, &transforms, &c.copies)
     }
@@ -1443,7 +1443,7 @@ pub(crate) fn duplicate_entries() -> Vec<Arc<dyn OpDef>> {
 // ======== Edit group ========
 //
 // Slice, Axis Slice, Polygon Reduce and Mesh Cleanup. (Boolean, Solid Drill,
-// Axis Drill and Merge Meshes read other items; see meshops_items.rs.)
+// Axis Drill and Merge Meshes read other items; see mesh_stack_items.rs.)
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields, rename_all = "camelCase")]

@@ -311,7 +311,7 @@ Locate Library… is a folder-picker button that runs the map's
 `pbview.basePathAdd`, so it has no command of its own.
 
 Pack UVs runs the map's `uv.pack` (no longer Operandi-only). The
-registry thread's names (MeshOps, Remesh, the preset browser, the sculpt
+registry thread's names (Mesh Stack, Remesh, the preset browser, the sculpt
 brushes, `tool.*`, Backdrop) are lines in
 `specifications/command-names/MODO-NAMES-SUBSET.txt` since 2026-11-11, so
 the test's hand-kept RECORDED list is empty.
@@ -322,9 +322,9 @@ Naming decisions (registry owner, 2026-11-11):
 - Export formats are lowercase extensions: usd, usda, usdc, usdz, abc,
   ply, plyAscii, stl, stlAscii (and obj, gltf, glb, geo, svg, lxo). A
   `scene.saveAs` to a foreign format acts as `export:true`.
-- MeshOps saved types: effector.clone.item with pmodel.mirror /
+- Mesh Stack saved types: effector.clone.item with pmodel.mirror /
   pmodel.array for Mirror and Array, pmodel.triangulate.item, and
-  index.selop.item for Select by Index. **Not done yet:** `meshops::OP_TYPES`
+  index.selop.item for Select by Index. **Not done yet:** `mesh_stack::OP_TYPES`
   still saves Mirror and Array as mirror.clone.item / array.clone.item.
   Changing that changes saved scenes (it needs a format version and a
   reader for the old ids), so it's left for its own change (CMD-Q).
@@ -632,7 +632,7 @@ Names from the registry thread:
 - Phrases: `Remesh` (Operandi-only) and `Automatic Retopology`
   (`mesh.retopo`) open the dialogs, as do the bare commands.
 
-## MeshOps (registry MESHOPS-NAMES rev 3)
+## Mesh Stack (registry MESHOPS-NAMES rev 3)
 
 - Ops aren't scene items in Operandi; scripts name one `op:<item>:<op>`
   (`op:<item>:base` is the Base Mesh row). `item.delete`, `item.parent

@@ -77,15 +77,7 @@ impl Operandi {
     /// The selection in pick order (the active item last), as the rig
     /// commands read it.
     fn picked_items(&self) -> Vec<u64> {
-        let s = &self.editor.scene.selection;
-        let mut out: Vec<u64> = s.also.clone();
-        if let Some(a) = s.item
-            && !out.contains(&a)
-        {
-            out.push(a);
-        }
-        out.retain(|i| self.editor.scene.item(*i).is_some());
-        out
+        self.editor.scene.picked_items()
     }
 
     pub(super) fn channel_links_window(&mut self, ctx: &Context) {

@@ -14,6 +14,14 @@ use crate::{Editor, Mesh, Mode, Result, Scene};
 use serde::{Deserialize, Serialize};
 use std::collections::{BTreeMap, BTreeSet};
 
+/// Polygon sets Operandi itself names that were renamed: (old, new).
+/// Adding to the new name first moves an old-named set's members into it,
+/// so scenes saved before the rename keep one set.
+const RENAMED_POLYGON_SETS: &[(&str, &str)] = &[
+    // Retopo Edge Flow's set (TC-53) before 2026-11-23, to match RetopoEdgeLock.
+    ("RetopoFlow", "RetopoEdgeFlow"),
+];
+
 /// Which components a selection set holds.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
 pub enum SetKind {
@@ -294,11 +302,14 @@ impl Editor {
                 if selection.faces.iter().any(|&f| f as usize >= faces) {
                     return Err("A selected polygon no longer exists".into());
                 }
-                mesh.attributes
-                    .polygon_sets
-                    .entry(name)
-                    .or_default()
-                    .extend(selection.faces);
+                let sets = &mut mesh.attributes.polygon_sets;
+                // A set under its old name joins the new one, in this step.
+                if let Some((old, _)) = RENAMED_POLYGON_SETS.iter().find(|(_, new)| *new == name)
+                    && let Some(members) = sets.remove(*old)
+                {
+                    sets.entry(name.clone()).or_default().extend(members);
+                }
+                sets.entry(name).or_default().extend(selection.faces);
             }
         }
         self.commit_set_edit(WHAT, before)

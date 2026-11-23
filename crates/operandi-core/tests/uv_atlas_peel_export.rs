@@ -262,9 +262,8 @@ fn uvt92_transfer_copies_uvs_to_a_mesh_of_the_same_topology() {
     e.scene.active_mut().unwrap().mesh = src.clone().into();
     let source = e.scene.active().unwrap().id;
     // The source primary, the target also active.
-    e.scene.selection.item = Some(source);
-    e.dispatch(Command::ToggleItemSelection(target)).unwrap();
-    e.scene.selection.item = Some(source);
+    e.scene.select_item(Some(target));
+    e.dispatch(Command::ToggleItemSelection(source)).unwrap();
     e.dispatch(Command::UvTransfer).unwrap();
     assert_eq!(
         e.scene.item(target).unwrap().mesh.uv_maps["Texture"],

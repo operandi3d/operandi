@@ -509,17 +509,17 @@ impl Operandi {
             }
             // Version-local immutable projected snapshot; GPU depth resolves occlusion.
             // A numeric tool's preview (Cone, Ellipsoid, the Shapes) stands
-            // in for the scene; otherwise MeshOps (MO-01): items with a
+            // in for the scene; otherwise the Mesh Stack (MO-01): items with a
             // stack show its result, the mesh in Edit Base Mesh its Base
             // Mesh (MO-27). Frame All reads the same (`shown_display`).
             let preview_snapshot = self.editor.tool_preview_display();
-            let meshops_snapshot = preview_snapshot
+            let mesh_stack_snapshot = preview_snapshot
                 .is_none()
                 .then(|| self.editor.evaluated_display())
                 .flatten();
             let display_scene = preview_snapshot
                 .as_ref()
-                .or(meshops_snapshot.as_ref())
+                .or(mesh_stack_snapshot.as_ref())
                 .unwrap_or(&self.editor.scene);
             // G8 RP-3: Replicators' copies draw as wire boxes unless this
             // view's Replicators option shades them.
@@ -1157,11 +1157,11 @@ impl Operandi {
             if let Some(base) = self.editor.base_edit
                 && let Some(item) = self.editor.scene.item(base)
                 && display_scene.shows(item)
-                && let Some(result) = self.editor.meshops.result(&self.editor.scene, item)
+                && let Some(result) = self.editor.mesh_stack.result(&self.editor.scene, item)
             {
                 const GHOST_EDGE_BUDGET: usize = 200_000;
                 let ghost = u64::MAX - base;
-                let color = crate::mesh_ops_ui::ghost_color();
+                let color = crate::mesh_stack_ui::ghost_color();
                 let edges = result.mesh.edges();
                 for &(a, b) in edges.iter().take(GHOST_EDGE_BUDGET) {
                     let world =

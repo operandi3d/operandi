@@ -25,5 +25,5 @@ that everyday selecting still works the same.
    Click empty space: selection cleared.
 6. **Paint and lasso.** Drag-paint across polygons, then a lasso: both
    select as before.
-7. **MeshOps still show.** Add a MeshOps stack (Mesh Ops panel, add a
+7. **Mesh Stacks still show.** Add a Mesh Stack (Mesh Stack panel, add a
    Cube op) to an empty mesh:    Render shows it; File > Export OBJ contains it.

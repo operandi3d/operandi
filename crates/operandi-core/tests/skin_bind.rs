@@ -115,7 +115,7 @@ fn sk02_bind_needs_setup_mode() {
         err(&mut a.e, &text),
         "Bind needs Setup mode. Turn on Setup and try again."
     );
-    assert!(a.e.scene.item(a.mesh).unwrap().mesh_ops.is_none());
+    assert!(a.e.scene.item(a.mesh).unwrap().mesh_stack.is_none());
 }
 
 #[test]
@@ -191,7 +191,7 @@ fn sk21_heat_refuses_bad_geometry_and_selects_it() {
     let text = format!("operandi.skin.bind items:{} root:{}", a.mesh, a.joints[0]);
     assert!(err(&mut a.e, &text).contains("loose points"));
     assert_eq!(a.e.undo.len(), steps, "nothing changes");
-    assert!(a.e.scene.item(a.mesh).unwrap().mesh_ops.is_none());
+    assert!(a.e.scene.item(a.mesh).unwrap().mesh_stack.is_none());
     let n = rest(&a).len() as u32;
     assert_eq!(a.e.scene.selection.vertices, vec![n - 1]);
     // The [OP] fallback: Smooth (Distance) binds it.
@@ -262,7 +262,7 @@ fn sk24_sk25_unbind_and_rebind() {
     .unwrap();
     assert!(q.contains("Tip1"));
     ok(&mut a.e, &format!("operandi.skin.unbind items:{}", a.mesh));
-    assert!(a.e.scene.item(a.mesh).unwrap().mesh_ops.is_none());
+    assert!(a.e.scene.item(a.mesh).unwrap().mesh_stack.is_none());
     assert!(maps(&a).contains_key("Elbow1"), "maps kept");
     a.e.dispatch(Command::Undo).unwrap();
     ok(

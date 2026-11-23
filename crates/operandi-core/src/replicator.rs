@@ -3,9 +3,9 @@
 //!
 //! A Replica tool (the Replica buttons, `Copier::Replica`) places exactly
 //! where its Instance sibling would, but instead of N instance items it
-//! makes three: a group ("proto Replicator") at the root holding a hidden
+//! makes three: a group ("proto Instancer") at the root holding a hidden
 //! points-only mesh ("proto (Point Cloud)") and the Replicator item
-//! ("proto (Replicator)"). The original stays and counts as the first copy,
+//! ("proto (Instancer)"). The original stays and counts as the first copy,
 //! so the cloud has a point for each other copy.
 //!
 //! Each point is where that copy's pivot goes; its rotation and scale (a
@@ -39,7 +39,7 @@ pub const SCALE_MAP: &str = "Replica Scale";
 /// index), for Mesh Paint Replica.
 pub const MEMBER_MAP: &str = "Replica Member";
 /// RP-6: what a Replica tool says with nothing to copy.
-pub const NOTHING_TO_REPLICATE: &str = "Select an item to replicate";
+pub const NOTHING_TO_REPLICATE: &str = "Select an item to instance";
 /// Most copies one Replicator shows. Copies are drawn and rendered as
 /// instances, so this is far above any one point cloud; past it the
 /// Replicator panel says how many points are left out (hidden-limits A4,
@@ -132,7 +132,7 @@ impl Replicator {
             && self.density.is_finite()
             && self.display_density.is_finite();
         if !finite {
-            return Err("Replicator settings must be finite".into());
+            return Err("Instancer settings must be finite".into());
         }
         if !(0.0..=100.).contains(&self.density) || !(0.0..=100.).contains(&self.display_density) {
             return Err("Density is a percentage from 0 to 100".into());
@@ -501,7 +501,7 @@ fn virtual_copy(scene: &Scene, item: &Item, id: u64) -> Item {
     c.hides_children = false;
     c.source_id = None;
     c.source_display_name = None;
-    c.mesh_ops = None;
+    c.mesh_stack = None;
     if item.is_mesh() {
         c.instance_of = Some(scene.instance_source(item.id).unwrap_or(item.id));
     }
@@ -617,7 +617,7 @@ fn blank(template: &Item, id: u64, name: String) -> Item {
     i.environment = None;
     i.common = Default::default();
     i.elements = Default::default();
-    i.mesh_ops = None;
+    i.mesh_stack = None;
     i.kit = None;
     i.instance_of = None;
     i.replicator = None;
@@ -637,7 +637,7 @@ pub(crate) fn add(
 ) -> Result<u64> {
     if !options.source.built() {
         return Err(format!(
-            "Replica Source {} isn't built yet; use Active Item",
+            "Instancer Source {} isn't built yet; use Active Item",
             options.source.label()
         ));
     }
@@ -663,7 +663,7 @@ pub(crate) fn add(
     let group_id = ids.take()?;
     let cloud_id = ids.take()?;
     let rep_id = ids.take()?;
-    let group_name = name(scene, format!("{} Replicator", proto.name));
+    let group_name = name(scene, format!("{} Instancer", proto.name));
     let mut group = blank(&proto, group_id, group_name);
     group.locator = Some(crate::locator::LocatorKind::Group);
     if options.parent == ReplicaParent::Selected {
@@ -676,7 +676,7 @@ pub(crate) fn add(
     cloud_item.mesh = cloud(&transforms).into();
     cloud_item.parent = Some(group_id);
     cloud_item.visible = false;
-    let rep_name = name(scene, format!("{} (Replicator)", proto.name));
+    let rep_name = name(scene, format!("{} (Instancer)", proto.name));
     let mut rep = blank(&proto, rep_id, rep_name);
     rep.parent = Some(group_id);
     rep.replicator = Some(Box::new(Replicator {
@@ -744,7 +744,7 @@ pub(crate) fn add_painted(
     let group_id = ids.take()?;
     let cloud_id = ids.take()?;
     let rep_id = ids.take()?;
-    let group_name = scene.free_name(&format!("{} Replicator", proto.name));
+    let group_name = scene.free_name(&format!("{} Instancer", proto.name));
     let mut group = blank(&proto, group_id, group_name);
     group.locator = Some(crate::locator::LocatorKind::Group);
     let cloud_name = scene.free_name(&format!("{} (Point Cloud)", proto.name));
@@ -752,7 +752,7 @@ pub(crate) fn add_painted(
     cloud_item.mesh = cloud_mesh.into();
     cloud_item.parent = Some(group_id);
     cloud_item.visible = false;
-    let rep_name = scene.free_name(&format!("{} (Replicator)", proto.name));
+    let rep_name = scene.free_name(&format!("{} (Instancer)", proto.name));
     let mut rep = blank(&proto, rep_id, rep_name);
     rep.parent = Some(group_id);
     rep.replicator = Some(Box::new(Replicator {
@@ -781,7 +781,7 @@ pub(crate) fn freeze(
     let item = scene
         .item(id)
         .filter(|i| i.replicator.is_some())
-        .ok_or("Select a Replicator to freeze")?
+        .ok_or("Select an Instancer to freeze")?
         .clone();
     let rep = item.replicator.as_deref().cloned().unwrap_or_default();
     let made = copies(scene, id, false);
@@ -852,14 +852,14 @@ impl crate::Editor {
         self.require_idle()?;
         let id = self
             .selected_replicator()
-            .ok_or("Select a Replicator to freeze")?;
+            .ok_or("Select an Instancer to freeze")?;
         let before = self.scene.clone();
         let mut scene = self.scene.clone();
         let mut ids = crate::duplicate_items::Ids::starting(scene.next_id.max(self.next_item_id));
         let group = freeze(&mut scene, id, &mut ids)?;
         scene.next_id = ids.next();
         scene.select_item(Some(group));
-        self.commit_replicator_edit(scene, before, "Freeze Replicator")
+        self.commit_replicator_edit(scene, before, "Freeze Instancer")
     }
 
     /// RP-2: Replicator `item`'s settings, one undo step.
@@ -871,12 +871,12 @@ impl crate::Editor {
         let target = scene
             .item_mut(item)
             .filter(|i| i.replicator.is_some())
-            .ok_or("That item isn't a Replicator")?;
+            .ok_or("That item isn't an Instancer")?;
         if target.replicator.as_deref() == Some(&settings) {
             return Ok(());
         }
         target.replicator = Some(Box::new(settings));
-        self.commit_replicator_edit(scene, before, "Replicator Settings")
+        self.commit_replicator_edit(scene, before, "Instancer Settings")
     }
 
     fn commit_replicator_edit(&mut self, scene: Scene, before: Scene, label: &str) -> Result<()> {

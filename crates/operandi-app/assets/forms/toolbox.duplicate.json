@@ -87,8 +87,8 @@
             "icon": "instance-clone"
           },
           {
-            "command": "Replica Clone",
-            "label": "Replica Clone",
+            "command": "Instancer Clone",
+            "label": "Instancer Clone",
             "icon": "replica-clone"
           }
         ]
@@ -119,8 +119,8 @@
             "icon": "curve-instance"
           },
           {
-            "command": "Curve Replica",
-            "label": "Curve Replica",
+            "command": "Curve Instancer",
+            "label": "Curve Instancer",
             "icon": "curve-replica"
           },
           {
@@ -138,8 +138,8 @@
             "icon": "bezier-instance"
           },
           {
-            "command": "Bezier Replica",
-            "label": "Bezier Replica",
+            "command": "Bezier Instancer",
+            "label": "Bezier Instancer",
             "icon": "bezier-replica"
           },
           {
@@ -157,8 +157,8 @@
             "icon": "bspline-instance"
           },
           {
-            "command": "B-Spline Replica",
-            "label": "B-Spline Replica",
+            "command": "B-Spline Instancer",
+            "label": "B-Spline Instancer",
             "icon": "bspline-replica"
           },
           {
@@ -176,8 +176,8 @@
             "icon": "pen-instance"
           },
           {
-            "command": "Pen Replicate",
-            "label": "Pen Replicate",
+            "command": "Pen Instancer",
+            "label": "Pen Instancer",
             "icon": "pen-replicate"
           },
           {
@@ -212,8 +212,8 @@
             "icon": "instance-scatter"
           },
           {
-            "command": "Replica Scatter",
-            "label": "Replica Scatter",
+            "command": "Instancer Scatter",
+            "label": "Instancer Scatter",
             "icon": "replica-scatter"
           },
           {
@@ -237,10 +237,10 @@
           "tooltip": "Mesh Paint Instance{binding} · the same, making instance items of the background mesh\n{variants}"
         },
         "ctrl": {
-          "line": "Mesh Paint Replica",
-          "label": "Mesh Paint Replica",
+          "line": "Mesh Paint Instancer",
+          "label": "Mesh Paint Instancer",
           "icon": "mesh-paint-replica",
-          "tooltip": "Mesh Paint Replica{binding} · the same, each stroke making one Replicator of the background meshes\n{variants}"
+          "tooltip": "Mesh Paint Instancer{binding} · the same, each stroke making one Instancer of the background meshes\n{variants}"
         }
       }
     },
@@ -271,8 +271,8 @@
             "icon": "instance-array"
           },
           {
-            "command": "Replica Array",
-            "label": "Replica Array",
+            "command": "Instancer Array",
+            "label": "Instancer Array",
             "icon": "replica-array"
           },
           {
@@ -306,8 +306,8 @@
             "icon": "instance-radial-array"
           },
           {
-            "command": "Replica Radial Array",
-            "label": "Replica Radial Array",
+            "command": "Instancer Radial Array",
+            "label": "Instancer Radial Array",
             "icon": "replica-radial-array"
           },
           {
@@ -345,8 +345,8 @@
             "icon": "instance-mirror"
           },
           {
-            "command": "Replica Mirror",
-            "label": "Replica Mirror",
+            "command": "Instancer Mirror",
+            "label": "Instancer Mirror",
             "icon": "replica-mirror"
           }
         ]

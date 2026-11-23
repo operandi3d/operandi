@@ -773,11 +773,11 @@ fn two_cubes(b: &mut Bridge) -> (u64, u64) {
 /// BRQ-90..94: build a stack, set an op's options and item inputs, read
 /// the stack and its result.
 #[test]
-fn mesh_ops_read_back_their_stack_and_result() {
+fn mesh_stack_read_back_their_stack_and_result() {
     let mut b = Bridge::new();
     let (first, second) = two_cubes(&mut b);
     command(&mut b, "meshop.create", json!({"type": "pmodel.meshmerge"})).unwrap();
-    let ops = call(&mut b, "item_get", json!({"item": first})).unwrap()["mesh_ops"].clone();
+    let ops = call(&mut b, "item_get", json!({"item": first})).unwrap()["mesh_stack"].clone();
     assert_eq!(ops.as_array().unwrap().len(), 1, "{ops}");
     let op = ops[0]["op"].as_str().unwrap().to_owned();
     assert_eq!(ops[0]["type"], "pmodel.meshmerge");
@@ -792,7 +792,7 @@ fn mesh_ops_read_back_their_stack_and_result() {
     )
     .unwrap();
     assert_eq!(undo_len(&mut b), undo + 1);
-    let ops = call(&mut b, "item_get", json!({"item": first})).unwrap()["mesh_ops"].clone();
+    let ops = call(&mut b, "item_get", json!({"item": first})).unwrap()["mesh_stack"].clone();
     assert_eq!(ops[0]["values"]["sources"], json!([second]));
     assert_eq!(ops[0]["values"]["hierarchy"], true);
     assert_eq!(ops[0]["status"], "ok");
@@ -808,7 +808,7 @@ fn mesh_ops_read_back_their_stack_and_result() {
     assert_eq!(result["vertices"].as_array().unwrap().len(), 16);
     assert_eq!(result["faces"].as_array().unwrap().len(), 12);
     assert_eq!(result["faces"][0]["type"], "face");
-    assert_eq!(result["mesh_ops_status"], json!(["ok"]));
+    assert_eq!(result["mesh_stack_status"], json!(["ok"]));
     // Off passes the input through.
     command(
         &mut b,
@@ -823,7 +823,7 @@ fn mesh_ops_read_back_their_stack_and_result() {
     )
     .unwrap();
     assert_eq!(off["vertices"].as_array().unwrap().len(), 8);
-    assert_eq!(off["mesh_ops_status"], json!(["off"]));
+    assert_eq!(off["mesh_stack_status"], json!(["off"]));
     // Refusals change nothing.
     let undo = undo_len(&mut b);
     refused(
@@ -1135,9 +1135,9 @@ fn mesh_cleanup_unify_keeps_duplicates_with_another_material() {
     assert_eq!(faces(&mut b), 2, "{}", mesh(&mut b));
 }
 
-/// A full undo after a multi-item MeshOps case leaves the document clean.
+/// A full undo after a multi-item Mesh Stack case leaves the document clean.
 #[test]
-fn undoing_a_mesh_ops_case_clears_modified() {
+fn undoing_a_mesh_stack_case_clears_modified() {
     let mut b = Bridge::new();
     cube(&mut b, [0.; 3]);
     let dir = std::env::temp_dir().join(format!("operandi-brq-dirty2-{}", std::process::id()));
@@ -1157,7 +1157,8 @@ fn undoing_a_mesh_ops_case_clears_modified() {
     let second = b.editor.scene.selection.item.unwrap();
     command(&mut b, "select.item", json!({"item": first})).unwrap();
     command(&mut b, "meshop.create", json!({"type": "pmodel.meshmerge"})).unwrap();
-    let op = call(&mut b, "item_get", json!({"item": first})).unwrap()["mesh_ops"][0]["op"].clone();
+    let op =
+        call(&mut b, "item_get", json!({"item": first})).unwrap()["mesh_stack"][0]["op"].clone();
     call(
         &mut b,
         "meshop_set",

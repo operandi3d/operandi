@@ -978,7 +978,7 @@ fn panel_name(kind: panel_registry::PanelKind) -> &'static str {
         PanelKind::ShaderTree => "shader_tree",
         PanelKind::Groups => "groups",
         PanelKind::Properties => "properties",
-        PanelKind::MeshOps => "mesh_ops",
+        PanelKind::MeshStack => "mesh_stack",
         PanelKind::PresetBrowser => "preset_browser",
         PanelKind::UvMaps => "uv_maps",
         PanelKind::CommandHistory => "command_history",
@@ -999,6 +999,10 @@ fn panel_kind(name: &str) -> std::result::Result<panel_registry::PanelKind, Stri
             .collect::<String>()
     };
     let wanted = squash(name);
+    // "mesh_ops", the panel's bridge name before 2026-11-23.
+    if wanted == "meshops" {
+        return Ok(panel_registry::PanelKind::MeshStack);
+    }
     panel_registry::REGISTRY
         .iter()
         .map(|t| t.kind)
@@ -1727,10 +1731,10 @@ mod tests {
         assert_eq!(a.path.as_deref(), Some(path.as_path()));
     }
 
-    /// A full undo after a multi-item MeshOps case leaves the app's
+    /// A full undo after a multi-item Mesh Stack case leaves the app's
     /// document clean (replay quirk).
     #[test]
-    fn undoing_a_mesh_ops_case_leaves_the_document_clean() {
+    fn undoing_a_mesh_stack_case_leaves_the_document_clean() {
         let mut a = app();
         call(&mut a, "primitive_add", json!({"shape": "cube"})).unwrap();
         let path = temp("dirty-ops").join("cube.opscene");
@@ -1751,8 +1755,8 @@ mod tests {
         let second = a.editor.scene.selection.item.unwrap();
         run(&mut a, "select.item", json!({"item": first}));
         run(&mut a, "meshop.create", json!({"type": "pmodel.meshmerge"}));
-        let op =
-            call(&mut a, "item_get", json!({"item": first})).unwrap()["mesh_ops"][0]["op"].clone();
+        let op = call(&mut a, "item_get", json!({"item": first})).unwrap()["mesh_stack"][0]["op"]
+            .clone();
         call(
             &mut a,
             "meshop_set",
@@ -1985,10 +1989,17 @@ mod tests {
         call(&mut a, "panel_show", json!({"panel": "properties"})).unwrap();
         assert_eq!(a.lower_frame.front(), Some(PanelKind::Properties));
         call(&mut a, "panel_show", json!({"panel": "mesh ops"})).unwrap();
-        assert_eq!(a.upper_frame.front(), Some(PanelKind::MeshOps));
+        assert_eq!(a.upper_frame.front(), Some(PanelKind::MeshStack));
+        // The bridge name before 2026-11-23 still opens the Mesh Stack.
+        a.upper_frame.show_page(0);
+        call(&mut a, "panel_show", json!({"panel": "mesh_ops"})).unwrap();
+        assert_eq!(a.upper_frame.front(), Some(PanelKind::MeshStack));
+        a.upper_frame.show_page(0);
+        call(&mut a, "panel_show", json!({"panel": "mesh_stack"})).unwrap();
+        assert_eq!(a.upper_frame.front(), Some(PanelKind::MeshStack));
         a.upper_frame.show_page(0);
         call(&mut a, "panel_show", json!({"panel": "Mesh Stack"})).unwrap();
-        assert_eq!(a.upper_frame.front(), Some(PanelKind::MeshOps));
+        assert_eq!(a.upper_frame.front(), Some(PanelKind::MeshStack));
         assert!(call(&mut a, "panel_show", json!({"panel": "no such panel"})).is_err());
         // Layout only: runs with a dialog open, opens none, edits nothing.
         a.show_preferences = true;

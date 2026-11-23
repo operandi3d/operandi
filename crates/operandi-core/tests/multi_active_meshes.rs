@@ -319,27 +319,28 @@ fn shift_click_adds_items_and_ctrl_click_removes_them() {
     let c = add_cube(&mut e, 10.);
     e.dispatch(Command::Mode(Mode::Item)).unwrap();
     pick(&mut e, a, Component::Item, true, false);
-    assert_eq!(e.scene.selected_items(), vec![a]);
+    assert_eq!(e.scene.picked_items(), vec![a]);
     pick(&mut e, b, Component::Item, false, false);
     pick(&mut e, c, Component::Item, false, false);
-    assert_eq!(e.scene.selected_items(), vec![a, b, c]);
-    assert_eq!(e.scene.active_meshes(), vec![a, b, c]);
+    assert_eq!(e.scene.picked_items(), vec![a, b, c]);
+    // The primary (last picked) comes first.
+    assert_eq!(e.scene.active_meshes(), vec![c, a, b]);
     // Shift on an item already selected leaves it.
     pick(&mut e, b, Component::Item, false, false);
-    assert_eq!(e.scene.selected_items(), vec![a, b, c]);
+    assert_eq!(e.scene.picked_items(), vec![a, b, c]);
     pick(&mut e, b, Component::Item, false, true);
-    assert_eq!(e.scene.selected_items(), vec![a, c]);
+    assert_eq!(e.scene.picked_items(), vec![a, c]);
     // Ctrl toggles: a second Ctrl-click puts it back.
     pick(&mut e, b, Component::Item, false, true);
-    assert_eq!(e.scene.selected_items(), vec![a, c, b]);
+    assert_eq!(e.scene.picked_items(), vec![a, c, b]);
     pick(&mut e, b, Component::Item, false, true);
-    assert_eq!(e.scene.selected_items(), vec![a, c]);
+    assert_eq!(e.scene.picked_items(), vec![a, c]);
     // A plain click selects only the clicked item.
     pick(&mut e, c, Component::Item, true, false);
-    assert_eq!(e.scene.selected_items(), vec![c]);
+    assert_eq!(e.scene.picked_items(), vec![c]);
     // One undo step per click.
     e.dispatch(Command::Undo).unwrap();
-    assert_eq!(e.scene.selected_items(), vec![a, c]);
+    assert_eq!(e.scene.picked_items(), vec![a, c]);
 }
 
 #[test]

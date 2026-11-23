@@ -126,7 +126,7 @@ impl SketchSession {
         self.current = s.current;
         self.options = s.options;
     }
-    /// Symmetry changed with the tool open (tool pipe, Jason 2026-11-14):
+    /// Symmetry changed with the tool open (tool chain, Jason 2026-11-14):
     /// the activation rule again, so new nodes follow the new setting.
     pub(crate) fn follow_symmetry(
         &mut self,

@@ -14,13 +14,16 @@ opens the release page in your browser.
 `OPERANDI_UPDATE_FEED=<file>` makes the app read that JSON file instead
 of asking GitHub. Make these two files somewhere (e.g. `/tmp`):
 
-`test-newer.json` (Test channel; the time is far in the future, so it is
-always newer):
+`test-newer.json` (Test channel, for macOS, Windows and Linux; the time is
+far in the future, so it is always newer):
 
 ```json
 {"tag_name": "test-build", "prerelease": true,
- "body": "- **macOS**: `Operandi-Test-macOS.zip`, built from [`1a2b3c4d`](https://example.com)\n<!-- operandi-build mac=1a2b3c4d mac_time=4102444800 windows=1a2b3c4d windows_time=4102444800 -->"}
+ "body": "- **macOS**: `Operandi-Test-macOS.zip`, built from [`1a2b3c4d`](https://example.com)\n<!-- operandi-build mac=1a2b3c4d mac_time=4102444800 windows=1a2b3c4d windows_time=4102444800 linux=1a2b3c4d linux_time=4102444800 -->"}
 ```
+
+A platform with an empty value in that line (`linux= linux_time=`) has no
+test build yet: the check offers nothing for it.
 
 `release-newer.json` (Release channel):
 
@@ -68,7 +71,12 @@ OPERANDI_UPDATE_FEED=/tmp/test-newer.json OPERANDI_DEV_DATA=/tmp/operandi-qa "/p
     Updates says GitHub could not be reached. Wi-Fi on, Release channel:
     "You have the newest release." (or the offer, if a newer release is
     out).
-11. Type `operandi.update.check` on the command line: same as the menu.
+11. On Linux (the AppImage), steps 2-7 work the same: the Test channel
+    reads the `linux=` fields, or the "- **Linux**: ... built from" line
+    when the hidden line has none. Change the feed to `linux= linux_time=`:
+    Help > Check for Updates says there is no test build for this platform
+    yet.
+12. Type `operandi.update.check` on the command line: same as the menu.
     Type `pref.value updates.channel Test` and `pref.value
     updates.check_on_launch false`: the Preferences rows follow.
 

@@ -151,7 +151,7 @@ impl Bridge {
                     "item": {"type": "integer"},
                     "world": {"type": "boolean"},
                     "edges": {"type": "boolean", "description": "Include the edge list (default true)."},
-                    "evaluated": {"type": "boolean", "description": "The mesh after its Mesh Operations (item space), as renders and exports read it, with each face's type and mesh_ops_status per op; a mesh without ops returns its own mesh. Default false: the Base Mesh."},
+                    "evaluated": {"type": "boolean", "description": "The mesh after its Mesh Operations (item space), as renders and exports read it, with each face's type and mesh_stack_status per op; a mesh without ops returns its own mesh. Default false: the Base Mesh."},
                     "polygon_types": {"type": "boolean", "description": "Give each face its type: face, subdivision, catmullClark, polyline, curve, bspline or bezier (closed_ prefixed when closed). Implied by evaluated."},
                     "uvs": {"type": "boolean", "description": "Include uv_maps: each UV map's name with one [u, v] per polygon corner, in face order (null where the map has none). Default false."},
                     "subdivided": {"description": "true: the mesh as displayed after subdivision (Subdivision and Catmull-Clark polygons refined at the mesh's display levels, Face polygons kept), with source_faces giving each output polygon's cage polygon; a number 0-6: that level for both kinds instead."}
@@ -363,7 +363,7 @@ impl Bridge {
                 "panel_show",
                 "Running app only: bring a side panel to the front of its tab group so a viewport_capture or a screen shot shows it, as clicking its tab does; a panel that was closed is added back to its group (Properties to the lower group, the others to the upper). Panel layout only: no undo step, no scene change, never opens a dialog. Answers each group's tabs and which is in front.",
                 json!({"type": "object", "properties": {
-                    "panel": {"enum": PANEL_NAMES, "description": "items (Items list), shader_tree (Shader Tree), groups, properties, mesh_ops (Mesh Stack), preset_browser (Preset Browser), uv_maps (UV Maps), command_history (Command History), vertex_normal_tools (Vertex Normal Tools), statistics (Statistics), node_view (Node View)."}
+                    "panel": {"enum": PANEL_NAMES, "description": "items (Items list), shader_tree (Shader Tree), groups, properties, mesh_stack (Mesh Stack), preset_browser (Preset Browser), uv_maps (UV Maps), command_history (Command History), vertex_normal_tools (Vertex Normal Tools), statistics (Statistics), node_view (Node View)."}
                 }, "required": ["panel"], "additionalProperties": false}),
             ),
             def(
@@ -759,10 +759,10 @@ impl Bridge {
         // BRQ-91: the result of the item's Mesh Operations, as renders and
         // exports read it (current, never stale).
         let evaluated = opt_bool(args, "evaluated")?.unwrap_or(false);
-        let result = if evaluated && item.mesh_ops.is_some() {
+        let result = if evaluated && item.mesh_stack.is_some() {
             let r = self
                 .editor
-                .meshops
+                .mesh_stack
                 .current(scene, item)
                 .ok_or("The Mesh Operations could not be evaluated")?;
             Some(r)
@@ -858,7 +858,7 @@ impl Bridge {
         }
         if let Some(r) = &result {
             out["evaluated"] = json!(true);
-            out["mesh_ops_status"] = json!(r.statuses.iter().map(op_status).collect::<Vec<_>>());
+            out["mesh_stack_status"] = json!(r.statuses.iter().map(op_status).collect::<Vec<_>>());
         }
         if let Some(source) = sources {
             out["subdivided"] = json!(true);
@@ -903,8 +903,8 @@ fn polygon_type(r: operandi_core::PolygonRepresentation) -> String {
 }
 
 /// One op's evaluation status (BRQ-91/94): ok, off, or failed with why.
-pub fn op_status(s: &operandi_core::meshops::OpStatus) -> Value {
-    use operandi_core::meshops::OpStatus as S;
+pub fn op_status(s: &operandi_core::mesh_stack::OpStatus) -> Value {
+    use operandi_core::mesh_stack::OpStatus as S;
     match s {
         S::Ok => json!("ok"),
         S::Off => json!("off"),
@@ -962,7 +962,7 @@ pub const PANEL_NAMES: [&str; 11] = [
     "shader_tree",
     "groups",
     "properties",
-    "mesh_ops",
+    "mesh_stack",
     "uv_maps",
     "preset_browser",
     "command_history",
@@ -1067,6 +1067,17 @@ fn select(e: &mut Editor, args: &Map<String, Value>) -> Result<()> {
         None => e.scene.selection.item.ok_or("No active item; pass item")?,
     };
     if mode == Mode::Item {
+        // add: the item joins the selection as the newest pick (and the
+        // primary), so pick-order commands read it last (rig-pick-order).
+        if opt_bool(args, "add")?.unwrap_or(false) {
+            if e.scene.selected_items().contains(&item) && e.scene.selection.item != Some(item) {
+                // Already picked earlier: picking it again makes it newest.
+                e.dispatch(Command::ToggleItemSelection(item))?;
+            } else if e.scene.selection.item == Some(item) {
+                return Ok(());
+            }
+            return e.dispatch(Command::ToggleItemSelection(item));
+        }
         return e.dispatch(Command::SelectItem(Some(item)));
     }
     // The item becomes the active one in component modes too, so later

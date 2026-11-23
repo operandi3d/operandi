@@ -467,6 +467,12 @@ impl Operandi {
                                 id,
                                 ClickHow::Range,
                             );
+                            // Pick order: the anchor first, the range, and
+                            // the clicked end last, which becomes primary
+                            // (SelectItems takes the primary first).
+                            if let Some(clicked) = selected.pop() {
+                                selected.insert(0, clicked);
+                            }
                             self.run(Command::SelectItems(selected));
                         }
                     }
@@ -560,7 +566,7 @@ impl Operandi {
                     .editor
                     .scene
                     .item(item)
-                    .and_then(|i| i.mesh_ops.as_ref())
+                    .and_then(|i| i.mesh_stack.as_ref())
                     .and_then(|st| st.ops.iter().find(|o| o.id == op))
                     .is_some_and(|o| o.enabled);
                 self.execute(&format!(
@@ -1119,7 +1125,7 @@ impl Operandi {
             .editor
             .scene
             .item(item)
-            .and_then(|i| i.mesh_ops.as_ref())
+            .and_then(|i| i.mesh_stack.as_ref())
             .and_then(|st| st.ops.iter().find(|o| o.id == op))
             .map(|o| o.enabled);
         let Some(enabled) = enabled else {

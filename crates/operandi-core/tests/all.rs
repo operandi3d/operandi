@@ -92,8 +92,8 @@ mod chamfer_basic;
 mod chamfer_edit_clean_spec;
 #[path = "checkpoint_boundary.rs"]
 mod checkpoint_boundary;
-#[path = "checks_ac_meshops_replay.rs"]
-mod checks_ac_meshops_replay;
+#[path = "checks_ac_mesh_stack_replay.rs"]
+mod checks_ac_mesh_stack_replay;
 #[path = "click_start.rs"]
 mod click_start;
 #[path = "clipboard.rs"]
@@ -352,16 +352,16 @@ mod mesh_cleanup_clean_spec;
 mod mesh_commands_measured;
 #[path = "mesh_paint_spec.rs"]
 mod mesh_paint_spec;
-#[path = "meshops_boolean_merge.rs"]
-mod meshops_boolean_merge;
-#[path = "meshops_links.rs"]
-mod meshops_links;
-#[path = "meshops_selops.rs"]
-mod meshops_selops;
-#[path = "meshops_stress.rs"]
-mod meshops_stress;
-#[path = "meshops_tools.rs"]
-mod meshops_tools;
+#[path = "mesh_stack_boolean_merge.rs"]
+mod mesh_stack_boolean_merge;
+#[path = "mesh_stack_links.rs"]
+mod mesh_stack_links;
+#[path = "mesh_stack_selops.rs"]
+mod mesh_stack_selops;
+#[path = "mesh_stack_stress.rs"]
+mod mesh_stack_stress;
+#[path = "mesh_stack_tools.rs"]
+mod mesh_stack_tools;
 #[path = "mid_tool_undo.rs"]
 mod mid_tool_undo;
 #[path = "mode_availability.rs"]
@@ -444,6 +444,8 @@ mod pen_walls;
 mod perf_snapshot;
 #[path = "performance_invariants.rs"]
 mod performance_invariants;
+#[path = "pick_order.rs"]
+mod pick_order;
 #[path = "poly_flip_clean_spec.rs"]
 mod poly_flip_clean_spec;
 #[path = "poly_haul_clean_spec.rs"]

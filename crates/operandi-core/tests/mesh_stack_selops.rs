@@ -1,9 +1,9 @@
-//! MeshOps suite batch 3: selection operations (MO-50..53) and Select by
+//! Mesh Stack suite batch 3: selection operations (MO-50..53) and Select by
 //! Previous Operation groups (PG-xx).
+use operandi_core::mesh_stack::{OpStatus, Runtime};
+use operandi_core::mesh_stack_editor::{OpRef, SelOpEdit};
+use operandi_core::mesh_stack_items::BOOLEAN_OP;
 use operandi_core::meshop_selection::{Blend, SelKind, SelOp};
-use operandi_core::meshops::{OpStatus, Runtime};
-use operandi_core::meshops_editor::{OpRef, SelOpEdit};
-use operandi_core::meshops_items::BOOLEAN_OP;
 use operandi_core::{Command, Editor, Mesh, persistence};
 use serde_json::{Value, json};
 
@@ -22,7 +22,7 @@ fn add(e: &mut Editor, item: u64, type_id: &str, values: Value) -> OpRef {
             .scene
             .item(item)
             .unwrap()
-            .mesh_ops
+            .mesh_stack
             .as_ref()
             .unwrap()
             .ops
@@ -48,8 +48,8 @@ fn previous(source: OpRef, name: &str) -> SelOp {
         name: name.into(),
     })
 }
-fn result(e: &Editor, item: u64) -> operandi_core::meshops::Evaluated {
-    e.meshops
+fn result(e: &Editor, item: u64) -> operandi_core::mesh_stack::Evaluated {
+    e.mesh_stack
         .current(&e.scene, e.scene.item(item).unwrap())
         .unwrap()
 }

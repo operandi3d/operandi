@@ -1,6 +1,6 @@
-# MeshOps: how the stack works and how to add an op type
+# Mesh Stack: how the stack works and how to add an op type
 
-MeshOps are procedural mesh operations stacked on a mesh item
+Mesh Stack ops are procedural mesh operations stacked on a mesh item
 (specifications/meshops-2026-11-11). This page is for anyone adding an op
 type, built in or from a kit.
 
@@ -9,12 +9,12 @@ type, built in or from a kit.
 | File | What it holds |
 |---|---|
 | `operandi-core/src/meshop_types.rs` | The op type table: `OpDef`, form `Field`s, `OpContext`, item links (`Source`, `Linked`), `register` for kits |
-| `operandi-core/src/meshops_builtin.rs` | Operandi's own op types and their table entries |
-| `operandi-core/src/meshops.rs` | The stack (`MeshOpStack`, `MeshOp`, `OpKind`), saving, the guard, the cache and background evaluation (`Runtime`), loop checks |
-| `operandi-core/src/meshops_editor.rs` | The commands that edit stacks (`meshop.create`, `item.channel`, `deformer.enable` ...) |
-| `operandi-app/src/mesh_ops_ui.rs` | The Mesh Ops tab and the op Properties form |
+| `operandi-core/src/mesh_stack_builtin.rs` | Operandi's own op types and their table entries |
+| `operandi-core/src/mesh_stack.rs` | The stack (`MeshStack`, `MeshOp`, `OpKind`), saving, the guard, the cache and background evaluation (`Runtime`), loop checks |
+| `operandi-core/src/mesh_stack_editor.rs` | The commands that edit stacks (`meshop.create`, `item.channel`, `deformer.enable` ...) |
+| `operandi-app/src/mesh_stack_ui.rs` | The Mesh Stack tab and the op Properties form |
 
-`meshops.rs` never names a particular op type. Everything about a type comes
+`mesh_stack.rs` never names a particular op type. Everything about a type comes
 from its table entry.
 
 ## Adding an op type
@@ -30,14 +30,14 @@ from its table entry.
    direct tool's kernel; never its live session.
 3. Add a table entry: `Typed::<YourOp>::new(id, label, folder,
    takes_selection, fields)`. Built-ins go in `builtin()`; a kit calls
-   `operandi_core::meshops::register(Arc::new(...))` once at start.
+   `operandi_core::mesh_stack::register(Arc::new(...))` once at start.
    - `id` is the saved type id. A built-in uses the reference id from the
      registry thread's MESHOPS-NAMES list. A kit uses its own dotted
      namespace (`mykit.cable.item`).
    - Every saved value needs a `Field` (KIT-4: the app draws the form).
      `FieldKind::Item` / `Items` fields are item links.
 4. Tests: one per acceptance criterion, plus the op shows up in the
-   stress harness automatically (`meshops_stress.rs` picks from the table).
+   stress harness automatically (`mesh_stack_stress.rs` picks from the table).
 
 Nothing else changes: the menu, Properties, saving, undo, loop checks and
 caching all read the table.

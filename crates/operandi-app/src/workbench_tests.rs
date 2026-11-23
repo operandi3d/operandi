@@ -533,12 +533,12 @@ fn the_tool_pipe_preset_re_runs_the_same_pipe() {
     // No tool: greyed with why. Macro and script aren't built.
     let why = |a: &Operandi, line: &str| a.line_state(line).unwrap().unavailable;
     assert!(
-        why(&a, "operandi.workbench.addPipe")
+        why(&a, "operandi.workbench.addChain")
             .unwrap()
             .contains("Open a tool")
     );
     for kind in ["macro", "script"] {
-        let line = format!("operandi.workbench.addPipe as:{kind}");
+        let line = format!("operandi.workbench.addChain as:{kind}");
         assert!(why(&a, &line).unwrap().contains("aren't in Operandi yet"));
         a.execute(&line);
         assert!(a.status.contains("aren't in Operandi yet"), "{}", a.status);
@@ -550,8 +550,8 @@ fn the_tool_pipe_preset_re_runs_the_same_pipe() {
     a.execute("Bevel");
     assert_eq!(a.editor.live.as_ref().map(|l| l.tool), Some(Tool::Bevel));
     let pipe = (a.editor.action_context, a.editor.symmetry.axis);
-    assert!(why(&a, "operandi.workbench.addPipe").is_none());
-    a.execute("operandi.workbench.addPipe");
+    assert!(why(&a, "operandi.workbench.addChain").is_none());
+    a.execute("operandi.workbench.addChain");
     assert!(a.last_failure.is_none(), "{}", a.status);
     let preset = bench(&a).controls[0].clone();
     assert_eq!(preset.label, "Bevel Preset");
@@ -582,8 +582,11 @@ fn the_tool_pipe_preset_re_runs_the_same_pipe() {
     assert_eq!((a.editor.action_context, a.editor.symmetry.axis), pipe);
     assert!(matches!(a.editor.spatial_falloff, Some(Falloff::Linear(_))));
     // With a name of its own.
-    a.execute("operandi.workbench.addPipe label:{Soft Bevel}");
+    a.execute("operandi.workbench.addChain label:{Soft Bevel}");
     assert_eq!(bench(&a).controls[1].label, "Soft Bevel");
+    // addPipe, its name before 2026-11-23, still adds one.
+    a.execute("operandi.workbench.addPipe label:{Old Name}");
+    assert_eq!(bench(&a).controls[2].label, "Old Name", "{}", a.status);
 }
 
 #[test]

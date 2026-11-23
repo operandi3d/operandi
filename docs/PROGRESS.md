@@ -1,5 +1,31 @@
 # Milestone progress ledger
 
+- **Brand renames (2026-11-23, branch brand-renames, Jason's names):**
+  what users see changes; ids, file names, saved keys and LXO keys stay.
+  - Tool Pipe → Tool Chain (Workbench ▸ Add Tool Chain, docs). Command
+    `operandi.workbench.addChain`; `addPipe` still works as an alias.
+  - Replicator → Instancer in labels, tooltips, status text, item names
+    and undo labels: Instancer Clone/Array/Radial Array/Mirror/Scatter,
+    Curve/Bezier/B-Spline Instancer, Pen Instancer, Mesh Paint Instancer,
+    Freeze Instancer, the Instancer properties tab and Duplicate section,
+    Viewport Properties ▸ Instancers, Texture Instancer. The old phrases
+    (Replica Clone, Freeze Replicator, Replicators, Mesh Paint Replica …)
+    still work. Tool preset ids, icon files, `Item::replicator` and the
+    vertex maps "Replica Rotation/Scale/Member" (saved names) are unchanged.
+  - Retopo Edge Flow's set is RetopoEdgeFlow (was RetopoFlow); in an older
+    scene the next Retopo Edge Flow moves RetopoFlow's polygons into it, in
+    the same undo step.
+  - Add Item lists only what Operandi makes: Backdrop Item, Camera, Mesh,
+    Lights, Locators ▸ Group Locator. Show unsupported is gone (IL-Q4, a
+    deliberate departure from IL-02).
+- **Mesh Stack rename (2026-11-23, branch mesh-stack-rename):** Mesh Ops
+  renamed Mesh Stack in code, docs and bridge names. Saved files keep the
+  key `mesh_ops` (scene items and saved panel layouts), so they open in
+  older and newer builds. Bridge: panel name `mesh_stack` (`mesh_ops` still
+  accepted); `item_get` field `mesh_stack` and `mesh_get`
+  `mesh_stack_status` replace `mesh_ops` / `mesh_ops_status`. Command and
+  type ids (`meshop.*`, `*.meshop.item`) unchanged.
+
 - **Work plane display (2026-11-23, branch workplane-display):** the work
   plane has its own Show Work Plane switch again (Work Plane Settings >
   Display and Preferences > Display), off by default and saved with the
@@ -44,8 +70,8 @@
   and Help > Check for Updates (`operandi.update.check`) ask GitHub by the
   system's `curl` on a background thread and offer the newer build in an
   Update Available confirmation (OK opens its release page, Skip This
-  Build). Never downloads or installs. Linux follows releases only (no
-  test build yet). The channel is a dropdown, not joined segments (UIC-113:
+  Build). Never downloads or installs. macOS, Windows and Linux all
+  follow the chosen channel (Linux test builds, 2026-11-23). The channel is a dropdown, not joined segments (UIC-113:
   segments are for dialogs and tool properties). GUI: UPDATE_CHECK_GUI_QA.md.
 
 - **Edge Bevel with hard edges (2026-11-22, branch forum-bevel-loopslice;
@@ -378,7 +404,7 @@
   maps as blend shapes, parts and point/polygon/edge selection sets, and
   Mesh Instances as native USD instances; the import reads each back
   (round-trip tests in operandi-usd `export_gaps_tests.rs`). Whatever USD
-  still gets nothing of is a line in the export report. MeshOps results
+  still gets nothing of is a line in the export report. Mesh Stack results
   were already exported (every entry point passes the evaluated scene;
   now tested). Bridge ABI 6: rerun scripts/build-usd.sh. Provisional:
   USD-IQ22.
@@ -503,8 +529,8 @@
   `mesh.cleanup` headless with its twelve switches (BRQ-60); `tool_run
   edge.bridge` with segments, mode, twist, tension, remove, flip, reverse
   (BRQ-80; the rest of Bridge's panel isn't built and is refused).
-  Batch 6: `mesh_get evaluated` (the Mesh Ops result, with polygon types
-  and op statuses), `item_get` lists `mesh_ops`, new `meshop_set` for
+  Batch 6: `mesh_get evaluated` (the Mesh Stack result, with polygon types
+  and op statuses), `item_get` lists `mesh_stack`, new `meshop_set` for
   op values and item inputs, `command_help meshop.create` lists every op
   type (BRQ-91..94; no Freeze or Set Polygon Type op exists yet).
   `tool_run action_center` per call (BRQ-100; Parent and Pivot aren't
@@ -594,7 +620,7 @@
   and sorted, size slider, four view modes (List default), double-click or
   Enter adds, closes on click outside unless pinned. Ops are filed in the
   AB §5 Mesh Operations tree. Provisional: MOQ-29.
-- **MeshOps suite batch 4: tools as ops, 7 groups (2026-11-17, branch
+- **Mesh Stack suite batch 4: tools as ops, 7 groups (2026-11-17, branch
   claude/project-thread-fcjo2t, TYPE-IDS.md types/channels/defaults):**
   Polygon (Extrude, Merge, Flip, Symmetrize, Detriangulate, UnSubdivide,
   Unify, Material Tag, Spike, Delete), Edge (Bevel, Chamfer, Split,
@@ -603,12 +629,12 @@
   Effectors), Edit (Solid Drill, Axis Drill, Slice, Axis Slice, Polygon
   Reduce, Mesh Cleanup), Deform (Jitter, Push, Smooth), UV (Unwrap, Pack
   UVs, Transform UV Map). Each runs its direct tool's kernel
-  (meshops_tools.rs, drills in meshops_items.rs). Reduce uses our own
+  (mesh_stack_tools.rs, drills in mesh_stack_items.rs). Reduce uses our own
   quadric reducer (SolidCraft's is the same method, triangles only, so
   nothing taken); no new Blender code (UV Unwrap already runs our Blender
   port). Provisional/open: MOQ-25..28. GUI check:
-  docs/MESHOPS_SUITE_GUI_QA.md (batch 4).
-- **MeshOps suite batch 3: selection ops (2026-11-17, branch
+  docs/MESH_STACK_SUITE_GUI_QA.md (batch 4).
+- **Mesh Stack suite batch 3: selection ops (2026-11-17, branch
   claude/project-thread-fcjo2t):** an op's Selection input is its Select by
   Index plus a stack of selection ops (Index, Range, Pattern, Previous
   Operation, Selection Set) with Enable, Invert and Blend Mode (MO-50..53),
@@ -617,7 +643,7 @@
   front/sides, Array/Mirror clone and clone1.., Boolean geometry/driver.
   Groups ride as hidden polygon sets kernels never see and never reach the
   result. Scripts: `selop.create`, `selop.edit`. Provisional: MOQ-21..24.
-- **MeshOps suite batch 2: Boolean and Merge Meshes ops (2026-11-17,
+- **Mesh Stack suite batch 2: Boolean and Merge Meshes ops (2026-11-17,
   branch claude/project-thread-fcjo2t, specs meshops-specs-2026-11-17):**
   Boolean (`boolean.meshop.item`, BOP-xx) runs the direct Boolean's engine
   (`boolean_gathered`, shared) on the mesh below with a linked Driver
@@ -626,17 +652,17 @@
   results by world transform or own points, with Index, Merge Hierarchy,
   polygon type and map switches; deleted sources contribute nothing.
   Provisional: MOQ-15..20 (no create dialog: a second selected mesh
-  becomes the Boolean's driver). GUI check: docs/MESHOPS_SUITE_GUI_QA.md.
-- **MeshOps suite batch 1: framework (2026-11-17, branch
+  becomes the Boolean's driver). GUI check: docs/MESH_STACK_SUITE_GUI_QA.md.
+- **Mesh Stack suite batch 1: framework (2026-11-17, branch
   claude/project-thread-fcjo2t):** op types come from one table built-ins
   and kits share (`meshop_types.rs`, KIT-1/K7); the 9 v1 ops moved to
-  `meshops_builtin.rs`, and the Properties form is drawn from each type's
+  `mesh_stack_builtin.rs`, and the Properties form is drawn from each type's
   fields (KIT-4). Ops can link other mesh items (`Item`/`Items` fields):
   linked results are evaluated first and placed in the reader's space,
   loops are refused when made and turned off on load (SAFE-07), deleted
   sources fail only their op (SAFE-08), hidden items evaluate (SAFE-09).
   A placeholder op runs once a kit registers its type. File format
-  unchanged. Guide: docs/MESHOPS.md. Provisional: MOQ-12..14. No op uses
+  unchanged. Guide: docs/MESH_STACK.md. Provisional: MOQ-12..14. No op uses
   links yet; Boolean and Merge Meshes (batch 2) are the first.
 - **Phase 0 doors (2026-11-17, branch claude/project-thread-bjattn, master
   plan §4 / ARCHITECTURE-RULES):** (1) `Item::kit` (kit_item.rs, KIT-1):
@@ -1430,7 +1456,7 @@
   our own files and a hand-written ASCII FBX. GUI check:
   `docs/FILE_FORMATS.md` items 11–13.
 
-- **MeshOps v1 (2026-11-11, branch meshops, spec meshops-2026-11-11
+- **Mesh Stack v1 (2026-11-11, branch meshops, spec meshops-2026-11-11
   Stage 0 trimmed):** a mesh item can carry a stack of ops over its Base
   Mesh (native v39); views, render and export show the result. Nine ops on
   the existing kernels: Cube, Sphere, Cylinder, Polygon Bevel, Smooth
@@ -1438,13 +1464,13 @@
   (auto-captured from the Base Mesh selection). Each op runs guarded
   (panic, bad value, invalid or over-limit result = red row, input passed
   through); results are cached per op off the scene and evaluated on
-  worker threads with stale ones dropped. Mesh Ops tab (list, eye, drag
+  worker threads with stale ones dropped. Mesh Stack tab (list, eye, drag
   reorder, Add Operator, Properties, Select by Index buttons, row menu
   Freeze / Duplicate and Freeze / Delete, Base toggle), Edit Base Mesh with
   a ghost, direct tools refused on a stack otherwise, Freeze in one undo
   step, every edit one undo step, stress harness
-  (`tests/meshops_stress.rs`). Provisional: MOQ-01..10. GUI check:
-  `docs/MESHOPS_GUI_QA.md`.
+  (`tests/mesh_stack_stress.rs`). Provisional: MOQ-01..10. GUI check:
+  `docs/MESH_STACK_GUI_QA.md`.
 - **Nodes N1: Node Material layer (2026-11-11, branch nodes-n1, spec
   nodes-n1-2026-11-11):** graphs are stored in the shader tree's Nodes
   section in the shared node graph JSON v1 shape (native v38, own
@@ -1904,7 +1930,7 @@
   Case, Flat), draggable column widths, sideways scroll. Panel groups read a
   panel-type registry (`panel_registry.rs`): "+" menu by category, cut-off
   tab names with a ▾ overflow list, drag to reorder, Close Tab, tabs saved
-  with the layout. Mesh Ops waits for mesh operators (TREE-Q04). New core
+  with the layout. Mesh Stack waits for mesh operators (TREE-Q04). New core
   commands: `SelectItems`, `SetItemsVisible`. GUI check:
   `docs/TREE_LIST_GUI_QA.md`.
 - **Viewport Properties header (2026-11-08, same branch, UIC-103/111):**
@@ -3831,7 +3857,7 @@ panel; its tab strip stays 22 points at either end. Tests: layout_tests.rs.
 - The OpenGL Polygon Count overlay line now reads "GL: 8,832": triangles drawn for visible items (quad 2, n-gon n-2, after SubD), under the selection line. It replaced "N polygons drawn", which counted polygons and keyed SubD off the shading flag.
 - Source: each resident item's cached GPU fill (`Resident::drawn_triangles`, one lookup per item a frame); items not on the GPU fall back to `subdivision::drawn_triangles` (polygon list, both SubD kinds).
 - Tests: `gl_count_tests` (6).
-- Max GL Polygon Count counts triangles, the same number as the "GL:" line (PREF-Q21 answered, Jason 2026-11-13); the dialog says "N triangles". Non-SubD meshes off the GPU count from the remembered polygon summary (`FaceSummary::plain_triangles`), so the per-frame Bounding Box check never walks polygons. Mesh Ops items count their result. Preference key unchanged.
+- Max GL Polygon Count counts triangles, the same number as the "GL:" line (PREF-Q21 answered, Jason 2026-11-13); the dialog says "N triangles". Non-SubD meshes off the GPU count from the remembered polygon summary (`FaceSummary::plain_triangles`), so the per-frame Bounding Box check never walks polygons. Mesh Stack items count their result. Preference key unchanged.
 
 ## 2026-11-13 — Direct Caustics and Absorption Distance (branch whiskey-caustics)
 
@@ -3951,7 +3977,7 @@ Spec: vertex-tools-2026-11-14 v1.3 (VX-B11, VX-M01..M06, VX-C01; G04, G06, G13).
 
 Spec: freeze-transforms-2026-11-14 (BUILD-BRIEF-STAGE1, BEHAVIOR-ITEM-TRANSFORM-OPS §3, §4, §7, §8, §10 defaults).
 - Item Properties > Item Transform ends with a Reset dropdown (every item type) and, on mesh items, a Freeze dropdown: Position, Rotation, Scale, All; Shear hidden. Item > Transform has the same eight entries. Both run `transform.reset` / `transform.freeze` (typed, MCP; no argument = all) on the item selection. The camera's own Reset moved onto the shared one.
-- Reset: the part goes to identity, children follow, geometry untouched. Freeze: the part is baked into the points (P = P'·B, points take B) and nothing moves; direct children get B·C. Parents first when both are selected. Mirrored bakes reverse polygons; corner normals, normal and relative-morph maps follow; UVs, weights, sets untouched. Mesh Ops items bake into the Base Mesh, stack live. Rotation order never changes.
+- Reset: the part goes to identity, children follow, geometry untouched. Freeze: the part is baked into the points (P = P'·B, points take B) and nothing moves; direct children get B·C. Parents first when both are selected. Mirrored bakes reverse polygons; corner normals, normal and relative-morph maps follow; UVs, weights, sets untouched. Mesh Stack items bake into the Base Mesh, stack live. Rotation order never changes.
 - Locked items skipped with one status note ("2 locked items skipped"); non-mesh items skipped by Freeze; identity is no undo step; one step per pick ("Freeze Rotation", "Reset Transform").
 - Provisional: no pivot channel or animation yet, so nothing to compensate there (FRZT-Q01, Q02); mesh-light prototypes not compensated (Q03); a stored Solid Sketch is dropped by Freeze (Q04); a Freeze whose children would need shear is skipped (Q05).
 - Tests: core `tests/freeze_transforms.rs` (15), `item_transform_ops` unit tests (3), app `item_transform_menu_resets_and_freezes`. GUI check: docs/FREEZE_TRANSFORMS_GUI_QA.md.
@@ -4026,18 +4052,18 @@ Spec: falloff-2026-11-15 v1.1, batch 6 (G19, G21). Every falloff type in the spe
 
 Specs: CURVE-EXTRUDE-PEN-CLONE v1, SPEC-CURVE-CLONE v1, CURVE-COMMANDS-2D-SHAPES v1.
 - Works: one path engine (`path_tools.rs`) with Sweep and Clone; buttons Curve / Bezier / B-Spline Extrude and Curve / Bezier / B-Spline / Pen Clone as preset rows. Path points by click (surface or work plane, snapped), drag, Delete, and Sketch (VectorCraft curve fit, `curve_fit.rs`). Symmetry. Ops `curve.extrude.item`, `curve.clone.item`, `pen.clone.item`.
-- Works: Make Open / Closed Curve, Make Curve Fill, Align Winding, Set Curves Color (view setting); Curve tab form; Circle, Ellipse, Rectangle, Diamond, N-Sided, Star MeshOps.
+- Works: Make Open / Closed Curve, Make Curve Fill, Align Winding, Set Curves Color (view setting); Curve tab form; Circle, Ellipse, Rectangle, Diamond, N-Sided, Star Mesh Stack.
 - Pen Extrude added 2026-11-17 from the hands-on check (preset `PenExtrude`). Not built yet: conversions, offsets, Bezier Tangent. Provisional: CX-Q2..Q8, CC-Q3..Q5 in SPECIFICATION_QUESTIONS.md. Tests: core `tests/path_tools.rs` (18), `tests/curve_commands.rs` (16); app `path_tool_view`, `curve_tab`. GUI check: docs/CURVE_TOOLS_GUI_QA.md.
 
 ## 2026-11-17 — Generators and on-hold ops, batch 5 (branch curve-tools)
 
 Spec: SCATTER-UVRECT-TRANSFER-CONSTRAINT v1 (`generator_ops.rs`).
-- Works: Scatter Clone tool (Duplicate tab; Count incl. source, Centre ± Range, Scale/Rotate variation, Seed, Clone effector) and `scatter.clone.item` op (even spread in a plane or box); `surfaceConstraint.meshop.item` (Directional/Half Ray/Closest, Invert, Offset, Max Distance, Strength); UV Rectangle (`uvrect.meshop.item`, `operandi.uv.rectangle`, UV tab row); Transfer Vertex Map (`vertexmaptransfer`, `operandi.vertMap.transfer`); `uvfit.meshop.item`. The UnSubdivide op (`poly.unsubdiv.item`) is left to the MeshOps branch, which already has it.
-- Julienne… and Dicer… (Edit tab, commands `operandi.julienne` / `operandi.dicer`, `julienne.rs`): closed pieces on the Boolean engine, Gap, Inner Material (JD-Q1). Not built: Curve Boolean (no spec yet; the MeshOps branch has the solid Boolean op). Provisional: GO-Q1..Q5. Tests: core `tests/generator_ops.rs` (15).
+- Works: Scatter Clone tool (Duplicate tab; Count incl. source, Centre ± Range, Scale/Rotate variation, Seed, Clone effector) and `scatter.clone.item` op (even spread in a plane or box); `surfaceConstraint.meshop.item` (Directional/Half Ray/Closest, Invert, Offset, Max Distance, Strength); UV Rectangle (`uvrect.meshop.item`, `operandi.uv.rectangle`, UV tab row); Transfer Vertex Map (`vertexmaptransfer`, `operandi.vertMap.transfer`); `uvfit.meshop.item`. The UnSubdivide op (`poly.unsubdiv.item`) is left to the Mesh Stack branch, which already has it.
+- Julienne… and Dicer… (Edit tab, commands `operandi.julienne` / `operandi.dicer`, `julienne.rs`): closed pieces on the Boolean engine, Gap, Inner Material (JD-Q1). Not built: Curve Boolean (no spec yet; the Mesh Stack branch has the solid Boolean op). Provisional: GO-Q1..Q5. Tests: core `tests/generator_ops.rs` (15).
 ## 2026-11-17 — Deform finish, modelling parity batch 1 (branch deform-finish)
 
-Spec: deform-presets-2026-11-06 v0 + DEFORM-PROBES v1 (DP-xx, 10 cases). Engines in `deform_finish.rs`, ops in `meshops_deform.rs`.
-- Works: Jitter (Range X/Y/Z, Seed, per-axis switches, Rigid Translate/Rotate/Scale; drag right for Range), Quantize (Step X/Y/Z from the world origin), Radial Align (Circle, Arc, N-Sided, Weight, Start/Central Angle, Exponent, Flatten + Smoothing for polygon borders), Linear Align (Line/Curve, Uniform, Align Length, Align to First, Screen Align), Relax Mesh... (dialog and `sculpt.relaxMesh iter: constrain:`, one step), Vortex (Rotate + Cylinder falloff, click sets the centre). All live tools take falloff and Symmetry (primary side mirrored). Toolbox rows replace `operandi.notBuilt`; Radial/Linear grey with nothing to align. MeshOps: Jitter (`xfrm.jitter.item`), Quantize, Radial Align, Linear Align, Relax Mesh.
+Spec: deform-presets-2026-11-06 v0 + DEFORM-PROBES v1 (DP-xx, 10 cases). Engines in `deform_finish.rs`, ops in `mesh_stack_deform.rs`.
+- Works: Jitter (Range X/Y/Z, Seed, per-axis switches, Rigid Translate/Rotate/Scale; drag right for Range), Quantize (Step X/Y/Z from the world origin), Radial Align (Circle, Arc, N-Sided, Weight, Start/Central Angle, Exponent, Flatten + Smoothing for polygon borders), Linear Align (Line/Curve, Uniform, Align Length, Align to First, Screen Align), Relax Mesh... (dialog and `sculpt.relaxMesh iter: constrain:`, one step), Vortex (Rotate + Cylinder falloff, click sets the centre). All live tools take falloff and Symmetry (primary side mirrored). Toolbox rows replace `operandi.notBuilt`; Radial/Linear grey with nothing to align. Mesh Stack: Jitter (`xfrm.jitter.item`), Quantize, Radial Align, Linear Align, Relax Mesh.
 - Provisional: DFF-Q01..Q08 (SPECIFICATION_QUESTIONS.md). Not built here (Jason, 2026-11-17, hands-on batch later): Soft Drag, Element Push, Soft Selection x4; drafted in commit eda70e80 and taken out after it. Sculpt stays with the Sculpt milestone.
 - Tests: core `tests/deform_finish.rs` (24: every DP case), app `deform_tab_tests::deform_finish_rows_start_their_tools`, speed guard rows. GUI check: docs/DEFORM_FINISH_GUI_QA.md.
 
@@ -4045,7 +4071,7 @@ Spec: deform-presets-2026-11-06 v0 + DEFORM-PROBES v1 (DP-xx, 10 cases). Engines
 
 Spec: SELECTION-TOOLS v1 (SL-xx, 17 cases). Core `select_tools.rs` (`Command::SelectTool`), app `select_tools_ui.rs`.
 - Works: Shortest Path (vertices, edges, polygons; the reference's straight-then-turn route), Sharp..., Coplanar Edges..., Colinear Vertices..., Diagonal... (dialogs with last values; `select.edgeSharp min: max:` etc. run without one), Coplanar Polygons Tool (live dialog), Conditional Loop and its Tool dialog, Lazy Selection and Shortest Path Mode toggles. Each is one undo step that changes only the selection; Symmetry adds the mirrored elements.
-- Provisional: SL-Q1..Q6. The Conditional Loop selection op is the MeshOps builder's.
+- Provisional: SL-Q1..Q6. The Conditional Loop selection op is the Mesh Stack builder's.
 - Tests: core `tests/select_tools.rs` (14, every case), app `select_tab_tests::selection_tool_rows_run_their_commands`. GUI check: docs/SELECTION_TOOLS_GUI_QA.md.
 
 ## 2026-11-17 — Topology and clean-up, modelling parity batch 6 (branch deform-finish)
@@ -4516,6 +4542,7 @@ Design: docs/MATERIALX_GRAPHS.md (stages 1-5).
 - The Animate layout's toolbox has a Rig tab (`assets/forms/toolbox.rig.json`, UIC-190..201): Setup, Skeleton and Pose tools; constraints (flyout), hierarchy, Compensation; Channel Links, Schematic, Bake; Bind (Shift: Unbind), Rebind, the weight tools, Bake Weights; IK (two-bone, chain, full body, goals, tasks, up vector with Shift: Remove, Switch IK/FK, Set/Delete Keys, selects, Match, Update Rest Pose, Disable, Remove). Every button is an existing command (tested). The temporary timeline Skeleton/Pose/Bind/Weights/IK buttons are gone; Setup and the phase-4 rig buttons stay on the timeline. Icons still needed (text buttons now): Unparent, Add Parent, Compensation, Add Joints to Bind, the six weight tools, Add Position Task, Add Orientation Task, IK/FK Set Keys, Select Switch Channels, Select IK Solvers, Match Goal, Update Rest Pose, Disable IK, Remove IK.
 
 - Rig tab icons (branch rig-tab-icons): the 19 rendered Rig tab icons (icons-rig) set on every remaining Rig tab button; Dynamic Parent rows in the Items list use add-parent.
+- Pick order (branch rig-pick-order): Ctrl/Shift-clicking an item makes it the primary; the earlier picks stay in pick order, so Parent, Constrain, Channel Links, Bind and IK go the way you picked (Passenger then Car: Car is the parent). Items-list range: the clicked end is primary. Deselecting the primary promotes the latest remaining pick. Merge, Parent to Group Locator and New Group still go by the first pick. The Rig tab's Compensation lights while on. RG-Q92.
 
 ## 2026-11-23 — Shift+double-click empty space expands the selection (branch shift-dblclick-expand)
 

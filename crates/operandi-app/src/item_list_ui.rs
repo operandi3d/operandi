@@ -19,41 +19,27 @@ use std::{fs, io, path::Path};
 pub(crate) const ADD_ITEM: &str = "add-item";
 
 /// Add Item's contents (AB §6, AB-50): the items Operandi can make, the
-/// everyday ones in Items and the rest in their category folders. Entries
-/// it can't make yet aren't listed and empty folders don't show.
+/// everyday ones in Items and the rest in their category folders.
 pub(crate) fn item_catalog() -> crate::add_browser::Catalog {
-    fn walk(out: &mut Vec<crate::add_browser::Entry>, folder: &[String], entries: &[Entry]) {
-        for e in entries {
-            match e {
-                Item(label, Some(kind)) => out.push(crate::add_browser::Entry {
-                    id: kind.key().into(),
-                    label: (*label).into(),
-                    folder: folder.to_vec(),
-                    icon: crate::icons::Icon::from_slug(match kind {
-                        AddItemKind::Light(_) => "tree-light",
-                        AddItemKind::GroupLocator => "tree-group",
-                        AddItemKind::Environment => "tree-environment",
-                        AddItemKind::Backdrop => "tree-texture",
-                        AddItemKind::Camera => "render",
-                        AddItemKind::Mesh => "tree-mesh",
-                    }),
-                }),
-                Item(_, None) => {}
-                Sub(name, inner) => {
-                    let mut f = folder.to_vec();
-                    f.push((*name).into());
-                    walk(out, &f, inner);
-                }
-            }
-        }
-    }
+    let entry = |folder: &[String], &(label, kind): &Entry| crate::add_browser::Entry {
+        id: kind.key().into(),
+        label: label.into(),
+        folder: folder.to_vec(),
+        icon: crate::icons::Icon::from_slug(match kind {
+            AddItemKind::Light(_) => "tree-light",
+            AddItemKind::GroupLocator => "tree-group",
+            AddItemKind::Environment => "tree-environment",
+            AddItemKind::Backdrop => "tree-texture",
+            AddItemKind::Camera => "render",
+            AddItemKind::Mesh => "tree-mesh",
+        }),
+    };
     let items = vec!["Items".to_string()];
-    let mut entries = Vec::new();
-    walk(&mut entries, &items, &TOP);
+    let mut entries: Vec<_> = TOP.iter().map(|e| entry(&items, e)).collect();
     for (name, inner) in CATEGORIES {
         let mut f = items.clone();
         f.push(name.into());
-        walk(&mut entries, &f, inner);
+        entries.extend(inner.iter().map(|e| entry(&f, e)));
     }
     crate::add_browser::Catalog {
         roots: vec!["Items".into(), "Assemblies".into()],
@@ -62,252 +48,64 @@ pub(crate) fn item_catalog() -> crate::add_browser::Catalog {
     }
 }
 
-/// Tooltip on every Add Item entry Operandi can't make yet (spec
-/// "Recommendation for the builder").
-pub(crate) const NOT_YET: &str = "Not yet in Operandi";
+/// One Add Item menu entry: its label and the item type it makes.
+///
+/// Only types Operandi can make are listed (Jason, 2026-11-23): IL-02's
+/// full list named many types Operandi doesn't have, shown greyed. That
+/// list is a deliberate departure from IL-02 (SPECIFICATION_QUESTIONS.md,
+/// IL-Q4).
+pub(crate) type Entry = (&'static str, AddItemKind);
 
-/// One Add Item menu entry: a type (made by `kind`, or disabled when
-/// `None`) or a submenu.
-pub(crate) enum Entry {
-    Item(&'static str, Option<AddItemKind>),
-    Sub(&'static str, &'static [Entry]),
-}
-use Entry::{Item, Sub};
-
-const fn light(kind: LightKind) -> Option<AddItemKind> {
-    Some(AddItemKind::Light(kind))
+const fn light(kind: LightKind) -> AddItemKind {
+    AddItemKind::Light(kind)
 }
 
 /// IL-02, top level above the separator.
 pub(crate) const TOP: [Entry; 3] = [
-    Item("Backdrop Item", Some(AddItemKind::Backdrop)),
-    Item("Camera", Some(AddItemKind::Camera)),
-    Item("Mesh", Some(AddItemKind::Mesh)),
+    ("Backdrop Item", AddItemKind::Backdrop),
+    ("Camera", AddItemKind::Camera),
+    ("Mesh", AddItemKind::Mesh),
 ];
 
-/// IL-02 categories, in the spec's order (alphabetical, Other last).
-pub(crate) const CATEGORIES: [(&str, &[Entry]); 10] = [
-    (
-        "Deformers",
-        &[
-            Item("Bend Effector", None),
-            Item("Curve Constraint Effector", None),
-            Item("Lag Effector", None),
-            Item("Lattice Effector", None),
-            Item("Magnet Effector", None),
-            Item("Mesh Wrap Effector", None),
-            Item("Morph Container", None),
-            Item("Morph Influence", None),
-            Item("Soft Lag", None),
-            Item("Twist Effector", None),
-            Item("Weight Container", None),
-        ],
-    ),
-    (
-        "Dynamics",
-        &[
-            Item("Collision Emitter", None),
-            Item("Dynamic Replicator", None),
-            Item("Procedural Shatter", None),
-            Sub(
-                "Constraints",
-                &[
-                    Item("Constraint Modifier", None),
-                    Item("Hinge", None),
-                    Item("Pin", None),
-                    Item("Point", None),
-                    Item("Slide Hinge", None),
-                    Item("Spring", None),
-                ],
-            ),
-        ],
-    ),
-    (
-        "Falloffs",
-        &[
-            Item("Area Falloff", None),
-            Item("Bezier Falloff", None),
-            Item("Blend Falloff", None),
-            Item("Capsule Falloff", None),
-            Item("Curve Falloff", None),
-            Item("Falloff Operator", None),
-            Item("Incidence Falloff", None),
-            Item("Linear Falloff", None),
-            Item("Radial Falloff", None),
-            Item("Spline Falloff", None),
-            Item("Texture Falloff", None),
-            Item("Weight Map Falloff", None),
-        ],
-    ),
-    (
-        "Forces",
-        &[
-            Item("Curve Force", None),
-            Item("Drag Force", None),
-            Item("Linear Force", None),
-            Item("Newton Force", None),
-            Item("Radial Force", None),
-            Item("Turbulence Force", None),
-            Item("Vortex Force", None),
-            Item("Wind Force", None),
-        ],
-    ),
+/// IL-02 categories that have something Operandi can make, in the spec's
+/// order (alphabetical).
+pub(crate) const CATEGORIES: [(&str, &[Entry]); 2] = [
     (
         "Lights",
         &[
-            Item("Area Light", light(LightKind::Area)),
-            Item("Cylinder Light", light(LightKind::Cylinder)),
-            Item("Directional Light", light(LightKind::Directional)),
-            Item("Dome Light", light(LightKind::Dome)),
-            Item("Mesh Light", light(LightKind::Mesh)),
-            Item("Photometric Light", light(LightKind::Photometric)),
-            Item("Point Light", light(LightKind::Point)),
-            Item("Portal", light(LightKind::Portal)),
-            Item("Spot Light", light(LightKind::Spot)),
+            ("Area Light", light(LightKind::Area)),
+            ("Cylinder Light", light(LightKind::Cylinder)),
+            ("Directional Light", light(LightKind::Directional)),
+            ("Dome Light", light(LightKind::Dome)),
+            ("Mesh Light", light(LightKind::Mesh)),
+            ("Photometric Light", light(LightKind::Photometric)),
+            ("Point Light", light(LightKind::Point)),
+            ("Portal", light(LightKind::Portal)),
+            ("Spot Light", light(LightKind::Spot)),
         ],
     ),
-    (
-        "Locators",
-        &[
-            Item("Group Locator", Some(AddItemKind::GroupLocator)),
-            Item("Locator", None),
-            Item("Texture Locator", None),
-        ],
-    ),
-    (
-        "Particles",
-        &[
-            Item("Replicator", None),
-            Sub(
-                "Modifiers",
-                &[
-                    Item("Particle Audio", None),
-                    Item("Particle Expression", None),
-                    Item("Particle Look At", None),
-                    Item("Particle Modifier", None),
-                    Item("Particle Random", None),
-                    Item("Particle Sieve", None),
-                    Item("Particle Snap", None),
-                    Item("Particle Step", None),
-                    Item("Particle UVT Modifier", None),
-                ],
-            ),
-            Sub(
-                "Point Clouds",
-                &[
-                    Item("CSV Point Cache", None),
-                    Item("Curve Particle Generator", None),
-                    Item("Particle Cloud", None),
-                    Item("Particle Generator", None),
-                    Item("Realflow Particles", None),
-                    Item("Stitch Particle Generator", None),
-                    Item("Surface Particle Generator", None),
-                ],
-            ),
-            Sub(
-                "Simulation",
-                &[
-                    Item("Collector / Emitter", None),
-                    Item("Curve Emitter", None),
-                    Item("Dynamic Collider", None),
-                    Item("Dynamic Fluid", None),
-                    Item("Particle Flocking", None),
-                    Item("Particle Operator", None),
-                    Item("Particle Simulation", None),
-                    Item("Radial Emitter", None),
-                    Item("Source Emitter", None),
-                    Item("Surface Emitter", None),
-                    Item("Terminator", None),
-                ],
-            ),
-        ],
-    ),
-    (
-        "Procedural",
-        &[
-            Item("Deferred Mesh", None),
-            Item("Fractal Gasket", None),
-            Item("Lace Item", None),
-            Item("Poisson Particles", None),
-            Item("Proxy", None),
-            Item("Sphere", None),
-            Item("SubDFusion", None),
-        ],
-    ),
-    (
-        "Volumes",
-        &[
-            Item("Blob", None),
-            Item("Ground Plane", None),
-            Item("Render Boolean", None),
-            Item("Sprite", None),
-            Item("VDBVoxel", None),
-            Item("Volume", None),
-        ],
-    ),
-    (
-        "Other",
-        &[
-            Item("Bezier Node", None),
-            Item("Canvas", None),
-            Item("Channel Handle", None),
-        ],
-    ),
+    ("Locators", &[("Group Locator", AddItemKind::GroupLocator)]),
 ];
 
-/// True when some entry under `entries` can be made.
-pub(crate) fn any_enabled(entries: &[Entry]) -> bool {
-    entries.iter().any(|e| match e {
-        Item(_, kind) => kind.is_some(),
-        Sub(_, inner) => any_enabled(inner),
-    })
-}
-
-/// Every type entry whose label contains `find` (case-insensitive), in
-/// menu order, with whether its category is on show.
-pub(crate) fn find_entries(
-    find: &str,
-    show_unsupported: bool,
-) -> Vec<(&'static str, Option<AddItemKind>)> {
-    fn walk(
-        entries: &'static [Entry],
-        find: &str,
-        shown: bool,
-        out: &mut Vec<(&'static str, Option<AddItemKind>)>,
-    ) {
-        for e in entries {
-            match e {
-                Item(label, kind) => {
-                    if shown && label.to_lowercase().contains(find) {
-                        out.push((label, *kind));
-                    }
-                }
-                Sub(_, inner) => walk(inner, find, shown, out),
-            }
-        }
-    }
+/// Every entry whose label contains `find` (case-insensitive), in menu
+/// order.
+pub(crate) fn find_entries(find: &str) -> Vec<Entry> {
     let find = find.trim().to_lowercase();
-    let mut out = Vec::new();
-    walk(&TOP, &find, true, &mut out);
-    for (_, entries) in CATEGORIES {
-        walk(
-            entries,
-            &find,
-            show_unsupported || any_enabled(entries),
-            &mut out,
-        );
-    }
-    out
+    TOP.iter()
+        .chain(CATEGORIES.iter().flat_map(|(_, e)| e.iter()))
+        .filter(|(label, _)| label.to_lowercase().contains(&find))
+        .copied()
+        .collect()
 }
 
 /// What the header remembers across restarts, in `item-list.json`:
-/// Recent (IL-04) and the Show unsupported choice.
+/// Recent (IL-04). Files from before 2026-11-23 also hold a Show
+/// unsupported choice, which is ignored now that every entry can be made.
 #[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
 #[serde(default)]
 pub struct ItemListPreferences {
     /// Add Item keys (`AddItemKind::key`), newest first.
     pub recent: Vec<String>,
-    pub show_unsupported: bool,
 }
 
 impl ItemListPreferences {
@@ -526,19 +324,18 @@ impl super::Operandi {
         );
         self.text_editors.insert(find.id);
         crate::numeric_tab::register(ui, &find, Some(&self.item_list.find));
-        let show_unsupported = self.item_list.prefs.show_unsupported;
         if !self.item_list.find.trim().is_empty() {
-            let found = find_entries(&self.item_list.find, show_unsupported);
+            let found = find_entries(&self.item_list.find);
             if found.is_empty() {
                 ui.gated(
                     Some("No item type matches the search"),
                     Button::new("(no match)"),
                 );
             }
-            // Enter makes the first entry that can be made.
+            // Enter makes the first entry.
             if find.lost_focus()
                 && ui.input(|i| i.key_pressed(egui::Key::Enter))
-                && let Some(kind) = found.iter().find_map(|(_, k)| *k)
+                && let Some(&(_, kind)) = found.first()
             {
                 self.add_item(kind);
                 ui.close();
@@ -558,76 +355,45 @@ impl super::Operandi {
                     .insert("Add Item: (none)".into(), _none.rect);
             }
             for kind in recent {
-                self.add_item_entry(ui, kind.label(), Some(kind));
+                self.add_item_entry(ui, kind.label(), kind);
             }
         });
         #[cfg(test)]
         self.toolbox_rects
             .insert("Add Item menu: Recent".into(), _recent.response.rect);
-        for entry in &TOP {
-            self.add_item_entries(ui, entry);
+        for &(label, kind) in &TOP {
+            self.add_item_entry(ui, label, kind);
         }
         ui.separator();
         for (name, entries) in CATEGORIES {
-            // IL-Q3 (provisional): a category with nothing Operandi can make
-            // is hidden unless Show unsupported is on.
-            if show_unsupported || any_enabled(entries) {
-                let _menu = ui.menu_button(name, |ui| {
-                    for entry in entries {
-                        self.add_item_entries(ui, entry);
-                    }
-                });
-                #[cfg(test)]
-                self.toolbox_rects
-                    .insert(format!("Add Item menu: {name}"), _menu.response.rect);
-            }
-        }
-        ui.separator();
-        let mut show = show_unsupported;
-        if ui
-            .checkbox(&mut show, "Show unsupported")
-            .on_hover_text("Also list item types Operandi can't make yet")
-            .changed()
-        {
-            self.item_list.prefs.show_unsupported = show;
-            self.save_item_list_prefs();
+            let _menu = ui.menu_button(name, |ui| {
+                for &(label, kind) in entries {
+                    self.add_item_entry(ui, label, kind);
+                }
+            });
+            #[cfg(test)]
+            self.toolbox_rects
+                .insert(format!("Add Item menu: {name}"), _menu.response.rect);
         }
     }
-    fn add_item_entries(&mut self, ui: &mut Ui, entry: &'static Entry) {
-        match entry {
-            Item(label, kind) => self.add_item_entry(ui, label, *kind),
-            Sub(name, entries) => {
-                ui.menu_button(*name, |ui| {
-                    for entry in *entries {
-                        self.add_item_entries(ui, entry);
-                    }
-                });
-            }
-        }
-    }
-    fn add_item_entry(&mut self, ui: &mut Ui, label: &str, kind: Option<AddItemKind>) {
+    fn add_item_entry(&mut self, ui: &mut Ui, label: &str, kind: AddItemKind) {
         // Mesh stays available with a tool live, as New Mesh was (the
         // editor resolves a Smooth Shift stage first); the others wait.
-        let why = match kind {
-            None => Some(NOT_YET),
-            Some(k) => crate::unavailable::unless(
-                k == AddItemKind::Mesh || self.editor.live.is_none(),
-                crate::unavailable::TOOL_ACTIVE,
-            ),
-        };
+        let why = crate::unavailable::unless(
+            kind == AddItemKind::Mesh || self.editor.live.is_none(),
+            crate::unavailable::TOOL_ACTIVE,
+        );
         let response = ui.gated(why, Button::new(label));
         #[cfg(test)]
         {
             self.toolbox_rects
                 .insert(format!("Add Item: {label}"), response.rect);
-            if kind == Some(AddItemKind::Mesh) {
+            if kind == AddItemKind::Mesh {
                 self.toolbox_rects
                     .insert("Scenes menu New Mesh".into(), response.rect);
             }
         }
-        if response.clicked()
-            && let Some(kind) = kind
-        {
+        if response.clicked() {
             self.add_item(kind);
             ui.close();
         }
@@ -754,61 +520,22 @@ impl super::Operandi {
 mod tests {
     use super::*;
 
+    /// Only types Operandi makes are listed (Jason, 2026-11-23, IL-Q4), in
+    /// IL-02's order, and every type Add Item can make is reachable.
     #[test]
-    fn menu_lists_the_spec_order_and_only_supported_entries_are_enabled() {
-        let tops: Vec<_> = TOP
-            .iter()
-            .map(|e| match e {
-                Item(l, _) => *l,
-                Sub(l, _) => *l,
-            })
-            .collect();
+    fn menu_lists_only_what_operandi_makes_in_the_spec_order() {
+        let tops: Vec<_> = TOP.iter().map(|(l, _)| *l).collect();
         assert_eq!(tops, ["Backdrop Item", "Camera", "Mesh"]);
         let names: Vec<_> = CATEGORIES.iter().map(|(n, _)| *n).collect();
-        assert_eq!(
-            names,
-            [
-                "Deformers",
-                "Dynamics",
-                "Falloffs",
-                "Forces",
-                "Lights",
-                "Locators",
-                "Particles",
-                "Procedural",
-                "Volumes",
-                "Other"
-            ]
-        );
-        // Entries in each submenu are alphabetical (IL-02).
-        // (Submenus follow a category's own entries.)
-        fn labels(entries: &[Entry]) -> Vec<String> {
-            entries
-                .iter()
-                .filter_map(|e| match e {
-                    Item(l, _) => Some(l.to_lowercase()),
-                    Sub(..) => None,
-                })
-                .collect()
-        }
+        assert_eq!(names, ["Lights", "Locators"]);
+        // Entries in each category are alphabetical (IL-02).
         for (name, entries) in CATEGORIES {
-            let got = labels(entries);
+            let got: Vec<_> = entries.iter().map(|(l, _)| l.to_lowercase()).collect();
             let mut sorted = got.clone();
             sorted.sort();
             assert_eq!(got, sorted, "{name}");
         }
-        // Today only Lights and Locators (Group Locator, GL-02) have
-        // entries Operandi can make.
-        let shown: Vec<_> = CATEGORIES
-            .iter()
-            .filter(|(_, e)| any_enabled(e))
-            .map(|(n, _)| *n)
-            .collect();
-        assert_eq!(shown, ["Lights", "Locators"]);
-        let made: Vec<_> = find_entries("", true)
-            .into_iter()
-            .filter_map(|(_, k)| k)
-            .collect();
+        let made: Vec<_> = find_entries("").into_iter().map(|(_, k)| k).collect();
         // An Environment is made from Item > Create Environment and the
         // Shader Tree (ENV §6), not from the Add Item list (IL-02 has none).
         let listed: Vec<_> = AddItemKind::ALL
@@ -819,20 +546,23 @@ mod tests {
         for kind in listed {
             assert!(made.contains(&kind), "{kind:?} is reachable");
         }
+        // The catalog the Add browser shows holds the same entries.
+        assert_eq!(item_catalog().entries.len(), made.len());
     }
 
     #[test]
-    fn find_filters_entries_and_hides_unsupported_categories() {
-        let spot: Vec<_> = find_entries("SPOT", false);
-        assert_eq!(spot, [("Spot Light", light(LightKind::Spot))]);
-        // Unsupported entries in a shown category stay (disabled).
+    fn find_filters_entries() {
         assert_eq!(
-            find_entries("dome", false),
+            find_entries("SPOT"),
+            [("Spot Light", light(LightKind::Spot))]
+        );
+        assert_eq!(
+            find_entries("dome"),
             [("Dome Light", light(LightKind::Dome))]
         );
-        // A hidden category's entries need Show unsupported.
-        assert!(find_entries("vortex", false).is_empty());
-        assert_eq!(find_entries("vortex", true), [("Vortex Force", None)]);
+        // Types Operandi can't make aren't listed at all.
+        assert!(find_entries("vortex").is_empty());
+        assert!(find_entries("instancer").is_empty());
     }
 
     #[test]
@@ -845,7 +575,6 @@ mod tests {
         prefs.push_recent(AddItemKind::Camera);
         prefs.push_recent(AddItemKind::Light(LightKind::Spot));
         prefs.push_recent(AddItemKind::Camera);
-        prefs.show_unsupported = true;
         prefs.save(&path).unwrap();
         let back = ItemListPreferences::load(&path);
         assert_eq!(back, prefs);
@@ -856,7 +585,6 @@ mod tests {
         // Unknown keys (a type from a newer build) are skipped.
         let odd = ItemListPreferences {
             recent: vec!["locator".into(), "mesh".into()],
-            show_unsupported: false,
         };
         assert_eq!(odd.recent_kinds(), [AddItemKind::Mesh]);
         fs::remove_dir_all(&dir).ok();

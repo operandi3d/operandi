@@ -546,3 +546,22 @@ fn same_weights(got: &Value, want: &Value) {
         assert!((a - b).abs() <= 1e-12, "point {k}: {a} vs {b}");
     }
 }
+
+/// Pick order through the bridge: select Passenger, add Car, Parent: Car
+/// becomes the parent (rig-pick-order).
+#[test]
+fn parent_follows_pick_order_through_the_bridge() {
+    let mut b = Bridge::new();
+    let passenger = cube(&mut b, [0., 0., 0.]);
+    let car = cube(&mut b, [2., 0., 0.]);
+    call(&mut b, "select", json!({"mode": "item", "item": passenger})).unwrap();
+    call(
+        &mut b,
+        "select",
+        json!({"mode": "item", "item": car, "add": true}),
+    )
+    .unwrap();
+    run(&mut b, "operandi.rig.parent", json!({}));
+    let p = call(&mut b, "item_get", json!({"item": passenger})).unwrap();
+    assert_eq!(p["parent"], json!(car), "{p}");
+}

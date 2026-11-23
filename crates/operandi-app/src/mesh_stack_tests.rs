@@ -1,12 +1,12 @@
-//! The Mesh Ops tab through the real panel (MeshOps v1, MO-10..28).
+//! The Mesh Stack tab through the real panel (Mesh Stack v1, MO-10..28).
 use super::tests::{draw, pointer};
 use super::*;
-use crate::mesh_ops_ui::OpKey;
-use operandi_core::meshops_editor::OpRow;
+use crate::mesh_stack_ui::OpKey;
+use operandi_core::mesh_stack_editor::OpRow;
 
 const SIZE: Vec2 = vec2(1440., 900.);
 
-/// An empty mesh with a Cube and a Triangulate op, Mesh Ops tab in front.
+/// An empty mesh with a Cube and a Triangulate op, Mesh Stack tab in front.
 fn stacked() -> (Operandi, Context, u64) {
     let mut a = Operandi::empty();
     a.run(Command::NewMesh);
@@ -17,7 +17,7 @@ fn stacked() -> (Operandi, Context, u64) {
         .upper_frame
         .tabs
         .iter()
-        .position(|k| *k == panel_registry::PanelKind::MeshOps)
+        .position(|k| *k == panel_registry::PanelKind::MeshStack)
         .expect("the Mesh Stack tab is in the default layout");
     a.upper_frame.show_page(page);
     let ctx = Context::default();
@@ -42,7 +42,7 @@ fn click(a: &mut Operandi, ctx: &Context, at: Pos2) {
 }
 fn ops(a: &Operandi) -> Vec<String> {
     a.editor.scene.items[0]
-        .mesh_ops
+        .mesh_stack
         .as_ref()
         .map_or_else(Vec::new, |s| {
             s.ops.iter().map(|o| o.kind.type_id().to_string()).collect()
@@ -52,8 +52,8 @@ fn ops(a: &Operandi) -> Vec<String> {
 #[test]
 fn the_list_shows_ops_top_down_with_the_base_mesh_last() {
     let (a, _, id) = stacked();
-    let keys: Vec<OpKey> = a.mesh_ops_tree.rects.iter().map(|(k, _)| *k).collect();
-    let stack = a.editor.scene.items[0].mesh_ops.as_ref().unwrap();
+    let keys: Vec<OpKey> = a.mesh_stack_tree.rects.iter().map(|(k, _)| *k).collect();
+    let stack = a.editor.scene.items[0].mesh_stack.as_ref().unwrap();
     assert_eq!(
         keys,
         vec![
@@ -67,17 +67,17 @@ fn the_list_shows_ops_top_down_with_the_base_mesh_last() {
 #[test]
 fn clicking_rows_selects_them_and_the_eye_turns_an_op_off() {
     let (mut a, ctx, id) = stacked();
-    let base = a.mesh_ops_tree.rects.last().unwrap().1.center();
+    let base = a.mesh_stack_tree.rects.last().unwrap().1.center();
     click(&mut a, &ctx, base);
     assert_eq!(a.editor.meshop_row, Some(OpRow { item: id, op: None }));
-    let top = a.editor.scene.items[0].mesh_ops.as_ref().unwrap().ops[1].id;
-    let eye = a.mesh_ops_tree.cells[&(OpKey::Op(id, top), 0)].center();
+    let top = a.editor.scene.items[0].mesh_stack.as_ref().unwrap().ops[1].id;
+    let eye = a.mesh_stack_tree.cells[&(OpKey::Op(id, top), 0)].center();
     click(&mut a, &ctx, eye);
-    assert!(!a.editor.scene.items[0].mesh_ops.as_ref().unwrap().ops[1].enabled);
+    assert!(!a.editor.scene.items[0].mesh_stack.as_ref().unwrap().ops[1].enabled);
     let item = a.editor.scene.items[0].clone();
     assert_eq!(
         a.editor
-            .meshops
+            .mesh_stack
             .current(&a.editor.scene, &item)
             .unwrap()
             .mesh
@@ -86,7 +86,7 @@ fn clicking_rows_selects_them_and_the_eye_turns_an_op_off() {
         6
     );
     a.run(Command::Undo);
-    assert!(a.editor.scene.items[0].mesh_ops.as_ref().unwrap().ops[1].enabled);
+    assert!(a.editor.scene.items[0].mesh_stack.as_ref().unwrap().ops[1].enabled);
 }
 
 #[test]
@@ -126,9 +126,9 @@ fn freeze_from_the_row_menu_command_bakes_the_stack() {
 #[test]
 fn a_selected_op_shows_its_values_in_the_properties_panel() {
     let (mut a, ctx, _) = stacked();
-    let top = a.mesh_ops_tree.rects[0].1.center();
+    let top = a.mesh_stack_tree.rects[0].1.center();
     click(&mut a, &ctx, top);
-    assert_eq!(a.property_tabs(), [crate::mesh_ops_ui::MESH_OP_TAB]);
+    assert_eq!(a.property_tabs(), [crate::mesh_stack_ui::MESH_OP_TAB]);
     // Select the Bevel instead and check its rows are drawn there.
     a.run(Command::MeshOpCreate("poly.bevel.item".into()));
     crate::ui_inventory::take_rects();
@@ -137,23 +137,23 @@ fn a_selected_op_shows_its_values_in_the_properties_panel() {
     assert!(rects.contains_key("Shift"), "{:?}", rects.keys());
     assert!(rects.contains_key("Group Polygons"));
     // The Base Mesh row (or another front tab) is the item's own panel.
-    let base = a.mesh_ops_tree.rects.last().unwrap().1.center();
+    let base = a.mesh_stack_tree.rects.last().unwrap().1.center();
     click(&mut a, &ctx, base);
-    assert_ne!(a.property_tabs(), [crate::mesh_ops_ui::MESH_OP_TAB]);
+    assert_ne!(a.property_tabs(), [crate::mesh_stack_ui::MESH_OP_TAB]);
 }
 
 #[test]
-fn frame_all_frames_a_mesh_ops_result() {
-    // Jason 2026-11-17: Frame All did nothing with only a MeshOps item.
+fn frame_all_frames_a_mesh_stack_result() {
+    // Jason 2026-11-17: Frame All did nothing with only a Mesh Stack item.
     let mut a = Operandi::empty();
     a.run(Command::NewMesh);
     a.run(Command::MeshOpCreate("prim.cube.item".into()));
     let item = a.editor.scene.items[0].id;
-    let op = a.editor.scene.items[0].mesh_ops.as_ref().unwrap().ops[0].id;
+    let op = a.editor.scene.items[0].mesh_stack.as_ref().unwrap().ops[0].id;
     let mut v = serde_json::Map::new();
     v.insert("cenX".into(), 10.0.into());
     a.run(Command::MeshOpSet {
-        op: operandi_core::meshops_editor::OpRef { item, op },
+        op: operandi_core::mesh_stack_editor::OpRef { item, op },
         values: v,
     });
     a.frame(false);
@@ -175,7 +175,7 @@ fn frame_all_frames_a_mesh_ops_result() {
 
 #[test]
 fn ab_5_add_operator_files_ops_in_the_mesh_operations_tree() {
-    let c = crate::mesh_ops_ui::operator_catalog();
+    let c = crate::mesh_stack_ui::operator_catalog();
     let folder_of = |label: &str| {
         c.entries
             .iter()
@@ -225,13 +225,13 @@ fn add_operator_opens_the_browser_and_double_click_adds() {
         .scene
         .item(id)
         .unwrap()
-        .mesh_ops
+        .mesh_stack
         .as_ref()
         .unwrap()
         .ops
         .len();
     a.add_browsers
-        .entry(crate::mesh_ops_ui::ADD_OPERATOR)
+        .entry(crate::mesh_stack_ui::ADD_OPERATOR)
         .or_insert_with(|| {
             (
                 Default::default(),
@@ -243,14 +243,14 @@ fn add_operator_opens_the_browser_and_double_click_adds() {
     draw(&mut a, &ctx, SIZE, vec![]);
     // Search for Cube and double-click its row.
     a.add_browsers
-        .get_mut(crate::mesh_ops_ui::ADD_OPERATOR)
+        .get_mut(crate::mesh_stack_ui::ADD_OPERATOR)
         .unwrap()
         .0
         .search = "Cube".into();
     draw(&mut a, &ctx, SIZE, vec![]);
     // Enter on a selected row adds it (AB-22).
     a.add_browsers
-        .get_mut(crate::mesh_ops_ui::ADD_OPERATOR)
+        .get_mut(crate::mesh_stack_ui::ADD_OPERATOR)
         .unwrap()
         .0
         .selected = Some("prim.cube.item".into());
@@ -271,14 +271,14 @@ fn add_operator_opens_the_browser_and_double_click_adds() {
         .scene
         .item(id)
         .unwrap()
-        .mesh_ops
+        .mesh_stack
         .as_ref()
         .unwrap()
         .ops
         .len();
     assert_eq!(after, before + 1);
     assert!(
-        !a.add_browsers[crate::mesh_ops_ui::ADD_OPERATOR].0.open,
+        !a.add_browsers[crate::mesh_stack_ui::ADD_OPERATOR].0.open,
         "unpinned: it closes"
     );
 }
@@ -289,7 +289,7 @@ fn ab_10_11_the_browser_is_a_450_by_600_pop_over_with_two_vertical_columns() {
     // one row.
     let (mut a, ctx, _) = stacked();
     a.add_browsers
-        .entry(crate::mesh_ops_ui::ADD_OPERATOR)
+        .entry(crate::mesh_stack_ui::ADD_OPERATOR)
         .or_insert_with(|| {
             (
                 Default::default(),
@@ -346,12 +346,12 @@ fn every_op_icon_name_is_a_generator_icon() {
         // Relax Mesh is a small text button with no icon (DEFORM §1).
         "sculpt.relaxMesh.item",
     ];
-    for d in operandi_core::meshops::op_defs() {
+    for d in operandi_core::mesh_stack::op_defs() {
         if d.id().starts_with("test.") || generic.contains(&d.id()) {
             continue;
         }
         assert!(
-            crate::mesh_ops_ui::op_icon(d.id()).is_some(),
+            crate::mesh_stack_ui::op_icon(d.id()).is_some(),
             "{} has no icon",
             d.id()
         );
@@ -363,7 +363,7 @@ fn the_add_browser_drags_by_its_title_bar_and_the_circle_pins_it() {
     // Jason 2026-11-17: our popup rules, movable, nothing spilling out.
     let (mut a, ctx, _) = stacked();
     a.add_browsers
-        .entry(crate::mesh_ops_ui::ADD_OPERATOR)
+        .entry(crate::mesh_stack_ui::ADD_OPERATOR)
         .or_insert_with(|| {
             (
                 Default::default(),
@@ -412,7 +412,7 @@ fn the_add_browser_drags_by_its_title_bar_and_the_circle_pins_it() {
             && (after.top() - (before.top() + 40.)).abs() < 3.,
         "{before:?} -> {after:?}"
     );
-    let state = &a.add_browsers[crate::mesh_ops_ui::ADD_OPERATOR].0;
+    let state = &a.add_browsers[crate::mesh_stack_ui::ADD_OPERATOR].0;
     assert!(state.open && state.place.is_some());
     // Every row stays inside the window.
     crate::add_browser::RECTS.with(|r| r.borrow_mut().clear());
@@ -447,7 +447,7 @@ fn a_click_in_the_add_operator_browser_over_a_view_stays_in_the_browser() {
         .upper_frame
         .tabs
         .iter()
-        .position(|k| *k == panel_registry::PanelKind::MeshOps)
+        .position(|k| *k == panel_registry::PanelKind::MeshStack)
         .expect("the Mesh Stack tab is in the Model layout");
     a.upper_frame.show_page(page);
     for _ in 0..3 {
@@ -457,7 +457,7 @@ fn a_click_in_the_add_operator_browser_over_a_view_stays_in_the_browser() {
     // Opened from a button on the right, so it opens to its left, over the view.
     let anchor = egui::Rect::from_min_size(pos2(1300., 200.), vec2(90., 20.));
     a.add_browsers
-        .entry(crate::mesh_ops_ui::ADD_OPERATOR)
+        .entry(crate::mesh_stack_ui::ADD_OPERATOR)
         .or_insert_with(|| (Default::default(), anchor))
         .0
         .open = true;
@@ -499,7 +499,7 @@ fn a_click_in_the_add_operator_browser_over_a_view_stays_in_the_browser() {
             "{what}: the mesh under the browser stays selected"
         );
         assert!(
-            a.add_browsers[crate::mesh_ops_ui::ADD_OPERATOR].0.open,
+            a.add_browsers[crate::mesh_stack_ui::ADD_OPERATOR].0.open,
             "{what}: the browser stays open"
         );
     }

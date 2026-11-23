@@ -311,7 +311,7 @@ pub fn command_for(
 /// `Ok(None)` when it took several steps and already ran them.
 pub fn built_in(e: &mut Editor, name: &str, a: &Map<String, Value>) -> Result<Option<Command>> {
     let active = |e: &Editor| e.scene.selection.item.ok_or("No active item");
-    if let Some(cmd) = crate::meshops_editor::script_command(e, name, a)? {
+    if let Some(cmd) = crate::mesh_stack_editor::script_command(e, name, a)? {
         return Ok(Some(cmd));
     }
     if let Some(cmd) = crate::uv_ops::script_command(e, name, a)? {
@@ -1504,7 +1504,7 @@ fn absolute_args(a: &Map<String, Value>) -> Result<crate::AbsoluteScale> {
 }
 
 /// scene.saveAs without a window: File > Export's writer on the scene as
-/// MeshOps evaluate it. Changes nothing in the editor (no history step);
+/// Mesh Stacks evaluate it. Changes nothing in the editor (no history step);
 /// the document's own file name and saved state are the caller's and stay.
 /// A plain .opscene save, or no filename (the save panel), is refused.
 fn export_scene(e: &Editor, a: &Map<String, Value>) -> Result<crate::interchange::ExportReport> {

@@ -1,0 +1,23 @@
+[book]
+title = "Operandi User Guide"
+description = "How to use Operandi, an open-source polygon modeler."
+language = "en"
+src = "src"
+
+[build]
+build-dir = "book"
+# Pages listed in SUMMARY.md but not yet written stay drafts; don't create
+# empty files for them.
+create-missing = false
+
+[output.html]
+default-theme = "navy"
+preferred-dark-theme = "navy"
+git-repository-url = "https://github.com/operandi3d/operandi"
+edit-url-template = "https://github.com/operandi3d/operandi/edit/main/docs/guide/{path}"
+additional-css = ["theme/operandi.css"]
+additional-js = ["theme/operandi.js"]
+no-section-label = true
+
+[output.html.search]
+enable = true

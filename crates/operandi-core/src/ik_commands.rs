@@ -49,19 +49,7 @@ fn one(a: &Args, name: &str) -> Result<Option<u64>> {
 
 /// The selection in pick order.
 fn picked(scene: &Scene) -> Vec<u64> {
-    let s = &scene.selection;
-    let mut out: Vec<u64> = s
-        .also
-        .iter()
-        .copied()
-        .filter(|i| scene.item(*i).is_some())
-        .collect();
-    if let Some(active) = s.item
-        && !out.contains(&active)
-    {
-        out.push(active);
-    }
-    out
+    scene.picked_items()
 }
 
 fn is_joint(scene: &Scene, id: u64) -> bool {

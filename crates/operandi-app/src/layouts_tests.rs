@@ -181,7 +181,7 @@ fn a_fresh_install_opens_model_and_writes_no_copy_until_it_changes() {
             PanelKind::Items,
             PanelKind::ShaderTree,
             PanelKind::Groups,
-            PanelKind::MeshOps
+            PanelKind::MeshStack
         ]
     );
     assert_eq!(a.upper_frame.front(), Some(PanelKind::Items));
@@ -920,12 +920,12 @@ fn dock_tree_reopens_a_legacy_user_file_and_saves_tab_edits() {
 /// The Mesh Stack panel was called "Mesh Ops" until 2026-11-19: saved layouts
 /// with the old kind still open it, and layouts are written with the new name.
 #[test]
-fn old_mesh_ops_kind_opens_the_mesh_stack_panel() {
+fn old_mesh_stack_kind_opens_the_mesh_stack_panel() {
     use crate::layouts::kind_named;
-    assert_eq!(kind_named("Mesh Ops"), Some(PanelKind::MeshOps));
-    assert_eq!(kind_named("Mesh Stack"), Some(PanelKind::MeshOps));
+    assert_eq!(kind_named("Mesh Ops"), Some(PanelKind::MeshStack));
+    assert_eq!(kind_named("Mesh Stack"), Some(PanelKind::MeshStack));
     assert_eq!(
-        crate::panel_registry::panel_type(PanelKind::MeshOps).name,
+        crate::panel_registry::panel_type(PanelKind::MeshStack).name,
         "Mesh Stack"
     );
 }

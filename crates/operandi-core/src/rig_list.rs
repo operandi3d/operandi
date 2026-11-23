@@ -63,7 +63,7 @@ pub fn rows(scene: &Scene, item: u64) -> Vec<RigRow> {
             missing: p.is_missing(),
         })
         .collect();
-    if let Some(stack) = scene.item(item).and_then(|i| i.mesh_ops.as_ref()) {
+    if let Some(stack) = scene.item(item).and_then(|i| i.mesh_stack.as_ref()) {
         for op in stack
             .ops
             .iter()

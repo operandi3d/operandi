@@ -1,4 +1,4 @@
-"""Batch 19: tree-row type icons (Shader Tree, Items, Groups, Mesh Ops, UV
+"""Batch 19: tree-row type icons (Shader Tree, Items, Groups, Mesh Stack, UV
 maps, preset lists), in place of single-letter badges (Jason, 2026-11-16).
 
 Flat glyphs drawn for small rows (about 14 px): one bold silhouette per

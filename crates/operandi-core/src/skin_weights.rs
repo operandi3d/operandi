@@ -26,7 +26,7 @@ pub fn map_for_joint(scene: &Scene, joint: u64) -> Option<(u64, String)> {
     scene
         .items
         .iter()
-        .filter(|i| i.mesh_ops.is_some())
+        .filter(|i| i.mesh_stack.is_some())
         .find_map(|i| {
             let (_, v) = crate::skin_commands::skin_op(scene, i.id).ok()?;
             let k = v.joints.iter().position(|j| *j == joint)?;
@@ -46,7 +46,7 @@ pub fn follow_rename(scene: &mut Scene, joint: u64, old: &str) {
     let meshes: Vec<u64> = scene
         .items
         .iter()
-        .filter(|i| i.mesh_ops.is_some())
+        .filter(|i| i.mesh_stack.is_some())
         .map(|i| i.id)
         .collect();
     for m in meshes {

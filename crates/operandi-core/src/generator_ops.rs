@@ -1,5 +1,5 @@
 //! Generators and the on-hold ops (modelling-parity batch 5; spec
-//! SCATTER-UVRECT-TRANSFER-CONSTRAINT v1, GO-xx; MeshOps TYPE-IDS):
+//! SCATTER-UVRECT-TRANSFER-CONSTRAINT v1, GO-xx; Mesh Stack TYPE-IDS):
 //!
 //! - Scatter: random copies in a box (the direct tool, GO-01..07) and an
 //!   evenly spread set in a square or box (the op, GO-10..13).
@@ -9,7 +9,7 @@
 //! - Transfer Vertex Map (GO-30..32, not probed): a map sampled from a
 //!   linked source surface.
 //! - UV Fit as an op (the Fit command's engine). The UnSubdivide op is
-//!   the MeshOps builder's (`poly.unsubdiv.item`).
+//!   the Mesh Stack builder's (`poly.unsubdiv.item`).
 use crate::background_constraint::Background;
 use crate::duplicate::{Copies, WeldAt, copy_faces, jitter};
 use crate::meshop_types::{Field, FieldKind, OpContext, OpDef, Typed, TypedOp};
@@ -190,7 +190,7 @@ impl ScatterOp {
             return Err(format!("Count must be 1 to {MAX_SCATTER}"));
         }
         let size = DVec3::new(self.size_x, self.size_y, self.size_z);
-        crate::meshops_builtin::finite(&size.to_array(), "Size")?;
+        crate::mesh_stack_builtin::finite(&size.to_array(), "Size")?;
         let flat = self.kind == 0;
         let unit = even_points(self.number, flat, 0);
         // The unit square's second axis is Z; turn it into the plane.
@@ -222,7 +222,7 @@ impl ScatterOp {
 
 /// The source polygons' bounding-box centre.
 fn faces_centre(mesh: &Mesh, faces: &[usize]) -> DVec3 {
-    crate::meshops_builtin::faces_centre(mesh, faces)
+    crate::mesh_stack_builtin::faces_centre(mesh, faces)
 }
 
 impl TypedOp for ScatterOp {
@@ -1240,7 +1240,7 @@ impl TypedOp for TransferVertexMapOp {
     }
 }
 
-// ---- UV Fit as an op (UnSubdivide's op is on the MeshOps branch) ----
+// ---- UV Fit as an op (UnSubdivide's op is on the Mesh Stack branch) ----
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]

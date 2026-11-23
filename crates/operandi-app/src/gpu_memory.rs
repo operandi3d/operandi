@@ -173,7 +173,7 @@ impl Operandi {
             .scene
             .items
             .iter()
-            .any(|i| i.mesh_ops.is_some())
+            .any(|i| i.mesh_stack.is_some())
             .then(|| self.editor.evaluated_display())
             .flatten();
         let scene = shown.as_ref().unwrap_or(&self.editor.scene);

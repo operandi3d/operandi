@@ -1,7 +1,7 @@
-//! The Mesh Ops tab (MeshOps v1, MO-10..28): the selected mesh's
+//! The Mesh Stack tab (Mesh Stack v1, MO-10..28): the selected mesh's
 //! operation stack, top = last evaluated, with its Base Mesh at the bottom,
 //! and the selected op's Properties under it. Every change goes through a
-//! command (meshops_editor.rs), so buttons, menus and scripts agree.
+//! command (mesh_stack_editor.rs), so buttons, menus and scripts agree.
 //!
 //! Provisional for v1: the list shows only the selected mesh (Single item
 //! view, MO-28); Add Operator is a menu, not the preset browser (MO-15); no
@@ -11,10 +11,10 @@ use crate::tree_list::{
     Cell, Column, DropAt, Heading, RowIcon, Selected, TreeEvent, TreeHooks, TreeRow, TreeSpec,
 };
 use crate::unavailable::Gate;
+use operandi_core::mesh_stack::{OpKind, OpStatus, op_defs};
+use operandi_core::mesh_stack_editor::{IndexEdit, OpRef, OpRow, SelOpEdit};
 use operandi_core::meshop_selection::{Blend, SelKind, SelOp};
 use operandi_core::meshop_types::FieldKind;
-use operandi_core::meshops::{OpKind, OpStatus, op_defs};
-use operandi_core::meshops_editor::{IndexEdit, OpRef, OpRow, SelOpEdit};
 
 /// The Properties panel's one category while an op is selected.
 pub(crate) const MESH_OP_TAB: &str = "Mesh Op";
@@ -34,7 +34,7 @@ pub(crate) fn ghost_color() -> Color32 {
 
 fn spec() -> TreeSpec {
     TreeSpec {
-        id: "mesh-ops-tree",
+        id: "mesh-stack-tree",
         columns: vec![
             Column::state(
                 Heading::Eye,
@@ -63,8 +63,8 @@ fn item_options(meshes: &[(u64, String)], current: u64) -> Vec<(u64, &str)> {
 /// an Add Selection menu. Returns the one change made this frame.
 fn selection_ops(
     ui: &mut Ui,
-    op: &operandi_core::meshops::MeshOp,
-    below: &[operandi_core::meshops::MeshOp],
+    op: &operandi_core::mesh_stack::MeshOp,
+    below: &[operandi_core::mesh_stack::MeshOp],
 ) -> (Option<SelOpEdit>, Option<egui::Rect>) {
     use crate::form::{Unit, rows};
     let mut edit = None;
@@ -382,15 +382,15 @@ impl TreeHooks<OpKey> for Hooks {
 }
 
 impl Operandi {
-    /// The Mesh Ops panel body (registered in panel_registry.rs).
-    pub(super) fn mesh_ops_section(&mut self, ui: &mut Ui, _area: Rect) {
+    /// The Mesh Stack panel body (registered in panel_registry.rs).
+    pub(super) fn mesh_stack_section(&mut self, ui: &mut Ui, _area: Rect) {
         let idle = self.editor.live.is_none();
         let Some(item) = self.editor.scene.active().filter(|i| i.is_mesh()).cloned() else {
             ui.add_space(6.);
             crate::form::rows::note(ui, "Select a mesh item to see its Mesh Stack.");
             return;
         };
-        let mut state = std::mem::take(&mut self.mesh_ops_tree);
+        let mut state = std::mem::take(&mut self.mesh_stack_tree);
         let mut add: Option<String> = None;
         let mut add_open: Option<egui::Rect> = None;
         let editing_base = self.editor.base_edit == Some(item.id);
@@ -411,7 +411,7 @@ impl Operandi {
                 );
             }
             tree_list::Side::Right => {
-                if item.mesh_ops.is_some() {
+                if item.mesh_stack.is_some() {
                     let r = tree_list::toggle_button(ui, "Base", editing_base).on_hover_text(
                         if editing_base {
                             "Stop editing the Base Mesh"
@@ -426,8 +426,8 @@ impl Operandi {
                 }
             }
         });
-        let evaluated = self.editor.meshops.result(&self.editor.scene, &item);
-        let ops = item.mesh_ops.as_ref().map_or(&[][..], |s| &s.ops[..]);
+        let evaluated = self.editor.mesh_stack.result(&self.editor.scene, &item);
+        let ops = item.mesh_stack.as_ref().map_or(&[][..], |s| &s.ops[..]);
         let row_sel = self.editor.meshop_row.filter(|r| r.item == item.id);
         let mut rows = Vec::new();
         for (i, op) in ops.iter().enumerate().rev() {
@@ -482,7 +482,7 @@ impl Operandi {
         let events = tree_list::show(ui, &spec(), &mut state, &rows, &mut hooks, &mut editors);
         self.text_editors = editors;
         state.retain(|k| rows.iter().any(|r| r.key == k));
-        self.mesh_ops_tree = state;
+        self.mesh_stack_tree = state;
 
         // AB-01: Add Operator opens the Add browser.
         if let Some(rect) = add_open {
@@ -578,7 +578,7 @@ impl Operandi {
         let Some((item, _)) = self.selected_mesh_op() else {
             return;
         };
-        let evaluated = self.editor.meshops.result(&self.editor.scene, &item);
+        let evaluated = self.editor.mesh_stack.result(&self.editor.scene, &item);
         self.mesh_op_properties(ui, &item, evaluated.as_ref());
     }
 
@@ -587,7 +587,7 @@ impl Operandi {
         &mut self,
         ui: &mut Ui,
         item: &operandi_core::scene::Item,
-        evaluated: Option<&operandi_core::meshops::Evaluated>,
+        evaluated: Option<&operandi_core::mesh_stack::Evaluated>,
     ) {
         use crate::form::{Unit, rows};
         let Some(OpRow {
@@ -603,7 +603,7 @@ impl Operandi {
             }
             return;
         };
-        let Some(stack) = item.mesh_ops.as_ref() else {
+        let Some(stack) = item.mesh_stack.as_ref() else {
             return;
         };
         let Some(index) = stack.index_of(op_id) else {
@@ -849,17 +849,17 @@ impl Operandi {
         }
         if changes.is_empty() {
             if !ui.input(|i| i.pointer.any_down()) {
-                self.mesh_ops_gesture = None;
+                self.mesh_stack_gesture = None;
             }
             return;
         }
         // One undo step per drag (SAFE-13).
         let dragging = dragged || ui.input(|i| i.pointer.any_down());
-        let gesture = match self.mesh_ops_gesture {
+        let gesture = match self.mesh_stack_gesture {
             Some(g) if dragging => g,
             _ => crate::colour_field::next_gesture(),
         };
-        self.mesh_ops_gesture = dragging.then_some(gesture);
+        self.mesh_stack_gesture = dragging.then_some(gesture);
         let previous = self.editor.undo_fold.replace(gesture);
         self.run(Command::MeshOpSet {
             op: r,
