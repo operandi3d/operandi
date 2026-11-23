@@ -1716,9 +1716,13 @@ impl Operandi {
             {
                 self.execute("operandi.skel.tool");
             }
-            // IK-50: the Pose tool (text until its studio icon).
+            // IK-50: the Pose tool.
             if ui
-                .selectable_label(self.pose.on, "Pose")
+                .add(
+                    crate::icons::button(ui, Icon::PoseTool, "")
+                        .selected(self.pose.on)
+                        .min_size(vec2(22., 20.)),
+                )
                 .on_hover_text("Pose: drag the selected hierarchy's items; Ctrl world, Shift twist, middle FK, right-click pin\noperandi.pose.tool")
                 .clicked()
             {
@@ -1785,7 +1789,11 @@ impl Operandi {
                         "operandi.ik.pole mode:create",
                     ),
                     (None, "Remove Up Vector", "operandi.ik.pole mode:remove"),
-                    (None, "Assign IK (Full Body)", "operandi.ik.assign"),
+                    (
+                        Some(Icon::IkFullBody),
+                        "Assign IK (Full Body)",
+                        "operandi.ik.assign",
+                    ),
                     (Some(Icon::IkGoal), "Add Goal", "operandi.ik.addGoal"),
                     (
                         None,
@@ -1800,7 +1808,7 @@ impl Operandi {
                     (None, "Add to Chain", "operandi.ik.addToChain"),
                     (None, "Remove from Chain", "operandi.ik.removeFromChain"),
                     (None, "Remove IK", "operandi.ik.remove"),
-                    (None, switch_label, "operandi.ik.switch"),
+                    (Some(Icon::IkFkSwitch), switch_label, "operandi.ik.switch"),
                     (None, "IK/FK: Set Keys", "operandi.ik.setKeys"),
                     (
                         None,
