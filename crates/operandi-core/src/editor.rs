@@ -3838,8 +3838,11 @@ impl Editor {
                         if name.trim().is_empty() || name.len() > 1024 {
                             return Err("Name must contain 1–1024 bytes".into());
                         }
-                        self.scene.active_mut().ok_or("Select an item")?.name =
-                            name.trim().to_owned();
+                        let item = self.scene.active_mut().ok_or("Select an item")?;
+                        let (id, old) = (item.id, item.name.clone());
+                        item.name = name.trim().to_owned();
+                        // SK-23: a joint's weight maps follow its name.
+                        crate::skin_weights::follow_rename(&mut self.scene, id, &old);
                         "Rename Mesh"
                     }
                     Command::SetParent {

@@ -255,6 +255,7 @@ pub mod skeleton;
 pub mod skin;
 pub mod skin_bind;
 pub mod skin_commands;
+pub mod skin_weights;
 pub mod time_tick;
 pub use boolean::{BooleanOp, BooleanOptions, BooleanProblem, DriveMesh};
 pub use drill::{DrillAxis, DrillKind, DrillOp, DrillOptions};

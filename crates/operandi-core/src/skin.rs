@@ -388,3 +388,19 @@ pub fn setup_local(scene: &Scene, id: u64) -> DMat4 {
         None => local,
     }
 }
+
+/// Whether `a` and `b` differ only in their weight maps.
+pub fn weights_only(a: &Mesh, b: &Mesh) -> bool {
+    if a.vertices != b.vertices || a.faces != b.faces {
+        return false;
+    }
+    let (mut a, mut b) = (a.clone(), b.clone());
+    a.attributes.point_weights.clear();
+    b.attributes.point_weights.clear();
+    a == b
+}
+
+/// Whether every op of `stack` is a skin (it keeps every point).
+pub fn only_skin(stack: &crate::meshops::MeshOpStack) -> bool {
+    !stack.ops.is_empty() && stack.ops.iter().all(|o| o.kind.type_id() == SKIN_OP)
+}

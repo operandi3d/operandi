@@ -590,6 +590,9 @@ impl Editor {
                     && self.base_edit != Some(item.id)
                     && !crate::Shared::same(old.mesh.shared(), item.mesh.shared())
                     && *old.mesh != *item.mesh
+                    // Weight maps are the skin's input, not its geometry:
+                    // painting them is allowed (SK-41, skin.rs).
+                    && !crate::skin::weights_only(&old.mesh, &item.mesh)
                 {
                     return Err(DIRECT_EDIT_REFUSED.into());
                 }
@@ -626,6 +629,9 @@ impl Editor {
             .items
             .iter()
             .filter(|i| i.mesh_ops.is_some() && Some(i.id) != self.base_edit)
+            // A skin keeps every point: its points stay selectable for the
+            // weight tools (SK-42).
+            .filter(|i| !i.mesh_ops.as_ref().is_some_and(crate::skin::only_skin))
             .map(|i| i.id)
             .collect();
         for id in shown_by_result {

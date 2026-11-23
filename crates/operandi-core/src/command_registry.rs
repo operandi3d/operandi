@@ -3663,6 +3663,153 @@ pub static COMMANDS: &[Entry] = &[
         .undo()
         .operandi()
         .example("operandi.skin.unbind"),
+    script("operandi.weight.adjust", Sculpt, "Adjust Weights (SK-42): adds Weight to a map over the selected points (or all), or sets it.")
+        .on_editor(
+            "Change a weight map over the points, one undo step: additive (default) adds weight (negative lowers), off sets it; normalize lowers the other maps so totals stay at most 100%.",
+            &[
+            jopt("item", "integer", "The mesh (default the selected one)."),
+            jopt("map", "string", "The weight map (default the selected one)."),
+            jopt("points", "string", "Point indices, comma separated (default the selected points, else all)."),
+            jreq("weight", "number", "The amount (0-1; negative lowers when additive)."),
+            jopt("additive", "boolean", "Add (default true) or set."),
+            jopt("normalize", "boolean", "Keep totals at most 100% by lowering the other maps."),
+        ],
+            crate::skin_weights::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.weight.adjust weight:0.1"),
+    script("operandi.weight.isolate", Sculpt, "Isolate Weights (SK-42): clears a map outside the selected points.")
+        .on_editor(
+            "Remove the map's values outside the points (default the selected points), one undo step.",
+            &[
+            jopt("item", "integer", "The mesh (default the selected one)."),
+            jopt("map", "string", "The weight map (default the selected one)."),
+            jopt("points", "string", "Point indices, comma separated (default the selected points, else all)."),
+        ],
+            crate::skin_weights::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.weight.isolate map:Elbow1"),
+    script("operandi.weight.merge", Sculpt, "Merge Weights (SK-42): adds one map into another (capped at 100%).")
+        .on_editor(
+            "Add map from into map into (default the selected map), capped at 1, and remove from unless remove is false; one undo step.",
+            &[
+            jopt("item", "integer", "The mesh (default the selected one)."),
+            jreq("from", "string", "The map merged in."),
+            jopt("into", "string", "The map it goes into (default the selected one)."),
+            jopt("remove", "boolean", "Remove from afterwards (default true)."),
+        ],
+            crate::skin_weights::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.weight.merge from:Hand1 into:Wrist1"),
+    script("operandi.weight.mirror", Sculpt, "Mirror Weights (SK-42): copies weights across the mirror plane, swapping _L and _R maps.")
+        .on_editor(
+            "Mirror every weight map (or map) across axis (default X) from the + side to the − side (from:minus the other way), matching points by position within tolerance, _L/_R maps swapped; one undo step.",
+            &[
+            jopt("item", "integer", "The mesh (default the selected one)."),
+            jopt("map", "string", "The weight map (default the selected one)."),
+            jopt("axis", "string", "X (default), Y or Z."),
+            jopt("from", "string", "plus (default) or minus: the side copied."),
+            jopt("tolerance", "number", "Matching distance (default 0.0001)."),
+            jopt("suffixPlus", "string", "Default _L."),
+            jopt("suffixMinus", "string", "Default _R."),
+        ],
+            crate::skin_weights::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.weight.mirror"),
+    script("operandi.weight.normalize", Sculpt, "Normalize Weights (SK-42): each point's weights add up to 100%.")
+        .on_editor(
+            "Scale each point's weights (the skin's joint maps on a bound mesh, else every weight map) to add up to 1, over the points (default selected, else all); one undo step.",
+            &[
+            jopt("item", "integer", "The mesh (default the selected one)."),
+            jopt("map", "string", "The weight map (default the selected one)."),
+            jopt("points", "string", "Point indices, comma separated (default the selected points, else all)."),
+        ],
+            crate::skin_weights::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.weight.normalize"),
+    script("operandi.weight.query", Sculpt, "Reads weight maps as JSON (UIC-163): the mesh's maps, one map's values, or every map's value at a point.")
+        .on_editor(
+            "Read weight maps as JSON: item, maps, skin (its joint maps), selected; with map, values (point: weight) or with vertex its value; with vertex alone, weights (map: weight) and total.",
+            &[
+            jopt("item", "integer", "The mesh (default the selected one)."),
+            jopt("map", "string", "The weight map (default the selected one)."),
+            jopt("vertex", "integer", "A point index."),
+        ],
+            crate::skin_weights::run,
+        )
+        .query()
+        .quiet()
+        .operandi()
+        .example("operandi.weight.query vertex:0"),
+    script("operandi.weight.set", Sculpt, "Writes weight values per point (§7 MCP), or erases them (no value).")
+        .on_editor(
+            "Set map's value at points to value (0-1), or erase:true removes it; normalize lowers the other maps; one undo step.",
+            &[
+            jopt("item", "integer", "The mesh (default the selected one)."),
+            jopt("map", "string", "The weight map (default the selected one)."),
+            jreq("points", "string", "Point indices, comma separated."),
+            jopt("value", "number", "0 to 1."),
+            jopt("erase", "boolean", "Remove the value (no weight at all)."),
+            jopt("normalize", "boolean", "Keep totals at most 100%."),
+        ],
+            crate::skin_weights::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.weight.set map:Elbow1 points:0,1 value:0.5"),
+    script("operandi.weight.smooth", Sculpt, "Smooth Selected (SK-42): one blur pass of a map towards its neighbours.")
+        .on_editor(
+            "Blur the map once over the points (default selected, else all): each moves amount (default 0.5) of the way to its neighbours' mean; one undo step.",
+            &[
+            jopt("item", "integer", "The mesh (default the selected one)."),
+            jopt("map", "string", "The weight map (default the selected one)."),
+            jopt("points", "string", "Point indices, comma separated (default the selected points, else all)."),
+            jopt("amount", "number", "0 to 1 (default 0.5)."),
+        ],
+            crate::skin_weights::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.weight.smooth"),
+    script("operandi.weight.split", Sculpt, "Split Left/Right (SK-42): one map into _L and _R maps by side.")
+        .on_editor(
+            "Split map by the side of axis (default X): + side into map_L, − side into map_R, points on the plane half to each; removes the map unless remove is false; one undo step.",
+            &[
+            jopt("item", "integer", "The mesh (default the selected one)."),
+            jopt("map", "string", "The weight map (default the selected one)."),
+            jopt("axis", "string", "X (default), Y or Z."),
+            jopt("remove", "boolean", "Remove the original (default true)."),
+            jopt("suffixPlus", "string", "Default _L."),
+            jopt("suffixMinus", "string", "Default _R."),
+        ],
+            crate::skin_weights::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.weight.split map:Arm1"),
+    script("operandi.weight.transfer", Sculpt, "Transfer Weights (SK-42): weights from another mesh, by nearest point.")
+        .on_editor(
+            "Copy every weight map (or map) of mesh from onto this mesh's points (default selected, else all): each takes the nearest source point's weights in world space; one undo step.",
+            &[
+            jopt("item", "integer", "The mesh (default the selected one)."),
+            jopt("map", "string", "The weight map (default the selected one)."),
+            jopt("points", "string", "Point indices, comma separated (default the selected points, else all)."),
+            jreq("from", "integer", "The source mesh item."),
+        ],
+            crate::skin_weights::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.weight.transfer from:3"),
     script("operandi.eval.graph", Items, "Reads the scene's evaluation graph (who reads whom: time, channels, fields, transforms, shown meshes) as JSON nodes and edges (UIC-163; the Schematic's data).")
         .on_editor(
             "Read the evaluation graph as JSON: nodes (id, kind time/channel/field/transform/shownMesh, item, name, label, dirty) and edges [from, to] (to reads from). item limits it to one item's nodes and the edges touching them.",
@@ -7079,7 +7226,7 @@ mod tests {
                 assert!(!json.about.is_empty(), "{}", e.name);
             }
         }
-        assert_eq!(crate::command_exec::specs().count(), 272);
+        assert_eq!(crate::command_exec::specs().count(), 282);
     }
 
     #[test]
