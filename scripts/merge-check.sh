@@ -51,7 +51,12 @@ if [ -x development/python/python/bin/python3 ]; then
 elif command -v python3 >/dev/null 2>&1; then
     PY_FOR_TESTS="$(command -v python3)"
 fi
-if [ -n "$PY_FOR_TESTS" ]; then
+if [ -f development/python/pyo3-config.txt ]; then
+    step "Python tests (--features python, bundled CPython)"
+    PYO3_CONFIG_FILE="$(cd development/python && pwd -P)/pyo3-config.txt" \
+        OPERANDI_PYTHON_BUILD_HOME="$(cd development/python/python && pwd -P)" \
+        "$CARGO_BIN" test --locked --workspace --features operandi-app/python
+elif [ -n "$PY_FOR_TESTS" ]; then
     step "Python tests (--features python, $PY_FOR_TESTS)"
     PYO3_PYTHON="$PY_FOR_TESTS" "$CARGO_BIN" test --locked --workspace --features operandi-app/python
 else

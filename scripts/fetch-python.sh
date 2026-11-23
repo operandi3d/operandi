@@ -6,7 +6,9 @@
 # (git-ignored).
 #
 # Afterwards build with it:
-#   PYO3_PYTHON=development/python/python/bin/python3 cargo build -p operandi-app --features python
+#   PYO3_CONFIG_FILE=$PWD/development/python/pyo3-config.txt \
+#   OPERANDI_PYTHON_BUILD_HOME=$PWD/development/python/python \
+#   cargo build -p operandi-app --features python
 # scripts/bundle-dev.sh does that by itself once the folder exists.
 #
 # The library's install name is set to its absolute path here, so
@@ -50,4 +52,18 @@ if [ "$(uname -s)" = Darwin ]; then
     install_name_tool -id "$LIB" "$LIB"
     codesign --force --sign - "$LIB"
 fi
+# PyO3's build config: the standalone build's own sysconfig names the
+# folder it was built in (/install/lib), so point PyO3 at this copy.
+cat > "$DEST/pyo3-config.txt" <<CONFIG
+implementation=CPython
+version=$MINOR
+shared=true
+abi3=false
+lib_name=python$MINOR
+lib_dir=$PY/lib
+executable=$PY/bin/python3
+pointer_width=64
+build_flags=
+suppress_build_script_link_lines=false
+CONFIG
 echo "Python $("$PY/bin/python3" -c 'import platform; print(platform.python_version())') in $PY"

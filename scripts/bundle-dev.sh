@@ -40,7 +40,10 @@ if [ "${OPERANDI_PYTHON_BUILD:-}" != 0 ] && [ "${OPERANDI_PYTHON_BUILD:-}" != sy
     && [ -x development/python/python/bin/python3 ]; then
     FEATURES="${FEATURES:+$FEATURES,}python"
     PYTHON_INSTALL="$(cd development/python/python && pwd -P)"
-    export PYO3_PYTHON="$PYTHON_INSTALL/bin/python3"
+    [ -f development/python/pyo3-config.txt ] || scripts/fetch-python.sh
+    PYO3_CONFIG_FILE="$(cd development/python && pwd -P)/pyo3-config.txt"
+    OPERANDI_PYTHON_BUILD_HOME="$PYTHON_INSTALL"
+    export PYO3_CONFIG_FILE OPERANDI_PYTHON_BUILD_HOME
 fi
 # 3D painting is on by default (the maintainer, 2026-11-19);
 # OPERANDI_PAINTING=0 builds without it.
