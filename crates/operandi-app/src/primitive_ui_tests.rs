@@ -529,8 +529,8 @@ fn vp2_automatic_new_scene_draws_on_the_view_plane_and_retains_explicit_fixed_st
         let mut a = Operandi::empty();
         assert!(!a.editor.scene.workplane.fixed);
         assert!(
-            a.display.settings.drawing.grid && a.plane_display,
-            "ground grid and active workplane display on by default"
+            a.display.settings.drawing.grid && !a.viewport_preferences.workplane_display,
+            "ground grid on and work plane display off by default"
         );
         a.camera.view = view;
         a.camera.yaw = yaw;

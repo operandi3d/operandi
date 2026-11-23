@@ -58,9 +58,13 @@ the left view to Top.
     empty space in Item mode to deselect all, switch back to Polygon mode:
     A still looks active and Select All (Ctrl+A) selects A's polygons.
     Open a saved scene fresh: every mesh draws inactive until one is picked.
-14. **Visibility tab (P2).** Show Work Plane Active + Show Grid Inactive
-    Work Plane (the defaults): only the floor grid shows until the work
-    plane is moved (then only the work plane grid). Draw Faded Grid off:
+14. **Visibility tab (P2).** The work plane is off by default: only the
+    floor grid shows, even after moving the work plane. Turn on Show Work
+    Plane (Work Plane Settings > Display, or Preferences > Display): the
+    work plane's blue grid shows at rest too, and stays on after a
+    restart. With Show Grid Inactive Work Plane (the default), moving the
+    work plane then hides the floor grid; Show Work Plane Active in this
+    tab shows the work plane only once it is moved. Draw Faded Grid off:
     far grid lines no longer fade. Faded Grid Color Axes off: the floor's
     axis lines draw plain. Show Locators off hides group locators; Show
     Texture Locators on draws every texture gizmo.

@@ -1746,8 +1746,21 @@ impl Operandi {
                                 .on_hover_text("Draw the ground grid in this view");
                             rows::check(ui, "Ground X/Z Axes", &mut app.ground_axes)
                                 .on_hover_text("World X and Z axes, fading toward the viewport edges. Independent of workplane opacity.");
-                            rows::check(ui, "Work Plane Display", &mut app.plane_display)
-                                .on_hover_text("Draw the work plane's grid");
+                            if rows::check(
+                                ui,
+                                "Show Work Plane",
+                                &mut app.viewport_preferences.workplane_display,
+                            )
+                            .on_hover_text("Draw the work plane's own grid, apart from the ground grid")
+                            .changed()
+                                && let Err(error) = app
+                                    .viewport_preferences
+                                    .save(&app.environment.paths().viewport_display())
+                            {
+                                app.status = format!(
+                                    "Work plane display changed; could not save display preference: {error}"
+                                );
+                            }
                             let d = crate::viewport_preferences::ViewportPreferences::default();
                             if rows::number_d(
                                 ui,

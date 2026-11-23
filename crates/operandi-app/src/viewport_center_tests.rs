@@ -170,7 +170,7 @@ fn vac_t02_t04_t07_planes_display_and_context_are_independent() {
     }
     let before = app.editor.clone();
     app.display.settings.drawing.grid = false;
-    app.plane_display = false;
+    app.viewport_preferences.workplane_display = false;
     app.axes = true;
     app.plane_widget = false;
     assert!(app.editor == before);

@@ -546,8 +546,8 @@ fn panel_tabs(camera: bool, cameras: &[String]) -> Vec<panel::Tab> {
                 Section::new(
                     "General Visibility",
                     vec![
-                        Row::choice(key::WORK_PLANE, "Show Work Plane", &names(&SHOW_WORK_PLANE), 1)
-                            .tip("Always; Active: only once the work plane has been moved or rotated; Never")
+                        Row::choice(key::WORK_PLANE, "Show Work Plane", &names(&SHOW_WORK_PLANE), 0)
+                            .tip("When this view draws the work plane, while Show Work Plane is on (Work Plane Settings or Preferences > Display). Always; Active: only once the work plane has been moved or rotated; Never")
                             .not_channel(),
                         Row::choice(key::GRID, "Show Grid", &names(&SHOW_GRID), 1)
                             .tip("The floor grid. Inactive Work Plane: only while the work plane is at rest, so only one grid shows")
@@ -2699,9 +2699,17 @@ mod tests {
     fn show_grid_and_show_work_plane_draw_one_grid_by_default() {
         let mut s = view_display::Settings::default();
         let d = s.drawing;
-        // At rest: the floor grid; moved: the work plane's grid.
-        assert!(d.floor_grid(false) && !d.work_plane_grid(false));
-        assert!(!d.floor_grid(true) && d.work_plane_grid(true));
+        // Show Work Plane defaults to Always: the app-wide Show Work Plane
+        // switch (off by default) decides whether it draws at all.
+        assert!(d.work_plane_grid(false) && d.work_plane_grid(true));
+        // At rest: the floor grid. Moved: the work plane's grid takes over,
+        // but only when it is actually drawn.
+        assert!(d.floor_grid(false, true) && d.floor_grid(false, false));
+        assert!(
+            !d.floor_grid(true, true),
+            "the drawn work plane replaces it"
+        );
+        assert!(d.floor_grid(true, false), "work plane off keeps the floor");
         let tabs = panel_tabs(false, &[]);
         let values = panel_values(&all_rows(&tabs), &s, Some(View::Top), false);
         assert_eq!(
@@ -2710,16 +2718,19 @@ mod tests {
         );
         assert_eq!(
             names(&SHOW_WORK_PLANE)[values.choice(key::WORK_PLANE)],
-            "Active"
+            "Always"
         );
-        // Always / Always: both, whatever the work plane does.
+        // Active: only once moved.
+        edit(&mut s, key::WORK_PLANE, Value::Choice(1));
+        assert!(!s.drawing.work_plane_grid(false) && s.drawing.work_plane_grid(true));
+        // Show Grid Always: the floor grid whatever the work plane does.
         edit(&mut s, key::GRID, Value::Choice(0));
         edit(&mut s, key::WORK_PLANE, Value::Choice(0));
-        assert!(s.drawing.floor_grid(true) && s.drawing.work_plane_grid(false));
+        assert!(s.drawing.floor_grid(true, true) && s.drawing.work_plane_grid(false));
         // Never / Never: none.
         edit(&mut s, key::GRID, Value::Choice(2));
         edit(&mut s, key::WORK_PLANE, Value::Choice(2));
-        assert!(!s.drawing.grid && !s.drawing.floor_grid(false));
+        assert!(!s.drawing.grid && !s.drawing.floor_grid(false, false));
         assert!(!s.drawing.work_plane_grid(true));
         // The Display menu's grid toggle is the same setting: back on, it
         // follows the work plane again.

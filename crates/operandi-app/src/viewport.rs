@@ -387,37 +387,41 @@ impl Operandi {
                     painter.line_segment([a, b], Stroke::new(width, color));
                 }
             };
-            let grid_step = grid::spacing(
-                &self.camera,
-                r,
-                if self.plane_display { plane } else { 0 },
-                if self.plane_display {
-                    plane_center
-                } else {
-                    DVec3::ZERO
-                },
-            );
-            let grid_label = if self.plane_display {
-                format!("Work plane: {grid_step} m minor")
-            } else if self.display.settings.drawing.grid {
-                format!("Ground XZ: {grid_step} m minor")
-            } else {
-                "Grid hidden".into()
-            };
             let mut grids = Vec::new();
             // Show Grid / Show Work Plane (Viewport Properties > Visibility):
             // the work plane counts as moved once it is fixed or centred
-            // off the origin.
+            // off the origin. The work plane draws only while its own
+            // display is on (Show Work Plane, off by default); it is never
+            // folded into the ground grid.
             let drawing = self.display.settings.drawing;
             let work_plane_moved = {
                 let w = &self.editor.scene.workplane;
                 w.fixed || w.center != DVec3::ZERO
             };
-            let work_plane_grid = self.plane_display && drawing.work_plane_grid(work_plane_moved);
+            let work_plane_grid = self.viewport_preferences.workplane_display
+                && drawing.work_plane_grid(work_plane_moved);
+            let floor_grid = drawing.floor_grid(work_plane_moved, work_plane_grid);
+            let grid_step = grid::spacing(
+                &self.camera,
+                r,
+                if work_plane_grid { plane } else { 0 },
+                if work_plane_grid {
+                    plane_center
+                } else {
+                    DVec3::ZERO
+                },
+            );
+            let grid_label = if work_plane_grid {
+                format!("Work plane: {grid_step} m minor")
+            } else if floor_grid {
+                format!("Ground XZ: {grid_step} m minor")
+            } else {
+                "Grid hidden".into()
+            };
             let fade = drawing.faded_grid;
             // Separate layers preserve ground visibility even when the
             // coincident workplane grid is made fully transparent.
-            if drawing.floor_grid(work_plane_moved) {
+            if floor_grid {
                 grids.push(grid::PlaneGrid::new(
                     &self.camera,
                     r,
@@ -458,7 +462,7 @@ impl Operandi {
             // Top/Bottom: the zero lines below lie exactly on the ground axes
             // and replace them; their anti-aliased edges would otherwise let
             // the light tint show through the dark line.
-            let zero_plane = if drawing.floor_grid(work_plane_moved) {
+            let zero_plane = if floor_grid {
                 grid::view_zero_plane(&self.camera)
             } else {
                 None

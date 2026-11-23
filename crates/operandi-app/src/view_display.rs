@@ -443,17 +443,23 @@ fn point_size() -> f32 {
 /// Visibility > Show Work Plane).
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
 pub enum WorkPlaneShow {
+    /// The default (Jason, 2026-11-23): the work plane's own display
+    /// (Show Work Plane, off by default) is the switch, so turning it on
+    /// shows the work plane at rest too.
+    #[default]
     Always,
     /// Only once the work plane has been moved or rotated away from its
     /// resting place (provisional: fixed, or centred off the origin).
-    #[default]
     Active,
     Never,
 }
 impl Drawing {
-    /// Whether the floor grid draws, given whether the work plane is moved.
-    pub fn floor_grid(&self, work_plane_moved: bool) -> bool {
-        self.grid && !(self.grid_follows_work_plane && work_plane_moved)
+    /// Whether the floor grid draws, given whether the work plane is moved
+    /// and whether its grid is drawn. Inactive Work Plane hands over to the
+    /// work plane's grid only when that grid is actually drawn, so turning
+    /// the work plane off never hides the ground grid with it.
+    pub fn floor_grid(&self, work_plane_moved: bool, work_plane_drawn: bool) -> bool {
+        self.grid && !(self.grid_follows_work_plane && work_plane_moved && work_plane_drawn)
     }
     /// Whether the work plane's grid draws, given whether it is moved.
     pub fn work_plane_grid(&self, work_plane_moved: bool) -> bool {
