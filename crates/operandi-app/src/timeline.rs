@@ -1474,7 +1474,8 @@ impl Operandi {
         let tip = format!("{name}{}\n{line}", self.shortcut(action));
         let button = crate::icons::button(ui, icon, "").min_size(vec2(22., 20.));
         let r = ui.add(button).on_hover_text(tip);
-        if r.clicked() {
+        // An empty line: a pop-up button the caller opens.
+        if r.clicked() && !line.is_empty() {
             self.execute(line);
         }
         r
@@ -1689,6 +1690,71 @@ impl Operandi {
                 "Animation Editors: the tall timeline and the Graph Editor together",
                 "",
                 "operandi.anim.editors",
+            );
+            // Rig phase 4: Constrain and Hierarchy pop-ups (the Animate
+            // menu's), Channel Links, Schematic and Bake Selected.
+            let constrain = self.tbi(
+                ui,
+                Icon::Constrain,
+                "Constrain: the first selected item follows the others",
+                "",
+                "",
+            );
+            let mut lines: Vec<String> = Vec::new();
+            egui::Popup::menu(&constrain).show(|ui| {
+                for kind in operandi_core::rig::CONSTRAINTS {
+                    if ui.button(operandi_core::rig::label(kind)).clicked() {
+                        lines.push(format!("operandi.rig.constrain kind:{kind}"));
+                        ui.close();
+                    }
+                }
+            });
+            let hierarchy = self.tbi(
+                ui,
+                Icon::Hierarchy,
+                "Hierarchy: parent, unparent, insert, extract, dynamic parents, Compensation",
+                "",
+                "",
+            );
+            egui::Popup::menu(&hierarchy).show(|ui| {
+                for (label, line) in [
+                    ("Parent", "operandi.rig.parent"),
+                    ("Unparent", "operandi.rig.unparent"),
+                    ("Insert", "operandi.rig.insert"),
+                    ("Extract", "operandi.rig.extract"),
+                    ("Add Parent", "operandi.rig.dynamicParentAdd"),
+                    ("Remove Dynamic Parent", "operandi.rig.dynamicParentRemove"),
+                    ("Compensation", "operandi.rig.compensation"),
+                ] {
+                    if ui.button(label).on_hover_text(line).clicked() {
+                        lines.push(line.into());
+                        ui.close();
+                    }
+                }
+            });
+            for l in lines {
+                self.execute(&l);
+            }
+            self.tbi(
+                ui,
+                Icon::ChannelLinks,
+                "Channel Links (RG-50)",
+                "",
+                "operandi.rig.links",
+            );
+            self.tbi(
+                ui,
+                Icon::Schematic,
+                "Schematic (RG-70)",
+                "",
+                "operandi.rig.schematicView",
+            );
+            self.tbi(
+                ui,
+                Icon::BakeKeys,
+                "Bake Selected: the evaluated motion as keys, rig pieces off",
+                "",
+                "operandi.rig.bake",
             );
         }
         // TK-41: Apply / Discard while edits are pending.
