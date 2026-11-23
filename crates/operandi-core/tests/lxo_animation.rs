@@ -57,6 +57,9 @@ impl File {
         let mut d = Vec::new();
         u32(&mut d, 2);
         f.chunk(b"ENCO", &d);
+        // Modo writes the item assignment table; Operandi's own export
+        // profile doesn't, so files here are read by the Modo rules.
+        f.chunk(b"IASS", &[]);
         let mut d = Vec::new();
         for t in tags {
             text(&mut d, t);
@@ -147,21 +150,97 @@ impl File {
         }
         self.chunk(b"ITEM", &d);
     }
+    /// An ACTN chunk: `name` is also its kind; `subs` its records.
+    fn action(&mut self, name: &str, id: u32, subs: &[([u8; 4], Vec<u8>)]) {
+        let mut d = Vec::new();
+        text(&mut d, name);
+        text(&mut d, name);
+        u32(&mut d, id);
+        for (sid, sd) in subs {
+            d.extend_from_slice(sid);
+            u16(&mut d, sd.len() as u16);
+            d.extend_from_slice(sd);
+            if sd.len() % 2 == 1 {
+                d.push(0);
+            }
+        }
+        self.chunk(b"ACTN", &d);
+    }
+    /// The file, ending with an empty setup action as every Modo file
+    /// has one.
     fn bytes(&self) -> Vec<u8> {
+        let mut end = File::default();
+        end.action("setup", 2, &[]);
         let mut out = b"FORM".to_vec();
-        u32(&mut out, self.body.len() as u32 + 4);
+        u32(&mut out, (self.body.len() + end.body.len()) as u32 + 4);
         out.extend_from_slice(b"LXOB");
         out.extend_from_slice(&self.body);
+        out.extend_from_slice(&end.body);
         out
     }
 }
 
 fn link(graph: &str, target: u32) -> ([u8; 4], Vec<u8>) {
+    link_at(graph, target, 0)
+}
+fn link_at(graph: &str, target: u32, ordinal: u32) -> ([u8; 4], Vec<u8>) {
     let mut d = Vec::new();
     text(&mut d, graph);
     u32(&mut d, target);
-    u32(&mut d, 0);
+    u32(&mut d, ordinal);
     (*b"LINK", d)
+}
+
+/// A CHNV vector channel (`pos` with X, Y, Z).
+fn vector(base: &str, v: [f64; 3]) -> ([u8; 4], Vec<u8>) {
+    let mut d = Vec::new();
+    text(&mut d, base);
+    u16(&mut d, 2);
+    u16(&mut d, 3);
+    for (c, x) in ["X", "Y", "Z"].iter().zip(v) {
+        text(&mut d, c);
+        f32(&mut d, x);
+    }
+    (*b"CHNV", d)
+}
+
+/// A string CHAN; `index` is the name's place in CHNM.
+fn string_channel(index: u32, value: &str) -> ([u8; 4], Vec<u8>) {
+    let mut d = Vec::new();
+    vx(&mut d, index);
+    u16(&mut d, 3);
+    text(&mut d, value);
+    (*b"CHAN", d)
+}
+
+/// Channel names every hierarchy file declares, in CHNM order.
+const NAMES: [&str; 3] = ["type", "order", "visible"];
+const TYPE: u32 = 0;
+const ORDER: u32 = 1;
+const VISIBLE: u32 = 2;
+
+/// A core transform item of `kind` moving `target`, at stack place `ordinal`.
+fn transform(
+    f: &mut File,
+    id: u32,
+    kind: &str,
+    target: u32,
+    ordinal: u32,
+    v: [f64; 3],
+    extra: &[([u8; 4], Vec<u8>)],
+) {
+    let base = match kind {
+        "translation" => "pos",
+        "rotation" => "rot",
+        _ => "scl",
+    };
+    let mut subs = vec![
+        string_channel(TYPE, "core"),
+        vector(base, v),
+        link_at("xfrmCore", target, ordinal),
+    ];
+    subs.extend(extra.iter().cloned());
+    f.item(kind, "", id, &subs);
 }
 
 fn import(bytes: &[u8]) -> lxo::Result<lxo::Candidate> {
@@ -259,4 +338,113 @@ fn a_parent_link_between_meshes_still_imports() {
     let c = import(&f.bytes()).unwrap();
     let child = c.scene.items.iter().find(|i| i.name == "Child").unwrap();
     assert_eq!(child.parent, Some(2));
+}
+
+// --- hierarchy --------------------------------------------------------------
+
+#[test]
+fn meshes_under_locators_keep_their_place() {
+    // Locator (moved to x 10) > Group Locator (rotated 90° about Y) > Mesh.
+    let mut f = File::new(&["Default"], &NAMES);
+    f.layer(0, "Mesh", 3);
+    f.points(&QUAD);
+    f.polygons(b"FACE", &[&[0, 3, 2, 1]]);
+    f.item("locator", "Rig", 1, &[]);
+    f.item("groupLocator", "Group", 2, &[link("parent", 1)]);
+    f.item("mesh", "Mesh", 3, &[link("parent", 2)]);
+    transform(&mut f, 10, "translation", 1, 2, [10., 0., 0.], &[]);
+    let quarter = std::f64::consts::FRAC_PI_2;
+    transform(
+        &mut f,
+        11,
+        "rotation",
+        2,
+        1,
+        [0., quarter, 0.],
+        &[string_channel(ORDER, "xyz")],
+    );
+    let c = import(&f.bytes()).unwrap();
+    let s = &c.scene;
+    assert_eq!(s.items.len(), 3);
+    let by = |n: &str| s.items.iter().find(|i| i.name == n).unwrap();
+    let (rig, group, mesh) = (by("Rig"), by("Group"), by("Mesh"));
+    assert!(rig.is_group_locator() && group.is_group_locator());
+    assert_eq!(group.parent, Some(rig.id));
+    assert_eq!(mesh.parent, Some(group.id));
+    assert_eq!(
+        group.transform.rotation_order(),
+        operandi_core::scene::RotationOrder::Xyz
+    );
+    // The mesh's +X corner (1, 0, 0) turns to -Z, then moves to x 10.
+    let w = s
+        .world_matrix(mesh.id)
+        .unwrap()
+        .transform_point3(glam::DVec3::X);
+    assert!((w - glam::DVec3::new(10., 0., -1.)).length() < 1e-6, "{w}");
+    assert_eq!(c.report.meshes, 1);
+    assert!(
+        c.report
+            .notes
+            .iter()
+            .any(|n| n == "2 locators and group locators imported as Group Locators")
+    );
+}
+
+#[test]
+fn the_core_transform_wins_over_a_zeroed_one() {
+    // "Zero transforms" leaves a second rotation in the stack; the core
+    // one carries the item's rotation, whatever order the items come in.
+    let mut f = File::new(&["Default"], &NAMES);
+    f.item("locator", "Loc", 1, &[]);
+    f.item(
+        "rotation",
+        "Rotation Zero",
+        2,
+        &[
+            string_channel(TYPE, "21"),
+            vector("rot", [0.5, 0., 0.]),
+            link_at("xfrmCore", 1, 2),
+        ],
+    );
+    transform(&mut f, 3, "rotation", 1, 1, [0.25, 0., 0.], &[]);
+    let c = import(&f.bytes()).unwrap();
+    assert_eq!(c.scene.items[0].transform.rotation.x, 0.25);
+    assert_eq!(
+        c.report.omissions["extra rotation transforms not combined"],
+        1
+    );
+}
+
+#[test]
+fn all_off_hides_the_item_and_its_children() {
+    let mut f = File::new(&["Default"], &NAMES);
+    f.item(
+        "groupLocator",
+        "Hidden",
+        1,
+        &[string_channel(VISIBLE, "allOff")],
+    );
+    f.item("locator", "Shown", 2, &[string_channel(VISIBLE, "default")]);
+    let c = import(&f.bytes()).unwrap();
+    let hidden = &c.scene.items[0];
+    assert!(!hidden.visible && hidden.hides_children);
+    assert!(c.scene.items[1].visible);
+}
+
+#[test]
+fn a_mesh_instance_shows_its_source_mesh() {
+    let mut f = File::new(&["Default"], &NAMES);
+    f.layer(0, "Mesh", 1);
+    f.points(&QUAD);
+    f.polygons(b"FACE", &[&[0, 3, 2, 1]]);
+    f.item("mesh", "Mesh", 1, &[]);
+    f.item("meshInst", "Copy", 2, &[link("source", 1)]);
+    transform(&mut f, 10, "translation", 2, 0, [0., 5., 0.], &[]);
+    let c = import(&f.bytes()).unwrap();
+    let copy = c.scene.items.iter().find(|i| i.name == "Copy").unwrap();
+    assert_eq!(copy.instance_of, Some(c.scene.items[0].id));
+    assert_eq!(copy.mesh.faces.len(), 1);
+    assert_eq!(copy.transform.translation.y, 5.);
+    // Counted once, as the source mesh.
+    assert_eq!(c.report.meshes, 1);
 }
