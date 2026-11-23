@@ -15,8 +15,8 @@
 //! Pattern channel names and Select by Selection Set's type id are
 //! Operandi's own.
 use crate::{Mesh, Result};
-use serde::{Deserialize, Serialize};
 use rand::prelude::*;
+use serde::{Deserialize, Serialize};
 
 /// Reserved polygon set names start with this (not typeable).
 const GROUP_PREFIX: &str = "\u{1}meshop:";
@@ -195,7 +195,7 @@ impl SelKind {
                     seed: 314159265,
                     probability: 50.0,
                 },
-            )
+            ),
         ]
     }
     pub fn label(&self) -> &'static str {
