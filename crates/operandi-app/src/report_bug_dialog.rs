@@ -77,6 +77,8 @@ impl ReportBug {
 
 fn rows(defaults: ReportOptions) -> Vec<form::Row> {
     vec![
+        // Says what OK does next (Jason 2026-11-23: a tester didn't know OK opens GitHub). Message row next to options, as in Delete Item; UIC-82 exception OK'd by Jason.
+        form::Row::message("OK opens a new issue on GitHub in your browser. Describe the problem there, then press Submit. The ticked items below are filled in for you."),
         form::Row::check("screenshot", "Screenshot", defaults.screenshot).tip(
             "A picture of the Operandi window. Saved on your computer; it only goes into the report if you paste or drag it in.",
         ),
@@ -545,7 +547,14 @@ mod tests {
             "held in memory, not saved"
         );
         let keys: Vec<_> = form.rows.iter().map(|r| r.key.as_str()).collect();
-        assert_eq!(keys, ["screenshot", "toolState", "commands", "log"]);
+        assert_eq!(
+            keys,
+            ["message", "screenshot", "toolState", "commands", "log"]
+        );
+        assert!(
+            form.rows[0].label.contains("GitHub"),
+            "the top line says OK opens GitHub"
+        );
         assert!(
             ["screenshot", "toolState", "commands", "log"]
                 .iter()
