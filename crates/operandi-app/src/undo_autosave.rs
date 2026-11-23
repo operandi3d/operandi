@@ -37,9 +37,10 @@ pub struct UndoAutosavePreferences {
     /// `None` uses the default folder in the app's data folder.
     pub backup_dir: Option<PathBuf>,
     pub revisions: u32,
-    /// Experimental: Animation (preview), the animation switch's
-    /// preference (anim_switch.rs).
-    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    /// Experimental: Animation, the animation switch's preference
+    /// (anim_switch.rs). On by default (Jason, 2026-11-23); turning it off
+    /// is saved.
+    #[serde(default = "yes", skip_serializing_if = "is_true")]
     pub animation_preview: bool,
     /// RG-11: rig Compensation (Animate > Hierarchy > Compensation), kept
     /// between sessions.
@@ -49,6 +50,12 @@ pub struct UndoAutosavePreferences {
     /// preference (python_switch.rs).
     #[serde(default, skip_serializing_if = "std::ops::Not::not")]
     pub python_preview: bool,
+}
+fn yes() -> bool {
+    true
+}
+fn is_true(b: &bool) -> bool {
+    *b
 }
 impl Default for UndoAutosavePreferences {
     fn default() -> Self {
@@ -67,7 +74,7 @@ impl Default for UndoAutosavePreferences {
             backup_dir: None,
             // Provisional (AS-Q1).
             revisions: 5,
-            animation_preview: false,
+            animation_preview: crate::anim_switch::DEFAULT_ON,
             rig_compensation: false,
             python_preview: false,
         }
@@ -482,11 +489,12 @@ impl super::Operandi {
         rows::section(ui, "Experimental", false, |ui| {
             rows::check_d(
                 ui,
-                "Animation (preview)",
+                "Animation",
                 &mut p.animation_preview,
                 d.animation_preview,
-                "Show the animation tools: the Animate layout and menu, the timeline, the \
-                 graph editor and keying. OPERANDI_ANIMATION=1 or 0 in the environment wins",
+                "The animation tools: the Animate layout and menu, the timeline, the graph \
+                 editor and keying (on by default; off hides them). OPERANDI_ANIMATION=1 or 0 \
+                 in the environment wins",
             );
             rows::check_d(
                 ui,
@@ -504,6 +512,8 @@ impl super::Operandi {
         }
         ui.add_space(8.);
         self.application_defaults_ui(ui);
+        ui.add_space(8.);
+        self.updates_preferences_ui(ui);
     }
     /// Preferences > Defaults > Auto-Save.
     pub(super) fn autosave_page(&mut self, ui: &mut egui::Ui) {

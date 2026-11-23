@@ -128,6 +128,7 @@ fn uic210_converted_menus_paint_as_the_old_ones() {
                 false
             ),
             ("Report Bug or Idea…".to_owned(), true, None, false),
+            ("Check for Updates".to_owned(), true, None, false),
         ]
     );
     // No native key equivalents, as before.
@@ -375,7 +376,8 @@ fn lay83_reorder_moves_a_control_and_the_selection_follows() {
     a.execute("operandi.form.move from:0 to:9");
     assert!(a.status.contains("controls"), "{}", a.status);
     a.execute("operandi.form.delete index:0");
-    assert_eq!(form(&a, "menu.help").controls.len(), 1);
+    // Documentation and Check for Updates are left.
+    assert_eq!(form(&a, "menu.help").controls.len(), 2);
 }
 
 #[test]

@@ -897,6 +897,7 @@ impl super::Operandi {
                     self.defaults_preferences
                         .save(&paths.defaults_preferences()),
                 );
+                note(self.reset_update_preferences());
             }
             Page::AutoSave => {
                 let factory = crate::undo_autosave::UndoAutosavePreferences::default();

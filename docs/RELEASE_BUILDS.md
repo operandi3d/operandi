@@ -84,7 +84,8 @@ The result is `~/Developer/Operandi-Builds/Operandi <branch> <commit> Windows.zi
 
 ## Animation in test builds
 
-Animation is hidden by default until launch. Testers turn it on with
-Preferences > Defaults > Application > Experimental > Animation (preview),
-or by starting the app with `OPERANDI_ANIMATION=1` (see SETUP.md,
-"Animation (preview, hidden by default)").
+Animation shows by default. Testers can turn it off with Preferences >
+Defaults > Application > Experimental > Animation, or start the app with
+`OPERANDI_ANIMATION=0` (see SETUP.md, "Animation (on by default)"). Python
+scripting stays opt-in (Experimental > Python scripting, or
+`OPERANDI_PYTHON=1`).

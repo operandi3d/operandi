@@ -349,6 +349,8 @@ mod ui_preferences;
 mod unavailable;
 mod undo_autosave;
 mod units_preferences;
+mod update_check;
+mod update_check_ui;
 mod uv_checker;
 mod uv_dialogs;
 mod uv_edit_ui;
@@ -492,6 +494,8 @@ struct Operandi {
     status: String,
     /// "Operandi crashed last time. Report it?" (bug_report.rs).
     crash_prompt: bug_report::CrashPrompt,
+    /// Help > Check for Updates and the launch check (update_check.rs).
+    update_check: update_check::UpdateCheck,
     bridge_ui: bridge_panel::BridgeUi,
     fields: BTreeMap<String, String>,
     confirmed_fields: BTreeMap<String, String>,
@@ -1245,6 +1249,8 @@ impl Operandi {
         anim_switch::set_preference(app.undo_autosave.animation_preview);
         app.editor.rig_compensation = app.undo_autosave.rig_compensation;
         python_switch::set_preference(app.undo_autosave.python_preview);
+        app.update_check.prefs =
+            update_check::UpdatePreferences::load(&app.environment.paths().update_preferences());
         app.view_presets = view_display::Presets::load(&app.environment.paths().viewport_presets());
         // Layouts (layouts.rs): the one open at quit, or the old layout
         // files read once as the Model layout.
@@ -1343,6 +1349,7 @@ impl Operandi {
             key_hold: None,
             frame_status: String::new(),
             crash_prompt: Default::default(),
+            update_check: Default::default(),
             frame_action: false,
             editor_owned_input: false,
             menu_owned_input: false,
@@ -2731,6 +2738,8 @@ impl Operandi {
                 self.shading.confirm_delete.is_some(),
                 "shader Delete question",
             ),
+            // Last: it waits until every dialog above is closed.
+            (self.update_dialog_open(), update_check_ui::DIALOG_NAME),
         ];
         open.into_iter().find(|(on, _)| *on).map(|(_, name)| name)
     }
@@ -3468,6 +3477,7 @@ impl Operandi {
         self.usd_import_dialog(ctx);
         self.flip_it_dialog(ctx);
         self.report_bug_frame(ctx);
+        self.update_check_dialogs(ctx);
         self.subdivide_dialogs(ctx);
         self.detriangulate_dialog(ctx);
         self.curves_color_dialog(ctx);
@@ -3665,6 +3675,8 @@ impl eframe::App for Operandi {
         self.sync_window_title(ctx);
         log_ring::note_status(&self.status);
         self.end_frame(ctx);
+        // After the first frame, so the window is up before any prompt.
+        self.launch_update_check(ctx);
         bug_report::test_crash_after_first_frame();
     }
 }

@@ -2229,6 +2229,7 @@ fn tables(r: &mut Commands) {
     on(r, &["operandi.help.documentation"], |a, _| {
         a.open_documentation()
     });
+    on(r, &["operandi.update.check"], |a, _| a.check_for_updates());
     fn tool_set(rest: &str) -> Option<toolbox::ToolSet> {
         let tokens = command::tokens(rest).ok()?;
         let args =

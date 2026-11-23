@@ -204,23 +204,17 @@ cargo run --locked -p operandi-app --no-default-features
 
 `scripts/check-no-painting.sh` checks that such a build has none of it.
 
-### Animation (preview, hidden by default)
+### Animation (on by default)
 
 Animation (keys, the timeline, the graph editor, the Animate layout and
-menu) is built in but hidden until launch. Turn it on with
-Preferences > Defaults > Application > Experimental > **Animation
-(preview)**, or start Operandi with `OPERANDI_ANIMATION=1` in the
-environment (it wins over the preference; `OPERANDI_ANIMATION=0` forces it
-off). For a test app:
+menu, rigging) shows by default. Turn it off with Preferences > Defaults >
+Application > Experimental > **Animation**, or start Operandi with
+`OPERANDI_ANIMATION=0` in the environment (it wins over the preference;
+`OPERANDI_ANIMATION=1` forces it on).
 
-```bash
-OPERANDI_ANIMATION=1 open "Operandi <name>.app"
-```
-
-(or tick the preference once in that app). While it's off, scenes with
-keys still open, play their pose and save their keys, and scripts and the
-MCP bridge still run every animation command. Launch day: flip
-`DEFAULT_ON` in `crates/operandi-app/src/anim_switch.rs`.
+While it's off, scenes with keys still open, play their pose and save
+their keys, and scripts and the MCP bridge still run every animation
+command.
 
 ### App bundles (macOS)
 
