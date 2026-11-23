@@ -832,6 +832,9 @@ pub struct Editor {
     /// MeshOps results (meshops.rs): a cache shared by clones, never part
     /// of the scene (SAFE-03).
     pub meshops: crate::meshops::Runtime,
+    /// The scene's evaluation graph (eval_state.rs): a cache, never part
+    /// of the scene or undo (AR-04, AR-15).
+    pub eval: crate::eval_state::EvalState,
     /// The mesh in Edit Base Mesh (MO-27): direct tools edit its Base Mesh.
     pub base_edit: Option<u64>,
     /// The selected row of the Mesh Operations list.

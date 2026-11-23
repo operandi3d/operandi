@@ -3079,6 +3079,16 @@ pub static COMMANDS: &[Entry] = &[
         .quiet()
         .operandi()
         .example("operandi.anim.query frames:0,12,24"),
+    script("operandi.eval.graph", Items, "Reads the scene's evaluation graph (who reads whom: time, channels, fields, transforms, shown meshes) as JSON nodes and edges (UIC-163; the Schematic's data).")
+        .on_editor(
+            "Read the evaluation graph as JSON: nodes (id, kind time/channel/field/transform/shownMesh, item, name, label, dirty) and edges [from, to] (to reads from). item limits it to one item's nodes and the edges touching them.",
+            &[jopt("item", "integer", "Only this item's nodes.")],
+            crate::eval_state::run,
+        )
+        .query()
+        .quiet()
+        .operandi()
+        .example("operandi.eval.graph"),
     script("operandi.render.frameRange", Render, "Renders a frame range with Cycles, one numbered image per frame, into the project's renders folder (TL-70); needs the running app.")
         .on_editor(
             "Render frames start..end (default the current range) with Cycles into folder (default the project's renders/) as <name>_0000.png; needs the running app. operandi.anim.query reports progress (job).",
@@ -6485,7 +6495,7 @@ mod tests {
                 assert!(!json.about.is_empty(), "{}", e.name);
             }
         }
-        assert_eq!(crate::command_exec::specs().count(), 227);
+        assert_eq!(crate::command_exec::specs().count(), 228);
     }
 
     #[test]

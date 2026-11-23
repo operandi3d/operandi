@@ -348,3 +348,48 @@ fn graph_editor_tools_through_the_bridge() {
     assert_eq!(xch["keys"][0]["frame"], 30.);
     let _ = std::fs::remove_dir_all(&dir);
 }
+
+/// The evaluation graph through the bridge (EVAL-GRAPH-PROPOSAL step 8):
+/// a keyed channel reads Time and drives its item's transform.
+#[test]
+fn the_eval_graph_through_the_bridge() {
+    let mut b = Bridge::new();
+    let added = call(&mut b, "primitive_add", json!({"shape": "cube"})).unwrap();
+    let id = added["active"]["item"].as_u64().unwrap();
+    let y = format!("{id}:pos.Y");
+    run(
+        &mut b,
+        "operandi.key.add",
+        json!({"channel": y, "frame": 0, "value": 0}),
+    );
+    run(
+        &mut b,
+        "operandi.key.add",
+        json!({"channel": y, "frame": 10, "value": 2}),
+    );
+    let out = call(
+        &mut b,
+        "command_run",
+        json!({"command": "operandi.eval.graph", "args": {"item": id}}),
+    )
+    .unwrap();
+    let v: Value = serde_json::from_str(out["value"].as_str().unwrap()).unwrap();
+    let node = |kind: &str| {
+        v["nodes"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|n| n["kind"] == kind)
+            .unwrap_or_else(|| panic!("no {kind} node in {v}"))["id"]
+            .as_u64()
+            .unwrap()
+    };
+    let (channel, field, transform) = (node("channel"), node("field"), node("transform"));
+    let edges = v["edges"].as_array().unwrap();
+    let has = |a: u64, b: u64| edges.iter().any(|e| e[0] == a && e[1] == b);
+    assert!(has(channel, field) && has(field, transform), "{v}");
+    assert!(
+        edges.iter().any(|e| e[1] == channel),
+        "the channel reads Time: {v}"
+    );
+}

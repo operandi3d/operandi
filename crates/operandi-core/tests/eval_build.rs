@@ -117,3 +117,79 @@ fn an_empty_scene_has_just_time() {
     assert_eq!(g.len(), 1);
     assert_eq!(g.key(g.id(&NodeKey::Time).unwrap()), &NodeKey::Time);
 }
+
+/// Step 5: each document keeps its own graph, rebuilt only when its
+/// structure changes; the graph is no part of undo or editor equality.
+#[test]
+fn each_document_keeps_its_graph_and_it_is_not_document_data() {
+    let (mut e, a, _) = keyed();
+    let g1 = e.eval.graph(&e.scene);
+    // A value edit keeps the cached graph (same Arc).
+    ok(
+        &mut e,
+        &format!("operandi.key.add channel:{a}:pos.Y frame:10 value:7"),
+    );
+    assert!(std::sync::Arc::ptr_eq(&g1, &e.eval.graph(&e.scene)));
+    // A new channel rebuilds it.
+    ok(
+        &mut e,
+        &format!("operandi.key.add channel:{a}:rot.Z frame:0 value:0"),
+    );
+    let g2 = e.eval.graph(&e.scene);
+    assert!(!std::sync::Arc::ptr_eq(&g1, &g2));
+    assert!(g2.id(&NodeKey::Channel(a, "rot.Z".into())).is_some());
+    // Undo is about the scene; the graph follows the restored structure.
+    e.dispatch(Command::Undo).unwrap();
+    assert!(
+        e.eval
+            .graph(&e.scene)
+            .id(&NodeKey::Channel(a, "rot.Z".into()))
+            .is_none()
+    );
+    // Another scene tab has its own graph.
+    let mut other = Editor::default();
+    e.swap_document_state(&mut other);
+    assert!(
+        e.eval
+            .graph(&e.scene)
+            .id(&NodeKey::Channel(a, "pos.Y".into()))
+            .is_none()
+    );
+    e.swap_document_state(&mut other);
+    assert!(e.eval.cached_for(&e.scene));
+    // Equality ignores it.
+    let mut copy = e.clone();
+    copy.eval = Default::default();
+    assert!(copy == e);
+}
+
+#[test]
+fn the_eval_graph_query_lists_nodes_and_edges() {
+    let (e, a, _) = keyed();
+    let text = operandi_core::command_exec::answer(&e, "operandi.eval.graph", &Default::default())
+        .expect("a query")
+        .unwrap();
+    let v: serde_json::Value = serde_json::from_str(&text).unwrap();
+    let nodes = v["nodes"].as_array().unwrap();
+    assert!(nodes.iter().any(|n| n["kind"] == "time"));
+    assert!(
+        nodes
+            .iter()
+            .any(|n| n["kind"] == "channel" && n["item"] == a && n["name"] == "pos.Y")
+    );
+    assert!(!v["edges"].as_array().unwrap().is_empty());
+    // As a typed line too, and one item's part.
+    let mut e = e;
+    let one = command_line::run_line(&mut e, &format!("operandi.eval.graph item:{a}"))
+        .unwrap()
+        .unwrap()
+        .unwrap();
+    let v: serde_json::Value = serde_json::from_str(&one).unwrap();
+    assert!(
+        v["nodes"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .all(|n| n["item"] == a)
+    );
+}

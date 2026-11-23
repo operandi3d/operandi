@@ -642,6 +642,8 @@ used in the app; `primitive_add` always starts from the Reset values.
   - `channels` (string): Only these channels, item:name,...
   - `item` (integer): Only this item's channels.
   - `frames` (string): Frames to read each curve at, comma separated.
+- **`operandi.eval.graph`** — Read the evaluation graph as JSON: nodes (id, kind time/channel/field/transform/shownMesh, item, name, label, dirty) and edges [from, to] (to reads from). item limits it to one item's nodes and the edges touching them.
+  - `item` (integer): Only this item's nodes.
 - **`operandi.render.frameRange`** — Render frames start..end (default the current range) with Cycles into folder (default the project's renders/) as <name>_0000.png; needs the running app. operandi.anim.query reports progress (job).
   - `start` (number): First frame (default the current range's).
   - `end` (number): Last frame (default the current range's).
