@@ -280,13 +280,21 @@ mod tests {
 
     #[test]
     fn relative_to_uses_forward_slashes_and_needs_inside() {
-        let root = Path::new("/p/Proj");
+        // An absolute path needs a drive letter on Windows.
+        let abs = |p: &str| {
+            PathBuf::from(if cfg!(windows) {
+                format!("C:{p}")
+            } else {
+                p.into()
+            })
+        };
+        let root = &abs("/p/Proj");
         assert_eq!(
-            relative_to(root, Path::new("/p/Proj/sourceimages/w/oak.png")).as_deref(),
+            relative_to(root, &abs("/p/Proj/sourceimages/w/oak.png")).as_deref(),
             Some("sourceimages/w/oak.png")
         );
-        assert_eq!(relative_to(root, Path::new("/p/Other/oak.png")), None);
-        assert_eq!(relative_to(root, Path::new("/p/Proj")), None);
+        assert_eq!(relative_to(root, &abs("/p/Other/oak.png")), None);
+        assert_eq!(relative_to(root, &abs("/p/Proj")), None);
         assert_eq!(relative_to(root, Path::new("rel/oak.png")), None);
     }
 }

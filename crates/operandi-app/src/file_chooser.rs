@@ -672,7 +672,7 @@ mod tests {
         let item = a.editor.scene.selection.item.unwrap();
         let before = a.editor.scene.images.len();
         a.chosen(Purpose::BackdropImage(item), picture.clone());
-        let copy = root.join("references/ref.png");
+        let copy = root.join("references").join("ref.png");
         assert!(copy.is_file() && picture.is_file());
         assert!(
             a.editor

@@ -982,9 +982,12 @@ fn remove(mesh: &Mesh, edges: &[(u32, u32)], clean: bool) -> Result<(Mesh, Vec<(
 /// 2026-11-10, provisional ER-Q01): a point no polygon uses, or one left
 /// between exactly two interior edges, as removing an edge loop leaves all
 /// along it. Such a point only splits a polygon side, so it goes from its
-/// polygons and the mesh. Border points stay (CMD-E-01/02 measured only
-/// points that keep other edges), as do points a polyline uses, and a
-/// point is kept if taking it out would leave a polygon under three sides.
+/// polygons and the mesh. A border point goes too when it is left between
+/// two border edges of one polygon that run in a straight line, as the
+/// ends of a loop cut across an open surface are (issue #5); a border
+/// point at a real corner stays, so the outline keeps its shape. Points a
+/// polyline uses stay, and a point is kept if taking it out would leave a
+/// polygon under three sides.
 fn leftover_points(out: &Mesh, chosen: &BTreeSet<(u32, u32)>) -> Vec<u32> {
     let uses = edge_uses(out);
     let mut around: BTreeMap<u32, Vec<(u32, u32)>> = BTreeMap::new();
@@ -1009,7 +1012,8 @@ fn leftover_points(out: &Mesh, chosen: &BTreeSet<(u32, u32)>) -> Vec<u32> {
     for (&v, edges) in &around {
         let unused = edges.is_empty();
         let in_a_run = edges.len() == 2 && edges.iter().all(|e| uses[e].len() == 2);
-        if on_polyline.contains(&v) || !(unused || in_a_run) {
+        let on_straight_border = straight_border_point(out, &uses, v, edges);
+        if on_polyline.contains(&v) || !(unused || in_a_run || on_straight_border) {
             continue;
         }
         let faces: BTreeSet<usize> = edges
@@ -1026,6 +1030,32 @@ fn leftover_points(out: &Mesh, chosen: &BTreeSet<(u32, u32)>) -> Vec<u32> {
         leftover.push(v);
     }
     leftover
+}
+
+/// `v` sits between exactly two border edges of the same polygon, and
+/// they run in a straight line through it (issue #5).
+fn straight_border_point(out: &Mesh, uses: &EdgeUses, v: u32, edges: &[(u32, u32)]) -> bool {
+    let [e1, e2] = edges else {
+        return false;
+    };
+    let (Some([(f1, _, _)]), Some([(f2, _, _)])) =
+        (uses.get(e1).map(|u| &u[..]), uses.get(e2).map(|u| &u[..]))
+    else {
+        return false;
+    };
+    if f1 != f2 {
+        return false;
+    }
+    let other = |&(a, b): &(u32, u32)| if a == v { b } else { a };
+    let p = out.vertices[v as usize];
+    let a = out.vertices[other(e1) as usize] - p;
+    let b = out.vertices[other(e2) as usize] - p;
+    let (la, lb) = (a.length(), b.length());
+    if la <= 1e-12 || lb <= 1e-12 {
+        return false;
+    }
+    // Opposite directions, within about a tenth of a degree.
+    a.dot(b) / (la * lb) < -(1.0 - 1e-6)
 }
 
 fn spin(mesh: &Mesh, edges: &[(u32, u32)]) -> Result<(Mesh, Vec<(u32, u32)>)> {

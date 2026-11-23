@@ -12,6 +12,10 @@
 //! block, then the parser's "framing"), `Control::used`, the refusal category,
 //! and unchanged task-owned copies, mtimes and a sentinel. The heap-order
 //! witness for the same refusal is in `lxo_allocation_measurement.rs`.
+//!
+//! The one test here reads `/dev/zero` as an endless stream, so the whole
+//! file is Unix-only (its helpers would be unused elsewhere).
+#![cfg(unix)]
 
 use operandi_core::lxo;
 use std::panic::{AssertUnwindSafe, catch_unwind};

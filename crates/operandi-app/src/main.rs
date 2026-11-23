@@ -3555,6 +3555,9 @@ impl eframe::App for Operandi {
     fn on_exit(&mut self) {
         self.main_window
             .save(&self.environment.paths().main_window());
+        // A quit during a camera drag keeps the view (persist_layout waits
+        // for the drag to end).
+        self.persist_layout_on_exit();
         self.autosave_quit();
     }
     fn raw_input_hook(&mut self, ctx: &Context, input: &mut RawInput) {

@@ -35,6 +35,12 @@ fn copy_dir(from: &Path, to: &Path) {
     }
 }
 
+/// `rel` (written with `/`) as a path with this system's separators, so it
+/// compares equal to the paths the loader builds.
+fn native(rel: &str) -> PathBuf {
+    rel.split('/').collect()
+}
+
 fn s(p: &Path) -> String {
     p.to_string_lossy().into_owned()
 }
@@ -84,15 +90,15 @@ fn copied_project_finds_its_files_and_outside_files_stay_absolute() {
     let base = scratch("copy");
     let a = base.join("A");
     Project::create(&a, "A").unwrap();
-    let oak = a.join("sourceimages/wood/oak.png");
-    let ies = a.join("sourceimages/down.ies");
-    let render = a.join("renders/shot.exr");
-    let outside = base.join("elsewhere/ref.png");
+    let oak = a.join(native("sourceimages/wood/oak.png"));
+    let ies = a.join(native("sourceimages/down.ies"));
+    let render = a.join(native("renders/shot.exr"));
+    let outside = base.join(native("elsewhere/ref.png"));
     for f in [&oak, &ies, &outside] {
         touch(f);
     }
     let scene = scene_using(&oak, &ies, &outside, &render);
-    let file = a.join("scenes/shot.opscene");
+    let file = a.join(native("scenes/shot.opscene"));
     persistence::save(&file, &scene).unwrap();
 
     let text = std::fs::read_to_string(&file).unwrap();
@@ -109,13 +115,19 @@ fn copied_project_finds_its_files_and_outside_files_stay_absolute() {
     assert_eq!(persistence::load(&file).unwrap(), scene);
 
     // Copy the project; the copy's scene points into the copy.
-    let b = base.join("moved/B");
+    let b = base.join(native("moved/B"));
     copy_dir(&a, &b);
     std::fs::remove_dir_all(&a).unwrap();
-    let back = persistence::load(&b.join("scenes/shot.opscene")).unwrap();
-    assert_eq!(back.images[0].path, s(&b.join("sourceimages/wood/oak.png")));
+    let back = persistence::load(&b.join(native("scenes/shot.opscene"))).unwrap();
+    assert_eq!(
+        back.images[0].path,
+        s(&b.join(native("sourceimages/wood/oak.png")))
+    );
     assert_eq!(back.images[1].path, s(&outside));
-    assert_eq!(graph_image(&back), s(&b.join("sourceimages/wood/oak.png")));
+    assert_eq!(
+        graph_image(&back),
+        s(&b.join(native("sourceimages/wood/oak.png")))
+    );
     let photometry = back
         .items
         .iter()
@@ -123,11 +135,11 @@ fn copied_project_finds_its_files_and_outside_files_stay_absolute() {
         .unwrap();
     assert_eq!(
         photometry.photometry_file,
-        s(&b.join("sourceimages/down.ies"))
+        s(&b.join(native("sourceimages/down.ies")))
     );
     for output in back.shader_tree.outputs.values() {
         if !output.filename.is_empty() {
-            assert_eq!(output.filename, s(&b.join("renders/shot.exr")));
+            assert_eq!(output.filename, s(&b.join(native("renders/shot.exr"))));
         }
     }
 }
@@ -139,10 +151,10 @@ fn a_scene_outside_any_project_keeps_absolute_paths() {
     let base = scratch("recovery");
     let a = base.join("A");
     Project::create(&a, "A").unwrap();
-    let oak = a.join("sourceimages/oak.png");
+    let oak = a.join(native("sourceimages/oak.png"));
     touch(&oak);
-    let scene = scene_using(&oak, &oak, &oak, &a.join("renders/r.exr"));
-    let journal = base.join("AppData/recovery.opscene");
+    let scene = scene_using(&oak, &oak, &oak, &a.join(native("renders/r.exr")));
+    let journal = base.join(native("AppData/recovery.opscene"));
     std::fs::create_dir_all(journal.parent().unwrap()).unwrap();
     persistence::save(&journal, &scene).unwrap();
     let text = std::fs::read_to_string(&journal).unwrap();
@@ -155,13 +167,13 @@ fn a_scene_outside_any_project_keeps_absolute_paths() {
 fn an_old_absolute_scene_loads_unchanged_inside_a_project() {
     let a = scratch("old").join("A");
     Project::create(&a, "A").unwrap();
-    let oak = a.join("sourceimages/oak.png");
+    let oak = a.join(native("sourceimages/oak.png"));
     touch(&oak);
     let mut scene = Scene::default();
     scene.new_mesh().unwrap();
     scene.image_for_path(&s(&oak), 4, 4).unwrap();
     // What a build before version 48 wrote: absolute, older version.
-    let file = a.join("scenes/old.opscene");
+    let file = a.join(native("scenes/old.opscene"));
     std::fs::write(&file, persistence::encode(&scene).unwrap()).unwrap();
     let text = std::fs::read_to_string(&file).unwrap();
     assert!(!text.contains("\"version\": 48"));
@@ -180,15 +192,15 @@ fn without_the_manifest_the_scene_folder_ancestors_are_tried() {
     let base = scratch("fallback");
     let a = base.join("A");
     Project::create(&a, "A").unwrap();
-    let oak = a.join("sourceimages/oak.png");
-    let gone = a.join("sourceimages/gone.png");
+    let oak = a.join(native("sourceimages/oak.png"));
+    let gone = a.join(native("sourceimages/gone.png"));
     touch(&oak);
     touch(&gone);
     let mut scene = Scene::default();
     scene.new_mesh().unwrap();
     scene.image_for_path(&s(&oak), 4, 4).unwrap();
     scene.image_for_path(&s(&gone), 4, 4).unwrap();
-    let file = a.join("scenes/s.opscene");
+    let file = a.join(native("scenes/s.opscene"));
     persistence::save(&file, &scene).unwrap();
     std::fs::remove_file(a.join(project::MANIFEST)).unwrap();
     std::fs::remove_file(&gone).unwrap();
@@ -204,12 +216,12 @@ fn without_the_manifest_the_scene_folder_ancestors_are_tried() {
 fn a_missing_file_in_the_project_resolves_to_where_it_belongs() {
     let a = scratch("missing").join("A");
     Project::create(&a, "A").unwrap();
-    let oak = a.join("sourceimages/oak.png");
+    let oak = a.join(native("sourceimages/oak.png"));
     touch(&oak);
     let mut scene = Scene::default();
     scene.new_mesh().unwrap();
     scene.image_for_path(&s(&oak), 4, 4).unwrap();
-    let file = a.join("scenes/s.opscene");
+    let file = a.join(native("scenes/s.opscene"));
     persistence::save(&file, &scene).unwrap();
     std::fs::remove_file(&oak).unwrap();
     assert_eq!(persistence::load(&file).unwrap().images[0].path, s(&oak));
@@ -219,9 +231,9 @@ fn a_missing_file_in_the_project_resolves_to_where_it_belongs() {
 fn copy_into_reuses_identical_files_and_numbers_clashes() {
     use operandi_core::project_paths::{Adopted, copy_into};
     let base = scratch("copy-into");
-    let folder = base.join("P/sourceimages");
-    let a = base.join("one/oak.png");
-    let b = base.join("two/oak.png");
+    let folder = base.join(native("P/sourceimages"));
+    let a = base.join(native("one/oak.png"));
+    let b = base.join(native("two/oak.png"));
     std::fs::create_dir_all(a.parent().unwrap()).unwrap();
     std::fs::create_dir_all(b.parent().unwrap()).unwrap();
     std::fs::write(&a, b"first").unwrap();

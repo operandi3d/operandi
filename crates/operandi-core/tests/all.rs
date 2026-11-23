@@ -156,6 +156,8 @@ mod edge_bevel_normal_map;
 mod edge_bevel_options;
 #[path = "edge_commands.rs"]
 mod edge_commands;
+#[path = "edge_delete_border_points.rs"]
+mod edge_delete_border_points;
 #[path = "edge_extend_extrude.rs"]
 mod edge_extend_extrude;
 #[path = "edge_extend_rotate_scale.rs"]

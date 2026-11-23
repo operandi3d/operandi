@@ -144,7 +144,9 @@ fn tp12_remove_polygon_edge_and_vertex() {
     .unwrap();
     assert_eq!(mesh(&e).faces.len(), 3);
     e.dispatch(Command::Undo).unwrap();
-    // Interior vertex (the centre, point 4): the four quads become one.
+    // Interior vertex (the centre, point 4): the four quads become one,
+    // and the border midpoints its edges left in a straight line go too
+    // (issue #5), leaving the four corners.
     pen(
         &mut e,
         PenEdit::Remove {
@@ -157,7 +159,7 @@ fn tp12_remove_polygon_edge_and_vertex() {
     .unwrap();
     let m = mesh(&e);
     assert_eq!(m.faces.len(), 1);
-    assert_eq!(m.vertices.len(), 8);
+    assert_eq!(m.vertices.len(), 4);
     e.dispatch(Command::Undo).unwrap();
     // Border edges are never removed, and a refusal is no undo step.
     let steps = e.undo.len();

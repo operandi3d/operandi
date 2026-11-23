@@ -481,6 +481,9 @@ fn load_forms(path: &Path, control: &mut Control<'_>, forms: &[[u8; 4]]) -> Resu
     let buffer = read_source(file, meta.len(), control)?;
     control.check("framing")?;
     let mut candidate = parse_reserved(&buffer.bytes, control, forms)?;
+    // Device and inode are filled in below on Unix only; elsewhere they stay
+    // `None` and `source` is never changed.
+    #[cfg_attr(not(unix), allow(unused_mut))]
     let mut source = crate::ImportSource {
         path: path
             .canonicalize()

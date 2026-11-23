@@ -1354,3 +1354,82 @@ fn companion_uv_view_and_matching_layout_highlight() {
     assert!(a.layout_matches_screen("UV"));
     assert!(!a.layout_matches_screen("Model"));
 }
+
+/// An orbit drag changes the layout (it holds the camera) on every frame;
+/// the file is written once the drag ends, not on every frame of it.
+/// Writing it every frame froze Windows for 100-300 ms now and then.
+#[test]
+fn camera_drag_writes_the_layout_once_it_ends() {
+    let root = data_root();
+    let ctx = Context::default();
+    let mut a = launch(&root, &ctx);
+    a.camera.view = crate::camera::View::Perspective;
+    frames(&mut a, &ctx, 2);
+    let name = a.layouts.current.clone();
+    let path = a.layout_file(&name).expect("a layout file path");
+    let read = || std::fs::read_to_string(&path).unwrap_or_default();
+    let before = read();
+    let c = a.viewport_rect.center();
+    let press = |pressed, pos| Event::PointerButton {
+        pos,
+        button: PointerButton::Primary,
+        pressed,
+        modifiers: Modifiers::ALT,
+    };
+    let step = |a: &mut Operandi, events| {
+        draw(a, &ctx, SIZE, events);
+        a.persist_layout(&ctx);
+    };
+    step(&mut a, vec![Event::PointerMoved(c)]);
+    step(&mut a, vec![press(true, c)]);
+    let yaw = a.camera.yaw;
+    for k in 1..=5 {
+        step(
+            &mut a,
+            vec![Event::PointerMoved(c + vec2(20. * k as f32, 0.))],
+        );
+    }
+    assert!(a.navigation.is_some(), "Alt+left drag orbits");
+    assert_ne!(a.camera.yaw, yaw, "the view turned");
+    assert_eq!(read(), before, "no layout writes during the drag");
+    step(&mut a, vec![press(false, c + vec2(100., 0.))]);
+    step(&mut a, vec![]);
+    assert!(a.navigation.is_none());
+    assert_ne!(read(), before, "the turned view is saved after the drag");
+}
+
+/// A wheel zoom is smoothed over several frames, each changing the camera;
+/// the layout is written once the wheel goes quiet, not on each of them.
+#[test]
+fn wheel_zoom_writes_the_layout_once_it_settles() {
+    let root = data_root();
+    let ctx = Context::default();
+    let mut a = launch(&root, &ctx);
+    a.camera.view = crate::camera::View::Perspective;
+    frames(&mut a, &ctx, 2);
+    let name = a.layouts.current.clone();
+    let path = a.layout_file(&name).expect("a layout file path");
+    let read = || std::fs::read_to_string(&path).unwrap_or_default();
+    let before = read();
+    let distance = a.camera.distance;
+    let c = a.viewport_rect.center();
+    draw(&mut a, &ctx, SIZE, vec![Event::PointerMoved(c)]);
+    a.persist_layout(&ctx);
+    for _ in 0..3 {
+        draw(
+            &mut a,
+            &ctx,
+            SIZE,
+            vec![Event::MouseWheel {
+                unit: egui::MouseWheelUnit::Point,
+                delta: vec2(0., 40.),
+                modifiers: Modifiers::NONE,
+            }],
+        );
+        a.persist_layout(&ctx);
+    }
+    assert_ne!(a.camera.distance, distance, "the wheel zoomed");
+    assert_eq!(read(), before, "no layout writes while the wheel turns");
+    frames(&mut a, &ctx, 60);
+    assert_ne!(read(), before, "the zoomed view is saved once it settles");
+}

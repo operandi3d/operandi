@@ -748,10 +748,15 @@ mod tests {
 
     #[test]
     fn screenshots_are_full_size_pngs_and_the_eleventh_deletes_the_oldest() {
+        // Nanoseconds, not `SystemTime`'s Debug text: that has `:` and
+        // braces, which Windows refuses in a folder name.
         let dir = std::env::temp_dir().join(format!(
-            "operandi-report-shots-{}-{:?}",
+            "operandi-report-shots-{}-{}",
             std::process::id(),
             std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
         ));
         let (w, h) = (37u32, 21u32);
         let rgba = vec![200u8; (w * h * 4) as usize];

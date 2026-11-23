@@ -779,6 +779,20 @@ impl Operandi {
         if self.layouts.migrating {
             return;
         }
+        // The layout holds each view's camera, so an orbit, pan or zoom
+        // drag changes it every frame. Writing the file that often froze
+        // Windows for 100-300 ms now and then (the write waits on the
+        // virus scanner). It is written once the drag ends, and on quit.
+        // A wheel zoom is smoothed over several frames, so it waits the
+        // same way until the wheel goes quiet. The extra frame makes sure
+        // the held-back write happens even if nothing else redraws.
+        let scrolling = ctx.input(|i| {
+            i.smooth_scroll_delta != egui::Vec2::ZERO || i.raw_scroll_delta != egui::Vec2::ZERO
+        });
+        if self.navigation.is_some() || scrolling {
+            ctx.request_repaint();
+            return;
+        }
         self.note_torn_windows();
         self.write_current_layout();
     }
@@ -790,6 +804,13 @@ impl Operandi {
 
     pub(super) fn persist_layout_file(&mut self) {
         self.write_current_layout();
+    }
+
+    /// On quit: write what a camera drag still held back (persist_layout).
+    pub(super) fn persist_layout_on_exit(&mut self) {
+        if !self.layouts.migrating {
+            self.write_current_layout();
+        }
     }
 
     /// Write the current layout's file when it changed, or take the user's
