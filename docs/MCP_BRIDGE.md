@@ -769,6 +769,43 @@ used in the app; `primitive_add` always starts from the Reset values.
 - **`operandi.anim.restoreSetup`** — Throw away the edit values (the keys) of the items' animated channels and put back their setup values, one undo step. channels limits it to names such as pos.Y.
   - `items` (string): Item ids (default the selection).
   - `channels` (string): Only these channels, comma separated.
+- **`operandi.skel.add`** — Add a joint at a world position, as a child of parent (or a new chain's root), one undo step. symmetry X/Y/Z also adds the mirrored joint under the mirrored parent, named with the side suffixes; the parent is re-aimed at its new first child unless preserveAlignment.
+  - `position` (string, required): World position x,y,z.
+  - `parent` (integer): Parent joint id (none: a new root).
+  - `symmetry` (string): off (default), X, Y or Z.
+  - `prefix` (string): Name prefix (SK-15).
+  - `name` (string): Base name (default Joint); a number is added.
+  - `suffixPlus` (string): Suffix on the + side of the mirror plane (default _L).
+  - `suffixMinus` (string): Suffix on the - side (default _R).
+  - `direction` (string): Axis down the bone: X, Y or Z (default Z, SK-16).
+  - `axis` (string): Axis across the bone (roll): X, Y or Z (default X).
+  - `preserveAlignment` (boolean): Keep orientations instead of re-aiming (default false).
+- **`operandi.skel.align`** — Re-aim a joint (or the selected joints), and with chain its descendants, at their first children, one undo step. Children keep their world places.
+  - `joint` (integer): The joint (default the selected joints).
+  - `chain` (boolean): Also its descendants (default true).
+  - `direction` (string): Axis down the bone: X, Y or Z (default Z, SK-16).
+  - `axis` (string): Axis across the bone (roll): X, Y or Z (default X).
+  - `preserveAlignment` (boolean): Keep orientations instead of re-aiming (default false).
+- **`operandi.skel.delete`** — Delete a joint, one undo step; its children move to its parent keeping their world places.
+  - `joint` (integer, required): The joint.
+- **`operandi.skel.insert`** — Split the bone from joint to its first child with a new joint at its middle, one undo step.
+  - `joint` (integer, required): The joint whose bone is split.
+  - `prefix` (string): Name prefix (SK-15).
+  - `name` (string): Base name (default Joint); a number is added.
+  - `suffixPlus` (string): Suffix on the + side of the mirror plane (default _L).
+  - `suffixMinus` (string): Suffix on the - side (default _R).
+  - `direction` (string): Axis down the bone: X, Y or Z (default Z, SK-16).
+  - `axis` (string): Axis across the bone (roll): X, Y or Z (default X).
+  - `preserveAlignment` (boolean): Keep orientations instead of re-aiming (default false).
+- **`operandi.skel.move`** — Move a joint to a world position, one undo step. compensate (default true) keeps its children in place; off, they move with it. The parent and the joint are re-aimed unless preserveAlignment.
+  - `joint` (integer, required): The joint.
+  - `position` (string, required): World position x,y,z.
+  - `compensate` (boolean): Children stay put (default true).
+  - `direction` (string): Axis down the bone: X, Y or Z (default Z, SK-16).
+  - `axis` (string): Axis across the bone (roll): X, Y or Z (default X).
+  - `preserveAlignment` (boolean): Keep orientations instead of re-aiming (default false).
+- **`operandi.skel.query`** — Read joints as JSON: id, name, parent, firstChild, children, position, boneLength, axes X/Y/Z. root limits it to that joint's chain, depth first.
+  - `root` (integer): Only this joint's chain.
 - **`operandi.eval.graph`** — Read the evaluation graph as JSON: nodes (id, kind time/channel/field/transform/shownMesh, item, name, label, dirty) and edges [from, to] (to reads from). item limits it to one item's nodes and the edges touching them.
   - `item` (integer): Only this item's nodes.
 - **`operandi.render.frameRange`** — Render frames start..end (default the current range) with Cycles into folder (default the project's renders/) as <name>_0000.png; needs the running app. operandi.anim.query reports progress (job).

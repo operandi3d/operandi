@@ -562,6 +562,8 @@ mod shader_settings;
 mod shader_tree_stale_selection;
 #[path = "shared_payloads.rs"]
 mod shared_payloads;
+#[path = "skeleton.rs"]
+mod skeleton;
 #[path = "sketch_extrude_clean_spec.rs"]
 mod sketch_extrude_clean_spec;
 #[path = "sketch_extrude_drag_clean_spec.rs"]

@@ -9685,3 +9685,6 @@ Built from BEHAVIOR-TOPOLOGY-PEN (2026-11-20) on branch topology-pen. These are 
 
 - SK-Q01 Setup mode is a view state of the scene (`Animation::setup`, never saved); undo and redo keep it as it is, like the current time. Setup values are each animated channel's `rest`; unanimated channels' own values are their setup values. Constraints still evaluate in setup mode; the skin shows the rest shape (SK-51).
 - SK-Q02 SK-03 Restore Setup throws away the channel's keys (its edit values) and puts the setup value back; Item to Setup copies the value shown now into the setup value. Provisional.
+- SK-Q03 SK-15 numbering: the number counts per name and side (Joint1, Joint1_L, Joint1_R); a mirrored pair shares its number. A joint on the mirror plane gets no suffix and no mirror. Provisional.
+- SK-Q04 SK-16 the Axis (roll) is chosen as near as it can be to perpendicular to world up (Z up when the bone is vertical); a leaf keeps its orientation. Provisional.
+- SK-Q05 SK-10 a drag after the click moves the joint in the plane through it facing the view; SK-18 shape: three rings a tenth of the bone long (a fixed screen size for leaves) and a four-sided bone. Provisional.

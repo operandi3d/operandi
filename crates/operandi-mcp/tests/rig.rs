@@ -288,3 +288,46 @@ fn setup_mode_through_the_bridge() {
         "back to the edited setup value"
     );
 }
+
+fn skel(b: &mut Bridge, args: Value) -> Value {
+    let out = call(
+        b,
+        "command_run",
+        json!({"command": "operandi.skel.query", "args": args}),
+    )
+    .unwrap();
+    serde_json::from_str(out["value"].as_str().unwrap()).unwrap()
+}
+
+#[test]
+fn sk10_sk14_skeleton_through_the_bridge() {
+    let mut b = Bridge::new();
+    run(&mut b, "operandi.skel.add", json!({"position": [0, 1, 0]}));
+    let root = skel(&mut b, json!({}))["joints"][0]["id"].as_u64().unwrap();
+    run(
+        &mut b,
+        "operandi.skel.add",
+        json!({"position": "1,1,0", "parent": root, "symmetry": "X"}),
+    );
+    let all = skel(&mut b, json!({"root": root}));
+    let joints = all["joints"].as_array().unwrap();
+    assert_eq!(joints.len(), 3);
+    let names: Vec<&str> = joints.iter().map(|j| j["name"].as_str().unwrap()).collect();
+    assert_eq!(names, ["Joint1", "Joint1_L", "Joint1_R"]);
+    near(&joints[2]["position"], [-1., 1., 0.]);
+    let left = joints[1]["id"].as_u64().unwrap();
+    run(
+        &mut b,
+        "operandi.skel.move",
+        json!({"joint": left, "position": [2, 1, 0]}),
+    );
+    near(
+        &skel(&mut b, json!({"root": left}))["joints"][0]["position"],
+        [2., 1., 0.],
+    );
+    run(&mut b, "operandi.skel.delete", json!({"joint": left}));
+    assert_eq!(
+        skel(&mut b, json!({}))["joints"].as_array().unwrap().len(),
+        2
+    );
+}

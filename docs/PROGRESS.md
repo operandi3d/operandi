@@ -4441,3 +4441,4 @@ Design: docs/MATERIALX_GRAPHS.md (stages 1-5).
 ## 2026-11-23 — Rig phase 5 (branch graph-editor-resize)
 
 - Step 1 (SK-01..03): Setup mode (`operandi.anim.setup`, Animate > Setup, timeline toggle, yellow view outline): items show setup values, keys are ignored, edits change setup values; Item to Setup and Restore Setup. Provisional: SK-Q01/Q02.
+- Step 2 (SK-10..19): joints are Joint locators (skeleton.rs); `operandi.skel.add/insert/delete/move/align/query`; symmetry and _L/_R naming; Z-down-the-bone alignment; Skeleton tool (timeline toggle, options window) with Add/Edit/Insert/Delete, Intersection placement, Compensation, one step per click or drag; joints draw on top as rings plus a bone to the first child. Not yet: the item Display tab's joint shape choices (SK-18). Provisional: SK-Q03..Q05.

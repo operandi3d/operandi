@@ -3489,6 +3489,94 @@ pub static COMMANDS: &[Entry] = &[
         .undo()
         .operandi()
         .example("operandi.anim.restoreSetup items:3"),
+    script("operandi.skel.add", Items, "Adds a skeleton joint (SK-10): a child of parent, or a new root, with symmetry and naming (SK-14/15).")
+        .on_editor(
+            "Add a joint at a world position, as a child of parent (or a new chain's root), one undo step. symmetry X/Y/Z also adds the mirrored joint under the mirrored parent, named with the side suffixes; the parent is re-aimed at its new first child unless preserveAlignment.",
+            &[
+            jreq("position", "string", "World position x,y,z."),
+            jopt("parent", "integer", "Parent joint id (none: a new root)."),
+            jopt("symmetry", "string", "off (default), X, Y or Z."),
+            jopt("prefix", "string", "Name prefix (SK-15)."),
+            jopt("name", "string", "Base name (default Joint); a number is added."),
+            jopt("suffixPlus", "string", "Suffix on the + side of the mirror plane (default _L)."),
+            jopt("suffixMinus", "string", "Suffix on the - side (default _R)."),
+            jopt("direction", "string", "Axis down the bone: X, Y or Z (default Z, SK-16)."),
+            jopt("axis", "string", "Axis across the bone (roll): X, Y or Z (default X)."),
+            jopt("preserveAlignment", "boolean", "Keep orientations instead of re-aiming (default false)."),
+        ],
+            crate::skeleton::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.skel.add position:0,1,0"),
+    script("operandi.skel.align", Items, "Aims joints down their bones (SK-16): Direction along the bone to the first child, Axis across it.")
+        .on_editor(
+            "Re-aim a joint (or the selected joints), and with chain its descendants, at their first children, one undo step. Children keep their world places.",
+            &[
+            jopt("joint", "integer", "The joint (default the selected joints)."),
+            jopt("chain", "boolean", "Also its descendants (default true)."),
+            jopt("direction", "string", "Axis down the bone: X, Y or Z (default Z, SK-16)."),
+            jopt("axis", "string", "Axis across the bone (roll): X, Y or Z (default X)."),
+            jopt("preserveAlignment", "boolean", "Keep orientations instead of re-aiming (default false)."),
+        ],
+            crate::skeleton::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.skel.align joint:4 direction:Z axis:X"),
+    script("operandi.skel.delete", Items, "Deletes a joint (SK-12); its children re-parent to its parent in place.")
+        .on_editor(
+            "Delete a joint, one undo step; its children move to its parent keeping their world places.",
+            &[jreq("joint", "integer", "The joint.")],
+            crate::skeleton::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.skel.delete joint:4"),
+    script("operandi.skel.insert", Items, "Inserts a joint halfway along a bone (SK-12), splitting it in two.")
+        .on_editor(
+            "Split the bone from joint to its first child with a new joint at its middle, one undo step.",
+            &[
+            jreq("joint", "integer", "The joint whose bone is split."),
+            jopt("prefix", "string", "Name prefix (SK-15)."),
+            jopt("name", "string", "Base name (default Joint); a number is added."),
+            jopt("suffixPlus", "string", "Suffix on the + side of the mirror plane (default _L)."),
+            jopt("suffixMinus", "string", "Suffix on the - side (default _R)."),
+            jopt("direction", "string", "Axis down the bone: X, Y or Z (default Z, SK-16)."),
+            jopt("axis", "string", "Axis across the bone (roll): X, Y or Z (default X)."),
+            jopt("preserveAlignment", "boolean", "Keep orientations instead of re-aiming (default false)."),
+        ],
+            crate::skeleton::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.skel.insert joint:4"),
+    script("operandi.skel.move", Items, "Moves a joint (SK-12 Edit, SK-13 Compensation): with compensate the rest of the chain stays where it is.")
+        .on_editor(
+            "Move a joint to a world position, one undo step. compensate (default true) keeps its children in place; off, they move with it. The parent and the joint are re-aimed unless preserveAlignment.",
+            &[
+            jreq("joint", "integer", "The joint."),
+            jreq("position", "string", "World position x,y,z."),
+            jopt("compensate", "boolean", "Children stay put (default true)."),
+            jopt("direction", "string", "Axis down the bone: X, Y or Z (default Z, SK-16)."),
+            jopt("axis", "string", "Axis across the bone (roll): X, Y or Z (default X)."),
+            jopt("preserveAlignment", "boolean", "Keep orientations instead of re-aiming (default false)."),
+        ],
+            crate::skeleton::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.skel.move joint:4 position:0,2,0"),
+    script("operandi.skel.query", Items, "Reads the skeleton's joints as JSON (UIC-163): parent, children, first child, world position, bone length and axes.")
+        .on_editor(
+            "Read joints as JSON: id, name, parent, firstChild, children, position, boneLength, axes X/Y/Z. root limits it to that joint's chain, depth first.",
+            &[jopt("root", "integer", "Only this joint's chain.")],
+            crate::skeleton::run,
+        )
+        .query()
+        .quiet()
+        .operandi()
+        .example("operandi.skel.query"),
     script("operandi.eval.graph", Items, "Reads the scene's evaluation graph (who reads whom: time, channels, fields, transforms, shown meshes) as JSON nodes and edges (UIC-163; the Schematic's data).")
         .on_editor(
             "Read the evaluation graph as JSON: nodes (id, kind time/channel/field/transform/shownMesh, item, name, label, dirty) and edges [from, to] (to reads from). item limits it to one item's nodes and the edges touching them.",
@@ -6905,7 +6993,7 @@ mod tests {
                 assert!(!json.about.is_empty(), "{}", e.name);
             }
         }
-        assert_eq!(crate::command_exec::specs().count(), 260);
+        assert_eq!(crate::command_exec::specs().count(), 266);
     }
 
     #[test]

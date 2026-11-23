@@ -1700,6 +1700,14 @@ impl Operandi {
             {
                 self.execute("operandi.anim.setup");
             }
+            // SK-10: the Skeleton tool (text until its studio icon).
+            if ui
+                .selectable_label(self.skeleton.on, "Skeleton")
+                .on_hover_text("Skeleton: click to draw joints; Shift+click starts a new chain\noperandi.skel.tool")
+                .clicked()
+            {
+                self.execute("operandi.skel.tool");
+            }
             // Rig phase 4: Constrain and Hierarchy pop-ups (the Animate
             // menu's), Channel Links, Schematic and Bake Selected.
             let constrain = self.tbi(

@@ -20,7 +20,8 @@ const CURRENT_VERSION: u32 = RIG_VERSION;
 /// build would refuse the unknown field.
 const RIG_VERSION: u32 = 62;
 fn has_v62_rig(scene: &Scene) -> bool {
-    !scene.animation.rig.is_default()
+    // Joints (SK-10) came in with the rig, before 62 was released.
+    !scene.animation.rig.is_default() || scene.items.iter().any(|i| i.is_joint())
 }
 /// Version 61: graph editor data (curve behaviours, cycles, weighted or
 /// manual handles, shadows). A v60 build would refuse the unknown fields.

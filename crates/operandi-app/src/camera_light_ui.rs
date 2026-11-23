@@ -256,6 +256,59 @@ pub(crate) fn group_locator_marks(world: glam::DMat4, size: f64) -> Vec<Mark> {
     marks
 }
 
+/// A joint's viewport shape (SK-17/18): a wire sphere (three rings in
+/// its own axes) and, to its first child, a solid bone (four edges out to
+/// a square a sixth of the way along, then in to the child); other
+/// children get thin dotted lines. The sphere scales with the bone
+/// (a tenth of its length); a leaf uses `leaf` (a constant screen size).
+pub(crate) fn joint_marks(world: glam::DMat4, children: &[DVec3], leaf: f64) -> Vec<Mark> {
+    let at = world.w_axis.truncate();
+    let bone = children
+        .first()
+        .map(|c| c.distance(at))
+        .filter(|l| *l > 1e-9);
+    let radius = bone.map_or(leaf, |l| l * 0.1);
+    let axes = [
+        world.x_axis.truncate().normalize_or(DVec3::X),
+        world.y_axis.truncate().normalize_or(DVec3::Y),
+        world.z_axis.truncate().normalize_or(DVec3::Z),
+    ];
+    let mut marks = Vec::new();
+    const SEGMENTS: usize = 16;
+    for (u, v) in [(0, 1), (1, 2), (2, 0)] {
+        let ring = |k: usize| {
+            let t = k as f64 / SEGMENTS as f64 * std::f64::consts::TAU;
+            at + (axes[u] * t.cos() + axes[v] * t.sin()) * radius
+        };
+        for k in 0..SEGMENTS {
+            marks.push(Mark::Line([ring(k), ring(k + 1)]));
+        }
+    }
+    if let (Some(&tip), Some(len)) = (children.first(), bone) {
+        let d = (tip - at) / len;
+        // Two directions across the bone.
+        let side = if d.cross(axes[0]).length_squared() > 1e-6 {
+            axes[0]
+        } else {
+            axes[1]
+        };
+        let a = d.cross(side).normalize();
+        let b = d.cross(a);
+        let base = at + d * len / 6.;
+        let w = len * 0.08;
+        let square = [base + a * w, base + b * w, base - a * w, base - b * w];
+        for k in 0..4 {
+            marks.push(Mark::Line([at + d * radius, square[k]]));
+            marks.push(Mark::Line([square[k], tip]));
+            marks.push(Mark::Line([square[k], square[(k + 1) % 4]]));
+        }
+    }
+    for &c in children.iter().skip(1) {
+        marks.push(Mark::Dotted([at, c]));
+    }
+    marks
+}
+
 /// One mark of a camera or light glyph, in world space.
 #[derive(Clone, Debug, PartialEq)]
 pub(crate) enum Mark {
@@ -970,6 +1023,25 @@ impl Operandi {
                         grown.stored.display_size *= grow;
                         light_marks(world, &grown, selected)
                     }
+                }
+                _ if item.is_joint() => {
+                    let Ok(world) = scene.world_matrix(item.id) else {
+                        continue;
+                    };
+                    let at = world.w_axis.truncate();
+                    let Some(mpp) = self.camera.metres_per_pixel(at, r) else {
+                        continue;
+                    };
+                    let kids: Vec<DVec3> = operandi_core::skeleton::children(scene, item.id)
+                        .into_iter()
+                        .filter_map(|c| scene.world_matrix(c).ok())
+                        .map(|m| m.w_axis.truncate())
+                        .collect();
+                    joint_marks(
+                        world,
+                        &kids,
+                        mpp * defaults::GROUP_LOCATOR_GLYPH_POINTS * 0.5 * grow,
+                    )
                 }
                 _ if item.is_group_locator() => {
                     let Ok(world) = scene.world_matrix(item.id) else {
@@ -2292,6 +2364,31 @@ mod tests {
         assert!((span(&two) / span(&one) - 2.0).abs() < 1e-9);
         // Hidden by default (Jason, 2026-11-05).
         assert!(!a.display.settings.drawing.cameras && !a.display.settings.drawing.lights);
+    }
+
+    /// SK-17/18: a joint draws a sphere sized by its bone, a solid bone
+    /// to its first child and dotted lines to the others.
+    #[test]
+    fn joint_marks_follow_the_first_child() {
+        let kids = [DVec3::new(0., 2., 0.), DVec3::new(1., 0., 0.)];
+        let marks = joint_marks(glam::DMat4::IDENTITY, &kids, 0.05);
+        let lines = marks.iter().filter(|m| matches!(m, Mark::Line(_))).count();
+        assert_eq!(lines, 3 * 16 + 12);
+        assert_eq!(
+            marks
+                .iter()
+                .filter(|m| matches!(m, Mark::Dotted(_)))
+                .count(),
+            1
+        );
+        // The sphere's radius is a tenth of the bone.
+        let Mark::Line([p, _]) = &marks[0] else {
+            panic!()
+        };
+        assert!((p.length() - 0.2).abs() < 1e-9);
+        // A leaf: rings only, at the given size.
+        let leaf = joint_marks(glam::DMat4::IDENTITY, &[], 0.05);
+        assert_eq!(leaf.len(), 48);
     }
 
     /// GL-10..12: a Group Locator's row glyph, viewport marks and Show

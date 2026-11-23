@@ -255,6 +255,9 @@ mod shape_panel;
 #[cfg(test)]
 mod shifted_key_tests;
 mod side_tabs;
+#[cfg(test)]
+mod skeleton_tool_tests;
+mod skeleton_tool_ui;
 mod slice_view;
 #[cfg(test)]
 mod small_commands_tab_tests;
@@ -910,6 +913,8 @@ struct Operandi {
     links: channel_links_ui::ChannelLinks,
     /// The Schematic window (schematic_ui.rs, RG-70).
     schematic: schematic_ui::SchematicView,
+    /// The Skeleton tool (skeleton_tool_ui.rs, SK-10).
+    skeleton: skeleton_tool_ui::SkeletonTool,
     /// The Script Console and the running script (python_ui.rs).
     python: python_ui::PythonConsole,
     anim_ui: anim_ui::AnimUi,
@@ -1581,6 +1586,7 @@ impl Operandi {
             graph: Default::default(),
             links: Default::default(),
             schematic: Default::default(),
+            skeleton: Default::default(),
             python: Default::default(),
             anim_ui: Default::default(),
             form_editor: Default::default(),

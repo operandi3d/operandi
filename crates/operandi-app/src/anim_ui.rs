@@ -348,6 +348,7 @@ impl Operandi {
         self.channel_links_window(ctx);
         self.setup_outline(ctx);
         self.schematic_window(ctx);
+        self.skeleton_window(ctx);
     }
 
     /// SK-01: in Setup mode every 3D view gets a yellow outline.
