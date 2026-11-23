@@ -662,6 +662,9 @@ used in the app; `primitive_add` always starts from the Reset values.
 - **`operandi.rig.remove`** — Delete a rig piece (its keys go too), one undo step; a dynamic parent with compensate keeps the item where it is.
   - `piece` (integer, required): Rig piece id.
   - `compensate` (boolean): Keep the item where it is (default Compensation).
+- **`operandi.rig.rename`** — Give a rig piece (constraint, link, modifier, IK solver) its own name in the Items list and Schematic, one undo step; an empty name goes back to the kind's label.
+  - `piece` (integer, required): The rig piece.
+  - `name` (string): The new name (empty: the kind's label).
 - **`operandi.rig.set`** — Set a channel of a rig piece, one undo step; Auto Key keys it as for any channel. Names as operandi.rig.query lists them (influence 0-1, weight.0, axis 0/1/2, roll radians, percent 0-1...).
   - `piece` (integer, required): Rig piece id.
   - `channel` (string, required): Channel name.

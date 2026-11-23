@@ -78,6 +78,12 @@ named "Operandi Animation". Each step also once typed in the command line.
 50. Select the hips, timeline Pose: white circles on every joint, the one under the pointer yellow. Right-click both feet (red), drag the head down: the knees bend, the feet stay. Shift+drag twists, middle-drag turns one joint, drag empty space moves the whole body; each drag is one Cmd+Z. With Auto Key on, the moved joints get keys.
 51. Bake Selected on any joint of an IK leg: the leg plays the same with the solver switched to FK. File > Export USD the skinned IK leg and open it in Blender: same motion.
 
+## Rig rows in the Items list
+
+52. Constrain a cube to another: the Items list shows "Position Constraint" under the cube (constraint icon). Click it: the cube is selected and the row marked; double-click renames it (Cmd+Z undoes); its eye turns it off and on; right-click shows Rename, Disable, Delete, Select Item.
+53. Bind a mesh to a skeleton: a "Skin" row under the mesh; open it: one row per joint. A joint row's eye turns that joint's influence off; clicking it selects the joint. Right-click the Skin: Enable/Disable, Bake Weights, Duplicate and Freeze, Delete (Unbind, greyed outside Setup).
+54. Two-bone IK on a leg: "Two-Bone IK" shows under the hip joint (two-bone icon); its goal and the IK root are item rows.
+
 ## Rig tab
 
 55. Switch to the Animate layout: the toolbox strip has a Rig tab (after Curve). It lists Setup, Skeleton, Pose; Constraints (a flyout of the nine kinds), Parent, Unparent, Add Parent, Compensation; Channel Links, Schematic, Bake Selected; Bind (Shift+click Unbind), Add Joints to Bind and the weight tools; the IK buttons (Two-Bone, Chain, Full Body, Add Goal, tasks, Up Vector with Shift+click Remove, Switch IK/FK, Set Keys with Shift+click Delete Keys, selects, Match, Update Rest Pose, Disable, Remove). Each button runs its command; greyed ones say why.

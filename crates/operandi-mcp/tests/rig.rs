@@ -505,3 +505,24 @@ fn mirror_and_transfer_through_the_bridge() {
         before
     );
 }
+
+/// RG-01 Items list names through the bridge: a renamed piece reads back
+/// in the rig query.
+#[test]
+fn rig_rename_through_the_bridge() {
+    let mut b = Bridge::new();
+    let a = cube(&mut b, [0., 0., 0.]);
+    let t = cube(&mut b, [1., 0., 0.]);
+    run(
+        &mut b,
+        "operandi.rig.constrain",
+        json!({"kind": "position", "items": a.to_string(), "targets": t.to_string()}),
+    );
+    let piece = query(&mut b, a)["pieces"][0]["id"].as_u64().unwrap();
+    run(
+        &mut b,
+        "operandi.rig.rename",
+        json!({"piece": piece, "name": "Follow T"}),
+    );
+    assert_eq!(query(&mut b, a)["pieces"][0]["label"], "Follow T");
+}

@@ -254,6 +254,7 @@ pub mod rig;
 pub mod rig_commands;
 pub mod rig_eval;
 pub mod rig_expression;
+pub mod rig_list;
 pub mod rig_schematic;
 pub mod scene_time;
 pub mod script_mesh;

@@ -112,7 +112,7 @@ pub fn build(scene: &Scene) -> Schematic {
         let inputs = piece_inputs(p);
         let mut node = Node {
             key: piece_key(p.id),
-            label: rig::label(&p.kind),
+            label: crate::rig_list::name(p),
             id: p.id,
             piece: true,
             kind: Some(p.kind.clone()),
