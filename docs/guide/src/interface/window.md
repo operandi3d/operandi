@@ -44,8 +44,9 @@ below.
     pages.
 13. **Tool Properties**: the active tool's settings. Type exact values
     here. With no tool active it says so.
-14. **Work plane grid**: the floor grid that new shapes sit on, with
-    colored lines for the main axes.
+14. **Grid**: the ground grid, a floor of lines at ground level, with
+    colored lines for the main axes. **Grid** in the **Readout** gives
+    the size of one square.
 15. **Axis marker**: shows which way X, Y and Z point. The line under it
     names the work plane (here **XY**, picked automatically).
 16. **Readout**: what is selected, how much the screen is drawing (**GL**),
