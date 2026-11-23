@@ -154,6 +154,10 @@ pub(super) enum Category {
     /// UV tab (UVT-201, uv_editor.rs): Map, the transform tools, Unwrap,
     /// Pack and the island buttons; the UV layout opens at it.
     Uv,
+    /// Rig tab (UIC-190..201; phases 4-6): setup, skeleton and pose,
+    /// constraints, links, skin and IK (`assets/forms/toolbox.rig.json`).
+    /// Shows in the Animate layout, with the animation switch on.
+    Rig,
     /// The user's own workbench (layouts stage 4, LAY-82): an empty form
     /// they fill with Edit Workbench (workbench.rs).
     Workbench,
@@ -169,7 +173,7 @@ pub(super) enum Category {
 }
 impl Category {
     #[cfg(not(feature = "painting"))]
-    pub(super) const ALL: [Self; 13] = [
+    pub(super) const ALL: [Self; 14] = [
         Self::Create,
         Self::Select,
         Self::Deform,
@@ -182,10 +186,11 @@ impl Category {
         Self::Curve,
         Self::Sculpt,
         Self::Uv,
+        Self::Rig,
         Self::Workbench,
     ];
     #[cfg(feature = "painting")]
-    pub(super) const ALL: [Self; 16] = [
+    pub(super) const ALL: [Self; 17] = [
         Self::Create,
         Self::Select,
         Self::Deform,
@@ -199,6 +204,7 @@ impl Category {
         Self::Sculpt,
         Self::Paint,
         Self::Uv,
+        Self::Rig,
         Self::Workbench,
         Self::VertexMaps,
         Self::PaintUtilities,
@@ -223,6 +229,7 @@ impl Category {
             Self::Curve => "Curve",
             Self::Sculpt => "Sculpt",
             Self::Uv => "UV",
+            Self::Rig => "Rig",
             Self::Workbench => "Workbench",
             #[cfg(feature = "painting")]
             Self::Paint => "Paint",
@@ -823,6 +830,7 @@ impl Operandi {
                         Category::Curve => forms::CURVE_FORM,
                         Category::Topology => forms::TOPOLOGY_FORM,
                         Category::Uv => forms::UV_FORM,
+                        Category::Rig => forms::RIG_FORM,
                         Category::Vertex => forms::VERTEX_FORM,
                         Category::Edge => forms::EDGE_FORM,
                         Category::Polygon => forms::POLYGON_FORM,
@@ -863,12 +871,15 @@ impl Operandi {
             // TB-01: Topology and Curve follow Polygon.
             Category::Topology,
             Category::Curve,
+            // UIC-190: the Rig tab, in the Animate layout.
+            Category::Rig,
             // Layouts stage 4 (LAY-82): last, so the tabs above it keep
             // their places; shown once opened (below).
             Category::Workbench,
         ]
         .into_iter()
         .filter(|&c| c != Category::Uv || uv_tab)
+        .filter(|&c| c != Category::Rig || self.rig_tab_shows())
         .filter(|&c| self.paint_tab_shows(c))
         // The Workbench tab joins once opened (LAY-Q47), like UV.
         .filter(|&c| {
@@ -1284,6 +1295,12 @@ impl Operandi {
 
 impl Operandi {
     /// A tab's name in the strip: a toolbox set names its own (PNT-211).
+    /// The Rig tab shows with the animation switch on, in the Animate
+    /// layout (or once opened, like UV).
+    pub(super) fn rig_tab_shows(&self) -> bool {
+        crate::anim_switch::enabled()
+            && (self.layouts.current == "Animate" || self.category == Category::Rig)
+    }
     fn category_tab_label(&self, c: Category) -> &'static str {
         #[cfg(feature = "painting")]
         if let Some(label) = self.paint_set_label(c) {

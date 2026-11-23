@@ -77,3 +77,9 @@ named "Operandi Animation". Each step also once typed in the command line.
 49. Full body: a biped's hips, Setup on, IK ▾ > Assign IK (Full Body); select a hand, Add Goal (goal icon); select each foot, Add Position Task; Setup off; drag the hand goal: the arm reaches, the feet stay; Translate Root on (rig channel): the hips lean towards the hand.
 50. Select the hips, timeline Pose: white circles on every joint, the one under the pointer yellow. Right-click both feet (red), drag the head down: the knees bend, the feet stay. Shift+drag twists, middle-drag turns one joint, drag empty space moves the whole body; each drag is one Cmd+Z. With Auto Key on, the moved joints get keys.
 51. Bake Selected on any joint of an IK leg: the leg plays the same with the solver switched to FK. File > Export USD the skinned IK leg and open it in Blender: same motion.
+
+## Rig tab
+
+55. Switch to the Animate layout: the toolbox strip has a Rig tab (after Curve). It lists Setup, Skeleton, Pose; Constraints (a flyout of the nine kinds), Parent, Unparent, Add Parent, Compensation; Channel Links, Schematic, Bake Selected; Bind (Shift+click Unbind), Add Joints to Bind and the weight tools; the IK buttons (Two-Bone, Chain, Full Body, Add Goal, tasks, Up Vector with Shift+click Remove, Switch IK/FK, Set Keys with Shift+click Delete Keys, selects, Match, Update Rest Pose, Disable, Remove). Each button runs its command; greyed ones say why.
+56. The timeline no longer has the Skeleton, Pose, Bind, Weights and IK buttons (they are on the Rig tab); Setup and the phase-4 rig buttons stay there.
+57. In the Model layout the Rig tab isn't in the strip; `operandi.toolbox.tab rig` opens it there too.

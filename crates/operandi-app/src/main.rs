@@ -236,6 +236,8 @@ mod replicator_ui;
 mod report_bug_dialog;
 mod resource_write;
 #[cfg(test)]
+mod rig_tab_tests;
+#[cfg(test)]
 mod rig_ui_tests;
 mod scale_offset_dialog;
 mod scenes;

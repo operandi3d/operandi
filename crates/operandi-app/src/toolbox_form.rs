@@ -51,6 +51,8 @@ pub(super) const EDIT_FORM: &str = "toolbox.edit";
 pub(super) const SCULPT_FORM: &str = "toolbox.sculpt";
 /// The Create tab's form.
 pub(super) const CREATE_FORM: &str = "toolbox.create";
+/// The Rig tab's form.
+pub(super) const RIG_FORM: &str = "toolbox.rig";
 /// The Curve tab's form.
 pub(super) const CURVE_FORM: &str = "toolbox.curve";
 /// The Paint tab's form (painting builds only, PNT-85).
