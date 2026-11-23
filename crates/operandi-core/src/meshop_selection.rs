@@ -15,7 +15,6 @@
 //! Pattern channel names and Select by Selection Set's type id are
 //! Operandi's own.
 use crate::{Mesh, Result};
-use rand::prelude::*;
 use serde::{Deserialize, Serialize};
 
 /// Reserved polygon set names start with this (not typeable).
@@ -312,10 +311,14 @@ impl SelOp {
                 }
             }
             SelKind::Random { seed, probability } => {
-                let mut rng = rand::rngs::StdRng::seed_from_u64(*seed as u64);
-                for o in out.iter_mut() {
-                    let rnd = rng.r#gen::<f32>();
-                    *o = rnd < (*probability / 100.0);
+                // Each polygon's draw comes from the seed and its own index
+                // (SplitMix64), not from a library generator, so a saved
+                // scene picks the same polygons on every version and a
+                // polygon's pick doesn't depend on the ones before it.
+                let p = f64::from(*probability) / 100.0;
+                for (i, o) in out.iter_mut().enumerate() {
+                    let key = (u64::from(*seed) << 32) | i as u64;
+                    *o = crate::vertex_map_texture::random01(key) < p;
                 }
             }
         }

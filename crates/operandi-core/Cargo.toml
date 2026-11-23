@@ -44,8 +44,6 @@ boolmesh = { version = "0.2.2", default-features = false }
 robust = "1"
 # 3D painting's images (PNT stage 1); only with the `painting` feature.
 operandi-paint = { path = "../operandi-paint", optional = true }
-# random number generation for selops
-rand = "0.8"
 
 [features]
 # 3D painting, stage 1 (PNT-01..39, PNT-300..309): paintable images in the

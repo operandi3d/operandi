@@ -315,3 +315,71 @@ fn selection_ops_save_as_version_50_and_reopen_identical() {
     assert_eq!(*theirs.mesh, *result(&e, id).mesh);
     let _ = Mesh::default();
 }
+
+/// A 4x4x4 cube (96 polygons) with Triangulate on the randomly picked
+/// ones: each picked quad becomes two triangles, so the result has
+/// 96 + picked polygons.
+fn random_cube(seed: u32, probability: f32) -> (Editor, u64) {
+    let (mut e, id) = editor();
+    add(
+        &mut e,
+        id,
+        "prim.cube.item",
+        json!({ "segmentsX": 4, "segmentsY": 4, "segmentsZ": 4 }),
+    );
+    let tri = add(&mut e, id, TRI, json!({}));
+    selop(
+        &mut e,
+        tri,
+        SelOp::new(SelKind::Random { seed, probability }),
+    )
+    .unwrap();
+    (e, id)
+}
+
+#[test]
+fn select_randomly_none_at_0_and_all_at_100() {
+    let (e, id) = random_cube(7, 0.0);
+    assert_eq!(faces(&e, id), 96);
+    let (e, id) = random_cube(7, 100.0);
+    assert_eq!(faces(&e, id), 192);
+}
+
+#[test]
+fn select_randomly_same_seed_same_polygons() {
+    let (a, id) = random_cube(42, 50.0);
+    let (b, _) = random_cube(42, 50.0);
+    assert_eq!(*result(&a, id).mesh, *result(&b, id).mesh);
+    let picked = faces(&a, id) - 96;
+    assert!((20..=76).contains(&picked), "picked {picked} of 96");
+    // Another seed picks other polygons.
+    let (c, _) = random_cube(43, 50.0);
+    assert_ne!(*result(&a, id).mesh, *result(&c, id).mesh);
+    // The picks are fixed for good: a saved scene must reopen with the
+    // same polygons on every version. Update this only on purpose.
+    let mesh = Mesh::box_mesh(Default::default(), glam::DVec3::ONE, 0).unwrap();
+    let picks = operandi_core::meshop_selection::resolve(
+        None,
+        &[SelOp::new(SelKind::Random {
+            seed: 42,
+            probability: 50.0,
+        })],
+        &mesh,
+    )
+    .unwrap()
+    .unwrap();
+    assert_eq!(picks, GOLDEN_42);
+}
+const GOLDEN_42: &[u32] = &[1, 2, 4, 5];
+
+#[test]
+fn select_randomly_saves_and_reopens_identical() {
+    let (e, id) = random_cube(1234, 30.0);
+    let bytes = persistence::encode(&e.scene).unwrap();
+    let back = persistence::decode(&bytes).unwrap();
+    assert_eq!(back, e.scene);
+    let theirs = Runtime::default()
+        .current(&back, back.item(id).unwrap())
+        .unwrap();
+    assert_eq!(*theirs.mesh, *result(&e, id).mesh);
+}
