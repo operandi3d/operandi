@@ -23,6 +23,28 @@ if [ "${OPERANDI_USD:-0}" = 1 ]; then
     FEATURES="${FEATURES:+$FEATURES,}usd"
     [ -f development/usd/install/lib/liboperandi_usd.dylib ] || scripts/build-usd.sh
 fi
+# Python scripting (preview) is built in once scripts/fetch-python.sh has
+# put CPython in development/python/python; OPERANDI_PYTHON_BUILD=1 runs
+# it first, OPERANDI_PYTHON_BUILD=0 leaves Python out, and
+# OPERANDI_PYTHON_BUILD=system links the python3 on PATH without bundling
+# it (that app runs only on this Mac). (OPERANDI_PYTHON is the app's
+# run-time switch, python_switch.rs.)
+PYTHON_INSTALL=""
+if [ "${OPERANDI_PYTHON_BUILD:-}" = system ]; then
+    FEATURES="${FEATURES:+$FEATURES,}python"
+    PYO3_PYTHON="$(command -v python3)"
+    export PYO3_PYTHON
+fi
+[ "${OPERANDI_PYTHON_BUILD:-}" = 1 ] && [ ! -x development/python/python/bin/python3 ] && scripts/fetch-python.sh
+if [ "${OPERANDI_PYTHON_BUILD:-}" != 0 ] && [ "${OPERANDI_PYTHON_BUILD:-}" != system ] \
+    && [ -x development/python/python/bin/python3 ]; then
+    FEATURES="${FEATURES:+$FEATURES,}python"
+    PYTHON_INSTALL="$(cd development/python/python && pwd -P)"
+    [ -f development/python/pyo3-config.txt ] || scripts/fetch-python.sh
+    PYO3_CONFIG_FILE="$(cd development/python && pwd -P)/pyo3-config.txt"
+    OPERANDI_PYTHON_BUILD_HOME="$PYTHON_INSTALL"
+    export PYO3_CONFIG_FILE OPERANDI_PYTHON_BUILD_HOME
+fi
 # 3D painting is on by default (the maintainer, 2026-11-19);
 # OPERANDI_PAINTING=0 builds without it.
 NO_DEFAULT=""
@@ -59,7 +81,7 @@ CYCLES_INSTALL=""
 [ "${OPERANDI_CYCLES:-0}" = 1 ] && CYCLES_INSTALL=development/cycles/install
 USD_INSTALL=""
 [ "${OPERANDI_USD:-0}" = 1 ] && USD_INSTALL=development/usd/install
-PROFILE="$PROFILE" USD_INSTALL="$USD_INSTALL" assemble_app "$STAGED_BUNDLE" "$DEV_BUNDLE_NAME" "$DEV_BUNDLE_ID" 0.1.1 1 "$STAGE" $CYCLES_INSTALL
+PROFILE="$PROFILE" USD_INSTALL="$USD_INSTALL" PYTHON_INSTALL="$PYTHON_INSTALL" assemble_app "$STAGED_BUNDLE" "$DEV_BUNDLE_NAME" "$DEV_BUNDLE_ID" 0.1.1 1 "$STAGE" $CYCLES_INSTALL
 PLIST="$STAGED_BUNDLE/Contents/Info.plist"
 /usr/libexec/PlistBuddy -c 'Add :LSEnvironment dict' "$PLIST"
 # The window title names the build (commit and time) so QA can tell
@@ -73,6 +95,10 @@ if [ -n "$FEATURES" ]; then
     for lib in "$STAGED_BUNDLE"/Contents/Frameworks/*.dylib; do
         codesign --force --sign - "$lib"
     done
+fi
+# Python's extension modules are code too.
+if [ -n "$PYTHON_INSTALL" ]; then
+    find "$STAGED_BUNDLE/Contents/Resources/python" -name '*.so' -exec codesign --force --sign - {} +
 fi
 codesign --force --sign - "$STAGED_BUNDLE"
 codesign --verify --deep --strict "$STAGED_BUNDLE"
@@ -101,5 +127,10 @@ if [ "$(cd "$OUTPUT_ROOT" && pwd -P)" != "$(cd development && pwd -P)" ]; then
         rm -f "$LINK"
         ln -s "$BUNDLE" "$LINK"
     fi
+fi
+# Python inside the app: the link order always; the live import check
+# (it opens the app briefly) with OPERANDI_PYTHON_CHECK=1.
+if [ -n "$PYTHON_INSTALL" ]; then
+    OPERANDI_PYTHON_CHECK_LIVE="${OPERANDI_PYTHON_CHECK:-0}" scripts/check-bundled-python.sh "$BUNDLE" >&2
 fi
 printf '%s\n' "$BUNDLE"

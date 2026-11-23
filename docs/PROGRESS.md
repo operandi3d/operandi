@@ -4430,3 +4430,10 @@ Design: docs/MATERIALX_GRAPHS.md (stages 1-5).
 - In Vertex, Edge or Polygon mode with components selected, every sculpt brush (Shift-smooth, Ctrl, Move/Emboss, symmetry, Vertex Map brushes) moves only the selection's points; unselected points join the frozen set, so locks and hidden points work as before (SCS-01..09). Nothing selected or Item mode sculpts the whole mesh; with several active meshes, one without a selection is left alone.
 - A selection of nothing but locked or hidden points starts no stroke ("nothing to sculpt on the active meshes").
 - Step 9 (§9): the four milestone rigs as tests (piston rod aiming at a crank pin turned by a keyed user channel through a link; wheels from an expression on the car's distance; a camera on a bent path at constant speed aiming at a target; the robot arm hand-off with no pops either way and the same motion after Bake). The hand-off exports to USD rigged and baked, and Blender's OpenUSD reads the same positions (1e-4). Evaluated copies keep the hierarchy and carry their document scene so exports sample the rig at every frame.
+## 2026-11-22 — Python scripting preview (branch python-scripting)
+
+- Embedded CPython (PyO3 0.30.1, crate operandi-python, feature `python`), one Python thread; scripts call back into the app between frames, so the window stays live and Stop works. Errors end the script with a traceback, never the app.
+- `operandi` module: run (the command's own result, CommandError on failure), query, undo_group, mesh_get/mesh_set (lists or buffers of doubles), set_time/set_channel/set_key. A script is one undo step (UIC-227).
+- Script Console (floating window), System > Run Script…, Scripts folder, commands operandi.python.console/run/runScript/stop and operandi.mesh.setData; MCP `python_run`.
+- Hidden behind Preferences > Experimental > Python scripting (preview) or OPERANDI_PYTHON=1 (python_switch.rs, off by default).
+- Bundled CPython: scripts/fetch-python.sh + bundle-dev.sh/macos-app-bundle.sh; release signing, Windows and Linux not done (docs/PYTHON_SCRIPTING.md). Provisional: PY-Q01..Q04.

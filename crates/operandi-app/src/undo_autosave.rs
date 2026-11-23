@@ -45,6 +45,10 @@ pub struct UndoAutosavePreferences {
     /// between sessions.
     #[serde(default, skip_serializing_if = "std::ops::Not::not")]
     pub rig_compensation: bool,
+    /// Experimental: Python scripting (preview), the scripting switch's
+    /// preference (python_switch.rs).
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub python_preview: bool,
 }
 impl Default for UndoAutosavePreferences {
     fn default() -> Self {
@@ -65,6 +69,7 @@ impl Default for UndoAutosavePreferences {
             revisions: 5,
             animation_preview: false,
             rig_compensation: false,
+            python_preview: false,
         }
     }
 }
@@ -483,9 +488,18 @@ impl super::Operandi {
                 "Show the animation tools: the Animate layout and menu, the timeline, the \
                  graph editor and keying. OPERANDI_ANIMATION=1 or 0 in the environment wins",
             );
+            rows::check_d(
+                ui,
+                "Python scripting (preview)",
+                &mut p.python_preview,
+                d.python_preview,
+                "Show the Script Console and System > Run Script…, and let scripts and the \
+                 MCP bridge's python_run run. OPERANDI_PYTHON=1 or 0 in the environment wins",
+            );
         });
         if self.undo_autosave != before {
             crate::anim_switch::set_preference(self.undo_autosave.animation_preview);
+            crate::python_switch::set_preference(self.undo_autosave.python_preview);
             self.save_undo_autosave();
         }
         ui.add_space(8.);

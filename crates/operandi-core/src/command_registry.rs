@@ -1891,6 +1891,19 @@ pub static COMMANDS: &[Entry] = &[
             "Fix Black Dots (MT2): every pair of polygons sharing two or more edges in a row (inner points used by those two only) becomes one polygon; the inner points are kept unused and selected with the run's ends, Vertex mode, one undo step. 'No black dots found.' when there are none.",
             &[],
         ).undo(),
+    script("operandi.mesh.setData", Modeling, "Set Mesh Data: replaces a mesh item's points, and its polygons when given, as one undo step (scripts, K9).")
+        .on_editor(
+            "Set Mesh Data (K9): sets a mesh item's points (a list of [x, y, z] in item space, metres) and, when polygons is given, its polygons (lists of point indices; the mesh is rebuilt and its UV maps, vertex maps and component selection go). Points alone must keep the point count. One undo step; a bad mesh is refused and nothing changes.",
+            &[
+            jopt("item", "integer", "Mesh item id; default the active item."),
+            jreq("points", "array", "Points as [x, y, z] lists."),
+            jopt("polygons", "array", "Polygons as lists of point indices."),
+        ],
+            crate::script_mesh::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.mesh.setData points:[[0,0,0],[1,0,0],[0,1,0]] polygons:[[0,1,2]]"),
     script("operandi.edge.zip", Modeling, "Edge Zip: welds the edge rows either side of the selected edges onto them, removing the quads between.")
         .operandi()
         .headless(
@@ -6859,7 +6872,7 @@ mod tests {
                 assert!(!json.about.is_empty(), "{}", e.name);
             }
         }
-        assert_eq!(crate::command_exec::specs().count(), 256);
+        assert_eq!(crate::command_exec::specs().count(), 257);
     }
 
     #[test]

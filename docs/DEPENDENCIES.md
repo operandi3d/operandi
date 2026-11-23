@@ -344,6 +344,11 @@ compatibility warning; the current build passes. Milestone 1 had no authored uns
 | pulp | 0.22.3 | MIT | [source](https://github.com/sarah-quinones/pulp) |
 | pulp-wasm-simd-flag | 0.1.1 | MIT | [source](https://github.com/sarah-quinones/pulp) |
 | pxfm | 0.1.30 | BSD-3-Clause OR Apache-2.0 | [source](https://github.com/awxkee/pxfm) |
+| pyo3 | 0.30.1 | MIT OR Apache-2.0 | [source](https://github.com/PyO3/pyo3) |
+| pyo3-build-config | 0.30.1 | MIT OR Apache-2.0 | [source](https://github.com/PyO3/pyo3) |
+| pyo3-ffi | 0.30.1 | MIT OR Apache-2.0 | [source](https://github.com/PyO3/pyo3) |
+| pyo3-macros | 0.30.1 | MIT OR Apache-2.0 | [source](https://github.com/PyO3/pyo3) |
+| pyo3-macros-backend | 0.30.1 | MIT OR Apache-2.0 | [source](https://github.com/PyO3/pyo3) |
 | quick-error | 2.0.1 | MIT/Apache-2.0 | [source](http://github.com/tailhook/quick-error) |
 | quick-xml | 0.41.0 | MIT | [source](https://github.com/tafia/quick-xml) |
 | quote | 1.0.47 | MIT OR Apache-2.0 | [source](https://github.com/dtolnay/quote) |
@@ -390,6 +395,7 @@ compatibility warning; the current build passes. Milestone 1 had no authored uns
 | syn | 2.0.119 | MIT OR Apache-2.0 | [source](https://github.com/dtolnay/syn) |
 | syn | 3.0.9 | MIT OR Apache-2.0 | [source](https://github.com/dtolnay/syn) |
 | synstructure | 0.14.0 | MIT | [source](https://github.com/mystor/synstructure) |
+| target-lexicon | 0.13.6 | Apache-2.0 WITH LLVM-exception | [source](https://github.com/bytecodealliance/target-lexicon) |
 | tempfile | 3.27.0 | MIT OR Apache-2.0 | [source](https://github.com/Stebalien/tempfile) |
 | termcolor | 1.4.1 | Unlicense OR MIT | [source](https://github.com/BurntSushi/termcolor) |
 | thiserror | 1.0.69 | MIT OR Apache-2.0 | [source](https://github.com/dtolnay/thiserror) |
@@ -1013,3 +1019,24 @@ format as `crates/operandi-core/src/utah_teapot.patches`. Terms: freely
 available for any use, including commercial use, credited as a "Utah
 Teapot"; the credit is in that file's header and the About window. Data
 only, no code.
+
+## Python scripting (2026-11-22, `crates/operandi-python`)
+
+Python scripting (preview) embeds CPython through PyO3 (pyo3, pyo3-ffi,
+pyo3-macros, pyo3-build-config: MIT OR Apache-2.0; target-lexicon:
+Apache-2.0 WITH LLVM-exception, a build-time helper). They are used only
+with the `python` feature; without it the crate builds with no Python.
+
+CPython itself is under the Python Software Foundation License (PSF-2.0),
+which is GPL-compatible. The app bundle carries a relocatable CPython from
+python-build-standalone (BSD-3-Clause build scripts; the interpreter and
+standard library keep CPython's PSF licence and the licences of the
+libraries it links, such as OpenSSL (Apache-2.0), zlib, libffi, SQLite
+(public domain), XZ and bzip2). `scripts/fetch-python.sh` records the exact
+release; its licence files are copied into the bundle's
+`Resources/licenses/python`.
+
+Unsafe Rust: `operandi-python/src/embed.rs` starts the interpreter with an
+isolated `PyConfig` and uses `PyThreadState_SetAsyncExc` for Stop; each
+block carries its safety reason.
+

@@ -214,6 +214,10 @@ mod profile_browser;
 mod project_files;
 mod project_presets;
 mod project_ui;
+mod python_switch;
+mod python_ui;
+#[cfg(test)]
+mod python_ui_tests;
 #[cfg(feature = "qa")]
 mod qa;
 mod reduction_panel;
@@ -906,6 +910,8 @@ struct Operandi {
     links: channel_links_ui::ChannelLinks,
     /// The Schematic window (schematic_ui.rs, RG-70).
     schematic: schematic_ui::SchematicView,
+    /// The Script Console and the running script (python_ui.rs).
+    python: python_ui::PythonConsole,
     anim_ui: anim_ui::AnimUi,
     /// The Form Editor (layouts stage 7, form_editor.rs).
     form_editor: form_editor::State,
@@ -1229,6 +1235,7 @@ impl Operandi {
         // The animation switch reads its preference before the layouts load.
         anim_switch::set_preference(app.undo_autosave.animation_preview);
         app.editor.rig_compensation = app.undo_autosave.rig_compensation;
+        python_switch::set_preference(app.undo_autosave.python_preview);
         app.view_presets = view_display::Presets::load(&app.environment.paths().viewport_presets());
         // Layouts (layouts.rs): the one open at quit, or the old layout
         // files read once as the Model layout.
@@ -1574,6 +1581,7 @@ impl Operandi {
             graph: Default::default(),
             links: Default::default(),
             schematic: Default::default(),
+            python: Default::default(),
             anim_ui: Default::default(),
             form_editor: Default::default(),
             field_rects: BTreeMap::new(),
@@ -3376,6 +3384,8 @@ impl Operandi {
         self.layouts.message_line_here = self.message_line_in_tool_properties();
         // Playback, the rows' key requests and frame jobs (anim_ui.rs).
         self.anim_frame(ctx);
+        // A running script's calls and the Script Console (python_ui.rs).
+        self.python_frame(ctx);
         self.toolbar(ctx);
         self.timeline_panel(ctx);
         // The workbench row along the top, when shown (LAY-82).
