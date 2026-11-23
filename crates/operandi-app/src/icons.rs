@@ -875,8 +875,10 @@ fn paint_tinted(ui: &Ui, rect: Rect, icon: Icon, angle: f32, tint: Color32) {
     if !ui.is_rect_visible(rect) {
         return;
     }
-    let pixels = (rect.width().max(rect.height()) * ui.ctx().pixels_per_point())
-        .ceil()
+    let ppp = ui.ctx().pixels_per_point();
+    let rect = snap_to_pixels(rect, ppp);
+    let pixels = (rect.width().max(rect.height()) * ppp)
+        .round()
         .clamp(1., 256.) as u32;
     let Some(texture) = texture(ui, icon, pixels) else {
         return;
@@ -885,6 +887,23 @@ fn paint_tinted(ui: &Ui, rect: Rect, icon: Icon, angle: f32, tint: Color32) {
         .rotate(angle, vec2(0.5, 0.5))
         .tint(tint)
         .paint_at(ui, rect);
+}
+
+/// `rect` moved and sized onto whole device pixels, about its centre, so an
+/// icon's picture lands pixel for pixel instead of being resampled across
+/// pixel edges: at Windows' 125% and 150% scales and other fractional
+/// `pixels_per_point`, a point position is often between pixels.
+pub fn snap_to_pixels(rect: Rect, pixels_per_point: f32) -> Rect {
+    let ppp = pixels_per_point.max(0.25);
+    let size = vec2(
+        (rect.width() * ppp).round().max(1.) / ppp,
+        (rect.height() * ppp).round().max(1.) / ppp,
+    );
+    let min = rect.center() - size / 2.;
+    Rect::from_min_size(
+        pos2((min.x * ppp).round() / ppp, (min.y * ppp).round() / ppp),
+        size,
+    )
 }
 
 /// Shared texture source for painted glyphs and native egui icon+label controls.
@@ -960,6 +979,20 @@ pub fn disclosure(ui: &Ui, rect: Rect, openness: f32) {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn icons_land_on_whole_device_pixels_at_fractional_scales() {
+        // A 32-point toolbox icon at a fractional point position, at
+        // Windows' 125% and 150% and a 3x dense display.
+        for ppp in [1., 1.25, 1.5, 3.] {
+            let r = snap_to_pixels(Rect::from_min_size(pos2(10.3, 7.7), vec2(32., 32.)), ppp);
+            for v in [r.min.x, r.min.y, r.width(), r.height()] {
+                let px = v * ppp;
+                assert!((px - px.round()).abs() < 1e-3, "{v} at {ppp}");
+            }
+            let moved = r.center() - pos2(26.3, 23.7);
+            assert!(moved.x.abs().max(moved.y.abs()) <= 0.5 / ppp + 1e-4);
+        }
+    }
     #[test]
     fn admitted_art_rasterizes_at_control_sizes_and_display_scales() {
         for icon in [

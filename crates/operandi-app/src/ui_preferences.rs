@@ -1,6 +1,6 @@
 //! Preferences > Defaults > UI (spec preferences-2026-11-06, Tier 2):
 //! Popup Transparency, Popover Dismissal Behavior and Default Form Icon
-//! Size. Saved per user in `ui-preferences.json`.
+//! Size, plus Interface Scale. Saved per user in `ui-preferences.json`.
 use crate::prefs_file::PrefsFile;
 use eframe::egui;
 use serde::{Deserialize, Serialize};
@@ -55,6 +55,35 @@ impl IconSize {
     }
 }
 
+/// Interface Scale steps, in percent of the system's own display scale.
+/// 100 follows the system exactly; the others are for a display whose
+/// system scale leaves the interface too small or too large (a 4K screen
+/// left at 100%, say).
+pub const INTERFACE_SCALES: [u16; 8] = [75, 90, 100, 110, 125, 150, 175, 200];
+
+thread_local! {
+    /// The applied Interface Scale as a zoom factor (each frame reads it in
+    /// [`sync_zoom`]). Per thread like the toolbox icon scale, so parallel
+    /// tests don't see each other's choice.
+    static ZOOM: std::cell::Cell<f32> = const { std::cell::Cell::new(1.) };
+}
+
+/// Make `ctx` draw at the chosen Interface Scale. egui multiplies its zoom
+/// factor into `pixels_per_point`, so text, icons (they pick their picture
+/// size from `pixels_per_point`), wires, gizmos and hit tests all follow
+/// it. Window sizes are saved in the system's points
+/// (`window_state::Tracker::observe_zoomed`).
+pub fn sync_zoom(ctx: &egui::Context) {
+    let zoom = zoom_factor();
+    if (ctx.zoom_factor() - zoom).abs() > 1e-4 {
+        ctx.set_zoom_factor(zoom);
+    }
+}
+/// The applied Interface Scale (1 = the system's scale).
+pub fn zoom_factor() -> f32 {
+    ZOOM.with(std::cell::Cell::get)
+}
+
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(default, deny_unknown_fields)]
 pub struct UiPreferences {
@@ -75,6 +104,8 @@ pub struct UiPreferences {
     /// the interface uses (rendered_icons.rs). Stored with the UI page's
     /// values; the Colors page shows and resets it.
     pub rendered_icon_outline: crate::rendered_icons::OutlineChoice,
+    /// Interface Scale, percent of the system scale ([`INTERFACE_SCALES`]).
+    pub interface_scale: u16,
 }
 impl Default for UiPreferences {
     fn default() -> Self {
@@ -86,6 +117,7 @@ impl Default for UiPreferences {
             original_compatible: false,
             slider_min_max_labels: false,
             rendered_icon_outline: Default::default(),
+            interface_scale: 100,
         }
     }
 }
@@ -97,6 +129,7 @@ impl UiPreferences {
         crate::original_compatible::set_on(self.original_compatible);
         crate::form::range_labels::set_on(self.slider_min_max_labels);
         crate::rendered_icons::set_choice(self.rendered_icon_outline);
+        ZOOM.with(|z| z.set(f32::from(self.interface_scale) / 100.));
     }
     /// Force Click-Off: the popover stays until a click outside it
     /// (Default and Force Roll-Off close it when the pointer leaves).
@@ -104,10 +137,19 @@ impl UiPreferences {
         self.dismissal == Dismissal::ClickOff
     }
 }
+fn scale_label(percent: u16) -> String {
+    if percent == 100 {
+        "100% (System)".into()
+    } else {
+        format!("{percent}%")
+    }
+}
 impl crate::prefs_file::PrefsFile for UiPreferences {
     const INVALID: &'static str = "Invalid UI preference";
     fn valid(&self) -> bool {
-        self.version == 1 && self.popup_transparency <= 90
+        self.version == 1
+            && self.popup_transparency <= 90
+            && INTERFACE_SCALES.contains(&self.interface_scale)
     }
 }
 
@@ -119,6 +161,22 @@ impl super::Operandi {
         let d = UiPreferences::default();
         use crate::form::{Unit, rows};
         rows::section(ui, "UI", false, |ui| {
+            let labels: Vec<_> = INTERFACE_SCALES.iter().map(|&x| scale_label(x)).collect();
+            let scales: Vec<_> = INTERFACE_SCALES
+                .iter()
+                .zip(&labels)
+                .map(|(&x, l)| (x, l.as_str()))
+                .collect();
+            rows::choice_d(
+                ui,
+                "Interface Scale",
+                &mut p.interface_scale,
+                &d.interface_scale,
+                &scales,
+                "Size of the whole interface on top of the system's display scale. \
+                 100% follows the system; raise it when text and icons are too \
+                 small on a high-resolution display",
+            );
             rows::number_d(
                 ui,
                 "Popup Transparency",
@@ -213,5 +271,41 @@ mod tests {
         p.save(&path).unwrap();
         assert_eq!(UiPreferences::load(&path), p);
         let _ = std::fs::remove_file(path);
+    }
+
+    #[test]
+    fn interface_scale_zooms_the_interface_and_rejects_odd_steps() {
+        let ctx = egui::Context::default();
+        let p = UiPreferences {
+            interface_scale: 150,
+            ..Default::default()
+        };
+        assert!(p.valid());
+        // As the app does: synced inside a frame, taking hold from the next.
+        let frame = || {
+            let _ = ctx.run(egui::RawInput::default(), sync_zoom);
+        };
+        p.apply();
+        frame();
+        frame();
+        assert_eq!(ctx.zoom_factor(), 1.5);
+        // egui multiplies the zoom into the scale everything draws and
+        // picks icon pictures at.
+        assert_eq!(ctx.pixels_per_point(), 1.5);
+        UiPreferences::default().apply();
+        frame();
+        frame();
+        assert_eq!(ctx.zoom_factor(), 1.);
+        assert_eq!(ctx.pixels_per_point(), 1.);
+        assert_eq!(scale_label(100), "100% (System)");
+        assert_eq!(scale_label(125), "125%");
+        let odd = UiPreferences {
+            interface_scale: 133,
+            ..Default::default()
+        };
+        assert!(!odd.valid());
+        // Older files without the field load at 100%.
+        let old: UiPreferences = serde_json::from_str(r#"{"version":1}"#).unwrap();
+        assert_eq!(old.interface_scale, 100);
     }
 }

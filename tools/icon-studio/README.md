@@ -117,7 +117,8 @@ operandi-app --icon-studio render <icon.opscene | folder>... --out <folder>
   deform tools listed there). To swap another icon, add its scene
   here, add a line to `RENDERED` and `FILES`, and run
   `scripts/render-icons.sh --install`. Sizes between the installed ones
-  (16, 20, 24, 32, 40, 48, 64 px) are scaled down from the next one up.
+  (16, 20, 24, 32, 40, 48, 64, 128 px) are scaled down from the next one
+  up.
 - No per-size pixel hinting: at 16 px a few edges fall between pixels and go
   soft. Moving the subject a fraction of a pixel per size would sharpen them.
 - Only silhouette outlines: inner edges show by shading alone.

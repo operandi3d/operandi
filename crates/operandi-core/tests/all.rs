@@ -176,6 +176,8 @@ mod editor_color;
 mod ellipsoid_clean_spec;
 #[path = "ellipsoid_numeric.rs"]
 mod ellipsoid_numeric;
+#[path = "empty_mesh_item_transform.rs"]
+mod empty_mesh_item_transform;
 #[path = "env_texture_locator.rs"]
 mod env_texture_locator;
 #[path = "environments.rs"]
@@ -520,6 +522,8 @@ mod scene_transfer;
 mod scripts_gate;
 #[path = "sculpt_brush_engine.rs"]
 mod sculpt_brush_engine;
+#[path = "sculpt_selection.rs"]
+mod sculpt_selection;
 #[path = "select_tools.rs"]
 mod select_tools;
 #[path = "selection_continuation_m15.rs"]

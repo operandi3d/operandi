@@ -59,6 +59,7 @@ for set in dark-outline light-outline; do
         cp "$from/$slug-20@2x.png" "$ASSETS/$set/$slug-40.png"
         cp "$from/$slug-24@2x.png" "$ASSETS/$set/$slug-48.png"
         cp "$from/$slug-32@2x.png" "$ASSETS/$set/$slug-64.png"
+        cp "$from/$slug-32@4x.png" "$ASSETS/$set/$slug-128.png"
     done
 done
 echo "Installed $(echo $SLUGS | wc -w | tr -d ' ') rendered icons into $ASSETS"
