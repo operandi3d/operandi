@@ -362,6 +362,10 @@ pub(crate) fn snapshot(id: &str) -> String {
 /// Checks (or, with OPERANDI_BLESS_MENUS=1, writes) menu `id`'s snapshot.
 fn check_snapshot(id: &str, golden: &str) {
     let now = snapshot(id);
+    // Snapshots are taken on macOS; where the MCP bridge has no transport
+    // yet (Windows, mcp.rs) its menu entry is greyed with this reason.
+    #[cfg(not(unix))]
+    let now = now.replace(" (greyed: The MCP bridge needs macOS or Linux)", "");
     if std::env::var_os("OPERANDI_BLESS_MENUS").is_some() {
         let path = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
             .join("src/menu_snapshots")

@@ -343,6 +343,19 @@ impl Default for KeyLight {
         KeyLight::Toward(crate::display_shading::HEADLIGHT)
     }
 }
+/// wgpu's instance flags: its build defaults and WGPU_* variables, but on
+/// Windows without `DEBUG` unless `WGPU_DEBUG=1` asks for it. `DEBUG` makes
+/// DirectX 12 compile shaders unoptimised, and FXC then aborts on the
+/// procedural pattern shaders ("internal error: compilation aborted
+/// unexpectedly"). It only changes development builds; releases leave
+/// `DEBUG` off anyway.
+pub fn instance_flags() -> wgpu::InstanceFlags {
+    let mut flags = wgpu::InstanceFlags::from_build_config();
+    if cfg!(windows) {
+        flags.remove(wgpu::InstanceFlags::DEBUG);
+    }
+    flags.with_env()
+}
 /// The graphics setup the app asks for: egui's, with the adapter's own
 /// buffer limits instead of WebGPU's 256 MiB defaults, so a subdivision
 /// surface's patches (subd_gpu.rs, ~1.8 GB for 145M triangles) fit in
@@ -350,6 +363,7 @@ impl Default for KeyLight {
 pub fn wgpu_configuration() -> egui_wgpu::WgpuConfiguration {
     let mut config = egui_wgpu::WgpuConfiguration::default();
     if let egui_wgpu::WgpuSetup::CreateNew(create) = &mut config.wgpu_setup {
+        create.instance_descriptor.flags = instance_flags();
         let base = create.device_descriptor.clone();
         create.device_descriptor = std::sync::Arc::new(move |adapter| {
             let mut descriptor = base(adapter);

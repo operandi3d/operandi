@@ -62,6 +62,7 @@ fn load(path: &Path, limits: lxo::Limits) -> Run {
     run(limits, |c| lxo::load(path, c))
 }
 
+#[cfg(unix)] // only its Unix-only test uses it
 fn input_limit(input_bytes: usize) -> lxo::Limits {
     lxo::Limits {
         input_bytes,

@@ -325,7 +325,10 @@ mod tests {
         );
         assert_eq!(
             a.save_dialog_default(),
-            root.join("scenes/Untitled.opscene").display().to_string()
+            root.join("scenes")
+                .join("Untitled.opscene")
+                .display()
+                .to_string()
         );
         // A scene that already has a file keeps saving there.
         a.path = Some(PathBuf::from("/elsewhere/kept.opscene"));

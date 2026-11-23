@@ -9,6 +9,12 @@
 //! On by default in development/QA builds, off by default in packaged release
 //! builds (an always-open control port is not something to ship switched
 //! on). `OPERANDI_MCP=1` or `=0` overrides the default at launch.
+//!
+//! The server listens on a Unix socket, so on Windows the bridge can't be
+//! switched on yet and nothing reaches the request handling below. It is
+//! kept compiling there (not cfg'd out) so a Windows transport only has to
+//! feed `mcp_queue`.
+#![cfg_attr(not(unix), allow(dead_code))]
 use super::*;
 use serde_json::{Value, json};
 use std::time::{Duration, Instant};

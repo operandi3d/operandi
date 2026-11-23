@@ -111,7 +111,13 @@ fn an_image_chain_becomes_image_texture_mapping_and_maths() {
     let colour = images.iter().find(|n| n.name == "tex").unwrap();
     assert_eq!(
         value(colour, "Filename"),
-        Some(&FlatValue::Text("/pictures/bricks.png".into()))
+        // The base folder joined the system's way (`\` on Windows).
+        Some(&FlatValue::Text(
+            Path::new("/pictures")
+                .join("bricks.png")
+                .to_string_lossy()
+                .into_owned()
+        ))
     );
     assert_eq!(
         value(colour, "Colorspace"),

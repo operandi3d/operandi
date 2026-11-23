@@ -502,11 +502,14 @@ mod tests {
         );
         assert_eq!(net.nodes[3].pos, Some([1.5, -2.]));
         let file = &net.nodes[0].inputs[0];
+        // The base folder joined the system's way (`\` on Windows).
+        let path = Path::new("/lib").join("tex/a.png");
+        let path = path.to_string_lossy();
         assert_eq!(
             file.value,
             NetValue::File {
-                key: picture_key("/lib/tex/a.png"),
-                path: "/lib/tex/a.png".into()
+                key: picture_key(&path),
+                path: path.clone().into()
             }
         );
         assert_eq!(file.colorspace.as_deref(), Some("srgb_texture"));

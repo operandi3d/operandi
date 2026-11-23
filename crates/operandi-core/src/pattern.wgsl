@@ -51,12 +51,14 @@ fn op_pt_random3(c: vec3<f32>) -> vec3<f32> {
   let x = i32(c.x);
   let y = i32(c.y);
   let z = i32(c.z);
-  var out = vec3<f32>(0.0);
-  for (var k = 0; k < 3; k++) {
-    let h = op_pt_hash(x + k * 7919, y, z);
-    out[k] = f32(h >> 8u) / 16777216.0;
-  }
-  return out;
+  // Built whole, not written component by component in a loop: DirectX
+  // 12's FXC can't write a vector component picked by a loop counter and
+  // fails to compile the shader (here and in the other .wgsl files).
+  return vec3<f32>(
+    f32(op_pt_hash(x, y, z) >> 8u),
+    f32(op_pt_hash(x + 7919, y, z) >> 8u),
+    f32(op_pt_hash(x + 2 * 7919, y, z) >> 8u),
+  ) / 16777216.0;
 }
 fn op_pt_ripple_hash(x0: u32) -> u32 {
   var x = x0;
@@ -224,10 +226,11 @@ fn op_pat(mode: u32, a: vec4<f32>, b: vec4<f32>, c: vec4<f32>, p: vec3<f32>) -> 
       let n = clamp(u32(a.z + 0.5), 1u, 32u);
       var sum = 0.0;
       for (var i = 0u; i < n; i++) {
-        var centre = vec3<f32>(0.0);
-        for (var k = 0u; k < 3u; k++) {
-          centre[k] = f32(op_pt_ripple_hash(i * 3u + k) >> 8u) / 16777216.0 - 0.5;
-        }
+        let centre = vec3<f32>(
+          f32(op_pt_ripple_hash(i * 3u) >> 8u),
+          f32(op_pt_ripple_hash(i * 3u + 1u) >> 8u),
+          f32(op_pt_ripple_hash(i * 3u + 2u) >> 8u),
+        ) / 16777216.0 - 0.5;
         let d = length(p - centre);
         sum += cos(6.2831853 * (d / max(a.w, 1e-6) + b.x));
       }
@@ -261,31 +264,33 @@ fn op_pat(mode: u32, a: vec4<f32>, b: vec4<f32>, c: vec4<f32>, p: vec3<f32>) -> 
       }
       return sum / total;
     }
-    default: {
-      // Noise (mode 3): procedural.rs noise_value.
-      let turbulence = kind == 2u;
-      let octaves = clamp(u32(a.z + 0.5), 1u, 8u);
-      let phase = select(0.0, b.w, b.z != 0.0);
-      var amplitude = 1.0;
-      var frequency = 1.0;
-      var first = 0.0;
-      var rest = 0.0;
-      var total = 0.0;
-      for (var i = 0u; i < octaves; i++) {
-        var s = op_pt_noise(p * frequency, phase);
-        if (turbulence) { s = abs(s); }
-        if (i == 0u) { first = s; } else { rest += amplitude * s; }
-        total += amplitude;
-        amplitude *= b.x;
-        frequency *= a.w;
-      }
-      let t0 = select(0.5 + 0.5 * first, 2.0 * first, turbulence);
-      let k = 1.0 - b.y * clamp(t0, 0.0, 1.0);
-      let sum = (first + k * rest) / max(total, 1e-12);
-      if (turbulence) { return clamp(2.0 * sum, 0.0, 1.0); }
-      return 0.5 + 0.5 * sum;
-    }
+    // Noise (mode 3, and any other) follows the switch, so the function
+    // visibly ends in a return: DirectX 12's FXC refuses a function whose
+    // every return is inside a switch ("not all control paths return").
+    default: {}
   }
+  // Noise (mode 3): procedural.rs noise_value.
+  let turbulence = kind == 2u;
+  let octaves = clamp(u32(a.z + 0.5), 1u, 8u);
+  let phase = select(0.0, b.w, b.z != 0.0);
+  var amplitude = 1.0;
+  var frequency = 1.0;
+  var first = 0.0;
+  var rest = 0.0;
+  var total = 0.0;
+  for (var i = 0u; i < octaves; i++) {
+    var s = op_pt_noise(p * frequency, phase);
+    if (turbulence) { s = abs(s); }
+    if (i == 0u) { first = s; } else { rest += amplitude * s; }
+    total += amplitude;
+    amplitude *= b.x;
+    frequency *= a.w;
+  }
+  let t0 = select(0.5 + 0.5 * first, 2.0 * first, turbulence);
+  let k = 1.0 - b.y * clamp(t0, 0.0, 1.0);
+  let sum = (first + k * rest) / max(total, 1e-12);
+  if (turbulence) { return clamp(2.0 * sum, 0.0, 1.0); }
+  return 0.5 + 0.5 * sum;
 }
 // Pattern::cell_random: three randoms for the cell holding p (0 for
 // patterns without cells).

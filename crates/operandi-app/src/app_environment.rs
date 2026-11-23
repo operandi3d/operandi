@@ -474,7 +474,9 @@ mod tests {
         );
         assert_eq!(
             mac.paths.save_dialog,
-            home.join("Documents/Untitled.opscene").to_string_lossy()
+            home.join("Documents")
+                .join("Untitled.opscene")
+                .to_string_lossy()
         );
         assert_eq!(mac.title, "Operandi-milestone1");
         let local = PathBuf::from("/local-data");

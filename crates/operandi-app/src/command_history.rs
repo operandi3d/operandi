@@ -256,6 +256,8 @@ impl Operandi {
     }
 
     /// The record of an MCP bridge call (UIC-224, source bridge).
+    // Unused on Windows, where the bridge has no transport yet (mcp.rs).
+    #[cfg_attr(not(unix), allow(dead_code))]
     pub(super) fn bridge_record(&self, tool: &str, args: &serde_json::Value) -> CommandRecord {
         let line = match (tool, args.get("command").and_then(|c| c.as_str())) {
             ("command_run", Some(command)) => {
@@ -278,6 +280,7 @@ impl Operandi {
 
     /// After a bridge call: drop its waiting record when no step came of
     /// it, note a failure, and log it.
+    #[cfg_attr(not(unix), allow(dead_code))]
     pub(super) fn bridge_recorded(
         &mut self,
         mut r: CommandRecord,

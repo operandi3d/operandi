@@ -728,6 +728,7 @@ fn item_move_drag_large() {
 /// A headless graphics device, as the QA renderer makes (qa.rs), so a
 /// benchmark frame includes the real GPU uploads and drawing.
 ///
+/// `WGPU_BACKEND` chooses the graphics API (`vulkan`, `dx12`, `metal`, `gl`).
 /// `OPERANDI_TEST_GPU=off` hides the graphics card, so GPU tests skip as on
 /// a machine without one. CI sets it on Jason's Linux runner, whose card
 /// isn't a test target (docs/CI.md).
@@ -752,7 +753,12 @@ pub(crate) fn headless_gpu() -> Option<egui_wgpu::RenderState> {
             }
         }
     }
-    let instance = egui_wgpu::wgpu::Instance::new(&Default::default());
+    // WGPU_BACKEND picks the graphics API, as it does for the app (for
+    // example `dx12` to run the GPU tests on DirectX 12 on Windows).
+    let instance = egui_wgpu::wgpu::Instance::new(&egui_wgpu::wgpu::InstanceDescriptor {
+        flags: crate::gpu::instance_flags(),
+        ..egui_wgpu::wgpu::InstanceDescriptor::from_env_or_default()
+    });
     wait(egui_wgpu::RenderState::create(
         &crate::gpu::wgpu_configuration(),
         &instance,

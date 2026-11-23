@@ -482,7 +482,10 @@ fn op_g_random_offset(dims: u32, seed: f32) -> vec4<f32> {
   if (dims == 1u) { return vec4<f32>(100.0 + op_g_hashf(vec4<f32>(seed, 0.0, 0.0, 0.0), 1u) * 100.0, 0.0, 0.0, 0.0); }
   var o = vec4<f32>(0.0);
   for (var k = 0u; k < dims; k++) {
-    o[k] = 100.0 + op_g_hashf(vec4<f32>(seed, f32(k), 0.0, 0.0), 2u) * 100.0;
+    // Component k by a lane mask, not o[k]: FXC (DirectX 12) can't write
+    // a vector component picked by a loop counter.
+    let value = 100.0 + op_g_hashf(vec4<f32>(seed, f32(k), 0.0, 0.0), 2u) * 100.0;
+    o = select(o, vec4<f32>(value), vec4<u32>(0u, 1u, 2u, 3u) == vec4<u32>(k));
   }
   return o;
 }
@@ -500,7 +503,8 @@ fn op_g_noise(dims: u32, kind: u32, normalize: bool, color: bool, vv: vec3<f32>,
     for (var k = 0u; k < dims; k++) {
       var seed = f32(k);
       if (dims == 1u) { seed = 0.0; }
-      d[k] = op_g_snoise(dims, p + op_g_random_offset(dims, seed)) * distortion.x;
+      let value = op_g_snoise(dims, p + op_g_random_offset(dims, seed)) * distortion.x;
+      d = select(d, vec4<f32>(value), vec4<u32>(0u, 1u, 2u, 3u) == vec4<u32>(k));
     }
     p += d;
   }
