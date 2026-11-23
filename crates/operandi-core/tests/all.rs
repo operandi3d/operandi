@@ -190,6 +190,8 @@ mod eval_build;
 mod eval_graph;
 #[path = "eval_probe.rs"]
 mod eval_probe;
+#[path = "expand_selection_ops.rs"]
+mod expand_selection_ops;
 #[path = "extrude_clean_spec.rs"]
 mod extrude_clean_spec;
 #[path = "eye_hides_children.rs"]

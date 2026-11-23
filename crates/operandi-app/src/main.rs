@@ -93,6 +93,7 @@ mod edge_panel;
 mod edit_panel;
 mod editor_color_ui;
 mod ellipsoid_panel;
+mod empty_expand;
 mod environment_gpu;
 mod environment_preset_ui;
 mod environment_ui;
@@ -969,6 +970,9 @@ struct Operandi {
     /// Edge mode: time and place of the last ordinary select press, so the
     /// next one can make it a double-click (Select Loop).
     last_component_press: Option<(f64, Pos2)>,
+    /// A Shift press that missed every component (empty_expand.rs), so a
+    /// second one there makes Expand Selection.
+    last_empty_shift_press: Option<(f64, Pos2)>,
     /// Opens the modeling menu this frame (modeling_menu.rs).
     modeling_menu_requested: bool,
     /// The open pie menu (pie_menu.rs), and one asked for by name.
@@ -1638,6 +1642,7 @@ impl Operandi {
             selection_context_requested: false,
             modeling_menu_pressed: false,
             last_component_press: None,
+            last_empty_shift_press: None,
             modeling_menu_requested: false,
             pie: None,
             pie_request: None,
@@ -3938,6 +3943,8 @@ mod drop_lag_tests;
 mod duplicate_tools_tests;
 #[cfg(test)]
 mod edge_tab_tests;
+#[cfg(test)]
+mod empty_expand_tests;
 #[cfg(test)]
 mod environment_image_tests;
 #[cfg(test)]
