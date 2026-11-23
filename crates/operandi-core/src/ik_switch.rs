@@ -355,6 +355,7 @@ pub fn run(e: &mut Editor, name: &str, a: &Args) -> Result<Option<Command>> {
                 solvers(&e.scene, a)?
             };
             e.anim_step("Update Rest Pose", |e| {
+                let before = e.scene.animation.rig.pieces.clone();
                 for id in &ids {
                     let p = e
                         .scene
@@ -402,7 +403,7 @@ pub fn run(e: &mut Editor, name: &str, a: &Args) -> Result<Option<Command>> {
                         _ => {}
                     }
                 }
-                Ok(true)
+                Ok(e.scene.animation.rig.pieces != before)
             })?;
             Ok(None)
         }

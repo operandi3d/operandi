@@ -66,3 +66,14 @@ named "Operandi Animation". Each step also once typed in the command line.
 41. Select a bound joint: its weight map becomes the selected map; Vertex Map shading shows it; Vertex Map Tools Paint changes it and the other joints' maps lower (totals 100%).
 42. Timeline Weights ▾: Smooth Selected, Normalize, Mirror (left to right), Split; each one Cmd+Z.
 43. File > Export USD the bent cylinder; open it in Blender: an armature and the same bend; play: same animation.
+
+## Rig phase 6 (IK and posing)
+
+44. Draw a three-joint leg with a slight knee bend; Setup on; select hip, knee, ankle in order; timeline IK ▾ > Apply IK (Two-Bone) (two-bone icon): a goal box (green on +X, red on −X, blue in the middle) at the ankle. Setup off, drag the goal: the leg follows, the knee keeps bending the same way; pull it out of reach: the leg straightens, no stretch.
+45. IK ▾ > Create IK Up Vector (up-vector icon): a pole appears in front of the knee; move it: the knee points at it. Rig channels: Orient spins the knee, Soft eases the last bit of reach, Stretch reaches the goal.
+46. A five-joint tail: select root then end, IK ▾ > Apply IK (Chain) (chain icon); drag its goal around: every bone keeps its length.
+47. Joint limits: on the knee run `operandi.ik.jointSet enableLimits:true useLimitsX:true minX:0 maxX:90`; select the knee: a thin fan shows the allowed arc; the solved knee stops at it.
+48. Animate the goal 0–24, at 24 IK ▾ > Switch to FK; key a hip turn at 48; scrub 16–32: no pop at 24. At 48 IK ▾ > Switch to IK: no pop. IK ▾ > IK/FK: Set Keys / Delete Keys work at the current frame.
+49. Full body: a biped's hips, Setup on, IK ▾ > Assign IK (Full Body); select a hand, Add Goal (goal icon); select each foot, Add Position Task; Setup off; drag the hand goal: the arm reaches, the feet stay; Translate Root on (rig channel): the hips lean towards the hand.
+50. Select the hips, timeline Pose: white circles on every joint, the one under the pointer yellow. Right-click both feet (red), drag the head down: the knees bend, the feet stay. Shift+drag twists, middle-drag turns one joint, drag empty space moves the whole body; each drag is one Cmd+Z. With Auto Key on, the moved joints get keys.
+51. Bake Selected on any joint of an IK leg: the leg plays the same with the solver switched to FK. File > Export USD the skinned IK leg and open it in Blender: same motion.

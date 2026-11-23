@@ -528,6 +528,8 @@ mod rig_modifiers;
 mod rig_phase4;
 #[path = "rig_phase5_milestones.rs"]
 mod rig_phase5_milestones;
+#[path = "rig_phase6_milestones.rs"]
+mod rig_phase6_milestones;
 #[path = "rig_schematic.rs"]
 mod rig_schematic;
 #[path = "rig_setup.rs"]

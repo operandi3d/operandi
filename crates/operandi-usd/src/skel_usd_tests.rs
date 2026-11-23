@@ -433,7 +433,13 @@ fn an_ik_arm_exports_its_solved_pose() {
         .collect();
     // Bend the elbow a little in Setup so the chain has a side.
     ok(&mut e, "operandi.anim.setup on:true");
-    ok(&mut e, &format!("operandi.skel.move joint:{} position:0.25,0,-0.05 compensate:true preserveAlignment:true", joints[1]));
+    ok(
+        &mut e,
+        &format!(
+            "operandi.skel.move joint:{} position:0.25,0,-0.05 compensate:true preserveAlignment:true",
+            joints[1]
+        ),
+    );
     ok(
         &mut e,
         &format!(
