@@ -111,7 +111,7 @@ impl Operandi {
                 &d.channel,
                 &channels,
                 "Release: published versions. Test: the rolling test build, rebuilt from the \
-                 newest code (Linux follows releases)",
+                 newest code",
             );
             // UIC-87: box then text, no left label.
             rows::check_d(

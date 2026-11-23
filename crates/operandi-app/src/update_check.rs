@@ -21,7 +21,7 @@
 //!   line, the "built from `1a2b3c4d`" line for this platform is compared
 //!   with this build's commit; a development build (`+dirty`, `unknown`)
 //!   can't be compared that way and says nothing at launch.
-//! - Linux has no test build yet, so it always follows the Release channel.
+//! - Every platform (macOS, Windows, Linux) follows the chosen channel.
 //!
 //! The fetch is a plain GET to api.github.com by the system's `curl` on a
 //! background thread (no HTTP library in the app); it sends nothing about
@@ -115,13 +115,6 @@ impl Platform {
             Self::Windows
         } else {
             Self::Linux
-        }
-    }
-    /// The channel actually checked: Linux has no test build yet.
-    pub fn feed_channel(self, channel: Channel) -> Channel {
-        match self {
-            Self::Linux => Channel::Release,
-            _ => channel,
         }
     }
     /// The key in the hidden build line, and the name in the notes.
@@ -444,7 +437,7 @@ pub fn evaluate(
     me: &ThisBuild,
     platform: Platform,
 ) -> Result<Verdict, String> {
-    match platform.feed_channel(channel) {
+    match channel {
         Channel::Release => evaluate_releases(json, me),
         Channel::Test => evaluate_test(json, me, platform),
     }
@@ -558,7 +551,7 @@ impl UpdateCheck {
             running.manual |= manual;
             return;
         }
-        let channel = Platform::current().feed_channel(self.prefs.channel);
+        let channel = self.prefs.channel;
         let (send, result) = mpsc::channel();
         let spawned = std::thread::Builder::new()
             .name("update-check".into())
@@ -873,16 +866,55 @@ mod tests {
         ));
     }
 
+    const LIN_SHA: &str = "9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d";
+    const LINUX_NOTE: &str = "- **Linux**: `Operandi-Test-Linux-x86_64.AppImage`, built from [`9c0d1e2f`](https://github.com/x/commit/9c0d1e2f)\n";
+
     #[test]
-    fn linux_follows_releases() {
+    fn linux_follows_the_test_channel_like_the_others() {
+        let me = build("0.1.0", "9f8e7d6c", Some(NOV_21));
+        let t = NOV_23;
+        let notes = format!("{NOTES}{LINUX_NOTE}");
+        // Linux filled in the hidden line: offered by time, full sha kept.
+        let filled = test_release(&format!(
+            "{notes}\n<!-- operandi-build mac={MAC_SHA} mac_time={t} windows={WIN_SHA} \
+             windows_time={t} linux={LIN_SHA} linux_time={t} -->"
+        ));
+        let Ok(Verdict::Newer(offer)) = evaluate(Channel::Test, &filled, &me, Platform::Linux)
+        else {
+            panic!("expected a Linux offer");
+        };
+        assert_eq!(offer.channel, Channel::Test);
+        assert_eq!(offer.key, LIN_SHA);
         assert_eq!(
-            Platform::Linux.feed_channel(Channel::Test),
-            Channel::Release
+            offer.url(),
+            "https://github.com/operandi3d/operandi/releases/tag/test-build"
         );
-        assert_eq!(Platform::Mac.feed_channel(Channel::Test), Channel::Test);
-        let me = build("0.1.0", "9f8e7d6c", None);
+        // Linux empty: no Linux build, even with a "built from" line.
+        let empty = test_release(&format!(
+            "{notes}\n<!-- operandi-build mac={MAC_SHA} mac_time={t} windows={WIN_SHA} \
+             windows_time={t} linux= linux_time= -->"
+        ));
+        assert_eq!(
+            evaluate_test(&empty, &me, Platform::Linux),
+            Ok(Verdict::Unknown(
+                "There is no test build for this platform yet.".into()
+            ))
+        );
+        // An older line without linux fields: the notes decide.
+        let old_line = format!("\n<!-- operandi-build mac={MAC_SHA} mac_time={t} -->");
+        let with_note = test_release(&format!("{notes}{old_line}"));
+        let Ok(Verdict::Newer(offer)) = evaluate_test(&with_note, &me, Platform::Linux) else {
+            panic!("expected the fallback offer");
+        };
+        assert_eq!(offer.key, "9c0d1e2f");
+        let no_note = test_release(&format!("{NOTES}{old_line}"));
         assert!(matches!(
-            evaluate(Channel::Test, RELEASES, &me, Platform::Linux),
+            evaluate_test(&no_note, &me, Platform::Linux),
+            Ok(Verdict::Unknown(_))
+        ));
+        // The Release channel on Linux still reads releases.
+        assert!(matches!(
+            evaluate(Channel::Release, RELEASES, &me, Platform::Linux),
             Ok(Verdict::Newer(Offer {
                 channel: Channel::Release,
                 ..
