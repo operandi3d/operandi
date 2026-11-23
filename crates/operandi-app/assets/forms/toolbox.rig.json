@@ -1,0 +1,273 @@
+{
+  "version": 1,
+  "id": "toolbox.rig",
+  "label": "Rig",
+  "exported": true,
+  "controls": [
+    {
+      "divider": "Setup",
+      "id": "rig-setup"
+    },
+    {
+      "command": "operandi.anim.setup",
+      "label": "Setup",
+      "icon": "setup-pose",
+      "tooltip": "Setup: show and edit the setup (rest) pose; keys are ignored (SK-01) · operandi.anim.setup"
+    },
+    {
+      "command": "operandi.skel.tool",
+      "label": "Skeleton",
+      "icon": "skeleton-tool",
+      "tooltip": "Skeleton: click to draw joints; Shift+click starts a new chain (SK-10) · operandi.skel.tool"
+    },
+    {
+      "command": "operandi.pose.tool",
+      "label": "Pose",
+      "icon": "pose-tool",
+      "tooltip": "Pose: drag the selected hierarchy's items; Ctrl world, Shift twist, middle FK, right-click pin (IK-50) · operandi.pose.tool"
+    },
+    {
+      "divider": "Constraints",
+      "id": "rig-constraints"
+    },
+    {
+      "form": {
+        "style": "flyout",
+        "controls": [
+          {
+            "command": "operandi.rig.constrain kind:position",
+            "label": "Position",
+            "icon": "constrain"
+          },
+          {
+            "command": "operandi.rig.constrain kind:rotation",
+            "label": "Rotation"
+          },
+          {
+            "command": "operandi.rig.constrain kind:scale",
+            "label": "Scale"
+          },
+          {
+            "command": "operandi.rig.constrain kind:transform",
+            "label": "Transform"
+          },
+          {
+            "command": "operandi.rig.constrain kind:direction",
+            "label": "Direction"
+          },
+          {
+            "command": "operandi.rig.constrain kind:distance",
+            "label": "Distance"
+          },
+          {
+            "command": "operandi.rig.constrain kind:path",
+            "label": "Path"
+          },
+          {
+            "command": "operandi.rig.constrain kind:pathPosition",
+            "label": "Path Position"
+          },
+          {
+            "command": "operandi.rig.constrain kind:pathNormal",
+            "label": "Path Normal"
+          }
+        ]
+      },
+      "id": "rig-constrain"
+    },
+    {
+      "command": "operandi.rig.parent",
+      "label": "Parent",
+      "icon": "hierarchy",
+      "tooltip": "Parent: the last picked item becomes the parent of the others (RG-11) · operandi.rig.parent"
+    },
+    {
+      "command": "operandi.rig.unparent",
+      "label": "Unparent",
+      "tooltip": "Unparent: the items move to the scene root (RG-11) · operandi.rig.unparent"
+    },
+    {
+      "command": "operandi.rig.dynamicParentAdd",
+      "label": "Add Parent",
+      "tooltip": "Add Parent: a dynamic parent (RG-20) · operandi.rig.dynamicParentAdd"
+    },
+    {
+      "command": "operandi.rig.compensation",
+      "label": "Compensation",
+      "tooltip": "Compensation: rig edits keep items where they are (RG-11) · operandi.rig.compensation"
+    },
+    {
+      "divider": "Links",
+      "id": "rig-links"
+    },
+    {
+      "command": "operandi.rig.links",
+      "label": "Channel Links",
+      "icon": "channel-links",
+      "tooltip": "Channel Links (RG-50) · operandi.rig.links"
+    },
+    {
+      "command": "operandi.rig.schematicView",
+      "label": "Schematic",
+      "icon": "schematic",
+      "tooltip": "Schematic (RG-70) · operandi.rig.schematicView"
+    },
+    {
+      "command": "operandi.rig.bake",
+      "label": "Bake Selected",
+      "icon": "bake-keys",
+      "tooltip": "Bake Selected: the evaluated motion as keys, rig pieces off (§8) · operandi.rig.bake"
+    },
+    {
+      "divider": "Skin",
+      "id": "rig-skin"
+    },
+    {
+      "command": "operandi.skin.bindDialog",
+      "label": "Bind",
+      "icon": "skin-mesh",
+      "tooltip": "Bind the selected meshes to the selected root joint (needs Setup) · Shift+click: Unbind · operandi.skin.bindDialog",
+      "variants": {
+        "shift": {
+          "line": "operandi.skin.unbind",
+          "label": "Unbind",
+          "tooltip": "Unbind: removes the skin, keeps the weight maps (SK-24) · operandi.skin.unbind"
+        }
+      }
+    },
+    {
+      "command": "operandi.skin.rebind",
+      "label": "Add Joints to Bind",
+      "tooltip": "Rebind: the selected joints join the skin with empty weight maps (SK-25) · operandi.skin.rebind"
+    },
+    {
+      "command": "operandi.weight.smooth",
+      "label": "Smooth Selected",
+      "tooltip": "One blur pass of the selected weight map (SK-42) · operandi.weight.smooth"
+    },
+    {
+      "command": "operandi.weight.normalize",
+      "label": "Normalize Weights",
+      "tooltip": "Each point's weights add up to 100% (SK-42) · operandi.weight.normalize"
+    },
+    {
+      "command": "operandi.weight.mirror",
+      "label": "Mirror Weights",
+      "tooltip": "+X side to −X side, _L and _R swapped (SK-42) · operandi.weight.mirror"
+    },
+    {
+      "command": "operandi.weight.isolate",
+      "label": "Isolate Weights",
+      "tooltip": "Clear the map outside the selected points (SK-42) · operandi.weight.isolate"
+    },
+    {
+      "command": "operandi.weight.split",
+      "label": "Split Left/Right",
+      "tooltip": "One map into _L and _R maps (SK-42) · operandi.weight.split"
+    },
+    {
+      "command": "operandi.skin.bakeWeights",
+      "label": "Bake Weights",
+      "tooltip": "The skin's effective weights into its maps (SK-34) · operandi.skin.bakeWeights"
+    },
+    {
+      "divider": "IK",
+      "id": "rig-ik"
+    },
+    {
+      "command": "operandi.ik.applyTwoBone",
+      "label": "Two-Bone IK",
+      "icon": "ik-two-bone",
+      "tooltip": "Apply IK (Two-Bone): select root, middle, end joints in Setup (IK-01) · operandi.ik.applyTwoBone"
+    },
+    {
+      "command": "operandi.ik.applyChain",
+      "label": "Chain IK",
+      "icon": "ik-chain",
+      "tooltip": "Apply IK (Chain): select the root then the end joint in Setup (IK-15) · operandi.ik.applyChain"
+    },
+    {
+      "command": "operandi.ik.assign",
+      "label": "Full Body IK",
+      "icon": "ik-full-body",
+      "tooltip": "Assign IK: the root's hierarchy as one full-body chain, in Setup (IK-20) · operandi.ik.assign"
+    },
+    {
+      "command": "operandi.ik.addGoal",
+      "label": "Add Goal",
+      "icon": "ik-goal",
+      "tooltip": "Add Goal: a goal at the selected joint with position and orientation tasks (IK-22) · operandi.ik.addGoal"
+    },
+    {
+      "command": "operandi.ik.addTask mode:position",
+      "label": "Add Position Task",
+      "tooltip": "Pin the selected joint where it is (IK-22) · operandi.ik.addTask"
+    },
+    {
+      "command": "operandi.ik.addTask mode:orientation",
+      "label": "Add Orientation Task",
+      "tooltip": "Hold the selected joint's orientation (IK-22) · operandi.ik.addTask"
+    },
+    {
+      "command": "operandi.ik.pole mode:create",
+      "label": "Up Vector",
+      "icon": "ik-up-vector",
+      "tooltip": "Create IK Up Vector: a pole on the bend side (IK-06) · Shift+click: Remove Up Vector · operandi.ik.pole",
+      "variants": {
+        "shift": {
+          "line": "operandi.ik.pole mode:remove",
+          "label": "Remove Up Vector",
+          "tooltip": "Remove Up Vector: back to Orient (IK-06) · operandi.ik.pole mode:remove"
+        }
+      }
+    },
+    {
+      "command": "operandi.ik.switch",
+      "label": "Switch IK/FK",
+      "icon": "ik-fk-switch",
+      "tooltip": "Switch to FK / to IK by the chain's Blend, keyed, no pop (IK-31) · operandi.ik.switch"
+    },
+    {
+      "command": "operandi.ik.setKeys",
+      "label": "IK/FK: Set Keys",
+      "tooltip": "Key every switch channel now (IK-32) · Shift+click: Delete Keys · operandi.ik.setKeys",
+      "variants": {
+        "shift": {
+          "line": "operandi.ik.setKeys delete:true",
+          "label": "IK/FK: Delete Keys",
+          "tooltip": "Delete the switch channels' keys at the current time (IK-32) · operandi.ik.setKeys delete:true"
+        }
+      }
+    },
+    {
+      "command": "operandi.ik.selectSwitch",
+      "label": "Select Switch Channels",
+      "tooltip": "Select the chain's joints, goal and pole (IK-32) · operandi.ik.selectSwitch"
+    },
+    {
+      "command": "operandi.ik.selectSolvers",
+      "label": "Select IK Solvers",
+      "tooltip": "Select the joints the selection's IK solvers sit on (IK-33) · operandi.ik.selectSolvers"
+    },
+    {
+      "command": "operandi.ik.match",
+      "label": "Match Goal",
+      "tooltip": "Move the goal onto its end joint (IK-33) · operandi.ik.match"
+    },
+    {
+      "command": "operandi.ik.updateRest all:true",
+      "label": "Update Rest Pose",
+      "tooltip": "Every solver re-reads its rest pose (IK-33) · operandi.ik.updateRest"
+    },
+    {
+      "command": "operandi.ik.disable",
+      "label": "Disable IK",
+      "tooltip": "No IK solver runs (Setup only, IK-33) · operandi.ik.disable"
+    },
+    {
+      "command": "operandi.ik.remove",
+      "label": "Remove IK",
+      "tooltip": "Remove the selected chain's IK solver, tasks and settings (IK-26) · operandi.ik.remove"
+    }
+  ]
+}

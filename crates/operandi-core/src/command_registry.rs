@@ -3172,6 +3172,18 @@ pub static COMMANDS: &[Entry] = &[
         .undo()
         .operandi()
         .example("operandi.rig.remove piece:7"),
+    script("operandi.rig.rename", Items, "Renames a rig piece as the Items list shows it (an empty name goes back to its kind's label).")
+        .on_editor(
+            "Give a rig piece (constraint, link, modifier, IK solver) its own name in the Items list and Schematic, one undo step; an empty name goes back to the kind's label.",
+            &[
+            jreq("piece", "integer", "The rig piece."),
+            jopt("name", "string", "The new name (empty: the kind's label)."),
+        ],
+            crate::rig_list::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.rig.rename piece:7 name:Follow"),
     script("operandi.rig.set", Items, "Sets a rig piece's channel (Influence, a weight, Axis, Percent...).")
         .on_editor(
             "Set a channel of a rig piece, one undo step; Auto Key keys it as for any channel. Names as operandi.rig.query lists them (influence 0-1, weight.0, axis 0/1/2, roll radians, percent 0-1...).",
@@ -7630,7 +7642,7 @@ mod tests {
                 assert!(!json.about.is_empty(), "{}", e.name);
             }
         }
-        assert_eq!(crate::command_exec::specs().count(), 312);
+        assert_eq!(crate::command_exec::specs().count(), 313);
     }
 
     #[test]

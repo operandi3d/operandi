@@ -522,6 +522,8 @@ mod rig_bake;
 mod rig_expression;
 #[path = "rig_links.rs"]
 mod rig_links;
+#[path = "rig_list.rs"]
+mod rig_list;
 #[path = "rig_milestones.rs"]
 mod rig_milestones;
 #[path = "rig_modifiers.rs"]

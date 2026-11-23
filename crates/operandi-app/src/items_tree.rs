@@ -21,6 +21,12 @@ pub(crate) enum ItemKey {
     Item(u64, u64),
     /// The "(new scene)" row at the end.
     NewScene,
+    /// A rig piece under its item (RG-01, IK-02), by scene and piece id.
+    Rig(u64, u64),
+    /// A skin under its mesh (SK-36), by scene, mesh and op id.
+    Skin(u64, u64, u64),
+    /// One joint influence under a skin, by scene, mesh and joint.
+    Influence(u64, u64, u64),
 }
 
 /// Column indexes.
@@ -219,8 +225,10 @@ impl Operandi {
             } else {
                 item.name.clone()
             };
+            let rig = operandi_core::rig_list::rows(&self.editor.scene, id);
             let mut row = TreeRow::new(ItemKey::Item(scene, id), depth, name, 3);
-            row.disclosure = has_children.then_some(!self.collapsed_items.contains(&id));
+            row.disclosure =
+                (has_children || !rig.is_empty()).then_some(!self.collapsed_items.contains(&id));
             row.icon = match camera_light_ui::LocatorGlyph::of(item) {
                 Some(glyph) => RowIcon::Locator(glyph),
                 None => RowIcon::Icon(item_type_icon(item)),
@@ -291,6 +299,91 @@ impl Operandi {
             row.draggable = self.editor.live.is_none();
             row.renamable = self.editor.live.is_none();
             rows.push(row);
+            if !self.collapsed_items.contains(&id) {
+                self.rig_rows(scene, id, depth + 1, rig, rows);
+            }
+        }
+    }
+
+    /// The rig rows under item `item` (RG-01, IK-02, SK-36): its pieces,
+    /// then its skin and, opened, the skin's joint influences.
+    fn rig_rows(
+        &self,
+        scene: u64,
+        item: u64,
+        depth: usize,
+        rig: Vec<operandi_core::rig_list::RigRow>,
+        rows: &mut Vec<TreeRow<ItemKey>>,
+    ) {
+        use operandi_core::rig_list::RigRow;
+        let selected = |key: ItemKey| {
+            if self.rig_row == Some(key) {
+                Selected::Primary
+            } else {
+                Selected::No
+            }
+        };
+        let eye = |on: bool, what: &str| Cell::Toggle {
+            on,
+            tip: format!("{} {what}", if on { "Disable" } else { "Enable" }),
+            dimmed: false,
+        };
+        for r in rig {
+            match r {
+                RigRow::Piece {
+                    id,
+                    kind,
+                    name,
+                    enabled,
+                    missing,
+                } => {
+                    let key = ItemKey::Rig(scene, id);
+                    let mut row = TreeRow::new(key, depth, name, 3);
+                    row.icon = RowIcon::Icon(rig_icon(&kind));
+                    row.style.dimmed = !enabled || missing;
+                    row.cells[EYE] = eye(enabled, "this rig piece");
+                    row.selected = selected(key);
+                    row.renamable = self.editor.live.is_none();
+                    row.fixed = true;
+                    row.tip = Some(if missing {
+                        format!("{kind}: made by another Operandi; kept as it is")
+                    } else {
+                        "A rig piece: right-click for its menu, double-click to rename".into()
+                    });
+                    rows.push(row);
+                }
+                RigRow::Skin {
+                    op,
+                    enabled,
+                    influences,
+                } => {
+                    let key = ItemKey::Skin(scene, item, op);
+                    let open = self.open_skins.contains(&(item, op));
+                    let mut row = TreeRow::new(key, depth, "Skin", 3);
+                    row.icon = RowIcon::Icon(icons::Icon::SkinMesh);
+                    row.disclosure = (!influences.is_empty()).then_some(open);
+                    row.style.dimmed = !enabled;
+                    row.cells[EYE] = eye(enabled, "the skin");
+                    row.selected = selected(key);
+                    row.fixed = true;
+                    row.tip = Some(format!("{} joint influences", influences.len()));
+                    rows.push(row);
+                    if !open {
+                        continue;
+                    }
+                    for inf in influences {
+                        let key = ItemKey::Influence(scene, item, inf.joint);
+                        let mut row = TreeRow::new(key, depth + 1, inf.name, 3);
+                        row.icon = RowIcon::Icon(icons::Icon::SkeletonTool);
+                        row.style.dimmed = !inf.enabled || inf.missing;
+                        row.cells[EYE] = eye(inf.enabled, "this joint's influence");
+                        row.selected = selected(key);
+                        row.fixed = true;
+                        row.tip = Some(format!("Weight map {}", inf.map));
+                        rows.push(row);
+                    }
+                }
+            }
         }
     }
 
@@ -330,10 +423,30 @@ impl Operandi {
                 ItemKey::Item(s, id) if s != here => {
                     return index_of(self, s).map(|i| A::SelectItem(i, id));
                 }
+                // A rig row selects the item it belongs to (an influence,
+                // its joint) and stays marked.
+                ItemKey::Rig(_, piece) => {
+                    if let Some(p) = self.editor.scene.animation.rig.piece(piece) {
+                        let owner = p.item;
+                        self.run(Command::SelectItem(Some(owner)));
+                        self.rig_row = Some(key);
+                    }
+                }
+                ItemKey::Skin(_, item, _) => {
+                    self.run(Command::SelectItem(Some(item)));
+                    self.rig_row = Some(key);
+                }
+                ItemKey::Influence(_, _, joint) => {
+                    if self.editor.scene.item(joint).is_some() {
+                        self.run(Command::SelectItem(Some(joint)));
+                    }
+                    self.rig_row = Some(key);
+                }
                 ItemKey::Item(_, id) => {
                     if !self.confirm_fields() {
                         return None;
                     }
+                    self.rig_row = None;
                     match how {
                         ClickHow::Only => self.run(Command::SelectItem(Some(id))),
                         ClickHow::Toggle => self.run(Command::ToggleItemSelection(id)),
@@ -382,6 +495,15 @@ impl Operandi {
             TreeEvent::DoubleClick(_) => {}
             TreeEvent::Disclosure { key, subtree } => self.item_disclosure(key, subtree),
             TreeEvent::Attributes(_) => {}
+            TreeEvent::Rename {
+                key: ItemKey::Rig(_, piece),
+                name,
+            } => {
+                self.execute(&format!(
+                    "operandi.rig.rename piece:{piece} name:{}",
+                    quoted(&name)
+                ));
+            }
             TreeEvent::Rename { key, name } => {
                 if let ItemKey::Item(s, id) = key
                     && s == here
@@ -417,6 +539,53 @@ impl Operandi {
                         hides_children: self.mesh_items_preferences.auto_hide_children,
                     });
                 }
+            }
+            TreeEvent::Toggle {
+                key: ItemKey::Rig(_, piece),
+                ..
+            } => {
+                if let Some(p) = self.editor.scene.animation.rig.piece(piece) {
+                    let on = p.flag("enable");
+                    self.execute(&format!(
+                        "operandi.rig.set piece:{piece} channel:enable value:{}",
+                        if on { 0 } else { 1 }
+                    ));
+                }
+            }
+            TreeEvent::Toggle {
+                key: ItemKey::Skin(_, item, op),
+                ..
+            } => {
+                let on = self
+                    .editor
+                    .scene
+                    .item(item)
+                    .and_then(|i| i.mesh_ops.as_ref())
+                    .and_then(|st| st.ops.iter().find(|o| o.id == op))
+                    .is_some_and(|o| o.enabled);
+                self.execute(&format!(
+                    "deformer.enable deformer:op:{item}:{op} enable:{}",
+                    !on
+                ));
+            }
+            TreeEvent::Toggle {
+                key: ItemKey::Influence(_, item, joint),
+                ..
+            } => {
+                let on = operandi_core::rig_list::rows(&self.editor.scene, item)
+                    .into_iter()
+                    .find_map(|r| match r {
+                        operandi_core::rig_list::RigRow::Skin { influences, .. } => influences
+                            .into_iter()
+                            .find(|i| i.joint == joint)
+                            .map(|i| i.enabled),
+                        _ => None,
+                    })
+                    .unwrap_or(true);
+                self.execute(&format!(
+                    "operandi.skin.set item:{item} joint:{joint} enable:{}",
+                    !on
+                ));
             }
             TreeEvent::Toggle { .. } => {}
             TreeEvent::Sweep { column, keys, on } if column == EYE => {
@@ -493,7 +662,12 @@ impl Operandi {
                     p.collapsed_items.insert(id);
                 }
             }
-            ItemKey::NewScene => {}
+            ItemKey::Skin(_, item, op) => {
+                if !self.open_skins.remove(&(item, op)) {
+                    self.open_skins.insert((item, op));
+                }
+            }
+            ItemKey::NewScene | ItemKey::Rig(..) | ItemKey::Influence(..) => {}
         }
     }
 
@@ -615,6 +789,12 @@ impl Operandi {
             | DropAt::Before(ItemKey::NewScene)
             | DropAt::After(ItemKey::NewScene)
             | DropAt::End => (source, None),
+            // Rig rows take no drops.
+            DropAt::On(ItemKey::Rig(..) | ItemKey::Skin(..) | ItemKey::Influence(..))
+            | DropAt::Before(ItemKey::Rig(..) | ItemKey::Skin(..) | ItemKey::Influence(..))
+            | DropAt::After(ItemKey::Rig(..) | ItemKey::Skin(..) | ItemKey::Influence(..)) => {
+                return None;
+            }
         };
         if scene != source {
             // A plain drop moves, Option copies (scenes::DRAG_COPIES).
@@ -759,6 +939,20 @@ impl Operandi {
     }
 }
 
+/// A rig piece's row icon (the rig, IK and skin studio icons).
+fn rig_icon(kind: &str) -> icons::Icon {
+    use icons::Icon;
+    match kind {
+        "ik.twoBone" => Icon::IkTwoBone,
+        "ik.chain" => Icon::IkChain,
+        "ik.body" => Icon::IkFullBody,
+        "dynamicParent" => Icon::Hierarchy,
+        "link" => Icon::ChannelLinks,
+        k if k.starts_with("mod.") => Icon::Schematic,
+        _ => Icon::Constrain,
+    }
+}
+
 /// The Items row icon for an item that has no locator glyph: Backdrop's
 /// polygon, otherwise the mesh cube. Environments never show here
 /// (ENVIRONMENT-PLACEMENT §1); their icon is on the Shader Tree's rows.
@@ -861,7 +1055,147 @@ impl TreeHooks<ItemKey> for ItemsHooks<'_> {
                     self.action = Some(scenes::SceneRowAction::Item(i, id, entry));
                 }
             }
+            ItemKey::Rig(_, piece) => self.app.rig_piece_menu(ui, piece, _rename),
+            ItemKey::Skin(_, item, op) => self.app.skin_row_menu(ui, item, op),
+            ItemKey::Influence(_, item, joint) => self.app.influence_menu(ui, item, joint),
             ItemKey::NewScene => {}
+        }
+    }
+}
+
+/// `v` as one argument of a command line.
+fn quoted(v: &str) -> String {
+    if v.is_empty() || v.contains(char::is_whitespace) || v.contains('"') {
+        format!("\"{}\"", v.replace('\\', "\\\\").replace('"', "\\\""))
+    } else {
+        v.to_owned()
+    }
+}
+
+impl Operandi {
+    /// A rig piece's menu (UIC-60: never empty): rename, enable, delete,
+    /// select its item.
+    fn rig_piece_menu(&mut self, ui: &mut Ui, piece: u64, rename: &mut dyn FnMut()) {
+        self.menu_owned_input = true;
+        let Some(p) = self.editor.scene.animation.rig.piece(piece).cloned() else {
+            ui.label("This rig piece is gone");
+            return;
+        };
+        let mut line: Option<String> = None;
+        if ui.button("Rename…").clicked() {
+            rename();
+            ui.close();
+        }
+        let on = p.flag("enable");
+        if ui.button(if on { "Disable" } else { "Enable" }).clicked() {
+            line = Some(format!(
+                "operandi.rig.set piece:{piece} channel:enable value:{}",
+                if on { 0 } else { 1 }
+            ));
+        }
+        let delete = if operandi_core::ik::is_ik(&p.kind) {
+            format!("operandi.ik.remove piece:{piece}")
+        } else {
+            format!("operandi.rig.remove piece:{piece}")
+        };
+        if ui.button("Delete").on_hover_text(&delete).clicked() {
+            line = Some(delete);
+        }
+        ui.separator();
+        if ui.button("Select Item").clicked() {
+            self.run(Command::SelectItem(Some(p.item)));
+            ui.close();
+        }
+        if let Some(l) = line {
+            self.execute(&l);
+            ui.close();
+        }
+    }
+
+    /// A skin row's menu (SK-36).
+    fn skin_row_menu(&mut self, ui: &mut Ui, item: u64, op: u64) {
+        self.menu_owned_input = true;
+        let enabled = self
+            .editor
+            .scene
+            .item(item)
+            .and_then(|i| i.mesh_ops.as_ref())
+            .and_then(|st| st.ops.iter().find(|o| o.id == op))
+            .map(|o| o.enabled);
+        let Some(enabled) = enabled else {
+            ui.label("This skin is gone");
+            return;
+        };
+        let setup = self.editor.scene.animation.setup;
+        let mut line: Option<String> = None;
+        if ui
+            .button(if enabled { "Disable" } else { "Enable" })
+            .clicked()
+        {
+            line = Some(format!(
+                "deformer.enable deformer:op:{item}:{op} enable:{}",
+                !enabled
+            ));
+        }
+        if ui.button("Bake Weights").clicked() {
+            line = Some(format!("operandi.skin.bakeWeights item:{item}"));
+        }
+        if ui
+            .button("Duplicate and Freeze")
+            .on_hover_text("A new mesh with the deformed shape; this one stays bound")
+            .clicked()
+        {
+            line = Some(format!(
+                "deformer.freeze deformer:op:{item}:{op} duplicate:true"
+            ));
+        }
+        if ui
+            .gated(
+                crate::unavailable::unless(setup, operandi_core::skin_bind::NEEDS_SETUP),
+                Button::new("Delete (Unbind)"),
+            )
+            .clicked()
+        {
+            line = Some(format!("operandi.skin.unbind items:{item}"));
+        }
+        if let Some(l) = line {
+            self.execute(&l);
+            ui.close();
+        }
+    }
+
+    /// A joint influence's menu (SK-35).
+    fn influence_menu(&mut self, ui: &mut Ui, item: u64, joint: u64) {
+        self.menu_owned_input = true;
+        let on = operandi_core::rig_list::rows(&self.editor.scene, item)
+            .into_iter()
+            .find_map(|r| match r {
+                operandi_core::rig_list::RigRow::Skin { influences, .. } => influences
+                    .into_iter()
+                    .find(|i| i.joint == joint)
+                    .map(|i| i.enabled),
+                _ => None,
+            })
+            .unwrap_or(true);
+        if ui.button(if on { "Disable" } else { "Enable" }).clicked() {
+            self.execute(&format!(
+                "operandi.skin.set item:{item} joint:{joint} enable:{}",
+                !on
+            ));
+            ui.close();
+        }
+        if ui
+            .gated(
+                crate::unavailable::unless(
+                    self.editor.scene.item(joint).is_some(),
+                    "The joint is gone",
+                ),
+                Button::new("Select Joint"),
+            )
+            .clicked()
+        {
+            self.run(Command::SelectItem(Some(joint)));
+            ui.close();
         }
     }
 }
@@ -939,3 +1273,7 @@ mod tests {
         assert_eq!(item_type_icon(mesh), icons::Icon::Cube);
     }
 }
+
+#[cfg(test)]
+#[path = "items_rig_tests.rs"]
+mod rig_tests;

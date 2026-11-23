@@ -1559,7 +1559,7 @@ pub fn answer(e: &Editor, name: &str, a: &Args) -> Option<Result<String, String>
                 json!({
                     "id": p.id,
                     "kind": p.kind,
-                    "label": rig::label(&p.kind),
+                    "label": crate::rig_list::name(p),
                     "item": p.item,
                     "targets": p.targets,
                     "refs": p.refs,
