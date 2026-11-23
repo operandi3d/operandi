@@ -36,7 +36,7 @@ pub enum NodeKey {
     Field(u64, String),
     /// An item's transform (later: its world transform through parents).
     Transform(u64),
-    /// An item's shown mesh: Base Mesh, MeshOps, later deformers (AR-05).
+    /// An item's shown mesh: Base Mesh, Mesh Stack, later deformers (AR-05).
     ShownMesh(u64),
 }
 

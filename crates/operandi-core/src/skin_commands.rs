@@ -2,7 +2,7 @@
 //! its channels and influences, Bake Weights (SK-34), and the query that
 //! reads its joints, a point's weights and its deformed position at a time.
 //! Each edit is one undo step (UIC-224).
-use crate::meshops::{MeshOp, OpKind};
+use crate::mesh_stack::{MeshOp, OpKind};
 use crate::skin::{self, SKIN_OP, SkinValues};
 use crate::{Command, Editor, Result, Scene};
 use serde_json::{Map, Value, json};
@@ -67,7 +67,7 @@ pub fn skinned_item(scene: &Scene, a: &Args) -> Result<u64> {
 pub fn skin_op(scene: &Scene, item: u64) -> Result<(u64, SkinValues)> {
     let it = scene.item(item).ok_or_else(|| format!("No item {item}"))?;
     let op = it
-        .mesh_ops
+        .mesh_stack
         .as_ref()
         .and_then(|s| s.ops.iter().find(|o| o.kind.type_id() == SKIN_OP))
         .ok_or_else(|| format!("{} has no skin", it.name))?;
@@ -80,7 +80,7 @@ pub fn skin_op(scene: &Scene, item: u64) -> Result<(u64, SkinValues)> {
 pub fn write_skin(scene: &mut Scene, item: u64, op: u64, values: &SkinValues) -> Result<()> {
     let stack = scene
         .item_mut(item)
-        .and_then(|i| i.mesh_ops.as_mut())
+        .and_then(|i| i.mesh_stack.as_mut())
         .ok_or("No skin")?;
     let row: &mut MeshOp = stack.ops.iter_mut().find(|o| o.id == op).ok_or("No skin")?;
     row.kind = OpKind::Op {
@@ -247,7 +247,7 @@ pub fn answer(e: &Editor, name: &str, a: &Args) -> Option<Result<String>> {
             let posed = crate::animation::evaluate_at(&e.scene, time);
             let shown = crate::evaluate::evaluate(
                 &posed,
-                &e.meshops,
+                &e.mesh_stack,
                 &e.eval,
                 time,
                 crate::evaluate::Purpose::Final,

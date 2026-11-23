@@ -1,9 +1,9 @@
-# MeshOps v1 GUI check
+# Mesh Stack v1 GUI check
 
 QA app identity only (`OPERANDI_DEV_DATA`). Claude can't click in
 Operandi; this is for Jason or Codex.
 
-1. New scene, select the empty Mesh. Upper side panel, **Mesh Ops** tab
+1. New scene, select the empty Mesh. Upper side panel, **Mesh Stack** tab
    (last tab). Add Operator ▾ › Cube. A 1 m cube appears; the list shows
    Cube above Base Mesh.
 2. Add Operator › Polygon Bevel (it lands on top and is selected). Its values show in the

@@ -401,6 +401,6 @@ pub fn weights_only(a: &Mesh, b: &Mesh) -> bool {
 }
 
 /// Whether every op of `stack` is a skin (it keeps every point).
-pub fn only_skin(stack: &crate::meshops::MeshOpStack) -> bool {
+pub fn only_skin(stack: &crate::mesh_stack::MeshStack) -> bool {
     !stack.ops.is_empty() && stack.ops.iter().all(|o| o.kind.type_id() == SKIN_OP)
 }

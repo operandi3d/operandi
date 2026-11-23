@@ -364,7 +364,7 @@ fn normals_and_morphs_follow_the_bake() {
 }
 
 #[test]
-fn mesh_ops_stay_live_on_the_frozen_base_mesh() {
+fn mesh_stack_stay_live_on_the_frozen_base_mesh() {
     let mut e = editor();
     let id = add_cube(
         &mut e,
@@ -374,11 +374,11 @@ fn mesh_ops_stay_live_on_the_frozen_base_mesh() {
     );
     select(&mut e, &[id]);
     command_exec::run(&mut e, "mirror.clone.create", &Default::default()).unwrap();
-    let ops = e.scene.item(id).unwrap().mesh_ops.clone();
+    let ops = e.scene.item(id).unwrap().mesh_stack.clone();
     assert!(ops.is_some());
     freeze(&mut e, &[id], TransformReset::Position).unwrap();
     let item = e.scene.item(id).unwrap();
-    assert_eq!(item.mesh_ops, ops, "the stack stays as it was");
+    assert_eq!(item.mesh_stack, ops, "the stack stays as it was");
     assert_eq!(item.transform.translation, DVec3::ZERO);
 }
 

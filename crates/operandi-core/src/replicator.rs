@@ -501,7 +501,7 @@ fn virtual_copy(scene: &Scene, item: &Item, id: u64) -> Item {
     c.hides_children = false;
     c.source_id = None;
     c.source_display_name = None;
-    c.mesh_ops = None;
+    c.mesh_stack = None;
     if item.is_mesh() {
         c.instance_of = Some(scene.instance_source(item.id).unwrap_or(item.id));
     }
@@ -617,7 +617,7 @@ fn blank(template: &Item, id: u64, name: String) -> Item {
     i.environment = None;
     i.common = Default::default();
     i.elements = Default::default();
-    i.mesh_ops = None;
+    i.mesh_stack = None;
     i.kit = None;
     i.instance_of = None;
     i.replicator = None;

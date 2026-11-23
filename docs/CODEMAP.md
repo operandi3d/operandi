@@ -34,7 +34,7 @@ this page is the "which files" companion. Paths are under `crates/`.
 | Saving and opening `.opscene` | `operandi-core/src/persistence.rs`, `mesh_pack.rs` |
 | Import / export (OBJ, FBX, glTF, LXO...) | `operandi-core/src/interchange/`, `lxo/` |
 | USD import / export (OpenUSD bridge, reader, scene builder, import dialog) | `operandi-usd/src/` (`import.rs`, `import_materials.rs`, `stage.rs`), `operandi-usd/bridge/`, `operandi-app/src/usd_import_dialog.rs` |
-| MeshOps (procedural stack), op types, adding an op | `operandi-core/src/meshops.rs`, `meshop_types.rs`, `meshops_builtin.rs`; `operandi-app/src/mesh_ops_ui.rs`; guide in [MESHOPS.md](MESHOPS.md) |
+| Mesh Stack (procedural stack), op types, adding an op | `operandi-core/src/mesh_stack.rs`, `meshop_types.rs`, `mesh_stack_builtin.rs`; `operandi-app/src/mesh_stack_ui.rs`; guide in [MESH_STACK.md](MESH_STACK.md) |
 | Node View panel (registry kind, follows the Shader Tree selection, docks under the views) | `operandi-app/src/node_material_ui.rs`, `node_edit_ui.rs`, `panel_docking.rs` `reveal_registry_panel` |
 | Closing a registry panel (header ×, Close Panel, Node View toggle, window close) | `operandi-app/src/panel_close.rs`, `node_view_open.rs` `toggle_node_view` |
 | Shader tree and materials | `operandi-core/src/shader_tree.rs`, `shader_eval.rs`, `shader_wgsl.rs`, `material.rs`; MaterialX graphs `materialx/` (`cycles.rs` translation, `graph.rs`, the tree's own form `tree.rs` + `tree_library.rs`, docs/MATERIALX_GRAPHS.md); graph layers in the viewport `graph_view.rs` (+ `shader_func.rs`/`.wgsl`, `cycles_noise.rs`) |
@@ -104,7 +104,7 @@ Test locations:
 - `operandi-core/src`: unit tests inside modules (`mod tests`).
 - `operandi-app/src/*_tests.rs`: app tests, all in the app's one test
   program (they're modules of `main.rs`).
-- The slowest tests (20-35 s each, in debug builds): `meshops_stress`,
+- The slowest tests (20-35 s each, in debug builds): `mesh_stack_stress`,
   `drag_undo_guard_tests::every_tool_drag_records_at_most_one_undo_step`,
   `gpu_chunks`, the wire-fade tests. They set the floor on a full run.
 

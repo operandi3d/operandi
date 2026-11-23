@@ -1,10 +1,10 @@
-//! SAFE-16 stress harness for MeshOps: random stacks of real ops with
+//! SAFE-16 stress harness for Mesh Stack: random stacks of real ops with
 //! random edits (reorder, eye, values including zero, huge, negative and
 //! NaN through the script path, delete, freeze), undo/redo storms and
 //! save/load round trips, with a background evaluator racing the edits.
 //! Pass = no panic escapes, every command either works or refuses with
 //! the scene unchanged, and a saved scene reopens to the identical result.
-use operandi_core::meshops::{Limits, Runtime, evaluate_stack_within, op_defs};
+use operandi_core::mesh_stack::{Limits, Runtime, evaluate_stack_within, op_defs};
 
 /// Small limits keep the run quick; over-limit results fail their op,
 /// which the harness wants to see happen too.
@@ -12,7 +12,7 @@ const LIMITS: Limits = Limits {
     max_polygons: 20_000,
     max_points: 20_000,
 };
-use operandi_core::meshops_editor::{IndexEdit, OpRef, OpRow};
+use operandi_core::mesh_stack_editor::{IndexEdit, OpRef, OpRow};
 use operandi_core::{Command, Editor, persistence};
 use serde_json::{Value, json};
 
@@ -54,7 +54,7 @@ fn ops_of(e: &Editor, item: u64) -> Vec<u64> {
         .items
         .iter()
         .find(|i| i.id == item)
-        .and_then(|i| i.mesh_ops.as_ref())
+        .and_then(|i| i.mesh_stack.as_ref())
         .map_or_else(Vec::new, |s| s.ops.iter().map(|o| o.id).collect())
 }
 
@@ -66,7 +66,7 @@ fn random_stacks_and_edits_never_panic_and_reopen_identical() {
 }
 
 /// The full stress set: `cargo test --locked --workspace --
-/// meshops_stress:: --ignored`.
+/// mesh_stack_stress:: --ignored`.
 #[test]
 #[ignore = "stress probe: run with --ignored"]
 fn random_stacks_and_edits_more_seeds() {
@@ -77,10 +77,10 @@ fn random_stacks_and_edits(seeds: std::ops::RangeInclusive<u64>) {
     for seed in seeds {
         let mut rng = Rng(0x9E37_79B9_7F4A_7C15 ^ seed);
         let mut e = Editor::default();
-        e.meshops.set_limits(LIMITS);
+        e.mesh_stack.set_limits(LIMITS);
         // Half the runs race a background evaluator against the edits.
         if seed % 2 == 0 {
-            e.meshops.set_background(true, None);
+            e.mesh_stack.set_background(true, None);
         }
         e.scene.new_mesh().unwrap();
         // A Base Mesh with polygons, so direct tools have something to
@@ -115,7 +115,7 @@ fn random_stacks_and_edits(seeds: std::ops::RangeInclusive<u64>) {
                 },
                 4 | 5 => {
                     let r = pick(&mut rng);
-                    let op = &e.scene.items[0].mesh_ops.as_ref().unwrap().ops
+                    let op = &e.scene.items[0].mesh_stack.as_ref().unwrap().ops
                         [ops.iter().position(|&o| o == r.op).unwrap()];
                     let values = op.kind.values();
                     let Some(map) = values.as_object() else {
@@ -155,7 +155,7 @@ fn random_stacks_and_edits(seeds: std::ops::RangeInclusive<u64>) {
             // A direct tool on the procedural mesh is refused (SAFE-05).
             // (A Base Mesh frozen down to no polygons has nothing to flip.)
             if step % 15 == 7
-                && e.scene.items[0].mesh_ops.is_some()
+                && e.scene.items[0].mesh_stack.is_some()
                 && e.base_edit.is_none()
                 && !e.scene.items[0].mesh.faces.is_empty()
             {
@@ -166,7 +166,7 @@ fn random_stacks_and_edits(seeds: std::ops::RangeInclusive<u64>) {
             }
             // Ask for results as the app does every frame.
             for i in &e.scene.items {
-                let _ = e.meshops.result(&e.scene, i);
+                let _ = e.mesh_stack.result(&e.scene, i);
             }
             // Select by Index edits with nothing selected are refused.
             if step % 20 == 3 && !ops_of(&e, item).is_empty() {
@@ -180,7 +180,7 @@ fn random_stacks_and_edits(seeds: std::ops::RangeInclusive<u64>) {
                 });
             }
         }
-        e.meshops.wait();
+        e.mesh_stack.wait();
         // Save and reopen: same recipe, same result (SAFE-11, MO-91).
         let bytes = persistence::encode(&e.scene).unwrap();
         let back = persistence::decode(&bytes).unwrap();
@@ -188,15 +188,15 @@ fn random_stacks_and_edits(seeds: std::ops::RangeInclusive<u64>) {
         let fresh = Runtime::default();
         fresh.set_limits(LIMITS);
         for (a, b) in e.scene.items.iter().zip(&back.items) {
-            if a.mesh_ops.is_none() {
+            if a.mesh_stack.is_none() {
                 continue;
             }
-            let ours = e.meshops.current(&e.scene, a).unwrap();
+            let ours = e.mesh_stack.current(&e.scene, a).unwrap();
             let theirs = fresh.current(&back, b).unwrap();
             assert_eq!(*ours.mesh, *theirs.mesh, "seed {seed}");
             assert_eq!(ours.statuses, theirs.statuses, "seed {seed}");
             let direct =
-                evaluate_stack_within(b.mesh.shared(), b.mesh_ops.as_ref().unwrap(), LIMITS);
+                evaluate_stack_within(b.mesh.shared(), b.mesh_stack.as_ref().unwrap(), LIMITS);
             assert_eq!(
                 *direct.mesh, *ours.mesh,
                 "seed {seed}: cache = from scratch"
@@ -221,7 +221,7 @@ fn a_hand_edited_file_with_bad_values_opens_and_fails_per_op() {
     let back = persistence::decode(text.as_bytes()).unwrap();
     let out = Runtime::default().current(&back, &back.items[0]).unwrap();
     assert!(
-        matches!(&out.statuses[0], operandi_core::meshops::OpStatus::Failed(r) if r.contains("Sides")),
+        matches!(&out.statuses[0], operandi_core::mesh_stack::OpStatus::Failed(r) if r.contains("Sides")),
         "{:?}",
         out.statuses
     );

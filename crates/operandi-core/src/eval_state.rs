@@ -5,7 +5,7 @@
 //! each scene tab keeps its own graph. It is a cache: never undo data,
 //! never saved, and two editors compare equal whatever it holds (AR-04,
 //! AR-15). Clones (an editor's staged copy) share it, as they share the
-//! MeshOps cache; it is keyed by the structure fingerprint, so a stale
+//! Mesh Stack cache; it is keyed by the structure fingerprint, so a stale
 //! entry is never read for another structure.
 //!
 //! The graph holds structure only so far (who reads whom). Values still

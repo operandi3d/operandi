@@ -2,7 +2,7 @@
 //! CC-xx): acceptance criteria from CURVE_COMMANDS_ACCEPTANCE.md.
 //!
 //! MC1–MC3 Make Open / Closed Curve; MF1, MF3 Make Curve Fill; AW1, AW2
-//! Align Winding; SH1–SH6 the six shapes as MeshOps.
+//! Align Winding; SH1–SH6 the six shapes as Mesh Stack.
 use glam::{DVec2, DVec3};
 use operandi_core::curve_commands::{self, WindingOptions};
 use operandi_core::curve_ops::{self, KAPPA, Shape, ShapeType};

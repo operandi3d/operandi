@@ -1,4 +1,4 @@
-//! MeshOps for the Deform finish tools (modelling parity batch 1):
+//! Mesh Stack for the Deform finish tools (modelling parity batch 1):
 //! Quantize, Radial Align,
 //! Linear Align and Relax Mesh under Operandi's own ids (the type list
 //! names none for them; DFF-Q08, provisional). Each runs the direct tool's
@@ -14,7 +14,7 @@ use serde::{Deserialize, Serialize};
 use std::collections::BTreeSet;
 use std::sync::Arc;
 
-/// Jitter's op (`xfrm.jitter.item`) is in meshops_tools.rs and runs
+/// Jitter's op (`xfrm.jitter.item`) is in mesh_stack_tools.rs and runs
 /// `deform_finish::jitter_geometry`.
 pub const JITTER_OP: &str = "xfrm.jitter.item";
 pub const QUANTIZE_OP: &str = "xfrm.quantize.item";

@@ -1931,7 +1931,7 @@ fn a_sidebar_tab_dropped_outside_reopens_with_its_own_window() {
     let from = a.upper_frame.rects[1].center();
     let out = pos2(SIZE.x + 40., 280.);
     drag(&mut a, &ctx, from, out, Modifiers::NONE);
-    assert_eq!(a.upper_frame.tabs, [K::Items, K::Groups, K::MeshOps]);
+    assert_eq!(a.upper_frame.tabs, [K::Items, K::Groups, K::MeshStack]);
     let (&key, slot) = a
         .views
         .dock_tabs
@@ -1961,7 +1961,7 @@ fn a_sidebar_tab_dropped_outside_reopens_with_its_own_window() {
     assert!(reopened.views.dock_tabs.is_empty());
     assert_eq!(
         reopened.upper_frame.tabs,
-        [K::Items, K::ShaderTree, K::Groups, K::MeshOps]
+        [K::Items, K::ShaderTree, K::Groups, K::MeshStack]
     );
     assert_eq!(reopened.upper_frame.front(), Some(K::ShaderTree));
 }

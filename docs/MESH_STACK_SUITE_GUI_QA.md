@@ -1,4 +1,4 @@
-# MeshOps suite: GUI check
+# Mesh Stack suite: GUI check
 
 QA app: `~/Developer/Operandi-Builds/Operandi project-thread-fcjo2t <commit>.app`.
 Open the Mesh Stack tab (right panel, last tab of the upper group).

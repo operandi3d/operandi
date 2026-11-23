@@ -132,13 +132,13 @@ const MESH_INSTANCE_VERSION: u32 = 51;
 fn has_v51_instances(scene: &Scene) -> bool {
     scene.items.iter().any(|i| i.instance_of.is_some())
 }
-/// Version 50: MeshOps selection ops (`MeshOp::selops`,
+/// Version 50: Mesh Stack selection ops (`MeshOp::selops`,
 /// meshop_selection.rs). Older builds refuse the unknown field, a clean
 /// refusal; a scene without any keeps its older number.
 const SELECTION_OPS_VERSION: u32 = 50;
 fn has_v50_selops(scene: &Scene) -> bool {
     scene.items.iter().any(|i| {
-        i.mesh_ops
+        i.mesh_stack
             .as_ref()
             .is_some_and(|s| s.ops.iter().any(|o| !o.selops.is_empty()))
     })
@@ -244,25 +244,25 @@ fn has_v41_openpbr(scene: &Scene) -> bool {
             .iter()
             .any(|n| matches!(&n.kind, NodeKind::Material(m) if !m.openpbr.is_legacy()))
 }
-/// Version 40: MeshOps Mirror and Array saved as a Clone Effector with a
+/// Version 40: Mesh Stack Mirror and Array saved as a Clone Effector with a
 /// `pmodel.mirror` / `pmodel.array` generator (registry rev 3). Version 39
 /// files saved them flat as `mirror.clone.item` / `array.clone.item`; the
 /// reader still takes that form.
 const CLONE_EFFECTOR_VERSION: u32 = 40;
 fn has_v40_clone_effectors(scene: &Scene) -> bool {
     scene.items.iter().any(|i| {
-        i.mesh_ops.as_ref().is_some_and(|s| {
+        i.mesh_stack.as_ref().is_some_and(|s| {
             s.ops.iter().any(|o| {
-                matches!(o.kind, crate::meshops::OpKind::Op { .. })
+                matches!(o.kind, crate::mesh_stack::OpKind::Op { .. })
                     && matches!(o.kind.type_id(), "mirror.clone.item" | "array.clone.item")
             })
         })
     })
 }
-/// Version 39: MeshOps stacks on mesh items (`Item::mesh_ops`, meshops.rs).
-const MESH_OPS_VERSION: u32 = 39;
-fn has_v39_mesh_ops(scene: &Scene) -> bool {
-    scene.items.iter().any(|i| i.mesh_ops.is_some())
+/// Version 39: Mesh Stacks on mesh items (`Item::mesh_stack`, mesh_stack.rs).
+const MESH_STACK_VERSION: u32 = 39;
+fn has_v39_mesh_stack(scene: &Scene) -> bool {
+    scene.items.iter().any(|i| i.mesh_stack.is_some())
 }
 /// Version 38: node graphs (the shader tree's Nodes section), Node
 /// Material layers and texture layers driving their exposed inputs (Nodes
@@ -623,8 +623,8 @@ fn encode_document(scene: &Scene, preset: Option<&crate::preset::PresetHeader>) 
             OPENPBR_VERSION
         } else if has_v40_clone_effectors(scene) {
             CLONE_EFFECTOR_VERSION
-        } else if has_v39_mesh_ops(scene) {
-            MESH_OPS_VERSION
+        } else if has_v39_mesh_stack(scene) {
+            MESH_STACK_VERSION
         } else if has_v38_node_graphs(scene) {
             NODE_GRAPH_VERSION
         } else if preset.is_some_and(|p| p.source.is_some()) {
@@ -974,7 +974,7 @@ fn decode_document(
     scene.sync_instances(None);
     // A file whose op links loop opens with the closing ops turned off
     // (SAFE-07).
-    crate::meshops::break_loops(&mut scene);
+    crate::mesh_stack::break_loops(&mut scene);
     scene.validate()?;
     // TK-42: a reopened scene shows its curves at the saved time; edits
     // that were never keyed don't survive closing it.

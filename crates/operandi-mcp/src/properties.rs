@@ -208,13 +208,13 @@ pub fn item_get(e: &Editor, args: &Map<String, Value>) -> Result<Value> {
         });
         out["subdivision"] = crate::shading::subdivision_json(i);
         // BRQ-94: the Mesh Operations, bottom (first applied) to top.
-        if let Some(stack) = &i.mesh_ops {
+        if let Some(stack) = &i.mesh_stack {
             let statuses = e
-                .meshops
+                .mesh_stack
                 .current(scene, i)
                 .map(|r| r.statuses)
                 .unwrap_or_default();
-            out["mesh_ops"] = json!(
+            out["mesh_stack"] = json!(
                 stack
                     .ops
                     .iter()
@@ -784,7 +784,7 @@ pub fn meshop_set(e: &mut Editor, args: &Map<String, Value>) -> Result<()> {
         .get("op")
         .and_then(Value::as_str)
         .ok_or("op is required, written op:<item>:<op>")?;
-    let op = operandi_core::meshops_editor::OpRef::parse(text)
+    let op = operandi_core::mesh_stack_editor::OpRef::parse(text)
         .ok_or("op must be written op:<item>:<op>")?;
     let values = args
         .get("values")

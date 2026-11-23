@@ -392,7 +392,7 @@ impl super::Operandi {
     /// costs a lookup per item even at 10M+ triangles; others (no GPU, an
     /// item a primitive tool is drawing, a shape preview) are counted from
     /// their polygon list, which for a mesh with no SubD or polylines is a
-    /// remembered number, not a pass. Items with Mesh Ops count the result
+    /// remembered number, not a pass. Items with a Mesh Stack count the result
     /// the views draw (MO-01). The graphics memory watch counts the same way
     /// (PREF-Q21, Jason 2026-11-13: triangles).
     pub(super) fn drawn_triangles(&self) -> u64 {
@@ -402,14 +402,14 @@ impl super::Operandi {
     /// Statistics panel's Drawn (GPU) Active and Background rows read the
     /// same count (statistics_ui.rs).
     pub(super) fn drawn_triangles_where(&self, count: impl Fn(u64) -> bool) -> u64 {
-        // Items with Mesh Ops draw their result; that scene is only built
+        // Items with a Mesh Stack draw their result; that scene is only built
         // when some item has a stack.
         let shown = self
             .editor
             .scene
             .items
             .iter()
-            .any(|i| i.mesh_ops.is_some())
+            .any(|i| i.mesh_stack.is_some())
             .then(|| self.editor.evaluated_display())
             .flatten();
         let scene = shown.as_ref().unwrap_or(&self.editor.scene);

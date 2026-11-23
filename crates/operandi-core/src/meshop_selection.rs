@@ -234,7 +234,7 @@ impl SelOp {
         let mut out = vec![false; n];
         match &self.kind {
             SelKind::Index { index } => {
-                let s = crate::meshops::SelectByIndex::parse(index)?;
+                let s = crate::mesh_stack::SelectByIndex::parse(index)?;
                 if let Some(&bad) = s.polygons.iter().find(|&&f| f as usize >= n) {
                     return Err(format!(
                         "Select by Index names polygon {bad}, but the mesh below has {n} polygons"
@@ -308,7 +308,7 @@ impl SelOp {
 /// works on the whole mesh, PG-05), otherwise the picked polygons, which
 /// may be none at all (PG-04).
 pub fn resolve(
-    index: Option<&crate::meshops::SelectByIndex>,
+    index: Option<&crate::mesh_stack::SelectByIndex>,
     selops: &[SelOp],
     mesh: &Mesh,
 ) -> Result<Option<Vec<u32>>> {

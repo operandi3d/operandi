@@ -127,7 +127,7 @@ pub(crate) fn skins(scene: &Scene, frames: Option<&crate::anim_usd::Frames>) -> 
     let mut out = Skins::default();
     let mut by_root: BTreeMap<u64, usize> = BTreeMap::new();
     for item in &scene.items {
-        let Some(stack) = item.mesh_ops.as_ref() else {
+        let Some(stack) = item.mesh_stack.as_ref() else {
             continue;
         };
         if !skin::only_skin(stack) {

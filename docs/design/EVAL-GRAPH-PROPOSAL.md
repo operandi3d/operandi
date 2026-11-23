@@ -6,7 +6,7 @@ Status: proposal, read-only design. Nothing here is built. 2026-11-22.
 
 Today, every time something changes (a key, a drag, a frame step), Operandi
 works out what to show by asking each part "is your input the same object
-as last time?". Each part keeps its own memory: MeshOps compares recipes,
+as last time?". Each part keeps its own memory: Mesh Stack compares recipes,
 the viewport compares mesh pointers, the Cycles preview does the same.
 That works, and it is fast for the cases we have. It does not scale to
 rigs, where one controller moves a hundred bones that move ten meshes,
@@ -32,8 +32,8 @@ that can always be thrown away and rebuilt.
 | Time change | `Editor::set_current_time` (anim_edit.rs) | `animation::pose` writes every channel's value into item fields, for the scene and the live tool's base. Bumps `Editor::revision`. |
 | Key / curve edit | anim_edit.rs, anim_graph.rs | Each command ends with `animation::repose(&mut e.scene)`: every channel re-posed, not only the edited one. |
 | Other times | `animation::evaluate_at` | Clones the scene and poses the copy (USD export, renders of a range). |
-| Evaluated scene | `evaluate::evaluate` (evaluate.rs) | Purpose Display / Final / Pick. MeshOps substitution, live patches, replicators. Takes `time` but ignores it. Each layer clones the scene when it changes anything and scans every item. |
-| MeshOps | `meshops::Runtime` (meshops.rs) | Per-item `Chain` of cached op results; `valid_prefix` compares base mesh pointer, op values and `OpInputs` (links, time). Background jobs for Display. Pull-and-compare, not dirty flags. |
+| Evaluated scene | `evaluate::evaluate` (evaluate.rs) | Purpose Display / Final / Pick. Mesh Stack substitution, live patches, replicators. Takes `time` but ignores it. Each layer clones the scene when it changes anything and scans every item. |
+| Mesh Stack | `mesh_stack::Runtime` (mesh_stack.rs) | Per-item `Chain` of cached op results; `valid_prefix` compares base mesh pointer, op values and `OpInputs` (links, time). Background jobs for Display. Pull-and-compare, not dirty flags. |
 | Viewport | gpu_scene.rs | Per-item geometry keyed on `Shared::same` mesh pointers plus a generation; patches changed ranges (`Patch`). |
 | Cycles preview | preview.rs | Compares item meshes by pointer (`Shared::same`) and fields to decide what to resend. |
 
@@ -42,7 +42,7 @@ Where whole-scene work happens on a drag or frame step:
 1. `pose` / `repose` loop over all channels on every frame step and after
    every key edit.
 2. `evaluate` (Display) runs every frame: `with_patches` and
-   `replicator::expand` scan all items; MeshOps `substituted` clones the
+   `replicator::expand` scan all items; Mesh Stack `substituted` clones the
    scene when any item has a stack.
 3. Each reader (viewport, preview, framing) compares item by item.
 
@@ -59,7 +59,7 @@ From the approved audit remediation (`hardening` branch, batch 4):
   (app-wide settings and tool context), with an exhaustive list that
   doesn't compile until a new field is sorted.
   `Editor::swap_document_state` swaps the Document ones when scene tabs
-  switch; the MeshOps cache already travels with its tab this way.
+  switch; the Mesh Stack cache already travels with its tab this way.
 - **Undo reports success truthfully** (P2-001 stage 2).
 
 This proposal does not change the Editor field layout beyond adding its
@@ -74,14 +74,14 @@ A node is one value someone can ask for:
 - `Channel(item, name)`: a curve's value at the current time.
 - `ItemField(item, field)`: a transform or property as posed.
 - `WorldTransform(item)`: parent chain (later, rigs).
-- `ShownMesh(item)`: Base Mesh → MeshOps → (later) morphs, skinning,
+- `ShownMesh(item)`: Base Mesh → Mesh Stack → (later) morphs, skinning,
   deformers, sim cache, in the AR-05 order.
 - `Time`: the document's current time; one node everyone time-dependent
   reads.
 
 Edges come from what each node reads: a channel writes one field; a
-MeshOps link reads another item's shown mesh; a time-using op reads
-`Time`. MeshOps already lists its links (`OpDef::links`) and its time use
+Mesh Stack link reads another item's shown mesh; a time-using op reads
+`Time`. Mesh Stack already lists its links (`OpDef::links`) and its time use
 (`OpInputs::time`), so its edges are already known.
 
 ### Dirty flags
@@ -93,7 +93,7 @@ MeshOps link reads another item's shown mesh; a time-using op reads
   bit. Pull keeps "who is asking" (Display in the background, Final now)
   exactly as `Purpose` does today.
 - The graph is rebuilt (structure only) when items, channels, parents or
-  MeshOps links are added or removed. A `structure` counter on the scene's
+  Mesh Stack links are added or removed. A `structure` counter on the scene's
   edit path tells it when; field edits only dirty nodes.
 
 ### Where it lives
@@ -105,7 +105,7 @@ The engine's per-document state is new `Editor` fields, each listed under
 ```
 Editor
   scene: Scene              document data: undo + files (unchanged)
-  meshops: Runtime          Document already (MeshOps cache)
+  mesh_stack: Runtime          Document already (Mesh Stack cache)
   eval: EvalGraph           NEW, Document: graph, dirty bits, node caches
   evaluated: EvalCache      NEW, Document: the last evaluated scene per Purpose
 ```
@@ -116,7 +116,7 @@ data or saved.
 ### Out of undo (AR-04, AR-15)
 
 - The graph, its dirty bits and its caches are never in undo checkpoints,
-  `PartialEq` or files (as MeshOps already is, SAFE-03).
+  `PartialEq` or files (as Mesh Stack already is, SAFE-03).
 - Undo restores the scene; the graph then marks everything the restored
   items touch dirty (or rebuilds when the structure changed). Undo never
   records "dirty" state.
@@ -158,9 +158,9 @@ frame on the 16k grid (`tool_frames_subdivided` probe), and the GE-X7 probe
 | # | Step | Tests | Can start before batch 4? |
 |---|---|---|---|
 | 1 | `eval_graph.rs` in operandi-core: node ids, edge list, dirty bits, forward marking, pull with a compute callback. Pure data structure, no Scene. | unit: marking stops at dirty, cycles refused, pull computes once | **Yes** (pure core) |
-| 2 | `EvalGraph::build(&Scene)`: nodes and edges from items, channels, MeshOps links and time use. | build on fixtures; edges match `OpDef::links`; structure counter | **Yes** |
+| 2 | `EvalGraph::build(&Scene)`: nodes and edges from items, channels, Mesh Stack links and time use. | build on fixtures; edges match `OpDef::links`; structure counter | **Yes** |
 | 3 | Channel nodes: `pose` and `repose` through the graph, so a key edit re-poses only the edited channel and a frame step only time-dependent channels. Same results as today. | every animation test unchanged; new test counts channel evaluations | **Yes**, as a pure function taking `&mut Scene` + `&mut EvalGraph` owned by the caller (a test or a temporary local), no Editor field |
-| 4 | `evaluate()` reads the graph: Display/Final skip items whose shown mesh is clean (no full scans). MeshOps chain lookup becomes a node pull; its recipe check stays as a safety net. | doors.rs, meshops tests; speed guard; 16 ms probe | Partly: the core function yes; wiring to `Editor::evaluated` waits |
+| 4 | `evaluate()` reads the graph: Display/Final skip items whose shown mesh is clean (no full scans). Mesh Stack chain lookup becomes a node pull; its recipe check stays as a safety net. | doors.rs, mesh_stack tests; speed guard; 16 ms probe | Partly: the core function yes; wiring to `Editor::evaluated` waits |
 | 5 | `Editor.eval` / `Editor.evaluated` fields, listed under Document in `document_state.rs`; `Editor::evaluated` and edit paths mark dirty. | tab switch keeps each scene's graph; undo/redo marks dirty; contract + monkey tests | **No**: needs batch 4 (document_state.rs) on main |
 | 6 | Evaluated values held by the graph, not written into item fields; pending = field vs node. Readers (viewport, Cycles preview, export, bridge) ask the graph. | command contract, save/reopen, USD animation export unchanged | **No**: needs step 5 and stage 2 |
 | 7 | Viewport and Cycles preview take a "changed items" list from the graph instead of comparing every item. | gpu_scene patch tests; preview sync tests; speed probes | **No** |
@@ -182,7 +182,7 @@ skin) without touching the engine.
 - **Live tools** edit `live.base` as well as the scene; both must mark the
   same graph or the drag preview and the commit disagree.
 - **Background Display evaluation**: dirty marks must cancel or supersede
-  running jobs (MeshOps already cancels with `Job::cancel`).
+  running jobs (Mesh Stack already cancels with `Job::cancel`).
 - **Batch 4 timing**: steps 5+ wait for document_state.rs on main; doing
   1-4 first means a short period where the graph is used by functions but
   not owned by the Editor.
@@ -194,7 +194,7 @@ tests to write, "no other files"):
 
 - Step 1: the graph data structure and its unit tests, from a written
   API.
-- Step 2's edge extraction for MeshOps links, given `OpDef::links`.
+- Step 2's edge extraction for Mesh Stack links, given `OpDef::links`.
 - Step 8's description struct and MCP query plumbing (after 5).
 - Converting each `animation::repose(&mut e.scene)` call site to the
   step 3 entry point (a dozen sites in anim_edit.rs and anim_graph.rs).
@@ -208,7 +208,7 @@ undo and the viewport), and the stale-view debug check.
   doc uses them as the coordinator described them. AR-21 also names an
   Array spec rule here, so the Schematic one should get a distinct label.
 - Should Final (render/export) share Display's caches when both are
-  current, or always pull separately? Today they share MeshOps results.
+  current, or always pull separately? Today they share Mesh Stack results.
 
 ## As built (2026-11-23)
 

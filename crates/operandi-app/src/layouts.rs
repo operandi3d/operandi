@@ -597,7 +597,7 @@ fn take_keys<T>(map: &mut BTreeMap<u32, T>, keys: &[u32]) -> BTreeMap<u32, T> {
 /// Mesh Stack panel "Mesh Ops", its name before 2026-11-19; they still open.
 pub(super) fn kind_named(name: &str) -> Option<PanelKind> {
     if name.eq_ignore_ascii_case("Mesh Ops") {
-        return Some(PanelKind::MeshOps);
+        return Some(PanelKind::MeshStack);
     }
     panel_registry::REGISTRY
         .iter()

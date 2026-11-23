@@ -62,7 +62,7 @@ fn rg01_pieces_and_the_skin_show_under_their_items() {
         .scene
         .item(cube)
         .unwrap()
-        .mesh_ops
+        .mesh_stack
         .as_ref()
         .unwrap()
         .ops[0]
@@ -168,7 +168,7 @@ fn rig_rows_select_rename_enable_and_delete() {
         .scene
         .item(cube)
         .unwrap()
-        .mesh_ops
+        .mesh_stack
         .as_ref()
         .unwrap()
         .ops[0]
@@ -186,7 +186,7 @@ fn rig_rows_select_rename_enable_and_delete() {
             .scene
             .item(cube)
             .unwrap()
-            .mesh_ops
+            .mesh_stack
             .as_ref()
             .unwrap()
             .ops[0]
@@ -223,7 +223,7 @@ fn uic60_rig_menus_are_never_empty_and_delete_works() {
         .scene
         .item(cube)
         .unwrap()
-        .mesh_ops
+        .mesh_stack
         .as_ref()
         .unwrap()
         .ops[0]

@@ -63,7 +63,7 @@ for is that **nothing moves on screen**; after every Reset, that the item
    the box's shape (its points) is unchanged.
 3. Undo title "Reset Transform".
 
-## 8. Mesh Ops
+## 8. Mesh Stack
 1. Box, add a Mirror mesh op, Position 2, 0, 0.
 2. Freeze > Position: nothing moves and the Mirror op is still in the list
    and live.

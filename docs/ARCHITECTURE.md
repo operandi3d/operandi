@@ -85,7 +85,7 @@ builds) and `fixtures/` (original test scenes).
   the shader tree, images and selection.
 - **Modelling operations**: one module or folder per tool family (bevel,
   extrude, slice, subdivide, booleans with Manifold, drills, duplicate,
-  deformers and falloffs, sculpt brushes, vertex maps, freeze, MeshOps
+  deformers and falloffs, sculpt brushes, vertex maps, freeze, Mesh Stack
   procedural stack).
 - **Shading** (`shader_tree.rs`, `material.rs`, `node_material.rs`,
   `shader_eval.rs`, `shader_wgsl.rs`): the layered shader tree and node

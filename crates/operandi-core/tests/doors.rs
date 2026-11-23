@@ -250,7 +250,7 @@ fn one_evaluated_scene_for_every_reader() {
         ));
     }
     assert!(e.evaluated_display().is_none());
-    // A MeshOps Cube on an empty Base Mesh.
+    // A Mesh Stack Cube on an empty Base Mesh.
     e.dispatch(Command::MeshOpCreate("prim.cube.item".into()))
         .unwrap();
     let base_points = e.scene.items[0].mesh.vertices.len();

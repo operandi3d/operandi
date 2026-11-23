@@ -1,6 +1,6 @@
 //! BEHAVIOR-RIG-PHASE5 §4: the skin piece (SK-30..36, SK-51, SK-52).
 use glam::DVec3;
-use operandi_core::meshops::{MeshOp, MeshOpStack, OpKind};
+use operandi_core::mesh_stack::{MeshOp, MeshStack, OpKind};
 use operandi_core::skin::{self, SkinValues};
 use operandi_core::*;
 use std::collections::BTreeMap;
@@ -54,7 +54,7 @@ fn arm(w: f64, interpolation: u32) -> Arm {
     values.add(elbow, "Elbow");
     let item = e.scene.item_mut(mesh).unwrap();
     item.mesh = m.into();
-    item.mesh_ops = Some(MeshOpStack {
+    item.mesh_stack = Some(MeshStack {
         ops: vec![MeshOp {
             id: 0,
             enabled: true,
@@ -223,7 +223,7 @@ fn sk52_skinning_fifty_thousand_points_on_sixty_joints() {
     }
     let item = e.scene.item_mut(mesh).unwrap();
     item.mesh = m.into();
-    item.mesh_ops = Some(MeshOpStack {
+    item.mesh_stack = Some(MeshStack {
         ops: vec![MeshOp {
             id: 0,
             enabled: true,

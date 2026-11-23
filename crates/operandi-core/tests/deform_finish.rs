@@ -810,12 +810,12 @@ fn soft_selection_move_moves_the_selection_rigidly_and_fades_beyond() {
     assert_eq!(p[0].y, 0., "far corner stays");
 }
 
-// ---- MeshOps ----
+// ---- Mesh Stack ----
 
 #[test]
 fn the_deform_ops_run_the_tools_functions() {
+    use operandi_core::mesh_stack_deform::*;
     use operandi_core::meshop_types::{OpContext, op_def};
-    use operandi_core::meshops_deform::*;
     let m = grid(3);
     let ctx = OpContext {
         input: &m,

@@ -832,16 +832,16 @@ pub struct Editor {
     pub boolean_preset: crate::BooleanOptions,
     /// What the last successful Boolean wants on the status line.
     pub boolean_note: Option<String>,
-    /// MeshOps results (meshops.rs): a cache shared by clones, never part
+    /// Mesh Stack results (mesh_stack.rs): a cache shared by clones, never part
     /// of the scene (SAFE-03).
-    pub meshops: crate::meshops::Runtime,
+    pub mesh_stack: crate::mesh_stack::Runtime,
     /// The scene's evaluation graph (eval_state.rs): a cache, never part
     /// of the scene or undo (AR-04, AR-15).
     pub eval: crate::eval_state::EvalState,
     /// The mesh in Edit Base Mesh (MO-27): direct tools edit its Base Mesh.
     pub base_edit: Option<u64>,
     /// The selected row of the Mesh Operations list.
-    pub meshop_row: Option<crate::meshops_editor::OpRow>,
+    pub meshop_row: Option<crate::mesh_stack_editor::OpRow>,
     /// Solid Drill's and Axis Drill's last-used options (DRILL-08).
     pub solid_drill_preset: crate::DrillOptions,
     pub axis_drill_preset: crate::DrillOptions,
@@ -1663,42 +1663,42 @@ pub enum Command {
     SelectUvIslands(Option<String>),
     /// BOOL-01..25 Boolean (`poly.boolean`) of the active mesh, one step.
     Boolean(crate::BooleanOptions),
-    /// MeshOps (meshops_editor.rs): add an op of this type to the
+    /// Mesh Stack (mesh_stack_editor.rs): add an op of this type to the
     /// selected mesh (`meshop.create`).
     MeshOpCreate(String),
     /// Delete ops (`item.delete item:<op>`).
-    MeshOpDelete(Vec<crate::meshops_editor::OpRef>),
+    MeshOpDelete(Vec<crate::mesh_stack_editor::OpRef>),
     /// Move an op to a position in evaluation order (`item.parent`).
     MeshOpMove {
-        op: crate::meshops_editor::OpRef,
+        op: crate::mesh_stack_editor::OpRef,
         position: usize,
     },
     /// An op's eye (`deformer.enable`).
     MeshOpEnable {
-        op: crate::meshops_editor::OpRef,
+        op: crate::mesh_stack_editor::OpRef,
         on: bool,
     },
     /// Set op values by attribute name (`item.channel ... item:<op>`).
     MeshOpSet {
-        op: crate::meshops_editor::OpRef,
+        op: crate::mesh_stack_editor::OpRef,
         values: serde_json::Map<String, serde_json::Value>,
     },
     /// Select a row of the Mesh Operations list (`select.item <op>`).
-    MeshOpSelect(Option<crate::meshops_editor::OpRow>),
+    MeshOpSelect(Option<crate::mesh_stack_editor::OpRow>),
     /// Select by Index Set/Clear/Add/Remove (`selop.selection`).
     MeshOpIndex {
-        op: crate::meshops_editor::OpRef,
-        edit: crate::meshops_editor::IndexEdit,
+        op: crate::mesh_stack_editor::OpRef,
+        edit: crate::mesh_stack_editor::IndexEdit,
     },
     /// Add, change or remove one of an op's selection ops (`selop.create`,
     /// `selop.edit`).
     MeshOpSelOp {
-        op: crate::meshops_editor::OpRef,
-        edit: crate::meshops_editor::SelOpEdit,
+        op: crate::mesh_stack_editor::OpRef,
+        edit: crate::mesh_stack_editor::SelOpEdit,
     },
     /// Freeze an op and those below it (`deformer.freeze`).
     MeshOpFreeze {
-        op: crate::meshops_editor::OpRef,
+        op: crate::mesh_stack_editor::OpRef,
         duplicate: bool,
     },
     /// Freeze the selected mesh's whole stack (`mesh.freeze`).
@@ -2159,10 +2159,10 @@ impl Editor {
             Command::MeshOpFreeze { op, duplicate } => self.meshop_freeze(op, duplicate),
             Command::MeshOpFreezeAll => self.meshop_freeze_all(),
             Command::MeshOpEditBase { item, on } => self.meshop_edit_base(item, on),
-            cmd => self.dispatch_after_meshops(cmd, report),
+            cmd => self.dispatch_after_mesh_stack(cmd, report),
         }
     }
-    fn dispatch_after_meshops(
+    fn dispatch_after_mesh_stack(
         &mut self,
         cmd: Command,
         report: &mut Option<crate::history_completion::HistoryReport>,

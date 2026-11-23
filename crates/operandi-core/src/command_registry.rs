@@ -2897,7 +2897,7 @@ pub static COMMANDS: &[Entry] = &[
             ),
         ],
         ),
-    // MeshOps (meshops_editor.rs), reference names from the registry
+    // Mesh Stack (mesh_stack_editor.rs), reference names from the registry
     // thread (MESHOPS-NAMES 2026-11-11). item.delete, item.parent,
     // item.channel and select.item take an op as item:op:<item>:<op>.
     script("meshop.create", Modeling, "Adds a mesh operation to the selected mesh, above the selected row of its stack.")

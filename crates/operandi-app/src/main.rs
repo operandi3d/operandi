@@ -12,9 +12,9 @@ mod command_history_ui;
 #[cfg(test)]
 mod contour_tests;
 mod item_transform_ui;
-mod mesh_ops_ui;
 #[cfg(test)]
 mod mesh_paint_tests;
+mod mesh_stack_ui;
 mod node_edit_ui;
 #[cfg(test)]
 mod node_edit_ui_tests;
@@ -734,9 +734,9 @@ struct Operandi {
     /// Layouts: the layout bar, switching, the UV Editor window
     /// (layouts.rs, uv_editor.rs).
     layouts: layouts::Layouts,
-    /// The Mesh Ops tab's list state and its drag gesture (mesh_ops_ui.rs).
-    mesh_ops_tree: Box<tree_list::TreeState<mesh_ops_ui::OpKey>>,
-    mesh_ops_gesture: Option<u64>,
+    /// The Mesh Stack tab's list state and its drag gesture (mesh_stack_ui.rs).
+    mesh_stack_tree: Box<tree_list::TreeState<mesh_stack_ui::OpKey>>,
+    mesh_stack_gesture: Option<u64>,
     /// The Add browsers (AB-01, AB-24): Add Operator, Add Selection and
     /// Add Item, each with its own remembered state and the button it
     /// opened from.
@@ -1415,7 +1415,7 @@ impl Operandi {
                     panel_registry::PanelKind::Groups,
                     // Last, so the other tabs keep their places (MO-10
                     // puts it beside the Items list; provisional).
-                    panel_registry::PanelKind::MeshOps,
+                    panel_registry::PanelKind::MeshStack,
                 ],
             ),
             shading: Default::default(),
@@ -1506,8 +1506,8 @@ impl Operandi {
             uv_maps_tree: Default::default(),
             uv_maps_picked: Vec::new(),
             layouts: Default::default(),
-            mesh_ops_tree: Default::default(),
-            mesh_ops_gesture: None,
+            mesh_stack_tree: Default::default(),
+            mesh_stack_gesture: None,
             add_browsers: Default::default(),
             vertex_weld: false,
             weld_drag: None,
@@ -2571,7 +2571,7 @@ impl Operandi {
             scene.selection.item == Some(id) && scene.selection.mode == Mode::Item
         }
         // Frame what the views show: an open tool's preview included, and
-        // for items with MeshOps their result (AR-01), not their Base
+        // for items with a Mesh Stack their result (AR-01), not their Base
         // Mesh, which may be empty.
         let snapshot = self.editor.shown_display();
         let scene = snapshot.as_ref().unwrap_or(&self.editor.scene);
@@ -3613,9 +3613,9 @@ impl eframe::App for Operandi {
         if let Some(text) = self.copy_next.take() {
             ctx.copy_text(text);
         }
-        // MeshOps evaluate on worker threads in the app (SAFE-02); a
+        // Mesh Stacks evaluate on worker threads in the app (SAFE-02); a
         // finished result repaints.
-        self.editor.meshops.ensure_background(|| {
+        self.editor.mesh_stack.ensure_background(|| {
             let ctx = ctx.clone();
             std::sync::Arc::new(move || ctx.request_repaint())
         });
@@ -4088,7 +4088,7 @@ mod falloff_batch6_tests;
 #[cfg(test)]
 mod falloff_panel_tests;
 #[cfg(test)]
-mod mesh_ops_tests;
+mod mesh_stack_tests;
 #[cfg(test)]
 mod snap_service_tests;
 #[cfg(test)]

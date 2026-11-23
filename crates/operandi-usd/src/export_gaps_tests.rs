@@ -29,11 +29,11 @@ fn export_and_import(scene: &Scene, format: ExportFormat) -> (Vec<String>, Scene
     (report.notes, back.scene, text)
 }
 
-/// MeshOps: File > Export, scene.saveAs and the MCP bridge hand the
+/// Mesh Stack: File > Export, scene.saveAs and the MCP bridge hand the
 /// export the evaluated scene (Purpose::Final), so the file holds what the
 /// stack makes, not the Base Mesh under it.
 #[test]
-fn meshops_results_are_exported_not_the_base_mesh() {
+fn mesh_stack_results_are_exported_not_the_base_mesh() {
     use operandi_core::evaluate::Purpose;
     operandi_core::interchange::set_usd_exporter(crate::export);
     let mut e = Editor::default();
@@ -45,7 +45,7 @@ fn meshops_results_are_exported_not_the_base_mesh() {
     let base = e.scene.items[0].mesh.faces.len();
     let evaluated = e.evaluated(Purpose::Final).items[0].mesh.faces.len();
     assert!(evaluated > base, "the stack adds polygons to the Base Mesh");
-    let path = scratch("meshops").join("stack.usda");
+    let path = scratch("mesh_stack").join("stack.usda");
     let mut args = serde_json::Map::new();
     args.insert(
         "filename".into(),

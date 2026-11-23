@@ -67,7 +67,7 @@ as ±2. What's mostly missing:
 | Subdivision | Sub-D polygons, levels, edge weights, crease, freeze; evaluated display and picking | Usable |
 | Sculpt and vertex maps | 11 brushes (Blender-derived maths), weight painting, vertex-map falloffs as masks | Started; masks pending |
 | UVs | Unwrap and pack (Blender port), UV view, UV map list, Move/Rotate/Scale in UV, Fit, Flip, Mirror, Align, paint and lasso select, Checker | Started (editing stage 1) |
-| Procedural (MeshOps) | A procedural stack on mesh items | Started |
+| Procedural (Mesh Stack) | A procedural stack on mesh items | Started |
 | Items and scene | Meshes, groups, locators, cameras, lights, backdrops, environments, render item, hierarchy, multiple open scenes | Broad |
 | Materials and shading | Layered shader tree (materials, gradients, procedurals, images, vertex maps, occlusion, group scale), node materials (first stage), material presets and a CC0 starter library, viewport per-pixel materials | Usable |
 | Viewport | Shaded/wire/matcap styles, split and tear-off views, header buttons, quad view, navigation presets, 3D mouse and tablet input | Broad |
