@@ -35,6 +35,10 @@ pub struct Rig {
     /// User channels (RG-53), in the order added.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub user: Vec<UserChannel>,
+    /// On an evaluated copy (rig_eval::apply): the document scene it was
+    /// made from, for exports that evaluate other times. Never saved.
+    #[serde(skip)]
+    pub source: Option<std::sync::Arc<crate::Scene>>,
 }
 
 /// A user channel's value type (RG-53).

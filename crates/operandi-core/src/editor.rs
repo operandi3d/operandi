@@ -5853,7 +5853,7 @@ impl Editor {
             // The handle sits where rigged items show (RG-01), not at
             // their own unconstrained place.
             let rigged = (!scene.animation.rig.pieces.is_empty())
-                .then(|| crate::rig_eval::apply(scene, &crate::rig_eval::evaluate(scene)))
+                .then(|| crate::rig_eval::apply(scene, &crate::rig_eval::evaluate(scene), false))
                 .flatten();
             let scene = rigged.as_ref().unwrap_or(scene);
             let frame = context.resolve(scene)?;

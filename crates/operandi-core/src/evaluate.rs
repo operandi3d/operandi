@@ -52,7 +52,7 @@ pub fn evaluate<'a>(
     let rigged = if scene.animation.rig.pieces.is_empty() {
         None
     } else {
-        crate::rig_eval::apply(scene, &eval.rig(scene))
+        crate::rig_eval::apply(scene, &eval.rig(scene), purpose == Purpose::Final)
     };
     let base = rigged.as_ref().unwrap_or(scene);
     let shown = match purpose {

@@ -639,11 +639,15 @@ fn path_point(scene: &Scene, curve: u64, world: DMat4, p: &Piece) -> Option<(DVe
     Some((a.lerp(b, f), b - a))
 }
 
-/// The scene as the rig shows it (evaluate.rs): each item the rig moves
-/// placed at its evaluated world, as a root item, so every reader of the
-/// evaluated scene (viewport, renders, export, picking) sees the rig
-/// without knowing about it. `None` when the rig moves nothing.
-pub fn apply(scene: &Scene, result: &RigResult) -> Option<Scene> {
+/// The scene as the rig shows it (evaluate.rs): each item a rig piece
+/// places gets the local transform that puts it at its evaluated world
+/// under its document parent (the hierarchy stays, so exports keep it),
+/// and the channels links and modifiers drive get their values. The rig's
+/// pieces are left out of the copy, so nothing evaluates twice; with
+/// `keep_source` the copy remembers the document scene (`Rig::source`) so
+/// an export can evaluate it at other times (§8 USD). `None` when the rig
+/// changes nothing.
+pub fn apply(scene: &Scene, result: &RigResult, keep_source: bool) -> Option<Scene> {
     if result.world.is_empty() && result.driven.is_empty() {
         return None;
     }
@@ -651,23 +655,38 @@ pub fn apply(scene: &Scene, result: &RigResult) -> Option<Scene> {
     for (k, v) in &result.driven {
         let _ = crate::animation::write(&mut out, k, *v);
     }
-    for (id, w) in result
+    let world_of = |id: u64| -> DMat4 {
+        result
+            .world
+            .get(&id)
+            .copied()
+            .unwrap_or_else(|| out.world_matrix(id).unwrap_or(DMat4::IDENTITY))
+    };
+    let placed: Vec<(u64, DMat4)> = result
         .world
         .iter()
         .filter(|(id, _)| result.placed.contains(id))
-    {
-        let Some(item) = out.item_mut(*id) else {
+        .map(|(id, w)| {
+            let parent = out
+                .item(*id)
+                .and_then(|i| i.parent)
+                .map_or(DMat4::IDENTITY, world_of);
+            (*id, parent.inverse() * *w)
+        })
+        .collect();
+    for (id, local) in placed {
+        let Some(item) = out.item_mut(id) else {
             continue;
         };
-        let (s, q, t) = w.to_scale_rotation_translation();
-        item.transform = crate::Transform {
-            translation: t,
-            rotation: item.transform.angles_for(q),
-            scale: s,
-            ..item.transform.clone()
-        };
-        item.parent = None;
-        out.animation.rig.pivots.remove(id);
+        let (s, q, t) = local.to_scale_rotation_translation();
+        item.transform.translation = t;
+        item.transform.rotation = item.transform.angles_for(q);
+        item.transform.scale = s;
+        out.animation.rig.pivots.remove(&id);
+    }
+    out.animation.rig.pieces.clear();
+    if keep_source {
+        out.animation.rig.source = Some(std::sync::Arc::new(scene.clone()));
     }
     Some(out)
 }
@@ -811,48 +830,15 @@ fn channel_value(scene: &Scene, p: &Piece) -> Option<f64> {
     }
 }
 
-/// The scene with the rig's results written as each item's own local
-/// transform under its document parent (USD export keeps the hierarchy,
-/// §8): local = (parent's evaluated world)⁻¹ · evaluated world, plus the
-/// values links and modifiers drive. The rig itself is left out of the
-/// copy, so nothing evaluates twice.
+/// The scene with the rig's results written as plain transforms under
+/// each item's document parent, the rig left out ([`apply`] at the
+/// scene's own time; USD export samples it, §8).
 pub fn baked_scene(scene: &Scene) -> Scene {
-    let result = evaluate(scene);
-    let mut out = scene.clone();
-    for (k, v) in &result.driven {
-        let _ = crate::animation::write(&mut out, k, *v);
-    }
-    let world_of = |id: u64| -> DMat4 {
-        result
-            .world
-            .get(&id)
-            .copied()
-            .unwrap_or_else(|| scene.world_matrix(id).unwrap_or(DMat4::IDENTITY))
-    };
-    let placed: Vec<(u64, DMat4)> = result
-        .world
-        .iter()
-        .filter(|(id, _)| result.placed.contains(id))
-        .map(|(id, w)| {
-            let parent = scene
-                .item(*id)
-                .and_then(|i| i.parent)
-                .map_or(DMat4::IDENTITY, world_of);
-            (*id, parent.inverse() * *w)
-        })
-        .collect();
-    for (id, local) in placed {
-        let Some(item) = out.item_mut(id) else {
-            continue;
-        };
-        let (s, q, t) = local.to_scale_rotation_translation();
-        item.transform.translation = t;
-        item.transform.rotation = item.transform.angles_for(q);
-        item.transform.scale = s;
-        out.animation.rig.pivots.remove(&id);
-    }
-    out.animation.rig.pieces.clear();
-    out
+    apply(scene, &evaluate(scene), false).unwrap_or_else(|| {
+        let mut out = scene.clone();
+        out.animation.rig.pieces.clear();
+        out
+    })
 }
 
 /// The items the rig moves (their world or a transform channel).

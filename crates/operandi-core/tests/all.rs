@@ -504,6 +504,8 @@ mod rig_bake;
 mod rig_expression;
 #[path = "rig_links.rs"]
 mod rig_links;
+#[path = "rig_milestones.rs"]
+mod rig_milestones;
 #[path = "rig_modifiers.rs"]
 mod rig_modifiers;
 #[path = "rig_phase4.rs"]

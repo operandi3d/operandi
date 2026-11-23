@@ -51,7 +51,7 @@ pub fn stage_time(scene: &Scene, mode: UsdAnimation) -> Option<StageTime> {
     let fps = rate.as_f64();
     match mode {
         UsdAnimation::Off => None,
-        _ if scene.animation.channels.is_empty() && scene.animation.rig.pieces.is_empty() => None,
+        _ if animated(scene).is_none() => None,
         UsdAnimation::CurrentFrame => {
             let f = animation::frames(rate, scene.time.current);
             Some(StageTime {
@@ -68,13 +68,21 @@ pub fn stage_time(scene: &Scene, mode: UsdAnimation) -> Option<StageTime> {
     }
 }
 
+/// The scene to sample: the document behind an evaluated copy, or the
+/// scene itself; `None` when nothing in it can move.
+fn animated(scene: &Scene) -> Option<&Scene> {
+    let s = scene.animation.rig.source.as_deref().unwrap_or(scene);
+    (!s.animation.channels.is_empty() || !s.animation.rig.pieces.is_empty()).then_some(s)
+}
+
 /// The sample times (frames) and the scene posed at each (TL-81).
 pub(crate) fn frames(scene: &Scene, mode: UsdAnimation) -> Option<Frames> {
-    if mode != UsdAnimation::On
-        || (scene.animation.channels.is_empty() && scene.animation.rig.pieces.is_empty())
-    {
+    if mode != UsdAnimation::On {
         return None;
     }
+    // An evaluated copy carries the document scene it came from (§8): the
+    // rig is evaluated from that at every sample time.
+    let scene = animated(scene)?;
     let rate = scene.time.rate;
     let (a, b) = (scene.time.start, scene.time.end);
     let (fa, fb) = (rate.frame_at(a), rate.frame_at(b));
