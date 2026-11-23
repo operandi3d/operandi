@@ -106,7 +106,7 @@ map commands; unchanged), toolbox config (labels only).
 | viewport.split / viewport.detach (new, menus as forms) | viewport.split / viewport.detach | **match** (their arguments aren't read yet) | – |
 | operandi.layout.togglePalettes (new, layouts stage 6) | no match | **placeholder**, see NAMES-NEEDED.md; class "ui" | – |
 | operandi.layout.setKey / clearKeys (new, layouts stage 5); operandi.layout.revert `keys:` | no match | **placeholders**, see NAMES-NEEDED.md; class "ui" | action, key, layout; layout; keys |
-| operandi.workbench.edit / pick / add / addProperty / addDivider / addPipe / move / set / chooseIcon / duplicate / delete / undo / topBar (new, layouts stage 4) | no match | **placeholders**, see NAMES-NEEDED.md; all class "ui" | on, form; line, label; property; as; from, to; index, attr, value |
+| operandi.workbench.edit / pick / add / addProperty / addDivider / addChain / move / set / chooseIcon / duplicate / delete / undo / topBar (new, layouts stage 4) | no match | **placeholders**, see NAMES-NEEDED.md; all class "ui" | on, form; line, label; property; as; from, to; index, attr, value |
 | operandi.view3d.matcap | no match (Operandi own: the Matcap style's matcap choice, 2026-11-10) | kept | name, image, bgmesh |
 | view3d.shadingStyle value Reflection | shown as Matcap (VS-N01, Jason 2026-11-10) | Reflection still accepted | value |
 | poly.subdivide (new) | same | **new**, map name | `type` (positional or `type:`; `ccsds`, `flat`, `smooth`, `sds`), `fractal` (fraction), `maxangle` (radians), `linear`, `bound`, `bgCons`, `noEdgeWeight`; bare `poly.subdivide` opens the dialog (SUBT-Q01) |

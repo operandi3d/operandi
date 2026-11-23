@@ -623,18 +623,18 @@ pub const TOOL_PHRASES: &[(&str, &str)] = &[
     ("BezierClone", "Bezier Clone"),
     ("BezierExtrude", "Bezier Extrude"),
     ("BezierInstance", "Bezier Instance"),
-    ("BezierReplica", "Bezier Replica"),
+    ("BezierReplica", "Bezier Instancer"),
     ("BezierTransform", "Bezier Transform"),
     ("BSplineClone", "B-Spline Clone"),
     ("BSplineExtrude", "B-Spline Extrude"),
     ("BSplineInstance", "B-Spline Instance"),
-    ("BSplineReplica", "B-Spline Replica"),
+    ("BSplineReplica", "B-Spline Instancer"),
     ("BSplineTransform", "B-Spline Transform"),
     ("const.bg", "Constrain to Background"),
     ("CurveClone", "Curve Clone"),
     ("CurveExtrude", "Curve Extrude"),
     ("CurveInstance", "Curve Instance"),
-    ("CurveReplica", "Curve Replica"),
+    ("CurveReplica", "Curve Instancer"),
     ("CurveTransform", "Curve Transform"),
     ("ElementPush", "Element Push"),
     ("Flare", "Flare"),
@@ -651,7 +651,7 @@ pub const TOOL_PHRASES: &[(&str, &str)] = &[
     ("PenClone", "Pen Clone"),
     ("PenExtrude", "Pen Extrude"),
     ("PenInstance", "Pen Instance"),
-    ("PenReplicate", "Pen Replicate"),
+    ("PenReplicate", "Pen Instancer"),
     ("PenTransform", "Transform Pen"),
     ("prim.bezier", "Bezier Curve"),
     ("prim.bspline", "B-Spline"),
@@ -659,11 +659,11 @@ pub const TOOL_PHRASES: &[(&str, &str)] = &[
     ("prim.sketch", "Sketch"),
     ("prim.text", "Text"),
     ("QuickAlign", "Quick Align"),
-    ("ReplicaArray", "Replica Array"),
-    ("ReplicaClone", "Replica Clone"),
-    ("ReplicaMirror", "Replica Mirror"),
-    ("ReplicaRadialArray", "Replica Radial Array"),
-    ("ReplicaScatter", "Replica Scatter"),
+    ("ReplicaArray", "Instancer Array"),
+    ("ReplicaClone", "Instancer Clone"),
+    ("ReplicaMirror", "Instancer Mirror"),
+    ("ReplicaRadialArray", "Instancer Radial Array"),
+    ("ReplicaScatter", "Instancer Scatter"),
     ("seam.marker", "Conditional Loop Tool"),
     ("select.polygonCoplanar", "Coplanar Polygons Tool"),
     ("SoftSelectionMove", "Soft Selection Move"),
@@ -5433,10 +5433,11 @@ pub static COMMANDS: &[Entry] = &[
         .args(&[opt("label", TEXT, N, None), opt("form", TEXT, N, None)])
         .example("operandi.workbench.addDivider label:Bevels")
         .ui(),
-    script("operandi.workbench.addPipe", View, "Adds the current tool pipe (action centre, falloff, symmetry and the open tool) to workbench form: as a one-click custom tool (as:preset). as:macro and as:script aren't in Operandi yet.")
+    script("operandi.workbench.addChain", View, "Adds the current tool chain (action centre, falloff, symmetry and the open tool) to workbench form: as a one-click custom tool (as:preset). as:macro and as:script aren't in Operandi yet.")
         .operandi()
+        .aliases(&["operandi.workbench.addPipe"])
         .args(&[opt("as", ArgType::Choice(&["preset", "macro", "script"]), N, Some("preset")), opt("label", TEXT, N, None), opt("form", TEXT, N, None)])
-        .example("operandi.workbench.addPipe label:{Soft Bevel}")
+        .example("operandi.workbench.addChain label:{Soft Bevel}")
         .ui(),
     script("operandi.workbench.move", View, "Moves control from: of workbench form: to index to: (drag to reorder).")
         .operandi()
@@ -6266,7 +6267,7 @@ pub static COMMANDS: &[Entry] = &[
         .modo("tool.set vert.slide on").tool(),
     action("Retopo Edge Lock", Modeling, "Adds the selected guide curves to the RetopoEdgeLock selection set (TC-53).")
         .operandi().undo(),
-    action("Retopo Edge Flow", Modeling, "Adds the selected guide curves to the RetopoFlow selection set (TC-53).")
+    action("Retopo Edge Flow", Modeling, "Adds the selected guide curves to the RetopoEdgeFlow selection set (TC-53).")
         .operandi().undo(),
     action("Topology Pen", Tools, "Starts Topology Pen: drag an element to move it; Shift+drag an edge to pull out a new strip onto the background.")
         .modo("tool.set mesh.topology on").tool(),
@@ -6278,8 +6279,8 @@ pub static COMMANDS: &[Entry] = &[
         .operandi().ui(),
     action("Guides", Tools, "Turns the Guides tool on or off: up to ten construction lines that draw in the views and that points snap to (missing-tools-g9 GD-0).")
         .operandi().ui(),
-    action("Mesh Paint Replica", Tools, "Turns Mesh Paint Replica on or off: Mesh Paint making one Replicator per stroke (missing-tools-g8 RP-7).")
-        .operandi().ui(),
+    action("Mesh Paint Instancer", Tools, "Turns Mesh Paint Instancer on or off: Mesh Paint making one Instancer per stroke (missing-tools-g8 RP-7).")
+        .aliases(&["Mesh Paint Replica"]).operandi().ui(),
     action("Retopo Sketch", Tools, "Turns Retopo Sketch on or off: drag across a background mesh to draw a guide curve on it.")
         .operandi().ui(),
     action("Axis Rotate", Tools, "Starts Axis Rotate: Rotate about the work plane's normal only.")
@@ -6406,24 +6407,24 @@ pub static COMMANDS: &[Entry] = &[
         .tool().operandi(),
     // The Duplicate tab's Replica buttons (missing-tools-g8 RP-6,
     // replicator.rs): the Instance buttons' placement, one Replicator.
-    action("Replica Clone", Tools, "Starts Replica Clone: one Replicator of the selected items, a point per copy (missing-tools-g8 RP-6).")
-        .tool().operandi(),
-    action("Curve Replica", Tools, "Starts Curve Replica: one Replicator of the selected items, a point per copy (missing-tools-g8 RP-6).")
-        .tool().operandi(),
-    action("Bezier Replica", Tools, "Starts Bezier Replica: one Replicator of the selected items, a point per copy (missing-tools-g8 RP-6).")
-        .tool().operandi(),
-    action("B-Spline Replica", Tools, "Starts B-Spline Replica: one Replicator of the selected items, a point per copy (missing-tools-g8 RP-6).")
-        .tool().operandi(),
-    action("Pen Replicate", Tools, "Starts Pen Replicate: one Replicator of the selected items, a point per copy (missing-tools-g8 RP-6).")
-        .tool().operandi(),
-    action("Replica Scatter", Tools, "Starts Replica Scatter: one Replicator of the selected items, a point per copy (missing-tools-g8 RP-6).")
-        .tool().operandi(),
-    action("Replica Array", Tools, "Starts Replica Array: one Replicator of the selected items, a point per copy (missing-tools-g8 RP-6).")
-        .tool().operandi(),
-    action("Replica Radial Array", Tools, "Starts Replica Radial Array: one Replicator of the selected items, a point per copy (missing-tools-g8 RP-6).")
-        .tool().operandi(),
-    action("Replica Mirror", Tools, "Starts Replica Mirror: one Replicator of the selected items, a point per copy (missing-tools-g8 RP-6).")
-        .tool().operandi(),
+    action("Instancer Clone", Tools, "Starts Instancer Clone: one Instancer of the selected items, a point per copy (missing-tools-g8 RP-6).")
+        .aliases(&["Replica Clone"]).tool().operandi(),
+    action("Curve Instancer", Tools, "Starts Curve Instancer: one Instancer of the selected items, a point per copy (missing-tools-g8 RP-6).")
+        .aliases(&["Curve Replica"]).tool().operandi(),
+    action("Bezier Instancer", Tools, "Starts Bezier Instancer: one Instancer of the selected items, a point per copy (missing-tools-g8 RP-6).")
+        .aliases(&["Bezier Replica"]).tool().operandi(),
+    action("B-Spline Instancer", Tools, "Starts B-Spline Instancer: one Instancer of the selected items, a point per copy (missing-tools-g8 RP-6).")
+        .aliases(&["B-Spline Replica"]).tool().operandi(),
+    action("Pen Instancer", Tools, "Starts Pen Instancer: one Instancer of the selected items, a point per copy (missing-tools-g8 RP-6).")
+        .aliases(&["Pen Replicate"]).tool().operandi(),
+    action("Instancer Scatter", Tools, "Starts Instancer Scatter: one Instancer of the selected items, a point per copy (missing-tools-g8 RP-6).")
+        .aliases(&["Replica Scatter"]).tool().operandi(),
+    action("Instancer Array", Tools, "Starts Instancer Array: one Instancer of the selected items, a point per copy (missing-tools-g8 RP-6).")
+        .aliases(&["Replica Array"]).tool().operandi(),
+    action("Instancer Radial Array", Tools, "Starts Instancer Radial Array: one Instancer of the selected items, a point per copy (missing-tools-g8 RP-6).")
+        .aliases(&["Replica Radial Array"]).tool().operandi(),
+    action("Instancer Mirror", Tools, "Starts Instancer Mirror: one Instancer of the selected items, a point per copy (missing-tools-g8 RP-6).")
+        .aliases(&["Replica Mirror"]).tool().operandi(),
     action("Scatter Clone", Tools, "Starts Scatter Clone: copies scattered at random in a box (GO-01).")
         .modo("tool.set scatter.clone on").operandi().tool(),
     // The Duplicate tab's Transform buttons (DX-20): each moves the selected
@@ -6563,8 +6564,8 @@ pub static COMMANDS: &[Entry] = &[
         .operandi().undo(),
     action("Instance", Items, "Adds an instance of each selected mesh item in the same place: it shares its source's mesh (DX-38).")
         .operandi().undo(),
-    action("Freeze Replicator", Items, "Turns the selected Replicator into a group of instance items, one per copy, at the same places; the Replicator and its point cloud go (missing-tools-g8 RP-5).")
-        .operandi().undo(),
+    action("Freeze Instancer", Items, "Turns the selected Instancer into a group of instance items, one per copy, at the same places; the Instancer and its point cloud go (missing-tools-g8 RP-5).")
+        .aliases(&["Freeze Replicator"]).operandi().undo(),
     action("Flip", Modeling, "Reverses the selected polygons.")
         .modo("poly.flip").undo(),
     action("Flip It", Modeling, "Mirrors the selected polygons across an axis through the selection's centre, facing out; with no axis, asks for one.")
@@ -6802,8 +6803,8 @@ pub static COMMANDS: &[Entry] = &[
         .modo("vert.new").ui(),
     action("Show Vertices", ViewportOptions, "Toggles vertex display.")
         .modo("view3d.showVertices").ui(),
-    action("Replicators", ViewportOptions, "Steps the view's Replicators option: None (every copy a box), Selected (the selected Replicator's copies shaded), All (missing-tools-g8 RP-3).")
-        .operandi().ui(),
+    action("Instancers", ViewportOptions, "Steps the view's Instancers option: None (every copy a box), Selected (the selected Instancer's copies shaded), All (missing-tools-g8 RP-3).")
+        .aliases(&["Replicators"]).operandi().ui(),
     action("Vertex Split", Modeling, "Splits the selected points.")
         .modo("vert.split").undo(),
     action("Vertex Split Edge", Modeling, "Splits the selected points along edges.")

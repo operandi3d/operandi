@@ -529,11 +529,11 @@ fn panel_tabs(camera: bool, cameras: &[String]) -> Vec<panel::Tab> {
                         check(key::LOCATORS, "Show Locators", "Draw group locators in this view"),
                         Row::choice(
                             key::REPLICATORS,
-                            "Replicators",
+                            "Instancers",
                             &ReplicatorDisplay::ALL.map(|m| m.label()),
                             0,
                         )
-                        .tip("Which Replicators' copies draw shaded in this view: None draws every copy as a box, Selected shades the selected Replicator's, All shades them all")
+                        .tip("Which Instancers' copies draw shaded in this view: None draws every copy as a box, Selected shades the selected Instancer's, All shades them all")
                         .not_channel(),
                         check(key::MESHES, "Show Meshes", "Off hides every mesh item in this view"),
                         check(

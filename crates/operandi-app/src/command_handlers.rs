@@ -794,7 +794,7 @@ const WORKBENCH_COMMANDS: &[&str] = &[
     "operandi.workbench.add",
     "operandi.workbench.addProperty",
     "operandi.workbench.addDivider",
-    "operandi.workbench.addPipe",
+    "operandi.workbench.addChain",
     "operandi.workbench.move",
     "operandi.workbench.set",
     "operandi.workbench.chooseIcon",
@@ -1841,10 +1841,10 @@ fn phrases(r: &mut Commands) {
     // DX-38: one instance of each selected mesh item.
     on(r, &["instance"], |a, _| a.run(Command::InstanceItems));
     on(r, &["merge instance"], |a, _| a.run(Command::MergeInstance));
-    on(r, &["freeze replicator"], |a, _| {
+    on(r, &["freeze instancer"], |a, _| {
         a.run(Command::FreezeReplicator)
     });
-    on(r, &["replicators"], |a, _| {
+    on(r, &["instancers"], |a, _| {
         use crate::view_display::ReplicatorDisplay as R;
         let d = &mut a.display.settings.drawing;
         d.replicators = match d.replicators {
@@ -1852,7 +1852,7 @@ fn phrases(r: &mut Commands) {
             R::Selected => R::All,
             R::All => R::None,
         };
-        a.status = format!("Replicators: {}", d.replicators.label());
+        a.status = format!("Instancers: {}", d.replicators.label());
     });
     crate::vertex_normal_ui::register(r);
     crate::anim_ui::register(r);
@@ -1913,10 +1913,12 @@ fn phrases(r: &mut Commands) {
     on(r, &["retopo edge lock"], |a, _| {
         a.retopo_set("RetopoEdgeLock")
     });
-    on(r, &["retopo edge flow"], |a, _| a.retopo_set("RetopoFlow"));
+    on(r, &["retopo edge flow"], |a, _| {
+        a.retopo_set("RetopoEdgeFlow")
+    });
     on(
         r,
-        &["mesh paint", "mesh paint instance", "mesh paint replica"],
+        &["mesh paint", "mesh paint instance", "mesh paint instancer"],
         |a, c| a.utility_by_name(&c.lowered()),
     );
     on(r, &["guides"], |a, _| a.utility_by_name("guides"));

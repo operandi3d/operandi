@@ -25,7 +25,7 @@ Each line: do this → expect that. Render = File > Render Viewport.
 7. Falloff Spherical, X/Y/Z 0.5, on a large plane → the image fades out
    2 m from the locator centre. Linear X → fades only along X. 0 = no fade.
 8. A procedural (Checker) with Box or Triplanar → squares on each face.
-9. Random Offsets lists (none), Particles and Replicas, Mesh Parts,
+9. Random Offsets lists (none), Particles and Instancers, Mesh Parts,
    Surfaces; Texture Offset Strength 0–10; Tangent has dPdu Cross Product
    (all stored only).
 10. Save, reopen → every setting comes back.

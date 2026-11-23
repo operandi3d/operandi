@@ -18,7 +18,7 @@ Start with a cube in Polygon mode.
 ## Edit in place
 
 3. [ ] Click Edit Workbench: it becomes **Done**, and Pick to Add, Add
-       Divider, Add Divider with Label, Add Tool Pipe, Undo Edit and
+       Divider, Add Divider with Label, Add Tool Chain, Undo Edit and
        Revert appear under it.
 4. [ ] Click **Pick to Add**, go to the Polygon tab and hover buttons:
        each one lights green under the pointer. Click Bevel: Bevel does
@@ -70,7 +70,7 @@ Start with a cube in Polygon mode.
        open (change the value there: Tool Properties follows), and its name
        greyed after you drop Bevel.
 16. [ ] Set action centre Selection, falloff Linear, Symmetry X and start
-       Bevel. Edit Workbench ▸ Add Tool Pipe ▸ **As Preset**: a "Bevel
+       Bevel. Edit Workbench ▸ Add Tool Chain ▸ **As Preset**: a "Bevel
        Preset" button appears (As Macro and As Script are greyed, "not in
        Operandi yet"). Drop Bevel, reset the three to Automatic / none /
        off, then click Bevel Preset: all three come back and Bevel starts.

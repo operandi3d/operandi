@@ -76,7 +76,7 @@ named_enum! {
     RandomOffsets {
         None => "(none)",
         #[serde(alias = "Item")]
-        ParticlesAndReplicas => "Particles and Replicas",
+        ParticlesAndReplicas => "Particles and Instancers",
         #[serde(alias = "Part")]
         MeshParts => "Mesh Parts",
         Surfaces => "Surfaces",

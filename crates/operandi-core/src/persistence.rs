@@ -754,7 +754,7 @@ fn decode_document(
         return Err("Guides require native version 59".into());
     }
     if doc.version < REPLICATOR_VERSION && has_v58_replicators(&doc.scene) {
-        return Err("Replicators require native version 58".into());
+        return Err("Instancers require native version 58".into());
     }
     if doc.version < PATCH_POLYGON_VERSION && has_v57_patches(&doc.scene) {
         return Err("Live patches require native version 57".into());

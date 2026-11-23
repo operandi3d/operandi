@@ -222,7 +222,7 @@ impl TubeFrame {
 /// A group's falloff weight from its base centre and its points.
 pub type GroupWeight<'a> = &'a dyn Fn(DVec3, &[u32]) -> f64;
 
-/// What Twist Bevel reads from the shared tool pipe (spec section 5), in
+/// What Twist Bevel reads from the shared tool chain (spec section 5), in
 /// the mesh's own coordinates.
 pub struct TwistBevelPipe<'a> {
     /// Falloff weight of a group from its base centre and its points

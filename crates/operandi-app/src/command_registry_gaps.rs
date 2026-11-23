@@ -60,7 +60,7 @@ pub(super) const KNOWN_GAPS: &[&str] = &[
     "properties/Texture | Variation Source",
     "toolbox | Convert",
     "toolbox | Mesh Cleanup",
-    "viewport-properties | Replicators",
+    "viewport-properties | Instancers",
     "viewport-properties | Show Vertices",
     "viewport-properties | Smooth Shade",
 ];

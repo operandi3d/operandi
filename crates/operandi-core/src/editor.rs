@@ -1824,7 +1824,7 @@ impl Editor {
     /// Change the Symmetry setting (tool context, not saved). Turning it off
     /// remembers the last setting for Toggle Symmetry.
     ///
-    /// Tool pipe (Jason, 2026-11-14): Symmetry is a layer under every tool,
+    /// Tool chain (Jason, 2026-11-14): Symmetry is a layer under every tool,
     /// so it changes at any time and the open tool follows at once: its
     /// handle moves to the picked side (or back), and whatever it shows is
     /// rebuilt under the new plane. Not an undo step of its own. If the
@@ -1925,7 +1925,7 @@ impl Editor {
             return self.set_background_constraint(c);
         }
         // Symmetry too, Solid Sketch and every other session included: the
-        // open tool follows the change (tool pipe, Jason 2026-11-14).
+        // open tool follows the change (tool chain, Jason 2026-11-14).
         match cmd {
             Command::ToggleSymmetry => return self.toggle_symmetry(),
             Command::Symmetry(symmetry) => return self.set_symmetry(symmetry),

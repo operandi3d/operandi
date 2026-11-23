@@ -5,7 +5,7 @@
 use super::*;
 use crate::unavailable::Gate;
 
-pub(super) const REPLICATOR_TAB: &str = "Replicator";
+pub(super) const REPLICATOR_TAB: &str = "Instancer";
 
 impl Operandi {
     /// G8 RP-3: `scene` (the shown scene) with Replicators' copies as wire
@@ -177,11 +177,11 @@ impl Operandi {
                         });
                     });
                     if ui
-                        .button("Freeze Replicator")
+                        .button("Freeze Instancer")
                         .on_hover_text("Turn the copies into instance items in the group")
                         .clicked()
                     {
-                        self.execute("Freeze Replicator");
+                        self.execute("Freeze Instancer");
                     }
                 },
             );
@@ -263,15 +263,15 @@ mod tests {
     fn replica_buttons_start_their_tools_with_the_replica_copier() {
         use operandi_core::duplicate_copier::Copier;
         for (button, tool) in [
-            ("Replica Clone", operandi_core::Tool::Clone),
-            ("Replica Array", operandi_core::Tool::Array),
-            ("Replica Radial Array", operandi_core::Tool::RadialArray),
-            ("Replica Mirror", operandi_core::Tool::Mirror),
-            ("Replica Scatter", operandi_core::Tool::ScatterClone),
-            ("Curve Replica", operandi_core::Tool::CurveClone),
-            ("Bezier Replica", operandi_core::Tool::CurveClone),
-            ("B-Spline Replica", operandi_core::Tool::CurveClone),
-            ("Pen Replicate", operandi_core::Tool::CurveClone),
+            ("Instancer Clone", operandi_core::Tool::Clone),
+            ("Instancer Array", operandi_core::Tool::Array),
+            ("Instancer Radial Array", operandi_core::Tool::RadialArray),
+            ("Instancer Mirror", operandi_core::Tool::Mirror),
+            ("Instancer Scatter", operandi_core::Tool::ScatterClone),
+            ("Curve Instancer", operandi_core::Tool::CurveClone),
+            ("Bezier Instancer", operandi_core::Tool::CurveClone),
+            ("B-Spline Instancer", operandi_core::Tool::CurveClone),
+            ("Pen Instancer", operandi_core::Tool::CurveClone),
         ] {
             let mut a = crate::tests::box_app();
             a.run(Command::Mode(operandi_core::Mode::Item));
@@ -292,6 +292,57 @@ mod tests {
             assert!(
                 text.contains(&format!("\"command\":\"{button}\"")),
                 "{button} in the tab"
+            );
+        }
+    }
+
+    /// The Instancer names replaced Replica / Replicator on 2026-11-23; the
+    /// old phrases still start the same tools and commands.
+    #[test]
+    fn old_replica_phrases_still_work() {
+        use operandi_core::duplicate_copier::Copier;
+        for (old, tool) in [
+            ("Replica Clone", operandi_core::Tool::Clone),
+            ("Replica Array", operandi_core::Tool::Array),
+            ("Replica Radial Array", operandi_core::Tool::RadialArray),
+            ("Replica Mirror", operandi_core::Tool::Mirror),
+            ("Replica Scatter", operandi_core::Tool::ScatterClone),
+            ("Curve Replica", operandi_core::Tool::CurveClone),
+            ("Bezier Replica", operandi_core::Tool::CurveClone),
+            ("B-Spline Replica", operandi_core::Tool::CurveClone),
+            ("Pen Replicate", operandi_core::Tool::CurveClone),
+        ] {
+            let mut a = crate::tests::box_app();
+            a.run(Command::Mode(operandi_core::Mode::Item));
+            a.execute(old);
+            let live = a
+                .editor
+                .live
+                .as_ref()
+                .unwrap_or_else(|| panic!("{old}: {}", a.status));
+            assert_eq!(live.tool, tool, "{old}");
+            assert_eq!(live.params.duplicate.copier, Some(Copier::Replica), "{old}");
+        }
+        // Freeze Replicator with nothing to freeze says so, as Freeze
+        // Instancer does; Replicators steps the view option.
+        let mut a = crate::tests::box_app();
+        a.execute("Freeze Replicator");
+        assert!(a.status.contains("Instancer"), "{}", a.status);
+        a.execute("Replicators");
+        assert_eq!(
+            a.display.settings.drawing.replicators,
+            crate::view_display::ReplicatorDisplay::Selected
+        );
+        assert!(a.status.starts_with("Instancers"), "{}", a.status);
+        // Mesh Paint Replica turns on Mesh Paint making Instancers.
+        for phrase in ["Mesh Paint Replica", "Mesh Paint Instancer"] {
+            let mut a = crate::tests::box_app();
+            a.execute(phrase);
+            assert_eq!(
+                a.utility.map(|u| u.label()),
+                Some("Mesh Paint Instancer"),
+                "{phrase}: {}",
+                a.status
             );
         }
     }

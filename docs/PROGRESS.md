@@ -1,5 +1,23 @@
 # Milestone progress ledger
 
+- **Brand renames (2026-11-23, branch brand-renames, Jason's names):**
+  what users see changes; ids, file names, saved keys and LXO keys stay.
+  - Tool Pipe → Tool Chain (Workbench ▸ Add Tool Chain, docs). Command
+    `operandi.workbench.addChain`; `addPipe` still works as an alias.
+  - Replicator → Instancer in labels, tooltips, status text, item names
+    and undo labels: Instancer Clone/Array/Radial Array/Mirror/Scatter,
+    Curve/Bezier/B-Spline Instancer, Pen Instancer, Mesh Paint Instancer,
+    Freeze Instancer, the Instancer properties tab and Duplicate section,
+    Viewport Properties ▸ Instancers, Texture Instancer. The old phrases
+    (Replica Clone, Freeze Replicator, Replicators, Mesh Paint Replica …)
+    still work. Tool preset ids, icon files, `Item::replicator` and the
+    vertex maps "Replica Rotation/Scale/Member" (saved names) are unchanged.
+  - Retopo Edge Flow's set is RetopoEdgeFlow (was RetopoFlow); in an older
+    scene the next Retopo Edge Flow moves RetopoFlow's polygons into it, in
+    the same undo step.
+  - Add Item lists only what Operandi makes: Backdrop Item, Camera, Mesh,
+    Lights, Locators ▸ Group Locator. Show unsupported is gone (IL-Q4, a
+    deliberate departure from IL-02).
 - **Mesh Stack rename (2026-11-23, branch mesh-stack-rename):** Mesh Ops
   renamed Mesh Stack in code, docs and bridge names. Saved files keep the
   key `mesh_ops` (scene items and saved panel layouts), so they open in

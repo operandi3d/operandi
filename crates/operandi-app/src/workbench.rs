@@ -14,7 +14,7 @@
 //!   through `execute`), a Tool Properties row, a Preset Browser entry or
 //!   a Command History line is added instead of run. What is under the
 //!   pointer lights green.
-//! - Add the current tool pipe: action centre, falloff, symmetry and the
+//! - Add the current tool chain: action centre, falloff, symmetry and the
 //!   open tool as one `cmds.batch` button, a custom tool in one click.
 //! - Every edit is an `operandi.workbench.*` registry command and writes
 //!   the user's copy of the form (LAY-87, `FormStore::save`); Revert
@@ -467,7 +467,7 @@ impl Operandi {
         })
     }
 
-    /// The current tool pipe as command lines, in pipe order: action
+    /// The current tool chain as command lines, in pipe order: action
     /// centre, falloff, symmetry, then the open tool (LAY-82).
     pub(super) fn workbench_pipe(&self) -> std::result::Result<(Tool, Vec<String>), String> {
         let live = self
@@ -630,7 +630,7 @@ impl Operandi {
                 };
                 self.workbench_push(a[1].as_deref(), control)
             }
-            "operandi.workbench.addPipe" => {
+            "operandi.workbench.addChain" => {
                 let a = bound(name, rest, &["as", "label", "form"])?;
                 let kind = a[0]
                     .clone()
@@ -800,7 +800,7 @@ impl Operandi {
                     S::lit(self.workbench.picking)
                 }
             }
-            "operandi.workbench.addPipe" => {
+            "operandi.workbench.addChain" => {
                 let kind = bound(name, rest, &["as", "label", "form"])
                     .ok()
                     .and_then(|a| a[0].clone())
@@ -895,19 +895,19 @@ impl Operandi {
                 ),
                 "Starts a collapsible section; right-click it to rename it",
             );
-            let pipe = format!("operandi.workbench.addPipe as:preset form:{id}");
+            let pipe = format!("operandi.workbench.addChain as:preset form:{id}");
             let state = a.line_state(&pipe).unwrap_or_default();
-            let menu = ui.menu_button("Add Tool Pipe", |ui| {
+            let menu = ui.menu_button("Add Tool Chain", |ui| {
                 a.menu_owned_input = true;
                 for (label, kind, tip) in [
                     ("As Preset", "preset", "A custom tool in one click: the action centre, falloff, symmetry and open tool"),
                     ("As Macro", "macro", "Not in Operandi yet: there is no macro recorder"),
                     ("As Script", "script", "Not in Operandi yet"),
                 ] {
-                    let line = format!("operandi.workbench.addPipe as:{kind} form:{id}");
+                    let line = format!("operandi.workbench.addChain as:{kind} form:{id}");
                     let state = a.line_state(&line).unwrap_or_default();
                     let item = ui.gated(state.unavailable.as_deref(), Button::new(label));
-                    a.toolbox_rects.insert(format!("Add Tool Pipe {label}"), item.rect);
+                    a.toolbox_rects.insert(format!("Add Tool Chain {label}"), item.rect);
                     if item.clicked() {
                         a.execute(&line);
                         ui.close();
@@ -916,11 +916,11 @@ impl Operandi {
                 }
             });
             a.toolbox_rects
-                .insert("Add Tool Pipe".into(), menu.response.rect);
+                .insert("Add Tool Chain".into(), menu.response.rect);
             menu.response.on_hover_text(
                 state
                     .unavailable
-                    .unwrap_or_else(|| "Add the current tool pipe as a preset".into()),
+                    .unwrap_or_else(|| "Add the current tool chain as a preset".into()),
             );
             a.workbench_tool(
                 ui,

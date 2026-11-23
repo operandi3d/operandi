@@ -103,25 +103,25 @@ fn the_arrow_opens_the_same_menu() {
     rect(&a, "Add Item menu: Lights");
 }
 
+/// Only types Operandi makes are listed (Jason, 2026-11-23, IL-Q4): no
+/// greyed entries, no categories without one.
 #[test]
-fn disabled_entries_do_nothing_and_empty_categories_are_hidden() {
+fn only_types_operandi_makes_are_listed() {
     let (mut a, ctx) = setup();
     open_add_item(&mut a, &ctx);
-    assert!(!a.toolbox_rects.contains_key("Add Item menu: Forces"));
-    // Show unsupported brings the hidden categories back, greyed.
-    a.item_list.prefs.show_unsupported = true;
-    draw(&mut a, &ctx, SIZE, vec![super::tests::key(Key::Escape)]);
-    draw(&mut a, &ctx, SIZE, vec![]);
-    open_add_item(&mut a, &ctx);
-    let forces = rect(&a, "Add Item menu: Forces").center();
-    hover(&mut a, &ctx, forces);
-    let vortex = rect(&a, "Add Item: Vortex Force").center();
-    let before = a.editor.scene.clone();
-    let undo = a.editor.undo.len();
-    click(&mut a, &ctx, vortex);
-    assert_eq!(a.editor.scene, before);
-    assert_eq!(a.editor.undo.len(), undo);
-    assert!(a.item_list.prefs.recent.is_empty());
+    rect(&a, "Add Item menu: Lights");
+    rect(&a, "Add Item menu: Locators");
+    for gone in ["Forces", "Deformers", "Particles", "Other"] {
+        assert!(
+            !a.toolbox_rects
+                .contains_key(&format!("Add Item menu: {gone}")),
+            "{gone}"
+        );
+    }
+    let locators = rect(&a, "Add Item menu: Locators").center();
+    hover(&mut a, &ctx, locators);
+    rect(&a, "Add Item: Group Locator");
+    assert!(!a.toolbox_rects.contains_key("Add Item: Texture Locator"));
 }
 
 #[test]

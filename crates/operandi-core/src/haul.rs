@@ -12,7 +12,7 @@
 //! - [`Tracker`]: one drag's bookkeeping in screen pixels (DL-02): the axis
 //!   lock (DL-04), whole-number stepping (DL-05) and the sign (DL-06).
 //!
-//! The layer sits in the tool pipe after action centre, falloff, symmetry
+//! The layer sits in the tool chain after action centre, falloff, symmetry
 //! and snapping, and after the tool's handles get first pick (DL-01). Where
 //! the app checks for it is in `operandi-app/src/viewport/haul_view.rs`.
 use crate::Tool;

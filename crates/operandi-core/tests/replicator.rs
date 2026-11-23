@@ -9,7 +9,7 @@
 //! 4. One undo removes the whole Replicator.
 //! 5. Freeze Replicator: N − 1 instances in the group at the same places,
 //!    the Replicator and cloud gone.
-//! 6. Nothing to copy is refused with "Select an item to replicate".
+//! 6. Nothing to copy is refused with "Select an item to instance".
 use glam::{DMat4, DVec3};
 use operandi_core::evaluate::Purpose;
 use operandi_core::replicator::{self, Replicator};
@@ -81,9 +81,9 @@ fn replica_array_makes_a_group_a_hidden_cloud_and_a_replicator() {
         names,
         [
             "proto",
-            "proto Replicator",
+            "proto Instancer",
             "proto (Point Cloud)",
-            "proto (Replicator)"
+            "proto (Instancer)"
         ]
     );
     let group = &e.scene.items[1];
@@ -228,7 +228,7 @@ fn a_replica_tool_with_nothing_to_copy_is_refused() {
         p.duplicate.copier = Some(operandi_core::duplicate_copier::Copier::Replica);
         p.duplicate.placed = true;
         let err = e.dispatch(Command::Preview(p)).unwrap_err();
-        assert!(err.contains("Select an item to replicate"), "{err}");
+        assert!(err.contains("Select an item to instance"), "{err}");
     }
     assert!(e.scene.items.iter().all(|i| i.replicator.is_none()));
 }
@@ -294,7 +294,7 @@ fn mesh_paint_replica_makes_one_replicator_per_stroke() {
     let at = |x: f64| PaintPoint::at(DVec3::new(x, 0., 0.), DVec3::Y);
     e.dispatch(stroke(vec![at(0.1), at(0.2), at(0.3)])).unwrap();
     assert_eq!(e.undo.len(), steps + 1);
-    assert_eq!(e.undo.last().unwrap().label, "Mesh Paint Replica");
+    assert_eq!(e.undo.last().unwrap().label, "Mesh Paint Instancer");
     let reps: Vec<&Item> = e
         .scene
         .items
@@ -323,10 +323,10 @@ fn mesh_paint_replica_makes_one_replicator_per_stroke() {
         .iter()
         .filter(|i| i.replicator.is_some())
         .count();
-    assert_eq!(count, 2, "a second stroke, a second Replicator");
+    assert_eq!(count, 2, "a second stroke, a second Instancer");
     let names: Vec<&str> = e.scene.items.iter().map(|i| i.name.as_str()).collect();
     assert!(
-        names.iter().any(|n| n.ends_with("Replicator (2)")),
+        names.iter().any(|n| n.ends_with("Instancer (2)")),
         "{names:?}"
     );
 }
@@ -342,7 +342,7 @@ fn copies_left_out_counts_the_points_past_the_limit() {
     assert_eq!(
         replicator::copies_left_out(&e.scene, 999),
         0,
-        "not a Replicator"
+        "not an Instancer"
     );
 }
 

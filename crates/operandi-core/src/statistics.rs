@@ -339,7 +339,7 @@ impl ItemType {
             ItemType::Texture => "Texture Locator",
             ItemType::Locator => "Locator",
             ItemType::Environment => "Environment",
-            ItemType::Replicator => "Replicator",
+            ItemType::Replicator => "Instancer",
             ItemType::Kit => "Kit Item",
         }
     }

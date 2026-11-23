@@ -235,7 +235,7 @@ impl Operandi {
         if s.mode != Mode::Polygon || s.faces.is_empty() {
             self.status = format!(
                 "{}: select the guide curves first (Polygon mode)",
-                if name == "RetopoFlow" {
+                if name == "RetopoEdgeFlow" {
                     "Retopo Edge Flow"
                 } else {
                     "Retopo Edge Lock"

@@ -618,7 +618,7 @@ impl Scene {
             if let Some(rep) = &i.replicator {
                 rep.validate()?;
                 if !i.mesh.vertices.is_empty() || i.mesh_stack.is_some() {
-                    return Err("A Replicator holds no mesh or Mesh Stack".into());
+                    return Err("An Instancer holds no mesh or Mesh Stack".into());
                 }
             }
             if let Some(kit) = &i.kit {

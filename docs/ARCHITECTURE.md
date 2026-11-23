@@ -60,7 +60,7 @@ builds) and `fixtures/` (original test scenes).
   inside the tool). Cancel restores the start. Tool Properties panels are
   field lists driven by the same parameters (`tool_form.rs`,
   `NumericSession`).
-- **Tool cards and the tool pipe.** Every tool is a stack of shared layers
+- **Tool cards and the tool chain.** Every tool is a stack of shared layers
   (action centre, falloff, symmetry, snapping), then its own geometry.
   `operandi-core/src/tool_card.rs` gives each tool one card: its family,
   starting modes, which layers it uses, its handle layout and anchor,

@@ -2751,7 +2751,15 @@ Decided 2026-11-06 (settled defaults, not provisional):
 - **IL-Q3 Unsupported entries.** Shown disabled with the tooltip "Not yet
   in Operandi". Categories with nothing enabled are hidden unless "Show
   unsupported" (bottom of the menu, off by default, remembered) is ticked.
-  Today only Lights has enabled entries (all nine kinds).
+  Today only Lights has enabled entries (all nine kinds). Replaced by
+  IL-Q4 (2026-11-23).
+- **IL-Q4 Only what Operandi makes (Jason, 2026-11-23; deliberate
+  departure from IL-02).** Add Item lists only the types Operandi can
+  make: Backdrop Item, Camera, Mesh, Lights (nine kinds) and Locators
+  (Group Locator). IL-02's other entries and the categories left empty
+  (Deformers, Dynamics, Falloffs, Forces, Particles, Procedural, Volumes,
+  Other) are gone, and so is Show unsupported. An entry returns when
+  Operandi can make its type.
 
 Provisional:
 

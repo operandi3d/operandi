@@ -1,7 +1,7 @@
 //! One card per tool (architecture review 2026-11-14, pick A): everything
 //! the rest of the program asks about a tool, in one place.
 //!
-//! Every tool is a stack of shared layers, the "tool pipe" (Jason,
+//! Every tool is a stack of shared layers, the "tool chain" (Jason,
 //! 2026-11-14): action centre, falloff, symmetry, snapping and the mesh
 //! constraint (MC-08), then the tool's own geometry. A card says which layers the tool uses, and how its
 //! handles look and where they sit, instead of each layer keeping its own
