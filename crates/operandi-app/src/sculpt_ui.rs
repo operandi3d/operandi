@@ -1371,6 +1371,9 @@ impl Operandi {
     /// under the pointer (SC-40); off the mesh nothing happens (SC-43).
     /// Modifiers are read here and held for the stroke (SC section 7).
     pub(super) fn sculpt_press(&mut self, p: Pos2, r: Rect, mods: Modifiers) -> input::GestureKind {
+        // A stroke still held (its release never came) is finished as its
+        // own step before a new one starts (Astra P5-001).
+        self.finish_sculpt_stroke();
         let Some(brush) = self.sculpt.brush else {
             return input::GestureKind::Blocked;
         };

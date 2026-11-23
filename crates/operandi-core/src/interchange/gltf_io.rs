@@ -273,13 +273,8 @@ fn load_uri(uri: &str, folder: Option<&Path>) -> Result<Vec<u8>> {
         return Err(format!("glTF buffer '{uri}' is outside the file's folder"));
     }
     let full = folder.unwrap_or(Path::new(".")).join(path);
-    let size = std::fs::metadata(&full)
-        .map_err(|e| format!("glTF buffer '{uri}': {e}"))?
-        .len();
-    if size > super::MAX_IMPORT_BYTES {
-        return Err(format!("glTF buffer '{uri}' exceeds the import budget"));
-    }
-    std::fs::read(&full).map_err(|e| format!("glTF buffer '{uri}': {e}"))
+    operandi_files::read_whole(&full, super::MAX_IMPORT_BYTES)
+        .map_err(|e| format!("glTF buffer '{uri}': {e}"))
 }
 
 fn percent_decode(s: &str) -> String {

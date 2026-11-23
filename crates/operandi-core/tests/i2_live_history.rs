@@ -172,6 +172,7 @@ fn completed_history_anchor_and_capacity() {
                 identity_after: Some(e.identities.current.clone()),
                 fold: None,
                 records: Default::default(),
+                mark: 0,
             }));
         }
         arm(&mut e, 0.);
@@ -595,6 +596,9 @@ fn actual_temp_collision_preserves_v0_blocker_and_both_stage_owners() {
             begin(&mut e);
         }
         let before = e.clone();
+        // The planted temporary no longer collides (unique names), so the
+        // failure is injected.
+        operandi_core::persistence::refuse_next_save_on_this_thread();
         assert!(e.save_committed(&path).is_err());
         assert!(e == before);
         assert_eq!(std::fs::read(&path).unwrap(), original);
@@ -991,6 +995,7 @@ mod frozen_traces {
                     identity_after: Some(e.identities.current.clone()),
                     fold: None,
                     records: Default::default(),
+                    mark: 0,
                 })
             })
             .collect::<Vec<_>>();
@@ -1251,6 +1256,7 @@ fn malformed_101_completed_entries_refuse_without_eviction_or_partial_begin() {
         identity_after: Some(e.identities.current.clone()),
         fold: None,
         records: Default::default(),
+        mark: 0,
     };
     e.undo = (0..101).map(|_| std::sync::Arc::new(c.clone())).collect();
     let before = e.clone();

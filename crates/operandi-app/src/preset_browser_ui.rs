@@ -1837,7 +1837,7 @@ impl Operandi {
             return;
         };
         let file = slot.thumb_file(&history.folder);
-        let picture = image::open(&file).ok().or_else(|| {
+        let picture = crate::image_decode::open(&file).ok().or_else(|| {
             let pixels = crate::image_viewer::read_output(&history.folder, slot, 0).ok()?;
             let bytes: Vec<u8> = pixels
                 .as_chunks::<4>()

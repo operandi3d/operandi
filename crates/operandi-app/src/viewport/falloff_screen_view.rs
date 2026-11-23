@@ -471,7 +471,7 @@ impl Operandi {
 
     /// The chosen picture, read in grey, then stamped.
     pub(crate) fn falloff_image_chosen(&mut self, path: std::path::PathBuf) {
-        match image::open(&path) {
+        match crate::image_decode::open(&path) {
             Ok(img) => {
                 let grey = img.to_luma32f();
                 let (width, height) = (grey.width() as usize, grey.height() as usize);

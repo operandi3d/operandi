@@ -40,8 +40,27 @@ pub const SCALE_MAP: &str = "Replica Scale";
 pub const MEMBER_MAP: &str = "Replica Member";
 /// RP-6: what a Replica tool says with nothing to copy.
 pub const NOTHING_TO_REPLICATE: &str = "Select an item to replicate";
-/// Most copies one Replicator shows.
-pub const MAX_COPIES: usize = 1 << 20;
+/// Most copies one Replicator shows. Copies are drawn and rendered as
+/// instances, so this is far above any one point cloud; past it the
+/// Replicator panel says how many points are left out (hidden-limits A4,
+/// was 1,048,576 with no note).
+pub const MAX_COPIES: usize = 1 << 24;
+
+/// How many of the Replicator `id`'s points get no copy because of
+/// `MAX_COPIES` (0 when all fit, or `id` isn't a Replicator).
+pub fn copies_left_out(scene: &Scene, id: u64) -> usize {
+    let Some(rep) = scene.item(id).and_then(|i| i.replicator.as_ref()) else {
+        return 0;
+    };
+    scene.item(rep.point_source).map_or(0, |cloud| {
+        cloud
+            .mesh
+            .read()
+            .as_read()
+            .point_count()
+            .saturating_sub(MAX_COPIES)
+    })
+}
 
 /// A Replicator's settings (RP-2), shown in Properties.
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]

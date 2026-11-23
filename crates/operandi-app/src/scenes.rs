@@ -139,11 +139,14 @@ pub(crate) struct SceneState {
     field_errors: BTreeMap<String, String>,
     bridge_ui: bridge_panel::BridgeUi,
     bevel_ui: bevel_panel::BevelUi,
+    /// Image save queue and file times (painting.rs).
+    #[cfg(feature = "painting")]
+    images: crate::painting::DocImages,
 }
 
 impl SceneState {
     pub(super) fn dirty(&self) -> bool {
-        !super::same_document(&self.editor.scene, &self.saved)
+        super::needs_saving(&self.editor, &self.saved, super::same_document)
     }
 }
 
@@ -160,27 +163,9 @@ impl Operandi {
     /// Swap the per-scene state between the app and `s`.
     fn exchange(&mut self, s: &mut SceneState) {
         use std::mem::swap;
-        let (e, o) = (&mut self.editor, &mut s.editor);
-        swap(&mut e.scene, &mut o.scene);
-        swap(&mut e.undo, &mut o.undo);
-        swap(&mut e.redo, &mut o.redo);
-        swap(&mut e.selection_run, &mut o.selection_run);
-        swap(&mut e.next_item_id, &mut o.next_item_id);
-        swap(&mut e.selection_start, &mut o.selection_start);
-        swap(&mut e.identities, &mut o.identities);
-        swap(&mut e.i2, &mut o.i2);
-        swap(&mut e.extrude_moved_caps, &mut o.extrude_moved_caps);
-        // The scene's tool stays live, waiting for the scene's return.
-        swap(&mut e.live, &mut o.live);
-        swap(&mut e.anim, &mut o.anim);
-        swap(&mut e.pen_draft, &mut o.pen_draft);
-        swap(&mut e.solid_sketch, &mut o.solid_sketch);
-        swap(&mut e.bridge, &mut o.bridge);
-        swap(&mut e.spike, &mut o.spike);
-        swap(&mut e.reduction, &mut o.reduction);
-        swap(&mut e.ellipsoid, &mut o.ellipsoid);
-        swap(&mut e.shape, &mut o.shape);
-        swap(&mut e.cone, &mut o.cone);
+        // Every editor field is sorted into document or shared state in
+        // core (document_state.rs, Astra P2-001).
+        self.editor.swap_document_state(&mut s.editor);
         swap(&mut self.saved, &mut s.saved);
         swap(&mut self.path, &mut s.path);
         swap(&mut self.name, &mut s.name);
@@ -195,6 +180,8 @@ impl Operandi {
         swap(&mut self.field_errors, &mut s.field_errors);
         swap(&mut self.bridge_ui, &mut s.bridge_ui);
         swap(&mut self.bevel_ui, &mut s.bevel_ui);
+        #[cfg(feature = "painting")]
+        swap(&mut self.painting.doc, &mut s.images);
     }
 
     /// True while a tool, Pen draft or selection gesture holds the scene.
@@ -241,7 +228,7 @@ impl Operandi {
             None => self.scene_label(),
         }
     }
-    fn tab_dirty(&self, i: usize) -> bool {
+    pub(super) fn tab_dirty(&self, i: usize) -> bool {
         match &self.scenes.tabs[i].parked {
             Some(s) => s.dirty(),
             None => self.dirty(),
@@ -302,7 +289,7 @@ impl Operandi {
     }
 
     /// The swap itself (no tool checks).
-    fn switch_scene_now(&mut self, index: usize) {
+    pub(super) fn switch_scene_now(&mut self, index: usize) {
         self.flush_scene();
         self.cameras.insert(self.active_view, self.camera.clone());
         let mut incoming = self.scenes.tabs[index]
@@ -327,6 +314,7 @@ impl Operandi {
             && self.dirty()
             && self.autosave.changed_since_backup(&self.editor.scene)
             && self.editor.backup_ready()
+            && !self.app_stroke_held()
             && !self.autosave.busy()
         {
             self.start_backup();
@@ -378,7 +366,11 @@ impl Operandi {
         if let Some(job) = self.journal_job.take() {
             let _ = job.join();
         }
-        let _ = std::fs::remove_file(self.journal_path());
+        // A blocked session keeps the earlier session's journals on disk
+        // (Recover Scene, Cancel); closing must not delete them (P7-001).
+        if !self.journal_blocked {
+            let _ = std::fs::remove_file(self.journal_path());
+        }
         self.journaled = None;
         if self.scenes.tabs.len() == 1 {
             self.initialize_new_document();
@@ -428,8 +420,12 @@ impl Operandi {
         if let Some(job) = self.journal_job.take() {
             let _ = job.join();
         }
-        for tab in &self.scenes.tabs {
-            let _ = std::fs::remove_file(slot_path(&self.environment, tab.slot));
+        // Unless the journals on disk belong to an earlier session the
+        // user chose to keep (Recover Scene, Cancel; Astra P7-001).
+        if !self.journal_blocked {
+            for tab in &self.scenes.tabs {
+                let _ = std::fs::remove_file(slot_path(&self.environment, tab.slot));
+            }
         }
         self.journaled = None;
         self.allow_close = true;
@@ -1007,13 +1003,15 @@ impl Operandi {
             return;
         }
         let count = branch.len();
-        let before = self.editor.undo.len();
+        // Recorded or refused, by mark: at Max Undo Level the length stays
+        // put, and a Move would leave its copy behind (Astra P4-004).
+        let mark = self.editor.history_mark();
         self.run(Command::InsertItems {
             items: branch,
             parent,
             images,
         });
-        if self.editor.undo.len() == before {
+        if !self.editor.recorded_since(mark) {
             return; // refused; the status line says why
         }
         let mut status = format!(

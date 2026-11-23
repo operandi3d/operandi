@@ -239,13 +239,16 @@ fn save_image_writes_the_file_and_clears_the_star() {
 #[test]
 fn quitting_with_changed_images_asks_first() {
     let mut a = app();
-    assert!(!a.quit_waits_for_images());
+    a.begin_quit();
+    assert!(!a.painting.quit_prompt, "nothing to ask");
+    a.pending = None;
     a.execute("operandi.image.new resolution:64");
-    assert!(a.quit_waits_for_images());
+    a.begin_quit();
     assert!(a.painting.quit_prompt);
-    a.painting.quit_prompt = false;
-    a.painting.quit_decided = true;
-    assert!(!a.quit_waits_for_images(), "Don't Save lets the quit go on");
+    assert!(a.pending.is_none(), "the scene question waits");
+    a.quit_images_answer(false);
+    assert!(!a.painting.quit_prompt, "Don't Save lets the quit go on");
+    assert!(matches!(a.pending, Some(FileAction::Close)));
 }
 
 #[test]

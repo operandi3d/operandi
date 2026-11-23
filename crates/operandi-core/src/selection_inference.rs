@@ -327,7 +327,7 @@ impl Editor {
     ) -> Result<()> {
         let from = self.scene.selection.mode;
         let saved = self.scene.selection.clone();
-        let steps = self.undo.len();
+        let mark = self.history_mark();
         self.convert_selection(from, target);
         self.scene.selection.mode = target;
         if let Err(e) = self.dispatch_inner(cmd, report) {
@@ -335,7 +335,8 @@ impl Editor {
             return Err(e);
         }
         self.restore_source(from, &saved);
-        if self.undo.len() > steps
+        // By mark (Astra P9-006): at Max Undo Level the length doesn't grow.
+        if self.steps_since(mark) > 0
             && let Some(step) = self.undo.last_mut().map(std::sync::Arc::make_mut)
         {
             step.before.selection = saved;

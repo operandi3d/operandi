@@ -151,8 +151,7 @@ pub(crate) fn decode(path: &std::path::Path) -> std::result::Result<(Pixels, (u3
     if !path.exists() {
         return Err(format!("Backdrop picture not found: {name}"));
     }
-    let image = image::ImageReader::open(path)
-        .and_then(|r| r.with_guessed_format())
+    let image = crate::image_decode::reader(path)
         .map_err(|e| format!("Can't read {name}: {e}"))?
         .decode()
         .map_err(|e| format!("Can't read {name} as a PNG or JPEG picture: {e}"))?;

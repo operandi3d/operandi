@@ -901,58 +901,9 @@ impl Operandi {
             // Cancel (or Escape) keeps the journals on disk and starts a new
             // scene; they are offered again at the next launch.
             match self.show_confirm(ctx, "Recover Scene", &message, &["Discard"]) {
-                form::Outcome::Ok => {
-                    if let Some(scene) = self.recovery.take() {
-                        self.editor = Editor {
-                            scene,
-                            ..Default::default()
-                        };
-                        self.name = self
-                            .editor
-                            .scene
-                            .active()
-                            .map(|i| i.name.clone())
-                            .unwrap_or_default();
-                        self.path = None;
-                        self.saved = Scene::default();
-                        self.clear_fields();
-                        self.status = "Recovered unsaved scene; Save As to preserve it".into();
-                        self.frame(false);
-                        let more = std::mem::take(&mut self.recovery_more);
-                        if !more.is_empty() {
-                            // Old journals of further scenes go; each
-                            // recovered tab journals under its own slot.
-                            let first = self.environment.paths().recovery();
-                            for path in scenes::journal_files(&self.environment) {
-                                if path != first {
-                                    let _ = std::fs::remove_file(path);
-                                }
-                            }
-                            let count = more.len() + 1;
-                            self.recover_extra_scenes(more);
-                            self.status = format!(
-                                "Recovered {count} unsaved scenes; Save As to preserve them"
-                            );
-                        }
-                    }
-                }
-                form::Outcome::Extra(_) => {
-                    self.recovery = None;
-                    self.recovery_more.clear();
-                    for path in scenes::journal_files(&self.environment) {
-                        let _ = std::fs::remove_file(path);
-                    }
-                }
-                form::Outcome::Cancel => {
-                    // Keep the journals intact: no recovery writes this
-                    // session, so nothing overwrites them (UIC-96).
-                    self.recovery = None;
-                    self.recovery_more.clear();
-                    self.journal_blocked = true;
-                    self.status =
-                        "Recovery journal kept for the next launch; this session isn't journaled"
-                            .into();
-                }
+                form::Outcome::Ok => self.recover_journals(),
+                form::Outcome::Extra(_) => self.discard_journals(),
+                form::Outcome::Cancel => self.keep_journals(),
                 form::Outcome::Open | form::Outcome::No => {}
             }
             return;

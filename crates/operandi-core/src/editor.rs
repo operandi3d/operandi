@@ -547,10 +547,12 @@ pub struct Checkpoint {
     pub fold: Option<u64>,
     /// The command lines that made this step (UIC-226).
     pub records: crate::StepRecords,
+    /// `Editor::history_mark` right after this step was recorded: which
+    /// steps are newer than a mark, however trimming shifted the list.
+    pub mark: u64,
 }
-/// Most memory the undo history's item copies take (`trim_undo_memory`):
-/// 4 GiB, about 12 steps of a 100,000-item scene and every step of one
-/// under 10,000 items.
+/// Most memory the undo history takes (`trim_undo_memory`), counting the
+/// mesh data each step alone keeps (undo_memory.rs).
 pub const UNDO_MEMORY_BUDGET: usize = 4 << 30;
 /// Merge Tool's Distance after Reset (recorded, VTO-D0-05).
 pub const MERGE_TOOL_DISTANCE: f64 = 0.001;
@@ -566,6 +568,12 @@ impl PartialEq for FreeMemory {
 
 #[derive(Clone, Default, PartialEq)]
 pub struct Editor {
+    /// The undo memory budget in bytes; `None` is `UNDO_MEMORY_BUDGET`.
+    pub undo_memory_budget: Option<usize>,
+    /// Set while a multi-mesh command records one step per mesh that it
+    /// then joins into one (multi_tools.rs): trimming in between would
+    /// shift the steps it is about to join (Astra P9-001).
+    pub undo_trim_paused: bool,
     /// While set, undo steps recorded under this gesture id fold into one
     /// (a colour drag across several items and frames is one step). The
     /// app sets it around a gesture's commands and clears it after.
@@ -727,6 +735,11 @@ pub struct Editor {
     pub tweak_held: bool,
     /// Counts recorded document steps, to tell a tweak from an Apply.
     pub history_serial: u64,
+    /// Counts every change recording makes to the undo history: a new
+    /// step, a later edit folded into the newest one, or a selection change
+    /// joining a selection group (`recorded_since`). Unlike `undo.len()`, it
+    /// still moves once Max Undo Level trims the oldest step.
+    pub history_mark: u64,
     /// Redo depth when the active tool started; leaving the tool drops the
     /// steps undone above it.
     pub tool_redo_floor: Option<usize>,
@@ -5697,9 +5710,11 @@ impl Editor {
             last.records
                 .extend_capped(pending, self.history.max_sub_commands as usize);
             self.history_serial = self.history_serial.wrapping_add(1);
+            self.history_mark += 1;
             return;
         }
         self.i2_branch();
+        self.history_mark += 1;
         self.undo.push(std::sync::Arc::new(Checkpoint {
             identity_before: self.identities.record_before.clone(),
             identity_after: None,
@@ -5708,6 +5723,7 @@ impl Editor {
             after: self.scene.clone(),
             fold: self.undo_fold,
             records: std::mem::take(&mut self.pending_records),
+            mark: self.history_mark,
         }));
         // Max Undo Level: the oldest steps go once a new one exceeds it.
         // A lowered limit trims here, on the next step (UND-Q2, provisional).
@@ -5731,20 +5747,64 @@ impl Editor {
     /// of a 100,000-item scene were about 35 GB). Provisional
     /// (scene-budget, 2026-11-20).
     pub(crate) fn trim_undo_memory(&mut self) {
-        self.trim_undo_memory_to(UNDO_MEMORY_BUDGET);
+        if self.undo_trim_paused {
+            return;
+        }
+        self.trim_undo_memory_to(self.undo_memory_budget.unwrap_or(UNDO_MEMORY_BUDGET));
     }
     /// `trim_undo_memory` with another budget, in bytes.
+    /// The history counts the mesh data each step alone keeps alive
+    /// (undo_memory.rs, limits sweep A1), and is held to at most half of
+    /// the memory free beside it, when a free-memory source is set. The
+    /// newest step is always kept.
     pub fn trim_undo_memory_to(&mut self, budget: usize) {
-        let size = |c: &Checkpoint| {
-            (c.before.items.len() + c.after.items.len()) * std::mem::size_of::<crate::Item>()
+        let costs = crate::undo_memory::step_costs(&self.scene, &self.undo, &self.redo);
+        let mut total: usize = costs.iter().sum();
+        let budget = match self.free_memory {
+            crate::FreeMemory(Some(free)) => {
+                let free = usize::try_from(free()).unwrap_or(usize::MAX);
+                budget.min(total.saturating_add(free) / 2)
+            }
+            crate::FreeMemory(None) => budget,
         };
-        let mut total: usize = self.undo.iter().map(|c| size(c)).sum();
         let mut excess = 0;
         while total > budget && excess + 1 < self.undo.len() {
-            total -= size(&self.undo[excess]);
+            total -= costs[excess];
             excess += 1;
         }
         self.undo.drain(..excess);
+    }
+    /// The history's mark now; pass it to `recorded_since` or
+    /// `steps_since` after running something (Astra P4-003: "did that
+    /// record?" was guessed from `undo.len()` growing, which stops working
+    /// once Max Undo Level trims a step for every new one).
+    pub fn history_mark(&self) -> u64 {
+        self.history_mark
+    }
+    /// Whether recording changed the undo history since `mark`: a new step,
+    /// an edit folded into the newest one, or a joined selection change.
+    pub fn recorded_since(&self, mark: u64) -> bool {
+        self.history_mark != mark
+    }
+    /// How many undo steps are newer than `mark` (still in the history).
+    pub fn steps_since(&self, mark: u64) -> usize {
+        self.undo.iter().rev().take_while(|c| c.mark > mark).count()
+    }
+    /// For a command that sets its result selection after recording its
+    /// step: the step recorded since `mark` ends with that selection, so
+    /// Redo gives it back (Astra P4-002).
+    pub(crate) fn amend_step_selection(&mut self, mark: u64) {
+        if self.steps_since(mark) > 0
+            && let Some(step) = self.undo.last_mut().map(std::sync::Arc::make_mut)
+        {
+            step.after.selection = self.scene.selection.clone();
+        }
+    }
+    /// The bytes the undo history holds beyond the scene and redo list.
+    pub fn undo_memory_bytes(&self) -> usize {
+        crate::undo_memory::step_costs(&self.scene, &self.undo, &self.redo)
+            .iter()
+            .sum()
     }
     /// Action frame of a tool session, resolved against world-space positions
     /// for component editing (shared by the editor and viewport handles).

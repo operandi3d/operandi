@@ -120,6 +120,7 @@ mod help_menu;
 mod i2_route;
 mod icon_studio_cli;
 mod icons;
+mod image_decode;
 mod image_viewer;
 mod image_viewer_ui;
 mod import;
@@ -308,6 +309,8 @@ mod painting_speed_tests;
 mod painting_starter_tests;
 #[cfg(all(test, feature = "painting"))]
 mod painting_subd_tests;
+#[cfg(all(test, feature = "painting"))]
+mod painting_tabs_tests;
 #[cfg(all(test, feature = "painting"))]
 mod painting_tests;
 #[cfg(feature = "painting")]
@@ -762,6 +765,9 @@ struct Operandi {
     menus_in_system_bar: bool,
     /// A native panel that is open, waiting for the user.
     choosing: Option<file_chooser::Pending>,
+    /// Tests: native-style panels held open (file_chooser.rs).
+    #[cfg(test)]
+    held_panel: Option<file_chooser::HeldAnswer>,
     pending: Option<FileAction>,
     allow_close: bool,
     ground_axes: bool,
@@ -962,6 +968,10 @@ struct Operandi {
     /// Journals of further scenes open at the crash, restored with
     /// `recovery` into their own tabs.
     recovery_more: Vec<Scene>,
+    /// The journal files `recovery` and `recovery_more` were read from.
+    /// Recover and Discard delete only these; a journal that couldn't be
+    /// read is never deleted (Astra P7-002).
+    recovery_paths: Vec<PathBuf>,
     /// The open scenes (scenes.rs); the edited one's state is in the fields
     /// above.
     scenes: scenes::OpenScenes,
@@ -1469,6 +1479,8 @@ impl Operandi {
             native_panels: false,
             menus_in_system_bar: false,
             choosing: None,
+            #[cfg(test)]
+            held_panel: None,
             pending: None,
             allow_close: false,
             ground_axes: true,
@@ -1581,6 +1593,7 @@ impl Operandi {
             held_tab: Vec::new(),
             recovery: None,
             recovery_more: Vec::new(),
+            recovery_paths: Vec::new(),
             scenes: Default::default(),
             journaled: None,
             journal_written: None,
@@ -1621,45 +1634,109 @@ impl Operandi {
             env!("CARGO_MANIFEST_DIR"),
         ))
     }
+    /// Reads every recovery journal on its own (Astra P7-002): each healthy
+    /// one is offered, in slot order, and a damaged one neither hides the
+    /// others nor gets deleted. A damaged journal is copied aside for
+    /// diagnosis first; if that copy fails, recovery writes stay off this
+    /// session so nothing overwrites the original.
     fn read_recovery(&mut self) {
-        // Journals of further scenes; one that doesn't load is left alone.
-        let path = self.environment.paths().recovery();
-        self.recovery_more = scenes::journal_files(&self.environment)
-            .into_iter()
-            .filter(|p| *p != path)
-            .filter_map(|p| persistence::load(&p).ok())
-            .collect();
-        if !path.exists() {
-            if !self.recovery_more.is_empty() {
-                self.recovery = Some(self.recovery_more.remove(0));
-            }
-            return;
-        }
-        match persistence::load(&path) {
-            Ok(scene) => self.recovery = Some(scene),
-            Err(e) => {
-                let stamp = std::time::SystemTime::now()
-                    .duration_since(std::time::UNIX_EPOCH)
-                    .map(|d| d.as_nanos())
-                    .unwrap_or(0);
-                let backup = path.with_file_name(format!("recovery-corrupt-{stamp}.opscene"));
-                match std::fs::copy(&path, &backup) {
-                    Ok(_) => {
-                        self.recovery_warning = Some(format!(
+        let mut scenes = Vec::new();
+        let mut paths = Vec::new();
+        let mut problems = Vec::new();
+        let stamp = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .map(|d| d.as_nanos())
+            .unwrap_or(0);
+        for path in scenes::journal_files(&self.environment) {
+            match persistence::load(&path) {
+                Ok(scene) => {
+                    scenes.push(scene);
+                    paths.push(path);
+                }
+                Err(e) => {
+                    let stem = path
+                        .file_stem()
+                        .map(|s| s.to_string_lossy().into_owned())
+                        .unwrap_or_else(|| "recovery".into());
+                    let backup = path.with_file_name(format!("{stem}-corrupt-{stamp}.opscene"));
+                    match std::fs::copy(&path, &backup) {
+                        Ok(_) => problems.push(format!(
                             "{e}. Diagnostic copy preserved at {}",
                             backup.display()
-                        ))
-                    }
-                    Err(copy) => {
-                        self.journal_blocked = true;
-                        self.recovery_warning = Some(format!(
-                            "{e}; backup failed: {copy}. Original journal is preserved at {}; recovery writes disabled for this session",
-                            path.display()
-                        ));
+                        )),
+                        Err(copy) => {
+                            self.journal_blocked = true;
+                            problems.push(format!(
+                                "{e}; backup failed: {copy}. Original journal is preserved at {}; recovery writes disabled for this session",
+                                path.display()
+                            ));
+                        }
                     }
                 }
             }
         }
+        self.recovery_warning = (!problems.is_empty()).then(|| problems.join("\n\n"));
+        self.recovery_paths = paths;
+        let mut scenes = scenes.into_iter();
+        self.recovery = scenes.next();
+        self.recovery_more = scenes.collect();
+    }
+    /// Recover Scene, OK: the first journal's scene replaces the new one
+    /// and each further one opens in its own tab. The journals that were
+    /// read are replaced by the recovered tabs' own; the first is written
+    /// at once so the work is never only in memory.
+    fn recover_journals(&mut self) {
+        let Some(scene) = self.recovery.take() else {
+            return;
+        };
+        let more = std::mem::take(&mut self.recovery_more);
+        let first = self.journal_path();
+        for path in std::mem::take(&mut self.recovery_paths) {
+            if path != first {
+                let _ = std::fs::remove_file(path);
+            }
+        }
+        self.editor = Editor {
+            scene,
+            ..Default::default()
+        };
+        self.name = self
+            .editor
+            .scene
+            .active()
+            .map(|i| i.name.clone())
+            .unwrap_or_default();
+        self.path = None;
+        self.saved = Scene::default();
+        self.clear_fields();
+        self.status = "Recovered unsaved scene; Save As to preserve it".into();
+        self.frame(false);
+        self.journal();
+        if !more.is_empty() {
+            let count = more.len() + 1;
+            self.recover_extra_scenes(more);
+            self.status = format!("Recovered {count} unsaved scenes; Save As to preserve them");
+        }
+    }
+    /// Recover Scene, Discard: deletes the journals that were read (never
+    /// one that couldn't be read).
+    fn discard_journals(&mut self) {
+        self.recovery = None;
+        self.recovery_more.clear();
+        for path in std::mem::take(&mut self.recovery_paths) {
+            let _ = std::fs::remove_file(path);
+        }
+    }
+    /// Recover Scene, Cancel: keeps every journal for the next launch. No
+    /// recovery writes or journal deletions happen this session (UIC-96),
+    /// so Close Scene and Quit leave them too (Astra P7-001).
+    fn keep_journals(&mut self) {
+        self.recovery = None;
+        self.recovery_more.clear();
+        self.recovery_paths.clear();
+        self.journal_blocked = true;
+        self.status =
+            "Recovery journal kept for the next launch; this session isn't journaled".into();
     }
     fn clear_fields(&mut self) {
         self.bridge_ui = Default::default();
@@ -2102,17 +2179,7 @@ impl Operandi {
         self.dirty_by(|a, b| a == b)
     }
     fn dirty_by(&self, same: fn(&Scene, &Scene) -> bool) -> bool {
-        !same(&self.editor.scene, &self.saved)
-            || self
-                .editor
-                .ellipsoid
-                .as_ref()
-                .is_some_and(|s| s.preview.is_some())
-            || self
-                .editor
-                .shape
-                .as_ref()
-                .is_some_and(|s| s.preview.is_some())
+        needs_saving(&self.editor, &self.saved, same)
     }
     fn request_file(&mut self, a: FileAction) {
         if self.pending.is_some() || self.file_dialog.is_some() {
@@ -2281,6 +2348,12 @@ impl Operandi {
                 });
             }
             FileAction::SaveAs | FileAction::Export(_) => self.request_file(a),
+            // Closing waits while the scene's image save panels are open,
+            // so their answers write this scene's pixels (Astra P8-001).
+            #[cfg(feature = "painting")]
+            FileAction::Close | FileAction::CloseScene if self.image_saves_pending() => {
+                self.painting.after_images = Some(painting::AfterImages::File(a));
+            }
             FileAction::Close => self.continue_quit(),
             FileAction::CloseScene => {
                 self.close_active_scene();
@@ -2618,6 +2691,12 @@ impl Operandi {
             (self.boolean.is_some(), "Boolean dialog"),
             (self.boolean_notice.is_some(), "Boolean notice"),
             (self.drill.is_some(), "Drill dialog"),
+            // Astra P8-003: it was missing, so a queued Open could run
+            // under it and the answer delete same-numbered layers there.
+            (
+                self.shading.confirm_delete.is_some(),
+                "shader Delete question",
+            ),
         ];
         open.into_iter().find(|(on, _)| *on).map(|(_, name)| name)
     }
@@ -3504,14 +3583,11 @@ impl eframe::App for Operandi {
             && !self.allow_close
         {
             ctx.send_viewport_cmd(ViewportCommand::CancelClose);
-            // Changed images are listed first (PNT-34).
+            // Changed images are listed first (PNT-34), in every scene.
             #[cfg(feature = "painting")]
-            let waits = self.quit_waits_for_images();
+            self.begin_quit();
             #[cfg(not(feature = "painting"))]
-            let waits = false;
-            if !waits {
-                self.request_file(FileAction::Close);
-            }
+            self.request_file(FileAction::Close);
         }
         if self.allow_close {
             ctx.send_viewport_cmd(ViewportCommand::Close);
@@ -3602,12 +3678,33 @@ mod viewport;
 mod viewport_buttons;
 mod viewport_properties;
 mod views;
+/// One "does this scene need saving?" rule for the open scene and the
+/// parked ones alike (Astra P8-002: a parked tab's numeric preview was
+/// skipped by Quit): the scene differs from the saved one, or an Ellipsoid
+/// or shape preview is waiting to be applied.
+fn needs_saving(editor: &Editor, saved: &Scene, same: fn(&Scene, &Scene) -> bool) -> bool {
+    !same(&editor.scene, saved)
+        || editor
+            .ellipsoid
+            .as_ref()
+            .is_some_and(|s| s.preview.is_some())
+        || editor.shape.as_ref().is_some_and(|s| s.preview.is_some())
+}
+
+/// The launch arguments as text, for the command-line modes below. A
+/// file name that isn't valid Unicode (possible on Linux) is kept as it is
+/// for opening (`AppEnvironment::document_argument`) and only shown lossily
+/// here; `std::env::args` would panic on it (Astra P8-007).
+fn command_line_words(raw: impl Iterator<Item = std::ffi::OsString>) -> Vec<String> {
+    raw.map(|a| a.to_string_lossy().into_owned()).collect()
+}
+
 fn main() -> eframe::Result {
     let environment = app_environment::AppEnvironment::capture();
     // Crash files go to <data folder>/crashes (OPERANDI_DEV_DATA for QA apps).
     bug_report::install_panic_hook(environment.paths().crashes());
     // Bulk thumbnail re-render (PB-114 look change): no window opens.
-    let args: Vec<String> = std::env::args().skip(1).collect();
+    let args = command_line_words(std::env::args_os().skip(1));
     if args.first().map(String::as_str) == Some("--rerender-thumbnails") {
         std::process::exit(preset_thumbs::rerender_command(&args[1..]));
     }
@@ -3787,6 +3884,10 @@ mod handle_style_menu_tests;
 mod handle_tips_tests;
 #[cfg(test)]
 mod haul_tests;
+#[cfg(test)]
+mod history_limit_more_tests;
+#[cfg(test)]
+mod history_limit_tests;
 #[cfg(test)]
 mod input_focus_tests;
 #[cfg(test)]

@@ -15,13 +15,39 @@ cd "$(dirname "$0")/.."
 CARGO_BIN="${CARGO_BIN:-cargo}"
 
 LIST=$(mktemp)
+JSON=$(mktemp)
+ERRS=$(mktemp)
 LOGS=$(mktemp -d)
-trap 'rm -rf "$LIST" "$LOGS"' EXIT
+trap 'rm -rf "$LIST" "$JSON" "$ERRS" "$LOGS"' EXIT
 
-"$CARGO_BIN" test --locked --workspace --no-run --message-format=json 2>/dev/null |
+# Build first and keep Cargo's own exit code (Astra P1-001). The old version
+# piped Cargo straight into the list reader, so a test program that failed
+# to compile or link was silently left out while the others still ran and
+# the script reported success.
+BUILD_STATUS=0
+"$CARGO_BIN" test --locked --workspace --no-run --message-format=json >"$JSON" 2>"$ERRS" ||
+    BUILD_STATUS=$?
+if [ "$BUILD_STATUS" != 0 ]; then
+    # Show the compiler's messages, then Cargo's own.
     python3 -c '
+import json, sys
+for line in open(sys.argv[1]):
+    try:
+        m = json.loads(line)
+    except ValueError:
+        continue
+    if m.get("reason") == "compiler-message":
+        rendered = m.get("message", {}).get("rendered")
+        if rendered:
+            sys.stdout.write(rendered)
+' "$JSON"
+    cat "$ERRS" >&2
+    echo "test-all: the test build failed (cargo exit $BUILD_STATUS); no tests were run." >&2
+    exit "$BUILD_STATUS"
+fi
+python3 -c '
 import json, os, sys
-for line in sys.stdin:
+for line in open(sys.argv[1]):
     try:
         m = json.loads(line)
     except ValueError:
@@ -29,10 +55,9 @@ for line in sys.stdin:
     if m.get("reason") == "compiler-artifact" and m.get("executable") and m["profile"]["test"]:
         name = m["target"]["name"] + "-" + m["target"]["kind"][0]
         print(name, os.path.dirname(m["manifest_path"]), m["executable"], sep="\t")
-' >"$LIST"
+' "$JSON" >"$LIST"
 if [ ! -s "$LIST" ]; then
-    # Show the build error.
-    "$CARGO_BIN" test --locked --workspace --no-run
+    echo "test-all: Cargo built no test programs; nothing was tested." >&2
     exit 1
 fi
 

@@ -253,7 +253,7 @@ impl Operandi {
 
     fn run_select_tool(&mut self, request: SelectRequest) -> bool {
         let label = request.label();
-        let before = self.editor.undo.len();
+        let mark = self.editor.history_mark();
         let ok = self.run_ok(Command::SelectTool(request));
         if ok {
             let s = &self.editor.scene.selection;
@@ -263,7 +263,9 @@ impl Operandi {
                 Mode::Polygon => s.faces.len(),
                 Mode::Item => 0,
             };
-            self.status = if self.editor.undo.len() == before {
+            // By mark (Astra P9-007): a full history or a joined selection
+            // group keeps the length the same.
+            self.status = if !self.editor.recorded_since(mark) {
                 format!("{label}: nothing new to select")
             } else {
                 format!("{label}: {count} selected")
@@ -279,9 +281,11 @@ impl Operandi {
             return;
         }
         dialog.last = Some(now);
-        let before = self.editor.undo.len();
-        if self.run_select_tool(dialog.request()) && self.editor.undo.len() > before {
-            dialog.steps += 1;
+        let mark = self.editor.history_mark();
+        // New steps only: a change joined to a selection group is undone
+        // with that group (Astra P9-007).
+        if self.run_select_tool(dialog.request()) {
+            dialog.steps += self.editor.steps_since(mark);
         }
     }
 

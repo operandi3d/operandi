@@ -86,8 +86,22 @@ pub fn load(path: &Path) -> Result<PaintImage> {
     if FileType::of(path).is_some_and(FileType::is_psd) {
         return Err("Photoshop files load through their layers (psd::read)".into());
     }
-    let decoded = image::open(path).map_err(|e| format!("Cannot read {}: {e}", path.display()))?;
+    let decoded = open_picture(path).map_err(|e| format!("Cannot read {}: {e}", path.display()))?;
     Ok(from_dynamic(decoded))
+}
+
+/// The most memory one decoded picture may take (as the app's
+/// `image_decode::MOST_BYTES`): the `image` crate's own default, 512 MiB,
+/// refused 16K textures and 8K float EXRs (hidden-limits sweep A3).
+pub const MOST_PICTURE_BYTES: u64 = 16 << 30;
+
+/// `image::open` with the limit above.
+pub fn open_picture(path: &Path) -> image::ImageResult<DynamicImage> {
+    let mut reader = image::ImageReader::open(path)?.with_guessed_format()?;
+    let mut limits = image::Limits::no_limits();
+    limits.max_alloc = Some(MOST_PICTURE_BYTES);
+    reader.limits(limits);
+    reader.decode()
 }
 
 fn from_dynamic(d: DynamicImage) -> PaintImage {
@@ -229,21 +243,10 @@ pub fn save(image: &PaintImage, path: &Path) -> Result<()> {
 
 /// Runs `write` on a temporary file beside `path`, then renames it over.
 pub fn write_atomic(path: &Path, write: impl FnOnce(&Path) -> Result<()>) -> Result<()> {
-    let name = path
-        .file_name()
-        .map(|n| n.to_string_lossy().into_owned())
-        .unwrap_or_else(|| "image".into());
-    // Keep the extension last: the encoders pick nothing from it, but
-    // other tools watching the folder do.
-    let temp = path.with_file_name(format!(".{name}.operandi-tmp"));
-    if let Err(e) = write(&temp) {
-        let _ = std::fs::remove_file(&temp);
-        return Err(e);
-    }
-    std::fs::rename(&temp, path).map_err(|e| {
-        let _ = std::fs::remove_file(&temp);
-        format!("Cannot write {}: {e}", path.display())
-    })
+    // A unique temporary, synced before the rename (Astra P9-003): image
+    // writes used a fixed temporary name and never reached the disk before
+    // replacing a good file.
+    operandi_files::write_atomic_with(path, write)
 }
 
 #[cfg(test)]

@@ -346,6 +346,8 @@ mod multi_active_meshes;
 mod multi_active_tools;
 #[path = "multi_active_transforms.rs"]
 mod multi_active_transforms;
+#[path = "multi_mesh_undo_trim.rs"]
+mod multi_mesh_undo_trim;
 #[path = "native_wire_contract.rs"]
 mod native_wire_contract;
 #[path = "new_mesh_clean_spec.rs"]
@@ -494,6 +496,8 @@ mod replicator;
 mod scene_budget;
 #[path = "scene_transfer.rs"]
 mod scene_transfer;
+#[path = "scripts_gate.rs"]
+mod scripts_gate;
 #[path = "sculpt_brush_engine.rs"]
 mod sculpt_brush_engine;
 #[path = "select_tools.rs"]
@@ -614,6 +618,10 @@ mod tweak_oracles;
 mod twist_bevel;
 #[path = "undo_fold.rs"]
 mod undo_fold;
+#[path = "undo_marks.rs"]
+mod undo_marks;
+#[path = "undo_memory_budget.rs"]
+mod undo_memory_budget;
 #[path = "unit_primitive_clean_spec.rs"]
 mod unit_primitive_clean_spec;
 #[path = "unit_primitives.rs"]
