@@ -315,6 +315,25 @@ pub const KINDS: &[&str] = &[
     "pathNormal",
     "dynamicParent",
     "link",
+    "mod.expression",
+    "mod.blend",
+    "mod.math",
+    "mod.clamp",
+    "mod.switch",
+];
+
+/// Modifier kinds (RG-60..62), in menu order.
+pub const MODIFIERS: &[&str] = &[
+    "mod.expression",
+    "mod.blend",
+    "mod.math",
+    "mod.clamp",
+    "mod.switch",
+];
+
+/// Math operations (RG-62).
+pub const MATH_OPS: &[&str] = &[
+    "add", "subtract", "multiply", "divide", "min", "max", "power",
 ];
 
 /// Constraint kinds (RG-26..46), in menu order.
@@ -344,6 +363,11 @@ pub fn label(kind: &str) -> String {
         "pathNormal" => "Path Normal Constraint".into(),
         "dynamicParent" => "Dynamic Parent".into(),
         "link" => "Channel Link".into(),
+        "mod.expression" => "Expression".into(),
+        "mod.blend" => "Linear Blend".into(),
+        "mod.math" => "Math".into(),
+        "mod.clamp" => "Clamp".into(),
+        "mod.switch" => "Switch".into(),
         other => format!("{other} (missing)"),
     }
 }
@@ -393,6 +417,10 @@ pub fn default_value(kind: &str, name: &str) -> Option<f64> {
         ("path" | "pathPosition" | "pathNormal", "percent" | "pathOffset" | "wrap") => Some(0.),
         ("path" | "pathNormal", "localUp") => Some(0.),
         ("dynamicParent", "parent") => Some(0.),
+        ("mod.blend", "blend") => Some(0.),
+        ("mod.clamp", "min") => Some(0.),
+        ("mod.clamp", "max") => Some(1.),
+        ("mod.switch", "index") => Some(0.),
         _ => None,
     }
 }
@@ -413,6 +441,19 @@ pub fn channel_names(piece: &Piece) -> Vec<String> {
             return out;
         }
         "link" => return out,
+        "mod.blend" => {
+            out.push("blend".into());
+            return out;
+        }
+        "mod.clamp" => {
+            out.extend(["min", "max"].map(String::from));
+            return out;
+        }
+        "mod.switch" => {
+            out.push("index".into());
+            return out;
+        }
+        "mod.expression" | "mod.math" => return out,
         k if !KINDS.contains(&k) => return Vec::new(),
         _ => {}
     }
@@ -578,6 +619,9 @@ pub fn read(scene: &crate::Scene, item: u64, name: &str) -> Option<Option<f64>> 
     if let Some(u) = scene.animation.rig.user_channel(item, name) {
         return Some(u.get(name));
     }
+    if name.starts_with("world.") || name.starts_with("local.") {
+        return Some(matrix_channel(scene, item, name));
+    }
     let (group, axis) = pivot_part(name)?;
     scene.item(item)?;
     let p = scene
@@ -606,6 +650,9 @@ pub fn write(
     }
     if let Some(u) = scene.animation.rig.user_channel_mut(item, name) {
         return Some(u.set(name, value));
+    }
+    if name.starts_with("world.") || name.starts_with("local.") {
+        return Some(Err(format!("{name} is read-only (an output, RG-63)")));
     }
     let (group, axis) = pivot_part(name)?;
     scene.item(item)?;
@@ -729,4 +776,128 @@ mod pivot_list {
             })
             .collect())
     }
+}
+
+/// A modifier's wired inputs, by input name (`A`, `B`, `Blend`, an
+/// expression's variable), in name order: `names` entries `in.<name>` =
+/// `item:channel`.
+pub fn modifier_inputs(p: &Piece) -> Vec<(String, crate::animation::ChannelKey)> {
+    p.names
+        .iter()
+        .filter_map(|(k, v)| {
+            let name = k.strip_prefix("in.")?;
+            Some((
+                name.to_owned(),
+                crate::animation::ChannelKey::parse(v).ok()?,
+            ))
+        })
+        .collect()
+}
+
+/// A modifier's output (RG-60..62) from its inputs' values (`value(name)`,
+/// `None` when unwired). Unwired inputs read 0, as a syntax error does
+/// (RG-60: the output holds 0).
+pub fn modifier_value(
+    p: &Piece,
+    value: &dyn Fn(&str) -> Option<f64>,
+    scene: &crate::Scene,
+) -> Option<f64> {
+    let v = |n: &str| value(n).unwrap_or(0.);
+    Some(match p.kind.as_str() {
+        "mod.blend" => {
+            let t = value("Blend")
+                .unwrap_or_else(|| p.num("blend"))
+                .clamp(0., 1.);
+            v("A") + (v("B") - v("A")) * t
+        }
+        "mod.math" => {
+            let (a, b) = (v("A"), v("B"));
+            match p.names.get("op").map(String::as_str).unwrap_or("add") {
+                "subtract" => a - b,
+                "multiply" => a * b,
+                "divide" => a / b,
+                "min" => a.min(b),
+                "max" => a.max(b),
+                "power" => a.powf(b),
+                _ => a + b,
+            }
+        }
+        "mod.clamp" => {
+            let lo = value("Min").unwrap_or_else(|| p.num("min"));
+            let hi = value("Max").unwrap_or_else(|| p.num("max"));
+            v("A").max(lo.min(hi)).min(hi.max(lo))
+        }
+        "mod.switch" => {
+            let index = value("Index")
+                .unwrap_or_else(|| p.num("index"))
+                .round()
+                .max(0.) as usize;
+            let mut names: Vec<String> = modifier_inputs(p)
+                .into_iter()
+                .map(|(n, _)| n)
+                .filter(|n| n != "Index")
+                .collect();
+            names.sort();
+            names.get(index).map_or(0., |n| v(n))
+        }
+        "mod.expression" => expression_value(p, value, scene),
+        _ => return None,
+    })
+}
+
+/// RG-60: the expression with its inputs, `time` (seconds) and `frame`
+/// built in; a syntax error gives 0.
+fn expression_value(p: &Piece, value: &dyn Fn(&str) -> Option<f64>, scene: &crate::Scene) -> f64 {
+    let Some(source) = p.names.get("expr") else {
+        return 0.;
+    };
+    let Ok(expr) = crate::rig_expression::Expr::parse(source) else {
+        return 0.;
+    };
+    let t = scene.time.current;
+    let frame = crate::animation::frames(scene.time.rate, t);
+    expr.eval(&|n| match n {
+        "time" => Some(t.seconds()),
+        "frame" => Some(frame),
+        other => value(other),
+    })
+}
+
+/// RG-63: every item's world and local transform as read-only channels
+/// (`world.pos.X`, `local.rot.Y`...), so a link or modifier can follow an
+/// item without a script. Worlds are the document's (before the rig), so
+/// reading them never makes a loop.
+pub fn matrix_channel(scene: &crate::Scene, item: u64, name: &str) -> Option<f64> {
+    let (space, rest) = name.split_once('.')?;
+    let (group, axis) = rest.split_once('.')?;
+    let axis = XYZ.iter().position(|a| *a == axis)?;
+    let item_ref = scene.item(item)?;
+    let m = match space {
+        "world" => scene.world_matrix(item).ok()?,
+        "local" => scene.local_matrix(item_ref),
+        _ => return None,
+    };
+    let (s, q, t) = m.to_scale_rotation_translation();
+    Some(match group {
+        "pos" => t[axis],
+        "rot" => {
+            let (x, y, z) = q.to_euler(glam::EulerRot::XYZ);
+            [x, y, z][axis]
+        }
+        "scl" => s[axis],
+        _ => return None,
+    })
+}
+
+/// The matrix output channels every item has (RG-63).
+pub fn matrix_channel_names() -> Vec<String> {
+    let mut out = Vec::new();
+    for space in ["world", "local"] {
+        for group in ["pos", "rot", "scl"] {
+            for a in XYZ {
+                out.push(format!("{space}.{group}.{a}"));
+            }
+        }
+    }
+    out
 }

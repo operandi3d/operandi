@@ -40,6 +40,8 @@ pub struct Samples {
 pub(crate) struct Frames {
     pub(crate) times: Vec<f64>,
     pub(crate) posed: Vec<Scene>,
+    /// Items the rig moves: sampled like animated ones (§8).
+    pub(crate) rigged: std::collections::HashSet<u64>,
 }
 
 /// TL-80/83: the stage's timing; `None` writes none (no animation, or the
@@ -49,7 +51,7 @@ pub fn stage_time(scene: &Scene, mode: UsdAnimation) -> Option<StageTime> {
     let fps = rate.as_f64();
     match mode {
         UsdAnimation::Off => None,
-        _ if scene.animation.channels.is_empty() => None,
+        _ if scene.animation.channels.is_empty() && scene.animation.rig.pieces.is_empty() => None,
         UsdAnimation::CurrentFrame => {
             let f = animation::frames(rate, scene.time.current);
             Some(StageTime {
@@ -68,7 +70,9 @@ pub fn stage_time(scene: &Scene, mode: UsdAnimation) -> Option<StageTime> {
 
 /// The sample times (frames) and the scene posed at each (TL-81).
 pub(crate) fn frames(scene: &Scene, mode: UsdAnimation) -> Option<Frames> {
-    if mode != UsdAnimation::On || scene.animation.channels.is_empty() {
+    if mode != UsdAnimation::On
+        || (scene.animation.channels.is_empty() && scene.animation.rig.pieces.is_empty())
+    {
         return None;
     }
     let rate = scene.time.rate;
@@ -90,10 +94,19 @@ pub(crate) fn frames(scene: &Scene, mode: UsdAnimation) -> Option<Frames> {
     ticks.dedup();
     let posed = ticks
         .iter()
-        .map(|t| animation::evaluate_at(scene, *t).into_owned())
+        .map(|t| {
+            // §8: rigged items export their evaluated transforms.
+            let posed = animation::evaluate_at(scene, *t).into_owned();
+            if posed.animation.rig.pieces.is_empty() {
+                posed
+            } else {
+                operandi_core::rig_eval::baked_scene(&posed)
+            }
+        })
         .collect();
     Some(Frames {
         times: ticks.iter().map(|t| animation::frames(rate, *t)).collect(),
+        rigged: operandi_core::rig_eval::rigged_items(scene),
         posed,
     })
 }
@@ -108,7 +121,8 @@ fn group_animated(scene: &Scene, id: u64, group: &str) -> bool {
 
 /// Item `id`'s samples, or `None` when nothing of it is animated.
 pub(crate) fn item_samples(frames: &Frames, scene: &Scene, id: u64) -> Option<Box<Samples>> {
-    if !scene.animation.item_is_animated(id) {
+    let rigged = frames.rigged.contains(&id);
+    if !scene.animation.item_is_animated(id) && !rigged {
         return None;
     }
     let mut s = Samples {
@@ -119,13 +133,17 @@ pub(crate) fn item_samples(frames: &Frames, scene: &Scene, id: u64) -> Option<Bo
     let take = |f: &dyn Fn(&operandi_core::scene::Transform) -> [f64; 3]| -> Vec<[f64; 3]> {
         frames.posed.iter().map(|p| f(&transform(p))).collect()
     };
-    if group_animated(scene, id, "pos") {
+    if rigged || group_animated(scene, id, "pos") {
         s.translate = Some(take(&|t| t.translation.to_array()));
     }
-    if group_animated(scene, id, "rot") {
-        s.rotate = Some(take(&|t| t.rotation.to_array().map(f64::to_degrees)));
+    if rigged || group_animated(scene, id, "rot") {
+        let mut r = take(&|t| t.rotation.to_array().map(f64::to_degrees));
+        if rigged {
+            unwrap_degrees(&mut r);
+        }
+        s.rotate = Some(r);
     }
-    if group_animated(scene, id, "scl") {
+    if rigged || group_animated(scene, id, "scl") {
         s.scale = Some(take(&|t| t.scale.to_array()));
     }
     let item = scene.item(id)?;
@@ -183,6 +201,17 @@ pub(crate) fn item_samples(frames: &Frames, scene: &Scene, id: u64) -> Option<Bo
         || !s.camera.is_empty()
         || !s.light.is_empty();
     any.then(|| Box::new(s))
+}
+
+/// Rotations decomposed from matrices can jump by whole turns between
+/// frames; each angle takes the turn nearest the frame before.
+fn unwrap_degrees(r: &mut [[f64; 3]]) {
+    for i in 1..r.len() {
+        let prev = r[i - 1];
+        for (v, p) in r[i].iter_mut().zip(prev) {
+            *v += ((p - *v) / 360.).round() * 360.;
+        }
+    }
 }
 
 /// The samples as the bridge's JSON (`ou_set_samples`): the Xform's ops,

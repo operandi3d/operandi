@@ -3377,6 +3377,50 @@ pub static COMMANDS: &[Entry] = &[
         .undo()
         .operandi()
         .example("operandi.rig.bindUserChannel channel:3:pos.Y target:4"),
+    script("operandi.rig.modifierAdd", Items, "Adds a modifier (RG-60..62): Expression, Linear Blend, Math, Clamp or Switch; wired only as far as its arguments say (RG-71).")
+        .on_editor(
+            "Add a modifier, one undo step. kind expression, blend, math, clamp or switch; output item:channel it drives (optional: a modifier added without one only exists until wired); inputs as name=item:channel,... (A, B, Blend, Min, Max, Index, or an expression's variable names; up to 16); expr the expression (RG-60 syntax); op for math: add, subtract, multiply, divide, min, max or power.",
+            &[
+            jreq("kind", "string", "Modifier kind."),
+            jopt("output", "string", "The driven channel, item:name."),
+            jopt("inputs", "string", "Inputs, name=item:channel, comma separated."),
+            jopt("expr", "string", "Expression text."),
+            jopt("op", "string", "Math operation."),
+            jopt("item", "integer", "Item it belongs to when it has no output yet."),
+        ],
+            crate::rig_commands::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.rig.modifierAdd kind:expression output:3:rot.Z inputs:dist=4:pos.X expr:{dist / (2*pi*0.5) * 2*pi}"),
+    script("operandi.rig.modifierSet", Items, "Wires or edits a modifier: its output, inputs (an empty channel unwires), expression or operation.")
+        .on_editor(
+            "Edit a modifier, one undo step: output item:channel, inputs name=item:channel,... (name= unwires), expr, op. Loops are refused.",
+            &[
+            jreq("piece", "integer", "The modifier id."),
+            jopt("output", "string", "The driven channel, item:name."),
+            jopt("inputs", "string", "Inputs, name=item:channel, comma separated."),
+            jopt("expr", "string", "Expression text."),
+            jopt("op", "string", "Math operation."),
+        ],
+            crate::rig_commands::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.rig.modifierSet piece:7 inputs:B=4:pos.Y"),
+    script("operandi.rig.bake", Items, "Bake Selected (§8): the evaluated world transform as plain keys per frame, rig pieces disabled.")
+        .on_editor(
+            "Bake items (default the selection) over the current range (or start..end frames): their evaluated transforms become keys on every frame and their rig pieces are disabled, not deleted. One undo step.",
+            &[
+            jopt("items", "string", "Item ids, comma separated."),
+            jopt("start", "number", "First frame (default the current range's)."),
+            jopt("end", "number", "Last frame (default the current range's)."),
+        ],
+            crate::rig_commands::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.rig.bake items:3 start:0 end:24"),
     script("operandi.eval.graph", Items, "Reads the scene's evaluation graph (who reads whom: time, channels, fields, transforms, shown meshes) as JSON nodes and edges (UIC-163; the Schematic's data).")
         .on_editor(
             "Read the evaluation graph as JSON: nodes (id, kind time/channel/field/transform/shownMesh, item, name, label, dirty) and edges [from, to] (to reads from). item limits it to one item's nodes and the edges touching them.",
@@ -6793,7 +6837,7 @@ mod tests {
                 assert!(!json.about.is_empty(), "{}", e.name);
             }
         }
-        assert_eq!(crate::command_exec::specs().count(), 251);
+        assert_eq!(crate::command_exec::specs().count(), 254);
     }
 
     #[test]

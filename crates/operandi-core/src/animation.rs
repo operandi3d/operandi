@@ -510,6 +510,10 @@ impl Animation {
 /// of its `item.channel` tables whose setter posing can apply.
 pub fn keyable(scene: &Scene, id: u64, name: &str) -> bool {
     // Rig piece and pivot channels (rig.rs).
+    // Matrix outputs (RG-63) read but don't key.
+    if name.starts_with("world.") || name.starts_with("local.") {
+        return false;
+    }
     if let Some(v) = crate::rig::read(scene, id, name) {
         return v.is_some();
     }

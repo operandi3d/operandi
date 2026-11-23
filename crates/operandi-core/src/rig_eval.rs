@@ -689,7 +689,11 @@ fn inputs(p: &Piece) -> Vec<ChannelKey> {
             (Some(&i), Some(c)) => vec![ChannelKey::new(i, c)],
             _ => Vec::new(),
         },
-        _ => Vec::new(),
+        // Modifiers (RG-60..62): each wired input, in name order.
+        _ => crate::rig::modifier_inputs(p)
+            .into_iter()
+            .map(|(_, k)| k)
+            .collect(),
     }
 }
 
@@ -793,6 +797,71 @@ fn channel_value(scene: &Scene, p: &Piece) -> Option<f64> {
                 _ => Some(v),
             }
         }
+        k if k.starts_with("mod.") => {
+            let inputs = crate::rig::modifier_inputs(p);
+            let value = |name: &str| -> Option<f64> {
+                inputs
+                    .iter()
+                    .find(|(n, _)| n == name)
+                    .and_then(|(_, k)| crate::animation::read(scene, k))
+            };
+            crate::rig::modifier_value(p, &value, scene).filter(|v| v.is_finite())
+        }
         _ => None,
     }
+}
+
+/// The scene with the rig's results written as each item's own local
+/// transform under its document parent (USD export keeps the hierarchy,
+/// §8): local = (parent's evaluated world)⁻¹ · evaluated world, plus the
+/// values links and modifiers drive. The rig itself is left out of the
+/// copy, so nothing evaluates twice.
+pub fn baked_scene(scene: &Scene) -> Scene {
+    let result = evaluate(scene);
+    let mut out = scene.clone();
+    for (k, v) in &result.driven {
+        let _ = crate::animation::write(&mut out, k, *v);
+    }
+    let world_of = |id: u64| -> DMat4 {
+        result
+            .world
+            .get(&id)
+            .copied()
+            .unwrap_or_else(|| scene.world_matrix(id).unwrap_or(DMat4::IDENTITY))
+    };
+    let placed: Vec<(u64, DMat4)> = result
+        .world
+        .iter()
+        .filter(|(id, _)| result.placed.contains(id))
+        .map(|(id, w)| {
+            let parent = scene
+                .item(*id)
+                .and_then(|i| i.parent)
+                .map_or(DMat4::IDENTITY, world_of);
+            (*id, parent.inverse() * *w)
+        })
+        .collect();
+    for (id, local) in placed {
+        let Some(item) = out.item_mut(id) else {
+            continue;
+        };
+        let (s, q, t) = local.to_scale_rotation_translation();
+        item.transform.translation = t;
+        item.transform.rotation = item.transform.angles_for(q);
+        item.transform.scale = s;
+        out.animation.rig.pivots.remove(&id);
+    }
+    out.animation.rig.pieces.clear();
+    out
+}
+
+/// The items the rig moves (their world or a transform channel).
+pub fn rigged_items(scene: &Scene) -> HashSet<u64> {
+    if scene.animation.rig.pieces.is_empty() {
+        return HashSet::new();
+    }
+    let r = evaluate(scene);
+    let mut out: HashSet<u64> = r.world.keys().copied().collect();
+    out.extend(r.driven.iter().map(|(k, _)| k.item));
+    out
 }

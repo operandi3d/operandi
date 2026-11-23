@@ -498,8 +498,14 @@ mod render_outputs;
 mod render_outputs_d;
 #[path = "replicator.rs"]
 mod replicator;
+#[path = "rig_bake.rs"]
+mod rig_bake;
+#[path = "rig_expression.rs"]
+mod rig_expression;
 #[path = "rig_links.rs"]
 mod rig_links;
+#[path = "rig_modifiers.rs"]
+mod rig_modifiers;
 #[path = "rig_phase4.rs"]
 mod rig_phase4;
 #[path = "scene_budget.rs"]

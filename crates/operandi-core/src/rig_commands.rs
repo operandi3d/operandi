@@ -1023,6 +1023,234 @@ pub fn run(e: &mut Editor, name: &str, a: &Args) -> Out {
             })?;
             Ok(None)
         }
+        "operandi.rig.modifierAdd" | "operandi.rig.modifierSet" => {
+            let adding = name == "operandi.rig.modifierAdd";
+            let (piece, kind) = if adding {
+                let kind = text_arg(a, "kind")?
+                    .ok_or("Give kind: expression, blend, math, clamp or switch")?;
+                let kind = format!("mod.{kind}");
+                if !rig::MODIFIERS.contains(&kind.as_str()) {
+                    return Err(format!("{} isn't a modifier kind", &kind[4..]));
+                }
+                (None, kind)
+            } else {
+                let p = id(a, "piece")?.ok_or("Give piece")?;
+                let piece = e
+                    .scene
+                    .animation
+                    .rig
+                    .piece(p)
+                    .ok_or(format!("No rig piece {p}"))?;
+                if !piece.kind.starts_with("mod.") {
+                    return Err("That piece isn't a modifier".into());
+                }
+                (Some(p), piece.kind.clone())
+            };
+            // output:item:channel, inputs:A=3:pos.X,B=4:rot.Y (an empty
+            // channel unwires), expr, op.
+            let output = text_arg(a, "output")?.map(ChannelKey::parse).transpose()?;
+            let mut wires: Vec<(String, Option<ChannelKey>)> = Vec::new();
+            if let Some(list) = text_arg(a, "inputs")? {
+                for part in list.split(',').map(str::trim).filter(|s| !s.is_empty()) {
+                    let (n, k) = part
+                        .split_once('=')
+                        .ok_or_else(|| format!("Inputs are name=item:channel, not {part}"))?;
+                    let n = n.trim().to_owned();
+                    if n.is_empty() || !n.chars().all(|c| c.is_alphanumeric() || c == '_') {
+                        return Err(format!("Input names are letters, digits and _, not {n}"));
+                    }
+                    let k = k.trim();
+                    wires.push((
+                        n,
+                        if k.is_empty() {
+                            None
+                        } else {
+                            Some(ChannelKey::parse(k)?)
+                        },
+                    ));
+                }
+            }
+            if wires.iter().filter(|w| w.1.is_some()).count() > 16 {
+                return Err("A modifier takes up to 16 inputs".into());
+            }
+            for k in wires
+                .iter()
+                .filter_map(|w| w.1.as_ref())
+                .chain(output.as_ref())
+            {
+                if animation::read(&e.scene, k).is_none() {
+                    return Err(format!("{}:{} isn't a number channel", k.item, k.channel));
+                }
+            }
+            let expr = text_arg(a, "expr")?.map(str::to_owned);
+            if let Some(x) = &expr {
+                crate::rig_expression::Expr::parse(x).map_err(|err| {
+                    format!("Expression error at {}: {}", err.position + 1, err.message)
+                })?;
+            }
+            let op = text_arg(a, "op")?.map(str::to_owned);
+            if let Some(o) = &op
+                && !rig::MATH_OPS.contains(&o.as_str())
+            {
+                return Err(format!("op is one of {}", rig::MATH_OPS.join(", ")));
+            }
+            let owner = match (&output, piece) {
+                (Some(k), _) => k.item,
+                (None, Some(p)) => e.scene.animation.rig.piece(p).expect("checked").item,
+                (None, None) => id(a, "item")?
+                    .or(e.scene.selection.item)
+                    .ok_or("Give output or item")?,
+            };
+            check_item(&e.scene, owner)?;
+            let label = if adding {
+                format!("Add {}", rig::label(&kind))
+            } else {
+                format!("Edit {}", rig::label(&kind))
+            };
+            e.anim_step(&label, |e| {
+                let piece_id = match piece {
+                    Some(p) => p,
+                    None => {
+                        let id = new_id(&mut e.scene)?;
+                        let mut p = Piece::new(id, &kind, owner, Vec::new());
+                        if kind == "mod.expression" && expr.is_none() {
+                            p.names.insert("expr".into(), "A".into());
+                        }
+                        e.scene.animation.rig.pieces.push(p);
+                        id
+                    }
+                };
+                let p = e.scene.animation.rig.piece_mut(piece_id).expect("made");
+                if let Some(k) = &output {
+                    p.item = k.item;
+                    p.names.insert("driven".into(), k.channel.clone());
+                }
+                for (n, k) in &wires {
+                    match k {
+                        Some(k) => {
+                            p.names
+                                .insert(format!("in.{n}"), format!("{}:{}", k.item, k.channel));
+                        }
+                        None => {
+                            p.names.remove(&format!("in.{n}"));
+                        }
+                    }
+                }
+                if let Some(x) = &expr {
+                    p.names.insert("expr".into(), x.clone());
+                }
+                if let Some(o) = &op {
+                    p.names.insert("op".into(), o.clone());
+                }
+                refuse_loops(e)?;
+                Ok(true)
+            })?;
+            Ok(None)
+        }
+        "operandi.rig.bake" => {
+            // §8 Bake: the evaluated world of each item as plain keys per
+            // frame over the current range, its rig pieces disabled.
+            let items = ids(a, "items")?
+                .or(ids(a, "item")?)
+                .unwrap_or_else(|| e.scene.selected_items());
+            if items.is_empty() {
+                return Err("Select the items to bake".into());
+            }
+            for i in &items {
+                check_item(&e.scene, *i)?;
+            }
+            let rate = e.scene.time.rate;
+            let (ra, rb) = animation::current_range(&e.scene);
+            let start = number(a, "start")?.map_or(ra, |f| animation::at_frames(rate, f));
+            let end = number(a, "end")?.map_or(rb, |f| animation::at_frames(rate, f));
+            if end < start {
+                return Err("end is before start".into());
+            }
+            let (fa, fb) = (rate.frame_at(start), rate.frame_at(end));
+            if fb - fa > 100_000 {
+                return Err("That range is too long to bake".into());
+            }
+            // Sample first, on a copy: posing other times doesn't touch
+            // the document until the step records.
+            let mut samples: Vec<(u64, Vec<(crate::time_tick::Tick, DMat4)>)> =
+                items.iter().map(|i| (*i, Vec::new())).collect();
+            let mut probe = e.scene.clone();
+            for f in fa..=fb {
+                let t = rate.tick_of(f);
+                probe.time.current = t;
+                animation::pose(&mut probe, t);
+                let r = crate::rig_eval::evaluate(&probe);
+                for (item, list) in &mut samples {
+                    let world =
+                        r.world.get(item).copied().unwrap_or_else(|| {
+                            probe.world_matrix(*item).unwrap_or(DMat4::IDENTITY)
+                        });
+                    // The parent's world as it will be once the item's own
+                    // pieces are off (its static parent, evaluated).
+                    let parent =
+                        probe
+                            .item(*item)
+                            .and_then(|i| i.parent)
+                            .map_or(DMat4::IDENTITY, |p| {
+                                r.world.get(&p).copied().unwrap_or_else(|| {
+                                    probe.world_matrix(p).unwrap_or(DMat4::IDENTITY)
+                                })
+                            });
+                    list.push((t, parent.inverse() * world));
+                }
+            }
+            e.anim_step("Bake Selected", |e| {
+                for (item, list) in &samples {
+                    let mut previous: Option<glam::DVec3> = None;
+                    for (t, local) in list {
+                        let (s, q, tr) = local.to_scale_rotation_translation();
+                        let mut r = e
+                            .scene
+                            .item(*item)
+                            .expect("checked")
+                            .transform
+                            .angles_for(q);
+                        // Keep angles continuous across frames.
+                        if let Some(p) = previous {
+                            for a in 0..3 {
+                                r[a] += ((p[a] - r[a]) / std::f64::consts::TAU).round()
+                                    * std::f64::consts::TAU;
+                            }
+                        }
+                        previous = Some(r);
+                        for (g, v) in [("pos", tr), ("rot", r), ("scl", s)] {
+                            for (i, axis) in ["X", "Y", "Z"].iter().enumerate() {
+                                let key = ChannelKey::new(*item, &format!("{g}.{axis}"));
+                                let rest = animation::read(&e.scene, &key).unwrap_or(0.);
+                                let ch =
+                                    e.scene.animation.channels.entry(key).or_insert_with(|| {
+                                        AnimChannel {
+                                            curve: Default::default(),
+                                            rest,
+                                        }
+                                    });
+                                ch.curve.set(*t, rig::clean(v[i]));
+                            }
+                        }
+                    }
+                    // Disable (don't delete) the pieces that moved it.
+                    for p in e
+                        .scene
+                        .animation
+                        .rig
+                        .pieces
+                        .iter_mut()
+                        .filter(|p| p.item == *item)
+                    {
+                        let _ = p.set("enable", 0.);
+                    }
+                }
+                let now = e.scene.time.current;
+                animation::pose(&mut e.scene, now);
+                Ok(true)
+            })?;
+            Ok(None)
+        }
         _ => Err(format!("Unknown rig command {name}")),
     }
 }
@@ -1169,6 +1397,8 @@ pub fn answer(e: &Editor, name: &str, a: &Args) -> Option<Result<String, String>
                     "missing": p.is_missing(),
                     "broken": result.broken.contains(&p.id),
                     "names": p.names,
+                    "error": p.names.get("expr").and_then(|x| crate::rig_expression::Expr::parse(x).err()).map(|err| json!({"position": err.position, "message": err.message})),
+                    "value": crate::rig_eval::evaluate(&e.scene).driven.iter().rev().find(|(k, _)| k.item == p.item && p.names.get("driven") == Some(&k.channel)).map(|(_, v)| *v),
                     "curve": p.curve.as_ref().map(|c| c.keys.iter().map(|k| [k.time.seconds(), k.value]).collect::<Vec<_>>()),
                     "inputs": p.targets.iter().chain(p.refs.values()).collect::<Vec<_>>(),
                     "outputs": [p.item],

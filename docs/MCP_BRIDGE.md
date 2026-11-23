@@ -736,6 +736,23 @@ used in the app; `primitive_add` always starts from the Reset values.
   - `channel` (string, required): The channel to drive, item:name.
   - `target` (integer, required): Item that gets the user channel.
   - `name` (string): User channel name.
+- **`operandi.rig.modifierAdd`** — Add a modifier, one undo step. kind expression, blend, math, clamp or switch; output item:channel it drives (optional: a modifier added without one only exists until wired); inputs as name=item:channel,... (A, B, Blend, Min, Max, Index, or an expression's variable names; up to 16); expr the expression (RG-60 syntax); op for math: add, subtract, multiply, divide, min, max or power.
+  - `kind` (string, required): Modifier kind.
+  - `output` (string): The driven channel, item:name.
+  - `inputs` (string): Inputs, name=item:channel, comma separated.
+  - `expr` (string): Expression text.
+  - `op` (string): Math operation.
+  - `item` (integer): Item it belongs to when it has no output yet.
+- **`operandi.rig.modifierSet`** — Edit a modifier, one undo step: output item:channel, inputs name=item:channel,... (name= unwires), expr, op. Loops are refused.
+  - `piece` (integer, required): The modifier id.
+  - `output` (string): The driven channel, item:name.
+  - `inputs` (string): Inputs, name=item:channel, comma separated.
+  - `expr` (string): Expression text.
+  - `op` (string): Math operation.
+- **`operandi.rig.bake`** — Bake items (default the selection) over the current range (or start..end frames): their evaluated transforms become keys on every frame and their rig pieces are disabled, not deleted. One undo step.
+  - `items` (string): Item ids, comma separated.
+  - `start` (number): First frame (default the current range's).
+  - `end` (number): Last frame (default the current range's).
 - **`operandi.eval.graph`** — Read the evaluation graph as JSON: nodes (id, kind time/channel/field/transform/shownMesh, item, name, label, dirty) and edges [from, to] (to reads from). item limits it to one item's nodes and the edges touching them.
   - `item` (integer): Only this item's nodes.
 - **`operandi.render.frameRange`** — Render frames start..end (default the current range) with Cycles into folder (default the project's renders/) as <name>_0000.png; needs the running app. operandi.anim.query reports progress (job).
