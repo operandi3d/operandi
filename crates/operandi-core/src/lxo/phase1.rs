@@ -290,6 +290,15 @@ fn geometry(
                 _ => None,
             };
             layer.latest.clear();
+            if representation.is_none() {
+                // Curves (BCRV, CURV, BEZR), text, bones and other types
+                // don't share the face record layout (a B-spline curve
+                // stores more after its count), so their records aren't
+                // parsed: the whole chunk is skipped and named in the
+                // report, and its PTAGs find no polygons.
+                skip(format!("POLS.{}", String::from_utf8_lossy(&kind)));
+                return Ok(());
+            }
             while !r.done() {
                 c.check("polygons")?;
                 let n = (r.u16()? & 0x3ff) as usize;
@@ -541,7 +550,8 @@ fn scene(
             item.name.clone()
         };
         report.notes.extend(pivot_note(&name, layer.pivot));
-        let mesh = build_mesh(layer)?;
+        let (mesh, note) = build_mesh(layer, &name)?;
+        report.notes.extend(note);
         scene.items.push(Item {
             id: u64::from(id) + 1,
             name,
@@ -578,7 +588,8 @@ fn scene(
             layer.name.clone()
         };
         report.notes.extend(pivot_note(&name, layer.pivot));
-        let mesh = build_mesh(layer)?;
+        let (mesh, note) = build_mesh(layer, &name)?;
+        report.notes.extend(note);
         scene.items.push(Item {
             id: next,
             name,
@@ -669,7 +680,8 @@ fn scene(
     Ok(Candidate { scene, report })
 }
 
-fn build_mesh(layer: Layer) -> Result<Mesh> {
+/// Builds one layer's mesh, with notes on what was dropped or marked.
+fn build_mesh(layer: Layer, name: &str) -> Result<(Mesh, Vec<String>)> {
     let mut mesh = Mesh {
         vertices: layer.points,
         faces: layer.faces.into(),
@@ -708,17 +720,39 @@ fn build_mesh(layer: Layer) -> Result<Mesh> {
     {
         mesh.attributes.representations = layer.representations;
     }
+    // Edge weights are kept only on polygon edges. Modo also stores them
+    // on edges no polygon has (curve spans, edges of deleted polygons,
+    // a point paired with itself); those have nothing to crease.
+    let edges: BTreeSet<(u32, u32)> = if layer.creases.is_empty() {
+        BTreeSet::new()
+    } else {
+        mesh.edges().into_iter().collect()
+    };
+    let mut stray = 0usize;
     mesh.attributes.creases = layer
         .creases
         .into_iter()
         .filter(|&(_, w)| w != 0.)
+        .filter(|&(edge, w)| {
+            let keep = w.is_finite() && edges.contains(&edge);
+            stray += usize::from(!keep);
+            keep
+        })
         .map(|((a, b), weight)| MeshCrease { a, b, weight })
         .collect();
-    mesh.validate().map_err(|e| {
+    // Modo keeps zero-area polygons and non-manifold edges; so does
+    // Operandi, marked the way every other importer marks them.
+    let mut notes = Vec::new();
+    if stray > 0 {
+        notes.push(format!(
+            "{name}: {stray} edge weights on edges no polygon has were not imported"
+        ));
+    }
+    crate::interchange::finish_mesh(&mut mesh, name, &mut notes).map_err(|e| {
         err(
             "invalid_mesh",
             &format!("A mesh could not be imported: {e}"),
         )
     })?;
-    Ok(mesh)
+    Ok((mesh, notes))
 }
