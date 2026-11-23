@@ -199,3 +199,55 @@ fn a_loop_is_refused_through_the_bridge() {
     .unwrap_err();
     assert!(e.contains("depend on itself"), "{e}");
 }
+
+#[test]
+fn rg51_rg52_links_through_the_bridge() {
+    let mut b = Bridge::new();
+    let driven = cube(&mut b, [0., 0., 0.]);
+    let driver = cube(&mut b, [0., 0., 0.]);
+    run(
+        &mut b,
+        "operandi.rig.linkAdd",
+        json!({"driven": format!("{driven}:scl.Z"), "driver": format!("{driver}:pos.X")}),
+    );
+    let scl_z = |b: &mut Bridge| -> f64 {
+        let w = query(b, driven)["world"]["scale"].clone();
+        w[2].as_f64().unwrap()
+    };
+    for x in [0.5, 2.] {
+        run(
+            &mut b,
+            "transform.channel",
+            json!({"name": "pos.X", "value": x, "item": driver}),
+        );
+        assert!((scl_z(&mut b) - x).abs() < 1e-4, "{x}");
+    }
+    // RG-52: (0 m → 0%), (10 m → 100%); 5 m gives exactly 50%.
+    run(
+        &mut b,
+        "operandi.rig.linkRemove",
+        json!({"driven": format!("{driven}:scl.Z")}),
+    );
+    run(
+        &mut b,
+        "operandi.rig.linkAdd",
+        json!({"driven": format!("{driven}:scl.Z"), "driver": format!("{driver}:pos.X"), "mode": "relationship"}),
+    );
+    let piece = query(&mut b, driven)["pieces"][0]["id"].as_u64().unwrap();
+    run(
+        &mut b,
+        "operandi.rig.relationshipKey",
+        json!({"piece": piece, "driver": 0, "driven": 0}),
+    );
+    run(
+        &mut b,
+        "operandi.rig.relationshipKey",
+        json!({"piece": piece, "driver": 10, "driven": 1}),
+    );
+    run(
+        &mut b,
+        "transform.channel",
+        json!({"name": "pos.X", "value": 5, "item": driver}),
+    );
+    assert!((scl_z(&mut b) - 0.5).abs() < 1e-4);
+}

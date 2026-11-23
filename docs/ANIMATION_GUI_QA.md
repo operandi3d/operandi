@@ -50,3 +50,6 @@ named "Operandi Animation". Each step also once typed in the command line.
 28. Hierarchy > Add Parent (child first, then parent), move the parent: the child follows; switch to World with the operandi.rig.dynamicParentSet line: it stays put.
 29. Constrain A to B, then try B to A: "This would make B depend on itself", nothing changes.
 30. Path: a curve, then Constrain > Path; key Percent 0 → 1 over 120 frames: constant speed, facing along the curve.
+31. Select two cubes, Animate > Channel Links: the first is Driven, the second Driver. Pick scl.Z and pos.X, Add Link; drag the driver in X: the driven scales.
+32. Relationship: pick the pair again with Relationship on, Add Link; type driven values and Key at two driver positions; the driven eases between them and holds outside.
+33. Add User Channel (name, type angle) on the driven item, key it, link another item's rot.Z to it.

@@ -643,6 +643,11 @@ pub fn keyable_channels(scene: &Scene, id: u64) -> Vec<String> {
             _ => out.push(c.name.to_string()),
         }
     }
+    // User channels (RG-53) and pivots (RG-14), rig.rs.
+    for u in scene.animation.rig.user.iter().filter(|u| u.item == id) {
+        out.extend(u.channel_names());
+    }
+    out.extend(crate::rig::PIVOT_CHANNELS.iter().map(|s| s.to_string()));
     out.retain(|n| transform_part(n).is_some() || keyable(scene, id, n));
     out.dedup();
     out

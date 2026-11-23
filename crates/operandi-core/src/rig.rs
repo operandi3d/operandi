@@ -32,11 +32,198 @@ pub struct Rig {
         with = "pivot_list"
     )]
     pub pivots: BTreeMap<u64, Pivot>,
+    /// User channels (RG-53), in the order added.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub user: Vec<UserChannel>,
+}
+
+/// A user channel's value type (RG-53).
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub enum UserType {
+    #[default]
+    Float,
+    Distance,
+    Angle,
+    Percentage,
+    Time,
+    Integer,
+    Boolean,
+    Choice,
+    String,
+    Divider,
+}
+
+impl UserType {
+    pub fn parse(s: &str) -> Option<UserType> {
+        Some(match s.to_ascii_lowercase().as_str() {
+            "float" => UserType::Float,
+            "distance" => UserType::Distance,
+            "angle" => UserType::Angle,
+            "percentage" | "percent" => UserType::Percentage,
+            "time" => UserType::Time,
+            "integer" | "int" => UserType::Integer,
+            "boolean" | "bool" => UserType::Boolean,
+            "choice" => UserType::Choice,
+            "string" | "text" => UserType::String,
+            "divider" => UserType::Divider,
+            _ => return None,
+        })
+    }
+    /// Holds a number (keyable, linkable).
+    pub fn numeric(self) -> bool {
+        !matches!(self, UserType::String | UserType::Divider)
+    }
+    pub fn name(self) -> &'static str {
+        match self {
+            UserType::Float => "float",
+            UserType::Distance => "distance",
+            UserType::Angle => "angle",
+            UserType::Percentage => "percentage",
+            UserType::Time => "time",
+            UserType::Integer => "integer",
+            UserType::Boolean => "boolean",
+            UserType::Choice => "choice",
+            UserType::String => "string",
+            UserType::Divider => "divider",
+        }
+    }
+}
+
+/// A user channel's components (RG-53 Mode).
+pub fn mode_components(mode: &str) -> Option<&'static [&'static str]> {
+    Some(match mode.to_ascii_lowercase().as_str() {
+        "scalar" | "" => &[""],
+        "xy" | "vectorxy" => &["X", "Y"],
+        "xyz" | "vectorxyz" => &["X", "Y", "Z"],
+        "rgb" => &["R", "G", "B"],
+        "rgba" => &["R", "G", "B", "A"],
+        "uv" => &["U", "V"],
+        "uvw" => &["U", "V", "W"],
+        _ => return None,
+    })
+}
+
+/// A user channel on an item (RG-53).
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub struct UserChannel {
+    pub item: u64,
+    pub name: String,
+    #[serde(default, skip_serializing_if = "String::is_empty")]
+    pub display: String,
+    #[serde(default)]
+    pub ty: UserType,
+    /// scalar, xy, xyz, rgb, rgba, uv or uvw.
+    #[serde(default = "scalar", skip_serializing_if = "is_scalar")]
+    pub mode: String,
+    #[serde(default)]
+    pub default: f64,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub min: Option<f64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub max: Option<f64>,
+    /// Choice names (Choice type).
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub choices: Vec<String>,
+    /// Values by component ("" for a scalar); missing = the default.
+    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
+    pub values: BTreeMap<String, f64>,
+    /// A String channel's text.
+    #[serde(default, skip_serializing_if = "String::is_empty")]
+    pub text: String,
+}
+
+fn scalar() -> String {
+    "scalar".into()
+}
+fn is_scalar(m: &str) -> bool {
+    m == "scalar"
+}
+
+impl UserChannel {
+    /// The channel names it makes: `name` for a scalar, `name.X`... for
+    /// the vector modes; none for a divider or a string.
+    pub fn channel_names(&self) -> Vec<String> {
+        if !self.ty.numeric() {
+            return Vec::new();
+        }
+        mode_components(&self.mode)
+            .unwrap_or(&[""])
+            .iter()
+            .map(|c| {
+                if c.is_empty() {
+                    self.name.clone()
+                } else {
+                    format!("{}.{c}", self.name)
+                }
+            })
+            .collect()
+    }
+    /// Whether `channel` names this channel (or one of its components).
+    pub fn has(&self, channel: &str) -> bool {
+        self.component(channel).is_some() || (!self.ty.numeric() && channel == self.name)
+    }
+    fn component(&self, channel: &str) -> Option<String> {
+        let comps = mode_components(&self.mode).unwrap_or(&[""]);
+        if channel == self.name {
+            return (comps == [""]).then(String::new);
+        }
+        let rest = channel.strip_prefix(&self.name)?.strip_prefix('.')?;
+        comps.contains(&rest).then(|| rest.to_owned())
+    }
+    pub fn get(&self, channel: &str) -> Option<f64> {
+        let c = self.component(channel)?;
+        self.ty
+            .numeric()
+            .then(|| self.values.get(&c).copied().unwrap_or(self.default))
+    }
+    pub fn set(&mut self, channel: &str, value: f64) -> Result<(), String> {
+        if !self.ty.numeric() {
+            return Err(format!("{} holds text, not a number", self.name));
+        }
+        let c = self.component(channel).ok_or("No such user channel")?;
+        let mut v = value;
+        if let Some(lo) = self.min {
+            v = v.max(lo);
+        }
+        if let Some(hi) = self.max {
+            v = v.min(hi);
+        }
+        v = match self.ty {
+            UserType::Integer | UserType::Choice => v.round(),
+            UserType::Boolean => {
+                if v >= 0.5 {
+                    1.
+                } else {
+                    0.
+                }
+            }
+            _ => v,
+        };
+        if v == self.default {
+            self.values.remove(&c);
+        } else {
+            self.values.insert(c, v);
+        }
+        Ok(())
+    }
+}
+
+impl Rig {
+    /// The user channel holding `channel` on `item`.
+    pub fn user_channel(&self, item: u64, channel: &str) -> Option<&UserChannel> {
+        self.user.iter().find(|u| u.item == item && u.has(channel))
+    }
+    pub fn user_channel_mut(&mut self, item: u64, channel: &str) -> Option<&mut UserChannel> {
+        self.user
+            .iter_mut()
+            .find(|u| u.item == item && u.has(channel))
+    }
 }
 
 impl Rig {
     pub fn is_default(&self) -> bool {
-        self.pieces.is_empty() && self.pivots.is_empty()
+        self.pieces.is_empty() && self.pivots.is_empty() && self.user.is_empty()
     }
     pub fn piece(&self, id: u64) -> Option<&Piece> {
         self.pieces.iter().find(|p| p.id == id)
@@ -102,6 +289,14 @@ pub struct Piece {
     /// Item references other than targets (`upItem`).
     #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
     pub refs: BTreeMap<String, u64>,
+    /// Channel names a piece reads or writes (`driven`, `driver` for a
+    /// link) and text settings (`mode`).
+    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
+    pub names: BTreeMap<String, String>,
+    /// A relationship link's curve (RG-52): the driver's value on the
+    /// horizontal axis (as seconds), the driven value on the vertical.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub curve: Option<crate::anim_curve::Curve>,
     /// Fields a newer build wrote, saved back untouched.
     #[serde(flatten)]
     pub extra: serde_json::Map<String, serde_json::Value>,
@@ -119,6 +314,7 @@ pub const KINDS: &[&str] = &[
     "pathPosition",
     "pathNormal",
     "dynamicParent",
+    "link",
 ];
 
 /// Constraint kinds (RG-26..46), in menu order.
@@ -147,6 +343,7 @@ pub fn label(kind: &str) -> String {
         "pathPosition" => "Path Position Constraint".into(),
         "pathNormal" => "Path Normal Constraint".into(),
         "dynamicParent" => "Dynamic Parent".into(),
+        "link" => "Channel Link".into(),
         other => format!("{other} (missing)"),
     }
 }
@@ -215,6 +412,7 @@ pub fn channel_names(piece: &Piece) -> Vec<String> {
             out.extend(axes("offset.scl."));
             return out;
         }
+        "link" => return out,
         k if !KINDS.contains(&k) => return Vec::new(),
         _ => {}
     }
@@ -262,6 +460,8 @@ impl Piece {
             targets,
             values: BTreeMap::new(),
             refs: BTreeMap::new(),
+            names: BTreeMap::new(),
+            curve: None,
             extra: serde_json::Map::new(),
         }
     }
@@ -375,6 +575,9 @@ pub fn read(scene: &crate::Scene, item: u64, name: &str) -> Option<Option<f64>> 
     if let Some(piece) = scene.animation.rig.piece(item) {
         return Some(piece.get(name));
     }
+    if let Some(u) = scene.animation.rig.user_channel(item, name) {
+        return Some(u.get(name));
+    }
     let (group, axis) = pivot_part(name)?;
     scene.item(item)?;
     let p = scene
@@ -400,6 +603,9 @@ pub fn write(
 ) -> Option<Result<(), String>> {
     if let Some(piece) = scene.animation.rig.piece_mut(item) {
         return Some(piece.set(name, value));
+    }
+    if let Some(u) = scene.animation.rig.user_channel_mut(item, name) {
+        return Some(u.set(name, value));
     }
     let (group, axis) = pivot_part(name)?;
     scene.item(item)?;
@@ -441,6 +647,15 @@ pub const PIVOT_CHANNELS: [&str; 6] = [
 /// Whether `name` on the item is driven by one of its enabled pieces
 /// (RG-04), and by which.
 pub fn driven_by<'a>(scene: &'a crate::Scene, item: u64, name: &str) -> Option<&'a Piece> {
+    // A channel link or modifier output on exactly this channel (RG-51).
+    if let Some(p) = scene
+        .animation
+        .rig
+        .on(item)
+        .find(|p| p.flag("enable") && p.names.get("driven").is_some_and(|d| d == name))
+    {
+        return Some(p);
+    }
     let (group, axis) = crate::animation::transform_part(name)?;
     scene.animation.rig.on(item).find(|p| {
         !p.is_missing()
@@ -464,6 +679,15 @@ pub fn drives(scene: &crate::Scene, item: u64) -> bool {
         .pieces
         .iter()
         .any(|p| p.targets.contains(&item) || p.refs.values().any(|r| *r == item))
+}
+
+/// Whether `item`'s channel `name` feeds a link (the driver light, RG-04).
+pub fn drives_channel(scene: &crate::Scene, item: u64, name: &str) -> bool {
+    scene.animation.rig.pieces.iter().any(|p| {
+        p.kind == "link"
+            && p.targets.first() == Some(&item)
+            && p.names.get("driver").is_some_and(|d| d == name)
+    })
 }
 
 mod pivot_list {

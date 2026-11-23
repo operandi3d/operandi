@@ -345,6 +345,7 @@ impl Operandi {
         // The timeline's and graph editor's one-value dialogs.
         self.timeline_dialog(ctx);
         self.graph_editor_window(ctx);
+        self.channel_links_window(ctx);
     }
 
     /// TK-60/61/64: advance playback; no undo steps, and only the final

@@ -19,6 +19,7 @@
 //! compared against the actual inputs each time (the plan's stale-view
 //! check, built in).
 use crate::Scene;
+use crate::animation::ChannelKey;
 use crate::rig::Piece;
 use glam::{DMat4, DQuat, DVec3, EulerRot};
 use std::collections::{BTreeSet, HashMap, HashSet};
@@ -30,6 +31,13 @@ use std::hash::{Hash, Hasher};
 pub struct RigResult {
     pub world: HashMap<u64, DMat4>,
     pub broken: BTreeSet<u64>,
+    /// Channel values links and modifiers set (RG-50..63), in the order
+    /// they were evaluated.
+    pub driven: Vec<(ChannelKey, f64)>,
+    /// Items whose world a parent-space or constraint piece sets (and
+    /// their children): the evaluated scene places these at `world`;
+    /// the others follow their (driven) channels through the hierarchy.
+    pub placed: HashSet<u64>,
 }
 
 /// Per-item memo (eval_state.rs keeps one per document).
@@ -54,7 +62,7 @@ fn dependencies(scene: &Scene, item: u64, broken: &BTreeSet<u64>) -> Vec<u64> {
         out.push(parent);
     }
     for p in scene.animation.rig.on(item) {
-        if p.is_missing() || !p.flag("enable") || broken.contains(&p.id) {
+        if p.is_missing() || !p.flag("enable") || broken.contains(&p.id) || channel_piece(p) {
             continue;
         }
         out.extend(p.targets.iter().copied());
@@ -66,14 +74,17 @@ fn dependencies(scene: &Scene, item: u64, broken: &BTreeSet<u64>) -> Vec<u64> {
 
 /// The items whose world the rig changes: items with enabled pieces and
 /// everything below them (static children follow their parent).
-fn affected(scene: &Scene) -> HashSet<u64> {
+fn affected(scene: &Scene, seeds: impl IntoIterator<Item = u64>) -> HashSet<u64> {
     let mut out: HashSet<u64> = scene
         .animation
         .rig
         .pieces
         .iter()
-        .filter(|p| !p.is_missing() && p.flag("enable") && scene.item(p.item).is_some())
+        .filter(|p| {
+            !p.is_missing() && !channel_piece(p) && p.flag("enable") && scene.item(p.item).is_some()
+        })
         .map(|p| p.item)
+        .chain(seeds)
         .collect();
     if out.is_empty() {
         return out;
@@ -103,6 +114,12 @@ pub fn broken_pieces(scene: &Scene) -> BTreeSet<u64> {
     let none = BTreeSet::new();
     for p in &scene.animation.rig.pieces {
         if p.is_missing() || !p.flag("enable") {
+            continue;
+        }
+        if channel_piece(p) {
+            if channel_loop(scene, p) {
+                broken.insert(p.id);
+            }
             continue;
         }
         let reads: Vec<u64> = p.targets.iter().chain(p.refs.values()).copied().collect();
@@ -151,9 +168,25 @@ pub fn evaluate(scene: &Scene) -> RigResult {
 
 /// [`evaluate`] with a memo: unchanged items come from `cache`.
 pub fn evaluate_cached(scene: &Scene, cache: &mut RigCache) -> RigResult {
-    let affected = affected(scene);
+    let broken = broken_pieces(scene);
+    // Links and modifiers first (RG-01): they feed channels the local
+    // matrices read.
+    let (working, driven) = channels_stage(scene, &broken);
+    let scene = working.as_ref().unwrap_or(scene);
+    let moved = driven
+        .iter()
+        .filter(|(k, _)| {
+            k.transform_part().is_some() || crate::rig::pivot_part(&k.channel).is_some()
+        })
+        .map(|(k, _)| k.item)
+        .filter(|i| scene.item(*i).is_some());
+    let moved: Vec<u64> = moved.collect();
+    let placed = affected(scene, Vec::new());
+    let affected = affected(scene, moved);
     let mut out = RigResult {
-        broken: broken_pieces(scene),
+        broken,
+        driven,
+        placed,
         ..Default::default()
     };
     if affected.is_empty() {
@@ -611,11 +644,18 @@ fn path_point(scene: &Scene, curve: u64, world: DMat4, p: &Piece) -> Option<(DVe
 /// evaluated scene (viewport, renders, export, picking) sees the rig
 /// without knowing about it. `None` when the rig moves nothing.
 pub fn apply(scene: &Scene, result: &RigResult) -> Option<Scene> {
-    if result.world.is_empty() {
+    if result.world.is_empty() && result.driven.is_empty() {
         return None;
     }
     let mut out = scene.clone();
-    for (id, w) in &result.world {
+    for (k, v) in &result.driven {
+        let _ = crate::animation::write(&mut out, k, *v);
+    }
+    for (id, w) in result
+        .world
+        .iter()
+        .filter(|(id, _)| result.placed.contains(id))
+    {
         let Some(item) = out.item_mut(*id) else {
             continue;
         };
@@ -630,4 +670,129 @@ pub fn apply(scene: &Scene, result: &RigResult) -> Option<Scene> {
         out.animation.rig.pivots.remove(id);
     }
     Some(out)
+}
+
+/// A piece that works on channel values (links, modifiers), not worlds.
+pub fn channel_piece(p: &Piece) -> bool {
+    p.kind == "link" || p.kind.starts_with("mod.")
+}
+
+/// A channel piece's output channel.
+fn output(p: &Piece) -> Option<ChannelKey> {
+    Some(ChannelKey::new(p.item, p.names.get("driven")?))
+}
+
+/// A channel piece's input channels.
+fn inputs(p: &Piece) -> Vec<ChannelKey> {
+    match p.kind.as_str() {
+        "link" => match (p.targets.first(), p.names.get("driver")) {
+            (Some(&i), Some(c)) => vec![ChannelKey::new(i, c)],
+            _ => Vec::new(),
+        },
+        _ => Vec::new(),
+    }
+}
+
+/// Whether a channel piece's output feeds back into its own inputs.
+fn channel_loop(scene: &Scene, piece: &Piece) -> bool {
+    let Some(out) = output(piece) else {
+        return false;
+    };
+    let pieces: Vec<&Piece> = scene
+        .animation
+        .rig
+        .pieces
+        .iter()
+        .filter(|p| channel_piece(p) && p.flag("enable"))
+        .collect();
+    let mut seen = HashSet::new();
+    let mut stack = inputs(piece);
+    while let Some(k) = stack.pop() {
+        if k == out {
+            return true;
+        }
+        if !seen.insert(k.clone()) {
+            continue;
+        }
+        for p in &pieces {
+            if output(p).as_ref() == Some(&k) {
+                stack.extend(inputs(p));
+            }
+        }
+    }
+    false
+}
+
+/// Evaluates the links and modifiers in dependency order on a copy of the
+/// scene; `None` and nothing when there are none.
+fn channels_stage(
+    scene: &Scene,
+    broken: &BTreeSet<u64>,
+) -> (Option<Scene>, Vec<(ChannelKey, f64)>) {
+    let pieces: Vec<&Piece> = scene
+        .animation
+        .rig
+        .pieces
+        .iter()
+        .filter(|p| channel_piece(p) && p.flag("enable") && !broken.contains(&p.id))
+        .collect();
+    if pieces.is_empty() {
+        return (None, Vec::new());
+    }
+    // Order: a piece after every piece that writes one of its inputs.
+    let mut order: Vec<usize> = Vec::new();
+    let mut state = vec![0u8; pieces.len()];
+    fn visit(i: usize, pieces: &[&Piece], state: &mut [u8], order: &mut Vec<usize>) {
+        if state[i] != 0 {
+            return;
+        }
+        state[i] = 1;
+        for input in inputs(pieces[i]) {
+            for (j, p) in pieces.iter().enumerate() {
+                if output(p).as_ref() == Some(&input) {
+                    visit(j, pieces, state, order);
+                }
+            }
+        }
+        state[i] = 2;
+        order.push(i);
+    }
+    for i in 0..pieces.len() {
+        visit(i, &pieces, &mut state, &mut order);
+    }
+    let mut working = scene.clone();
+    let mut driven = Vec::new();
+    for i in order {
+        let p = pieces[i];
+        let Some(out) = output(p) else {
+            continue;
+        };
+        let Some(v) = channel_value(&working, p) else {
+            continue;
+        };
+        if crate::animation::write(&mut working, &out, v).is_ok() {
+            driven.push((out, v));
+        }
+    }
+    (Some(working), driven)
+}
+
+/// A channel piece's output value from `scene` (inputs already driven).
+fn channel_value(scene: &Scene, p: &Piece) -> Option<f64> {
+    match p.kind.as_str() {
+        "link" => {
+            let v = crate::animation::read(scene, inputs(p).first()?)?;
+            match (p.names.get("mode").map(String::as_str), &p.curve) {
+                // RG-52: through the relationship curve (driver value on
+                // the horizontal axis).
+                (Some("relationship"), Some(c)) if !c.is_empty() => {
+                    Some(c.value_at(crate::time_tick::Tick::from_seconds(v)))
+                }
+                (Some("relationship"), _) => None,
+                // RG-51: the raw value, no unit conversion.
+                _ => Some(v),
+            }
+        }
+        _ => None,
+    }
 }

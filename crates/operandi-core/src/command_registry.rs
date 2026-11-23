@@ -3266,6 +3266,117 @@ pub static COMMANDS: &[Entry] = &[
         .undo()
         .operandi()
         .example("operandi.rig.pivot item:3 position:0,1,0"),
+    script("operandi.rig.linkAdd", Items, "Add Link (RG-50..52): the driven channel takes the driver's value, directly or through a relationship curve.")
+        .on_editor(
+            "Link driven (item:channel) to driver (item:channel), one undo step. mode direct (default: the raw value, no unit conversion) or relationship (through a curve keyed with operandi.rig.relationshipKey). Groups (pos, a vector user channel) link component by component; text channels are refused.",
+            &[
+            jreq("driven", "string", "The driven channel, item:name."),
+            jreq("driver", "string", "The driver channel, item:name."),
+            jopt("mode", "string", "direct (default) or relationship."),
+        ],
+            crate::rig_commands::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.rig.linkAdd driven:3:scl.Z driver:4:pos.X"),
+    script("operandi.rig.linkRemove", Items, "Remove Link (RG-50).")
+        .on_editor(
+            "Remove a link by piece, or every link driving driven (item:channel, or a group), one undo step.",
+            &[
+            jopt("piece", "integer", "The link piece id."),
+            jopt("driven", "string", "The driven channel, item:name."),
+        ],
+            crate::rig_commands::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.rig.linkRemove driven:3:scl.Z"),
+    script("operandi.rig.relationshipKey", Items, "Key (RG-52): stores a driver value → driven value pair on a relationship link.")
+        .on_editor(
+            "Store a key on a relationship link's curve: driver and driven values (default the driver's current value and the driven channel's own value), smooth-flat, holding outside the keys. One undo step.",
+            &[
+            jreq("piece", "integer", "The relationship link id."),
+            jopt("driver", "number", "Driver value."),
+            jopt("driven", "number", "Driven value."),
+        ],
+            crate::rig_commands::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.rig.relationshipKey piece:7 driver:10 driven:1"),
+    script("operandi.rig.relationshipKeyRemove", Items, "Delete Key (RG-52) on a relationship link.")
+        .on_editor(
+            "Delete the relationship key at driver (default the driver's current value), one undo step.",
+            &[
+            jreq("piece", "integer", "The relationship link id."),
+            jopt("driver", "number", "Driver value of the key."),
+        ],
+            crate::rig_commands::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.rig.relationshipKeyRemove piece:7 driver:10"),
+    script("operandi.rig.userChannelAdd", Items, "Add User Channel (RG-53).")
+        .on_editor(
+            "Add a user channel to item (default the active item), one undo step. type float, distance, angle, percentage, time, integer, boolean, choice, string or divider; mode scalar, xy, xyz, rgb, rgba, uv or uvw (name.X... channels); default, min, max; choices for a choice.",
+            &[
+            jopt("item", "integer", "Item id (default the active item)."),
+            jreq("name", "string", "Channel name (no spaces)."),
+            jopt("display", "string", "Display name."),
+            jopt("type", "string", "Value type (default float)."),
+            jopt("mode", "string", "Components (default scalar)."),
+            jopt("default", "number", "Default value."),
+            jopt("min", "number", "Minimum."),
+            jopt("max", "number", "Maximum."),
+            jopt("choices", "string", "Choice names, comma separated."),
+        ],
+            crate::rig_commands::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.rig.userChannelAdd item:3 name:crank type:angle"),
+    script("operandi.rig.userChannelEdit", Items, "Edit User Channel (RG-53): rename, display name, range or default.")
+        .on_editor(
+            "Edit a user channel, one undo step; renaming keeps its keys and links.",
+            &[
+            jopt("item", "integer", "Item id (default the active item)."),
+            jreq("name", "string", "Channel name."),
+            jopt("rename", "string", "New name."),
+            jopt("display", "string", "Display name."),
+            jopt("min", "number", "Minimum."),
+            jopt("max", "number", "Maximum."),
+            jopt("default", "number", "Default value."),
+        ],
+            crate::rig_commands::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.rig.userChannelEdit item:3 name:crank rename:spin"),
+    script("operandi.rig.userChannelRemove", Items, "Delete User Channel (RG-53): removes it and the links using it.")
+        .on_editor(
+            "Delete a user channel, its keys and every link using it, one undo step (the status line says how many links went).",
+            &[
+            jopt("item", "integer", "Item id (default the active item)."),
+            jreq("name", "string", "Channel name."),
+        ],
+            crate::rig_commands::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.rig.userChannelRemove item:3 name:crank"),
+    script("operandi.rig.bindUserChannel", Items, "Bind into User Channel (RG-54): a user channel on target drives the channel.")
+        .on_editor(
+            "Add a user channel of the same kind to target (named after the channel unless name is given) and link the channel to it, one undo step; the channel becomes driven.",
+            &[
+            jreq("channel", "string", "The channel to drive, item:name."),
+            jreq("target", "integer", "Item that gets the user channel."),
+            jopt("name", "string", "User channel name."),
+        ],
+            crate::rig_commands::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.rig.bindUserChannel channel:3:pos.Y target:4"),
     script("operandi.eval.graph", Items, "Reads the scene's evaluation graph (who reads whom: time, channels, fields, transforms, shown meshes) as JSON nodes and edges (UIC-163; the Schematic's data).")
         .on_editor(
             "Read the evaluation graph as JSON: nodes (id, kind time/channel/field/transform/shownMesh, item, name, label, dirty) and edges [from, to] (to reads from). item limits it to one item's nodes and the edges touching them.",
@@ -6682,7 +6793,7 @@ mod tests {
                 assert!(!json.about.is_empty(), "{}", e.name);
             }
         }
-        assert_eq!(crate::command_exec::specs().count(), 243);
+        assert_eq!(crate::command_exec::specs().count(), 251);
     }
 
     #[test]

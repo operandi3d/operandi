@@ -697,6 +697,45 @@ used in the app; `primitive_add` always starts from the Reset values.
   - `item` (integer): Item id (default the active item).
   - `position` (string): Pivot position x,y,z.
   - `rotation` (string): Pivot rotation x,y,z (radians).
+- **`operandi.rig.linkAdd`** — Link driven (item:channel) to driver (item:channel), one undo step. mode direct (default: the raw value, no unit conversion) or relationship (through a curve keyed with operandi.rig.relationshipKey). Groups (pos, a vector user channel) link component by component; text channels are refused.
+  - `driven` (string, required): The driven channel, item:name.
+  - `driver` (string, required): The driver channel, item:name.
+  - `mode` (string): direct (default) or relationship.
+- **`operandi.rig.linkRemove`** — Remove a link by piece, or every link driving driven (item:channel, or a group), one undo step.
+  - `piece` (integer): The link piece id.
+  - `driven` (string): The driven channel, item:name.
+- **`operandi.rig.relationshipKey`** — Store a key on a relationship link's curve: driver and driven values (default the driver's current value and the driven channel's own value), smooth-flat, holding outside the keys. One undo step.
+  - `piece` (integer, required): The relationship link id.
+  - `driver` (number): Driver value.
+  - `driven` (number): Driven value.
+- **`operandi.rig.relationshipKeyRemove`** — Delete the relationship key at driver (default the driver's current value), one undo step.
+  - `piece` (integer, required): The relationship link id.
+  - `driver` (number): Driver value of the key.
+- **`operandi.rig.userChannelAdd`** — Add a user channel to item (default the active item), one undo step. type float, distance, angle, percentage, time, integer, boolean, choice, string or divider; mode scalar, xy, xyz, rgb, rgba, uv or uvw (name.X... channels); default, min, max; choices for a choice.
+  - `item` (integer): Item id (default the active item).
+  - `name` (string, required): Channel name (no spaces).
+  - `display` (string): Display name.
+  - `type` (string): Value type (default float).
+  - `mode` (string): Components (default scalar).
+  - `default` (number): Default value.
+  - `min` (number): Minimum.
+  - `max` (number): Maximum.
+  - `choices` (string): Choice names, comma separated.
+- **`operandi.rig.userChannelEdit`** — Edit a user channel, one undo step; renaming keeps its keys and links.
+  - `item` (integer): Item id (default the active item).
+  - `name` (string, required): Channel name.
+  - `rename` (string): New name.
+  - `display` (string): Display name.
+  - `min` (number): Minimum.
+  - `max` (number): Maximum.
+  - `default` (number): Default value.
+- **`operandi.rig.userChannelRemove`** — Delete a user channel, its keys and every link using it, one undo step (the status line says how many links went).
+  - `item` (integer): Item id (default the active item).
+  - `name` (string, required): Channel name.
+- **`operandi.rig.bindUserChannel`** — Add a user channel of the same kind to target (named after the channel unless name is given) and link the channel to it, one undo step; the channel becomes driven.
+  - `channel` (string, required): The channel to drive, item:name.
+  - `target` (integer, required): Item that gets the user channel.
+  - `name` (string): User channel name.
 - **`operandi.eval.graph`** — Read the evaluation graph as JSON: nodes (id, kind time/channel/field/transform/shownMesh, item, name, label, dirty) and edges [from, to] (to reads from). item limits it to one item's nodes and the edges touching them.
   - `item` (integer): Only this item's nodes.
 - **`operandi.render.frameRange`** — Render frames start..end (default the current range) with Cycles into folder (default the project's renders/) as <name>_0000.png; needs the running app. operandi.anim.query reports progress (job).

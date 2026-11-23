@@ -51,6 +51,7 @@ mod camera;
 mod camera_light_handles;
 mod camera_light_ui;
 mod camera_props_ui;
+mod channel_links_ui;
 mod clip_picker;
 mod color_theme;
 mod colour_field;
@@ -227,6 +228,8 @@ mod replica_safety_tests;
 mod replicator_ui;
 mod report_bug_dialog;
 mod resource_write;
+#[cfg(test)]
+mod rig_ui_tests;
 mod scale_offset_dialog;
 mod scenes;
 mod scrub;
@@ -898,6 +901,8 @@ struct Operandi {
     timeline: timeline::Timeline,
     /// The graph editor window (graph_editor.rs).
     graph: graph_editor::GraphEditor,
+    /// The Channel Links window (channel_links_ui.rs, RG-50).
+    links: channel_links_ui::ChannelLinks,
     anim_ui: anim_ui::AnimUi,
     /// The Form Editor (layouts stage 7, form_editor.rs).
     form_editor: form_editor::State,
@@ -1560,6 +1565,7 @@ impl Operandi {
             palettes: Default::default(),
             timeline: Default::default(),
             graph: Default::default(),
+            links: Default::default(),
             anim_ui: Default::default(),
             form_editor: Default::default(),
             field_rects: BTreeMap::new(),

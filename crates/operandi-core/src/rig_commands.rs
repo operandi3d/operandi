@@ -663,8 +663,424 @@ pub fn run(e: &mut Editor, name: &str, a: &Args) -> Out {
             })?;
             Ok(None)
         }
+        "operandi.rig.linkAdd" => {
+            let driven = text_arg(a, "driven")?.ok_or("Give driven (item:channel)")?;
+            let driver = text_arg(a, "driver")?.ok_or("Give driver (item:channel)")?;
+            let mode = match text_arg(a, "mode")?.unwrap_or("direct") {
+                "direct" => "direct",
+                "relationship" => "relationship",
+                other => return Err(format!("mode is direct or relationship, not {other}")),
+            };
+            let pairs = link_pairs(
+                &e.scene,
+                &ChannelKey::parse(driven)?,
+                &ChannelKey::parse(driver)?,
+            )?;
+            let label = if mode == "direct" {
+                "Add Link"
+            } else {
+                "Add Relationship"
+            };
+            e.anim_step(label, |e| {
+                for (to, from) in &pairs {
+                    if e.scene.animation.rig.pieces.iter().any(|p| {
+                        p.kind == "link"
+                            && p.item == to.item
+                            && p.names.get("driven") == Some(&to.channel)
+                    }) {
+                        return Err(format!("{} is already driven", to.channel));
+                    }
+                    let id = new_id(&mut e.scene)?;
+                    let mut p = Piece::new(id, "link", to.item, vec![from.item]);
+                    p.names.insert("driven".into(), to.channel.clone());
+                    p.names.insert("driver".into(), from.channel.clone());
+                    p.names.insert("mode".into(), mode.into());
+                    if mode == "relationship" {
+                        p.curve = Some(Default::default());
+                    }
+                    e.scene.animation.rig.pieces.push(p);
+                }
+                refuse_loops(e)?;
+                Ok(true)
+            })?;
+            Ok(None)
+        }
+        "operandi.rig.linkRemove" => {
+            let gone: Vec<u64> = match (id(a, "piece")?, text_arg(a, "driven")?) {
+                (Some(p), _) => vec![p],
+                (None, Some(d)) => {
+                    let k = ChannelKey::parse(d)?;
+                    e.scene
+                        .animation
+                        .rig
+                        .pieces
+                        .iter()
+                        .filter(|p| {
+                            p.kind == "link"
+                                && p.item == k.item
+                                && p.names.get("driven").is_some_and(|c| {
+                                    *c == k.channel || c.starts_with(&format!("{}.", k.channel))
+                                })
+                        })
+                        .map(|p| p.id)
+                        .collect()
+                }
+                (None, None) => return Err("Give piece or driven".into()),
+            };
+            if gone.is_empty()
+                || gone.iter().any(|g| {
+                    e.scene
+                        .animation
+                        .rig
+                        .piece(*g)
+                        .is_none_or(|p| p.kind != "link")
+                })
+            {
+                return Err("No such link".into());
+            }
+            e.anim_step("Remove Link", |e| {
+                remove_pieces(&mut e.scene, &gone);
+                Ok(true)
+            })?;
+            Ok(None)
+        }
+        "operandi.rig.relationshipKey" | "operandi.rig.relationshipKeyRemove" => {
+            let piece = id(a, "piece")?.ok_or("Give piece")?;
+            let p = e
+                .scene
+                .animation
+                .rig
+                .piece(piece)
+                .ok_or(format!("No rig piece {piece}"))?;
+            if p.curve.is_none() {
+                return Err("That piece isn't a relationship link".into());
+            }
+            let from = match (p.targets.first(), p.names.get("driver")) {
+                (Some(&i), Some(c)) => ChannelKey::new(i, c),
+                _ => return Err("The link has no driver".into()),
+            };
+            let to = ChannelKey::new(p.item, p.names.get("driven").ok_or("No driven channel")?);
+            let driver = match number(a, "driver")? {
+                Some(v) => v,
+                None => animation::read(&e.scene, &from).ok_or("The driver has no value")?,
+            };
+            let remove = name == "operandi.rig.relationshipKeyRemove";
+            let driven = match number(a, "driven")? {
+                Some(v) => v,
+                None => animation::read(&e.scene, &to).ok_or("The driven channel has no value")?,
+            };
+            e.anim_step(
+                if remove {
+                    "Delete Relationship Key"
+                } else {
+                    "Relationship Key"
+                },
+                |e| {
+                    let c = e
+                        .scene
+                        .animation
+                        .rig
+                        .piece_mut(piece)
+                        .and_then(|p| p.curve.as_mut())
+                        .expect("checked");
+                    let t = crate::time_tick::Tick::from_seconds(driver);
+                    if remove {
+                        if !c.remove(t) {
+                            return Err("No relationship key at that driver value".into());
+                        }
+                    } else {
+                        c.set(t, driven);
+                    }
+                    Ok(true)
+                },
+            )?;
+            Ok(None)
+        }
+        "operandi.rig.userChannelAdd" => {
+            let item = id(a, "item")?
+                .or(e.scene.selection.item)
+                .ok_or("Give item")?;
+            check_item(&e.scene, item)?;
+            let name = text_arg(a, "name")?.ok_or("Give name")?.trim().to_owned();
+            if name.is_empty() || name.contains(|c: char| c.is_whitespace() || c == ':' || c == ',')
+            {
+                return Err("A user channel name has no spaces, colons or commas".into());
+            }
+            let ty = match text_arg(a, "type")? {
+                None => rig::UserType::Float,
+                Some(t) => rig::UserType::parse(t).ok_or_else(|| format!("Unknown type {t}"))?,
+            };
+            let mode = text_arg(a, "mode")?
+                .unwrap_or("scalar")
+                .to_ascii_lowercase();
+            rig::mode_components(&mode).ok_or_else(|| format!("Unknown mode {mode}"))?;
+            let channel = rig::UserChannel {
+                item,
+                name: name.clone(),
+                display: text_arg(a, "display")?.unwrap_or("").to_owned(),
+                ty,
+                mode: if mode.is_empty() {
+                    "scalar".into()
+                } else {
+                    mode
+                },
+                default: number(a, "default")?.unwrap_or(0.),
+                min: number(a, "min")?,
+                max: number(a, "max")?,
+                choices: text_arg(a, "choices")?
+                    .map(|c| c.split(',').map(|s| s.trim().to_owned()).collect())
+                    .unwrap_or_default(),
+                values: Default::default(),
+                text: String::new(),
+            };
+            let taken = |n: &str| {
+                animation::keyable_channels(&e.scene, item)
+                    .iter()
+                    .any(|c| c == n)
+                    || e.scene
+                        .animation
+                        .rig
+                        .user
+                        .iter()
+                        .any(|u| u.item == item && u.name == name)
+            };
+            if channel.channel_names().iter().any(|n| taken(n)) || taken(&name) {
+                return Err(format!(
+                    "{} already has a channel {name}",
+                    item_name(&e.scene, item)
+                ));
+            }
+            e.anim_step("Add User Channel", |e| {
+                e.scene.animation.rig.user.push(channel);
+                Ok(true)
+            })?;
+            Ok(None)
+        }
+        "operandi.rig.userChannelEdit" => {
+            let item = id(a, "item")?
+                .or(e.scene.selection.item)
+                .ok_or("Give item")?;
+            let name = text_arg(a, "name")?.ok_or("Give name")?.to_owned();
+            let index = e
+                .scene
+                .animation
+                .rig
+                .user
+                .iter()
+                .position(|u| u.item == item && u.name == name)
+                .ok_or_else(|| format!("No user channel {name}"))?;
+            let rename = text_arg(a, "rename")?.map(str::to_owned);
+            let display = text_arg(a, "display")?.map(str::to_owned);
+            let (min, max, default) = (number(a, "min")?, number(a, "max")?, number(a, "default")?);
+            e.anim_step("Edit User Channel", |e| {
+                let old_names = e.scene.animation.rig.user[index].channel_names();
+                let u = &mut e.scene.animation.rig.user[index];
+                if let Some(d) = display {
+                    u.display = d;
+                }
+                if min.is_some() {
+                    u.min = min;
+                }
+                if max.is_some() {
+                    u.max = max;
+                }
+                if let Some(d) = default {
+                    u.default = d;
+                }
+                if let Some(r) = rename {
+                    u.name = r;
+                    // Keys and links follow the new name.
+                    let new_names = e.scene.animation.rig.user[index].channel_names();
+                    for (old, new) in old_names.iter().zip(&new_names) {
+                        if let Some(c) = e
+                            .scene
+                            .animation
+                            .channels
+                            .remove(&ChannelKey::new(item, old))
+                        {
+                            e.scene
+                                .animation
+                                .channels
+                                .insert(ChannelKey::new(item, new), c);
+                        }
+                        for p in &mut e.scene.animation.rig.pieces {
+                            if p.item == item && p.names.get("driven") == Some(old) {
+                                p.names.insert("driven".into(), new.clone());
+                            }
+                            if p.targets.first() == Some(&item)
+                                && p.names.get("driver") == Some(old)
+                            {
+                                p.names.insert("driver".into(), new.clone());
+                            }
+                        }
+                    }
+                }
+                Ok(true)
+            })?;
+            Ok(None)
+        }
+        "operandi.rig.userChannelRemove" => {
+            let item = id(a, "item")?
+                .or(e.scene.selection.item)
+                .ok_or("Give item")?;
+            let name = text_arg(a, "name")?.ok_or("Give name")?.to_owned();
+            let u = e
+                .scene
+                .animation
+                .rig
+                .user
+                .iter()
+                .find(|u| u.item == item && u.name == name)
+                .cloned()
+                .ok_or_else(|| format!("No user channel {name}"))?;
+            let names = u.channel_names();
+            let links: Vec<u64> = e
+                .scene
+                .animation
+                .rig
+                .pieces
+                .iter()
+                .filter(|p| {
+                    (p.item == item && p.names.get("driven").is_some_and(|d| names.contains(d)))
+                        || (p.targets.first() == Some(&item)
+                            && p.names.get("driver").is_some_and(|d| names.contains(d)))
+                })
+                .map(|p| p.id)
+                .collect();
+            e.anim_step("Delete User Channel", |e| {
+                e.scene
+                    .animation
+                    .rig
+                    .user
+                    .retain(|x| !(x.item == item && x.name == name));
+                for n in &names {
+                    e.scene.animation.channels.remove(&ChannelKey::new(item, n));
+                }
+                remove_pieces(&mut e.scene, &links);
+                Ok(true)
+            })?;
+            if !links.is_empty() {
+                e.anim.note = Some(format!(
+                    "Deleted {name} and the {} link(s) using it",
+                    links.len()
+                ));
+            }
+            Ok(None)
+        }
+        "operandi.rig.bindUserChannel" => {
+            // RG-54: a user channel of the same kind on target, linked
+            // into the channel, which becomes driven.
+            let source =
+                ChannelKey::parse(text_arg(a, "channel")?.ok_or("Give channel (item:name)")?)?;
+            let target = id(a, "target")?.ok_or("Give target")?;
+            check_item(&e.scene, target)?;
+            let value = animation::read(&e.scene, &source)
+                .ok_or_else(|| format!("{} isn't a number channel", source.channel))?;
+            let ty = match source.transform_part().map(|(g, _)| g) {
+                Some("pos") => rig::UserType::Distance,
+                Some("rot") => rig::UserType::Angle,
+                Some(_) => rig::UserType::Percentage,
+                None => rig::UserType::Float,
+            };
+            let base = text_arg(a, "name")?
+                .map(str::to_owned)
+                .unwrap_or_else(|| source.channel.replace('.', "_"));
+            let mut name = base.clone();
+            let mut n = 2;
+            while e
+                .scene
+                .animation
+                .rig
+                .user
+                .iter()
+                .any(|u| u.item == target && u.name == name)
+            {
+                name = format!("{base}{n}");
+                n += 1;
+            }
+            e.anim_step("Bind into User Channel", |e| {
+                e.scene.animation.rig.user.push(rig::UserChannel {
+                    item: target,
+                    name: name.clone(),
+                    display: String::new(),
+                    ty,
+                    mode: "scalar".into(),
+                    default: value,
+                    min: None,
+                    max: None,
+                    choices: Vec::new(),
+                    values: Default::default(),
+                    text: String::new(),
+                });
+                let id = new_id(&mut e.scene)?;
+                let mut p = Piece::new(id, "link", source.item, vec![target]);
+                p.names.insert("driven".into(), source.channel.clone());
+                p.names.insert("driver".into(), name.clone());
+                p.names.insert("mode".into(), "direct".into());
+                e.scene.animation.rig.pieces.push(p);
+                refuse_loops(e)?;
+                Ok(true)
+            })?;
+            Ok(None)
+        }
         _ => Err(format!("Unknown rig command {name}")),
     }
+}
+
+fn text_arg<'a>(a: &'a Args, name: &str) -> Result<Option<&'a str>, String> {
+    match a.get(name) {
+        None | Some(Value::Null) => Ok(None),
+        Some(Value::String(s)) => Ok(Some(s.as_str())),
+        Some(_) => Err(format!("{name} is text")),
+    }
+}
+
+/// The (driven, driver) channel pairs a link makes (RG-51): one pair, or
+/// one per component when both name a group (`pos`, a vector user
+/// channel). Both must hold numbers.
+fn link_pairs(
+    scene: &Scene,
+    to: &ChannelKey,
+    from: &ChannelKey,
+) -> Result<Vec<(ChannelKey, ChannelKey)>, String> {
+    check_item(scene, to.item)?;
+    check_item(scene, from.item)?;
+    let parts = |k: &ChannelKey| -> Vec<ChannelKey> {
+        let mut names: Vec<String> = animation::keyable_channels(scene, k.item)
+            .into_iter()
+            .filter(|n| {
+                n.strip_prefix(&k.channel)
+                    .is_some_and(|r| r.starts_with('.') && !r[1..].contains('.'))
+            })
+            .collect();
+        names.sort();
+        names
+            .into_iter()
+            .map(|n| ChannelKey::new(k.item, &n))
+            .collect()
+    };
+    let number = |k: &ChannelKey| animation::read(scene, k).is_some();
+    let text = |k: &ChannelKey| {
+        scene
+            .animation
+            .rig
+            .user_channel(k.item, &k.channel)
+            .is_some_and(|u| !u.ty.numeric())
+    };
+    if text(to) || text(from) {
+        return Err("Text channels can't be linked to numbers".into());
+    }
+    if number(to) && number(from) {
+        return Ok(vec![(to.clone(), from.clone())]);
+    }
+    let (a, b) = (parts(to), parts(from));
+    if !a.is_empty() && a.len() == b.len() {
+        return Ok(a.into_iter().zip(b).collect());
+    }
+    Err(format!(
+        "{} and {} can't be linked (each needs a number, or both the same number of parts)",
+        to.channel, from.channel
+    ))
 }
 
 /// Removes pieces and their channels' keys.
@@ -752,6 +1168,8 @@ pub fn answer(e: &Editor, name: &str, a: &Args) -> Option<Result<String, String>
                     "channels": channels,
                     "missing": p.is_missing(),
                     "broken": result.broken.contains(&p.id),
+                    "names": p.names,
+                    "curve": p.curve.as_ref().map(|c| c.keys.iter().map(|k| [k.time.seconds(), k.value]).collect::<Vec<_>>()),
                     "inputs": p.targets.iter().chain(p.refs.values()).collect::<Vec<_>>(),
                     "outputs": [p.item],
                 })
@@ -774,6 +1192,25 @@ pub fn answer(e: &Editor, name: &str, a: &Args) -> Option<Result<String, String>
                 .collect();
             out["driven"] = json!(driven);
             out["driver"] = json!(rig::drives(&e.scene, i));
+            let user: Vec<Value> = rig
+                .user
+                .iter()
+                .filter(|u| u.item == i)
+                .map(|u| {
+                    let values: Map<String, Value> = u
+                        .channel_names()
+                        .into_iter()
+                        .map(|n| {
+                            let v = u.get(&n).unwrap_or(0.);
+                            (n, json!(v))
+                        })
+                        .collect();
+                    json!({"name": u.name, "display": u.display, "type": u.ty.name(), "mode": u.mode,
+                           "default": u.default, "min": u.min, "max": u.max, "choices": u.choices,
+                           "values": values})
+                })
+                .collect();
+            out["user"] = json!(user);
             if let Some(pv) = rig.pivots.get(&i) {
                 out["pivot"] =
                     json!({"position": pv.position.to_array(), "rotation": pv.rotation.to_array()});
