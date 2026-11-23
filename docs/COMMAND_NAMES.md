@@ -98,6 +98,7 @@ map commands; unchanged), toolbox config (labels only).
 | operandi.pen.create, operandi.sketch.sweep, pen, operandi.bench.* | no match (Operandi own) | kept | – |
 | vertMap.new `type:uv` (UV editing stage 1) | vertMap.new | same command, new type: `uv` / `txuv` adds a UV map to the active mesh and selects it | name |
 | operandi.uvMap.select / rename / delete / copy / paste, operandi.uv.fit / flip / mirror / align (new, uv-editing-2026-11-16) | no match | **placeholders**, see NAMES-NEEDED.md | name, newName; fit, keepProportion, gaps, gapsByPixel, udim; axis, perPolygon; center; direction, alignTo, perRow |
+| operandi.statistics.select / hide / rename / delete / paste / clear / count (new, Statistics panel 2026-11-23) | no match | Operandi-only (UIC-165) | row, action, name, from |
 | operandi.uv.preset (new, layouts stage 3), operandi.form.revert (new, layouts stage 3), operandi.notBuilt (new, layouts stage 3) | no match | **placeholders**, see NAMES-NEEDED.md | id, click; form; name |
 | layout.window `hash:` palettes (layouts stage 6: uvEditor, uvView, toolbox, items, properties, shading, groups, vertexMaps, commandHistory beside presetBrowser) | layout.window | same command, more windows | hash, open |
 | operandi.form.newGroup / new / add / addForm / addDivider / move / set / delete / select / find / preview / export (new, layouts stage 7) | no match | **placeholders**, see NAMES-NEEDED.md; all class "ui" | name; id, label, style, group; line, sub, index, form; from, to; attr, value; on; filename |

@@ -1287,6 +1287,24 @@ used in the app; `primitive_add` always starts from the Reset values.
   - `node` (string, required): Box names, comma-separated.
 - **`operandi.nodes.showAll`** — Show every hidden box in a Material Group's node view.
   - `group` (integer, required): The Material Group's layer id.
+- **`operandi.statistics.count`** — Count a Statistics panel row (e.g. polygons.vertices:3) on the active meshes: "n (m selected)".
+  - `row` (string, required): A Statistics row, e.g. polygons.vertices:3, edges.border:flat, polygons.part:Wheel.
+- **`operandi.statistics.select`** — Add (default), remove or select only a Statistics panel row's elements, one undo step.
+  - `row` (string, required): A Statistics row, e.g. polygons.vertices:3, edges.border:flat, polygons.part:Wheel.
+  - `action` (string): "add" (default), "remove" or "only".
+- **`operandi.statistics.hide`** — Hide (default) or unhide a Statistics panel row's elements, one undo step.
+  - `row` (string, required): A Statistics row, e.g. polygons.vertices:3, edges.border:flat, polygons.part:Wheel.
+  - `action` (string): "hide" (default) or "unhide".
+- **`operandi.statistics.rename`** — Rename a named Statistics panel row everywhere, one undo step.
+  - `row` (string, required): A Statistics row, e.g. polygons.vertices:3, edges.border:flat, polygons.part:Wheel.
+  - `name` (string, required): The new name.
+- **`operandi.statistics.delete`** — Delete a named Statistics panel row's tag, set or map (elements stay), one undo step.
+  - `row` (string, required): A Statistics row, e.g. polygons.vertices:3, edges.border:flat, polygons.part:Wheel.
+- **`operandi.statistics.paste`** — Paste row from: onto row: (sets add members, maps overwrite values), one undo step.
+  - `row` (string, required): A Statistics row, e.g. polygons.vertices:3, edges.border:flat, polygons.part:Wheel.
+  - `from` (string, required): The copied row.
+- **`operandi.statistics.clear`** — Clear a vertex map's values to zero (the map stays), one undo step.
+  - `row` (string, required): A Statistics row, e.g. polygons.vertices:3, edges.border:flat, polygons.part:Wheel.
 - **`select.editSet`** — Store the current selection as a named selection set.
   - `name` (string, required): Set name.
 - **`select.useSet`** — Select a named selection set.

@@ -983,6 +983,7 @@ fn panel_name(kind: panel_registry::PanelKind) -> &'static str {
         PanelKind::UvMaps => "uv_maps",
         PanelKind::CommandHistory => "command_history",
         PanelKind::VertexNormalTools => "vertex_normal_tools",
+        PanelKind::Statistics => "statistics",
         PanelKind::NodeView => "node_view",
         // A layout's tab of a kind this build lacks (LAY-49).
         PanelKind::Missing(_) => "missing",

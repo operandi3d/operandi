@@ -618,6 +618,8 @@ mod stab01_history_policy;
 mod stab02_ownership;
 #[path = "stab02c_activation.rs"]
 mod stab02c_activation;
+#[path = "statistics.rs"]
+mod statistics;
 #[path = "subdivision_commands.rs"]
 mod subdivision_commands;
 #[path = "symmetrize_tool.rs"]

@@ -1,5 +1,20 @@
 # Milestone progress ledger
 
+- **Statistics panel (2026-11-23, branch statistics-panel;
+  development/specs/statistics-panel):** a tree-list panel (Info category,
+  Layout > Windows/Palettes "Statistics") counting the active meshes:
+  vertices by edge and polygon count, straight-line points, vertex maps and
+  sets; edges by polygon count, borders (part, material, open, UV seam,
+  flat), crease weights and sets; polygons by type, Checks (single point,
+  not flat, overlapping, flat with a neighbour, sharp angle, concave), by
+  vertex count, part, material, sets, smoothing groups and Drawn (GPU, the
+  GL readout's triangles); items by type and group. + / − select a row
+  (switching mode, Q2), one `operandi.statistics.select` undo step; row
+  menu Rename, Delete, Copy/Paste, Clear, Select Only, Hide/Unhide. Counted
+  on a worker thread, topology remembered per polygon list, only open
+  groups counted. Not built: the Filter row and a shortcut (Jason,
+  2026-11-23), the per-element Info page (Q9). Questions STAT-Q01..Q07.
+
 - **Update check (2026-11-23, branch update-check):** Preferences >
   Defaults > Application > Updates: Update Channel (Release / Test) and
   Check for Updates on Launch (`pref.value updates.*`). The launch check
