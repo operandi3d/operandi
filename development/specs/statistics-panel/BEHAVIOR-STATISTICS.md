@@ -3,6 +3,11 @@
 Received from the coordinator 2026-11-23 (behaviour only; clean room).
 Tags: [ref] = reference behaviour; [LW] = optional extra; [OP] = Operandi's own choice.
 
+## Change from Jason (2026-11-23, overrides Q1 and Q10)
+
+A Modo-style panel: no Filter row (§8 and acceptance check 7 dropped) and
+no default shortcut.
+
 ## Answers to spec questions
 
 - Q1 shortcut: none; offer W only if W is free in the keymap (report which).
