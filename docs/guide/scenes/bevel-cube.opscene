@@ -1,0 +1,161 @@
+{
+  "format": "Operandi",
+  "version": 1,
+  "scene": {
+    "items": [
+      {
+        "id": 1,
+        "name": "Cube",
+        "visible": true,
+        "transform": {
+          "translation": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "mesh": {
+          "vertices": [
+            [
+              -1.0,
+              -0.5,
+              -1.0
+            ],
+            [
+              1.0,
+              -0.5,
+              -1.0
+            ],
+            [
+              1.0,
+              1.5,
+              -1.0
+            ],
+            [
+              -1.0,
+              1.5,
+              -1.0
+            ],
+            [
+              -1.0,
+              -0.5,
+              1.0
+            ],
+            [
+              1.0,
+              -0.5,
+              1.0
+            ],
+            [
+              1.0,
+              1.5,
+              1.0
+            ],
+            [
+              -1.0,
+              1.5,
+              1.0
+            ]
+          ],
+          "faces": [
+            {
+              "vertices": [
+                0,
+                3,
+                2,
+                1
+              ],
+              "uv": null,
+              "material": "",
+              "smooth": false
+            },
+            {
+              "vertices": [
+                4,
+                5,
+                6,
+                7
+              ],
+              "uv": null,
+              "material": "",
+              "smooth": false
+            },
+            {
+              "vertices": [
+                0,
+                4,
+                7,
+                3
+              ],
+              "uv": null,
+              "material": "",
+              "smooth": false
+            },
+            {
+              "vertices": [
+                1,
+                2,
+                6,
+                5
+              ],
+              "uv": null,
+              "material": "",
+              "smooth": false
+            },
+            {
+              "vertices": [
+                0,
+                1,
+                5,
+                4
+              ],
+              "uv": null,
+              "material": "",
+              "smooth": false
+            },
+            {
+              "vertices": [
+                3,
+                7,
+                6,
+                2
+              ],
+              "uv": null,
+              "material": "",
+              "smooth": false
+            }
+          ]
+        }
+      }
+    ],
+    "next_id": 2,
+    "selection": {
+      "item": 1,
+      "mode": "Polygon",
+      "vertices": [],
+      "edges": [],
+      "faces": [
+        5
+      ]
+    },
+    "workplane": {
+      "fixed": false,
+      "plane": 0,
+      "center": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    }
+  }
+}

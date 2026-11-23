@@ -1,0 +1,77 @@
+# The guide's pictures, one [[shot]] per image. tools/guide_shots.py renders
+# them with the offscreen QA harness (OPERANDI_QA_OFFSCREEN) from these
+# settings, so every picture can be remade for a release.
+#
+# Every shot: default Steel theme (a fresh, empty data folder), the window
+# size below in logical points, captured at 2x.
+#
+# Fields:
+#   output     file name in docs/guide/src/images/
+#   scene      scene to open, relative to docs/guide/ (original or CC0 only)
+#   size       window size in logical points [width, height]
+#   selection  "none": nothing selected, no click; "click": the harness
+#              clicks the polygon under (0.3, 1.5, 0.3) like a user would
+#   tool       a tool the harness can start ("None" for no tool)
+#   env        extra OPERANDI_QA_* settings, passed as they are
+#   markers    optional numbered callouts: margin (logical points of dark
+#              border added round the capture) and list of {n, name, at,
+#              target, span}, in logical points from the window's top-left;
+#              name is the part's name on the page (not drawn)
+
+[defaults]
+scale = 2
+size = [1920, 1080]
+
+[[shot]]
+output = "window.png"
+page = "interface/window.md"
+what = "The default window on a new, empty scene; no tool, nothing selected"
+scene = "scenes/empty.opscene"
+selection = "none"
+tool = "None"
+[shot.env]
+# The app's own start-up view; the harness defaults to Top.
+OPERANDI_QA_VIEW = "Perspective"
+# A fresh scene, as File > New makes it; the opened empty file is closed again
+# so the Items list shows only the new scene.
+OPERANDI_QA_COMMAND = "scene.new; operandi.scene.current index:0; scene.close"
+# Numbers match the list on interface/window.md. A 60-point margin round the
+# capture holds the markers at y -30 / 1110 and x -30 / 1950.
+[shot.markers]
+margin = 60
+list = [
+  { n = 1, name = "Logo", at = [19, -30],    target = [19, 12] },
+  { n = 2, name = "Tool set bar", at = [270, -30],   target = [270, 12],   span = [103, 432, 22] },
+  { n = 3, name = "Tool Tabs", at = [-30, 40],    target = [5, 40],     span = [5, 500, 50] },
+  { n = 4, name = "Panel-group tabs", at = [1720, -30],  target = [1720, 72],  span = [1526, 1915, 84] },
+  { n = 5, name = "Transform tools", at = [-30, 77],    target = [6, 77] },
+  { n = 6, name = "View dot", at = [334, 130],   target = [334, 69] },
+  { n = 7, name = "View header", at = [490, 130],   target = [490, 69],   span = [346, 638, 80] },
+  { n = 8, name = "Navigation buttons", at = [1465, 130],  target = [1465, 69],  span = [1416, 1512, 80] },
+  { n = 9, name = "Toolbox", at = [-30, 300],   target = [6, 300] },
+  { n = 10, name = "Items list", at = [1950, 288],  target = [1912, 288] },
+  { n = 11, name = "3D view", at = [922, 330] },
+  { n = 12, name = "Properties", at = [1950, 600],  target = [1912, 600] },
+  { n = 13, name = "Tool Properties", at = [-30, 669],   target = [6, 669] },
+  { n = 14, name = "Grid", at = [1200, 860],  target = [1130, 800] },
+  { n = 15, name = "Axis marker", at = [-30, 1013],  target = [372, 1013] },
+  { n = 16, name = "Readout", at = [1400, 960],  target = [1469, 1020] },
+  { n = 17, name = "Command entry", at = [1950, 1039], target = [1912, 1039] },
+  { n = 18, name = "Message line", at = [20, 1110],   target = [20, 1067] },
+  { n = 19, name = "Mode bar", at = [345, 1110],  target = [330, 1067] },
+  { n = 20, name = "Selection modes", at = [520, 1110],  target = [520, 1067], span = [331, 720, 1078] },
+  { n = 21, name = "Modeling aids", at = [1090, 1110], target = [1090, 1067], span = [734, 1454, 1078] },
+  { n = 22, name = "Render and Preview", at = [1540, 1110], target = [1540, 1067], span = [1459, 1622, 1078] },
+]
+
+[[shot]]
+output = "bevel-active.png"
+page = "modeling/polygon-bevel.md"
+what = "Bevel on the top of a 2 m cube: Shift 0.2 m, Inset 0.1 m, handles showing"
+scene = "scenes/bevel-cube.opscene"
+selection = "click"
+tool = "Bevel"
+[shot.env]
+OPERANDI_QA_VIEW = "Perspective"
+OPERANDI_QA_POLYGON_STAGE = "A"
+OPERANDI_QA_CATEGORY = "Polygon"

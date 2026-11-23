@@ -25,3 +25,6 @@ local-samples/
 *.vtt
 *.srt
 *transcript*
+
+# User Guide build output (mdbook build docs/guide)
+/docs/guide/book/
