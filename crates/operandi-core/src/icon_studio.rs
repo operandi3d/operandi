@@ -625,10 +625,16 @@ pub enum Sample {
     IkUpVector,
     /// IK Goal: a cyan target with a bone tip in it.
     IkGoal,
+    /// Pose tool: a limb pinned at its root, its tip dragged by a cyan arrow.
+    PoseTool,
+    /// Assign IK (full body): a figure with cyan goals at its hands and feet.
+    IkFullBody,
+    /// Switch IK/FK: a limb with a cyan IK goal at its tip and a selected FK turn at its root.
+    IkFkSwitch,
 }
 
 impl Sample {
-    pub const ALL: [Sample; 168] = [
+    pub const ALL: [Sample; 171] = [
         Sample::Cube,
         Sample::SelectedFace,
         Sample::Sphere,
@@ -797,6 +803,9 @@ impl Sample {
         Sample::IkChain,
         Sample::IkUpVector,
         Sample::IkGoal,
+        Sample::PoseTool,
+        Sample::IkFullBody,
+        Sample::IkFkSwitch,
     ];
 
     /// File stem and icon slug.
@@ -970,6 +979,9 @@ impl Sample {
             Sample::IkChain => "ik-chain",
             Sample::IkUpVector => "ik-up-vector",
             Sample::IkGoal => "ik-goal",
+            Sample::PoseTool => "pose-tool",
+            Sample::IkFullBody => "ik-full-body",
+            Sample::IkFkSwitch => "ik-fk-switch",
         }
     }
 
@@ -3964,6 +3976,62 @@ fn sample_mesh(sample: Sample) -> Result<Mesh> {
             let mut parts = ik_target(goal, 0.36)?;
             parts.push(bone(flat(-0.5, -0.45), goal, 0.13, CLAY)?);
             parts.push(ball(flat(-0.5, -0.45), 0.1, CLAY)?);
+            merge(parts)?
+        }
+        Sample::PoseTool => {
+            let root = flat(-0.45, -0.4);
+            let tip = flat(0.25, 0.3);
+            let mut parts = thick_chain(&[root, flat(-0.1, 0.05), tip], CLAY)?;
+            // The pin: a selected pin head standing on the root joint.
+            parts.push(tube(&[root, root + DVec3::Y * 0.3], 0.035, 8, "Ink")?);
+            parts.push(ball(root + DVec3::Y * 0.3, 0.1, "Selected")?);
+            parts.push(arrow(
+                tip + flat(0.05, 0.02),
+                tip + flat(0.38, 0.12),
+                0.05,
+                "New",
+            )?);
+            merge(parts)?
+        }
+        Sample::IkFullBody => {
+            let hip = flat(0., -0.1);
+            let neck = flat(0., 0.3);
+            let (lh, rh) = (flat(-0.5, 0.15), flat(0.5, 0.15));
+            let (lf, rf) = (flat(-0.25, -0.55), flat(0.25, -0.55));
+            let mut parts = thick_chain(&[hip, neck], CLAY)?;
+            parts.extend(thick_chain(
+                &[lh, flat(-0.22, 0.32), neck, flat(0.22, 0.32), rh],
+                CLAY,
+            )?);
+            parts.extend(thick_chain(
+                &[lf, flat(-0.15, -0.32), hip, flat(0.15, -0.32), rf],
+                CLAY,
+            )?);
+            parts.push(ball(neck + DVec3::Y * 0.2, 0.14, CLAY)?);
+            for g in [lh, rh, lf, rf] {
+                parts.extend(ik_target(g, 0.13)?);
+            }
+            merge(parts)?
+        }
+        Sample::IkFkSwitch => {
+            let root = flat(-0.4, -0.35);
+            let tip = flat(0.42, -0.2);
+            let mut parts = thick_chain(&[root, flat(0.0, 0.3), tip], CLAY)?;
+            parts.extend(ik_target(tip, 0.18)?);
+            let arc: Vec<DVec3> = (0..=16)
+                .map(|k| {
+                    let a = 0.3 + 1.9 * f64::from(k) / 16.;
+                    root + flat(0.3 * a.cos(), 0.3 * a.sin())
+                })
+                .collect();
+            let n = arc.len();
+            parts.push(tube(&arc[..n - 2], 0.045, 10, "Selected")?);
+            parts.push(arrow(
+                arc[n - 3],
+                arc[n - 1] + (arc[n - 1] - arc[n - 3]),
+                0.045,
+                "Selected",
+            )?);
             merge(parts)?
         }
         Sample::LoopSlice => {
