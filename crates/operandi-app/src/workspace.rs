@@ -930,6 +930,36 @@ impl Operandi {
             self.item_field_owner = Some((item.id, item.transform.clone()));
             ui.data_mut(|d| d.insert_temp(signature_id, signature));
         }
+        // RG-04: a field a rig piece drives shows the evaluated value
+        // (greyed below), not the hidden own value.
+        let driven: Vec<(&str, usize)> = ["translation", "rotation", "scale"]
+            .into_iter()
+            .flat_map(|prefix| (0..3).map(move |axis| (prefix, axis)))
+            .filter(|(prefix, axis)| {
+                let group = match *prefix {
+                    "translation" => "pos",
+                    "rotation" => "rot",
+                    _ => "scl",
+                };
+                operandi_core::rig::driven_by(
+                    &self.editor.scene,
+                    item.id,
+                    &format!("{group}.{}", ["X", "Y", "Z"][*axis]),
+                )
+                .is_some()
+            })
+            .collect();
+        if !driven.is_empty() {
+            let baked = operandi_core::rig_eval::baked_scene(&self.editor.scene);
+            if let Some(t) = baked.item(item.id).map(|i| i.transform.clone()) {
+                for (prefix, axis) in driven {
+                    self.item_fields.insert(
+                        format!("{prefix}{axis}"),
+                        number_text(channel(&t, prefix, axis), channel_unit(prefix)),
+                    );
+                }
+            }
+        }
         crate::form::rows::section(ui, "Item Transform", false, |ui| {
             // IT-PHY-01: changing the order keeps the angles as typed.
             let mut order = item.transform.rotation_order();

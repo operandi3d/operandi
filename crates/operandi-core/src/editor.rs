@@ -4027,6 +4027,26 @@ impl Editor {
             .active()
             .ok_or("Select a mesh; use New Mesh before creating a primitive")?;
         let item_transform = self.scene.selection.mode == Mode::Item && t.transforms_items();
+        // RG-04: a rig piece drives the transform the tool would change;
+        // dragging it would only edit the hidden own value.
+        if item_transform {
+            let groups: &[&str] = match t {
+                Tool::Move => &["pos"],
+                Tool::Rotate => &["rot"],
+                Tool::Scale => &["scl"],
+                _ => &["pos", "rot", "scl"],
+            };
+            for id in self.scene.selected_items() {
+                for g in groups {
+                    for a in ["X", "Y", "Z"] {
+                        if let Some(p) = crate::rig::driven_by(&self.scene, id, &format!("{g}.{a}"))
+                        {
+                            return Err(format!("Driven by {}", crate::rig::label(&p.kind)));
+                        }
+                    }
+                }
+            }
+        }
         // Other tools have no geometry to edit on a Backdrop.
         if item.backdrop.is_some() && !item_transform {
             return Err(BACKDROP_NO_GEOMETRY.into());
@@ -5830,6 +5850,12 @@ impl Editor {
         // resolves its frame against world-space positions.
         let transform = tool.transforms_items();
         if scene.selection.mode == Mode::Item && tool != Tool::Extrude && !tool.is_smooth_shift() {
+            // The handle sits where rigged items show (RG-01), not at
+            // their own unconstrained place.
+            let rigged = (!scene.animation.rig.pieces.is_empty())
+                .then(|| crate::rig_eval::apply(scene, &crate::rig_eval::evaluate(scene)))
+                .flatten();
+            let scene = rigged.as_ref().unwrap_or(scene);
             let frame = context.resolve(scene)?;
             // Several items: the handle at their shared pivot.
             if transform

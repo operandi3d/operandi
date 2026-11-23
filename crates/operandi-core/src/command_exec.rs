@@ -1605,6 +1605,9 @@ pub fn answer(e: &Editor, given: &str, given_args: &Map<String, Value>) -> Optio
     if let Some(answer) = crate::anim_commands::answer(e, &name, &a) {
         return Some(answer);
     }
+    if let Some(answer) = crate::rig_schematic::answer(e, &name, &a) {
+        return Some(answer);
+    }
     // Rig pieces (rig_commands.rs), read any time.
     if let Some(answer) = crate::rig_commands::answer(e, &name, &a) {
         return Some(answer);

@@ -75,3 +75,72 @@ fn compensation_is_kept_in_the_preferences_and_constraints_drive_fields() {
     assert!(operandi_core::rig::driven_by(&a.editor.scene, ids[0], "pos.X").is_some());
     frames(&mut a, &ctx, 2);
 }
+
+#[test]
+fn the_schematic_draws_and_its_drops_become_rig_lines() {
+    crate::anim_switch::set_for_test(true);
+    let ctx = Context::default();
+    let mut a = box_app();
+    a.editor.scene.new_mesh().unwrap();
+    a.editor.scene.new_mesh().unwrap();
+    let ids: Vec<u64> = a.editor.scene.items.iter().map(|i| i.id).collect();
+    a.execute(&format!(
+        "operandi.rig.modifierAdd kind:math item:{}",
+        ids[1]
+    ));
+    a.execute("operandi.rig.schematicView");
+    assert!(a.schematic.open);
+    frames(&mut a, &ctx, 2);
+    assert!(a.palettes.places.contains_key("schematic"));
+    let model = operandi_core::rig_schematic::build(&a.editor.scene);
+    let m = a.editor.scene.animation.rig.pieces[0].id;
+    let (item0, item2, piece) = (
+        format!("item:{}", ids[0]),
+        format!("item:{}", ids[2]),
+        format!("piece:{m}"),
+    );
+    let mut model = model;
+    // Item nodes the user added.
+    for id in [ids[0], ids[2]] {
+        model.nodes.push(operandi_core::rig_schematic::Node {
+            key: format!("item:{id}"),
+            label: String::new(),
+            id,
+            piece: false,
+            kind: None,
+            inputs: vec![],
+            outputs: vec![],
+            broken: false,
+            column: 0,
+        });
+    }
+    use crate::schematic_ui::connect_line;
+    assert_eq!(
+        connect_line(&model, &item0, "pos.X", &piece, "A").unwrap(),
+        format!(
+            "operandi.rig.modifierSet piece:{m} inputs:A={}:pos.X",
+            ids[0]
+        )
+    );
+    assert_eq!(
+        connect_line(&model, &piece, "out", &item2, "rot.Y").unwrap(),
+        format!("operandi.rig.modifierSet piece:{m} output:{}:rot.Y", ids[2])
+    );
+    assert_eq!(
+        connect_line(&model, &item0, "pos.X", &item2, "scl.Z").unwrap(),
+        format!(
+            "operandi.rig.linkAdd driven:{}:scl.Z driver:{}:pos.X",
+            ids[2], ids[0]
+        )
+    );
+    assert!(connect_line(&model, &item0, "world", &piece, "A").is_err());
+    let line = connect_line(&model, &item0, "pos.X", &piece, "A").unwrap();
+    a.execute(&line);
+    assert_eq!(
+        operandi_core::rig_schematic::build(&a.editor.scene)
+            .wires
+            .len(),
+        1
+    );
+    frames(&mut a, &ctx, 1);
+}

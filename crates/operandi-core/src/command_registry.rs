@@ -3421,6 +3421,28 @@ pub static COMMANDS: &[Entry] = &[
         .undo()
         .operandi()
         .example("operandi.rig.bake items:3 start:0 end:24"),
+    script("operandi.rig.schematic", Items, "Reads the Schematic's nodes (items and rig pieces), their ports and wires as JSON (RG-70, UIC-163).")
+        .on_editor(
+            "Read the rig as Schematic nodes and wires: nodes (key item:<id> or piece:<id>, label, kind, inputs, outputs, broken, column) and wires (from, from_port, to, to_port, piece).",
+            &[],
+            crate::rig_commands::run,
+        )
+        .query()
+        .quiet()
+        .operandi()
+        .example("operandi.rig.schematic"),
+    script("operandi.rig.unwire", Items, "Deletes a Schematic wire (RG-72): a link goes, a modifier input or output is unwired, a constraint loses that target.")
+        .on_editor(
+            "Delete the wire at piece's port (a link: the link; a modifier: that input, or out; a constraint or dynamic parent: that target, the piece with its last), one undo step.",
+            &[
+            jreq("piece", "integer", "The rig piece id."),
+            jreq("port", "string", "The piece's port (A, driver, target 2, out...)."),
+        ],
+            crate::rig_commands::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.rig.unwire piece:7 port:A"),
     script("operandi.eval.graph", Items, "Reads the scene's evaluation graph (who reads whom: time, channels, fields, transforms, shown meshes) as JSON nodes and edges (UIC-163; the Schematic's data).")
         .on_editor(
             "Read the evaluation graph as JSON: nodes (id, kind time/channel/field/transform/shownMesh, item, name, label, dirty) and edges [from, to] (to reads from). item limits it to one item's nodes and the edges touching them.",
@@ -6837,7 +6859,7 @@ mod tests {
                 assert!(!json.about.is_empty(), "{}", e.name);
             }
         }
-        assert_eq!(crate::command_exec::specs().count(), 254);
+        assert_eq!(crate::command_exec::specs().count(), 256);
     }
 
     #[test]

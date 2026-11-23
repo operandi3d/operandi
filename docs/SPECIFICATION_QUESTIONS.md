@@ -9658,8 +9658,8 @@ Built from BEHAVIOR-TOPOLOGY-PEN (2026-11-20) on branch topology-pen. These are 
 ## Rig phase 4 (2026-11-23, branch graph-editor-resize)
 
 - RG-Q01 Rig pieces are scene data (`Animation::rig`, native v62), not items: they show in the Items list and Schematic later (§7); their channels key like any (`<piece id>:influence`). Provisional.
-- RG-Q02 The evaluated scene places each rigged item at its evaluated world as a root item (parent links are only in the document), so every reader (viewport, renders, export, picking) sees the rig. The transform gizmo still sits at the item's own (unconstrained) place. Provisional.
-- RG-Q03 RG-04 [OP]: a driven field greys with "Driven by <piece>" but still shows the item's own value, not the evaluated one. Provisional.
+- RG-Q02 The evaluated scene places each rigged item at its evaluated world as a root item (parent links are only in the document), so every reader (viewport, renders, export, picking) sees the rig; Item-mode handles sit at the evaluated place, and a transform tool on a driven channel is refused with "Driven by <piece>". Provisional.
+- RG-Q03 RG-04 [OP]: a driven field greys with "Driven by <piece>" and shows the evaluated value (the rig's result under the item's parent).
 - RG-Q04 RG-31 Affect X/Y/Z on rotations works on world XYZ Euler angles; Influence blends position and scale linearly and rotation by slerp. Provisional.
 - RG-Q05 Direction with Up parallel to the aim falls back to world +X (+Z when the aim lies along X); measured RG-44 cases hit exactly. Axis X aims X with Y towards up; Axis Y aims Y with Z towards up. Provisional.
 - RG-Q06 Path: Percent and Offset are fractions (1 = 100%); Wrap takes Percent modulo 100% (an exact lap lands on the end); smooth curves are sampled 24 steps per span for arc length. Provisional.
@@ -9671,3 +9671,4 @@ Built from BEHAVIOR-TOPOLOGY-PEN (2026-11-20) on branch topology-pen. These are 
 - RG-Q12 RG-61/62: Blend, Min, Max and Index are piece channels, overridden by a wired input of that name; Switch picks the inputs in name order.
 - RG-Q13 RG-63: every item has read-only `world.pos/rot/scl.X..Z` and `local.*` channels for links and modifiers to read; worlds are the document's (before the rig), so reading them never loops. Matrix-typed compose/decompose nodes aren't built (Operandi has no matrix channels yet).
 - RG-Q14 §8 Bake keys pos/rot/scl on every frame of the range (angles kept continuous) and disables every piece on the baked items; driven non-transform channels aren't baked.
+- RG-Q15 RG-70..72: the Schematic is Operandi's own small node view (the shader node view is built on the shader tree's board and doesn't fit items): automatic columns (drivers, pieces, driven), nodes dragged by hand aren't saved, items appear when a piece uses them or with Add Selected Item. Constraints are wired from Animate > Constrain; the Schematic wires links and modifiers and deletes wires and pieces.

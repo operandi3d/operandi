@@ -1251,6 +1251,63 @@ pub fn run(e: &mut Editor, name: &str, a: &Args) -> Out {
             })?;
             Ok(None)
         }
+        "operandi.rig.unwire" => {
+            // RG-72: deleting a wire in the Schematic.
+            let piece = id(a, "piece")?.ok_or("Give piece")?;
+            let port = text_arg(a, "port")?.ok_or("Give port")?.to_owned();
+            let p = e
+                .scene
+                .animation
+                .rig
+                .piece(piece)
+                .cloned()
+                .ok_or(format!("No rig piece {piece}"))?;
+            e.anim_step("Delete Wire", |e| {
+                if p.kind == "link" {
+                    remove_pieces(&mut e.scene, &[piece]);
+                    return Ok(true);
+                }
+                let q = e.scene.animation.rig.piece_mut(piece).expect("checked");
+                if q.kind.starts_with("mod.") {
+                    if port == "out" {
+                        q.names.remove("driven");
+                    } else if q.names.remove(&format!("in.{port}")).is_none() {
+                        return Err(format!("{port} isn't wired"));
+                    }
+                    return Ok(true);
+                }
+                // A constraint's or dynamic parent's target: drop it, and
+                // the piece with its last one.
+                let index = port
+                    .rsplit(' ')
+                    .next()
+                    .and_then(|n| n.parse::<usize>().ok())
+                    .and_then(|n| n.checked_sub(1))
+                    .filter(|i| *i < q.targets.len());
+                match index {
+                    Some(i) => {
+                        q.targets.remove(i);
+                        // Weights after it move down one.
+                        let weights: Vec<(usize, f64)> = (i + 1..=q.targets.len())
+                            .filter_map(|n| {
+                                q.values.remove(&format!("weight.{n}")).map(|w| (n - 1, w))
+                            })
+                            .collect();
+                        q.values.remove(&format!("weight.{i}"));
+                        for (n, w) in weights {
+                            q.values.insert(format!("weight.{n}"), w);
+                        }
+                        if q.targets.is_empty() {
+                            remove_pieces(&mut e.scene, &[piece]);
+                        }
+                    }
+                    None if q.refs.remove(&port).is_some() => {}
+                    None => return Err(format!("No wire at {port}")),
+                }
+                Ok(true)
+            })?;
+            Ok(None)
+        }
         _ => Err(format!("Unknown rig command {name}")),
     }
 }

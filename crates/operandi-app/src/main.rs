@@ -232,6 +232,7 @@ mod resource_write;
 mod rig_ui_tests;
 mod scale_offset_dialog;
 mod scenes;
+mod schematic_ui;
 mod scrub;
 mod sculpt_ui;
 #[cfg(test)]
@@ -903,6 +904,8 @@ struct Operandi {
     graph: graph_editor::GraphEditor,
     /// The Channel Links window (channel_links_ui.rs, RG-50).
     links: channel_links_ui::ChannelLinks,
+    /// The Schematic window (schematic_ui.rs, RG-70).
+    schematic: schematic_ui::SchematicView,
     anim_ui: anim_ui::AnimUi,
     /// The Form Editor (layouts stage 7, form_editor.rs).
     form_editor: form_editor::State,
@@ -1566,6 +1569,7 @@ impl Operandi {
             timeline: Default::default(),
             graph: Default::default(),
             links: Default::default(),
+            schematic: Default::default(),
             anim_ui: Default::default(),
             form_editor: Default::default(),
             field_rects: BTreeMap::new(),

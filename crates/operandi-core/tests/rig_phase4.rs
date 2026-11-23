@@ -829,3 +829,24 @@ fn every_rig_edit_is_one_undo_step_and_piece_channels_key() {
     assert!(!e.scene.animation.channels.keys().any(|k| k.item == p));
     let _ = DMat4::IDENTITY;
 }
+
+/// Coordinator review: the handle sits at the evaluated place, and a
+/// transform tool on a driven channel is refused (RG-04).
+#[test]
+fn handles_sit_where_the_rig_shows_and_driven_drags_are_refused() {
+    let mut e = Editor::default();
+    let c = item(&mut e, DVec3::new(5., 5., 5.));
+    let a = item(&mut e, DVec3::new(2., 0., 0.));
+    ok(
+        &mut e,
+        &format!("operandi.rig.constrain kind:position items:{c} targets:{a}"),
+    );
+    e.scene.selection.mode = Mode::Item;
+    e.scene.selection.also.clear();
+    e.scene.selection.item = Some(c);
+    let err = e.dispatch(Command::Activate(Tool::Move)).unwrap_err();
+    assert_eq!(err, "Driven by Position Constraint");
+    // Rotate isn't driven: allowed, its handle at the constrained place.
+    let frame = Editor::extrude_frame(e.action_context, Tool::Rotate, &e.scene).unwrap();
+    near(frame.center, DVec3::new(2., 0., 0.));
+}

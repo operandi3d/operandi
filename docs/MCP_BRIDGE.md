@@ -753,6 +753,10 @@ used in the app; `primitive_add` always starts from the Reset values.
   - `items` (string): Item ids, comma separated.
   - `start` (number): First frame (default the current range's).
   - `end` (number): Last frame (default the current range's).
+- **`operandi.rig.schematic`** — Read the rig as Schematic nodes and wires: nodes (key item:<id> or piece:<id>, label, kind, inputs, outputs, broken, column) and wires (from, from_port, to, to_port, piece). No arguments.
+- **`operandi.rig.unwire`** — Delete the wire at piece's port (a link: the link; a modifier: that input, or out; a constraint or dynamic parent: that target, the piece with its last), one undo step.
+  - `piece` (integer, required): The rig piece id.
+  - `port` (string, required): The piece's port (A, driver, target 2, out...).
 - **`operandi.eval.graph`** — Read the evaluation graph as JSON: nodes (id, kind time/channel/field/transform/shownMesh, item, name, label, dirty) and edges [from, to] (to reads from). item limits it to one item's nodes and the edges touching them.
   - `item` (integer): Only this item's nodes.
 - **`operandi.render.frameRange`** — Render frames start..end (default the current range) with Cycles into folder (default the project's renders/) as <name>_0000.png; needs the running app. operandi.anim.query reports progress (job).
