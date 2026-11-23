@@ -31,6 +31,21 @@
     --search-mark-bg: #b86f00;
 }
 
+/* Text and page colours always come from the current theme. mdBook sets
+   them on <html> and lets <body> inherit, so any host page that puts its
+   own body colour first (the private review link wraps the start page in a
+   skeleton with body{color:#000}) turned the text black on the dark theme.
+   Set them on body too, every theme. */
+html body {
+    color: var(--fg);
+    background-color: var(--bg);
+}
+html.light, html.rust { color-scheme: light; }
+html.coal, html.navy, html.ayu { color-scheme: dark; }
+.content blockquote, .content .mdbook-alerts, .content aside {
+    color: var(--fg);
+}
+
 /* Pictures of the app: full column width, a thin frame. */
 .content main img {
     max-width: 100%;
