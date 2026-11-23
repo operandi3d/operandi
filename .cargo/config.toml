@@ -1,5 +1,6 @@
 # Test threads get 2 MB of stack by default, but the app itself runs on the
-# main thread, which gets 8 MB. The app state is big, and Linux (x86) debug
+# main thread, which gets 8 MB (Windows too: crates/operandi-app/build.rs
+# sets it). The app state is big, and Linux (x86) debug
 # builds use more stack per call than the Mac, so some tests ran out of room
 # on Linux only. Give tests the same 8 MB the real app has.
 # A RUST_MIN_STACK already set in your shell still wins.
