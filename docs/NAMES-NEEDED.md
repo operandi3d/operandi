@@ -29,6 +29,7 @@ Help menu (Jason 2026-11-16): nothing in the name map, so placeholders:
 |---|---|
 | `operandi.help.reportBug` | Help > Report Bug: a pre-filled GitHub issue in the browser |
 | `operandi.help.documentation` | Help > Documentation: the docs in the browser (greyed "Coming soon" until `help_menu::DOCS_URL` is set) |
+| `operandi.update.check` | Help > Check for Updates: the newest build on the update channel, offered if newer (2026-11-23) |
 
 UV editing stage 1 (uv-editing-2026-11-16): the name map has
 `vertMap.new` (now also `type:uv`) but nothing for these, so they are

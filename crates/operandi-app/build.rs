@@ -5,7 +5,10 @@
 //!
 //! Also stamps the git commit into OPERANDI_GIT_COMMIT for bug and crash
 //! reports (bug_report.rs): short hash, "+dirty" with uncommitted changes to
-//! tracked files, "unknown" outside a git checkout.
+//! tracked files, "unknown" outside a git checkout. OPERANDI_GIT_COMMIT_TIME
+//! is that commit's time (Unix seconds, empty when unknown) for the update
+//! check (update_check.rs), which also reads OPERANDI_DEFAULT_UPDATE_CHANNEL
+//! (`test` makes a build follow the Test channel until the user picks one).
 fn main() {
     stamp_git_commit();
     embed_shipped_layouts();
@@ -64,6 +67,9 @@ fn stamp_git_commit() {
         None => "unknown".into(),
     };
     println!("cargo:rustc-env=OPERANDI_GIT_COMMIT={stamp}");
+    let time = git(&["log", "-1", "--format=%ct", "HEAD"]).unwrap_or_default();
+    println!("cargo:rustc-env=OPERANDI_GIT_COMMIT_TIME={time}");
+    println!("cargo:rerun-if-env-changed=OPERANDI_DEFAULT_UPDATE_CHANNEL");
     // Re-stamp when HEAD moves, the index changes or this crate's sources
     // change. A worktree's git files are not under ./.git, so ask git where
     // they are. (Edits elsewhere in the workspace can leave "+dirty" stale
