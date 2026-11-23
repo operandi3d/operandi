@@ -9,7 +9,9 @@
 //! ```
 //!
 //! `render` renders every icon straight at each size in
-//! `icon_studio::SIZES` and at twice that, with the camera's frame fitted
+//! `icon_studio::SIZES` and at twice that, plus 32 px at 4× (128 px, for
+//! big toolbox icons on high-density displays and large Interface Scales,
+//! which would otherwise be scaled up), with the camera's frame fitted
 //! to the picture, so edges are anti-aliased by the renderer's own pixel
 //! filter and samples rather than by shrinking a big picture. Each file
 //! comes in two sets with the same file names, a dark outline for light
@@ -308,6 +310,17 @@ fn save_png(path: &Path, p: &Picture) -> Result<(), String> {
         .map_err(|e| format!("Couldn't write {}: {e}", path.display()))
 }
 
+/// Every (size, scale) rendered per icon: each of [`SIZES`] at 1× and 2×,
+/// then [`LARGEST`].
+pub(crate) fn renders() -> impl Iterator<Item = (u32, u32)> {
+    SIZES
+        .into_iter()
+        .flat_map(|s| [(s, 1), (s, 2)])
+        .chain([LARGEST])
+}
+/// The biggest picture: 32 px at 4×, 128 px across.
+pub(crate) const LARGEST: (u32, u32) = (32, 4);
+
 /// The file name for `slug` at `size` and `scale`.
 pub(crate) fn file_name(slug: &str, size: u32, scale: u32) -> String {
     if scale == 1 {
@@ -333,8 +346,8 @@ fn render_icon(studio: &Scene, file: &Path, job: &RenderJob) -> Result<IconSet, 
     } else {
         &[Outline::None]
     };
-    for size in SIZES {
-        for scale in [1, 2] {
+    for (size, scale) in renders() {
+        {
             // One render, outlined once per set.
             let rgba = render_picture(&scene, size * scale, job)?;
             for &kind in sets {
@@ -705,6 +718,9 @@ mod tests {
     fn file_names_mark_the_2x_pictures() {
         assert_eq!(file_name("prim-cube", 16, 1), "prim-cube-16.png");
         assert_eq!(file_name("prim-cube", 16, 2), "prim-cube-16@2x.png");
+        assert_eq!(file_name("prim-cube", 32, 4), "prim-cube-32@4x.png");
+        let px: Vec<u32> = renders().map(|(s, k)| s * k).collect();
+        assert_eq!(px.iter().max(), Some(&128));
     }
 
     #[test]

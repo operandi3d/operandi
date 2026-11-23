@@ -3452,10 +3452,12 @@ fn rollover_pieces(
 /// N13 (Jason, 2026-11-16: wireframe lines were very thick): the plain
 /// wire width in points, sized in device pixels so a Retina display draws
 /// one pixel (1.5 in wireframe views), not two (three). On a standard
-/// display this is the old 1 point (1.5).
+/// display this is the old 1 point (1.5). Below one pixel per point (an
+/// Interface Scale under 100% on a standard display) it stays one device
+/// pixel rather than thinning to a faint fraction of one.
 pub fn plain_wire_width(wire: bool, pixels_per_point: f32) -> f32 {
     let pixels = if wire { 1.5 } else { 1. };
-    pixels / pixels_per_point.max(1.)
+    pixels / pixels_per_point.max(0.25)
 }
 
 /// The camera as the shader's uniform: eye (w: the orthographic depth
@@ -3564,6 +3566,9 @@ mod tests {
         assert_eq!(plain_wire_width(true, 2.), 0.75);
         assert_eq!(plain_wire_width(false, 1.), 1.);
         assert_eq!(plain_wire_width(true, 1.), 1.5);
+        // Windows 125% and a 75% Interface Scale: still one device pixel.
+        assert!((plain_wire_width(false, 1.25) * 1.25 - 1.).abs() < 1e-6);
+        assert!((plain_wire_width(false, 0.75) * 0.75 - 1.).abs() < 1e-6);
     }
 
     /// The shader's projection, written out on the CPU.

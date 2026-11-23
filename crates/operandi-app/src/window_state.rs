@@ -150,7 +150,21 @@ impl Tracker {
 
     /// Note the root viewport's latest report. Size and place are only taken
     /// from the normal (not maximised, fullscreen or minimised) window.
+    #[cfg(test)]
     pub fn observe(&mut self, info: &ViewportInfo) {
+        self.observe_zoomed(info, 1.);
+    }
+
+    /// [`Self::observe`] while the interface draws at `zoom` times the
+    /// system scale (Interface Scale): egui reports the window in zoomed
+    /// points, but the window opens next time in the system's points,
+    /// before any zoom applies.
+    pub fn observe_zoomed(&mut self, info: &ViewportInfo, zoom: f32) {
+        let zoom = if zoom.is_finite() && zoom > 0. {
+            zoom
+        } else {
+            1.
+        };
         if info.inner_rect.is_none() && info.outer_rect.is_none() {
             return;
         }
@@ -168,7 +182,7 @@ impl Tracker {
             return;
         }
         if let Some(r) = info.inner_rect {
-            let size = [r.width(), r.height()];
+            let size = [r.width() * zoom, r.height() * zoom];
             if size
                 .iter()
                 .zip(MIN_SIZE)
@@ -181,7 +195,7 @@ impl Tracker {
             && r.min.x.is_finite()
             && r.min.y.is_finite()
         {
-            self.state.position = Some([r.min.x, r.min.y]);
+            self.state.position = Some([r.min.x * zoom, r.min.y * zoom]);
         }
         if let Some(ppp) = info
             .native_pixels_per_point
@@ -580,6 +594,23 @@ mod tests {
         assert!(!t.state.maximized && !t.state.fullscreen);
         assert_eq!(t.state.size, [1000., 700.]);
         assert_eq!(t.state.position, Some([300., 200.]));
+    }
+
+    #[test]
+    fn tracker_saves_the_system_size_under_interface_scale() {
+        // At 150% Interface Scale egui reports the window in zoomed
+        // points; the saved size and place are the system's points the
+        // window reopens in.
+        let mut t = Tracker::new(MainWindow::default());
+        t.observe_zoomed(
+            &info(
+                screen(100., 108., 800., 600.),
+                screen(100., 80., 800., 628.),
+            ),
+            1.5,
+        );
+        assert_eq!(t.state.size, [1200., 900.]);
+        assert_eq!(t.state.position, Some([150., 120.]));
     }
 
     #[test]

@@ -42,8 +42,18 @@ pub fn offscreen(environment: app_environment::AppEnvironment) -> Result<()> {
         .ok()
         .and_then(|s| s.parse().ok())
         .unwrap_or(1.);
-    if !(1. ..=2.).contains(&scale) {
-        return Err("QA scale must be 1–2".into());
+    // 1.25 and 1.5 are Windows' 125% and 150% display scales; 3 and 4
+    // stand in for dense 4K/5K laptop screens.
+    if !(1. ..=4.).contains(&scale) {
+        return Err("QA scale must be 1–4".into());
+    }
+    // Interface Scale on top of the display scale (ui_preferences.rs).
+    let zoom: f32 = std::env::var("OPERANDI_QA_ZOOM")
+        .ok()
+        .and_then(|s| s.parse().ok())
+        .unwrap_or(1.);
+    if !(0.5..=2.).contains(&zoom) {
+        return Err("QA zoom must be 0.5–2".into());
     }
     let instance = wgpu::Instance::new(&wgpu::InstanceDescriptor::default());
     let state = wait(egui_wgpu::RenderState::create(
@@ -60,6 +70,7 @@ pub fn offscreen(environment: app_environment::AppEnvironment) -> Result<()> {
     // so those still win.
     let ctx = Context::default();
     theme::install(&ctx);
+    ctx.set_zoom_factor(zoom);
     app.preferences_ui.scheme = color_theme::load(&app.environment.paths().color_theme());
     app.dots.locks = panel_dot::LayoutLocks::load(&app.environment.paths().layout_locks());
     app.start_layouts();
@@ -243,7 +254,10 @@ pub fn offscreen(environment: app_environment::AppEnvironment) -> Result<()> {
         let mut raw = RawInput {
             screen_rect: Some(Rect::from_min_size(
                 Pos2::ZERO,
-                vec2(size[0] as f32 / scale, size[1] as f32 / scale),
+                vec2(
+                    size[0] as f32 / (scale * zoom),
+                    size[1] as f32 / (scale * zoom),
+                ),
             )),
             focused: true,
             ..Default::default()
