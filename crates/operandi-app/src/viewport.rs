@@ -62,7 +62,7 @@ const VERTEX_BEVEL_FREE_HANDLE: usize = 10;
 pub(super) const FREE_HANDLE: usize = 11;
 /// How far (points) the second press of an edge double-click may land from
 /// the first; egui's own click tolerance.
-const EDGE_DOUBLE_CLICK_DISTANCE: f32 = 6.;
+pub(super) const EDGE_DOUBLE_CLICK_DISTANCE: f32 = 6.;
 /// Pseudo-handle id for a drag anywhere off the handles (Jason, 2026-11-04):
 /// up/down acts like the tool's move arrow (its first handle), left/right
 /// like its scale widget (its second handle). See `update_off_handle`.
@@ -6004,6 +6004,14 @@ impl Operandi {
                         // count as a click outside it and close it again.
                         self.modeling_menu_pressed = true;
                         input::GestureKind::Blocked
+                    } else if let Some(kind) = self.empty_expand_double_click(
+                        pos,
+                        r,
+                        modifiers,
+                        press_time,
+                        double_click_delay,
+                    ) {
+                        kind
                     } else if let Some(kind) = self.polygon_connected_double_click(
                         pos,
                         r,
@@ -6027,7 +6035,10 @@ impl Operandi {
                             self.last_component_press = Some((press_time, pos));
                         }
                         self.run(Command::BeginSelection);
-                        self.select_at(pos, r, modifiers);
+                        let hit = self.select_at(pos, r, modifiers);
+                        // A possible first press of a Shift+double-click on
+                        // empty space (Expand Selection, empty_expand.rs).
+                        self.note_empty_shift_press(hit, modifiers, press_time, pos);
                         input::GestureKind::Select
                     };
                     ui.ctx().request_repaint();
@@ -6051,6 +6062,7 @@ impl Operandi {
                             && pos.distance(g.start) > EDGE_DOUBLE_CLICK_DISTANCE
                         {
                             self.last_component_press = None;
+                            self.last_empty_shift_press = None;
                         }
                         if let input::GestureKind::Draw(d) = &mut g.kind {
                             let start = g.start;
@@ -6800,7 +6812,8 @@ impl Operandi {
             .flatten()
             .any(|c| selected(c) == remove)
     }
-    pub(super) fn select_at(&mut self, p: Pos2, r: Rect, mods: Modifiers) {
+    /// Picks at `p` and applies the click; true when it hit a component.
+    pub(super) fn select_at(&mut self, p: Pos2, r: Rect, mods: Modifiers) -> bool {
         let hit = self.pick_component(p, r);
         let how = ClickHow::from_keys(mods.shift, mods.ctrl);
         // Only a plain click on nothing needs to know what it missed.
@@ -6811,13 +6824,14 @@ impl Operandi {
             how,
             over_skipped_mesh,
         }) {
-            return;
+            return hit.is_some();
         }
         if hit.is_some() {
             // SL-03: Shortest Path Mode adds the path to a Shift+clicked element.
             self.shortest_path_after_click(mods.shift, mods.ctrl);
         }
         self.selection_status();
+        hit.is_some()
     }
     /// Every viewport selection click ends here (AR-23): the hit becomes
     /// a selection change in `click_select::resolve`, so a later selection
