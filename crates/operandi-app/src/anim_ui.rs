@@ -326,6 +326,14 @@ impl Operandi {
         for request in crate::form::rows::take_anim_requests() {
             self.execute(&request);
         }
+        // RG-24's one-off hint, and Compensation kept in the preferences.
+        if let Some(note) = self.editor.anim.note.take() {
+            self.status = note;
+        }
+        if self.editor.rig_compensation != self.undo_autosave.rig_compensation {
+            self.undo_autosave.rig_compensation = self.editor.rig_compensation;
+            self.save_undo_autosave();
+        }
         self.tick_playback(ctx);
         let requests = std::mem::take(&mut self.editor.anim.requests);
         for r in requests {
@@ -694,6 +702,10 @@ impl Operandi {
         let now = s.time.current;
         let at = self.editor.key_time();
         let state = |k: &ChannelKey| match s.animation.channels.get(k) {
+            // RG-04: a rig piece drives it, or it feeds one.
+            _ if operandi_core::rig::driven_by(s, k.item, &k.channel).is_some() => {
+                ChannelStatus::Driven
+            }
             Some(c) if !c.curve.is_empty() => {
                 if animation::is_pending(s, k) {
                     ChannelStatus::Edited

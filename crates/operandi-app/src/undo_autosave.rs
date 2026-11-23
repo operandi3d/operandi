@@ -41,6 +41,10 @@ pub struct UndoAutosavePreferences {
     /// preference (anim_switch.rs).
     #[serde(default, skip_serializing_if = "std::ops::Not::not")]
     pub animation_preview: bool,
+    /// RG-11: rig Compensation (Animate > Hierarchy > Compensation), kept
+    /// between sessions.
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub rig_compensation: bool,
 }
 impl Default for UndoAutosavePreferences {
     fn default() -> Self {
@@ -60,6 +64,7 @@ impl Default for UndoAutosavePreferences {
             // Provisional (AS-Q1).
             revisions: 5,
             animation_preview: false,
+            rig_compensation: false,
         }
     }
 }

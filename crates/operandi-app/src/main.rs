@@ -1216,6 +1216,7 @@ impl Operandi {
             undo_autosave::UndoAutosavePreferences::load(&app.environment.paths().undo_autosave());
         // The animation switch reads its preference before the layouts load.
         anim_switch::set_preference(app.undo_autosave.animation_preview);
+        app.editor.rig_compensation = app.undo_autosave.rig_compensation;
         app.view_presets = view_display::Presets::load(&app.environment.paths().viewport_presets());
         // Layouts (layouts.rs): the one open at quit, or the old layout
         // files read once as the Model layout.

@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "id": "menu.animate.constrain",
+  "label": "Constrain",
+  "style": "menu",
+  "controls": [
+    { "command": "operandi.rig.constrain kind:position", "label": "Position" },
+    { "command": "operandi.rig.constrain kind:rotation", "label": "Rotation" },
+    { "command": "operandi.rig.constrain kind:scale", "label": "Scale" },
+    { "command": "operandi.rig.constrain kind:transform", "label": "Transform" },
+    { "command": "operandi.rig.constrain kind:direction", "label": "Direction" },
+    { "command": "operandi.rig.constrain kind:distance", "label": "Distance" },
+    { "command": "operandi.rig.constrain kind:path", "label": "Path" },
+    { "command": "operandi.rig.constrain kind:pathPosition", "label": "Path Position" },
+    { "command": "operandi.rig.constrain kind:pathNormal", "label": "Path Normal" },
+    { "divider": "" },
+    { "command": "operandi.rig.constrain kind:position multiple:true", "label": "Position (multiple)" },
+    { "command": "operandi.rig.constrain kind:rotation multiple:true", "label": "Rotation (multiple)" },
+    { "command": "operandi.rig.constrain kind:direction multiple:true", "label": "Direction (multiple)" },
+    { "divider": "" },
+    { "form": "menu.animate.constrain.remove" }
+  ]
+}

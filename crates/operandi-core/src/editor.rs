@@ -713,6 +713,9 @@ pub struct Editor {
     /// The document's key time, channel/key selections and playback
     /// (animation.rs; per scene tab).
     pub anim: crate::animation::AnimSession,
+    /// RG-11/RG-30 Compensation: rig edits keep items where they are in
+    /// world space (off by default; the app keeps it in its preferences).
+    pub rig_compensation: bool,
     /// Undo and redo steps, shared: the editor is copied for every command
     /// (identity_editor.rs stages each one), and copying each step's two
     /// scenes made a command in a 100,000-item scene take seconds. Change a

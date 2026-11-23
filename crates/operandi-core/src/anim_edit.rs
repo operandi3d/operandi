@@ -252,7 +252,7 @@ impl Editor {
             return Err("Nothing to key".into());
         }
         for k in channels {
-            if self.scene.item(k.item).is_none() {
+            if !self.scene.owns_channels(k.item) {
                 return Err(format!("No item {}", k.item));
             }
             if animation::read(&self.scene, k).is_none()
@@ -345,7 +345,7 @@ impl Editor {
             .anim
             .selected_channels
             .iter()
-            .filter(|k| self.scene.item(k.item).is_some())
+            .filter(|k| self.scene.owns_channels(k.item))
             .cloned()
             .collect();
         if list.is_empty()

@@ -21,6 +21,8 @@ type Cached = Option<(u64, Arc<SceneGraph>)>;
 #[derive(Clone, Default)]
 pub struct EvalState {
     cache: Arc<Mutex<Cached>>,
+    /// Evaluated rig worlds, per item with what they read (rig_eval.rs).
+    rig: Arc<Mutex<crate::rig_eval::RigCache>>,
 }
 
 impl PartialEq for EvalState {
@@ -52,6 +54,16 @@ impl EvalState {
         g
     }
 
+    /// The rig's evaluated worlds for `scene` at its current time, items
+    /// whose inputs didn't change taken from the memo (RG-06).
+    pub fn rig(&self, scene: &Scene) -> crate::rig_eval::RigResult {
+        let mut cache = self.rig.lock().unwrap_or_else(|e| e.into_inner());
+        crate::rig_eval::evaluate_cached(scene, &mut cache)
+    }
+    /// Rig items computed so far (not taken from the memo).
+    pub fn rig_computed(&self) -> u64 {
+        self.rig.lock().unwrap_or_else(|e| e.into_inner()).computed
+    }
     /// Whether a graph for `scene`'s structure is cached (tests).
     pub fn cached_for(&self, scene: &Scene) -> bool {
         let key = structure(scene);

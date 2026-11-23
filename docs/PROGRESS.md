@@ -4414,3 +4414,9 @@ Design: docs/MATERIALX_GRAPHS.md (stages 1-5).
 - Gaps finished (branch graph-editor-resize): Box Scale, drop copies, box zoom, Speed view, envelope presets, Stacked wheel rows, overshoot hint, retime strip, In/Out slope pop-ups, Animation Editors; each a command with a bridge test.
 - GE-X7: 100 curves x 1,000 keys pans at 16.5 ms/frame (qa build probe `graph_editor_speed_probe`), just inside 60 fps; dense views draw the curve and only selected keys.
 - Provisional: GE-Q01..Q09 in SPECIFICATION_QUESTIONS.md.
+
+## 2026-11-23 — Rig phase 4, steps 1-4 (branch graph-editor-resize)
+
+- Rig pieces (constraints: Position, Rotation, Scale, Transform, Direction, Distance, Path, Path Position, Path Normal; Dynamic Parent) and pivots as scene data (native v62); unknown kinds load as missing and save back untouched.
+- Evaluation (RG-01..06): parent/dynamic parent → constraints on the world, loops refused (commands) or broken (files); results held by the engine with a per-item memo keyed on its actual inputs (only what's downstream of a change is evaluated, never stale). The evaluated scene shows them everywhere.
+- 16 `operandi.rig.*` commands + `operandi.rig.query`; Animate > Constrain and Hierarchy menus; Compensation pref; driven lights and greyed fields. Bridge tests replay RG-22/28/29/44. Provisional: RG-Q01..Q08.

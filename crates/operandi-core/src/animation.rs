@@ -70,7 +70,7 @@ pub const TRANSFORM_CHANNELS: [&str; 9] = [
     "pos.X", "pos.Y", "pos.Z", "rot.X", "rot.Y", "rot.Z", "scl.X", "scl.Y", "scl.Z",
 ];
 
-fn transform_part(name: &str) -> Option<(&str, usize)> {
+pub(crate) fn transform_part(name: &str) -> Option<(&str, usize)> {
     let (group, axis) = name.split_once('.')?;
     let group = ["pos", "rot", "scl"]
         .into_iter()
@@ -330,6 +330,9 @@ pub struct Animation {
         with = "shadow_list"
     )]
     pub shadows: BTreeMap<ChannelKey, Curve>,
+    /// Phase 4: rig pieces and pivots (rig.rs; saved, native v62).
+    #[serde(default, skip_serializing_if = "crate::rig::Rig::is_default")]
+    pub rig: crate::rig::Rig,
 }
 
 mod shadow_list {
@@ -506,6 +509,10 @@ impl Animation {
 /// transform axis, or a number, on/off, choice or colour component channel
 /// of its `item.channel` tables whose setter posing can apply.
 pub fn keyable(scene: &Scene, id: u64, name: &str) -> bool {
+    // Rig piece and pivot channels (rig.rs).
+    if let Some(v) = crate::rig::read(scene, id, name) {
+        return v.is_some();
+    }
     if transform_part(name).is_some() {
         return read(scene, &ChannelKey::new(id, name)).is_some();
     }
@@ -612,6 +619,9 @@ pub fn channel_of_command(scene: &Scene, command: &crate::Command) -> Option<(u6
 
 /// Every keyable channel of item `id`, transforms first.
 pub fn keyable_channels(scene: &Scene, id: u64) -> Vec<String> {
+    if let Some(piece) = scene.animation.rig.piece(id) {
+        return crate::rig::channel_names(piece);
+    }
     let Some(item) = scene.item(id) else {
         return Vec::new();
     };
@@ -669,6 +679,9 @@ pub fn default_value(scene: &Scene, key: &ChannelKey) -> f64 {
 /// The value channel `key` holds now (its field: the evaluated value plus
 /// any pending edit).
 pub fn read(scene: &Scene, key: &ChannelKey) -> Option<f64> {
+    if let Some(v) = crate::rig::read(scene, key.item, &key.channel) {
+        return v;
+    }
     let item = scene.item(key.item)?;
     if let Some((group, axis)) = transform_part(&key.channel) {
         if item.environment.is_some() {
@@ -710,6 +723,9 @@ fn split_component(name: &str) -> (&str, Option<usize>) {
 pub fn write(scene: &mut Scene, key: &ChannelKey, value: f64) -> Result<()> {
     if !value.is_finite() {
         return Err("Not a number".into());
+    }
+    if let Some(r) = crate::rig::write(scene, key.item, &key.channel, value) {
+        return r;
     }
     if let Some((group, axis)) = transform_part(&key.channel) {
         let item = scene.item_mut(key.item).ok_or("Missing item")?;
@@ -1066,6 +1082,11 @@ pub struct AnimSession {
     /// The running frame render or playblast: frames done, frames in all,
     /// the folder it writes to. The app keeps it current.
     pub progress: Option<(usize, usize, String)>,
+    /// A one-off message for the status line (the app takes it), e.g.
+    /// RG-24's Compensation hint.
+    pub note: Option<String>,
+    /// RG-24: the Compensation hint was shown this session.
+    pub warned_compensation: bool,
 }
 
 /// A side-effect job only the app can run (TL-70/71).
@@ -1168,7 +1189,7 @@ impl crate::Editor {
                 .animation
                 .channels
                 .keys()
-                .filter(|k| scene.item(k.item).is_none())
+                .filter(|k| !scene.owns_channels(k.item))
                 .cloned()
                 .collect();
             for k in gone {

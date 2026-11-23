@@ -3079,6 +3079,193 @@ pub static COMMANDS: &[Entry] = &[
         .quiet()
         .operandi()
         .example("operandi.anim.query frames:0,12,24"),
+    script("operandi.rig.query", Items, "Reads the rig pieces (all, or one item's) with their channels, inputs, outputs and state, and the item's evaluated world, driven channels and pivot, as JSON (UIC-163).")
+        .on_editor(
+            "Read rig pieces as JSON: id, kind, label, item, targets, refs, channels (name: value), missing, broken, inputs, outputs; with item, also its evaluated world (position, rotation XYZ radians, scale, axes), driven channels, whether it drives a piece, and its pivot.",
+            &[jopt("item", "integer", "Only this item's pieces, plus its evaluated world.")],
+            crate::rig_commands::run,
+        )
+        .query()
+        .quiet()
+        .operandi()
+        .example("operandi.rig.query"),
+    script("operandi.rig.compensation", Items, "Compensation (RG-11/RG-30): rig edits keep items where they are in world space.")
+        .on_editor(
+            "Turn Compensation on or off (on: toggle, true or false). Rig commands default to it.",
+            &[jopt("on", "string", "toggle (default), true or false.")],
+            crate::rig_commands::run,
+        )
+        .ui()
+        .operandi()
+        .example("operandi.rig.compensation on:true"),
+    script("operandi.rig.constrain", Items, "Applies a constraint (RG-26..46): the first picked item follows the others, or with multiple each item follows the last.")
+        .on_editor(
+            "Apply a constraint, one undo step. kind: position, rotation, scale, transform, direction, distance, path, pathPosition or pathNormal. items and targets as id lists (default the selection: first picked = item, the rest = targets; multiple:true = every item but the last gets its own constraint on the last). compensate keeps the item where it is (default Compensation).",
+            &[
+            jreq("kind", "string", "Constraint kind."),
+            jopt("items", "string", "Constrained item ids, comma separated."),
+            jopt("targets", "string", "Target item ids (curve items for paths), comma separated."),
+            jopt("multiple", "boolean", "Each item gets its own constraint on the last selected."),
+            jopt("compensate", "boolean", "Keep the item where it is (default Compensation)."),
+        ],
+            crate::rig_commands::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.rig.constrain kind:position items:3 targets:4"),
+    script("operandi.rig.unconstrain", Items, "Removes every constraint of one kind from the items (Shift+click, RG-27).")
+        .on_editor(
+            "Remove constraints of kind from items (default the selection), one undo step.",
+            &[
+            jreq("kind", "string", "Constraint kind."),
+            jopt("items", "string", "Item ids, comma separated."),
+        ],
+            crate::rig_commands::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.rig.unconstrain kind:position items:3"),
+    script("operandi.rig.remove", Items, "Deletes one rig piece and its keys.")
+        .on_editor(
+            "Delete a rig piece (its keys go too), one undo step; a dynamic parent with compensate keeps the item where it is.",
+            &[
+            jreq("piece", "integer", "Rig piece id."),
+            jopt("compensate", "boolean", "Keep the item where it is (default Compensation)."),
+        ],
+            crate::rig_commands::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.rig.remove piece:7"),
+    script("operandi.rig.set", Items, "Sets a rig piece's channel (Influence, a weight, Axis, Percent...).")
+        .on_editor(
+            "Set a channel of a rig piece, one undo step; Auto Key keys it as for any channel. Names as operandi.rig.query lists them (influence 0-1, weight.0, axis 0/1/2, roll radians, percent 0-1...).",
+            &[
+            jreq("piece", "integer", "Rig piece id."),
+            jreq("channel", "string", "Channel name."),
+            jreq("value", "number", "New value."),
+        ],
+            crate::rig_commands::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.rig.set piece:7 channel:influence value:0.5"),
+    script("operandi.rig.upVector", Items, "Assign Up Vector, Assign Axis Up Vector or Remove Up Vector on a direction constraint (RG-44).")
+        .on_editor(
+            "Up vector of a direction constraint: item (its position defines up), with axis X/Y/Z (that item's axis is up); no item removes it (back to the Up Vector channels). One undo step.",
+            &[
+            jreq("piece", "integer", "Direction constraint id."),
+            jopt("item", "integer", "Up item id; omit to remove."),
+            jopt("axis", "string", "X, Y or Z: use that item's axis."),
+        ],
+            crate::rig_commands::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.rig.upVector piece:7 item:5"),
+    script("operandi.rig.dynamicParentAdd", Items, "Add Parent (RG-20): the child gets a dynamic parent with these parents appended; the current parent becomes the last added.")
+        .on_editor(
+            "Add dynamic parents to item (default the selection: first picked = child, the rest = parents), one undo step. Index 0 is World. compensate keeps the child where it is.",
+            &[
+            jopt("item", "integer", "The child item id."),
+            jopt("parents", "string", "Parent item ids, comma separated."),
+            jopt("compensate", "boolean", "Keep the child where it is (default Compensation)."),
+        ],
+            crate::rig_commands::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.rig.dynamicParentAdd item:3 parents:4"),
+    script("operandi.rig.dynamicParentSet", Items, "Switches the dynamic parent (RG-21..24): 0 = World, n = the n-th parent.")
+        .on_editor(
+            "Set the dynamic parent index, one undo step. compensate rewrites the offsets so nothing jumps; key (default: when Parent is animated and Auto Key is on) keys the switch and its offsets, stepped.",
+            &[
+            jopt("item", "integer", "The child item id."),
+            jopt("piece", "integer", "Or the dynamic parent piece id."),
+            jreq("parent", "integer", "0 = World, 1.. = the parents in order."),
+            jopt("compensate", "boolean", "Keep the child where it is (default Compensation)."),
+            jopt("key", "boolean", "Key the switch and offsets now."),
+        ],
+            crate::rig_commands::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.rig.dynamicParentSet item:3 parent:0"),
+    script("operandi.rig.dynamicParentRemove", Items, "Remove Dynamic Parent (RG-25).")
+        .on_editor(
+            "Delete the item's dynamic parent, one undo step; compensate rewrites the item's own transform so it stays where it is now.",
+            &[
+            jopt("item", "integer", "The child item id (default the selection)."),
+            jopt("compensate", "boolean", "Keep the item where it is (default Compensation)."),
+        ],
+            crate::rig_commands::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.rig.dynamicParentRemove item:3"),
+    script("operandi.rig.parent", Items, "Parent (RG-11/12): the last picked item becomes the parent of the others.")
+        .on_editor(
+            "Parent items to parent (default the selection: the last picked is the parent), one undo step; compensate keeps them where they are.",
+            &[
+            jopt("items", "string", "Child item ids, comma separated."),
+            jopt("parent", "integer", "Parent item id."),
+            jopt("compensate", "boolean", "Keep them where they are (default Compensation)."),
+        ],
+            crate::rig_commands::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.rig.parent items:3 parent:4"),
+    script("operandi.rig.unparent", Items, "Unparent (RG-11): the items move to the scene root.")
+        .on_editor(
+            "Unparent items (default the selection), one undo step; compensate keeps them where they are.",
+            &[
+            jopt("items", "string", "Item ids, comma separated."),
+            jopt("compensate", "boolean", "Keep them where they are (default Compensation)."),
+        ],
+            crate::rig_commands::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.rig.unparent items:3"),
+    script("operandi.rig.insert", Items, "Insert (RG-12): the first item becomes the second's parent, in the second's old place.")
+        .on_editor(
+            "Insert item above child in the hierarchy, one undo step; compensate keeps them where they are.",
+            &[
+            jopt("item", "integer", "The new parent."),
+            jopt("child", "integer", "The item that goes under it."),
+            jopt("compensate", "boolean", "Keep them where they are (default Compensation)."),
+        ],
+            crate::rig_commands::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.rig.insert item:4 child:3"),
+    script("operandi.rig.extract", Items, "Extract (RG-12): the item leaves its chain; its children move up to its parent.")
+        .on_editor(
+            "Extract item from the hierarchy, one undo step; compensate keeps everything where it is.",
+            &[
+            jopt("item", "integer", "Item id (default the selection)."),
+            jopt("compensate", "boolean", "Keep them where they are (default Compensation)."),
+        ],
+            crate::rig_commands::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.rig.extract item:3"),
+    script("operandi.rig.pivot", Items, "Sets an item's pivot (RG-14); the item's position compensates so the geometry stays.")
+        .on_editor(
+            "Set the pivot position and/or rotation (x,y,z; metres and radians, in the item's space), one undo step; the geometry doesn't move.",
+            &[
+            jopt("item", "integer", "Item id (default the active item)."),
+            jopt("position", "string", "Pivot position x,y,z."),
+            jopt("rotation", "string", "Pivot rotation x,y,z (radians)."),
+        ],
+            crate::rig_commands::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.rig.pivot item:3 position:0,1,0"),
     script("operandi.eval.graph", Items, "Reads the scene's evaluation graph (who reads whom: time, channels, fields, transforms, shown meshes) as JSON nodes and edges (UIC-163; the Schematic's data).")
         .on_editor(
             "Read the evaluation graph as JSON: nodes (id, kind time/channel/field/transform/shownMesh, item, name, label, dirty) and edges [from, to] (to reads from). item limits it to one item's nodes and the edges touching them.",
@@ -6495,7 +6682,7 @@ mod tests {
                 assert!(!json.about.is_empty(), "{}", e.name);
             }
         }
-        assert_eq!(crate::command_exec::specs().count(), 228);
+        assert_eq!(crate::command_exec::specs().count(), 243);
     }
 
     #[test]

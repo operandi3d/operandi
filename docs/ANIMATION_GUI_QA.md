@@ -41,3 +41,12 @@ named "Operandi Animation". Each step also once typed in the command line.
 22. Retime on: click the strip to add marks, drag one: keys between marks stretch; right-click removes a mark.
 23. In ▾ / Out ▾ set slopes (Out greyed while unified). Presets ▾ ▸ Save Envelope…, then apply it to another channel.
 24. Animate menu ▸ Animation Editors: tall timeline plus the graph editor.
+
+## Rig phase 4, steps 1-4
+
+25. Select a cube, then a second one; Animate > Constrain > Position: the first jumps to the second (with Hierarchy > Compensation on it stays, then follows). One Cmd+Z removes it.
+26. Its Position fields grey with "Driven by Position Constraint"; the status lights show the driven state.
+27. Direction on a cone at a moving locator: it keeps aiming, no flips when the target passes straight overhead.
+28. Hierarchy > Add Parent (child first, then parent), move the parent: the child follows; switch to World with the operandi.rig.dynamicParentSet line: it stays put.
+29. Constrain A to B, then try B to A: "This would make B depend on itself", nothing changes.
+30. Path: a curve, then Constrain > Path; key Percent 0 → 1 over 120 frames: constant speed, facing along the curve.

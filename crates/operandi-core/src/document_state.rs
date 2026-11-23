@@ -123,6 +123,7 @@ fn every_field_is_sorted(e: Editor) {
         meshop_row: _,
         // Shared: settings and tool context that follow the user.
         action_context: _,
+        rig_compensation: _,
         symmetry: _,
         symmetry_resume: _,
         polygon_tag_kind: _,

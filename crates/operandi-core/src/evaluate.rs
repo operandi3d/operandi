@@ -39,16 +39,28 @@ pub enum Purpose {
 pub fn evaluate<'a>(
     scene: &'a Scene,
     meshops: &crate::meshops::Runtime,
+    eval: &crate::eval_state::EvalState,
     time: crate::time_tick::Tick,
     purpose: Purpose,
 ) -> Cow<'a, Scene> {
     // Time is an input from day one (AR-02); deformers and keys read it.
     let _ = time;
+    // Rig pieces first (RG-01; eval graph steps 4, 6): constrained and
+    // parented items at their evaluated worlds, for every purpose (a
+    // constrained item is picked where it shows). MeshOps links then read
+    // the rigged worlds.
+    let rigged = if scene.animation.rig.pieces.is_empty() {
+        None
+    } else {
+        crate::rig_eval::apply(scene, &eval.rig(scene))
+    };
+    let base = rigged.as_ref().unwrap_or(scene);
     let shown = match purpose {
-        Purpose::Display { base_edit } => meshops.display_scene(scene, base_edit),
-        Purpose::Final => meshops.result_scene(scene),
+        Purpose::Display { base_edit } => meshops.display_scene(base, base_edit),
+        Purpose::Final => meshops.result_scene(base),
         Purpose::Pick => None,
     };
+    let shown = shown.or(rigged);
     let shown = match purpose {
         Purpose::Pick => shown,
         _ => with_patches(shown.as_ref().unwrap_or(scene)).or(shown),
@@ -103,7 +115,13 @@ impl crate::Editor {
     /// The viewport, Cycles, export, the bridge and picking all read the
     /// shown scene through this.
     pub fn evaluated(&self, purpose: Purpose) -> Cow<'_, Scene> {
-        evaluate(&self.scene, &self.meshops, self.scene.time.current, purpose)
+        evaluate(
+            &self.scene,
+            &self.meshops,
+            &self.eval,
+            self.scene.time.current,
+            purpose,
+        )
     }
     /// What the viewport draws: `None` when it is the document scene.
     pub fn evaluated_display(&self) -> Option<Scene> {

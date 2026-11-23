@@ -193,3 +193,20 @@ fn the_eval_graph_query_lists_nodes_and_edges() {
             .all(|n| n["item"] == a)
     );
 }
+
+/// Rig pieces and parents are edges of the graph (Schematic data, RG-70).
+#[test]
+fn rig_pieces_and_parents_are_edges() {
+    let (mut e, a, b) = keyed();
+    ok(
+        &mut e,
+        &format!("operandi.rig.constrain kind:position items:{b} targets:{a}"),
+    );
+    let g = build(&e.scene);
+    let ta = g.id(&NodeKey::Transform(a)).unwrap();
+    let tb = g.id(&NodeKey::Transform(b)).unwrap();
+    assert!(g.inputs(tb).contains(&ta));
+    // a's keyed pos.Y reaches b through the constraint.
+    let y = g.id(&NodeKey::Channel(a, "pos.Y".into())).unwrap();
+    assert!(g.reaches(y, tb));
+}

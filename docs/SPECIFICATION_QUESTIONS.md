@@ -9654,3 +9654,14 @@ Built from BEHAVIOR-TOPOLOGY-PEN (2026-11-20) on branch topology-pen. These are 
 - GE-Q07 Shown curves: the selected channels; with none selected, the listed items' animated channels. Normalised and Stacked map each curve's key range; Isolate shows the first selected key's curve.
 - GE-Q08 Built 2026-11-22: Box Scale (GE-44), Ctrl+Shift+drag copies (GE-31), Ctrl+Alt+right-drag box zoom (GE-20), Speed view (GE-81), envelope presets (GE-83), Ctrl/Shift+wheel rows in Stacked (GE-82), clamped/overshoot hint (GE-X4), retime strip (GE-X5), In/Out slope pop-ups (GE-53), Animation Editors (GE-01).
 - GE-Q09 Provisional: Box Scale Ctrl+corner drag scales time and value together about the opposite corner (no warp). Envelope presets are `.openvelope` files in Presets/Envelopes, listed in the graph's Presets menu; not yet shown in the Preset Browser and no drag-drop onto the graph. Overshoot hint is a ring on keys whose curve passes beyond both neighbours. Retime marks live in the editor only (not saved).
+
+## Rig phase 4 (2026-11-23, branch graph-editor-resize)
+
+- RG-Q01 Rig pieces are scene data (`Animation::rig`, native v62), not items: they show in the Items list and Schematic later (§7); their channels key like any (`<piece id>:influence`). Provisional.
+- RG-Q02 The evaluated scene places each rigged item at its evaluated world as a root item (parent links are only in the document), so every reader (viewport, renders, export, picking) sees the rig. The transform gizmo still sits at the item's own (unconstrained) place. Provisional.
+- RG-Q03 RG-04 [OP]: a driven field greys with "Driven by <piece>" but still shows the item's own value, not the evaluated one. Provisional.
+- RG-Q04 RG-31 Affect X/Y/Z on rotations works on world XYZ Euler angles; Influence blends position and scale linearly and rotation by slerp. Provisional.
+- RG-Q05 Direction with Up parallel to the aim falls back to world +X (+Z when the aim lies along X); measured RG-44 cases hit exactly. Axis X aims X with Y towards up; Axis Y aims Y with Z towards up. Provisional.
+- RG-Q06 Path: Percent and Offset are fractions (1 = 100%); Wrap takes Percent modulo 100% (an exact lap lands on the end); smooth curves are sampled 24 steps per span for arc length. Provisional.
+- RG-Q07 Ctrl/Shift+click forms (RG-26/27) are menu entries for now ("… (multiple)", Constrain > Remove); the Rig toolbox tab with live Ctrl/Shift labels comes with the rest of the Rig UI. Selection pick order: the other selected items in order, the active item last.
+- RG-Q08 The "0 targets weigh nothing" and "Use Pivots" cases use the target's pivot point in its own space (`pivot.position`).

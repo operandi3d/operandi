@@ -318,7 +318,7 @@ impl Editor {
     /// GE-31: a key on `channel` at `t` with `value` (the curve's own value
     /// there when `None`).
     pub fn add_key_at(&mut self, channel: &ChannelKey, t: Tick, value: Option<f64>) -> Result<()> {
-        if self.scene.item(channel.item).is_none() {
+        if !self.scene.owns_channels(channel.item) {
             return Err(format!("No item {}", channel.item));
         }
         let now = animation::read(&self.scene, channel).ok_or("That channel has no value")?;

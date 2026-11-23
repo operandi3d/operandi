@@ -1,0 +1,508 @@
+//! Rig pieces (BEHAVIOR-RIG-PHASE4, RG-xx): constraints, dynamic parents
+//! and item pivots, as scene data.
+//!
+//! A piece controls one item (`item`) and reads others (`targets`). Its
+//! settings are channels (AR-07): numbers in `values` under names such as
+//! `influence`, `weight.0` or `offset.pos.X`, keyable like any channel
+//! (`ChannelKey { item: piece.id, channel }`; piece ids come from the
+//! scene's item id counter, so they never collide with items). Nothing a
+//! piece computes is stored here or on the item: the evaluated result
+//! lives in the engine (rig_eval.rs, eval_state.rs) and the item keeps its
+//! own channels (ACS-API-31).
+//!
+//! A piece of a kind this build doesn't know loads as "missing": it is kept
+//! and saved back untouched, and evaluates as if disabled (§8 Files).
+//!
+//! Pivots (RG-14) are kept here too, by item: rotation and scale happen
+//! around them (`Scene::local_matrix`).
+use glam::{DMat4, DQuat, DVec3};
+use serde::{Deserialize, Serialize};
+use std::collections::BTreeMap;
+
+/// The scene's rig: pieces in evaluation order per item, and pivots.
+#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct Rig {
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub pieces: Vec<Piece>,
+    /// Item pivots, by item id (saved as a list: JSON keys are text).
+    #[serde(
+        default,
+        skip_serializing_if = "BTreeMap::is_empty",
+        with = "pivot_list"
+    )]
+    pub pivots: BTreeMap<u64, Pivot>,
+}
+
+impl Rig {
+    pub fn is_default(&self) -> bool {
+        self.pieces.is_empty() && self.pivots.is_empty()
+    }
+    pub fn piece(&self, id: u64) -> Option<&Piece> {
+        self.pieces.iter().find(|p| p.id == id)
+    }
+    pub fn piece_mut(&mut self, id: u64) -> Option<&mut Piece> {
+        self.pieces.iter_mut().find(|p| p.id == id)
+    }
+    /// The pieces on `item`, in evaluation order.
+    pub fn on(&self, item: u64) -> impl Iterator<Item = &Piece> {
+        self.pieces.iter().filter(move |p| p.item == item)
+    }
+}
+
+/// An item's pivot: position and rotation (radians) in its parent's space,
+/// relative to the item's position.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct Pivot {
+    #[serde(default)]
+    pub position: DVec3,
+    #[serde(default)]
+    pub rotation: DVec3,
+}
+
+impl Pivot {
+    /// `local` with rotation and scale about the pivot:
+    /// T · P · Rp · (R · S) · Rp⁻¹ · P⁻¹, where `local` = T · R · S.
+    pub fn apply(&self, local: DMat4) -> DMat4 {
+        if *self == Pivot::default() {
+            return local;
+        }
+        let t = DMat4::from_translation(local.w_axis.truncate());
+        let rs = DMat4::from_cols(local.x_axis, local.y_axis, local.z_axis, glam::DVec4::W);
+        let p = DMat4::from_translation(self.position);
+        let rp = DMat4::from_quat(DQuat::from_euler(
+            glam::EulerRot::XYZ,
+            self.rotation.x,
+            self.rotation.y,
+            self.rotation.z,
+        ));
+        t * p * rp * rs * rp.inverse() * p.inverse()
+    }
+}
+
+/// One rig piece.
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub struct Piece {
+    pub id: u64,
+    /// `position`, `rotation`, `scale`, `transform`, `direction`,
+    /// `distance`, `path`, `pathPosition`, `pathNormal`, `dynamicParent`,
+    /// or a kind this build doesn't know (kept as missing).
+    pub kind: String,
+    /// The controlled item.
+    pub item: u64,
+    /// Items it reads, in order (targets; parents for a dynamic parent,
+    /// where index 0 is World and target `i` is parent index `i + 1`;
+    /// curves for a path).
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub targets: Vec<u64>,
+    /// Channel values that differ from the kind's defaults.
+    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
+    pub values: BTreeMap<String, f64>,
+    /// Item references other than targets (`upItem`).
+    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
+    pub refs: BTreeMap<String, u64>,
+    /// Fields a newer build wrote, saved back untouched.
+    #[serde(flatten)]
+    pub extra: serde_json::Map<String, serde_json::Value>,
+}
+
+/// The kinds this build evaluates.
+pub const KINDS: &[&str] = &[
+    "position",
+    "rotation",
+    "scale",
+    "transform",
+    "direction",
+    "distance",
+    "path",
+    "pathPosition",
+    "pathNormal",
+    "dynamicParent",
+];
+
+/// Constraint kinds (RG-26..46), in menu order.
+pub const CONSTRAINTS: &[&str] = &[
+    "position",
+    "rotation",
+    "scale",
+    "transform",
+    "direction",
+    "distance",
+    "path",
+    "pathPosition",
+    "pathNormal",
+];
+
+/// The kind's display name.
+pub fn label(kind: &str) -> String {
+    match kind {
+        "position" => "Position Constraint".into(),
+        "rotation" => "Rotation Constraint".into(),
+        "scale" => "Scale Constraint".into(),
+        "transform" => "Transform Constraint".into(),
+        "direction" => "Direction Constraint".into(),
+        "distance" => "Distance Constraint".into(),
+        "path" => "Path Constraint".into(),
+        "pathPosition" => "Path Position Constraint".into(),
+        "pathNormal" => "Path Normal Constraint".into(),
+        "dynamicParent" => "Dynamic Parent".into(),
+        other => format!("{other} (missing)"),
+    }
+}
+
+const XYZ: [&str; 3] = ["X", "Y", "Z"];
+
+/// A channel's default; `None` for a name the kind doesn't have. Weights
+/// (`weight.<n>`) default to 1 for every target.
+pub fn default_value(kind: &str, name: &str) -> Option<f64> {
+    let common = match name {
+        "enable" | "influence" => Some(1.),
+        "usePivots" => Some(0.),
+        _ => None,
+    };
+    if common.is_some() {
+        return common;
+    }
+    if let Some(axis) = name.strip_prefix("affect.") {
+        return XYZ.contains(&axis).then_some(1.);
+    }
+    if let Some(i) = name.strip_prefix("weight.") {
+        return i.parse::<usize>().ok().map(|_| 1.);
+    }
+    for (group, default) in [
+        ("offset.pos.", 0.),
+        ("offset.rot.", 0.),
+        ("offset.scl.", 1.),
+    ] {
+        if let Some(axis) = name.strip_prefix(group) {
+            return XYZ.contains(&axis).then_some(default);
+        }
+    }
+    let up = |axis: &str| match axis {
+        "Y" => Some(1.),
+        "X" | "Z" => Some(0.),
+        _ => None,
+    };
+    match (kind, name) {
+        ("direction" | "path" | "pathNormal", "axis") => Some(2.),
+        ("direction" | "path" | "pathNormal", "negative" | "roll") => Some(0.),
+        ("direction" | "path" | "pathNormal", n) if n.starts_with("up.") => {
+            n.strip_prefix("up.").and_then(up)
+        }
+        ("direction", "upAxis") => Some(-1.),
+        ("distance", "distance") => Some(1.),
+        ("distance", "clamp") => Some(0.),
+        ("path" | "pathPosition" | "pathNormal", "percent" | "pathOffset" | "wrap") => Some(0.),
+        ("path" | "pathNormal", "localUp") => Some(0.),
+        ("dynamicParent", "parent") => Some(0.),
+        _ => None,
+    }
+}
+
+/// The channel names a piece shows, in order: its own settings first,
+/// then a weight per target (RG-27: weights at the end).
+pub fn channel_names(piece: &Piece) -> Vec<String> {
+    let mut out: Vec<String> = vec!["enable".into()];
+    fn axes(group: &str) -> Vec<String> {
+        XYZ.iter().map(|a| format!("{group}{a}")).collect()
+    }
+    match piece.kind.as_str() {
+        "dynamicParent" => {
+            out.push("parent".into());
+            out.extend(axes("offset.pos."));
+            out.extend(axes("offset.rot."));
+            out.extend(axes("offset.scl."));
+            return out;
+        }
+        k if !KINDS.contains(&k) => return Vec::new(),
+        _ => {}
+    }
+    out.push("influence".into());
+    out.extend(axes("affect."));
+    out.push("usePivots".into());
+    match piece.kind.as_str() {
+        "position" | "distance" | "pathPosition" => out.extend(axes("offset.pos.")),
+        "rotation" | "direction" | "pathNormal" => out.extend(axes("offset.rot.")),
+        "scale" => out.extend(axes("offset.scl.")),
+        "transform" | "path" => {
+            out.extend(axes("offset.pos."));
+            out.extend(axes("offset.rot."));
+            out.extend(axes("offset.scl."));
+        }
+        _ => {}
+    }
+    match piece.kind.as_str() {
+        "direction" => {
+            out.extend(["axis", "negative", "roll"].map(String::from));
+            out.extend(axes("up."));
+            out.push("upAxis".into());
+        }
+        "distance" => out.extend(["distance", "clamp"].map(String::from)),
+        "path" | "pathNormal" | "pathPosition" => {
+            out.extend(["percent", "pathOffset", "wrap"].map(String::from));
+            if piece.kind != "pathPosition" {
+                out.extend(["axis", "negative", "roll"].map(String::from));
+                out.extend(axes("up."));
+                out.push("localUp".into());
+            }
+        }
+        _ => {}
+    }
+    out.extend((0..piece.targets.len()).map(|i| format!("weight.{i}")));
+    out
+}
+
+impl Piece {
+    pub fn new(id: u64, kind: &str, item: u64, targets: Vec<u64>) -> Piece {
+        Piece {
+            id,
+            kind: kind.into(),
+            item,
+            targets,
+            values: BTreeMap::new(),
+            refs: BTreeMap::new(),
+            extra: serde_json::Map::new(),
+        }
+    }
+    /// A kind this build doesn't know (§8 Files).
+    pub fn is_missing(&self) -> bool {
+        !KINDS.contains(&self.kind.as_str())
+    }
+    /// A channel's value (its default when not set); `None` for a name
+    /// the piece doesn't have.
+    pub fn get(&self, name: &str) -> Option<f64> {
+        if let Some(v) = self.values.get(name) {
+            return Some(*v);
+        }
+        if let Some(i) = name.strip_prefix("weight.") {
+            return i
+                .parse::<usize>()
+                .ok()
+                .filter(|i| *i < self.targets.len())
+                .map(|_| 1.);
+        }
+        default_value(&self.kind, name)
+    }
+    /// The value or 0 (for names known to exist).
+    pub fn num(&self, name: &str) -> f64 {
+        self.get(name).unwrap_or(0.)
+    }
+    pub fn flag(&self, name: &str) -> bool {
+        self.num(name) >= 0.5
+    }
+    pub fn vec3(&self, group: &str) -> DVec3 {
+        DVec3::new(
+            self.num(&format!("{group}X")),
+            self.num(&format!("{group}Y")),
+            self.num(&format!("{group}Z")),
+        )
+    }
+    /// Sets a channel, refusing names the piece doesn't have and values
+    /// out of range. A value equal to the default is dropped from
+    /// `values`, so files only carry what changed.
+    pub fn set(&mut self, name: &str, value: f64) -> Result<(), String> {
+        if !value.is_finite() {
+            return Err("Not a number".into());
+        }
+        if !channel_names(self).iter().any(|n| n == name) {
+            return Err(format!("{} has no channel {name}", label(&self.kind)));
+        }
+        let value = match name {
+            "enable" | "usePivots" | "negative" | "wrap" | "localUp" => {
+                if value >= 0.5 {
+                    1.
+                } else {
+                    0.
+                }
+            }
+            n if n.starts_with("affect.") => {
+                if value >= 0.5 {
+                    1.
+                } else {
+                    0.
+                }
+            }
+            "influence" => value.clamp(0., 1.),
+            "axis" => (value.round()).clamp(0., 2.),
+            "clamp" => (value.round()).clamp(0., 2.),
+            "upAxis" => (value.round()).clamp(-1., 2.),
+            "parent" => (value.round()).clamp(0., self.targets.len() as f64),
+            n if n.starts_with("weight.") => value.max(0.),
+            "distance" => value.max(0.),
+            _ => value,
+        };
+        if default_value(&self.kind, name) == Some(value)
+            || (name.starts_with("weight.") && value == 1.)
+        {
+            self.values.remove(name);
+        } else {
+            self.values.insert(name.into(), value);
+        }
+        Ok(())
+    }
+    /// The piece's offset as a matrix (position, rotation XYZ radians,
+    /// scale).
+    pub fn offset_matrix(&self) -> DMat4 {
+        let r = self.vec3("offset.rot.");
+        DMat4::from_scale_rotation_translation(
+            self.vec3("offset.scl."),
+            DQuat::from_euler(glam::EulerRot::XYZ, r.x, r.y, r.z),
+            self.vec3("offset.pos."),
+        )
+    }
+    /// Sets the offset channels from a matrix (compensation).
+    pub fn set_offset_matrix(&mut self, m: DMat4) {
+        let (s, q, t) = m.to_scale_rotation_translation();
+        let (rx, ry, rz) = q.to_euler(glam::EulerRot::XYZ);
+        for (i, a) in XYZ.iter().enumerate() {
+            let _ = self.set(&format!("offset.pos.{a}"), clean(t[i]));
+            let _ = self.set(&format!("offset.rot.{a}"), clean([rx, ry, rz][i]));
+            let _ = self.set(&format!("offset.scl.{a}"), clean(s[i]));
+        }
+    }
+}
+
+/// Rounds away float noise from a decomposition (1e-12).
+pub fn clean(v: f64) -> f64 {
+    let r = (v * 1e9).round() / 1e9;
+    if (r - v).abs() < 1e-12 { r } else { v }
+}
+
+/// Channel reads and writes for piece and pivot channels (animation.rs
+/// routes `ChannelKey`s here first). `None`: not a rig channel.
+pub fn read(scene: &crate::Scene, item: u64, name: &str) -> Option<Option<f64>> {
+    if let Some(piece) = scene.animation.rig.piece(item) {
+        return Some(piece.get(name));
+    }
+    let (group, axis) = pivot_part(name)?;
+    scene.item(item)?;
+    let p = scene
+        .animation
+        .rig
+        .pivots
+        .get(&item)
+        .copied()
+        .unwrap_or_default();
+    Some(Some(if group == "pos" {
+        p.position[axis]
+    } else {
+        p.rotation[axis]
+    }))
+}
+
+/// See [`read`]; `None` when not a rig channel.
+pub fn write(
+    scene: &mut crate::Scene,
+    item: u64,
+    name: &str,
+    value: f64,
+) -> Option<Result<(), String>> {
+    if let Some(piece) = scene.animation.rig.piece_mut(item) {
+        return Some(piece.set(name, value));
+    }
+    let (group, axis) = pivot_part(name)?;
+    scene.item(item)?;
+    let pivots = &mut scene.animation.rig.pivots;
+    let p = pivots.entry(item).or_default();
+    if group == "pos" {
+        p.position[axis] = value;
+    } else {
+        p.rotation[axis] = value;
+    }
+    if *p == Pivot::default() {
+        pivots.remove(&item);
+    }
+    Some(Ok(()))
+}
+
+/// `pivot.pos.X` → ("pos", 0).
+pub fn pivot_part(name: &str) -> Option<(&'static str, usize)> {
+    let rest = name.strip_prefix("pivot.")?;
+    let (group, axis) = rest.split_once('.')?;
+    let group = match group {
+        "pos" => "pos",
+        "rot" => "rot",
+        _ => return None,
+    };
+    Some((group, XYZ.iter().position(|a| *a == axis)?))
+}
+
+/// The pivot channels every item has (RG-14).
+pub const PIVOT_CHANNELS: [&str; 6] = [
+    "pivot.pos.X",
+    "pivot.pos.Y",
+    "pivot.pos.Z",
+    "pivot.rot.X",
+    "pivot.rot.Y",
+    "pivot.rot.Z",
+];
+
+/// Whether `name` on the item is driven by one of its enabled pieces
+/// (RG-04), and by which.
+pub fn driven_by<'a>(scene: &'a crate::Scene, item: u64, name: &str) -> Option<&'a Piece> {
+    let (group, axis) = crate::animation::transform_part(name)?;
+    scene.animation.rig.on(item).find(|p| {
+        !p.is_missing()
+            && p.flag("enable")
+            && match p.kind.as_str() {
+                "dynamicParent" | "transform" | "path" => true,
+                "position" | "distance" | "pathPosition" => group == "pos",
+                "rotation" | "direction" | "pathNormal" => group == "rot",
+                "scale" => group == "scl",
+                _ => false,
+            }
+            && (p.kind == "dynamicParent" || p.flag(&format!("affect.{}", XYZ[axis])))
+    })
+}
+
+/// Whether `item` feeds a piece (the driver light, RG-04).
+pub fn drives(scene: &crate::Scene, item: u64) -> bool {
+    scene
+        .animation
+        .rig
+        .pieces
+        .iter()
+        .any(|p| p.targets.contains(&item) || p.refs.values().any(|r| *r == item))
+}
+
+mod pivot_list {
+    use super::Pivot;
+    use glam::DVec3;
+    use serde::{Deserialize, Deserializer, Serialize, Serializer};
+    use std::collections::BTreeMap;
+
+    #[derive(Serialize, Deserialize)]
+    #[serde(deny_unknown_fields)]
+    struct Entry {
+        item: u64,
+        #[serde(default)]
+        position: DVec3,
+        #[serde(default)]
+        rotation: DVec3,
+    }
+    pub fn serialize<S: Serializer>(m: &BTreeMap<u64, Pivot>, s: S) -> Result<S::Ok, S::Error> {
+        m.iter()
+            .map(|(&item, p)| Entry {
+                item,
+                position: p.position,
+                rotation: p.rotation,
+            })
+            .collect::<Vec<_>>()
+            .serialize(s)
+    }
+    pub fn deserialize<'de, D: Deserializer<'de>>(d: D) -> Result<BTreeMap<u64, Pivot>, D::Error> {
+        Ok(Vec::<Entry>::deserialize(d)?
+            .into_iter()
+            .map(|e| {
+                (
+                    e.item,
+                    Pivot {
+                        position: e.position,
+                        rotation: e.rotation,
+                    },
+                )
+            })
+            .collect())
+    }
+}

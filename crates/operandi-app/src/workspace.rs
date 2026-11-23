@@ -632,6 +632,18 @@ impl Operandi {
             let driven = prefix == "rotation" && driven_rotation;
             for axis in 0..3 {
                 let key = format!("{prefix}{axis}");
+                // RG-04: a channel a rig piece drives greys, naming the piece.
+                let group = match prefix {
+                    "translation" => "pos",
+                    "rotation" => "rot",
+                    _ => "scl",
+                };
+                let rig_driver = operandi_core::rig::driven_by(
+                    &self.editor.scene,
+                    item.id,
+                    &format!("{group}.{}", ["X", "Y", "Z"][axis]),
+                )
+                .map(|p| format!("Driven by {}", operandi_core::rig::label(&p.kind)));
                 let current = channel(&item.transform, prefix, axis);
                 let mixed = selected
                     .iter()
@@ -641,7 +653,8 @@ impl Operandi {
                     crate::unavailable::unless(
                         !driven,
                         "Rotation follows the target or Physical Sun; turn that off to type it",
-                    ),
+                    )
+                    .or(rig_driver.as_deref()),
                     |ui| {
                         ui.horizontal(|ui| {
                             // UIC-110/112: filled once a channel leaves its

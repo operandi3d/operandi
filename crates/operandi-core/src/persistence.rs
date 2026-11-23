@@ -15,7 +15,13 @@ const MAX_LOAD_BYTES: u64 = 256 << 30;
 /// Newest native version this build reads and writes.
 // Version numbers: renumber here (and in the tests that name them) when
 // branches merge in another order.
-const CURRENT_VERSION: u32 = GRAPH_EDITOR_VERSION;
+const CURRENT_VERSION: u32 = RIG_VERSION;
+/// Version 62: rig pieces and pivots (`Animation::rig`, rig.rs). A v61
+/// build would refuse the unknown field.
+const RIG_VERSION: u32 = 62;
+fn has_v62_rig(scene: &Scene) -> bool {
+    !scene.animation.rig.is_default()
+}
 /// Version 61: graph editor data (curve behaviours, cycles, weighted or
 /// manual handles, shadows). A v60 build would refuse the unknown fields.
 const GRAPH_EDITOR_VERSION: u32 = 61;
@@ -570,7 +576,9 @@ fn encode_document(scene: &Scene, preset: Option<&crate::preset::PresetHeader>) 
     let data = serde_json::to_vec_pretty(&Document {
         format: "Operandi".into(),
         preset: preset.cloned(),
-        version: if has_v61_graph(scene) {
+        version: if has_v62_rig(scene) {
+            RIG_VERSION
+        } else if has_v61_graph(scene) {
             GRAPH_EDITOR_VERSION
         } else if has_v60_animation(scene) {
             ANIMATION_VERSION
@@ -731,6 +739,9 @@ fn decode_document(
     }
     if doc.version < RENDER_OUTPUTS_D_VERSION && has_v55_outputs(&doc.scene) {
         return Err("These Render Outputs require native version 55".into());
+    }
+    if doc.version < RIG_VERSION && has_v62_rig(&doc.scene) {
+        return Err("Rig pieces require native version 62".into());
     }
     if doc.version < GRAPH_EDITOR_VERSION && has_v61_graph(&doc.scene) {
         return Err("Graph editor animation requires native version 61".into());

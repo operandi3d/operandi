@@ -642,6 +642,61 @@ used in the app; `primitive_add` always starts from the Reset values.
   - `channels` (string): Only these channels, item:name,...
   - `item` (integer): Only this item's channels.
   - `frames` (string): Frames to read each curve at, comma separated.
+- **`operandi.rig.query`** — Read rig pieces as JSON: id, kind, label, item, targets, refs, channels (name: value), missing, broken, inputs, outputs; with item, also its evaluated world (position, rotation XYZ radians, scale, axes), driven channels, whether it drives a piece, and its pivot.
+  - `item` (integer): Only this item's pieces, plus its evaluated world.
+- **`operandi.rig.compensation`** — Turn Compensation on or off (on: toggle, true or false). Rig commands default to it.
+  - `on` (string): toggle (default), true or false.
+- **`operandi.rig.constrain`** — Apply a constraint, one undo step. kind: position, rotation, scale, transform, direction, distance, path, pathPosition or pathNormal. items and targets as id lists (default the selection: first picked = item, the rest = targets; multiple:true = every item but the last gets its own constraint on the last). compensate keeps the item where it is (default Compensation).
+  - `kind` (string, required): Constraint kind.
+  - `items` (string): Constrained item ids, comma separated.
+  - `targets` (string): Target item ids (curve items for paths), comma separated.
+  - `multiple` (boolean): Each item gets its own constraint on the last selected.
+  - `compensate` (boolean): Keep the item where it is (default Compensation).
+- **`operandi.rig.unconstrain`** — Remove constraints of kind from items (default the selection), one undo step.
+  - `kind` (string, required): Constraint kind.
+  - `items` (string): Item ids, comma separated.
+- **`operandi.rig.remove`** — Delete a rig piece (its keys go too), one undo step; a dynamic parent with compensate keeps the item where it is.
+  - `piece` (integer, required): Rig piece id.
+  - `compensate` (boolean): Keep the item where it is (default Compensation).
+- **`operandi.rig.set`** — Set a channel of a rig piece, one undo step; Auto Key keys it as for any channel. Names as operandi.rig.query lists them (influence 0-1, weight.0, axis 0/1/2, roll radians, percent 0-1...).
+  - `piece` (integer, required): Rig piece id.
+  - `channel` (string, required): Channel name.
+  - `value` (number, required): New value.
+- **`operandi.rig.upVector`** — Up vector of a direction constraint: item (its position defines up), with axis X/Y/Z (that item's axis is up); no item removes it (back to the Up Vector channels). One undo step.
+  - `piece` (integer, required): Direction constraint id.
+  - `item` (integer): Up item id; omit to remove.
+  - `axis` (string): X, Y or Z: use that item's axis.
+- **`operandi.rig.dynamicParentAdd`** — Add dynamic parents to item (default the selection: first picked = child, the rest = parents), one undo step. Index 0 is World. compensate keeps the child where it is.
+  - `item` (integer): The child item id.
+  - `parents` (string): Parent item ids, comma separated.
+  - `compensate` (boolean): Keep the child where it is (default Compensation).
+- **`operandi.rig.dynamicParentSet`** — Set the dynamic parent index, one undo step. compensate rewrites the offsets so nothing jumps; key (default: when Parent is animated and Auto Key is on) keys the switch and its offsets, stepped.
+  - `item` (integer): The child item id.
+  - `piece` (integer): Or the dynamic parent piece id.
+  - `parent` (integer, required): 0 = World, 1.. = the parents in order.
+  - `compensate` (boolean): Keep the child where it is (default Compensation).
+  - `key` (boolean): Key the switch and offsets now.
+- **`operandi.rig.dynamicParentRemove`** — Delete the item's dynamic parent, one undo step; compensate rewrites the item's own transform so it stays where it is now.
+  - `item` (integer): The child item id (default the selection).
+  - `compensate` (boolean): Keep the item where it is (default Compensation).
+- **`operandi.rig.parent`** — Parent items to parent (default the selection: the last picked is the parent), one undo step; compensate keeps them where they are.
+  - `items` (string): Child item ids, comma separated.
+  - `parent` (integer): Parent item id.
+  - `compensate` (boolean): Keep them where they are (default Compensation).
+- **`operandi.rig.unparent`** — Unparent items (default the selection), one undo step; compensate keeps them where they are.
+  - `items` (string): Item ids, comma separated.
+  - `compensate` (boolean): Keep them where they are (default Compensation).
+- **`operandi.rig.insert`** — Insert item above child in the hierarchy, one undo step; compensate keeps them where they are.
+  - `item` (integer): The new parent.
+  - `child` (integer): The item that goes under it.
+  - `compensate` (boolean): Keep them where they are (default Compensation).
+- **`operandi.rig.extract`** — Extract item from the hierarchy, one undo step; compensate keeps everything where it is.
+  - `item` (integer): Item id (default the selection).
+  - `compensate` (boolean): Keep them where they are (default Compensation).
+- **`operandi.rig.pivot`** — Set the pivot position and/or rotation (x,y,z; metres and radians, in the item's space), one undo step; the geometry doesn't move.
+  - `item` (integer): Item id (default the active item).
+  - `position` (string): Pivot position x,y,z.
+  - `rotation` (string): Pivot rotation x,y,z (radians).
 - **`operandi.eval.graph`** — Read the evaluation graph as JSON: nodes (id, kind time/channel/field/transform/shownMesh, item, name, label, dirty) and edges [from, to] (to reads from). item limits it to one item's nodes and the edges touching them.
   - `item` (integer): Only this item's nodes.
 - **`operandi.render.frameRange`** — Render frames start..end (default the current range) with Cycles into folder (default the project's renders/) as <name>_0000.png; needs the running app. operandi.anim.query reports progress (job).

@@ -62,6 +62,31 @@ pub fn build(scene: &Scene) -> SceneGraph {
             let _ = g.connect(field, transform);
         }
     }
+    // Parents and rig pieces (RG-01): a transform reads its parent's and
+    // its pieces' targets'; a piece's animated channels feed it too.
+    for item in &scene.items {
+        if let Some(parent) = item.parent {
+            let theirs = g.node(NodeKey::Transform(parent));
+            let mine = g.node(NodeKey::Transform(item.id));
+            let _ = g.connect(theirs, mine);
+        }
+    }
+    for p in &scene.animation.rig.pieces {
+        if p.is_missing() {
+            continue;
+        }
+        let mine = g.node(NodeKey::Transform(p.item));
+        for &t in p.targets.iter().chain(p.refs.values()) {
+            let theirs = g.node(NodeKey::Transform(t));
+            // A loop (a loaded one; commands refuse them) is left out.
+            let _ = g.connect(theirs, mine);
+        }
+        for name in crate::rig::channel_names(p) {
+            if let Some(field) = g.id(&NodeKey::Field(p.id, name)) {
+                let _ = g.connect(field, mine);
+            }
+        }
+    }
     for item in &scene.items {
         let Some(stack) = &item.mesh_ops else {
             continue;
@@ -97,6 +122,16 @@ pub fn structure(scene: &Scene) -> u64 {
         key.channel.hash(&mut h);
         channel.curve.is_empty().hash(&mut h);
         time_dependent(&channel.curve).hash(&mut h);
+    }
+    for item in &scene.items {
+        item.parent.hash(&mut h);
+    }
+    for p in &scene.animation.rig.pieces {
+        p.id.hash(&mut h);
+        p.kind.hash(&mut h);
+        p.item.hash(&mut h);
+        p.targets.hash(&mut h);
+        p.refs.hash(&mut h);
     }
     for item in &scene.items {
         if let Some(stack) = &item.mesh_ops {
