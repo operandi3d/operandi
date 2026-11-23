@@ -1,7 +1,8 @@
 //! LXO import, phase 1 (spec `lxo-import-phase1-2026-11-05`): the modelling
 //! content of a Modo scene file. Mesh items and names, points, polygons and
 //! polygon types, material and part tags, UV maps, subdivision edge
-//! weights, item transforms, parenting and visibility. Everything else
+//! weights, item transforms, parenting and visibility; locators, group
+//! locators and mesh instances with them (LXO-AN-Q01..Q03). Everything else
 //! (cameras, lights, shader tree, envelopes, actions, animation) is skipped
 //! without failing.
 //!
@@ -290,6 +291,15 @@ fn geometry(
                 _ => None,
             };
             layer.latest.clear();
+            if representation.is_none() {
+                // Curves (BCRV, CURV, BEZR), text, bones and other types
+                // don't share the face record layout (a B-spline curve
+                // stores more after its count), so their records aren't
+                // parsed: the whole chunk is skipped and named in the
+                // report, and its PTAGs find no polygons.
+                skip(format!("POLS.{}", String::from_utf8_lossy(&kind)));
+                return Ok(());
+            }
             while !r.done() {
                 c.check("polygons")?;
                 let n = (r.u16()? & 0x3ff) as usize;
@@ -437,6 +447,97 @@ fn pivot_note(mesh: &str, pivot: DVec3) -> Option<String> {
     super::convert::layer_pivot_note(mesh, pivot.to_array())
 }
 
+/// Item kinds imported as scene items. Modo's locators and group
+/// locators become Group Locators, Operandi's one transform-only item
+/// (provisional, LXO-AN-Q01); a mesh instance becomes a Mesh Instance.
+fn scene_kind(kind: &str) -> bool {
+    matches!(kind, "mesh" | "locator" | "groupLocator" | "meshInst")
+}
+
+/// An item's transform from its stack of transform items. Each of
+/// position, rotation and scale is read from the stack's main ("core")
+/// item of that kind; other transforms in the stack (zeroed transforms,
+/// shear) are left out, with a note when they aren't identity
+/// (provisional, LXO-AN-Q02).
+fn item_transform(stack: &[(u32, &RawItem)], report: &mut Report) -> Transform {
+    let mut transform = Transform {
+        zxy: true,
+        order: None,
+        ..Default::default()
+    };
+    for kind in ["translation", "rotation", "scale"] {
+        let all: Vec<&RawItem> = stack
+            .iter()
+            .map(|(_, t)| *t)
+            .filter(|t| t.kind == kind)
+            .collect();
+        let Some(main) = all
+            .iter()
+            .find(|t| text(t, "type") == Some("core"))
+            .or(all.first())
+            .copied()
+        else {
+            continue;
+        };
+        let (base, default) = match kind {
+            "translation" => ("pos", 0.),
+            "rotation" => ("rot", 0.),
+            _ => ("scl", 1.),
+        };
+        let read = |t: &RawItem| {
+            DVec3::new(
+                number(t, &format!("{base}.X")).unwrap_or(default),
+                number(t, &format!("{base}.Y")).unwrap_or(default),
+                number(t, &format!("{base}.Z")).unwrap_or(default),
+            )
+        };
+        for other in all.iter().filter(|t| !std::ptr::eq(**t, main)) {
+            if (read(other) - DVec3::splat(default)).abs().max_element() > 1e-9 {
+                report.omit(format!("extra {kind} transforms not combined"));
+            }
+        }
+        let v = read(main);
+        match base {
+            "pos" => transform.translation = v,
+            "rot" => {
+                transform.rotation = v;
+                match text(main, "order").and_then(rotation_order) {
+                    Some(order) => transform.set_rotation_order(order),
+                    None if text(main, "order").is_some() => {
+                        report.omit("unknown rotation orders (read as ZXY)")
+                    }
+                    None => {}
+                }
+            }
+            _ => transform.scale = v,
+        }
+    }
+    let sheared = stack.iter().any(|(_, t)| {
+        t.kind == "shear"
+            && ["shearXY", "shearXZ", "shearYZ"]
+                .iter()
+                .any(|k| number(t, k).is_some_and(|v| v.abs() > 1e-6))
+    });
+    if sheared {
+        report.omit("shear transforms not imported");
+    }
+    transform
+}
+
+/// A Modo rotation order word (`zxy`).
+fn rotation_order(word: &str) -> Option<crate::scene::RotationOrder> {
+    use crate::scene::RotationOrder as R;
+    Some(match word {
+        "xyz" => R::Xyz,
+        "xzy" => R::Xzy,
+        "yxz" => R::Yxz,
+        "yzx" => R::Yzx,
+        "zxy" => R::Zxy,
+        "zyx" => R::Zyx,
+        _ => return None,
+    })
+}
+
 fn scene(
     layers: Vec<Layer>,
     items: BTreeMap<u32, RawItem>,
@@ -461,78 +562,76 @@ fn scene(
             _ => report.omit("mesh layers without a mesh item"),
         }
     }
-    // Transform items by the item they move (LINK graph xfrmCore).
-    let mut stacks: BTreeMap<u32, Vec<&RawItem>> = BTreeMap::new();
+    // Transform items by the item they move (LINK graph xfrmCore), in
+    // stack order.
+    let mut stacks: BTreeMap<u32, Vec<(u32, &RawItem)>> = BTreeMap::new();
     for item in items.values() {
-        if !matches!(item.kind.as_str(), "translation" | "rotation" | "scale") {
+        if !matches!(
+            item.kind.as_str(),
+            "translation" | "rotation" | "scale" | "shear"
+        ) {
             continue;
         }
-        for (graph, target, _) in &item.links {
+        for (graph, target, ordinal) in &item.links {
             if graph == "xfrmCore" {
-                stacks.entry(*target).or_default().push(item);
+                stacks.entry(*target).or_default().push((*ordinal, item));
             }
         }
+    }
+    for stack in stacks.values_mut() {
+        stack.sort_by_key(|(ordinal, _)| *ordinal);
     }
     let skipped: BTreeSet<&str> = items
         .values()
         .map(|i| i.kind.as_str())
-        .filter(|k| !matches!(*k, "mesh" | "translation" | "rotation" | "scale"))
+        .filter(|k| !scene_kind(k) && !matches!(*k, "translation" | "rotation" | "scale" | "shear"))
         .collect();
     for kind in skipped {
         report.omit(format!("{kind} items (not modelling)"));
     }
     let mut scene = Scene::default();
-    let meshes: Vec<u32> = items
+    let imported: Vec<u32> = items
         .iter()
-        .filter(|(_, i)| i.kind == "mesh")
+        .filter(|(_, i)| scene_kind(&i.kind))
         .map(|(&id, _)| id)
         .collect();
-    for &id in &meshes {
+    let mut locators = 0usize;
+    for &id in &imported {
         c.check("scene conversion")?;
         let item = &items[&id];
-        let layer = by_item.remove(&id).unwrap_or_default();
-        let mut transform = Transform {
-            zxy: true,
-            order: None,
-            ..Default::default()
-        };
-        for t in stacks.get(&id).into_iter().flatten() {
-            let (base, default) = match t.kind.as_str() {
-                "translation" => ("pos", 0.),
-                "rotation" => ("rot", 0.),
-                _ => ("scl", 1.),
-            };
-            let v = DVec3::new(
-                number(t, &format!("{base}.X")).unwrap_or(default),
-                number(t, &format!("{base}.Y")).unwrap_or(default),
-                number(t, &format!("{base}.Z")).unwrap_or(default),
-            );
-            match base {
-                "pos" => transform.translation = v,
-                "rot" => {
-                    transform.rotation = v;
-                    if text(t, "order").is_some_and(|o| o != "zxy") {
-                        report.omit("rotation orders other than ZXY (read as ZXY)");
-                    }
-                }
-                _ => transform.scale = v,
-            }
-        }
-        let visible = match text(item, "visible") {
-            None | Some("default") => true,
-            Some("off") => false,
+        let transform = item_transform(stacks.get(&id).map_or(&[][..], |s| s), &mut report);
+        // `allOff` hides the item and everything under it (GV-01).
+        let (visible, hides_children) = match text(item, "visible") {
+            None | Some("default") => (true, false),
+            Some("off") => (false, false),
+            Some("allOff") => (false, true),
             Some(_) => {
                 report.omit("visibility values other than default and off (imported visible)");
-                true
+                (true, false)
             }
         };
         let parent = item
             .links
             .iter()
             .find(|(graph, target, _)| {
-                graph == "parent" && items.get(target).is_some_and(|i| i.kind == "mesh")
+                graph == "parent" && items.get(target).is_some_and(|i| scene_kind(&i.kind))
             })
             .map(|(_, target, _)| u64::from(*target) + 1);
+        // A Mesh Instance shows the mesh its `source` link names.
+        let instance_of = (item.kind == "meshInst")
+            .then(|| {
+                item.links
+                    .iter()
+                    .find(|(graph, target, _)| {
+                        graph == "source" && items.get(target).is_some_and(|i| i.kind == "mesh")
+                    })
+                    .map(|(_, target, _)| u64::from(*target) + 1)
+            })
+            .flatten();
+        let locator = matches!(item.kind.as_str(), "locator" | "groupLocator")
+            .then_some(crate::locator::LocatorKind::Group);
+        locators += usize::from(locator.is_some());
+        let layer = by_item.remove(&id).unwrap_or_default();
         let name = if item.name.is_empty() {
             item.visible_name
                 .clone()
@@ -540,8 +639,17 @@ fn scene(
         } else {
             item.name.clone()
         };
-        report.notes.extend(pivot_note(&name, layer.pivot));
-        let mesh = build_mesh(layer)?;
+        let mesh = if item.kind == "mesh" {
+            report.notes.extend(pivot_note(&name, layer.pivot));
+            let (mesh, notes) = build_mesh(layer, &name)?;
+            report.notes.extend(notes);
+            mesh
+        } else {
+            if item.kind == "meshInst" && instance_of.is_none() {
+                report.omit("mesh instances without a source mesh (imported empty)");
+            }
+            Mesh::default()
+        };
         scene.items.push(Item {
             id: u64::from(id) + 1,
             name,
@@ -552,14 +660,14 @@ fn scene(
             camera: None,
             light: None,
             texture: None,
-            locator: None,
+            locator,
             environment: None,
             common: Default::default(),
             elements: Default::default(),
-            hides_children: false,
+            hides_children,
             mesh_ops: None,
             kit: None,
-            instance_of: None,
+            instance_of,
             replicator: None,
             visible,
             parent,
@@ -578,7 +686,8 @@ fn scene(
             layer.name.clone()
         };
         report.notes.extend(pivot_note(&name, layer.pivot));
-        let mesh = build_mesh(layer)?;
+        let (mesh, note) = build_mesh(layer, &name)?;
+        report.notes.extend(note);
         scene.items.push(Item {
             id: next,
             name,
@@ -608,7 +717,13 @@ fn scene(
             mesh: mesh.into(),
         });
     }
-    // A parent link to a mesh that isn't imported (or a cycle) drops the link.
+    if locators > 0 {
+        report.notes.push(format!(
+            "{locators} locators and group locators imported as Group Locators"
+        ));
+    }
+    scene.sync_instances(None);
+    // A parent link to an item that isn't imported (or a cycle) drops the link.
     let ids: BTreeSet<u64> = scene.items.iter().map(|i| i.id).collect();
     for i in 0..scene.items.len() {
         let mut seen = BTreeSet::new();
@@ -640,7 +755,11 @@ fn scene(
     let mut uv = Vec::new();
     let mut materials = BTreeSet::new();
     let mut parts = BTreeSet::new();
-    for item in &scene.items {
+    for item in scene
+        .items
+        .iter()
+        .filter(|i| i.is_mesh() && i.instance_of.is_none())
+    {
         report.meshes += 1;
         report.points += item.mesh.vertices.len();
         report.polygons += item.mesh.faces.len();
@@ -669,7 +788,8 @@ fn scene(
     Ok(Candidate { scene, report })
 }
 
-fn build_mesh(layer: Layer) -> Result<Mesh> {
+/// Builds one layer's mesh, with notes on what was dropped or marked.
+fn build_mesh(layer: Layer, name: &str) -> Result<(Mesh, Vec<String>)> {
     let mut mesh = Mesh {
         vertices: layer.points,
         faces: layer.faces.into(),
@@ -708,17 +828,39 @@ fn build_mesh(layer: Layer) -> Result<Mesh> {
     {
         mesh.attributes.representations = layer.representations;
     }
+    // Edge weights are kept only on polygon edges. Modo also stores them
+    // on edges no polygon has (curve spans, edges of deleted polygons,
+    // a point paired with itself); those have nothing to crease.
+    let edges: BTreeSet<(u32, u32)> = if layer.creases.is_empty() {
+        BTreeSet::new()
+    } else {
+        mesh.edges().into_iter().collect()
+    };
+    let mut stray = 0usize;
     mesh.attributes.creases = layer
         .creases
         .into_iter()
         .filter(|&(_, w)| w != 0.)
+        .filter(|&(edge, w)| {
+            let keep = w.is_finite() && edges.contains(&edge);
+            stray += usize::from(!keep);
+            keep
+        })
         .map(|((a, b), weight)| MeshCrease { a, b, weight })
         .collect();
-    mesh.validate().map_err(|e| {
+    // Modo keeps zero-area polygons and non-manifold edges; so does
+    // Operandi, marked the way every other importer marks them.
+    let mut notes = Vec::new();
+    if stray > 0 {
+        notes.push(format!(
+            "{name}: {stray} edge weights on edges no polygon has were not imported"
+        ));
+    }
+    crate::interchange::finish_mesh(&mut mesh, name, &mut notes).map_err(|e| {
         err(
             "invalid_mesh",
             &format!("A mesh could not be imported: {e}"),
         )
     })?;
-    Ok(mesh)
+    Ok((mesh, notes))
 }
