@@ -167,3 +167,23 @@ fn sk20_the_bind_dialog_runs_one_bind_line() {
 fn skeleton_tool_ui_bind_line(d: &form::Dialog) -> String {
     crate::bind_dialog_ui::bind_line(&d.values)
 }
+
+#[test]
+fn sk40_selecting_a_bound_joint_selects_its_map() {
+    let (mut a, mesh) = rigged();
+    a.execute("operandi.anim.setup on:true");
+    a.execute(
+        &crate::bind_dialog_ui::bind_line(&a.form_dialog("Bind", Vec::new()).values)
+            .replace("type:heat", "type:distance"),
+    );
+    assert!(
+        operandi_core::skin_commands::skin_op(&a.editor.scene, mesh).is_ok(),
+        "{}",
+        a.status
+    );
+    let root = joints(&a)[0];
+    a.editor.scene.select_item(Some(root));
+    a.joint_selects_its_map();
+    let (_, map) = operandi_core::skin_weights::map_for_joint(&a.editor.scene, root).unwrap();
+    assert_eq!(a.editor.selected_weight_map.as_deref(), Some(map.as_str()));
+}

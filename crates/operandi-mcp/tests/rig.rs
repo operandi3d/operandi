@@ -385,3 +385,123 @@ fn sk02_sk22_sk30_bind_through_the_bridge() {
         assert!((total - 1.).abs() < 1e-6, "point {p}: {w}");
     }
 }
+
+fn weight(b: &mut Bridge, args: Value) -> Value {
+    let out = call(
+        b,
+        "command_run",
+        json!({"command": "operandi.weight.query", "args": args}),
+    )
+    .unwrap();
+    serde_json::from_str(out["value"].as_str().unwrap()).unwrap()
+}
+
+/// SK-33 through the bridge: 50/50 shoulder/forearm, forearm turned 90°
+/// about Z at the elbow (the origin): Linear halves the move, Dual
+/// Quaternion turns the point 45° keeping its distance. SK-43: weights
+/// written with normalize keep the skin's totals at 100%.
+#[test]
+fn sk33_sk43_skin_maths_and_weights_through_the_bridge() {
+    let mut b = Bridge::new();
+    let mesh = cube(&mut b, [0., 0., 0.]);
+    run(
+        &mut b,
+        "operandi.skel.add",
+        json!({"position": [-0.3, 0, 0], "preserveAlignment": true, "name": "Shoulder"}),
+    );
+    let shoulder = skel(&mut b, json!({}))["joints"][0]["id"].as_u64().unwrap();
+    run(
+        &mut b,
+        "operandi.skel.add",
+        json!({"position": [0, 0, 0], "parent": shoulder, "preserveAlignment": true, "name": "Elbow"}),
+    );
+    let elbow = skel(&mut b, json!({}))["joints"][1]["id"].as_u64().unwrap();
+    run(&mut b, "operandi.anim.setup", json!({"on": "true"}));
+    run(
+        &mut b,
+        "operandi.skin.bind",
+        json!({"items": mesh.to_string(), "root": shoulder, "type": "rigid"}),
+    );
+    run(&mut b, "operandi.anim.setup", json!({"on": "false"}));
+    let all: Vec<u32> = (0..8).collect();
+    let points = all.iter().map(u32::to_string).collect::<Vec<_>>().join(",");
+    for map in ["Shoulder1", "Elbow1"] {
+        run(
+            &mut b,
+            "operandi.weight.set",
+            json!({"item": mesh, "map": map, "points": points, "value": 0.5}),
+        );
+    }
+    run(
+        &mut b,
+        "transform.channel",
+        json!({"name": "rot.Z", "value": std::f64::consts::FRAC_PI_2, "item": elbow}),
+    );
+    let at = |b: &mut Bridge| {
+        let q = skin(b, json!({"item": mesh, "vertex": 0}));
+        let get = |k: &str| -> [f64; 3] {
+            let v = &q[k];
+            [0, 1, 2].map(|i| v[i].as_f64().unwrap())
+        };
+        (get("rest"), get("position"))
+    };
+    let (r, p) = at(&mut b);
+    let turned = [-r[1], r[0], r[2]];
+    near(
+        &json!(p),
+        [(r[0] + turned[0]) / 2., (r[1] + turned[1]) / 2., r[2]],
+    );
+    run(
+        &mut b,
+        "operandi.skin.set",
+        json!({"item": mesh, "interpolation": "dualQuaternion"}),
+    );
+    let (r, p) = at(&mut b);
+    let c = std::f64::consts::FRAC_1_SQRT_2;
+    near(&json!(p), [c * r[0] - c * r[1], c * r[0] + c * r[1], r[2]]);
+    // SK-43.
+    run(
+        &mut b,
+        "operandi.weight.set",
+        json!({"item": mesh, "map": "Elbow1", "points": "3", "value": 0.8, "normalize": true}),
+    );
+    let w = weight(&mut b, json!({"item": mesh, "vertex": 3}));
+    assert!((w["total"].as_f64().unwrap() - 1.).abs() < 1e-9, "{w}");
+}
+
+/// Mirror and transfer round trip: mirrored weights match, and a copy
+/// takes them back by transfer.
+#[test]
+fn mirror_and_transfer_through_the_bridge() {
+    let mut b = Bridge::new();
+    let mesh = cube(&mut b, [0., 0., 0.]);
+    run(&mut b, "operandi.skel.add", json!({"position": [0, 0, 0]}));
+    let root = skel(&mut b, json!({}))["joints"][0]["id"].as_u64().unwrap();
+    run(
+        &mut b,
+        "operandi.skel.add",
+        json!({"position": [0.3, 0, 0], "parent": root, "symmetry": "X"}),
+    );
+    run(&mut b, "operandi.anim.setup", json!({"on": "true"}));
+    run(
+        &mut b,
+        "operandi.skin.bind",
+        json!({"items": mesh.to_string(), "root": root, "type": "distance"}),
+    );
+    let before = weight(&mut b, json!({"item": mesh, "map": "Joint1_R"}))["values"].clone();
+    run(&mut b, "operandi.weight.mirror", json!({"item": mesh}));
+    assert_eq!(
+        weight(&mut b, json!({"item": mesh, "map": "Joint1_R"}))["values"],
+        before
+    );
+    let copy = cube(&mut b, [0., 0., 0.]);
+    run(
+        &mut b,
+        "operandi.weight.transfer",
+        json!({"item": copy, "from": mesh}),
+    );
+    assert_eq!(
+        weight(&mut b, json!({"item": copy, "map": "Joint1_R"}))["values"],
+        before
+    );
+}

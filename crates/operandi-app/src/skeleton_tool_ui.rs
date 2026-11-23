@@ -43,6 +43,8 @@ pub(crate) struct SkeletonTool {
     pub(crate) current: Option<u64>,
     /// The open Bind dialog (bind_dialog_ui.rs).
     pub(crate) bind: Option<form::Dialog>,
+    /// The item selected last frame, for SK-40.
+    pub(crate) seen: Option<u64>,
 }
 
 impl Default for SkeletonTool {
@@ -63,6 +65,7 @@ impl Default for SkeletonTool {
             preserve: false,
             current: None,
             bind: None,
+            seen: None,
         }
     }
 }
@@ -340,9 +343,26 @@ impl Operandi {
         }
     }
 
+    /// SK-40: selecting a bound joint selects its weight map, so the
+    /// Vertex Map Tools paint it and Vertex Map shading shows it.
+    pub(super) fn joint_selects_its_map(&mut self) {
+        let now = self.editor.scene.selection.item;
+        if now == self.skeleton.seen {
+            return;
+        }
+        self.skeleton.seen = now;
+        if let Some(j) = now
+            && let Some((_, map)) =
+                operandi_core::skin_weights::map_for_joint(&self.editor.scene, j)
+        {
+            self.editor.selected_weight_map = Some(map);
+        }
+    }
+
     /// The Skeleton tool's options (SK-12..16), while it is on.
     pub(super) fn skeleton_window(&mut self, ctx: &Context) {
         self.bind_dialog(ctx);
+        self.joint_selects_its_map();
         if !self.skeleton_active() {
             return;
         }

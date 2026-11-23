@@ -1728,6 +1728,30 @@ impl Operandi {
                     self.execute("operandi.skin.bindDialog");
                 }
             }
+            // SK-42: the weight tools on the selected map (text menu until
+            // icons).
+            let weights = ui
+                .button("Weights")
+                .on_hover_text("Weight tools for the selected weight map (a joint's, once bound)");
+            let mut weight_lines: Vec<&str> = Vec::new();
+            egui::Popup::menu(&weights).show(|ui| {
+                for (label, line) in [
+                    ("Isolate Weights", "operandi.weight.isolate"),
+                    ("Smooth Selected", "operandi.weight.smooth"),
+                    ("Normalize Weights", "operandi.weight.normalize"),
+                    ("Mirror Weights", "operandi.weight.mirror"),
+                    ("Split Left/Right", "operandi.weight.split"),
+                    ("Bake Weights", "operandi.skin.bakeWeights"),
+                ] {
+                    if ui.button(label).on_hover_text(line).clicked() {
+                        weight_lines.push(line);
+                        ui.close();
+                    }
+                }
+            });
+            for l in weight_lines {
+                self.execute(l);
+            }
             // Rig phase 4: Constrain and Hierarchy pop-ups (the Animate
             // menu's), Channel Links, Schematic and Bake Selected.
             let constrain = self.tbi(
