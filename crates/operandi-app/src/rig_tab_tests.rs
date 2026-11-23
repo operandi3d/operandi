@@ -1,5 +1,5 @@
 //! The Rig tab (UIC-190..201): every button names a command, the tab shows
-//! in the Animate layout, and it draws.
+//! in the Setup and Game tool sets, and it draws.
 use super::*;
 
 fn lines(v: &serde_json::Value, out: &mut Vec<String>) {
@@ -37,20 +37,26 @@ fn uic221_every_rig_tab_button_names_a_command() {
 }
 
 #[test]
-fn the_rig_tab_shows_in_the_animate_layout_and_draws() {
+fn the_rig_tab_shows_in_the_setup_and_game_sets_and_draws() {
+    use toolbox::{Category, ToolSet};
     crate::anim_switch::set_for_test(true);
     let mut a = crate::tests::box_app();
-    a.layouts.current = "Model".into();
-    assert!(!a.rig_tab_shows(), "not in Model");
-    a.layouts.current = "Animate".into();
-    assert!(a.rig_tab_shows());
-    a.layouts.current = "Model".into();
+    assert!(
+        !ToolSet::Model.tabs().contains(&Category::Rig),
+        "not in Model"
+    );
+    assert_eq!(ToolSet::Setup.tabs().last(), Some(&Category::Rig));
+    assert_eq!(ToolSet::Game.tabs().last(), Some(&Category::Rig));
     a.toolbox_tab_line("rig");
-    assert_eq!(a.category, toolbox::Category::Rig);
-    assert!(a.rig_tab_shows(), "once opened, like UV");
+    assert_eq!(a.category, Category::Rig);
+    assert_eq!(a.layouts.tool_set, ToolSet::Setup, "the first set with Rig");
     let ctx = Context::default();
     let _ = crate::tests::draw(&mut a, &ctx, egui::vec2(1400., 900.), vec![]);
+    assert!(a.form_rects.contains_key("operandi.skel.tool"));
     crate::anim_switch::set_for_test(false);
-    assert!(!a.rig_tab_shows(), "hidden with the animation switch off");
+    assert!(
+        !ToolSet::Setup.tabs().contains(&Category::Rig),
+        "hidden with the animation switch off"
+    );
     crate::anim_switch::set_for_test(true);
 }

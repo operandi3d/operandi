@@ -256,7 +256,9 @@ fn uvt201_the_uv_file_gives_a_uv_and_a_perspective_view_and_the_uv_tab() {
     assert_eq!(a.category, toolbox::Category::Uv);
     assert!(a.layouts.uv_tab);
     assert_eq!(a.upper_frame.front(), Some(PanelKind::UvMaps));
-    assert!(a.toolbox_rects.contains_key("Category UV surface"));
+    // The UV set has one form, so no tab strip (Jason, 2026-11-23).
+    assert!(!a.toolbox_rects.contains_key("Category UV surface"));
+    assert!(a.form_rects.contains_key("Unwrap Tool"));
 }
 
 #[test]
@@ -1311,44 +1313,32 @@ fn message_line_sits_under_tool_properties_and_falls_back() {
     }
 }
 
-/// Jason, 2026-11-19: the UV tool set opens a UV view beside the view and
-/// closes it on leaving, only when it opened it; a layout entry is lit only
-/// while the screen matches that saved layout.
+/// Jason, 2026-11-23: picking a tool set never changes the layout (no UV
+/// view opens beside the view any more); a layout entry is lit only while
+/// the screen shows that layout with its own tool set.
 #[test]
-fn companion_uv_view_and_matching_layout_highlight() {
+fn tool_sets_leave_the_views_and_dock_tree_alone_and_layout_highlight() {
     let root = data_root();
     let ctx = Context::default();
     let mut a = launch(&root, &ctx);
     frames(&mut a, &ctx, 2);
-    let start = a.views.viewports();
+    let views = a.views.viewports();
+    let tree = a.views.main.clone();
     assert!(a.layout_matches_screen("Model"), "fresh Model matches");
     assert!(!a.layout_matches_screen("UV"), "not the open layout");
-
-    a.execute("operandi.toolbox.set UV");
-    frames(&mut a, &ctx, 2);
-    let now = a.views.viewports();
-    assert_eq!(now.len(), start.len() + 1, "{}", a.status);
-    let added = *now.iter().find(|v| !start.contains(v)).unwrap();
-    assert!(a.is_uv_view(added));
-    assert!(
-        !a.layout_matches_screen("Model"),
-        "UV tools in Model isn't Model"
-    );
-
+    for &set in crate::toolbox::ToolSet::ALL {
+        a.execute(&format!("operandi.toolbox.set {}", set.label()));
+        frames(&mut a, &ctx, 2);
+        assert_eq!(a.layouts.tool_set, set, "{}", a.status);
+        assert_eq!(a.views.viewports(), views, "{set:?} changed the views");
+        assert_eq!(a.views.main, tree, "{set:?} changed the dock tree");
+        assert_eq!(
+            a.layout_matches_screen("Model"),
+            set == crate::toolbox::ToolSet::Model,
+            "{set:?}"
+        );
+    }
     a.execute("operandi.toolbox.set Model");
-    frames(&mut a, &ctx, 2);
-    assert_eq!(a.views.viewports(), start, "the companion view closed");
-    assert!(a.layout_matches_screen("Model"));
-
-    // A UV view the user opened is theirs: the set uses it and leaves it.
-    a.toggle_uv_view();
-    a.execute("operandi.toolbox.set UV");
-    frames(&mut a, &ctx, 2);
-    assert_eq!(a.views.viewports(), start, "no second UV view");
-    a.execute("operandi.toolbox.set Model");
-    frames(&mut a, &ctx, 2);
-    assert!(a.is_uv_view(a.active_view), "the user's UV view stays");
-
     a.execute("layout.restore UV");
     frames(&mut a, &ctx, 2);
     assert!(a.layout_matches_screen("UV"));
