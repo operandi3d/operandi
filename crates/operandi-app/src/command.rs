@@ -197,9 +197,9 @@ impl Operandi {
     /// Field drafts of other panels are neither confirmed nor discarded.
     pub(super) fn remove_polygons(&mut self) {
         let count = self.editor.scene.selection.faces.len();
-        let before = self.editor.undo.len();
+        let mark = self.editor.history_mark();
         let succeeded = self.run_ok(Command::RemovePolygons);
-        if succeeded && self.editor.undo.len() > before {
+        if succeeded && self.editor.recorded_since(mark) {
             let plural = if count == 1 { "" } else { "s" };
             self.status = format!("Removed {count} polygon{plural}");
         }
@@ -220,9 +220,9 @@ impl Operandi {
     /// confirmed nor discarded.
     pub(super) fn polygon_collapse(&mut self) {
         let count = self.editor.scene.selection.faces.len();
-        let before = self.editor.undo.len();
+        let mark = self.editor.history_mark();
         let succeeded = self.run_ok(Command::CollapsePolygon);
-        if succeeded && self.editor.undo.len() > before {
+        if succeeded && self.editor.recorded_since(mark) {
             let plural = if count == 1 { "" } else { "s" };
             self.status = format!("Collapse: {count} polygon{plural} collapsed");
         }

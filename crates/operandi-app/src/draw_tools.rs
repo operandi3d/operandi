@@ -222,7 +222,8 @@ pub struct DrawTool {
 #[derive(Clone, Debug, PartialEq)]
 pub struct LastPatch {
     pub picks: Vec<u32>,
-    pub undo_len: usize,
+    pub mark: u64,
+    pub step_mark: Option<u64>,
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -230,9 +231,10 @@ pub struct LastStroke {
     pub samples: Vec<DVec3>,
     pub spacing: f64,
     pub normal: DVec3,
-    /// Undo depth right after it was added: it can be rebuilt only while
-    /// nothing else has happened since.
-    pub undo_len: usize,
+    /// Recording mark after adding the stroke, and the checkpoint that
+    /// must still be on top when rebuilding (Undo does not record).
+    pub mark: u64,
+    pub step_mark: Option<u64>,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -1267,7 +1269,8 @@ impl Operandi {
                         samples,
                         spacing,
                         normal,
-                        undo_len: self.editor.undo.len(),
+                        mark: self.editor.history_mark(),
+                        step_mark: self.editor.undo.last().map(|s| s.mark),
                     });
                 }
             }
@@ -1284,8 +1287,12 @@ impl Operandi {
         let Some(last) = tool.last_stroke.clone() else {
             return;
         };
-        if self.editor.undo.len() != last.undo_len
-            || self.editor.undo.last().is_none_or(|s| s.label != "Sketch")
+        if self.editor.recorded_since(last.mark)
+            || self
+                .editor
+                .undo
+                .last()
+                .is_none_or(|s| Some(s.mark) != last.step_mark || s.label != "Sketch")
         {
             if let Some(t) = self.draw.as_mut() {
                 t.last_stroke = None;
@@ -1428,7 +1435,8 @@ impl Operandi {
                     t.picks.clear();
                     t.last_patch = Some(LastPatch {
                         picks,
-                        undo_len: self.editor.undo.len(),
+                        mark: self.editor.history_mark(),
+                        step_mark: self.editor.undo.last().map(|s| s.mark),
                     });
                 }
             }
@@ -1576,12 +1584,12 @@ impl Operandi {
         let Some(last) = tool.last_patch.clone() else {
             return;
         };
-        if self.editor.undo.len() != last.undo_len
+        if self.editor.recorded_since(last.mark)
             || self
                 .editor
                 .undo
                 .last()
-                .is_none_or(|s| s.label != "Draw Patch")
+                .is_none_or(|s| Some(s.mark) != last.step_mark || s.label != "Draw Patch")
         {
             if let Some(t) = self.draw.as_mut() {
                 t.last_patch = None;
@@ -1592,11 +1600,11 @@ impl Operandi {
         self.editor.redo.clear();
         let candidates = self.patch_candidates();
         let ok = self.add_patch(&candidates, &last.picks, &tool.patch);
-        let undo_len = self.editor.undo.len();
         if let Some(t) = self.draw.as_mut() {
             t.last_patch = ok.then_some(LastPatch {
                 picks: last.picks,
-                undo_len,
+                mark: self.editor.history_mark(),
+                step_mark: self.editor.undo.last().map(|s| s.mark),
             });
         }
     }

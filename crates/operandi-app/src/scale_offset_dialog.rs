@@ -98,7 +98,7 @@ impl Operandi {
                 "The Scale Offset target changed since the dialog opened; nothing changed".into();
             return Some(self.status.clone());
         }
-        let undo = self.editor.undo.len();
+        let mark = self.editor.history_mark();
         let succeeded = self.run_ok(if dialog.detach {
             Command::ScaleOffsetDetach(distance)
         } else {
@@ -107,7 +107,7 @@ impl Operandi {
         if !succeeded {
             return Some(self.status.clone());
         }
-        self.status = if self.editor.undo.len() > undo {
+        self.status = if self.editor.recorded_since(mark) {
             "Scale Offset applied".into()
         } else {
             "Scale Offset: nothing changed".into()
