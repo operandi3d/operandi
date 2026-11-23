@@ -412,3 +412,107 @@ fn blender_round_trip() {
         }
     }
 }
+
+/// Phase 6 §7: an arm moved by two-bone IK exports its solved pose as
+/// the SkelAnimation (no solver, goal or task in the file), and reads
+/// back deforming the same.
+#[test]
+fn an_ik_arm_exports_its_solved_pose() {
+    let (mut e, mesh) = arm(false);
+    // Clear the elbow keys; drive the arm with IK instead.
+    e.scene
+        .animation
+        .channels
+        .retain(|k, _| !k.channel.starts_with("rot."));
+    let joints: Vec<u64> = e
+        .scene
+        .items
+        .iter()
+        .filter(|i| i.is_joint())
+        .map(|i| i.id)
+        .collect();
+    // Bend the elbow a little in Setup so the chain has a side.
+    ok(&mut e, "operandi.anim.setup on:true");
+    ok(&mut e, &format!("operandi.skel.move joint:{} position:0.25,0,-0.05 compensate:true preserveAlignment:true", joints[1]));
+    ok(
+        &mut e,
+        &format!(
+            "operandi.ik.applyTwoBone joints:{},{},{}",
+            joints[0], joints[1], joints[2]
+        ),
+    );
+    ok(&mut e, "operandi.anim.setup on:false");
+    let goal = e
+        .scene
+        .items
+        .iter()
+        .find(|i| i.name.ends_with("_IKGoal"))
+        .unwrap()
+        .id;
+    ok(&mut e, "operandi.time.set frame:0");
+    ok(
+        &mut e,
+        &format!("operandi.key.set channels:{goal}:pos.X,{goal}:pos.Y"),
+    );
+    ok(&mut e, "operandi.time.set frame:24");
+    ok(
+        &mut e,
+        &format!("transform.channel name:pos.X value:0.4 item:{goal}"),
+    );
+    ok(
+        &mut e,
+        &format!("transform.channel name:pos.Y value:0.6 item:{goal}"),
+    );
+    ok(
+        &mut e,
+        &format!("operandi.key.set channels:{goal}:pos.X,{goal}:pos.Y"),
+    );
+    let path = out_dir().join("ik-arm.usda");
+    crate::export(
+        &path,
+        &e.evaluated(evaluate::Purpose::Final),
+        ExportFormat::Usda,
+    )
+    .unwrap();
+    let text = std::fs::read_to_string(&path).unwrap();
+    assert!(!text.contains("IKGoal\""), "no goal prim in the file");
+    let back = crate::import(&path, &Default::default()).unwrap();
+    let mut b = Editor {
+        scene: back.scene,
+        ..Default::default()
+    };
+    assert!(
+        b.scene.animation.rig.pieces.is_empty(),
+        "no solver read back"
+    );
+    let m2 = b
+        .scene
+        .items
+        .iter()
+        .find(|i| i.is_mesh() && i.mesh_ops.is_some())
+        .unwrap()
+        .id;
+    for f in [0, 12, 24] {
+        ok(&mut e, &format!("operandi.time.set frame:{f}"));
+        ok(&mut b, &format!("operandi.time.set frame:{f}"));
+        let ours = e
+            .evaluated(evaluate::Purpose::Final)
+            .item(mesh)
+            .unwrap()
+            .mesh
+            .open()
+            .vertices
+            .clone();
+        let theirs = b
+            .evaluated(evaluate::Purpose::Final)
+            .item(m2)
+            .unwrap()
+            .mesh
+            .open()
+            .vertices
+            .clone();
+        for (p, (x, y)) in ours.iter().zip(&theirs).enumerate() {
+            assert!(x.distance(*y) < 1e-4, "frame {f} point {p}: {x} vs {y}");
+        }
+    }
+}

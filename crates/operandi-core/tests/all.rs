@@ -254,6 +254,8 @@ mod ik_chain;
 mod ik_limits;
 #[path = "ik_switch.rs"]
 mod ik_switch;
+#[path = "ik_ties.rs"]
+mod ik_ties;
 #[path = "ik_two_bone.rs"]
 mod ik_two_bone;
 #[path = "incidence_effects.rs"]

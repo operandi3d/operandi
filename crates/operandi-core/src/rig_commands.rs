@@ -1159,6 +1159,31 @@ pub fn run(e: &mut Editor, name: &str, a: &Args) -> Out {
             for i in &items {
                 check_item(&e.scene, *i)?;
             }
+            // Phase 6 §7: an IK chain bakes whole, and its solver is then
+            // turned to FK (Blend keyed to 0) rather than disabled.
+            let solvers: Vec<u64> = e
+                .scene
+                .animation
+                .rig
+                .pieces
+                .iter()
+                .filter(|p| crate::ik::is_ik(&p.kind))
+                .filter(|p| {
+                    crate::ik_commands::chain(&e.scene, p)
+                        .iter()
+                        .any(|j| items.contains(j))
+                })
+                .map(|p| p.id)
+                .collect();
+            let mut items = items;
+            for &s in &solvers {
+                let p = e.scene.animation.rig.piece(s).expect("listed");
+                for j in crate::ik_commands::chain(&e.scene, p) {
+                    if !items.contains(&j) {
+                        items.push(j);
+                    }
+                }
+            }
             let rate = e.scene.time.rate;
             let (ra, rb) = animation::current_range(&e.scene);
             let start = number(a, "start")?.map_or(ra, |f| animation::at_frames(rate, f));
@@ -1240,9 +1265,26 @@ pub fn run(e: &mut Editor, name: &str, a: &Args) -> Out {
                         .rig
                         .pieces
                         .iter_mut()
-                        .filter(|p| p.item == *item)
+                        .filter(|p| p.item == *item && !crate::ik::is_ik(&p.kind))
                     {
                         let _ = p.set("enable", 0.);
+                    }
+                }
+                for &s in &solvers {
+                    let key = ChannelKey::new(s, "blend");
+                    let ch = e
+                        .scene
+                        .animation
+                        .channels
+                        .entry(key)
+                        .or_insert_with(|| AnimChannel {
+                            curve: Default::default(),
+                            rest: 1.,
+                        });
+                    ch.curve.keys.clear();
+                    ch.curve.set(start, 0.);
+                    if let Some(p) = e.scene.animation.rig.piece_mut(s) {
+                        let _ = p.set("blend", 0.);
                     }
                 }
                 let now = e.scene.time.current;
