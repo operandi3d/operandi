@@ -1,0 +1,84 @@
+{
+  "version": 1,
+  "id": "toolbox.setup.ik",
+  "label": "Inverse Kinematics",
+  "exported": true,
+  "controls": [
+    {
+      "divider": "Solvers",
+      "id": "ik-solvers"
+    },
+    {
+      "command": "operandi.ik.applyTwoBone",
+      "label": "Two-Bone IK"
+    },
+    {
+      "command": "operandi.ik.applyChain",
+      "label": "Chain IK"
+    },
+    {
+      "command": "operandi.ik.assign",
+      "label": "Full Body IK"
+    },
+    {
+      "divider": "Goals",
+      "id": "ik-goals"
+    },
+    {
+      "command": "operandi.ik.addGoal",
+      "label": "Add Goal"
+    },
+    {
+      "command": "operandi.ik.addTask mode:position",
+      "label": "Add Position Task"
+    },
+    {
+      "command": "operandi.ik.addTask mode:orientation",
+      "label": "Add Orientation Task"
+    },
+    {
+      "command": "operandi.ik.pole mode:create",
+      "label": "Up Vector"
+    },
+    {
+      "divider": "IK/FK",
+      "id": "ik-fk"
+    },
+    {
+      "command": "operandi.ik.switch",
+      "label": "Switch IK/FK"
+    },
+    {
+      "command": "operandi.ik.setKeys",
+      "label": "IK/FK: Set Keys"
+    },
+    {
+      "command": "operandi.ik.selectSwitch",
+      "label": "Select Switch Channels"
+    },
+    {
+      "command": "operandi.ik.selectSolvers",
+      "label": "Select IK Solvers"
+    },
+    {
+      "command": "operandi.ik.match",
+      "label": "Match Goal"
+    },
+    {
+      "divider": "",
+      "id": "ik-edit"
+    },
+    {
+      "command": "operandi.ik.updateRest all:true",
+      "label": "Update Rest Pose"
+    },
+    {
+      "command": "operandi.ik.disable",
+      "label": "Disable IK"
+    },
+    {
+      "command": "operandi.ik.remove",
+      "label": "Remove IK"
+    }
+  ]
+}

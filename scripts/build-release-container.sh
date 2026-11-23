@@ -14,6 +14,8 @@ OUTPUT="${OPERANDI_RELEASE_OUTPUT:-$HOME/Developer/Operandi-Builds}"
 mkdir -p "$OUTPUT" "$HOME/.cache/operandi-container-cargo" "$HOME/.cache/operandi-container-rustup"
 # The repo is mounted at /src and the output folder at /out. Cargo's
 # download cache stays on the host between runs.
+# OPERANDI_DEFAULT_UPDATE_CHANNEL (test builds) is passed through when set.
+# shellcheck disable=SC2086
 podman run --rm \
     -v "$PWD:/src:Z" -v "$OUTPUT:/out:Z" \
     -v "$HOME/.cache/operandi-container-cargo:/root/.cargo/registry:Z" \
@@ -22,4 +24,5 @@ podman run --rm \
     -e OPERANDI_CYCLES_OUT=development/cycles-rocky8 \
     -e CARGO_TARGET_DIR=/src/target-rocky8 \
     -e OPERANDI_RELEASE_OUTPUT=/out \
+    ${OPERANDI_DEFAULT_UPDATE_CHANNEL:+-e OPERANDI_DEFAULT_UPDATE_CHANNEL="$OPERANDI_DEFAULT_UPDATE_CHANNEL"} \
     "$IMAGE" scripts/build-release.sh

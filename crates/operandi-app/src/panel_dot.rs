@@ -498,8 +498,10 @@ impl Operandi {
     }
 
     /// Panels move only in UI build mode (Jason, 2026-11-20, from
-    /// contributor feedback): grips, pads, tabs, floating titles and the
-    /// mode bar all wait for it. Clicks, menus and Float still work.
+    /// contributor feedback): grips, pads, floating titles, the mode bar
+    /// and dragging a tab out of its row all wait for it. Clicks, menus,
+    /// Float and reordering a tab within its own row (Jason, 2026-11-23)
+    /// still work.
     pub(super) fn panel_drags_locked(&self) -> bool {
         !self.dots.build_mode
     }

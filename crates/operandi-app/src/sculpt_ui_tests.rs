@@ -110,7 +110,8 @@ fn centre(a: &Operandi) -> Pos2 {
 #[test]
 fn the_sculpt_tab_buttons_turn_brushes_on_and_off() {
     let (mut a, ctx) = app();
-    assert!(a.toolbox_rects.contains_key("Category Sculpt"));
+    // The Sculpt tab is in the Brush set (Jason, 2026-11-23).
+    assert_eq!(a.layouts.tool_set, toolbox::ToolSet::Brush);
     for b in SculptBrush::ALL {
         if b.unavailable().is_some() {
             continue;

@@ -217,9 +217,9 @@ fn texture_menu_has_image_processing_and_file_has_the_image_entries() {
     assert!(t.iter().any(|x| x == "Image Processing"), "{t:?}");
 }
 
-/// The Model layout's strip has no Paint tab (Jason, 2026-11-18); the
-/// Paint layout's set does, and Texture > Paint Tools still opens it from
-/// the Model layout.
+/// The Model set's strip has no Paint or Sculpt tab (Jason, 2026-11-18,
+/// 2026-11-23); the Brush set (the Paint layout's) has both, and Texture >
+/// Paint Tools still opens it from the Model layout.
 #[test]
 fn only_the_paint_layout_has_a_paint_tab() {
     let mut a = app();
@@ -231,13 +231,13 @@ fn only_the_paint_layout_has_a_paint_tab() {
             .keys()
             .any(|k| k == "Category Paint" || k == "Category Paint Tools")
     };
-    assert!(a.toolbox_rects.contains_key("Category Sculpt"));
+    assert!(!a.toolbox_rects.contains_key("Category Sculpt"));
     assert!(!paint_tab(&a), "no Paint tab in the Model layout");
     a.execute(&crate::Operandi::restore_line("Paint"));
     frames(&mut a, &ctx, 3);
     assert!(paint_tab(&a), "the Paint layout's set has it");
     a.execute(&crate::Operandi::restore_line("Model"));
-    a.category = Category::Sculpt;
+    a.execute("operandi.toolbox.set model");
     frames(&mut a, &ctx, 3);
     assert_eq!(a.layouts.current, "Model", "{}", a.status);
     assert!(!paint_tab(&a), "gone again in the Model layout");
