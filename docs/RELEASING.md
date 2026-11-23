@@ -16,8 +16,10 @@ scripts/release.sh v0.1.0 --dry-run   # checks only, changes nothing
 scripts/release.sh v0.1.0             # the real thing
 ```
 
-This is the only command that uploads anything. Your everyday builds
-(`scripts/bundle-dev.sh` and friends) never do.
+This is the only command that makes a release. The other one that uploads
+is `scripts/test-build.sh`, which only ever replaces the files on the
+"Test build" page ("Test builds", below). Your everyday builds
+(`scripts/bundle-dev.sh` and friends) never upload.
 
 What it does, in order:
 
@@ -91,6 +93,44 @@ the Mac version only for now (it isn't built for Windows or Linux yet).
 - The Windows version isn't signed, so Windows shows a SmartScreen warning
   (More info > Run anyway). Signing it needs a Windows code-signing
   certificate, which is a separate purchase; not needed to start.
+
+## Test builds
+
+Testers get the newest Mac and Windows apps from one page that never
+changes address:
+
+    https://github.com/operandi3d/operandi/releases/tag/test-build
+
+To put a new test build there, run on the Mac:
+
+```bash
+cd ~/Developer/Operandi && OPERANDI_WINDOWS_SSH=<user>@<windows machine> scripts/test-build.sh
+```
+
+(`OPERANDI_WINDOWS_SSH` is the ssh login of the Windows build machine, the
+same one `scripts/release.sh` uses; `docs/RELEASE_BUILDS.md` sets it up.)
+
+It builds GitHub's `main` (give a branch name at the end to build a pushed
+branch instead), the Mac app here and the Windows zip on the Windows
+machine at the same time, checks neither has files that mustn't be shared,
+and replaces the two files on the page. The page is a GitHub
+*pre-release* called "Test build", so it never shows up as the latest
+release, and real releases like v0.1.0 are left alone.
+
+- `--platforms mac` (or `windows`) builds and replaces just one file; the
+  page still says which commit the other one came from.
+- `--no-upload` builds and checks without uploading; the files are in
+  `~/Developer/Operandi-Builds/test-build/upload`.
+- It builds in its own folder, `~/Developer/Operandi-test-build`, made the
+  first time, so it never switches branches in your main checkout.
+- Only commits that are on GitHub can be built, so anyone can get the
+  source of each file (the GPL asks for that).
+- The Mac app is a test build, not signed with your certificate or
+  notarized, so the first time testers open it they click
+  **Open Anyway** in System Settings > Privacy & Security. The page tells
+  them how.
+- Don't run it while `scripts/release.sh` is building Windows: both use the
+  Windows machine's one checkout.
 
 ## Releasing only the Mac version
 
