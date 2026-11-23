@@ -3489,6 +3489,15 @@ pub static COMMANDS: &[Entry] = &[
         .undo()
         .operandi()
         .example("operandi.anim.restoreSetup items:3"),
+    script("operandi.ik.applyChain", Items, "Apply IK (Chain) (IK-15..17): a FABRIK solver from the root to the end joint (2 to 100 joints) with a goal at the end; needs Setup mode.")
+        .on_editor(
+            "Make the chain from root to end (default the selection: root, then end) one FABRIK IK chain, one undo step. Needs Setup mode. Adds <root>_IKGoal under <root>_IKRoot.",
+            &[jopt("joints", "string", "Root and end joint ids, comma separated.")],
+            crate::ik_commands::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.ik.applyChain joints:3,9"),
     script("operandi.ik.applyTwoBone", Items, "Apply IK (Two-Bone) (IK-01..02): a goal at the end joint, a group holding it and the chain, and a two-bone solver on the root; needs Setup mode.")
         .on_editor(
             "Make three joints (root, middle, end; default the selection in pick order) a two-bone IK chain, one undo step. Needs Setup mode; the chain's bend there is the side it keeps. Adds <root>_IKGoal under <root>_IKRoot.",
@@ -7262,7 +7271,7 @@ mod tests {
                 assert!(!json.about.is_empty(), "{}", e.name);
             }
         }
-        assert_eq!(crate::command_exec::specs().count(), 285);
+        assert_eq!(crate::command_exec::specs().count(), 286);
     }
 
     #[test]

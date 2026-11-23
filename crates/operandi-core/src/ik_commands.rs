@@ -2,7 +2,7 @@
 //! pole (Create / Assign / Remove Up Vector) and the IK query. Each edit
 //! is one undo step; applying needs Setup mode, where the chain's rest
 //! pose (and so its bend side) is read (§0).
-use crate::ik::{self, TWO_BONE};
+use crate::ik::{self, CHAIN, TWO_BONE};
 use crate::locator::LocatorKind;
 use crate::rig::Piece;
 use crate::{Command, Editor, Result, Scene};
@@ -15,6 +15,9 @@ type Args = Map<String, Value>;
 pub const THREE_JOINTS: &str = "Select three joints in one chain, root first.";
 /// Applying outside Setup (provisional, IK-Q01).
 pub const NEEDS_SETUP: &str = "Apply IK needs Setup mode. Turn on Setup and try again.";
+/// IK-15's refusal.
+pub const ROOT_THEN_END: &str =
+    "Select the chain's root joint, then its end joint (2 to 100 joints).";
 /// IK-03: a straight chain has no bend side.
 pub const STRAIGHT: &str =
     "The chain is straight: bend the middle joint slightly first, towards where it should bend.";
@@ -134,6 +137,28 @@ fn add_locator(
     Ok(id)
 }
 
+/// IK-02: `<root>_IKRoot` takes the root's place under its parent and
+/// holds the root and `<root>_IKGoal`, a goal at `end` (placed and turned
+/// like it). Returns the goal.
+fn ik_root_and_goal(scene: &mut Scene, root: u64, root_name: &str, end: DMat4) -> Result<u64> {
+    let parent = scene.item(root).and_then(|i| i.parent);
+    let group = scene.add_group_locator_named(Some(format!("{root_name}_IKRoot")))?;
+    scene.item_mut(group).expect("made").parent = parent;
+    scene.set_parent(root, Some(group), true)?;
+    let goal = add_locator(
+        scene,
+        format!("{root_name}_IKGoal"),
+        Some(group),
+        end.w_axis.truncate(),
+        LocatorKind::IkGoal,
+    )?;
+    let gw = scene.world_matrix(group)?;
+    let (_, q, _) = (gw.inverse() * end).to_scale_rotation_translation();
+    let item = scene.item_mut(goal).expect("made");
+    item.transform.rotation = item.transform.angles_for(q).map(crate::rig::clean);
+    Ok(goal)
+}
+
 /// The handler for every `operandi.ik.*` edit.
 pub fn run(e: &mut Editor, name: &str, a: &Args) -> Result<Option<Command>> {
     match name {
@@ -169,20 +194,9 @@ pub fn run(e: &mut Editor, name: &str, a: &Args) -> Result<Option<Command>> {
             let (pa, pb, pc) = (pos(s, root), pos(s, mid), pos(s, end));
             let bend = ik::rest_bend(pa, pb, pc, pw).ok_or(STRAIGHT)?;
             let root_name = name_of(s, root);
+            let end_world = s.world_matrix(end)?;
             e.anim_step("Apply IK (Two-Bone)", |e| {
-                // IK-02: a group holding the chain's root and its goal.
-                let group = e
-                    .scene
-                    .add_group_locator_named(Some(format!("{root_name}_IKRoot")))?;
-                e.scene.item_mut(group).expect("made").parent = parent;
-                e.scene.set_parent(root, Some(group), true)?;
-                let goal = add_locator(
-                    &mut e.scene,
-                    format!("{root_name}_IKGoal"),
-                    Some(group),
-                    pc,
-                    LocatorKind::IkGoal,
-                )?;
+                let goal = ik_root_and_goal(&mut e.scene, root, &root_name, end_world)?;
                 let id = new_id(&mut e.scene)?;
                 let mut p = Piece::new(id, TWO_BONE, root, vec![goal]);
                 p.names.insert("mid".into(), mid.to_string());
@@ -194,6 +208,55 @@ pub fn run(e: &mut Editor, name: &str, a: &Args) -> Result<Option<Command>> {
                 e.scene.animation.rig.pieces.push(p);
                 for j in [root, mid, end] {
                     crate::skin::ensure_setup_channels(&mut e.scene, j);
+                }
+                e.scene.select_item(Some(goal));
+                Ok(true)
+            })?;
+            Ok(None)
+        }
+        "operandi.ik.applyChain" => {
+            // IK-15: root then end, 2 to 100 joints.
+            if !e.scene.animation.setup {
+                return Err(NEEDS_SETUP.into());
+            }
+            let joints = match ids(a, "joints")? {
+                Some(j) => j,
+                None => picked(&e.scene),
+            };
+            let [root, end] = joints.as_slice() else {
+                return Err(ROOT_THEN_END.into());
+            };
+            let (root, end) = (*root, *end);
+            let s = &e.scene;
+            let chain = ik::chain_down(s, root, end).ok_or(ROOT_THEN_END)?;
+            if chain.len() < 2 || chain.len() > 100 || !chain.iter().all(|j| is_joint(s, *j)) {
+                return Err(ROOT_THEN_END.into());
+            }
+            if s.animation
+                .rig
+                .pieces
+                .iter()
+                .any(|p| ik::is_ik(&p.kind) && chain.contains(&p.item))
+            {
+                return Err(format!("{} already has IK", name_of(s, root)));
+            }
+            let end_world = s.world_matrix(end)?;
+            let root_name = name_of(s, root);
+            e.anim_step("Apply IK (Chain)", |e| {
+                let goal = ik_root_and_goal(&mut e.scene, root, &root_name, end_world)?;
+                let id = new_id(&mut e.scene)?;
+                let mut p = Piece::new(id, CHAIN, root, vec![goal]);
+                p.names.insert("end".into(), end.to_string());
+                let gw = e.scene.world_matrix(goal)?;
+                let (_, q, _) = gw.to_scale_rotation_translation();
+                let (x, y, z) = q.to_euler(glam::EulerRot::XYZ);
+                for (axis, v) in ["X", "Y", "Z"].iter().zip([x, y, z]) {
+                    p.values
+                        .insert(format!("twist.{axis}"), crate::rig::clean(v));
+                }
+                e.scene.animation.rig.pieces.push(p);
+                for j in &chain {
+                    crate::skin::ensure_setup_channels(&mut e.scene, *j);
                 }
                 e.scene.select_item(Some(goal));
                 Ok(true)
@@ -285,7 +348,13 @@ pub fn run(e: &mut Editor, name: &str, a: &Args) -> Result<Option<Command>> {
 }
 
 /// The chain's joints, root first.
-pub fn chain(p: &Piece) -> Vec<u64> {
+pub fn chain(scene: &Scene, p: &Piece) -> Vec<u64> {
+    if p.kind == CHAIN
+        && let Some(end) = ik::named(p, "end")
+        && let Some(c) = ik::chain_down(scene, p.item, end)
+    {
+        return c;
+    }
     let mut out = vec![p.item];
     if let Some(m) = ik::named(p, "mid") {
         out.push(m);
@@ -330,7 +399,7 @@ pub fn answer(e: &Editor, name: &str, a: &Args) -> Option<Result<String>> {
             .iter()
             .filter(|p| ik::is_ik(&p.kind) && only.is_none_or(|o| o == p.id))
             .map(|p| {
-                let joints: Vec<Value> = chain(p)
+                let joints: Vec<Value> = chain(&posed, p)
                     .into_iter()
                     .map(|j| {
                         let (_, q, t) = world(j).to_scale_rotation_translation();
@@ -344,7 +413,7 @@ pub fn answer(e: &Editor, name: &str, a: &Args) -> Option<Result<String>> {
                     })
                     .collect();
                 let goal = p.targets.first().copied();
-                let end = *chain(p).last().expect("root");
+                let end = *chain(&posed, p).last().expect("root");
                 let left = goal.map(|g| {
                     world(g)
                         .w_axis

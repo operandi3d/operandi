@@ -44,6 +44,7 @@ pub fn default_value(kind: &str, name: &str) -> Option<f64> {
         (TWO_BONE, "stretchBase" | "stretchMid") => Some(1.),
         (TWO_BONE, "stretchEnd") => Some(0.),
         (TWO_BONE | CHAIN, n) if n.starts_with("bend.") => Some(0.),
+        (CHAIN, n) if n.starts_with("twist.") => Some(0.),
         (CHAIN, "iterations") => Some(10.),
         (CHAIN, "tolerance") => Some(0.001),
         (CHAIN, "rootLocked" | "twistSpread") => Some(1.),
@@ -295,10 +296,238 @@ pub fn two_bone(p: &Piece, root: DMat4, look: &Look, overrides: &mut HashMap<u64
     root_out
 }
 
+// ------------------------------------------------------------ chains
+
+/// FABRIK options (IK-17).
+#[derive(Clone, Copy, Debug)]
+pub struct Fabrik {
+    pub iterations: u32,
+    /// A fraction of the chain's length (IK-17: 0.001).
+    pub tolerance: f64,
+    pub root_locked: bool,
+}
+
+impl Default for Fabrik {
+    fn default() -> Self {
+        Fabrik {
+            iterations: 10,
+            tolerance: 0.001,
+            root_locked: true,
+        }
+    }
+}
+
+/// FABRIK (IK-15..18): the chain's joint positions with the end on the
+/// goal and every bone its length. Starts from `points` (the FK pose), so
+/// joints move as little as they need to; out of reach, the chain points
+/// straight at the goal. With a `pole`, each inner joint turns round its
+/// neighbours' line to the pole's side.
+pub fn fabrik(points: &[DVec3], goal: DVec3, pole: Option<DVec3>, o: Fabrik) -> Vec<DVec3> {
+    let n = points.len();
+    if n < 2 {
+        return points.to_vec();
+    }
+    let lengths: Vec<f64> = points.windows(2).map(|w| w[0].distance(w[1])).collect();
+    let total: f64 = lengths.iter().sum();
+    let tol = o.tolerance * total.max(1e-12);
+    let mut p = points.to_vec();
+    let root = p[0];
+    if o.root_locked && root.distance(goal) >= total {
+        let dir = (goal - root).normalize_or_zero();
+        for i in 1..n {
+            p[i] = p[i - 1] + dir * lengths[i - 1];
+        }
+        return p;
+    }
+    if p[n - 1].distance(goal) <= tol {
+        return p;
+    }
+    // A straight chain can't find a side by itself: lean the inner joints
+    // a little towards the pole first.
+    if let Some(pole) = pole {
+        let axis = (p[n - 1] - p[0]).normalize_or_zero();
+        let side = (pole - p[0]) - axis * (pole - p[0]).dot(axis);
+        if let Some(side) = side.try_normalize() {
+            for q in p.iter_mut().take(n - 1).skip(1) {
+                *q += side * total * 1e-3;
+            }
+        }
+    }
+    for _ in 0..o.iterations.max(1) {
+        // Backward: the end on the goal, each joint pulled after it.
+        p[n - 1] = goal;
+        for i in (0..n - 1).rev() {
+            let d = (p[i] - p[i + 1]).normalize_or(DVec3::Y);
+            p[i] = p[i + 1] + d * lengths[i];
+        }
+        if o.root_locked {
+            // Forward: the root back home, each joint pulled after it.
+            p[0] = root;
+            for i in 1..n {
+                let d = (p[i] - p[i - 1]).normalize_or(DVec3::Y);
+                p[i] = p[i - 1] + d * lengths[i - 1];
+            }
+        }
+        if let Some(pole) = pole {
+            for i in 1..n - 1 {
+                p[i] = towards_pole(p[i - 1], p[i], p[i + 1], pole);
+            }
+        }
+        if p[n - 1].distance(goal) <= tol {
+            break;
+        }
+    }
+    p
+}
+
+/// Joint `b` between `a` and `c`, turned round the line a–c to the
+/// pole's side (lengths kept).
+fn towards_pole(a: DVec3, b: DVec3, c: DVec3, pole: DVec3) -> DVec3 {
+    let axis = (c - a).normalize_or_zero();
+    if axis == DVec3::ZERO {
+        return b;
+    }
+    let flat = |v: DVec3| v - axis * v.dot(axis);
+    let (from, to) = (flat(b - a), flat(pole - a));
+    if from.length_squared() < 1e-18 || to.length_squared() < 1e-18 {
+        return b;
+    }
+    let angle = from.angle_between(to);
+    let sign = from.cross(to).dot(axis).signum();
+    a + DQuat::from_axis_angle(axis, angle * sign) * (b - a)
+}
+
+/// The chain from `root` down to `end` (root first); `None` when `end`
+/// isn't below `root`.
+pub fn chain_down(scene: &Scene, root: u64, end: u64) -> Option<Vec<u64>> {
+    let mut out = vec![end];
+    let mut at = end;
+    while at != root {
+        at = scene.item(at)?.parent?;
+        out.push(at);
+        if out.len() > 1000 {
+            return None;
+        }
+    }
+    out.reverse();
+    Some(out)
+}
+
+/// Solves a chain piece on the root whose FK world is `root`.
+pub fn chain(p: &Piece, root: DMat4, look: &Look, overrides: &mut HashMap<u64, DMat4>) -> DMat4 {
+    let s = look.scene;
+    let (Some(end), Some(&goal)) = (named(p, "end"), p.targets.first()) else {
+        return root;
+    };
+    let Some(ids) = chain_down(s, p.item, end) else {
+        return root;
+    };
+    let locals: Vec<DMat4> = ids[1..]
+        .iter()
+        .map(|&j| s.item(j).map_or(DMat4::IDENTITY, |i| s.local_matrix(i)))
+        .collect();
+    let mut fk = vec![root];
+    for l in &locals {
+        fk.push(*fk.last().expect("root") * *l);
+    }
+    let points: Vec<DVec3> = fk.iter().map(|m| m.w_axis.truncate()).collect();
+    let target = (look.world)(goal);
+    let pole = p
+        .refs
+        .get("pole")
+        .map(|&q| (look.world)(q).w_axis.truncate());
+    let o = Fabrik {
+        iterations: p.num("iterations").max(1.) as u32,
+        tolerance: p.num("tolerance"),
+        root_locked: p.flag("rootLocked"),
+    };
+    let solved = fabrik(&points, target.w_axis.truncate(), pole, o);
+    // Twist Spread: the goal's turn about the end bone, shared out.
+    let twist = if p.flag("twistSpread") {
+        let rest = p.vec3("twist.");
+        let q_rest = DQuat::from_euler(glam::EulerRot::XYZ, rest.x, rest.y, rest.z);
+        let (_, q_goal, _) = target.to_scale_rotation_translation();
+        let delta = q_goal * q_rest.inverse();
+        let n = ids.len();
+        let bone = (solved[n - 1] - solved[n - 2]).normalize_or_zero();
+        twist_about(delta, bone)
+    } else {
+        0.
+    };
+    // Each joint turns its bone onto the solved one, parents first.
+    let n = ids.len();
+    let mut ik_world = Vec::with_capacity(n);
+    let mut parent_ik = DMat4::IDENTITY;
+    for k in 0..n {
+        let base = if k == 0 {
+            root
+        } else {
+            parent_ik * locals[k - 1]
+        };
+        let at = base.w_axis.truncate();
+        let base = turned(base, DQuat::IDENTITY, at, solved[k]);
+        let w = if k + 1 < n {
+            let next = (base * locals[k]).w_axis.truncate();
+            let q = DQuat::from_rotation_arc(
+                (next - solved[k]).normalize_or_zero(),
+                (solved[k + 1] - solved[k]).normalize_or_zero(),
+            );
+            let spin = DQuat::from_axis_angle(
+                (solved[k + 1] - solved[k]).normalize_or(DVec3::Y),
+                twist / (n - 1) as f64,
+            );
+            turned(base, spin * q, solved[k], solved[k])
+        } else {
+            base
+        };
+        ik_world.push(w);
+        parent_ik = w;
+    }
+    let blend = p.num("blend");
+    let root_out = mix(root, ik_world[0], blend);
+    let mut parent_out = root_out;
+    for k in 1..n {
+        let local_ik = ik_world[k - 1].inverse() * ik_world[k];
+        let w = parent_out * mix(locals[k - 1], local_ik, blend);
+        overrides.insert(ids[k], w);
+        parent_out = w;
+    }
+    root_out
+}
+
+/// The angle of `q`'s twist about unit `axis`.
+fn twist_about(q: DQuat, axis: DVec3) -> f64 {
+    if axis == DVec3::ZERO {
+        return 0.;
+    }
+    let v = DVec3::new(q.x, q.y, q.z);
+    let proj = axis * v.dot(axis);
+    let t = DQuat::from_xyzw(proj.x, proj.y, proj.z, q.w);
+    if t.length_squared() < 1e-24 {
+        return 0.;
+    }
+    let t = t.normalize();
+    let angle = 2. * t.w.clamp(-1., 1.).acos();
+    let angle = if DVec3::new(t.x, t.y, t.z).dot(axis) < 0. {
+        -angle
+    } else {
+        angle
+    };
+    // The shorter way round.
+    if angle > std::f64::consts::PI {
+        angle - std::f64::consts::TAU
+    } else if angle < -std::f64::consts::PI {
+        angle + std::f64::consts::TAU
+    } else {
+        angle
+    }
+}
+
 /// Solves an IK piece on its root (two-bone or chain).
 pub fn solve(p: &Piece, root: DMat4, look: &Look, overrides: &mut HashMap<u64, DMat4>) -> DMat4 {
     match p.kind.as_str() {
         TWO_BONE => two_bone(p, root, look, overrides),
+        CHAIN => chain(p, root, look, overrides),
         _ => root,
     }
 }
@@ -326,6 +555,42 @@ mod tests {
         let (m, e, ..) = solve_two_bone(DVec3::ZERO, l, l, DVec3::new(0., 3., 0.), hint, o);
         near(m, DVec3::new(0., l, 0.));
         near(e, DVec3::new(0., 2.0396, 0.));
+    }
+
+    /// IK-18: four unit bones along +Y.
+    #[test]
+    fn ik18_fabrik_cases() {
+        let pts: Vec<DVec3> = (0..5).map(|i| DVec3::new(0., i as f64, 0.)).collect();
+        let o = Fabrik::default();
+        assert_eq!(
+            fabrik(&pts, DVec3::new(0., 4., 0.), None, o),
+            pts,
+            "no change"
+        );
+        let far = fabrik(&pts, DVec3::new(0., 10., 0.), None, o);
+        for (i, p) in far.iter().enumerate() {
+            near(*p, DVec3::new(0., i as f64, 0.));
+        }
+        let goal = DVec3::new(2., 2., 0.);
+        let bent = fabrik(&pts, goal, None, o);
+        assert!(bent[4].distance(goal) <= 0.004 + 1e-12, "{}", bent[4]);
+        for w in bent.windows(2) {
+            assert!((w[0].distance(w[1]) - 1.).abs() < 1e-6);
+        }
+        assert_eq!(bent[0], DVec3::ZERO, "root locked");
+    }
+
+    #[test]
+    fn fabrik_pole_bends_towards_it() {
+        let pts: Vec<DVec3> = (0..5).map(|i| DVec3::new(0., i as f64, 0.)).collect();
+        let o = Fabrik {
+            iterations: 30,
+            ..Default::default()
+        };
+        let goal = DVec3::new(0., 3., 0.);
+        let bent = fabrik(&pts, goal, Some(DVec3::new(0., 1.5, 5.)), o);
+        assert!(bent[2].z > 0.1, "{bent:?}");
+        assert!(bent[4].distance(goal) < 0.01);
     }
 
     #[test]

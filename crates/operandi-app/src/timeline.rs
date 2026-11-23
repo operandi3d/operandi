@@ -1736,6 +1736,7 @@ impl Operandi {
             egui::Popup::menu(&ik).show(|ui| {
                 for (label, line) in [
                     ("Apply IK (Two-Bone)", "operandi.ik.applyTwoBone"),
+                    ("Apply IK (Chain)", "operandi.ik.applyChain"),
                     ("Create IK Up Vector", "operandi.ik.pole mode:create"),
                     ("Remove Up Vector", "operandi.ik.pole mode:remove"),
                 ] {

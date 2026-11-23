@@ -9698,3 +9698,4 @@ Built from BEHAVIOR-TOPOLOGY-PEN (2026-11-20) on branch topology-pen. These are 
 - IK-Q02 IK-02 hierarchy: `<root>_IKRoot` takes the chain root's place under its parent and holds the root joint and the goal. Provisional (spec [probe]).
 - IK-Q03 IK-07 Soft is a fraction of the chain's reach (0.1 = the last 10% eases in, exponential); IK-08 stretch ratio 1 + Scale Factor·(distance/reach − 1), shared by Base and Mid amounts; End amount is stored but a two-bone chain has no third bone. Provisional.
 - IK-Q04 IK-06 the created pole sits one first-bone length out from the middle joint on the bend side, under the IK root group. Provisional (spec [probe]).
+- IK-Q05 FABRIK: a straight chain first leans its inner joints 0.1% of the chain length towards the pole (else it can't pick a side); with Root Locked off only the backward pass runs; Twist Spread shares the goal's turn about the end bone (against its rotation at Apply) evenly over the bones. Provisional.

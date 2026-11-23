@@ -4451,3 +4451,4 @@ Design: docs/MATERIALX_GRAPHS.md (stages 1-5).
 ## 2026-11-23 — Rig phase 6, IK and posing (branch graph-editor-resize)
 
 - Step 1 (IK-01..08): `ik.twoBone` rig piece on the chain root (ik.rs, analytic solve; the root's evaluation sets the middle/end joints' worlds), `operandi.ik.applyTwoBone` (Setup only; goal box under `<root>_IKRoot`, coloured by side), `operandi.ik.pole` create/assign/remove, Orient, Soft, Stretch (base/mid), Blend by slerp, `operandi.ik.query`. IK-04 numbers exact in unit, scene and bridge tests; the knee never flips. Timeline IK menu. Provisional: IK-Q01..Q04.
+- Step 2 (IK-15..18): `ik.chain` FABRIK solver (Iterations, Tolerance as a fraction of chain length, Root Locked, Pole, Twist Spread, Blend), `operandi.ik.applyChain` (2–100 joints, Setup only). IK-18 cases exact in unit, scene and bridge tests. Provisional: IK-Q05.

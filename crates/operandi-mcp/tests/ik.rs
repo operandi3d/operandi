@@ -92,3 +92,43 @@ fn ik04_two_bone_numbers_through_the_bridge() {
         near(&j[2]["position"], end);
     }
 }
+
+/// IK-18 through the bridge: four unit bones along +Y.
+#[test]
+fn ik18_fabrik_through_the_bridge() {
+    let mut b = Bridge::new();
+    let mut ids = Vec::new();
+    for k in 0..5 {
+        let id = joint(&mut b, [0., k as f64, 0.], ids.last().copied());
+        ids.push(id);
+    }
+    run(&mut b, "operandi.anim.setup", json!({"on": "true"}));
+    run(
+        &mut b,
+        "operandi.ik.applyChain",
+        json!({"joints": format!("{},{}", ids[0], ids[4])}),
+    );
+    run(&mut b, "operandi.anim.setup", json!({"on": "false"}));
+    let goal = read(&mut b, "operandi.ik.query", json!({}))["solvers"][0]["goal"]
+        .as_u64()
+        .unwrap();
+    goal_to(&mut b, goal, [0., 10., 0.]);
+    let q = read(&mut b, "operandi.ik.query", json!({}));
+    near(&q["solvers"][0]["joints"][4]["position"], [0., 4., 0.]);
+    goal_to(&mut b, goal, [2., 2., 0.]);
+    let q = read(&mut b, "operandi.ik.query", json!({"tolerance": 0.004}));
+    assert_eq!(q["solvers"][0]["met"], true, "{q}");
+    let j: Vec<[f64; 3]> = q["solvers"][0]["joints"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|j| [0, 1, 2].map(|i| j["position"][i].as_f64().unwrap()))
+        .collect();
+    for w in j.windows(2) {
+        let d = ((w[0][0] - w[1][0]).powi(2)
+            + (w[0][1] - w[1][1]).powi(2)
+            + (w[0][2] - w[1][2]).powi(2))
+        .sqrt();
+        assert!((d - 1.).abs() < 1e-6, "{d}");
+    }
+}
