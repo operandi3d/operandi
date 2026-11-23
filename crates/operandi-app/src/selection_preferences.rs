@@ -348,26 +348,29 @@ impl super::Operandi {
     pub(super) fn shows_selections(&self) -> bool {
         self.display.settings.drawing.selections && !self.brush_hides_selection()
     }
-    /// Painting builds: while a paint tool or a sculpt brush (the mask
-    /// brush too) is the tool in use, no element highlighting is drawn, so
-    /// it doesn't hide what is being painted (Jason, 2026-11-18). Any other
-    /// tool running brings it back. The selection itself stays; the wire
-    /// and the brush ring still draw.
+    /// Painting builds: whether element highlighting is hidden now (the
+    /// rule is [`brush_hides_selection`]). The wire and the brush ring
+    /// always draw.
     #[cfg(feature = "painting")]
     pub(super) fn brush_hides_selection(&self) -> bool {
-        (self.painting.brush.tool.is_some() || self.sculpt.brush.is_some())
-            && !self.editor.has_active_task()
+        brush_hides_selection(BrushInUse {
+            paint_tool: self.painting.brush.tool.is_some(),
+            limited_by_selection: self.sculpt.brush.is_some(),
+            other_task: self.editor.has_active_task(),
+        })
     }
     #[cfg(not(feature = "painting"))]
     pub(super) fn brush_hides_selection(&self) -> bool {
         false
     }
     /// Painting builds: Texture Locators don't draw while a paint tool or
-    /// sculpt brush is in use (the same rule), unless Show Texture Locators
-    /// while Painting is on.
+    /// sculpt brush is the tool in use, unless Show Texture Locators while
+    /// Painting is on.
     pub(super) fn brush_hides_locators(&self) -> bool {
         #[cfg(feature = "painting")]
-        return self.brush_hides_selection() && !self.painting.prefs.show_locators;
+        return (self.painting.brush.tool.is_some() || self.sculpt.brush.is_some())
+            && !self.editor.has_active_task()
+            && !self.painting.prefs.show_locators;
         #[cfg(not(feature = "painting"))]
         false
     }
@@ -397,10 +400,51 @@ impl super::Operandi {
     }
 }
 
+/// The brush tools on now, for [`brush_hides_selection`].
+#[cfg_attr(not(feature = "painting"), allow(dead_code))]
+#[derive(Clone, Copy, Debug, Default)]
+pub(crate) struct BrushInUse {
+    /// A paint tool (Paintbrush, Airbrush, …) is on.
+    pub paint_tool: bool,
+    /// A brush whose reach the component selection limits is on: every
+    /// sculpt brush, the mask brush too (SCS-01..09).
+    pub limited_by_selection: bool,
+    /// Another tool is running on top of the brush.
+    pub other_task: bool,
+}
+
+/// Whether element highlighting (the selected tint, outline, edges and
+/// points) is hidden. A paint tool hides it so it doesn't cover what is
+/// being painted (Jason, 2026-11-18). A brush the selection limits keeps it
+/// drawn the whole time, so the area the brush can reach stays visible
+/// (Jason, 2026-11-23); the pre-highlight stays off for it either way
+/// (`rollovers_on`). Any other tool running brings the highlight back.
+/// Display only: the selection itself never changes (UIC-243).
+#[cfg_attr(not(feature = "painting"), allow(dead_code))]
+pub(crate) fn brush_hides_selection(brush: BrushInUse) -> bool {
+    brush.paint_tool && !brush.limited_by_selection && !brush.other_task
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
     use std::fs;
+
+    #[test]
+    fn only_a_brush_the_selection_does_not_limit_hides_it() {
+        let hides = |paint_tool, limited_by_selection, other_task| {
+            brush_hides_selection(BrushInUse {
+                paint_tool,
+                limited_by_selection,
+                other_task,
+            })
+        };
+        assert!(!hides(false, false, false), "no brush: drawn");
+        assert!(hides(true, false, false), "paint tool: hidden");
+        assert!(!hides(false, true, false), "sculpt brush: drawn");
+        assert!(!hides(true, true, false), "sculpt brush wins: drawn");
+        assert!(!hides(true, false, true), "another tool on top: drawn");
+    }
 
     #[test]
     fn defaults_keep_todays_look_and_reach() {

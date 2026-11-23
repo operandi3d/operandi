@@ -387,7 +387,8 @@ fn symmetry_strokes_both_sides_in_one_step() {
 /// SC-110 probe (opt-in, release): stroke frames on a 100k-point grid with
 /// a 100 px brush, through the whole viewport frame (GPU geometry patched
 /// on the CPU side). Run with
-/// `cargo test --release -p operandi-app sculpt_frame_time -- --ignored --nocapture`.
+/// `cargo test --release -p operandi-app sculpt_frame_time -- --ignored --nocapture`
+/// (see `OPERANDI_SCULPT_PROBE_SELECTION` below for a selection).
 #[test]
 #[ignore]
 fn sculpt_frame_time_100k_points() {
@@ -426,6 +427,15 @@ fn sculpt_frame_time_100k_points() {
         theme::install(&ctx);
         // The mesh fills the view's height, as when sculpting it.
         a.camera.distance = 1.8;
+        // OPERANDI_SCULPT_PROBE_SELECTION=shown selects the middle half of
+        // the rows in Polygon mode, drawn while sculpting; `hidden` selects
+        // them with Show Selections off (the cost before the overlay).
+        if let Ok(how) = std::env::var("OPERANDI_SCULPT_PROBE_SELECTION") {
+            a.run(Command::Mode(Mode::Polygon));
+            a.editor.scene.selection.faces = (n * n / 4..3 * n * n / 4).collect();
+            a.display.settings.drawing.selections = how != "hidden";
+            println!("selection {how}: {} polygons", n * n / 2);
+        }
         for _ in 0..2 {
             super::tests::draw(&mut a, &ctx, SIZE, vec![]);
         }

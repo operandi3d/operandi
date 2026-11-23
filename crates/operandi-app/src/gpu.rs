@@ -1086,7 +1086,8 @@ struct VertexOut { @builtin(position) position: vec4<f32>, @location(0) color: v
                         "Operandi resident highlight",
                         &highlight_bytes,
                         EDGE_STRIDE,
-                        wgpu::BufferUsages::VERTEX,
+                        // COPY_DST: a drag rewrites moved polygons' sides.
+                        wgpu::BufferUsages::VERTEX | wgpu::BufferUsages::COPY_DST,
                     )
                 })
             };
@@ -1116,6 +1117,13 @@ struct VertexOut { @builtin(position) position: vec4<f32>, @location(0) color: v
                 if patch.highlight {
                     b.highlight = new_highlight();
                     b.highlight_count = geometry.highlight.len() as u32;
+                } else if let Some(buffer) = &b.highlight {
+                    // Only the moved selected polygons' sides.
+                    for range in merged(&patch.highlight_ranges) {
+                        let bytes = edge_bytes(&geometry.highlight[range.clone()]);
+                        uploaded.set(uploaded.get() + bytes.len() as u64);
+                        buffer.write(queue, range.start as u32, &bytes);
+                    }
                 }
                 if let (Some(p), Some(draw)) = (&mut b.patches, &geometry.patches)
                     && let Some(sent) = p.update(queue, draw, b.built)
