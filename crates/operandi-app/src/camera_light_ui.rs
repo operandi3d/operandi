@@ -256,6 +256,37 @@ pub(crate) fn group_locator_marks(world: glam::DMat4, size: f64) -> Vec<Mark> {
     marks
 }
 
+/// IK-43: for each limited axis, a thin fan from Min to Max about that
+/// axis of the joint's parent space, through the joint.
+pub(crate) fn limit_fan_marks(
+    parent: glam::DMat4,
+    at: DVec3,
+    ik: &operandi_core::ik_joint::JointIk,
+    size: f64,
+) -> Vec<Mark> {
+    let mut marks = Vec::new();
+    let axes = [
+        parent.x_axis.truncate().normalize_or(DVec3::X),
+        parent.y_axis.truncate().normalize_or(DVec3::Y),
+        parent.z_axis.truncate().normalize_or(DVec3::Z),
+    ];
+    for (k, a) in ik.axes.iter().enumerate().filter(|(_, a)| a.use_limits) {
+        let axis = axes[k];
+        let start = axes[(k + 1) % 3] * size;
+        let at_angle = |t: f64| at + glam::DQuat::from_axis_angle(axis, t) * start;
+        const STEPS: usize = 16;
+        let (lo, hi) = (a.min.min(a.max), a.min.max(a.max));
+        marks.push(Mark::Line([at, at_angle(lo)]));
+        marks.push(Mark::Line([at, at_angle(hi)]));
+        for i in 0..STEPS {
+            let t0 = lo + (hi - lo) * i as f64 / STEPS as f64;
+            let t1 = lo + (hi - lo) * (i + 1) as f64 / STEPS as f64;
+            marks.push(Mark::Dotted([at_angle(t0), at_angle(t1)]));
+        }
+    }
+    marks
+}
+
 /// IK-02: an IK goal's box is 10% of its chain's first bone.
 fn ik_goal_size(scene: &operandi_core::Scene, goal: u64) -> f64 {
     let pos = |id: u64| scene.world_matrix(id).map(|m| m.w_axis.truncate()).ok();
@@ -1108,11 +1139,24 @@ impl Operandi {
                         .filter_map(|c| scene.world_matrix(c).ok())
                         .map(|m| m.w_axis.truncate())
                         .collect();
-                    joint_marks(
+                    let mut marks = joint_marks(
                         world,
                         &kids,
                         mpp * defaults::GROUP_LOCATOR_GLYPH_POINTS * 0.5 * grow,
-                    )
+                    );
+                    // IK-43: a selected limited joint shows its allowed arcs.
+                    if selected
+                        && let Some(ik) = operandi_core::ik_joint::settings(scene, item.id)
+                            .filter(|j| j.limited())
+                    {
+                        let size = kids.first().map_or(mpp * 30., |c| c.distance(at) * 0.4);
+                        let parent = item
+                            .parent
+                            .and_then(|p| scene.world_matrix(p).ok())
+                            .unwrap_or(glam::DMat4::IDENTITY);
+                        marks.extend(limit_fan_marks(parent, at, ik, size));
+                    }
+                    marks
                 }
                 _ if item.is_group_locator() => {
                     let Ok(world) = scene.world_matrix(item.id) else {
@@ -2442,6 +2486,22 @@ mod tests {
         assert!((span(&two) / span(&one) - 2.0).abs() < 1e-9);
         // Hidden by default (Jason, 2026-11-05).
         assert!(!a.display.settings.drawing.cameras && !a.display.settings.drawing.lights);
+    }
+
+    /// IK-43: a fan per limited axis, its edges at Min and Max.
+    #[test]
+    fn limit_fan_spans_min_to_max() {
+        let mut ik = operandi_core::ik_joint::JointIk::new(1);
+        ik.enable_limits = true;
+        ik.axes[2].use_limits = true;
+        ik.axes[2].min = 0.;
+        ik.axes[2].max = std::f64::consts::FRAC_PI_2;
+        let marks = limit_fan_marks(glam::DMat4::IDENTITY, DVec3::ZERO, &ik, 1.);
+        assert_eq!(marks.len(), 2 + 16);
+        let Mark::Line([_, hi]) = &marks[1] else {
+            panic!()
+        };
+        assert!(hi.distance(DVec3::Y) < 1e-9, "Z from X round to Y: {hi}");
     }
 
     /// SK-17/18: a joint draws a sphere sized by its bone, a solid bone

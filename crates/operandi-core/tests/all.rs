@@ -248,6 +248,8 @@ mod icon_studio;
 mod identity_positions;
 #[path = "ik_chain.rs"]
 mod ik_chain;
+#[path = "ik_limits.rs"]
+mod ik_limits;
 #[path = "ik_two_bone.rs"]
 mod ik_two_bone;
 #[path = "incidence_effects.rs"]

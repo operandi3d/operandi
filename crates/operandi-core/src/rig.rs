@@ -32,6 +32,9 @@ pub struct Rig {
         with = "pivot_list"
     )]
     pub pivots: BTreeMap<u64, Pivot>,
+    /// Joints' IK settings and limits (ik_joint.rs, IK-24/40), by joint.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub joint_ik: Vec<crate::ik_joint::JointIk>,
     /// User channels (RG-53), in the order added.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub user: Vec<UserChannel>,
@@ -236,7 +239,10 @@ impl Rig {
 
 impl Rig {
     pub fn is_default(&self) -> bool {
-        self.pieces.is_empty() && self.pivots.is_empty() && self.user.is_empty()
+        self.pieces.is_empty()
+            && self.pivots.is_empty()
+            && self.user.is_empty()
+            && self.joint_ik.is_empty()
     }
     pub fn piece(&self, id: u64) -> Option<&Piece> {
         self.pieces.iter().find(|p| p.id == id)

@@ -132,3 +132,42 @@ fn ik18_fabrik_through_the_bridge() {
         assert!((d - 1.).abs() < 1e-6, "{d}");
     }
 }
+
+/// IK-41 through the bridge: the knee's bend stops at its limit.
+#[test]
+fn ik41_limits_through_the_bridge() {
+    let mut b = Bridge::new();
+    let (_, goal) = leg(&mut b);
+    goal_to(&mut b, goal, [0., 1.5, 0.]);
+    let q = read(&mut b, "operandi.ik.query", json!({}));
+    let mid = q["solvers"][0]["joints"][1]["joint"].as_u64().unwrap();
+    let bend = |q: &Value| {
+        let p: Vec<[f64; 3]> = (0..3)
+            .map(|k| {
+                [0, 1, 2].map(|i| {
+                    q["solvers"][0]["joints"][k]["position"][i]
+                        .as_f64()
+                        .unwrap()
+                })
+            })
+            .collect();
+        let u = [p[1][0] - p[0][0], p[1][1] - p[0][1], p[1][2] - p[0][2]];
+        let v = [p[2][0] - p[1][0], p[2][1] - p[1][1], p[2][2] - p[1][2]];
+        let dot = u[0] * v[0] + u[1] * v[1] + u[2] * v[2];
+        let len = |w: [f64; 3]| (w[0] * w[0] + w[1] * w[1] + w[2] * w[2]).sqrt();
+        (dot / (len(u) * len(v))).clamp(-1., 1.).acos().to_degrees()
+    };
+    let free = bend(&q);
+    assert!(free > 60., "{free}");
+    run(
+        &mut b,
+        "operandi.ik.jointSet",
+        json!({"joint": mid, "enableLimits": true, "useLimitsX": true, "minX": -30, "maxX": 30}),
+    );
+    let q = read(&mut b, "operandi.ik.query", json!({}));
+    // The rest bend (22.6°) plus the knee's own turn, at most 30°.
+    let held = bend(&q);
+    let rest = 2. * 0.2f64.atan().to_degrees();
+    assert!(held <= rest + 30. + 1e-6 && held < free, "{held}");
+    assert_eq!(q["solvers"][0]["met"], false);
+}

@@ -3507,6 +3507,53 @@ pub static COMMANDS: &[Entry] = &[
         .undo()
         .operandi()
         .example("operandi.ik.applyTwoBone joints:3,4,5"),
+    script("operandi.ik.jointQuery", Items, "Reads a joint's IK settings and limits as JSON (IK-24, IK-40; angles in degrees).")
+        .on_editor(
+            "Read a joint's IK settings as JSON: active, enableLimits, limitFk, limitsAxis, maxVelocity and per axis X/Y/Z translate, translateWeight, rotate, rotateWeight, useLimits, min, max (degrees).",
+            &[jopt("joint", "integer", "The joint (default the selected item).")],
+            crate::ik_joint::run,
+        )
+        .query()
+        .quiet()
+        .operandi()
+        .example("operandi.ik.jointQuery joint:4"),
+    script("operandi.ik.jointSet", Items, "Sets a joint's IK settings and limits (IK-24, IK-40..42): Active, Enable Limits, Limit FK, per-axis Use Limits and Min/Max in degrees.")
+        .on_editor(
+            "Change a joint's IK settings, one undo step: active, enableLimits, limitFk, limitsAxis X/Y/Z, maxVelocity (degrees), and per axis (X, Y, Z suffix) useLimits, min, max (degrees), translate, translateWeight, rotate, rotateWeight.",
+            &[
+            jopt("joint", "integer", "The joint (default the selected item)."),
+            jopt("active", "boolean", "The joint takes part in IK (default true)."),
+            jopt("enableLimits", "boolean", "Use the axes' limits (default false)."),
+            jopt("limitFk", "boolean", "Limits clamp FK edits too (default false)."),
+            jopt("limitsAxis", "string", "The axis down the bone: X, Y or Z (default Z)."),
+            jopt("maxVelocity", "number", "Degrees a solver step may turn it."),
+            jopt("useLimitsX", "boolean", "Limit X."),
+            jopt("minX", "number", "Degrees."),
+            jopt("maxX", "number", "Degrees."),
+            jopt("translateX", "boolean", "Full-body IK may move it along X."),
+            jopt("translateWeightX", "number", "Translation weight on X."),
+            jopt("rotateX", "boolean", "Full-body IK may turn it about X (default true)."),
+            jopt("rotateWeightX", "number", "0 locks, above 1 favours X."),
+            jopt("useLimitsY", "boolean", "Limit Y."),
+            jopt("minY", "number", "Degrees."),
+            jopt("maxY", "number", "Degrees."),
+            jopt("translateY", "boolean", "Full-body IK may move it along Y."),
+            jopt("translateWeightY", "number", "Translation weight on Y."),
+            jopt("rotateY", "boolean", "Full-body IK may turn it about Y (default true)."),
+            jopt("rotateWeightY", "number", "0 locks, above 1 favours Y."),
+            jopt("useLimitsZ", "boolean", "Limit Z."),
+            jopt("minZ", "number", "Degrees."),
+            jopt("maxZ", "number", "Degrees."),
+            jopt("translateZ", "boolean", "Full-body IK may move it along Z."),
+            jopt("translateWeightZ", "number", "Translation weight on Z."),
+            jopt("rotateZ", "boolean", "Full-body IK may turn it about Z (default true)."),
+            jopt("rotateWeightZ", "number", "0 locks, above 1 favours Z."),
+        ],
+            crate::ik_joint::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.ik.jointSet joint:4 enableLimits:true useLimitsX:true minX:0 maxX:150"),
     script("operandi.ik.pole", Items, "Create, Assign or Remove IK Up Vector (IK-06): the elbow or knee points at the pole.")
         .on_editor(
             "mode create (default) adds a pole locator one bone out on the bend side; assign uses pole (any item); remove goes back to Orient. One undo step.",
@@ -7271,7 +7318,7 @@ mod tests {
                 assert!(!json.about.is_empty(), "{}", e.name);
             }
         }
-        assert_eq!(crate::command_exec::specs().count(), 286);
+        assert_eq!(crate::command_exec::specs().count(), 288);
     }
 
     #[test]

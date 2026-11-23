@@ -1239,6 +1239,8 @@ impl crate::Editor {
         if self.anim.quiet {
             return;
         }
+        // IK-42: Limit FK joints stay inside their limits.
+        crate::ik_joint::clamp_fk(&mut self.scene);
         let scene = &mut self.scene;
         if !scene.animation.channels.is_empty() {
             let gone: Vec<ChannelKey> = scene

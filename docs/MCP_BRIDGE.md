@@ -773,6 +773,36 @@ used in the app; `primitive_add` always starts from the Reset values.
   - `joints` (string): Root and end joint ids, comma separated.
 - **`operandi.ik.applyTwoBone`** — Make three joints (root, middle, end; default the selection in pick order) a two-bone IK chain, one undo step. Needs Setup mode; the chain's bend there is the side it keeps. Adds <root>_IKGoal under <root>_IKRoot.
   - `joints` (string): Root, middle and end joint ids, comma separated.
+- **`operandi.ik.jointQuery`** — Read a joint's IK settings as JSON: active, enableLimits, limitFk, limitsAxis, maxVelocity and per axis X/Y/Z translate, translateWeight, rotate, rotateWeight, useLimits, min, max (degrees).
+  - `joint` (integer): The joint (default the selected item).
+- **`operandi.ik.jointSet`** — Change a joint's IK settings, one undo step: active, enableLimits, limitFk, limitsAxis X/Y/Z, maxVelocity (degrees), and per axis (X, Y, Z suffix) useLimits, min, max (degrees), translate, translateWeight, rotate, rotateWeight.
+  - `joint` (integer): The joint (default the selected item).
+  - `active` (boolean): The joint takes part in IK (default true).
+  - `enableLimits` (boolean): Use the axes' limits (default false).
+  - `limitFk` (boolean): Limits clamp FK edits too (default false).
+  - `limitsAxis` (string): The axis down the bone: X, Y or Z (default Z).
+  - `maxVelocity` (number): Degrees a solver step may turn it.
+  - `useLimitsX` (boolean): Limit X.
+  - `minX` (number): Degrees.
+  - `maxX` (number): Degrees.
+  - `translateX` (boolean): Full-body IK may move it along X.
+  - `translateWeightX` (number): Translation weight on X.
+  - `rotateX` (boolean): Full-body IK may turn it about X (default true).
+  - `rotateWeightX` (number): 0 locks, above 1 favours X.
+  - `useLimitsY` (boolean): Limit Y.
+  - `minY` (number): Degrees.
+  - `maxY` (number): Degrees.
+  - `translateY` (boolean): Full-body IK may move it along Y.
+  - `translateWeightY` (number): Translation weight on Y.
+  - `rotateY` (boolean): Full-body IK may turn it about Y (default true).
+  - `rotateWeightY` (number): 0 locks, above 1 favours Y.
+  - `useLimitsZ` (boolean): Limit Z.
+  - `minZ` (number): Degrees.
+  - `maxZ` (number): Degrees.
+  - `translateZ` (boolean): Full-body IK may move it along Z.
+  - `translateWeightZ` (number): Translation weight on Z.
+  - `rotateZ` (boolean): Full-body IK may turn it about Z (default true).
+  - `rotateWeightZ` (number): 0 locks, above 1 favours Z.
 - **`operandi.ik.pole`** — mode create (default) adds a pole locator one bone out on the bend side; assign uses pole (any item); remove goes back to Orient. One undo step.
   - `piece` (integer): The solver (default the selected chain's).
   - `mode` (string): create (default), assign or remove.

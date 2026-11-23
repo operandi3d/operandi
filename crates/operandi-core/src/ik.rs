@@ -267,6 +267,9 @@ pub fn two_bone(p: &Piece, root: DMat4, look: &Look, overrides: &mut HashMap<u64
     let n_new = (b1 - a).cross(c1 - b1);
     let q1 = align(b - a, n_fk, b1 - a, n_new);
     let root_ik = turned(root, q1, a, a);
+    // IK-41: limits on the root.
+    let root_ik =
+        look.parent * crate::ik_joint::limit(s, p.item, look.parent.inverse() * root_ik, 1.);
     // The middle joint: at its (stretched) place, turned onto the end.
     let mid_moved = root_ik * mid_local;
     let at = mid_moved.w_axis.truncate();
@@ -277,6 +280,8 @@ pub fn two_bone(p: &Piece, root: DMat4, look: &Look, overrides: &mut HashMap<u64
         (c1 - b1).normalize_or_zero(),
     );
     let mid_ik = turned(mid_moved, q2, b1, b1);
+    // IK-41: the middle joint's bend clamps the same way.
+    let mid_ik = root_ik * crate::ik_joint::limit(s, mid, root_ik.inverse() * mid_ik, 1.);
     let blend = p.num("blend");
     let root_out = mix(root, root_ik, blend);
     let mid_out = root_out * mix(mid_local, root_ik.inverse() * mid_ik, blend);
@@ -480,6 +485,9 @@ pub fn chain(p: &Piece, root: DMat4, look: &Look, overrides: &mut HashMap<u64, D
         } else {
             base
         };
+        // IK-41: each joint's limits.
+        let up = if k == 0 { look.parent } else { parent_ik };
+        let w = up * crate::ik_joint::limit(s, ids[k], up.inverse() * w, 1.);
         ik_world.push(w);
         parent_ik = w;
     }
