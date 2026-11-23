@@ -199,6 +199,7 @@ pub fn evaluate_cached(scene: &Scene, cache: &mut RigCache) -> RigResult {
         broken: &out.broken,
         world: HashMap::new(),
         cache,
+        overrides: HashMap::new(),
     };
     // Scene order, each item after what it reads (`world` recurses).
     let mut ids: Vec<u64> = scene
@@ -222,6 +223,9 @@ struct Eval<'a> {
     broken: &'a BTreeSet<u64>,
     world: HashMap<u64, DMat4>,
     cache: &'a mut RigCache,
+    /// Worlds IK solvers set for their chain's joints below the root
+    /// (ik.rs), taken instead of the joint's own.
+    overrides: HashMap<u64, DMat4>,
 }
 
 fn hash_mat(m: &DMat4, h: &mut impl Hasher) {
@@ -288,7 +292,15 @@ impl Eval<'_> {
             }
         }
         let key = h.finish();
-        if let Some((k, w)) = self.cache.items.get(&id)
+        // An IK chain's joints come from the solve on its root, which
+        // reads more than this hash holds: neither uses the memo.
+        if let Some(w) = self.overrides.get(&id).copied() {
+            self.world.insert(id, w);
+            return w;
+        }
+        let solves = pieces.iter().any(|p| crate::ik::is_ik(&p.kind));
+        if !solves
+            && let Some((k, w)) = self.cache.items.get(&id)
             && *k == key
         {
             let w = *w;
@@ -314,8 +326,21 @@ impl Eval<'_> {
                 None => local,
             },
         };
-        for p in pieces.iter().filter(|p| p.kind != "dynamicParent") {
+        for p in pieces
+            .iter()
+            .filter(|p| p.kind != "dynamicParent" && !crate::ik::is_ik(&p.kind))
+        {
             w = constrain(self.scene, p, w, &look);
+        }
+        // IK last (ik.rs): it turns the root and sets its chain below.
+        let parent = item.parent.map_or(DMat4::IDENTITY, look);
+        for p in pieces.iter().filter(|p| crate::ik::is_ik(&p.kind)) {
+            let l = crate::ik::Look {
+                scene: self.scene,
+                world: &look,
+                parent,
+            };
+            w = crate::ik::solve(p, w, &l, &mut self.overrides);
         }
         if !w.is_finite() {
             w = self.scene.world_matrix(id).unwrap_or(DMat4::IDENTITY);

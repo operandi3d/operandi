@@ -3489,6 +3489,42 @@ pub static COMMANDS: &[Entry] = &[
         .undo()
         .operandi()
         .example("operandi.anim.restoreSetup items:3"),
+    script("operandi.ik.applyTwoBone", Items, "Apply IK (Two-Bone) (IK-01..02): a goal at the end joint, a group holding it and the chain, and a two-bone solver on the root; needs Setup mode.")
+        .on_editor(
+            "Make three joints (root, middle, end; default the selection in pick order) a two-bone IK chain, one undo step. Needs Setup mode; the chain's bend there is the side it keeps. Adds <root>_IKGoal under <root>_IKRoot.",
+            &[jopt("joints", "string", "Root, middle and end joint ids, comma separated.")],
+            crate::ik_commands::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.ik.applyTwoBone joints:3,4,5"),
+    script("operandi.ik.pole", Items, "Create, Assign or Remove IK Up Vector (IK-06): the elbow or knee points at the pole.")
+        .on_editor(
+            "mode create (default) adds a pole locator one bone out on the bend side; assign uses pole (any item); remove goes back to Orient. One undo step.",
+            &[
+            jopt("piece", "integer", "The solver (default the selected chain's)."),
+            jopt("mode", "string", "create (default), assign or remove."),
+            jopt("pole", "integer", "The item, for assign."),
+        ],
+            crate::ik_commands::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.ik.pole mode:create"),
+    script("operandi.ik.query", Items, "Reads IK solvers as JSON (UIC-163): chain joints' solved positions and rotations at a time, goal, pole, and whether the goal is met.")
+        .on_editor(
+            "Read IK solvers as JSON: piece, kind, root, goal, pole, blend, enable, joints (joint, name, position, rotation w,x,y,z), distance (end to goal) and met (within tolerance).",
+            &[
+            jopt("piece", "integer", "Only this solver."),
+            jopt("time", "number", "Seconds (default the current time)."),
+            jopt("tolerance", "number", "Met within this distance (default 0.001)."),
+        ],
+            crate::ik_commands::run,
+        )
+        .query()
+        .quiet()
+        .operandi()
+        .example("operandi.ik.query"),
     script("operandi.skel.add", Items, "Adds a skeleton joint (SK-10): a child of parent, or a new root, with symmetry and naming (SK-14/15).")
         .on_editor(
             "Add a joint at a world position, as a child of parent (or a new chain's root), one undo step. symmetry X/Y/Z also adds the mirrored joint under the mirrored parent, named with the side suffixes; the parent is re-aimed at its new first child unless preserveAlignment.",
@@ -7226,7 +7262,7 @@ mod tests {
                 assert!(!json.about.is_empty(), "{}", e.name);
             }
         }
-        assert_eq!(crate::command_exec::specs().count(), 282);
+        assert_eq!(crate::command_exec::specs().count(), 285);
     }
 
     #[test]

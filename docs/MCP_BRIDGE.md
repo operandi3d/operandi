@@ -769,6 +769,16 @@ used in the app; `primitive_add` always starts from the Reset values.
 - **`operandi.anim.restoreSetup`** — Throw away the edit values (the keys) of the items' animated channels and put back their setup values, one undo step. channels limits it to names such as pos.Y.
   - `items` (string): Item ids (default the selection).
   - `channels` (string): Only these channels, comma separated.
+- **`operandi.ik.applyTwoBone`** — Make three joints (root, middle, end; default the selection in pick order) a two-bone IK chain, one undo step. Needs Setup mode; the chain's bend there is the side it keeps. Adds <root>_IKGoal under <root>_IKRoot.
+  - `joints` (string): Root, middle and end joint ids, comma separated.
+- **`operandi.ik.pole`** — mode create (default) adds a pole locator one bone out on the bend side; assign uses pole (any item); remove goes back to Orient. One undo step.
+  - `piece` (integer): The solver (default the selected chain's).
+  - `mode` (string): create (default), assign or remove.
+  - `pole` (integer): The item, for assign.
+- **`operandi.ik.query`** — Read IK solvers as JSON: piece, kind, root, goal, pole, blend, enable, joints (joint, name, position, rotation w,x,y,z), distance (end to goal) and met (within tolerance).
+  - `piece` (integer): Only this solver.
+  - `time` (number): Seconds (default the current time).
+  - `tolerance` (number): Met within this distance (default 0.001).
 - **`operandi.skel.add`** — Add a joint at a world position, as a child of parent (or a new chain's root), one undo step. symmetry X/Y/Z also adds the mirrored joint under the mirrored parent, named with the side suffixes; the parent is re-aimed at its new first child unless preserveAlignment.
   - `position` (string, required): World position x,y,z.
   - `parent` (integer): Parent joint id (none: a new root).

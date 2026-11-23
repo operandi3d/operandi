@@ -256,6 +256,71 @@ pub(crate) fn group_locator_marks(world: glam::DMat4, size: f64) -> Vec<Mark> {
     marks
 }
 
+/// IK-02: an IK goal's box is 10% of its chain's first bone.
+fn ik_goal_size(scene: &operandi_core::Scene, goal: u64) -> f64 {
+    let pos = |id: u64| scene.world_matrix(id).map(|m| m.w_axis.truncate()).ok();
+    scene
+        .animation
+        .rig
+        .pieces
+        .iter()
+        .filter(|p| operandi_core::ik::is_ik(&p.kind) && p.targets.contains(&goal))
+        .find_map(|p| {
+            let first = operandi_core::ik::named(p, "mid")
+                .or_else(|| operandi_core::ik::named(p, "end"))?;
+            Some(pos(p.item)?.distance(pos(first)?) * 0.1)
+        })
+        .filter(|s| *s > 1e-9)
+        .unwrap_or(0.1)
+}
+
+/// IK-02 colours: +X green, −X red, on the centre line blue (the axis
+/// colours).
+fn ik_goal_color(scene: &operandi_core::Scene, goal: u64) -> Color32 {
+    let x = scene.world_matrix(goal).map_or(0., |m| m.w_axis.x);
+    let [red, green, blue] = theme::viewport::grid_axes();
+    if x > 1e-4 {
+        green
+    } else if x < -1e-4 {
+        red
+    } else {
+        blue
+    }
+}
+
+/// A solid box `size` across in the goal's own axes.
+pub(crate) fn ik_goal_marks(world: glam::DMat4, size: f64) -> Vec<Mark> {
+    let h = size * 0.5;
+    let p = |x: f64, y: f64, z: f64| world.transform_point3(DVec3::new(x * h, y * h, z * h));
+    let faces: [[(f64, f64, f64); 4]; 6] = [
+        [
+            (-1., -1., -1.),
+            (1., -1., -1.),
+            (1., 1., -1.),
+            (-1., 1., -1.),
+        ],
+        [(-1., -1., 1.), (1., -1., 1.), (1., 1., 1.), (-1., 1., 1.)],
+        [
+            (-1., -1., -1.),
+            (1., -1., -1.),
+            (1., -1., 1.),
+            (-1., -1., 1.),
+        ],
+        [(-1., 1., -1.), (1., 1., -1.), (1., 1., 1.), (-1., 1., 1.)],
+        [
+            (-1., -1., -1.),
+            (-1., 1., -1.),
+            (-1., 1., 1.),
+            (-1., -1., 1.),
+        ],
+        [(1., -1., -1.), (1., 1., -1.), (1., 1., 1.), (1., -1., 1.)],
+    ];
+    faces
+        .iter()
+        .map(|f| Mark::Fill(f.iter().map(|&(x, y, z)| p(x, y, z)).collect()))
+        .collect()
+}
+
 /// A joint's viewport shape (SK-17/18): a wire sphere (three rings in
 /// its own axes) and, to its first child, a solid bone (four edges out to
 /// a square a sixth of the way along, then in to the child); other
@@ -1024,6 +1089,12 @@ impl Operandi {
                         light_marks(world, &grown, selected)
                     }
                 }
+                _ if item.locator == Some(operandi_core::locator::LocatorKind::IkGoal) => {
+                    let Ok(world) = scene.world_matrix(item.id) else {
+                        continue;
+                    };
+                    ik_goal_marks(world, ik_goal_size(scene, item.id))
+                }
                 _ if item.is_joint() => {
                     let Ok(world) = scene.world_matrix(item.id) else {
                         continue;
@@ -1064,6 +1135,13 @@ impl Operandi {
                 crate::item_extras_ui::draw_options_color(item)
                     .unwrap_or_else(theme::viewport::locator)
             };
+            // IK-02: a goal is coloured by its side of X.
+            let color =
+                if !selected && item.locator == Some(operandi_core::locator::LocatorKind::IkGoal) {
+                    ik_goal_color(scene, item.id)
+                } else {
+                    color
+                };
             let stroke = Stroke::new(if selected { 1.5f32 } else { 1.0 }, color);
             let project = |a: DVec3, b: DVec3| match (projector.project(a), projector.project(b)) {
                 (Some((a, _)), Some((b, _))) => Some([a, b]),

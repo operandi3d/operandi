@@ -236,6 +236,8 @@ pub mod eval_build;
 pub mod eval_graph;
 pub mod eval_state;
 pub mod evaluate;
+pub mod ik;
+pub mod ik_commands;
 pub mod kit_item;
 pub mod meshop_selection;
 pub mod meshop_types;

@@ -1728,6 +1728,26 @@ impl Operandi {
                     self.execute("operandi.skin.bindDialog");
                 }
             }
+            // Phase 6 IK (text until their studio icons, UIC-190).
+            let ik = ui.button("IK").on_hover_text(
+                "IK: apply to the selected joints, poles, query (needs Setup to apply)",
+            );
+            let mut ik_lines: Vec<&str> = Vec::new();
+            egui::Popup::menu(&ik).show(|ui| {
+                for (label, line) in [
+                    ("Apply IK (Two-Bone)", "operandi.ik.applyTwoBone"),
+                    ("Create IK Up Vector", "operandi.ik.pole mode:create"),
+                    ("Remove Up Vector", "operandi.ik.pole mode:remove"),
+                ] {
+                    if ui.button(label).on_hover_text(line).clicked() {
+                        ik_lines.push(line);
+                        ui.close();
+                    }
+                }
+            });
+            for l in ik_lines {
+                self.execute(l);
+            }
             // SK-42: the weight tools on the selected map (text menu until
             // icons).
             let weights = ui

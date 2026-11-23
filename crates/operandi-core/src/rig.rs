@@ -381,7 +381,10 @@ pub fn label(kind: &str) -> String {
         "mod.math" => "Math".into(),
         "mod.clamp" => "Clamp".into(),
         "mod.switch" => "Switch".into(),
-        other => format!("{other} (missing)"),
+        other => match crate::ik::label(other) {
+            Some(l) => l.into(),
+            None => format!("{other} (missing)"),
+        },
     }
 }
 
@@ -397,6 +400,9 @@ pub fn default_value(kind: &str, name: &str) -> Option<f64> {
     };
     if common.is_some() {
         return common;
+    }
+    if crate::ik::is_ik(kind) {
+        return crate::ik::default_value(kind, name);
     }
     if let Some(axis) = name.strip_prefix("affect.") {
         return XYZ.contains(&axis).then_some(1.);
@@ -467,6 +473,10 @@ pub fn channel_names(piece: &Piece) -> Vec<String> {
             return out;
         }
         "mod.expression" | "mod.math" => return out,
+        k if crate::ik::is_ik(k) => {
+            out.extend(crate::ik::channel_names(k));
+            return out;
+        }
         k if !KINDS.contains(&k) => return Vec::new(),
         _ => {}
     }
@@ -521,7 +531,7 @@ impl Piece {
     }
     /// A kind this build doesn't know (§8 Files).
     pub fn is_missing(&self) -> bool {
-        !KINDS.contains(&self.kind.as_str())
+        !KINDS.contains(&self.kind.as_str()) && !crate::ik::is_ik(&self.kind)
     }
     /// A channel's value (its default when not set); `None` for a name
     /// the piece doesn't have.
@@ -562,7 +572,9 @@ impl Piece {
         if !channel_names(self).iter().any(|n| n == name) {
             return Err(format!("{} has no channel {name}", label(&self.kind)));
         }
+        let ik = crate::ik::is_ik(&self.kind);
         let value = match name {
+            n if ik && n != "enable" => crate::ik::clamp(n, value),
             "enable" | "usePivots" | "negative" | "wrap" | "localUp" => {
                 if value >= 0.5 {
                     1.
