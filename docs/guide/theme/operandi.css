@@ -1,0 +1,56 @@
+/* Operandi User Guide: the navy theme pulled toward the app's Steel look
+   (neutral greys, orange accent). Light theme left as mdBook ships it. */
+.navy {
+    --bg: #2b2c2f;
+    --fg: #d2d2d2;
+    --sidebar-bg: #212225;
+    --sidebar-fg: #c8c8c8;
+    --sidebar-non-existant: #6b6b6b;
+    --sidebar-active: #ffa000;
+    --sidebar-spacer: #3a3b3f;
+    --scrollbar: #5a5a5a;
+    --icons: #8a8a8a;
+    --icons-hover: #d2d2d2;
+    --links: #ffb033;
+    --inline-code-color: #e6e6e6;
+    --theme-popup-bg: #212225;
+    --theme-popup-border: #4a4a4a;
+    --theme-hover: #3a3b3f;
+    --quote-bg: #333438;
+    --quote-border: #4a4b50;
+    --table-border-color: #47484c;
+    --table-header-bg: #3a3b3f;
+    --table-alternate-bg: #303135;
+    --searchbar-border-color: #4a4a4a;
+    --searchbar-bg: #3a3b3f;
+    --searchbar-fg: #e6e6e6;
+    --searchbar-shadow-color: #000;
+    --searchresults-header-fg: #9a9a9a;
+    --searchresults-border-color: #4a4a4a;
+    --searchresults-li-bg: #2b2c2f;
+    --search-mark-bg: #b86f00;
+}
+
+/* Pictures of the app: full column width, a thin frame. */
+.content main img {
+    max-width: 100%;
+    border: 1px solid var(--table-border-color);
+}
+
+/* Placeholder for a picture the shot script can't make yet. */
+.shot-placeholder {
+    border: 2px dashed var(--sidebar-active);
+    padding: 1.5em;
+    text-align: center;
+    color: var(--icons);
+}
+
+/* The footer the guide adds under every page (operandi.js). */
+.guide-footer {
+    margin-top: 3em;
+    padding-top: 1em;
+    border-top: 1px solid var(--table-border-color);
+    font-size: 0.85em;
+    color: var(--icons);
+}
+.guide-footer a { color: var(--links); }
