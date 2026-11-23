@@ -617,10 +617,18 @@ pub enum Sample {
     SkeletonTool,
     /// Skin: a bent mesh tube bound to the cyan bones beside it.
     SkinMesh,
+    /// Apply IK (Two-Bone): a bent two-bone limb reaching a cyan goal.
+    IkTwoBone,
+    /// Apply IK (Chain): a curving bone chain reaching a cyan goal.
+    IkChain,
+    /// IK Up Vector: a bent limb whose knee points at a selected pole.
+    IkUpVector,
+    /// IK Goal: a cyan target with a bone tip in it.
+    IkGoal,
 }
 
 impl Sample {
-    pub const ALL: [Sample; 164] = [
+    pub const ALL: [Sample; 168] = [
         Sample::Cube,
         Sample::SelectedFace,
         Sample::Sphere,
@@ -785,6 +793,10 @@ impl Sample {
         Sample::SetupPose,
         Sample::SkeletonTool,
         Sample::SkinMesh,
+        Sample::IkTwoBone,
+        Sample::IkChain,
+        Sample::IkUpVector,
+        Sample::IkGoal,
     ];
 
     /// File stem and icon slug.
@@ -954,6 +966,10 @@ impl Sample {
             Sample::SetupPose => "setup-pose",
             Sample::SkeletonTool => "skeleton-tool",
             Sample::SkinMesh => "skin-mesh",
+            Sample::IkTwoBone => "ik-two-bone",
+            Sample::IkChain => "ik-chain",
+            Sample::IkUpVector => "ik-up-vector",
+            Sample::IkGoal => "ik-goal",
         }
     }
 
@@ -1941,6 +1957,37 @@ fn chain(joints: &[DVec3], bone_tag: &str, joint_tag: &str) -> Result<Vec<Mesh>>
     }
     for &j in joints {
         parts.push(ball(j, 0.075, joint_tag)?);
+    }
+    Ok(parts)
+}
+
+/// A point in the picture's plane through the origin: `x` across, `y` up.
+fn flat(x: f64, y: f64) -> DVec3 {
+    DVec3::new(1., 0., -1.).normalize() * x + DVec3::Y * y
+}
+
+/// An IK goal: a cyan ring in the picture's plane round a cyan dot.
+fn ik_target(centre: DVec3, radius: f64) -> Result<Vec<Mesh>> {
+    let ring: Vec<DVec3> = (0..=40)
+        .map(|k| {
+            let a = std::f64::consts::TAU * f64::from(k) / 40.;
+            centre + flat(radius * a.cos(), radius * a.sin())
+        })
+        .collect();
+    Ok(vec![
+        tube(&ring, 0.045, 10, "New")?,
+        ball(centre, 0.07, "New")?,
+    ])
+}
+
+/// A thick joint chain for small icons: fat bones, big joints.
+fn thick_chain(joints: &[DVec3], tag: &str) -> Result<Vec<Mesh>> {
+    let mut parts = Vec::new();
+    for w in joints.windows(2) {
+        parts.push(bone(w[0], w[1], 0.13, tag)?);
+    }
+    for &j in joints {
+        parts.push(ball(j, 0.1, tag)?);
     }
     Ok(parts)
 }
@@ -3873,6 +3920,50 @@ fn sample_mesh(sample: Sample) -> Result<Mesh> {
             let mut parts = vec![deformed(tube_with(&path, |_| 0.16, 24, CLAY)?, behind)];
             let front: Vec<DVec3> = joints.iter().map(|&j| j + toward * 0.3).collect();
             parts.extend(chain(&front, "New", "New")?);
+            merge(parts)?
+        }
+        Sample::IkTwoBone => {
+            let goal = flat(0.4, -0.3);
+            let mut parts = thick_chain(&[flat(-0.45, -0.3), flat(-0.05, 0.38), goal], CLAY)?;
+            parts.extend(ik_target(goal, 0.2)?);
+            merge(parts)?
+        }
+        Sample::IkChain => {
+            let goal = flat(0.45, 0.35);
+            let mut parts = thick_chain(
+                &[
+                    flat(-0.5, -0.4),
+                    flat(-0.25, 0.05),
+                    flat(0.05, 0.2),
+                    flat(0.28, 0.1),
+                    goal,
+                ],
+                CLAY,
+            )?;
+            parts.extend(ik_target(goal, 0.18)?);
+            merge(parts)?
+        }
+        Sample::IkUpVector => {
+            let knee = flat(-0.1, 0.2);
+            let pole = flat(-0.1, 0.55) + DVec3::ONE.normalize() * 0.15;
+            let mut parts = thick_chain(&[flat(-0.5, -0.4), knee, flat(0.35, -0.4)], CLAY)?;
+            parts.push(ball(pole, 0.12, "Selected")?);
+            for k in [0., 2.] {
+                let (t0, t1) = (0.25 + k * 0.17, 0.25 + (k + 1.) * 0.17);
+                parts.push(tube(
+                    &[knee.lerp(pole, t0), knee.lerp(pole, t1)],
+                    0.035,
+                    8,
+                    "Ink",
+                )?);
+            }
+            merge(parts)?
+        }
+        Sample::IkGoal => {
+            let goal = flat(0.12, 0.08);
+            let mut parts = ik_target(goal, 0.36)?;
+            parts.push(bone(flat(-0.5, -0.45), goal, 0.13, CLAY)?);
+            parts.push(ball(flat(-0.5, -0.45), 0.1, CLAY)?);
             merge(parts)?
         }
         Sample::LoopSlice => {

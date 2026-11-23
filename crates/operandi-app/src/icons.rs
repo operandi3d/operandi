@@ -397,6 +397,10 @@ pub enum Icon {
     SetupPose,
     SkeletonTool,
     SkinMesh,
+    IkTwoBone,
+    IkChain,
+    IkUpVector,
+    IkGoal,
 }
 /// One table: each icon's file in assets/icons (named as in the generator's
 /// output) and its embedded artwork. Add Loop uses the Loop Cut artwork;
@@ -833,6 +837,10 @@ icon_files! {
     SetupPose => "setup-pose",
     SkeletonTool => "skeleton-tool",
     SkinMesh => "skin-mesh",
+    IkTwoBone => "ik-two-bone",
+    IkChain => "ik-chain",
+    IkUpVector => "ik-up-vector",
+    IkGoal => "ik-goal",
 }
 
 fn rasterize(icon: Icon, pixels: u32) -> Result<ColorImage, String> {
