@@ -274,3 +274,141 @@ fn the_arm_reads_back_the_same() {
         }
     }
 }
+
+const BLENDER: &str = "/Applications/Blender.app/Contents/MacOS/Blender";
+
+/// The Blender script: import argv[0], print the deformed mesh's world
+/// points at frames 0, 12, 24, export the scene again to argv[2].
+const BLENDER_SCRIPT: &str = r#"import bpy, sys
+argv = sys.argv[sys.argv.index("--") + 1:]
+src, out, again = argv[0], argv[1], argv[2]
+bpy.ops.wm.read_factory_settings(use_empty=True)
+bpy.ops.wm.usd_import(filepath=src)
+scene = bpy.context.scene
+lines = []
+mesh = next(o for o in bpy.data.objects if o.type == 'MESH')
+arm = next(o for o in bpy.data.objects if o.type == 'ARMATURE')
+lines.append("BONES " + " ".join(b.name for b in arm.data.bones))
+mod = next(m for m in mesh.modifiers if m.type == 'ARMATURE')
+lines.append(f"VOLUME {mod.use_deform_preserve_volume}")
+for f in (0, 12, 24):
+    scene.frame_set(f)
+    dg = bpy.context.evaluated_depsgraph_get()
+    ev = mesh.evaluated_get(dg)
+    me = ev.to_mesh()
+    for i in range(0, len(me.vertices), 37):
+        p = mesh.matrix_world @ me.vertices[i].co
+        lines.append(f"P {f} {i} {p.x} {p.y} {p.z}")
+    ev.to_mesh_clear()
+open(out, "w").write("\n".join(lines) + "\n")
+scene.frame_set(0)
+bpy.ops.wm.usd_export(filepath=again, export_animation=True, export_armatures=True)
+"#;
+
+/// §8 milestone check 3: animate the arm, export USD, open it in Blender:
+/// the same deformation; Blender's own export reads back into Operandi
+/// with the same joints and the same deformation. Skipped where Blender
+/// isn't installed.
+#[test]
+fn blender_round_trip() {
+    if !std::path::Path::new(BLENDER).is_file() {
+        eprintln!("no Blender here; round trip skipped");
+        return;
+    }
+    let (mut e, mesh) = arm(false);
+    let dir = out_dir();
+    let path = dir.join("arm-to-blender.usd");
+    crate::export(
+        &path,
+        &e.evaluated(evaluate::Purpose::Final),
+        ExportFormat::Usd,
+    )
+    .unwrap();
+    let script = dir.join("blender_round_trip.py");
+    std::fs::write(&script, BLENDER_SCRIPT).unwrap();
+    let report = dir.join("blender.txt");
+    let again = dir.join("from-blender.usda");
+    let out = std::process::Command::new(BLENDER)
+        .args(["--background", "--factory-startup", "--python"])
+        .arg(&script)
+        .arg("--")
+        .args([&path, &report, &again])
+        .output()
+        .unwrap();
+    assert!(
+        out.status.success(),
+        "{}",
+        String::from_utf8_lossy(&out.stderr)
+    );
+    let text = std::fs::read_to_string(&report).unwrap();
+    assert!(text.contains("BONES Shoulder1 Elbow1 Wrist1"), "{text}");
+    // Blender is Z up: our (x, y, z) is its (x, -z, y).
+    let mut seen = 0;
+    for line in text.lines().filter(|l| l.starts_with("P ")) {
+        let v: Vec<f64> = line[2..]
+            .split_whitespace()
+            .map(|w| w.parse().unwrap())
+            .collect();
+        ok(&mut e, &format!("operandi.time.set frame:{}", v[0]));
+        let ours = e
+            .evaluated(evaluate::Purpose::Final)
+            .item(mesh)
+            .unwrap()
+            .mesh
+            .open()
+            .vertices[v[1] as usize];
+        let theirs = glam::DVec3::new(v[2], v[4], -v[3]);
+        assert!(
+            ours.distance(theirs) < 1e-4,
+            "frame {} point {}: {ours} vs Blender {theirs}",
+            v[0],
+            v[1]
+        );
+        seen += 1;
+    }
+    assert!(seen > 6, "{text}");
+    // Back from Blender.
+    let back = crate::import(&again, &Default::default()).unwrap();
+    let mut b = Editor {
+        scene: back.scene,
+        ..Default::default()
+    };
+    let joints: Vec<String> = b
+        .scene
+        .items
+        .iter()
+        .filter(|i| i.is_joint())
+        .map(|i| i.name.clone())
+        .collect();
+    assert_eq!(
+        joints,
+        ["Shoulder1", "Elbow1", "Wrist1"],
+        "{:?}",
+        back.notes
+    );
+    let m2 = b
+        .scene
+        .items
+        .iter()
+        .find(|i| i.is_mesh() && i.mesh_ops.is_some())
+        .expect("a skinned mesh")
+        .id;
+    for f in [0, 12, 24] {
+        ok(&mut e, &format!("operandi.time.set frame:{f}"));
+        ok(&mut b, &format!("operandi.time.set frame:{f}"));
+        let s1 = e.evaluated(evaluate::Purpose::Final);
+        let s2 = b.evaluated(evaluate::Purpose::Final);
+        let w1 = s1.world_matrix(mesh).unwrap();
+        let w2 = s2.world_matrix(m2).unwrap();
+        let ours = &s1.item(mesh).unwrap().mesh.open().vertices;
+        let theirs = &s2.item(m2).unwrap().mesh.open().vertices;
+        assert_eq!(ours.len(), theirs.len());
+        for (p, (a, c)) in ours.iter().zip(theirs.iter()).enumerate() {
+            let (a, c) = (w1.transform_point3(*a), w2.transform_point3(*c));
+            assert!(
+                a.distance(c) < 1e-4,
+                "back from Blender, frame {f} point {p}: {a} vs {c}"
+            );
+        }
+    }
+}

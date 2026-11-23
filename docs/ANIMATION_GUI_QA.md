@@ -55,3 +55,14 @@ named "Operandi Animation". Each step also once typed in the command line.
 33. Add User Channel (name, type angle) on the driven item, key it, link another item's rot.Z to it.
 34. Animate > Schematic: constrained and linked items and their pieces as nodes; drag a node; drag from an item's output port to a Math modifier's A (Add ▾ > Math), then its out to another item's "+" and pick a channel; click a wire, Delete removes it; right-click a piece > Delete.
 35. A position-constrained cube: its Move handle isn't offered ("Driven by Position Constraint"); Rotate's handle sits on the cube where it shows.
+
+## Rig phase 5 (joints, binding, weights)
+
+36. Timeline Setup button (setup-pose icon) on: every 3D view gets a yellow outline; a keyed cube shows its setup pose and dragging it doesn't add keys. Off: the animated pose again.
+37. Skeleton button (skeleton-tool icon): its options window opens. Over a cylinder in a side view, click three times along it: a chain of joints halfway through the cylinder, each with rings and a bone to the next. Shift+click starts a new chain; click an existing joint, then click again: a branch from it. Click-drag places the joint as you drag; one Cmd+Z per click.
+38. Symmetry X: a joint off the middle draws its mirror at once, named …_L / …_R. Edit mode drags a joint (Compensation on: the rest of the chain stays); Insert splits a bone; Delete removes a joint, children stay where they are.
+39. Select the cylinder, then the root joint; Setup on; Bind: the Bind dialog (Heat default). OK: the cylinder gets a Skin row in its Mesh Stack (skin-mesh icon). Setup off, rotate a joint: the cylinder bends, nothing left behind. Shift+click Bind unbinds.
+40. Bind a mesh with a loose point (Heat): the dialog stays open with the reason and "Use Smooth (Distance) instead"; the loose point is selected.
+41. Select a bound joint: its weight map becomes the selected map; Vertex Map shading shows it; Vertex Map Tools Paint changes it and the other joints' maps lower (totals 100%).
+42. Timeline Weights ▾: Smooth Selected, Normalize, Mirror (left to right), Split; each one Cmd+Z.
+43. File > Export USD the bent cylinder; open it in Blender: an armature and the same bend; play: same animation.
