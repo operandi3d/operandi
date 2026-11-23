@@ -16,6 +16,7 @@
 //! Operandi's own.
 use crate::{Mesh, Result};
 use serde::{Deserialize, Serialize};
+use rand::prelude::*;
 
 /// Reserved polygon set names start with this (not typeable).
 const GROUP_PREFIX: &str = "\u{1}meshop:";
@@ -147,10 +148,13 @@ pub enum SelKind {
     /// The polygons of a selection set on the mesh below.
     #[serde(rename = "operandi.selset.selop")]
     SelectionSet { name: String },
+    /// Random selection
+    #[serde(rename = "random.selop")]
+    Random { seed: u32, probability: f32 },
 }
 impl SelKind {
     /// The kinds Add Selection offers, with their labels.
-    pub fn menu() -> [(&'static str, SelKind); 5] {
+    pub fn menu() -> [(&'static str, SelKind); 6] {
         [
             (
                 "Select by Index",
@@ -185,6 +189,13 @@ impl SelKind {
                     name: String::new(),
                 },
             ),
+            (
+                "Select Randomly",
+                SelKind::Random {
+                    seed: 314159265,
+                    probability: 50.0,
+                },
+            )
         ]
     }
     pub fn label(&self) -> &'static str {
@@ -194,6 +205,7 @@ impl SelKind {
             Self::Pattern { .. } => "Select by Pattern",
             Self::Previous { .. } => "Select by Previous Operation",
             Self::SelectionSet { .. } => "Select by Selection Set",
+            Self::Random { .. } => "Select Randomly",
         }
     }
 }
@@ -297,6 +309,13 @@ impl SelOp {
                             *o = true;
                         }
                     }
+                }
+            }
+            SelKind::Random { seed, probability } => {
+                let mut rng = rand::rngs::StdRng::seed_from_u64(*seed as u64);
+                for o in out.iter_mut() {
+                    let rnd = rng.r#gen::<f32>();
+                    *o = rnd < (*probability / 100.0);
                 }
             }
         }

@@ -185,6 +185,26 @@ fn selection_ops(
                         "A polygon selection set on the mesh below",
                     );
                 }
+                SelKind::Random { seed, probability } => {
+                    rows::number_d(
+                        ui,
+                        "Seed",
+                        seed,
+                        0,
+                        Unit::Count,
+                        0..=u32::MAX,
+                        "Random number generator seed",
+                    );
+                    rows::number_d(
+                        ui,
+                        "Probability",
+                        probability,
+                        50.0,
+                        Unit::Percent,
+                        0.0..=100.0,
+                        "The chance each polygon is picked",
+                    );
+                }
             }
             remove = rows::button(ui, "Remove").clicked();
         });
