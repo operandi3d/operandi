@@ -452,16 +452,8 @@ fn write_png(
         let mut writer = encoder.write_header().map_err(|e| e.to_string())?;
         writer.write_image_data(data).map_err(|e| e.to_string())?;
     }
-    let name = path
-        .file_name()
-        .ok_or("Choose a file name")?
-        .to_string_lossy();
-    let temp = path.with_file_name(format!(".{name}.{}.tmp", std::process::id()));
-    std::fs::write(&temp, &bytes).map_err(|e| format!("Cannot write {}: {e}", path.display()))?;
-    std::fs::rename(&temp, path).map_err(|e| {
-        let _ = std::fs::remove_file(&temp);
-        format!("Cannot write {}: {e}", path.display())
-    })
+    path.file_name().ok_or("Choose a file name")?;
+    operandi_files::write_atomic(path, &bytes)
 }
 
 /// Pads a texture (PNG, any colour type and depth) around mesh item

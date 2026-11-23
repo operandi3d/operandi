@@ -560,7 +560,7 @@ pub fn layer_add(e: &mut Editor, args: &Map<String, Value>) -> Result<NodeId> {
         }
         (None, None) => None,
     };
-    let start = e.undo.len();
+    let start = e.history_mark();
     e.dispatch(Command::ShaderTree(ShaderTreeEdit::Add {
         layer: kind,
         selected,
@@ -635,7 +635,7 @@ fn edit_layer(e: &mut Editor, id: NodeId, settings: &Map<String, Value>) -> Resu
         let m = v.as_object().ok_or("channels must be an object")?;
         set_channels(&mut node, &m.iter().collect::<Vec<_>>())?;
     }
-    let start = e.undo.len();
+    let start = e.history_mark();
     e.dispatch(Command::ShaderTree(ShaderTreeEdit::Replace {
         node,
         continuing: false,
@@ -857,7 +857,7 @@ pub fn subdivision_set(e: &mut Editor, args: &Map<String, Value>) -> Result<()> 
     if !SUBDIVISION_FIELDS.iter().any(|(k, _)| get(k).is_some()) {
         return Err("Nothing to change: give toggle or a setting".into());
     }
-    let start = e.undo.len();
+    let start = e.history_mark();
     if let Some(v) = get("item") {
         let id = v.as_u64().ok_or("item must be an item id")?;
         if !e

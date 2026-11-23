@@ -11,6 +11,7 @@ older design notes are in [Operandi_Architecture_v0_1.md](Operandi_Architecture_
 |---|---|---|
 | `operandi-core` | The model: meshes, scene and items, selection, every modelling operation, commands, undo history, shading data, file formats. No window, GPU or OS code, so all of it is testable headless. | 124k lines |
 | `operandi-app` | The egui/eframe application: panels, toolbox, Tool Properties, viewport input and wgpu drawing, menus, preferences, dialogs, OS windows. Turns input into core commands and draws the result. | 176k lines |
+| `operandi-files` | The one safe file writer: a unique temporary beside the file, synced, then renamed over it. Scenes, images, exports and bakes save through it. | 0.1k lines |
 | `operandi-layout` | The workspace layout model: panes in splits and tab groups, torn-off windows, saved layouts. Panes are named, not tied to widgets. | 2k lines |
 | `operandi-cycles` | Final renders through Cycles (Blender's path tracer, Apache-2.0) as a C++ library behind a small C interface (`cycles/operandi_cycles.h`). Off unless built with `--features cycles`. | 10k lines + C++ |
 | `operandi-uv` | UV unwrapping and packing, a port of Blender's UV parametrizer, packer and SLIM solver (GPL-2.0-or-later / MPL-2.0). | 7k lines |

@@ -391,7 +391,7 @@ pub fn write_slot_files(
 /// Read output `k` of a slot back from the cache.
 pub fn read_output(folder: &Path, slot: &Slot, k: usize) -> Result<Vec<f32>, String> {
     let path = slot.output_file(folder, k);
-    let image = image::open(&path).map_err(|e| format!("{}: {e}", path.display()))?;
+    let image = crate::image_decode::open(&path).map_err(|e| format!("{}: {e}", path.display()))?;
     if (image.width(), image.height()) != (slot.width, slot.height) {
         return Err(format!("{} has the wrong size", path.display()));
     }
@@ -820,9 +820,8 @@ pub fn save_image(
 /// sRGB view shows them as they were saved.
 pub fn load_image(path: &Path) -> Result<(u32, u32, Vec<f32>), String> {
     let name = path.display();
-    let reader = image::ImageReader::open(path)
-        .and_then(|r| r.with_guessed_format())
-        .map_err(|e| format!("Can't read {name}: {e}"))?;
+    let reader =
+        crate::image_decode::reader(path).map_err(|e| format!("Can't read {name}: {e}"))?;
     let linear = matches!(
         reader.format(),
         Some(image::ImageFormat::OpenExr | image::ImageFormat::Hdr)

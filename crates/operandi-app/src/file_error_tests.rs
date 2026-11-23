@@ -18,7 +18,7 @@ fn a_failed_save_shows_a_dialog_and_keeps_the_scene_dirty() {
     assert_eq!(title, "Save");
     assert!(message.contains("not saved"), "{message}");
     assert!(
-        message.contains("Cannot create save temporary"),
+        message.contains("Cannot create a temporary file"),
         "{message}"
     );
     assert!(!bad.exists());

@@ -501,10 +501,7 @@ fn shrink_linear(picture: &image::Rgba32FImage, side: u32) -> (u32, u32, Vec<f32
 /// A picture file shrunk to [`PIXELS`]; HDR and EXR are tone mapped
 /// ([`tone_map_hdr`]) so bright skies don't burn out.
 pub(crate) fn picture_file(path: &Path) -> Option<ColorImage> {
-    let reader = image::ImageReader::open(path)
-        .ok()?
-        .with_guessed_format()
-        .ok()?;
+    let reader = crate::image_decode::reader(path).ok()?;
     let hdr = matches!(
         reader.format(),
         Some(image::ImageFormat::OpenExr | image::ImageFormat::Hdr)

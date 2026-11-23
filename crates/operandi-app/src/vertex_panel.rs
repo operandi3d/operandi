@@ -250,10 +250,10 @@ impl Operandi {
     }
 
     pub(super) fn run_vertex_command(&mut self, command: VertexCommand) {
-        let before = self.editor.undo.len();
+        let mark = self.editor.history_mark();
         let succeeded = self.run_ok(Command::VertexCommand(command));
         if succeeded {
-            self.status = if self.editor.undo.len() == before {
+            self.status = if !self.editor.recorded_since(mark) {
                 format!("{}: nothing to change", command.label())
             } else {
                 format!("{} done", command.label())
@@ -276,14 +276,14 @@ impl Operandi {
         }
         match self.sync_source {
             Some((source, faces)) if source != item => {
-                let before = self.editor.undo.len();
+                let mark = self.editor.history_mark();
                 let succeeded = self.run_ok(Command::SyncVertexOrder {
                     source_item: source,
                     source_faces: faces,
                 });
                 if succeeded {
                     self.sync_source = None;
-                    self.status = if self.editor.undo.len() == before {
+                    self.status = if !self.editor.recorded_since(mark) {
                         "Sync Index Order: the point order already matches".into()
                     } else {
                         "Sync Index Order done".into()

@@ -357,6 +357,36 @@ fn image_loads_from_its_file_and_saves_back() {
     assert!((e.scene.paint.buffers[&id].get(0)[0] - 0.75).abs() < 1e-4);
 }
 
+/// Astra P9-002: a reload of a file that doesn't decode (another app still
+/// writing it) keeps the pixels the image had, and says why.
+#[test]
+fn a_reload_that_fails_keeps_the_pixels() {
+    let dir = scratch();
+    let path = dir.join("half-written.png");
+    let mut px = pixels::PaintImage::new(pixels::Layout {
+        width: 16,
+        height: 16,
+        format: pixels::Format::Rgb,
+        depth: pixels::Depth::U8,
+    })
+    .unwrap();
+    px.fill([1., 0., 0., 1.]);
+    pixels::io::save(&px, &path).unwrap();
+    let mut e = Editor::default();
+    let id = e
+        .scene
+        .image_for_path(&path.display().to_string(), 16, 16)
+        .unwrap();
+    let before = e.image_pixels(id).unwrap();
+    std::fs::write(&path, b"\x89PNG half").unwrap();
+    assert!(e.reload_image(id).is_err());
+    assert!(
+        Arc::ptr_eq(&e.scene.paint.buffers[&id], &before),
+        "the old pixels stay"
+    );
+    assert!(!e.image_changed(id), "and still count as saved");
+}
+
 #[test]
 fn expand_uv_seams_grows_colour_past_the_islands() {
     let mut e = cube();

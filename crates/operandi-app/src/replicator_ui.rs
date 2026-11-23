@@ -38,6 +38,7 @@ impl Operandi {
         };
         let mut next = current.clone();
         let scene = &self.editor.scene;
+        let left_out = operandi_core::replicator::copies_left_out(scene, item.id);
         // Point Source: any mesh item. Prototype: a mesh item or a group.
         let meshes: Vec<(u64, String)> = scene
             .items
@@ -69,6 +70,19 @@ impl Operandi {
                     )
                     .response
                     .on_hover_text("The mesh whose points place the copies");
+                    if left_out > 0 {
+                        // Never a silent cut (hidden-limits A4).
+                        crate::form::rows::note(
+                            ui,
+                            &format!(
+                                "Shows the first {} copies; {} points of the Point Source get none.",
+                                operandi_core::polygon_subdivide::group_thousands(
+                                    operandi_core::replicator::MAX_COPIES as u64
+                                ),
+                                operandi_core::polygon_subdivide::group_thousands(left_out as u64)
+                            ),
+                        );
+                    }
                     let protos: Vec<(u64, &str)> =
                         prototypes.iter().map(|(id, n)| (*id, n.as_str())).collect();
                     crate::option_row::choice(

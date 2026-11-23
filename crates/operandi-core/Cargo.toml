@@ -7,6 +7,8 @@ license = "GPL-3.0-or-later"
 autotests = false
 
 [dependencies]
+# The one safe file writer (fsync, then rename; Astra P9-003).
+operandi-files = { path = "../operandi-files" }
 base64 = "0.22"
 glam.workspace = true
 gltf = { version = "1", default-features = false, features = ["utils", "names", "extras"] }

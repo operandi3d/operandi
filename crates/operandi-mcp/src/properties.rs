@@ -301,7 +301,7 @@ pub fn camera_set(e: &mut Editor, args: &Map<String, Value>) -> Result<()> {
     {
         return Err(format!("Item {id} is not a camera"));
     }
-    let start = e.undo.len();
+    let start = e.history_mark();
     let mut edits = Vec::new();
     let mut render_camera = false;
     // In the table's order, so focal_length then angle_of_view is defined.
@@ -376,7 +376,7 @@ pub fn light_set(e: &mut Editor, args: &Map<String, Value>) -> Result<()> {
     {
         return Err(format!("Item {id} is not a light"));
     }
-    let start = e.undo.len();
+    let start = e.history_mark();
     let mut edits = Vec::new();
     for (key, _) in LIGHT_FIELDS {
         let Some(v) = args.get(*key).filter(|v| !v.is_null()) else {
@@ -549,7 +549,7 @@ pub fn render_settings_get(e: &Editor, args: &Map<String, Value>) -> Result<Valu
 pub fn render_settings_set(e: &mut Editor, args: &Map<String, Value>) -> Result<()> {
     let names: Vec<&str> = RENDER_FIELDS.iter().map(|(k, _)| *k).collect();
     crate::commands::check_keys("render_settings_set", args, &names)?;
-    let start = e.undo.len();
+    let start = e.history_mark();
     let mut s = e.scene.render.clone();
     let get = |k: &str| args.get(k).filter(|v| !v.is_null());
     if let Some(v) = get("samples") {
@@ -713,7 +713,7 @@ pub fn backdrop_set(e: &mut Editor, args: &Map<String, Value>) -> Result<()> {
     {
         return Err(format!("Item {id} is not a backdrop"));
     }
-    let start = e.undo.len();
+    let start = e.history_mark();
     // Use Uniform Size first, so a Pixel Size in the same call applies.
     let order = ["image", "uniform_size"];
     let keys = order.iter().copied().chain(

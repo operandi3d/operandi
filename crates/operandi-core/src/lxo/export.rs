@@ -21,6 +21,10 @@ const MAX_CORNERS: usize = 1023;
 const MAX_POINTS: usize = 5_000_000;
 const MAX_POLYGONS: usize = 5_000_000;
 const MAX_ITEMS: usize = crate::MAX_SCENE_ITEMS;
+/// Layer numbers are written as 16 bits (`write_layer`).
+const MAX_LAYERS: usize = u16::MAX as usize + 1;
+/// Point indices are written as at most 24 bits (`Bytes::vx`).
+const MAX_LAYER_POINTS: usize = 1 << 24;
 
 /// Big-endian writer for the IFF-style primitives in format/01-container.md.
 #[derive(Default)]
@@ -54,6 +58,7 @@ impl Bytes {
     }
     /// Two bytes below 0xFF00, else FF plus 24 value bits.
     fn vx(&mut self, v: u32) {
+        debug_assert!(v < 1 << 24, "LXO point index {v} needs more than 24 bits");
         if v < 0xFF00 {
             self.u16(v as u16);
         } else {
@@ -239,6 +244,20 @@ pub fn write(scene: &Scene, notes: &mut Vec<String>) -> Result<Vec<u8>> {
     }
     if items.is_empty() {
         return Err("Nothing to export: no item has polygons".into());
+    }
+    // Layer numbers are 16-bit and point indices 24-bit in the format:
+    // past them the file would be corrupt, so refuse (hidden-limits A5).
+    if items.len() > MAX_LAYERS {
+        return Err(format!(
+            "LXO files hold at most {MAX_LAYERS} mesh layers; this scene has {} meshes with polygons",
+            items.len()
+        ));
+    }
+    if let Some(l) = layers.iter().find(|l| l.points.len() > MAX_LAYER_POINTS) {
+        return Err(format!(
+            "LXO files hold at most {MAX_LAYER_POINTS} points per mesh; one mesh has {}",
+            l.points.len()
+        ));
     }
     if items.len() > MAX_ITEMS
         || layers.iter().map(|l| l.points.len()).sum::<usize>() > MAX_POINTS

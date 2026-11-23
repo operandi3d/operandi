@@ -1,0 +1,8 @@
+[package]
+name = "operandi-files"
+version = "0.1.0"
+edition = "2024"
+license = "GPL-3.0-or-later"
+description = "Operandi's one safe file writer: a save fully replaces the old file or leaves it untouched"
+
+[dependencies]

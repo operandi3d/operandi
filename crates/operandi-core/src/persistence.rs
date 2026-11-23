@@ -1,17 +1,17 @@
 use crate::{Result, Scene};
 use serde::{Deserialize, Serialize};
-use std::{
-    fs::{self, File, OpenOptions},
-    io::{Read, Write},
-    path::Path,
-};
+use std::{fs::File, io::Read, path::Path};
 /// Largest scene file read. Writing has no limit. This was a fixed 64 MiB
 /// for writing and reading alike, which refused scenes of a few hundred
 /// thousand polygons; reading is now checked section by section instead
 /// (packed array lengths, string and point indices, `Scene::validate`),
 /// and this only stops a file far bigger than any real scene from being
 /// read into memory whole.
-const MAX_LOAD_BYTES: u64 = 4 * 1024 * 1024 * 1024;
+// Raised from 4 GiB (hidden-limits A2; Jason 2026-11-22: big scenes over
+// 4 GB are common): scenes save at any size, and Open, crash recovery and
+// the MCP bridge read whatever fits in memory. 256 GiB only stops a file
+// with a damaged size from being read whole.
+const MAX_LOAD_BYTES: u64 = 256 << 30;
 /// Newest native version this build reads and writes.
 // Version numbers: renumber here (and in the tests that name them) when
 // branches merge in another order.
@@ -996,21 +996,12 @@ pub fn load_for_bridge(path: &Path) -> Result<Scene> {
     load(path).or_else(|strict| load_keeping_broken_polygons(path).map_err(|_| strict))
 }
 fn read_limited(path: &Path) -> Result<Vec<u8>> {
-    let file = File::open(path).map_err(|e| e.to_string())?;
-    let size = file.metadata().map_err(|e| e.to_string())?.len();
-    if size > MAX_LOAD_BYTES {
-        return Err(too_big());
-    }
-    let mut data = Vec::with_capacity(size as usize);
-    file.take(MAX_LOAD_BYTES + 1)
-        .read_to_end(&mut data)
-        .map_err(|e| e.to_string())?;
-    Ok(data)
+    operandi_files::read_whole(path, MAX_LOAD_BYTES)
 }
 fn too_big() -> String {
     format!(
-        "The file is larger than {} GiB, more than any scene this build can open",
-        MAX_LOAD_BYTES >> 30
+        "The scene is larger than the {} any scene file may be",
+        operandi_files::size_text(MAX_LOAD_BYTES)
     )
 }
 /// How much of an existing destination `guard_destination` reads.
@@ -1206,8 +1197,9 @@ fn relative_preset_images(path: &Path, preset: &crate::preset::Preset) -> Option
     }
     Some(scene)
 }
-/// Same-directory create-new temporary, flush+sync, atomic rename. Errors retain
-/// the previous destination. No existing temporary is overwritten.
+/// Written through the one safe file writer (`operandi_files`): a unique
+/// temporary beside the file, synced, then renamed over it. Errors keep
+/// the previous file; no existing temporary is overwritten.
 ///
 /// Files inside the project enclosing `path` are written project-relative
 /// (`project_paths`); the scene in memory is left as it is.
@@ -1218,30 +1210,15 @@ pub fn save(path: &Path, scene: &Scene) -> Result<()> {
     let data = encode(relative.as_ref().unwrap_or(scene))?;
     write_atomic(path, &data)
 }
+/// Tests: the next save on this thread fails before writing anything
+/// (`operandi_files::refuse_next_write_on_this_thread`).
+#[doc(hidden)]
+pub fn refuse_next_save_on_this_thread() {
+    operandi_files::refuse_next_write_on_this_thread();
+}
 pub(crate) fn write_atomic(path: &Path, data: &[u8]) -> Result<()> {
-    let name = path
-        .file_name()
-        .ok_or("Choose a scene file path")?
-        .to_string_lossy();
-    let temp = path.with_file_name(format!(".{name}.{}.tmp", std::process::id()));
-    let mut created = false;
-    let result = (|| {
-        let mut file = OpenOptions::new()
-            .write(true)
-            .create_new(true)
-            .open(&temp)
-            .map_err(|e| format!("Cannot create save temporary: {e}"))?;
-        created = true;
-        file.write_all(data)
-            .and_then(|_| file.sync_all())
-            .map_err(|e| format!("Cannot write scene: {e}"))?;
-        fs::rename(&temp, path).map_err(|e| format!("Cannot replace scene: {e}"))?;
-        Ok(())
-    })();
-    if result.is_err() && created {
-        let _ = fs::remove_file(&temp);
-    }
-    result
+    path.file_name().ok_or("Choose a scene file path")?;
+    operandi_files::write_atomic(path, data)
 }
 
 /// Check extension and source identity before creating any output temporary.

@@ -153,9 +153,10 @@ pub(super) enum Purpose {
     BakeTo,
     /// Pad Texture to UVs...: the picture the pending line pads.
     PadTexture,
-    /// Save Image / Save Image As for scene image `0` (painting.rs).
+    /// Save Image / Save Image As for image `1` of scene tab `0`
+    /// (painting.rs). The tab travels with the answer (Astra P8-001).
     #[cfg(feature = "painting")]
-    PaintImage(u64),
+    PaintImage(u64, u64),
 }
 
 /// A native panel shown as a sheet on the window. It doesn't block: a modal
@@ -166,6 +167,26 @@ pub(super) struct Pending {
     pub purpose: Purpose,
     future: std::pin::Pin<Box<dyn std::future::Future<Output = Option<PathBuf>>>>,
 }
+/// Tests: a stand-in native panel that stays open until the test puts an
+/// answer here (`Some(None)` is Cancel).
+#[cfg(test)]
+pub(super) type HeldAnswer = std::rc::Rc<std::cell::RefCell<Option<Option<PathBuf>>>>;
+
+#[cfg(test)]
+impl Pending {
+    pub fn held(purpose: Purpose, answer: HeldAnswer) -> Self {
+        Self {
+            purpose,
+            future: Box::pin(std::future::poll_fn(move |_| {
+                match answer.borrow_mut().take() {
+                    Some(a) => std::task::Poll::Ready(a),
+                    None => std::task::Poll::Pending,
+                }
+            })),
+        }
+    }
+}
+
 impl Pending {
     /// `Some(answer)` once the panel closed; `None` while it's open.
     pub fn poll(&mut self) -> Option<Option<PathBuf>> {
@@ -478,6 +499,13 @@ impl super::Operandi {
     /// its typed-path dialog instead). The answer arrives through `chosen`,
     /// now for a stand-in, or from `poll_choice` for the native sheet.
     pub(super) fn choose(&mut self, request: Choose, purpose: Purpose) -> bool {
+        #[cfg(test)]
+        if let Some(answer) = &self.held_panel {
+            if self.choosing.is_none() {
+                self.choosing = Some(Pending::held(purpose, answer.clone()));
+            }
+            return true;
+        }
         if self.native_panels {
             if self.choosing.is_none() {
                 self.choosing = Some(start(request, purpose));
@@ -487,8 +515,9 @@ impl super::Operandi {
         let Some(choose) = self.chooser else {
             return false;
         };
-        if let Some(path) = choose(request) {
-            self.chosen(purpose, path);
+        match choose(request) {
+            Some(path) => self.chosen(purpose, path),
+            None => self.choice_cancelled(purpose),
         }
         true
     }
@@ -503,12 +532,22 @@ impl super::Operandi {
             Some(answer) => {
                 let purpose = pending.purpose;
                 self.choosing = None;
-                if let Some(path) = answer {
-                    self.chosen(purpose, path);
+                match answer {
+                    Some(path) => self.chosen(purpose, path),
+                    None => self.choice_cancelled(purpose),
                 }
                 ctx.request_repaint();
             }
         }
+    }
+
+    /// A panel closed with Cancel. Most purposes just drop the request.
+    fn choice_cancelled(&mut self, purpose: Purpose) {
+        #[cfg(feature = "painting")]
+        if let Purpose::PaintImage(..) = purpose {
+            self.cancel_image_saves();
+        }
+        let _ = purpose;
     }
 
     fn chosen(&mut self, purpose: Purpose, path: PathBuf) {
@@ -586,11 +625,11 @@ impl super::Operandi {
             Purpose::BakeTo => self.bake_to(&path),
             Purpose::PadTexture => self.pad_texture(&path),
             #[cfg(feature = "painting")]
-            Purpose::PaintImage(image) => self.paint_image_chosen(image, path),
+            Purpose::PaintImage(tab, image) => self.paint_image_chosen(tab, image, path),
             Purpose::UvLayout(eps) => self.export_uv_layout(&path, eps),
             Purpose::PresetBrowserThumbnail => {
                 if let Some(target) = self.preset_browser.thumb_target.take() {
-                    match image::open(&path) {
+                    match crate::image_decode::open(&path) {
                         Ok(picture) => self.set_entry_thumbnail(&target, picture),
                         Err(e) => self.status = format!("Can't read {}: {e}", path.display()),
                     }

@@ -4599,6 +4599,45 @@ impl Operandi {
             _ => {}
         }
     }
+    /// Ends whatever the viewport's press was doing when it can't go on:
+    /// focus lost, a dialog or menu took the input, or the pointer left
+    /// with nothing held (Astra P5-001). One place, so every exit does the
+    /// same: a selection drag is cancelled, a sculpt or paint stroke keeps
+    /// what it did as its own undo step, and the press is released. Before,
+    /// a dialog or focus change only dropped the navigation, so the stroke
+    /// stayed held and the next press merged into it.
+    pub(super) fn end_gesture(&mut self) {
+        if self.navigation.is_none()
+            && self.editor.selection_start.is_none()
+            && !self.pointer_held
+            && !self.app_stroke_held()
+        {
+            return;
+        }
+        if self.editor.selection_start.is_some() {
+            self.run(Command::EndSelection { cancel: true });
+        }
+        self.navigation = None;
+        // A stroke the pointer left keeps what it did.
+        self.finish_sculpt_stroke();
+        #[cfg(feature = "painting")]
+        self.finish_paint_stroke();
+        self.sculpt.adjust_at = None;
+        self.release_pointer();
+        let lost_capture = self.i2_gesture_ticket.take().is_some();
+        if lost_capture {
+            let _ = self.editor.identity_ticket();
+        }
+    }
+    /// A sculpt or paint stroke is held: the app, not core, owns its
+    /// tentative points in the scene.
+    pub(super) fn app_stroke_held(&self) -> bool {
+        #[cfg(feature = "painting")]
+        if self.painting.brush.live.is_some() {
+            return true;
+        }
+        self.sculpt.stroke.is_some()
+    }
     fn viewport_input(&mut self, ui: &Ui, response: &Response, r: Rect) {
         if self.show_plane
             || self.show_diagnostics
@@ -4618,18 +4657,12 @@ impl Operandi {
             // 2026-11-20), they don't select, navigate or run tools.
             || self.dots.build_mode
         {
-            if self.editor.selection_start.is_some() {
-                self.run(Command::EndSelection { cancel: true });
-            }
-            self.navigation = None;
+            self.end_gesture();
             self.drop_drag = None;
             return;
         }
         if !ui.input(|i| i.focused) {
-            if self.editor.selection_start.is_some() {
-                self.run(Command::EndSelection { cancel: true });
-            }
-            self.navigation = None;
+            self.end_gesture();
             self.drop_drag = None;
             return;
         }
@@ -6189,22 +6222,9 @@ impl Operandi {
                 Event::PointerGone if pointer_down => {}
                 Event::WindowFocused(false) | Event::PointerGone => {
                     self.cancel_drop();
-                    self.release_pointer();
                     // An abandoned Command-press must not open the menu later.
                     self.modeling_menu_pressed = false;
-                    if self.editor.selection_start.is_some() {
-                        self.run(Command::EndSelection { cancel: true });
-                    }
-                    self.navigation = None;
-                    // A stroke the pointer left keeps what it did.
-                    self.finish_sculpt_stroke();
-                    #[cfg(feature = "painting")]
-                    self.finish_paint_stroke();
-                    self.sculpt.adjust_at = None;
-                    let lost_capture = self.i2_gesture_ticket.take().is_some();
-                    if lost_capture {
-                        let _ = self.editor.identity_ticket();
-                    }
+                    self.end_gesture();
                 }
                 _ => {}
             }

@@ -324,9 +324,16 @@ fn save_does_not_remove_preexisting_temporary() {
         std::process::id()
     ));
     std::fs::write(&tmp, b"original temporary").unwrap();
+    // Temporary names are unique now (operandi_files), so another file of
+    // the old name is neither in the way nor touched.
+    persistence::save(&path, &e.scene).unwrap();
+    assert_eq!(std::fs::read(&tmp).unwrap(), b"original temporary");
+    // A save that fails leaves it too.
+    persistence::refuse_next_save_on_this_thread();
     assert!(persistence::save(&path, &e.scene).is_err());
     assert_eq!(std::fs::read(&tmp).unwrap(), b"original temporary");
     std::fs::remove_file(tmp).unwrap();
+    std::fs::remove_file(path).unwrap();
 }
 #[test]
 fn creation_reapply_is_single_task_and_invalid_preview_recovers() {
@@ -435,6 +442,7 @@ fn m11_failed_staged_save_preserves_exact_live_ownership_and_existing_destinatio
         std::process::id()
     ));
     std::fs::write(&temp, b"injected exclusive-write failure").unwrap();
+    persistence::refuse_next_save_on_this_thread();
     assert!(e.save_committed(&path).is_err());
     assert_eq!(std::fs::read(&path).unwrap(), b"existing saved original");
     assert_eq!(e.scene, before.scene);

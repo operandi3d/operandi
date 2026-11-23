@@ -1906,9 +1906,11 @@ impl crate::Editor {
             EdgeCommand::Join | EdgeCommand::JoinAveraged => Vec::new(),
             _ => selection,
         };
+        let mark = self.history_mark();
         self.publish_edge_edit(item, out, command.label(), Some(selection))?;
         if command == EdgeCommand::Subdivide {
             self.select_new_points(old_points);
+            self.amend_step_selection(mark);
         }
         Ok(())
     }
@@ -1936,8 +1938,10 @@ impl crate::Editor {
             return Ok(());
         }
         let old_points = mesh.vertices.len();
+        let mark = self.history_mark();
         self.publish_edge_edit(item, out, "Subdivide", Some(selection))?;
         self.select_new_points(old_points);
+        self.amend_step_selection(mark);
         Ok(())
     }
 }

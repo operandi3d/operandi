@@ -10,7 +10,7 @@
 use crate::{Face, Item, Mesh, Result, Scene};
 use glam::{DMat4, DVec2, DVec3};
 use std::collections::{BTreeMap, BTreeSet};
-use std::fs::{self, OpenOptions};
+use std::fs::OpenOptions;
 use std::io::Write;
 use std::path::Path;
 
@@ -33,7 +33,9 @@ mod zip;
 /// A text OBJ of 5 million polygons is about 500 MB, so this was raised
 /// from 512 MiB; it only stops a file far bigger than any real model from
 /// being read into memory whole.
-const MAX_IMPORT_BYTES: u64 = 4 * 1024 * 1024 * 1024;
+/// Raised from 4 GiB with scene Open (hidden-limits B7): a 50M polygon OBJ
+/// is 3-5 GB. What fits in memory is read.
+const MAX_IMPORT_BYTES: u64 = 256 << 30;
 /// UV map that imported texture coordinates land in; the same name the
 /// primitives use, so tools that look for "Texture" find imported UVs.
 const UV_MAP: &str = crate::PRIMITIVE_UV_MAP;
@@ -305,13 +307,7 @@ pub fn import_with(path: &Path, usd: &UsdImportOptions) -> Result<Imported> {
         .and_then(|e| e.to_str())
         .map(str::to_ascii_lowercase)
         .unwrap_or_default();
-    let size = fs::metadata(path)
-        .map_err(|e| format!("Cannot read {}: {e}", path.display()))?
-        .len();
-    if size > MAX_IMPORT_BYTES {
-        return Err("File exceeds the 4 GiB import budget".into());
-    }
-    let bytes = fs::read(path).map_err(|e| format!("Cannot read {}: {e}", path.display()))?;
+    let bytes = operandi_files::read_whole(path, MAX_IMPORT_BYTES)?;
     let stem = path
         .file_stem()
         .map(|s| s.to_string_lossy().into_owned())
@@ -745,31 +741,8 @@ fn write_atomic(path: &Path, data: &[u8]) -> Result<()> {
 /// empty first so an existing file is never taken over.
 fn write_atomic_with(path: &Path, fill: impl FnOnce(&Path) -> Result<()>) -> Result<()> {
     refuse_scene_file(path)?;
-    let name = path
-        .file_name()
-        .ok_or("Choose a file to export to")?
-        .to_string_lossy();
-    let temp = path.with_file_name(format!(".{name}.{}.tmp", std::process::id()));
-    let mut created = false;
-    let result = (|| {
-        OpenOptions::new()
-            .write(true)
-            .create_new(true)
-            .open(&temp)
-            .map_err(|e| format!("Cannot create export temporary: {e}"))?;
-        created = true;
-        fill(&temp)?;
-        OpenOptions::new()
-            .write(true)
-            .open(&temp)
-            .and_then(|f| f.sync_all())
-            .map_err(|e| format!("Cannot write export: {e}"))?;
-        fs::rename(&temp, path).map_err(|e| format!("Cannot replace {}: {e}", path.display()))
-    })();
-    if result.is_err() && created {
-        let _ = fs::remove_file(&temp);
-    }
-    result
+    path.file_name().ok_or("Choose a file to export to")?;
+    operandi_files::write_atomic_with(path, fill)
 }
 
 /// Export never replaces an Operandi scene.

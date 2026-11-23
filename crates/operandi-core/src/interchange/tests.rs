@@ -1,4 +1,5 @@
 use super::*;
+use std::fs;
 use std::path::PathBuf;
 
 /// A fresh scratch folder per test.

@@ -1,5 +1,5 @@
 [workspace]
-members = ["crates/operandi-core", "crates/operandi-uv", "crates/operandi-remesh", "crates/operandi-alembic", "crates/operandi-app", "crates/operandi-mcp", "crates/operandi-layout", "crates/operandi-cycles", "crates/operandi-preset-convert", "crates/operandi-usd", "crates/operandi-paint"]
+members = ["crates/operandi-core", "crates/operandi-uv", "crates/operandi-remesh", "crates/operandi-alembic", "crates/operandi-app", "crates/operandi-mcp", "crates/operandi-layout", "crates/operandi-cycles", "crates/operandi-preset-convert", "crates/operandi-usd", "crates/operandi-paint", "crates/operandi-files"]
 resolver = "2"
 # Vendored third-party crates used as path dependencies, not ours to lint
 # or test (vendor/craft-psd/OPERANDI.md).

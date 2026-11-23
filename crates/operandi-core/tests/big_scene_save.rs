@@ -157,7 +157,7 @@ fn a_failed_save_keeps_the_old_file_and_leaves_no_temporary() {
     // Unwritable: a folder that doesn't exist.
     let missing = dir.join("no-such-folder").join("Big.opscene");
     let error = persistence::save(&missing, &grid_scene(100, 1)).unwrap_err();
-    assert!(error.contains("Cannot create save temporary"), "{error}");
+    assert!(error.contains("Cannot create a temporary file"), "{error}");
     // Replacing a file whose name is taken by a folder fails at the rename.
     let blocked = dir.join("Blocked.opscene");
     std::fs::create_dir(&blocked).unwrap();
@@ -167,7 +167,7 @@ fn a_failed_save_keeps_the_old_file_and_leaves_no_temporary() {
     let leftovers: Vec<_> = std::fs::read_dir(&dir)
         .unwrap()
         .filter_map(|e| e.ok())
-        .filter(|e| e.file_name().to_string_lossy().ends_with(".tmp"))
+        .filter(|e| e.file_name().to_string_lossy().ends_with("tmp"))
         .collect();
     assert!(leftovers.is_empty(), "{leftovers:?}");
     std::fs::remove_dir_all(&dir).unwrap();
@@ -199,4 +199,43 @@ fn a_damaged_packed_array_is_refused_not_misread() {
     let blob = "/".repeat(end - start - 4) + "/w==";
     text.replace_range(start..end, &blob[..end - start]);
     assert!(persistence::decode(text.as_bytes()).is_err());
+}
+
+/// Hidden-limits A2: a scene file over the old 4 GiB Open limit opens. The
+/// file is a small scene padded with JSON whitespace to 4.5 GiB, so it
+/// needs disk and memory but no big mesh. Opt-in (about 5 GB of memory and
+/// disk, a minute in release):
+/// `cargo test --release -p operandi-core --test all big_scene_save::a_scene_over -- --ignored --nocapture`
+#[test]
+#[ignore]
+fn a_scene_over_four_gib_reopens() {
+    use std::io::Write;
+    let scene = grid_scene(10, 2);
+    let bytes = persistence::encode(&scene).unwrap();
+    assert_eq!(bytes[0], b'{');
+    let dir = temp_dir("over-4-gib");
+    let path = dir.join("padded.opscene");
+    let mut file = std::io::BufWriter::new(std::fs::File::create(&path).unwrap());
+    file.write_all(b"{").unwrap();
+    let spaces = vec![b' '; 64 << 20];
+    let target: u64 = (4 << 30) + (512 << 20);
+    let mut written = 0u64;
+    while written < target {
+        file.write_all(&spaces).unwrap();
+        written += spaces.len() as u64;
+    }
+    file.write_all(&bytes[1..]).unwrap();
+    file.flush().unwrap();
+    drop(file);
+    let size = std::fs::metadata(&path).unwrap().len();
+    assert!(size > 4 << 30, "{size}");
+    let start = Instant::now();
+    let reopened = persistence::load(&path).unwrap();
+    eprintln!(
+        "{size} bytes reopened in {:.1} s",
+        start.elapsed().as_secs_f64()
+    );
+    assert_eq!(reopened.items.len(), scene.items.len());
+    assert_eq!(faces(&reopened), faces(&scene));
+    std::fs::remove_dir_all(&dir).unwrap();
 }

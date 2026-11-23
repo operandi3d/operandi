@@ -73,6 +73,81 @@ fn a_live_tool_stays_with_its_scene() {
     assert_eq!(a.fields.get("cone_sides").map(String::as_str), Some("7"));
 }
 
+/// Astra P2-001: a scene's open tool keeps its own tweak history and step
+/// counts while another scene is edited; Undo and Redo after switching back
+/// act as if the switch never happened.
+#[test]
+fn a_live_tools_tweak_history_stays_with_its_scene() {
+    use operandi_core::{HistoryRequest, Parameters};
+    fn drag(a: &mut Operandi, delta: DVec3) {
+        let base = a.editor.live.as_ref().unwrap().params.clone();
+        a.editor.tweak_held = true;
+        for t in [0.5, 1.] {
+            a.editor
+                .dispatch(Command::Preview(Parameters {
+                    delta: delta * t,
+                    ..base.clone()
+                }))
+                .unwrap();
+        }
+        a.editor.end_tweak();
+        a.editor.dispatch(Command::CommitTransformStep).unwrap();
+    }
+    let mut a = app();
+    a.run(Command::NewMesh);
+    a.editor.scene.active_mut().unwrap().mesh =
+        operandi_core::Mesh::box_mesh(DVec3::ZERO, DVec3::ONE, 0)
+            .unwrap()
+            .into();
+    a.editor.scene.selection.mode = Mode::Polygon;
+    a.editor.scene.selection.faces = vec![0];
+    a.editor.synchronize_identities().unwrap();
+    let original = a.editor.scene.clone();
+    a.editor.dispatch(Command::Activate(Tool::Move)).unwrap();
+    drag(&mut a, DVec3::Y * 0.25);
+    let first = a.editor.scene.clone();
+    drag(&mut a, DVec3::Y * 0.5);
+    let second = a.editor.scene.clone();
+
+    // Another scene, with its own tool and tweaks.
+    a.request_file(FileAction::New);
+    a.run(Command::NewMesh);
+    a.editor.scene.active_mut().unwrap().mesh =
+        operandi_core::Mesh::box_mesh(DVec3::ZERO, DVec3::ONE, 0)
+            .unwrap()
+            .into();
+    a.editor.scene.selection.mode = Mode::Polygon;
+    a.editor.scene.selection.faces = vec![1];
+    a.editor.synchronize_identities().unwrap();
+    a.editor.dispatch(Command::Activate(Tool::Move)).unwrap();
+    drag(&mut a, DVec3::X);
+    assert!(a.switch_scene(0));
+
+    // Each Undo takes back one of this scene's drags, Move still open.
+    let undo = |a: &mut Operandi| {
+        a.editor
+            .dispatch_history_reported(HistoryRequest::Undo)
+            .unwrap()
+    };
+    undo(&mut a);
+    assert_eq!(a.editor.scene, first);
+    assert!(a.editor.live.as_ref().is_some_and(|l| l.tool == Tool::Move));
+    undo(&mut a);
+    assert_eq!(a.editor.scene, original);
+    a.editor
+        .dispatch_history_reported(HistoryRequest::Redo)
+        .unwrap();
+    a.editor
+        .dispatch_history_reported(HistoryRequest::Redo)
+        .unwrap();
+    assert_eq!(a.editor.scene, second);
+    // The other scene's drag is still its own to undo.
+    assert!(a.switch_scene(1));
+    let moved = a.editor.scene.clone();
+    undo(&mut a);
+    assert_ne!(a.editor.scene, moved, "the other scene's Undo still works");
+}
+
 #[test]
 fn open_fills_an_untouched_scene_and_switches_to_an_open_file() {
     let mut a = app();
@@ -240,6 +315,103 @@ fn every_open_scene_has_its_own_journal_and_all_are_recovered() {
     assert!(b.dirty());
     assert!(b.switch_scene(0));
     assert_eq!(b.editor.scene, first);
+}
+
+/// A new run on `a`'s data folder that has read the journals, as at launch.
+fn relaunch(a: &Operandi) -> Operandi {
+    let mut b = Operandi::with_environment(a.environment.clone());
+    b.initialize_new_document();
+    b.read_recovery();
+    b
+}
+
+/// Astra P7-001: Cancel on Recover Scene keeps the journals for the next
+/// launch, and closing or quitting this session must not delete them.
+#[test]
+fn cancelled_recovery_survives_close_scene_and_quit() {
+    let mut a = app();
+    edit(&mut a);
+    a.journal();
+    let first = a.editor.scene.clone();
+    a.request_file(FileAction::New);
+    edit(&mut a);
+    a.journal();
+    let second = a.editor.scene.clone();
+    assert_eq!(scenes::journal_files(&a.environment).len(), 2);
+
+    // Cancel, then Close Scene on the (clean) new scene.
+    let mut b = relaunch(&a);
+    b.keep_journals();
+    b.close_active_scene();
+    assert_eq!(scenes::journal_files(&b.environment).len(), 2);
+    // Cancel, then edit, discard and quit.
+    let mut c = relaunch(&a);
+    c.keep_journals();
+    edit(&mut c);
+    c.continue_quit();
+    assert!(c.allow_close);
+    assert_eq!(scenes::journal_files(&c.environment).len(), 2);
+    // Both journals are still offered.
+    let d = relaunch(&a);
+    assert_eq!(d.recovery.as_ref(), Some(&first));
+    assert_eq!(d.recovery_more, vec![second]);
+}
+
+/// Astra P7-002: a damaged first journal doesn't hide the healthy ones,
+/// and Recover or Discard never deletes a journal that couldn't be read.
+#[test]
+fn a_damaged_journal_neither_hides_healthy_ones_nor_gets_deleted() {
+    let mut a = app();
+    edit(&mut a);
+    a.journal();
+    a.request_file(FileAction::New);
+    edit(&mut a);
+    a.journal();
+    let second = a.editor.scene.clone();
+    let files = scenes::journal_files(&a.environment);
+    assert_eq!(files.len(), 2);
+    std::fs::write(&files[0], b"{ not a scene").unwrap();
+
+    let mut b = relaunch(&a);
+    let warning = b
+        .recovery_warning
+        .clone()
+        .expect("the damaged one is reported");
+    assert!(warning.contains("Diagnostic copy"), "{warning}");
+    assert_eq!(
+        b.recovery.as_ref(),
+        Some(&second),
+        "the healthy one is offered"
+    );
+    assert!(b.recovery_more.is_empty());
+    b.recovery_warning = None; // OK on the notice
+    b.recover_journals();
+    assert_eq!(b.editor.scene, second);
+    // The recovered scene journals under the open tab's slot; the second
+    // slot's old journal went with the recovery.
+    assert!(b.journal_path().exists());
+    assert!(!files[1].exists(), "the recovered journal was replaced");
+    let copies = std::fs::read_dir(files[0].parent().unwrap())
+        .unwrap()
+        .flatten()
+        .filter(|e| e.file_name().to_string_lossy().contains("-corrupt-"))
+        .count();
+    assert_eq!(copies, 1, "the damaged journal was copied aside");
+
+    // Discard deletes only what it read: a damaged second journal stays.
+    let mut c = app();
+    edit(&mut c);
+    c.journal();
+    c.request_file(FileAction::New);
+    edit(&mut c);
+    c.journal();
+    let files = scenes::journal_files(&c.environment);
+    std::fs::write(&files[1], b"garbage").unwrap();
+    let mut d = relaunch(&c);
+    assert!(d.recovery.is_some() && d.recovery_warning.is_some());
+    d.discard_journals();
+    assert!(!files[0].exists());
+    assert!(files[1].exists(), "an unreadable journal is never deleted");
 }
 
 #[test]
@@ -490,4 +662,38 @@ fn delete_asks_about_child_items_only_when_there_are_some() {
             .iter()
             .all(|i| i.id != group && i.id != child)
     );
+}
+
+/// Astra P8-002: a parked scene whose Ellipsoid preview waits to be applied
+/// needs saving by the same rule as the open scene, so Quit asks about it.
+#[test]
+fn a_parked_numeric_preview_counts_as_unsaved() {
+    let mut a = super::tests::box_app();
+    let file = scratch(&a, "preview.opscene");
+    assert!(a.save(file));
+    assert!(!a.dirty());
+    let r = eframe::egui::Rect::from_min_size(eframe::egui::Pos2::ZERO, vec2(800., 600.));
+    a.run(Command::ArmEllipsoid);
+    let plane = a.actual_plane();
+    let center = a.camera.project(DVec3::new(2., 0., 0.), r).unwrap().0;
+    let edge = a.camera.project(DVec3::new(3., 0., 0.), r).unwrap().0;
+    let input::GestureKind::SolidDraw { anchor, .. } = a.begin_solid_draw(false, center, r) else {
+        panic!("no draw gesture: {}", a.status);
+    };
+    a.solid_draw(false, plane, anchor, edge, r, true);
+    assert!(a.editor.ellipsoid.as_ref().unwrap().preview.is_some());
+    assert!(a.dirty(), "the open scene counts its preview");
+    a.request_file(FileAction::New);
+    assert!(a.tab_dirty(0), "and so does the same scene parked");
+}
+
+/// Astra P8-003: the shader Delete question counts as an open dialog, so a
+/// queued Open or the MCP bridge waits for its answer.
+#[test]
+fn the_shader_delete_question_is_modal() {
+    let mut a = app();
+    assert!(!a.has_modal());
+    a.shading.confirm_delete = Some(Vec::new());
+    assert!(a.has_modal());
+    assert_eq!(a.open_dialog(), Some("shader Delete question"));
 }

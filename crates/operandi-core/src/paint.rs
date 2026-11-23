@@ -551,12 +551,31 @@ impl Editor {
 
     /// Forgets the pixels of image `id` and reads its file again (an
     /// outside change with no unsaved paint, PNT-307). Not an undo step.
+    /// The file is read before the old pixels go (Astra P9-002): a file
+    /// another app is still writing, or one that no longer decodes, leaves
+    /// the image as it was and returns the error.
     pub fn reload_image(&mut self, id: u64) -> Result<()> {
-        self.scene.paint.buffers.remove(&id);
-        self.paint.saved.buffers.remove(&id);
-        self.scene.paint.psd.remove(&id);
-        self.paint.saved.psd.remove(&id);
-        self.image_pixels(id).map(|_| ())
+        let kept = (
+            self.scene.paint.buffers.remove(&id),
+            self.paint.saved.buffers.remove(&id),
+            self.scene.paint.psd.remove(&id),
+            self.paint.saved.psd.remove(&id),
+        );
+        let result = self.image_pixels(id).map(|_| ());
+        if result.is_err() {
+            fn restore<V>(map: &mut BTreeMap<u64, V>, id: u64, value: Option<V>) {
+                map.remove(&id);
+                if let Some(v) = value {
+                    map.insert(id, v);
+                }
+            }
+            let (buffer, saved, psd, saved_psd) = kept;
+            restore(&mut self.scene.paint.buffers, id, buffer);
+            restore(&mut self.paint.saved.buffers, id, saved);
+            restore(&mut self.scene.paint.psd, id, psd);
+            restore(&mut self.paint.saved.psd, id, saved_psd);
+        }
+        result
     }
 
     pub(crate) fn edit_paint(&mut self, edit: PaintEdit) -> Result<()> {

@@ -1080,7 +1080,7 @@ fn shrunk_png_of_file(
     path: &std::path::Path,
     max_size: u32,
 ) -> std::result::Result<Vec<u8>, String> {
-    let picture = image::open(path)
+    let picture = crate::image_decode::open(path)
         .map_err(|e| format!("{}: {e}", path.display()))?
         .to_rgba8();
     shrunk_png(picture, max_size)
