@@ -340,8 +340,13 @@ pub fn evaluate_releases(json: &str, me: &ThisBuild) -> Result<Verdict, String> 
 
 /// The hidden `<!-- operandi-build k=v ... -->` line's pairs.
 fn build_line(body: &str) -> Option<Vec<(&str, &str)>> {
-    let start = body.find("<!-- operandi-build")? + "<!-- operandi-build".len();
-    let rest = &body[start..];
+    // Any spacing after "<!--" (the first comment that is this line).
+    let rest = body.split("<!--").skip(1).find_map(|comment| {
+        comment
+            .trim_start()
+            .strip_prefix("operandi-build")
+            .filter(|r| r.starts_with(char::is_whitespace) || r.starts_with("-->"))
+    })?;
     let end = rest.find("-->")?;
     Some(
         rest[..end]
@@ -395,9 +400,16 @@ pub fn evaluate_test(json: &str, me: &ThisBuild, platform: Platform) -> Result<V
     };
     let pairs = build_line(body).unwrap_or_default();
     let get = |k: &str| pairs.iter().find(|(p, _)| *p == k).map(|(_, v)| *v);
-    let remote_sha = get(key).filter(|s| is_hex(s));
-    let remote_time = get(&format!("{key}_time")).and_then(|t| t.parse::<i64>().ok());
-    if let (Some(sha), Some(time)) = (remote_sha, remote_time) {
+    let time_key = format!("{key}_time");
+    // The hidden line names this platform: it decides. An empty value
+    // (`windows= windows_time=`) means no build for it yet, never a cue to
+    // read the notes instead.
+    if get(key).is_some() || get(&time_key).is_some() {
+        let sha = get(key).filter(|s| is_hex(s));
+        let time = get(&time_key).and_then(|t| t.parse::<i64>().ok());
+        let (Some(sha), Some(time)) = (sha, time) else {
+            return Ok(none_yet());
+        };
         let Some(mine) = me.commit_time else {
             return Ok(Verdict::Unknown(
                 "This build doesn't know when it was made, so it can't be compared.".into(),
@@ -791,6 +803,72 @@ mod tests {
         );
         assert!(matches!(
             evaluate_test(&mac_only, &me, Platform::Windows),
+            Ok(Verdict::Unknown(_))
+        ));
+    }
+
+    const MAC_SHA: &str = "1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b";
+    const WIN_SHA: &str = "5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f";
+
+    #[test]
+    fn hidden_line_with_full_shas_and_empty_platforms() {
+        let me = build("0.1.0", "9f8e7d6c", Some(NOV_21));
+        let line = |mac: &str, mac_t: &str, win: &str, win_t: &str| {
+            test_release(&format!(
+                "{NOTES}\n<!-- operandi-build mac={mac} mac_time={mac_t} windows={win} \
+                 windows_time={win_t} -->"
+            ))
+        };
+        let t = NOV_23.to_string();
+        // Both filled: each platform offered its own full sha.
+        let both = line(MAC_SHA, &t, WIN_SHA, &t);
+        for (platform, sha) in [(Platform::Mac, MAC_SHA), (Platform::Windows, WIN_SHA)] {
+            let Ok(Verdict::Newer(offer)) = evaluate_test(&both, &me, platform) else {
+                panic!("{platform:?}: expected an offer");
+            };
+            assert_eq!(offer.key, sha);
+            assert!(offer.message.contains(&sha[..8]), "{}", offer.message);
+        }
+        // This build is the full sha's commit (short or full stamp): newest.
+        for commit in [&MAC_SHA[..8], MAC_SHA] {
+            assert_eq!(
+                evaluate_test(&both, &build("0.1.0", commit, Some(NOV_21)), Platform::Mac),
+                Ok(Verdict::Newest(Channel::Test))
+            );
+        }
+        // Windows empty, mac filled: no Windows build, even though the
+        // notes have a "built from" line for it; mac still offered.
+        let no_win = line(MAC_SHA, &t, "", "");
+        assert_eq!(
+            evaluate_test(&no_win, &me, Platform::Windows),
+            Ok(Verdict::Unknown(
+                "There is no test build for this platform yet.".into()
+            ))
+        );
+        assert!(matches!(
+            evaluate_test(&no_win, &me, Platform::Mac),
+            Ok(Verdict::Newer(_))
+        ));
+        // Mac empty: no mac build; Windows offered.
+        let no_mac = line("", "", WIN_SHA, &t);
+        assert!(matches!(
+            evaluate_test(&no_mac, &me, Platform::Mac),
+            Ok(Verdict::Unknown(_))
+        ));
+        let Ok(Verdict::Newer(offer)) = evaluate_test(&no_mac, &me, Platform::Windows) else {
+            panic!("expected a Windows offer");
+        };
+        assert_eq!(offer.key, WIN_SHA);
+        // Extra spaces anywhere in the line read the same.
+        let spaced = test_release(&format!(
+            "{NOTES}\n<!--   operandi-build    mac={MAC_SHA}   mac_time={t}  windows=   \
+             windows_time=    -->"
+        ));
+        assert!(
+            matches!(evaluate_test(&spaced, &me, Platform::Mac), Ok(Verdict::Newer(ref o)) if o.key == MAC_SHA)
+        );
+        assert!(matches!(
+            evaluate_test(&spaced, &me, Platform::Windows),
             Ok(Verdict::Unknown(_))
         ));
     }
