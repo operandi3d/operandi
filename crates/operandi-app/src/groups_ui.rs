@@ -138,9 +138,9 @@ impl Operandi {
             .filter(|g| self.editor.scene.group(*g).is_some())
     }
 
+    /// Members in pick order.
     fn selected_items(&self) -> Vec<u64> {
-        let s = &self.editor.scene.selection;
-        s.item.into_iter().chain(s.also.iter().copied()).collect()
+        self.editor.scene.picked_items()
     }
 
     /// Item > New Group from Selection (and the Groups tab's New Group).

@@ -91,19 +91,7 @@ fn vec3(a: &Args, name: &str) -> Result<Option<glam::DVec3>, String> {
 
 /// The selection in pick order (the active item was picked last).
 fn picked(e: &Editor) -> Vec<u64> {
-    let s = &e.scene.selection;
-    let mut out: Vec<u64> = s
-        .also
-        .iter()
-        .copied()
-        .filter(|i| e.scene.item(*i).is_some())
-        .collect();
-    if let Some(active) = s.item
-        && !out.contains(&active)
-    {
-        out.push(active);
-    }
-    out
+    e.scene.picked_items()
 }
 
 /// An item's evaluated world now (the rig included).

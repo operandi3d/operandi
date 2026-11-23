@@ -1067,6 +1067,17 @@ fn select(e: &mut Editor, args: &Map<String, Value>) -> Result<()> {
         None => e.scene.selection.item.ok_or("No active item; pass item")?,
     };
     if mode == Mode::Item {
+        // add: the item joins the selection as the newest pick (and the
+        // primary), so pick-order commands read it last (rig-pick-order).
+        if opt_bool(args, "add")?.unwrap_or(false) {
+            if e.scene.selected_items().contains(&item) && e.scene.selection.item != Some(item) {
+                // Already picked earlier: picking it again makes it newest.
+                e.dispatch(Command::ToggleItemSelection(item))?;
+            } else if e.scene.selection.item == Some(item) {
+                return Ok(());
+            }
+            return e.dispatch(Command::ToggleItemSelection(item));
+        }
         return e.dispatch(Command::SelectItem(Some(item)));
     }
     // The item becomes the active one in component modes too, so later

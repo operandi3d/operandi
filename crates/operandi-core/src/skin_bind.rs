@@ -639,7 +639,7 @@ fn is_joint(scene: &Scene, id: u64) -> bool {
 /// The meshes (`items`, else the selected meshes) and the root (`root`,
 /// else the last selected joint).
 fn targets(scene: &Scene, a: &Args) -> Result<(Vec<u64>, Option<u64>)> {
-    let selected = scene.selected_items();
+    let selected = scene.picked_items();
     let meshes = match ids(a, "items")? {
         Some(m) => m,
         None => selected

@@ -107,9 +107,10 @@ fn piece_state(
 impl Editor {
     pub(crate) fn merge_items(&mut self) -> Result<()> {
         self.require_idle()?;
+        // The first picked mesh survives (pick order, not the primary).
         let ids: Vec<u64> = self
             .scene
-            .selected_items()
+            .picked_items()
             .into_iter()
             .filter(|id| self.scene.items.iter().any(|i| i.id == *id && i.is_mesh()))
             .collect();

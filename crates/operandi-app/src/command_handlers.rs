@@ -361,6 +361,11 @@ fn answers(r: &mut Commands) {
     for (name, state) in lit {
         r.answer(name, state).unwrap_or_else(|e| panic!("{e}"));
     }
+    // The Rig tab's Compensation lights while it is on (Jason, 2026-11-23).
+    r.answer("operandi.rig.compensation", |a, _| {
+        CommandState::lit(a.editor.rig_compensation)
+    })
+    .unwrap_or_else(|e| panic!("{e}"));
     // The Polygon tab's sessions and dialogs light while they are open
     // (layouts stage 3 batch 5; the old rows read the state themselves).
     let lit: [(&str, StateHandler); 9] = [

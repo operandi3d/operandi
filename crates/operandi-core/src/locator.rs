@@ -95,8 +95,9 @@ impl Scene {
     }
 
     fn parent_to_group_locator_in_place(&mut self) -> Result<u64> {
+        // Pick order: the locator takes the first picked item's place.
         let selected: Vec<u64> = self
-            .selected_items()
+            .picked_items()
             .into_iter()
             .filter(|id| self.item(*id).is_some_and(|i| !i.is_texture_item()))
             .collect();

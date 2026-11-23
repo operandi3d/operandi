@@ -72,14 +72,14 @@ fn click_ctrl_click_and_shift_click_select_rows() {
     let row = |a: &Operandi, i: usize| a.scene_rows[&ids[i]].center();
     let p0 = row(&a, 1);
     click_with(&mut a, &ctx, p0, Modifiers::NONE);
-    assert_eq!(a.editor.scene.selected_items(), [ids[1]]);
+    assert_eq!(a.editor.scene.picked_items(), [ids[1]]);
     let p0 = row(&a, 3);
     click_with(&mut a, &ctx, p0, Modifiers::CTRL);
-    assert_eq!(a.editor.scene.selected_items(), [ids[1], ids[3]]);
+    assert_eq!(a.editor.scene.picked_items(), [ids[1], ids[3]]);
     let p0 = row(&a, 3);
     click_with(&mut a, &ctx, p0, Modifiers::CTRL);
     assert_eq!(
-        a.editor.scene.selected_items(),
+        a.editor.scene.picked_items(),
         [ids[1]],
         "Ctrl again removes"
     );
@@ -87,27 +87,27 @@ fn click_ctrl_click_and_shift_click_select_rows() {
     let p0 = row(&a, 0);
     click_with(&mut a, &ctx, p0, Modifiers::SHIFT);
     assert_eq!(
-        a.editor.scene.selected_items(),
+        a.editor.scene.picked_items(),
         [ids[3], ids[2], ids[1], ids[0]]
     );
     assert_eq!(
         a.editor.scene.selection.item,
-        Some(ids[3]),
-        "anchor is primary"
+        Some(ids[0]),
+        "the clicked end is primary (pick order anchor..clicked)"
     );
     // Cmd toggles like Ctrl (Jason, 2026-11-08): row 2 is selected, so
     // Cmd-click takes it out and a second Cmd-click puts it back.
     let p0 = row(&a, 2);
     click_with(&mut a, &ctx, p0, Modifiers::MAC_CMD | Modifiers::COMMAND);
-    assert_eq!(a.editor.scene.selected_items(), [ids[3], ids[1], ids[0]]);
+    assert_eq!(a.editor.scene.picked_items(), [ids[3], ids[1], ids[0]]);
     click_with(&mut a, &ctx, p0, Modifiers::MAC_CMD | Modifiers::COMMAND);
     assert_eq!(
-        a.editor.scene.selected_items(),
+        a.editor.scene.picked_items(),
         [ids[3], ids[1], ids[0], ids[2]]
     );
     // Opt (Alt) is a plain click.
     click_with(&mut a, &ctx, p0, Modifiers::ALT);
-    assert_eq!(a.editor.scene.selected_items(), [ids[2]]);
+    assert_eq!(a.editor.scene.picked_items(), [ids[2]]);
 }
 
 #[test]
