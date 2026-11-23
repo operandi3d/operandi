@@ -611,10 +611,16 @@ pub enum Sample {
     Schematic,
     /// Bake: a curve set with a cyan key at every frame.
     BakeKeys,
+    /// Setup: a skeleton standing in its straight rest pose on a selected base.
+    SetupPose,
+    /// Skeleton: a joint chain with its newest bone and joint cyan.
+    SkeletonTool,
+    /// Skin: a bent mesh tube bound to the cyan bones beside it.
+    SkinMesh,
 }
 
 impl Sample {
-    pub const ALL: [Sample; 161] = [
+    pub const ALL: [Sample; 164] = [
         Sample::Cube,
         Sample::SelectedFace,
         Sample::Sphere,
@@ -776,6 +782,9 @@ impl Sample {
         Sample::ChannelLinks,
         Sample::Schematic,
         Sample::BakeKeys,
+        Sample::SetupPose,
+        Sample::SkeletonTool,
+        Sample::SkinMesh,
     ];
 
     /// File stem and icon slug.
@@ -942,6 +951,9 @@ impl Sample {
             Sample::ChannelLinks => "channel-links",
             Sample::Schematic => "schematic",
             Sample::BakeKeys => "bake-keys",
+            Sample::SetupPose => "setup-pose",
+            Sample::SkeletonTool => "skeleton-tool",
+            Sample::SkinMesh => "skin-mesh",
         }
     }
 
@@ -1907,6 +1919,28 @@ fn key_handles(cx: f64, cy: f64, left: f64, right: f64, len: f64) -> Result<Vec<
             "Selected",
         )?);
         parts.push(ball(end, 0.07, "Selected")?);
+    }
+    Ok(parts)
+}
+
+/// A bone from joint `a` to joint `b`: a four-sided spindle, widest a
+/// fifth of the way along.
+fn bone(a: DVec3, b: DVec3, width: f64, tag: &str) -> Result<Mesh> {
+    let len = a.distance(b);
+    let mut m = revolve(&[(0., 0.), (width, len * 0.2), (0., len)], 4, false, tag)?;
+    let turn = glam::DQuat::from_rotation_arc(DVec3::Y, (b - a).normalize());
+    m = deformed(m, |v| a + turn * v);
+    Ok(m)
+}
+
+/// A joint chain: a ball at each joint, a bone between each pair.
+fn chain(joints: &[DVec3], bone_tag: &str, joint_tag: &str) -> Result<Vec<Mesh>> {
+    let mut parts = Vec::new();
+    for w in joints.windows(2) {
+        parts.push(bone(w[0], w[1], 0.09, bone_tag)?);
+    }
+    for &j in joints {
+        parts.push(ball(j, 0.075, joint_tag)?);
     }
     Ok(parts)
 }
@@ -3781,6 +3815,65 @@ fn sample_mesh(sample: Sample) -> Result<Mesh> {
                 parts.push(key(x, f(x), 0.15)?);
             }
             symbol(parts)?
+        }
+        Sample::SetupPose => {
+            // A T-pose seen square on: spine, arms straight out, legs down.
+            let across = DVec3::new(1., 0., -1.).normalize();
+            let at = |x: f64, y: f64| across * x * 1.3 + DVec3::Y * (y * 1.25 + 0.02);
+            let mut parts = vec![box_by_normal(
+                DVec3::new(-0.22, -0.6, -0.22),
+                DVec3::new(0.22, -0.54, 0.22),
+                |n| if n == DVec3::Y { "Selected" } else { CLAY },
+            )?];
+            parts.extend(chain(
+                &[at(0., -0.05), at(0., 0.25), at(0., 0.45)],
+                CLAY,
+                CLAY,
+            )?);
+            parts.extend(chain(
+                &[at(-0.48, 0.25), at(-0.22, 0.25), at(0., 0.25)],
+                CLAY,
+                CLAY,
+            )?);
+            parts.extend(chain(
+                &[at(0., 0.25), at(0.22, 0.25), at(0.48, 0.25)],
+                CLAY,
+                CLAY,
+            )?);
+            parts.extend(chain(
+                &[
+                    at(-0.12, -0.5),
+                    at(-0.12, -0.05),
+                    at(0.12, -0.05),
+                    at(0.12, -0.5),
+                ],
+                CLAY,
+                CLAY,
+            )?);
+            merge(parts)?
+        }
+        Sample::SkeletonTool => {
+            let across = DVec3::new(1., 0., -1.).normalize();
+            let at = |x: f64, y: f64| across * x + DVec3::Y * y;
+            let joints = [at(-0.45, -0.45), at(-0.15, -0.05), at(0.05, 0.3)];
+            let mut parts = chain(&joints, CLAY, CLAY)?;
+            let new_joint = at(0.45, 0.4);
+            parts.push(bone(joints[2], new_joint, 0.09, "New")?);
+            parts.push(ball(new_joint, 0.09, "New")?);
+            merge(parts)?
+        }
+        Sample::SkinMesh => {
+            let across = DVec3::new(1., 0., -1.).normalize();
+            let at = |x: f64, y: f64| across * x + DVec3::Y * y;
+            let joints = [at(-0.45, -0.35), at(0.05, -0.2), at(0.4, 0.35)];
+            let path = through(&joints, 12);
+            let toward = DVec3::ONE.normalize();
+            // The mesh sits behind; the bones it is bound to just in front.
+            let behind = |v: DVec3| v - toward * 0.12;
+            let mut parts = vec![deformed(tube_with(&path, |_| 0.16, 24, CLAY)?, behind)];
+            let front: Vec<DVec3> = joints.iter().map(|&j| j + toward * 0.3).collect();
+            parts.extend(chain(&front, "New", "New")?);
+            merge(parts)?
         }
         Sample::LoopSlice => {
             let mut parts = vec![sample_mesh(Sample::Cube)?];

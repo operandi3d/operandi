@@ -394,6 +394,9 @@ pub enum Icon {
     ChannelLinks,
     Schematic,
     BakeKeys,
+    SetupPose,
+    SkeletonTool,
+    SkinMesh,
 }
 /// One table: each icon's file in assets/icons (named as in the generator's
 /// output) and its embedded artwork. Add Loop uses the Loop Cut artwork;
@@ -827,6 +830,9 @@ icon_files! {
     ChannelLinks => "channel-links",
     Schematic => "schematic",
     BakeKeys => "bake-keys",
+    SetupPose => "setup-pose",
+    SkeletonTool => "skeleton-tool",
+    SkinMesh => "skin-mesh",
 }
 
 fn rasterize(icon: Icon, pixels: u32) -> Result<ColorImage, String> {
