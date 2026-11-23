@@ -631,10 +631,48 @@ pub enum Sample {
     IkFullBody,
     /// Switch IK/FK: a limb with a cyan IK goal at its tip and a selected FK turn at its root.
     IkFkSwitch,
+    /// Unparent: a selected child cut from its parent.
+    Unparent,
+    /// Add Parent: a child linked up to a new cyan parent.
+    AddParent,
+    /// Compensation: the parent moves, the child stays pinned.
+    Compensation,
+    /// Add Joints to Bind: a skin tube gaining a cyan joint.
+    AddJointsToBind,
+    /// Smooth weights: red weight columns in an even hill.
+    SmoothWeights,
+    /// Normalize weights: stacked columns all reaching one cyan line.
+    NormalizeWeights,
+    /// Mirror weights: red columns mirrored across a cyan line.
+    MirrorWeights,
+    /// Isolate weights: one red column among grey ones.
+    IsolateWeights,
+    /// Split Left/Right: red columns left, blue right, a dark divider.
+    SplitWeights,
+    /// Bake weights: red columns pressed onto a selected strip.
+    BakeWeights,
+    /// Add Position Task: an IK goal with a cyan move cross.
+    AddPositionTask,
+    /// Add Orientation Task: an IK goal with a cyan turn arrow.
+    AddOrientationTask,
+    /// IK/FK Set Keys: a cyan key beside an IK goal.
+    IkFkSetKeys,
+    /// Select Switch Channels: a switch with a selected knob.
+    SelectSwitchChannels,
+    /// Select IK Solvers: a selected limb with its goal.
+    SelectIkSolvers,
+    /// Match Goal: the goal snapped onto the limb's tip.
+    MatchGoal,
+    /// Update Rest Pose: a T-pose with a cyan refresh arrow.
+    UpdateRestPose,
+    /// Disable IK: a limb and goal struck through.
+    DisableIk,
+    /// Remove IK: a limb and goal with a dark cross.
+    RemoveIk,
 }
 
 impl Sample {
-    pub const ALL: [Sample; 171] = [
+    pub const ALL: [Sample; 190] = [
         Sample::Cube,
         Sample::SelectedFace,
         Sample::Sphere,
@@ -806,6 +844,25 @@ impl Sample {
         Sample::PoseTool,
         Sample::IkFullBody,
         Sample::IkFkSwitch,
+        Sample::Unparent,
+        Sample::AddParent,
+        Sample::Compensation,
+        Sample::AddJointsToBind,
+        Sample::SmoothWeights,
+        Sample::NormalizeWeights,
+        Sample::MirrorWeights,
+        Sample::IsolateWeights,
+        Sample::SplitWeights,
+        Sample::BakeWeights,
+        Sample::AddPositionTask,
+        Sample::AddOrientationTask,
+        Sample::IkFkSetKeys,
+        Sample::SelectSwitchChannels,
+        Sample::SelectIkSolvers,
+        Sample::MatchGoal,
+        Sample::UpdateRestPose,
+        Sample::DisableIk,
+        Sample::RemoveIk,
     ];
 
     /// File stem and icon slug.
@@ -982,6 +1039,25 @@ impl Sample {
             Sample::PoseTool => "pose-tool",
             Sample::IkFullBody => "ik-full-body",
             Sample::IkFkSwitch => "ik-fk-switch",
+            Sample::Unparent => "unparent",
+            Sample::AddParent => "add-parent",
+            Sample::Compensation => "compensation",
+            Sample::AddJointsToBind => "add-joints-to-bind",
+            Sample::SmoothWeights => "smooth-weights",
+            Sample::NormalizeWeights => "normalize-weights",
+            Sample::MirrorWeights => "mirror-weights",
+            Sample::IsolateWeights => "isolate-weights",
+            Sample::SplitWeights => "split-weights",
+            Sample::BakeWeights => "bake-weights",
+            Sample::AddPositionTask => "add-position-task",
+            Sample::AddOrientationTask => "add-orientation-task",
+            Sample::IkFkSetKeys => "ik-fk-set-keys",
+            Sample::SelectSwitchChannels => "select-switch-channels",
+            Sample::SelectIkSolvers => "select-ik-solvers",
+            Sample::MatchGoal => "match-goal",
+            Sample::UpdateRestPose => "update-rest-pose",
+            Sample::DisableIk => "disable-ik",
+            Sample::RemoveIk => "remove-ik",
         }
     }
 
@@ -2002,6 +2078,70 @@ fn thick_chain(joints: &[DVec3], tag: &str) -> Result<Vec<Mesh>> {
         parts.push(ball(j, 0.1, tag)?);
     }
     Ok(parts)
+}
+
+/// Weight columns in the symbol plane: one bar per height, on a base.
+fn weight_columns(heights: &[(f64, &'static str)]) -> Result<Vec<Mesh>> {
+    let n = heights.len() as f64;
+    let w = 1.0 / n;
+    let mut parts = vec![bar(-0.55, -0.42, 0.55, -0.42, 0.06, 0.08, CLAY)?];
+    for (k, &(h, tag)) in heights.iter().enumerate() {
+        let x = -0.5 + w * (k as f64 + 0.5);
+        let half = w * 0.44;
+        parts.push(slab(
+            &[
+                (x - half, -0.38),
+                (x + half, -0.38),
+                (x + half, -0.38 + h),
+                (x - half, -0.38 + h),
+            ],
+            0.16,
+            tag,
+        )?);
+    }
+    Ok(parts)
+}
+
+/// A turning arrow round `centre` in the picture's plane.
+fn turn_arrow(centre: DVec3, radius: f64, tag: &str) -> Result<Vec<Mesh>> {
+    let arc: Vec<DVec3> = (0..=20)
+        .map(|k| {
+            let a = 0.4 + std::f64::consts::TAU * 0.75 * f64::from(k) / 20.;
+            centre + flat(radius * a.cos(), radius * a.sin())
+        })
+        .collect();
+    let n = arc.len();
+    Ok(vec![
+        tube(&arc[..n - 2], 0.045, 10, tag)?,
+        arrow(
+            arc[n - 3],
+            arc[n - 1] + (arc[n - 1] - arc[n - 3]),
+            0.045,
+            tag,
+        )?,
+    ])
+}
+
+/// A plain two-bone limb with its goal, for the IK management icons.
+fn limb_with_goal(goal_tag: &str) -> Result<Vec<Mesh>> {
+    let goal = flat(0.38, -0.3);
+    let mut parts = thick_chain(&[flat(-0.45, -0.3), flat(-0.05, 0.3), goal], CLAY)?;
+    let mut ring = ik_target(goal, 0.18)?;
+    if goal_tag != "New" {
+        for m in &mut ring {
+            for f in &mut m.faces {
+                f.material = goal_tag.into();
+            }
+        }
+    }
+    parts.extend(ring);
+    Ok(parts)
+}
+
+/// A thick dark bar across the picture (struck through).
+fn strike(a: DVec3, b: DVec3) -> Result<Mesh> {
+    let toward = DVec3::ONE.normalize() * 0.25;
+    tube(&[a + toward, b + toward], 0.06, 10, "Ink")
 }
 
 /// The geometry of a sample, inside the icon box.
@@ -4032,6 +4172,236 @@ fn sample_mesh(sample: Sample) -> Result<Mesh> {
                 0.045,
                 "Selected",
             )?);
+            merge(parts)?
+        }
+        Sample::Unparent => {
+            let top = flat(-0.4, 0.4);
+            let child = flat(0.4, -0.4);
+            let step = (child - top).normalize();
+            merge(vec![
+                cube_at(top, 0.32, CLAY)?,
+                cube_at(child, 0.32, "Selected")?,
+                tube(&[top + step * 0.24, top + step * 0.44], 0.05, 8, "Ink")?,
+                tube(&[child - step * 0.44, child - step * 0.24], 0.05, 8, "Ink")?,
+            ])?
+        }
+        Sample::AddParent => {
+            let top = flat(-0.3, 0.3);
+            let child = flat(0.3, -0.3);
+            let step = (child - top).normalize();
+            merge(vec![
+                cube_at(top, 0.36, "New")?,
+                cube_at(child, 0.36, CLAY)?,
+                tube(&[top + step * 0.2, child - step * 0.2], 0.05, 8, "New")?,
+            ])?
+        }
+        Sample::Compensation => {
+            let parent = flat(-0.25, 0.25);
+            let child = flat(0.25, -0.3);
+            merge(vec![
+                cube_at(parent, 0.34, CLAY)?,
+                arrow(
+                    parent + flat(-0.05, 0.25),
+                    parent + flat(-0.5, 0.25),
+                    0.045,
+                    "New",
+                )?,
+                cube_at(child, 0.3, CLAY)?,
+                tube(
+                    &[child + DVec3::Y * 0.15, child + DVec3::Y * 0.42],
+                    0.035,
+                    8,
+                    "Ink",
+                )?,
+                ball(child + DVec3::Y * 0.42, 0.1, "Selected")?,
+            ])?
+        }
+        Sample::AddJointsToBind => {
+            let path = [flat(-0.5, -0.3), flat(-0.1, -0.1), flat(0.3, -0.25)];
+            let mut parts = vec![tube_with(&through(&path, 12), |_| 0.17, 24, CLAY)?];
+            let j = flat(0.25, 0.32);
+            parts.push(ball(j, 0.13, "New")?);
+            parts.push(tube(
+                &[j - flat(0.0, 0.13), path[2] + flat(0., 0.17)],
+                0.035,
+                8,
+                "New",
+            )?);
+            merge(parts)?
+        }
+        Sample::SmoothWeights => symbol(weight_columns(&[
+            (0.2, "Axis X"),
+            (0.45, "Axis X"),
+            (0.65, "Axis X"),
+            (0.45, "Axis X"),
+            (0.2, "Axis X"),
+        ])?)?,
+        Sample::NormalizeWeights => {
+            let mut parts = Vec::new();
+            for (k, h) in [0.25f64, 0.45, 0.15].into_iter().enumerate() {
+                let x = -0.33 + 0.33 * k as f64;
+                parts.push(slab(
+                    &[
+                        (x - 0.11, -0.38),
+                        (x + 0.11, -0.38),
+                        (x + 0.11, -0.38 + h),
+                        (x - 0.11, -0.38 + h),
+                    ],
+                    0.16,
+                    "Axis X",
+                )?);
+                parts.push(slab(
+                    &[
+                        (x - 0.11, -0.38 + h),
+                        (x + 0.11, -0.38 + h),
+                        (x + 0.11, 0.3),
+                        (x - 0.11, 0.3),
+                    ],
+                    0.16,
+                    CLAY,
+                )?);
+            }
+            parts.push(bar(-0.55, 0.38, 0.55, 0.38, 0.06, 0.1, "New")?);
+            parts.push(bar(-0.55, -0.42, 0.55, -0.42, 0.06, 0.08, CLAY)?);
+            symbol(parts)?
+        }
+        Sample::MirrorWeights => {
+            let mut parts = weight_columns(&[
+                (0.25, "Axis X"),
+                (0.6, "Axis X"),
+                (0.4, "Axis X"),
+                (0.4, "New"),
+                (0.6, "New"),
+                (0.25, "New"),
+            ])?;
+            parts.push(bar(0., -0.45, 0., 0.42, 0.05, 0.2, "Ink")?);
+            symbol(parts)?
+        }
+        Sample::IsolateWeights => symbol(weight_columns(&[
+            (0.3, CLAY),
+            (0.45, CLAY),
+            (0.7, "Axis X"),
+            (0.4, CLAY),
+            (0.25, CLAY),
+        ])?)?,
+        Sample::SplitWeights => {
+            let mut parts = weight_columns(&[
+                (0.35, "Axis X"),
+                (0.6, "Axis X"),
+                (0.45, "Axis X"),
+                (0.45, "Axis Z"),
+                (0.6, "Axis Z"),
+                (0.35, "Axis Z"),
+            ])?;
+            parts.push(bar(0., -0.45, 0., 0.42, 0.06, 0.2, "Ink")?);
+            symbol(parts)?
+        }
+        Sample::BakeWeights => {
+            let mut parts = vec![slab(
+                &[(-0.5, -0.5), (0.5, -0.5), (0.5, -0.38), (-0.5, -0.38)],
+                0.16,
+                "Selected",
+            )?];
+            for (k, h) in [0.25f64, 0.45, 0.3].into_iter().enumerate() {
+                let x = -0.32 + 0.32 * k as f64;
+                parts.push(slab(
+                    &[
+                        (x - 0.1, 0.05),
+                        (x + 0.1, 0.05),
+                        (x + 0.1, 0.05 + h),
+                        (x - 0.1, 0.05 + h),
+                    ],
+                    0.16,
+                    "Axis X",
+                )?);
+            }
+            parts.push(arrow(
+                DVec3::new(0.48, 0.3, 0.1),
+                DVec3::new(0.48, -0.3, 0.1),
+                0.045,
+                "New",
+            )?);
+            symbol(parts)?
+        }
+        Sample::AddPositionTask => {
+            let c = flat(-0.1, -0.05);
+            let mut parts = ik_target(c, 0.25)?;
+            parts.push(two_way(
+                c + flat(-0.52, 0.),
+                c + flat(0.52, 0.),
+                0.04,
+                "New",
+            )?);
+            parts.push(two_way(
+                c + flat(0., -0.52),
+                c + flat(0., 0.52),
+                0.04,
+                "New",
+            )?);
+            merge(parts)?
+        }
+        Sample::AddOrientationTask => {
+            let c = flat(0., 0.);
+            let mut parts = ik_target(c, 0.22)?;
+            parts.extend(turn_arrow(c, 0.45, "New")?);
+            merge(parts)?
+        }
+        Sample::IkFkSetKeys => {
+            let mut parts = ik_target(flat(0.3, -0.2), 0.22)?;
+            parts.push(deformed(key(0., 0., 0.6)?, |v| {
+                symbol_frame() * v + flat(-0.25, 0.15)
+            }));
+            merge(parts)?
+        }
+        Sample::SelectSwitchChannels => {
+            let mut parts = vec![revolve(
+                &[(0., -0.5), (0.22, -0.5), (0.22, 0.5), (0., 0.5)],
+                32,
+                false,
+                CLAY,
+            )?];
+            // The pill lies across the picture; its knob sits at one end.
+            let lay = glam::DQuat::from_rotation_arc(DVec3::Y, DVec3::new(1., 0., -1.).normalize());
+            parts[0] = deformed(parts[0].clone(), |v| lay * v);
+            parts.push(ball(
+                flat(0.32, 0.) + DVec3::ONE.normalize() * 0.08,
+                0.24,
+                "Selected",
+            )?);
+            merge(parts)?
+        }
+        Sample::SelectIkSolvers => {
+            let goal = flat(0.38, -0.3);
+            let mut parts = thick_chain(&[flat(-0.45, -0.3), flat(-0.05, 0.3), goal], "Selected")?;
+            parts.extend(ik_target(goal, 0.18)?);
+            merge(parts)?
+        }
+        Sample::MatchGoal => {
+            let tip = flat(0.05, -0.25);
+            let mut parts = thick_chain(&[flat(-0.6, -0.3), flat(-0.28, 0.3), tip], CLAY)?;
+            parts.extend(ik_target(tip, 0.18)?);
+            parts.push(arrow(flat(0.62, -0.25), flat(0.27, -0.25), 0.05, "New")?);
+            merge(parts)?
+        }
+        Sample::UpdateRestPose => {
+            let mut parts = Vec::new();
+            parts.extend(thick_chain(&[flat(0., -0.35), flat(0., 0.25)], CLAY)?);
+            parts.extend(thick_chain(
+                &[flat(-0.42, 0.12), flat(0., 0.12), flat(0.42, 0.12)],
+                CLAY,
+            )?);
+            parts.extend(turn_arrow(flat(0., 0.), 0.58, "New")?);
+            merge(parts)?
+        }
+        Sample::DisableIk => {
+            let mut parts = limb_with_goal("New")?;
+            parts.push(strike(flat(-0.55, 0.45), flat(0.55, -0.45))?);
+            merge(parts)?
+        }
+        Sample::RemoveIk => {
+            let mut parts = limb_with_goal("New")?;
+            parts.push(strike(flat(-0.45, 0.45), flat(0.45, -0.45))?);
+            parts.push(strike(flat(-0.45, -0.45), flat(0.45, 0.45))?);
             merge(parts)?
         }
         Sample::LoopSlice => {

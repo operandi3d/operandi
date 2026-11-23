@@ -4491,3 +4491,5 @@ Design: docs/MATERIALX_GRAPHS.md (stages 1-5).
 ## 2026-11-23 — Rig tab (branch rig-tab)
 
 - The Animate layout's toolbox has a Rig tab (`assets/forms/toolbox.rig.json`, UIC-190..201): Setup, Skeleton and Pose tools; constraints (flyout), hierarchy, Compensation; Channel Links, Schematic, Bake; Bind (Shift: Unbind), Rebind, the weight tools, Bake Weights; IK (two-bone, chain, full body, goals, tasks, up vector with Shift: Remove, Switch IK/FK, Set/Delete Keys, selects, Match, Update Rest Pose, Disable, Remove). Every button is an existing command (tested). The temporary timeline Skeleton/Pose/Bind/Weights/IK buttons are gone; Setup and the phase-4 rig buttons stay on the timeline. Icons still needed (text buttons now): Unparent, Add Parent, Compensation, Add Joints to Bind, the six weight tools, Add Position Task, Add Orientation Task, IK/FK Set Keys, Select Switch Channels, Select IK Solvers, Match Goal, Update Rest Pose, Disable IK, Remove IK.
+
+- Rig tab icons (branch rig-tab-icons): the 19 rendered Rig tab icons (icons-rig) set on every remaining Rig tab button; Dynamic Parent rows in the Items list use add-parent.

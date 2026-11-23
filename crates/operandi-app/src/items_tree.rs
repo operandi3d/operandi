@@ -946,7 +946,7 @@ fn rig_icon(kind: &str) -> icons::Icon {
         "ik.twoBone" => Icon::IkTwoBone,
         "ik.chain" => Icon::IkChain,
         "ik.body" => Icon::IkFullBody,
-        "dynamicParent" => Icon::Hierarchy,
+        "dynamicParent" => Icon::AddParent,
         "link" => Icon::ChannelLinks,
         k if k.starts_with("mod.") => Icon::Schematic,
         _ => Icon::Constrain,

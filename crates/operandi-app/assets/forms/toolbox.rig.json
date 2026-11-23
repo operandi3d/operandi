@@ -84,16 +84,19 @@
     {
       "command": "operandi.rig.unparent",
       "label": "Unparent",
+      "icon": "unparent",
       "tooltip": "Unparent: the items move to the scene root (RG-11) · operandi.rig.unparent"
     },
     {
       "command": "operandi.rig.dynamicParentAdd",
       "label": "Add Parent",
+      "icon": "add-parent",
       "tooltip": "Add Parent: a dynamic parent (RG-20) · operandi.rig.dynamicParentAdd"
     },
     {
       "command": "operandi.rig.compensation",
       "label": "Compensation",
+      "icon": "compensation",
       "tooltip": "Compensation: rig edits keep items where they are (RG-11) · operandi.rig.compensation"
     },
     {
@@ -138,36 +141,43 @@
     {
       "command": "operandi.skin.rebind",
       "label": "Add Joints to Bind",
+      "icon": "add-joints-to-bind",
       "tooltip": "Rebind: the selected joints join the skin with empty weight maps (SK-25) · operandi.skin.rebind"
     },
     {
       "command": "operandi.weight.smooth",
       "label": "Smooth Selected",
+      "icon": "smooth-weights",
       "tooltip": "One blur pass of the selected weight map (SK-42) · operandi.weight.smooth"
     },
     {
       "command": "operandi.weight.normalize",
       "label": "Normalize Weights",
+      "icon": "normalize-weights",
       "tooltip": "Each point's weights add up to 100% (SK-42) · operandi.weight.normalize"
     },
     {
       "command": "operandi.weight.mirror",
       "label": "Mirror Weights",
+      "icon": "mirror-weights",
       "tooltip": "+X side to −X side, _L and _R swapped (SK-42) · operandi.weight.mirror"
     },
     {
       "command": "operandi.weight.isolate",
       "label": "Isolate Weights",
+      "icon": "isolate-weights",
       "tooltip": "Clear the map outside the selected points (SK-42) · operandi.weight.isolate"
     },
     {
       "command": "operandi.weight.split",
       "label": "Split Left/Right",
+      "icon": "split-weights",
       "tooltip": "One map into _L and _R maps (SK-42) · operandi.weight.split"
     },
     {
       "command": "operandi.skin.bakeWeights",
       "label": "Bake Weights",
+      "icon": "bake-weights",
       "tooltip": "The skin's effective weights into its maps (SK-34) · operandi.skin.bakeWeights"
     },
     {
@@ -201,11 +211,13 @@
     {
       "command": "operandi.ik.addTask mode:position",
       "label": "Add Position Task",
+      "icon": "add-position-task",
       "tooltip": "Pin the selected joint where it is (IK-22) · operandi.ik.addTask"
     },
     {
       "command": "operandi.ik.addTask mode:orientation",
       "label": "Add Orientation Task",
+      "icon": "add-orientation-task",
       "tooltip": "Hold the selected joint's orientation (IK-22) · operandi.ik.addTask"
     },
     {
@@ -230,6 +242,7 @@
     {
       "command": "operandi.ik.setKeys",
       "label": "IK/FK: Set Keys",
+      "icon": "ik-fk-set-keys",
       "tooltip": "Key every switch channel now (IK-32) · Shift+click: Delete Keys · operandi.ik.setKeys",
       "variants": {
         "shift": {
@@ -242,31 +255,37 @@
     {
       "command": "operandi.ik.selectSwitch",
       "label": "Select Switch Channels",
+      "icon": "select-switch-channels",
       "tooltip": "Select the chain's joints, goal and pole (IK-32) · operandi.ik.selectSwitch"
     },
     {
       "command": "operandi.ik.selectSolvers",
       "label": "Select IK Solvers",
+      "icon": "select-ik-solvers",
       "tooltip": "Select the joints the selection's IK solvers sit on (IK-33) · operandi.ik.selectSolvers"
     },
     {
       "command": "operandi.ik.match",
       "label": "Match Goal",
+      "icon": "match-goal",
       "tooltip": "Move the goal onto its end joint (IK-33) · operandi.ik.match"
     },
     {
       "command": "operandi.ik.updateRest all:true",
       "label": "Update Rest Pose",
+      "icon": "update-rest-pose",
       "tooltip": "Every solver re-reads its rest pose (IK-33) · operandi.ik.updateRest"
     },
     {
       "command": "operandi.ik.disable",
       "label": "Disable IK",
+      "icon": "disable-ik",
       "tooltip": "No IK solver runs (Setup only, IK-33) · operandi.ik.disable"
     },
     {
       "command": "operandi.ik.remove",
       "label": "Remove IK",
+      "icon": "remove-ik",
       "tooltip": "Remove the selected chain's IK solver, tasks and settings (IK-26) · operandi.ik.remove"
     }
   ]
