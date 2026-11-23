@@ -4056,6 +4056,8 @@ mod toolbox_form;
 #[cfg(test)]
 mod toolbox_form_tests;
 #[cfg(test)]
+mod toolbox_sets_tests;
+#[cfg(test)]
 mod tweak_tests;
 #[cfg(test)]
 mod twist_bevel_tests;

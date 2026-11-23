@@ -52,6 +52,10 @@ pub(super) struct TabDrag {
     row: Rect,
     pointer: Pos2,
     size: Vec2,
+    /// Started outside UI build mode (Jason, 2026-11-23): the tab may only
+    /// move along its own row. A drop anywhere else cancels and says how
+    /// to move panels, and no dock guide shows.
+    reorder_only: bool,
 }
 
 #[derive(Clone, Copy)]
@@ -418,11 +422,9 @@ impl Operandi {
         let Some(at) = ctx.input(|i| i.pointer.latest_pos()).map(|p| p + origin) else {
             return;
         };
-        if response.drag_started_by(PointerButton::Primary) && self.panel_drags_locked() {
-            self.hint_build_mode();
-        }
+        // Reordering a tab within its own row works any time (Jason,
+        // 2026-11-23); docking or floating it waits for UI build mode.
         if response.drag_started_by(PointerButton::Primary)
-            && !self.panel_drags_locked()
             && self.dots.drag.is_none()
             && self.dots.tab_drag.is_none()
             && self.dots.window_drag.is_none()
@@ -432,6 +434,7 @@ impl Operandi {
                 pointer: at,
                 row: row.translate(origin),
                 size,
+                reorder_only: self.panel_drags_locked(),
             });
         }
         if let Some(drag) = &mut self.dots.tab_drag
@@ -441,9 +444,13 @@ impl Operandi {
             if ctx.input(|i| i.pointer.primary_released()) {
                 if let Some(drag) = self.dots.tab_drag.take() {
                     let over = self.tab_over(drag.source, drag.row, at);
-                    self.dots
-                        .requests
-                        .push(Request::TabDrop(source, over, at, drag.size));
+                    if drag.reorder_only && !matches!(over, Over::TabReorder(_)) {
+                        self.hint_build_mode();
+                    } else {
+                        self.dots
+                            .requests
+                            .push(Request::TabDrop(source, over, at, drag.size));
+                    }
                 }
             } else if !ctx.input(|i| i.pointer.primary_down()) {
                 self.dots.tab_drag = None;
@@ -707,6 +714,10 @@ impl Operandi {
         targets.panel_rows = std::mem::take(&mut targets.drawn_panel_rows);
         targets.tree_rows = std::mem::take(&mut targets.drawn_tree_rows);
         let (at, over) = if let Some(tab) = &self.dots.tab_drag {
+            // A reorder-only drag (outside UI build mode) offers no docking.
+            if tab.reorder_only {
+                return;
+            }
             let over = self.tab_over(tab.source, tab.row, tab.pointer);
             if tab.row.expand(6.).contains(tab.pointer) {
                 return;

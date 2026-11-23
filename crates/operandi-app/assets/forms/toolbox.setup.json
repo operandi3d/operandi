@@ -1,0 +1,275 @@
+{
+  "version": 1,
+  "id": "toolbox.setup",
+  "label": "Setup",
+  "exported": true,
+  "controls": [
+    {
+      "divider": "Transform",
+      "id": "setup-transform"
+    },
+    {
+      "form": {
+        "style": "horizontal",
+        "controls": [
+          {
+            "command": "Move",
+            "label": "Move"
+          },
+          {
+            "command": "Rotate",
+            "label": "Rotate"
+          },
+          {
+            "command": "Scale",
+            "label": "Scale"
+          },
+          {
+            "command": "Transform",
+            "label": "Transform"
+          }
+        ]
+      }
+    },
+    {
+      "divider": "Add Item",
+      "id": "setup-add"
+    },
+    {
+      "form": {
+        "style": "horizontal",
+        "controls": [
+          {
+            "command": "item.create camera",
+            "label": "Camera",
+            "look": "centered"
+          },
+          {
+            "command": "item.create mesh",
+            "label": "Mesh",
+            "look": "centered"
+          }
+        ]
+      }
+    },
+    {
+      "form": {
+        "style": "menu",
+        "controls": [
+          {
+            "command": "item.create light.point",
+            "label": "Point Light"
+          },
+          {
+            "command": "item.create light.spot",
+            "label": "Spot Light"
+          },
+          {
+            "command": "item.create light.area",
+            "label": "Area Light"
+          },
+          {
+            "command": "item.create light.directional",
+            "label": "Directional Light"
+          },
+          {
+            "command": "item.create light.cylinder",
+            "label": "Cylinder Light"
+          },
+          {
+            "command": "item.create light.dome",
+            "label": "Dome Light"
+          },
+          {
+            "command": "item.create light.photometric",
+            "label": "Photometric Light"
+          },
+          {
+            "command": "item.create light.portal",
+            "label": "Portal Light"
+          }
+        ]
+      },
+      "id": "setup-lights",
+      "label": "Light",
+      "tooltip": "Light · add a light of the kind you pick"
+    },
+    {
+      "form": {
+        "style": "horizontal",
+        "controls": [
+          {
+            "command": "item.create backdrop",
+            "label": "Backdrop",
+            "look": "centered"
+          },
+          {
+            "command": "item.create environment",
+            "label": "Environment",
+            "look": "centered"
+          }
+        ]
+      }
+    },
+    {
+      "divider": "Duplicate",
+      "id": "setup-duplicate"
+    },
+    {
+      "form": {
+        "style": "horizontal",
+        "controls": [
+          {
+            "command": "Duplicate Item",
+            "label": "Duplicate",
+            "look": "centered"
+          },
+          {
+            "command": "Duplicate Hierarchy",
+            "label": "Duplicate Hierarchy",
+            "look": "centered"
+          }
+        ]
+      }
+    },
+    {
+      "command": "Instance",
+      "label": "Instance"
+    },
+    {
+      "divider": "Draw",
+      "id": "setup-draw"
+    },
+    {
+      "form": {
+        "style": "horizontal",
+        "controls": [
+          {
+            "command": "Curve",
+            "label": "Curve"
+          },
+          {
+            "command": "Bezier Curve",
+            "label": "Bezier"
+          },
+          {
+            "command": "B-Spline",
+            "label": "B-Spline"
+          },
+          {
+            "command": "Sketch",
+            "label": "Sketch"
+          }
+        ]
+      }
+    },
+    {
+      "divider": "Hierarchy",
+      "id": "setup-hierarchy"
+    },
+    {
+      "command": "operandi.rig.compensation",
+      "label": "Compensation",
+      "look": "check"
+    },
+    {
+      "form": {
+        "style": "horizontal",
+        "controls": [
+          {
+            "command": "operandi.rig.parent",
+            "label": "Parent",
+            "look": "centered"
+          },
+          {
+            "command": "operandi.rig.unparent",
+            "label": "Unparent",
+            "look": "centered"
+          }
+        ]
+      }
+    },
+    {
+      "form": {
+        "style": "horizontal",
+        "controls": [
+          {
+            "command": "operandi.rig.insert",
+            "label": "Insert",
+            "look": "centered"
+          },
+          {
+            "command": "operandi.rig.extract",
+            "label": "Extract",
+            "look": "centered"
+          }
+        ]
+      }
+    },
+    {
+      "command": "Parent to Group Locator",
+      "label": "Parent to Group Locator"
+    },
+    {
+      "divider": "Align",
+      "id": "setup-align"
+    },
+    {
+      "form": {
+        "style": "horizontal",
+        "controls": [
+          {
+            "command": "Quick Align",
+            "label": "Quick Align"
+          },
+          {
+            "command": "Ground Align",
+            "label": "Ground Align"
+          }
+        ]
+      }
+    },
+    {
+      "divider": "Mirror",
+      "id": "setup-mirror"
+    },
+    {
+      "form": {
+        "style": "horizontal",
+        "controls": [
+          {
+            "command": "Mirror",
+            "label": "Mirror"
+          },
+          {
+            "command": "Instance Mirror",
+            "label": "Instance Mirror"
+          }
+        ]
+      }
+    },
+    {
+      "divider": "Measure",
+      "id": "setup-measure"
+    },
+    {
+      "form": {
+        "style": "horizontal",
+        "controls": [
+          {
+            "command": "Ruler",
+            "label": "Ruler"
+          },
+          {
+            "command": "Protractor",
+            "label": "Protractor"
+          },
+          {
+            "command": "Dimensions",
+            "label": "Dimensions"
+          }
+        ]
+      }
+    }
+  ]
+}

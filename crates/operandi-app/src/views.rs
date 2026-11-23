@@ -38,14 +38,11 @@ impl egui_tiles::Behavior<Pane> for Views<'_> {
         self.app.views.title_of(*pane).into()
     }
 
-    /// The grab hand only where a tab can be dragged: in UI build mode
-    /// (panels move only there, Jason 2026-11-20).
+    /// The grab hand on every tab: a tab reorders along its own row any
+    /// time; only dragging it out waits for UI build mode (Jason,
+    /// 2026-11-23).
     fn tab_hover_cursor_icon(&self) -> egui::CursorIcon {
-        if self.app.dots.build_mode {
-            egui::CursorIcon::Grab
-        } else {
-            egui::CursorIcon::Default
-        }
+        egui::CursorIcon::Grab
     }
 
     fn pane_ui(

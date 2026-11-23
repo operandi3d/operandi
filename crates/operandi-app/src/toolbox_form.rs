@@ -88,6 +88,14 @@ const PAINTING_FORMS: &[(&str, &str)] = &[
 ];
 /// The Topology tab's form.
 pub(super) const TOPOLOGY_FORM: &str = "toolbox.topology";
+/// The Setup set's tabs (Jason, 2026-11-23).
+pub(super) const SETUP_FORM: &str = "toolbox.setup";
+pub(super) const CONSTRAINTS_FORM: &str = "toolbox.setup.constraints";
+pub(super) const IK_FORM: &str = "toolbox.setup.ik";
+pub(super) const WEIGHTING_FORM: &str = "toolbox.setup.weighting";
+/// The Game set's tabs (Jason, 2026-11-23).
+pub(super) const GAME_VERTEX_MAP_FORM: &str = "toolbox.game.vertexmap";
+pub(super) const BAKING_FORM: &str = "toolbox.game.baking";
 
 /// How long a press on a tool flyout is held before its list opens.
 const HOLD_SECONDS: f64 = 0.35;

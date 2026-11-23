@@ -5617,15 +5617,15 @@ pub static COMMANDS: &[Entry] = &[
         .args(&[arg("kind", TEXT, N)])
         .example("operandi.panel.show kind:{Shader Tree}")
         .ui(),
-    script("operandi.toolbox.set", Tools, "Shows the Model, UV or Paint toolbox set without switching layouts (Paint requires a painting build).")
+    script("operandi.toolbox.set", Tools, "Shows a toolbox set (Model, UV, Brush, Setup, Animation, Workbench or Game) without switching layouts or changing the views; paint is the old name of Brush.")
         .operandi()
-        .args(&[arg("set", ArgType::Choice(&["model", "uv", "paint"]), N)])
+        .args(&[arg("set", ArgType::Choice(&["model", "uv", "brush", "setup", "animation", "workbench", "game", "paint"]), N)])
         .example("operandi.toolbox.set uv")
         .ui(),
     // A layout's open command (LAY-02): which toolbox tab opens.
-    script("operandi.toolbox.tab", Tools, "Opens a toolbox tab: create, select, deform, duplicate, polygon, edge, vertex, edit, sculpt, uv or workbench (the UV tab then stays in the strip). The Model and UV layouts open with it.")
+    script("operandi.toolbox.tab", Tools, "Opens a toolbox tab, switching to the first toolbox set that has it: create, select, deform, duplicate, polygon, edge, vertex, edit, topology, curve, sculpt, uv, setup, constraints, weighting, rig, baking or workbench. The Model and UV layouts open with it.")
         .operandi()
-        .args(&[arg("tab", ArgType::Choice(&["create", "select", "deform", "duplicate", "polygon", "edge", "vertex", "edit", "sculpt", "uv", "workbench"]), N)])
+        .args(&[arg("tab", ArgType::Choice(&["create", "select", "deform", "duplicate", "polygon", "edge", "vertex", "edit", "topology", "curve", "sculpt", "uv", "setup", "constraints", "weighting", "rig", "baking", "workbench"]), N)])
         .example("operandi.toolbox.tab uv")
         .ui(),
     // The Help menu (Jason 2026-11-16): Report Bug moved off the layout bar.

@@ -443,9 +443,11 @@ pub(crate) fn commands() -> Vec<(table::Entry, HostHandler<Operandi>, State)> {
             cmd("operandi.paint.tab", "Opens the toolbox's Paint tab (PNT-85); it then stays in the tab strip.").ui(),
             |a, _| {
                 a.painting.brush.tab_shown = true;
-                a.category = crate::toolbox::Category::Paint;
+                a.show_toolbox_tab(crate::toolbox::Category::Paint);
             },
-            |a, _| CommandState::lit(a.category == crate::toolbox::Category::Paint),
+            |a, _| {
+                CommandState::lit(a.shown_category() == Some(crate::toolbox::Category::Paint))
+            },
         ),
         (
             cmd("operandi.paint.notYet", "A paint toolbox button a later stage brings (PNT-85).").args(LATER_ARGS),
@@ -1033,7 +1035,7 @@ impl Operandi {
         }
         self.painting.brush.tool = Some(tool);
         self.painting.brush.tab_shown = true;
-        self.category = crate::toolbox::Category::Paint;
+        self.show_toolbox_tab(crate::toolbox::Category::Paint);
         self.paint_status();
     }
 

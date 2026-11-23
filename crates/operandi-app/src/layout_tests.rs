@@ -392,14 +392,12 @@ fn par_t15_t16_category_strip_anchor_grid_hit_regions_and_live_state() {
             assert!(tabs[0].top() > shared.bottom() && tabs[0].top() - shared.bottom() < 8.);
             assert!(a.toolbox_rects["Cube"].right() <= tabs[0].left());
             // Tabs are separate, with a small gap between them, in the order
-            // Create, Select, Deform, Sculpt, Duplicate, Edit, Vertex, Edge,
-            // Polygon, Topology, Curve (the UV tab joins after Edit in the
-            // UV layout).
+            // The Model set (Jason, 2026-11-23): Create, Select, Deform,
+            // Duplicate, Edit, Vertex, Edge, Polygon, Topology, Curve.
             let order = [
                 "Create",
                 "Select",
                 "Deform",
-                "Sculpt",
                 "Duplicate",
                 "Edit",
                 "Vertex",

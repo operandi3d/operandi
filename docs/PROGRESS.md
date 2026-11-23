@@ -1,5 +1,19 @@
 # Milestone progress ledger
 
+- **Toolsets and tool tabs rework (2026-11-23, branch toolsets-rework):**
+  seven toolsets (Model, UV, Brush, Setup, Animation, Workbench, Game);
+  each set lists its own tabs (`ToolSet::tabs`), a one-form set draws no
+  strip, Animation shows "No tools in this set yet". New forms (existing
+  commands only): Setup, Constraints, Inverse Kinematics, Weighting, Game
+  Vertex Map, Baking. `operandi.toolbox.tab` opens the first set with the
+  tab; "Paint" reads as Brush. Set buttons never change the layout (the UV
+  companion view is gone). Tabs reorder along their row without UI build
+  mode; dragging one out still needs it. Transform rows lost the
+  changed-from-default dot. Not built (no commands): Locator, Work Plane,
+  Match, Set, World/Local, Deformers, Controls, Rename Properties, game
+  navigation, smoothing groups, morph maps, mesh tangents, Game Presets.
+  GUI: TOOLSETS_GUI_QA.md.
+
 - **Statistics panel (2026-11-23, branch statistics-panel;
   development/specs/statistics-panel):** a tree-list panel (Info category,
   Layout > Windows/Palettes "Statistics") counting the active meshes:
