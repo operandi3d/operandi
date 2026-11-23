@@ -655,6 +655,12 @@ struct Strokes {
 }
 pub struct ViewportGpu {
     pub(crate) state: egui_wgpu::RenderState,
+    /// The outline pass may bind the depth buffer read-only. Not on
+    /// DirectX 12: there that pass's command list fails to close
+    /// (E_INVALIDARG) and the device is lost on the first frame (Windows
+    /// VM, 2026-11-23), so it loads and stores depth instead. Its
+    /// pipelines never write depth, so the picture is the same.
+    read_only_depth: bool,
     triangles: wgpu::RenderPipeline,
     outlines: wgpu::RenderPipeline,
     world_fill: wgpu::RenderPipeline,
@@ -883,6 +889,7 @@ struct VertexOut { @builtin(position) position: vec4<f32>, @location(0) color: v
             [&camera_layout, &look_layout, &patch_scene_layout],
         );
         Self {
+            read_only_depth: state.adapter.get_info().backend != wgpu::Backend::Dx12,
             patch_pipelines,
             shadow_pass,
             shadow_clear_pass,
@@ -1814,7 +1821,10 @@ struct VertexOut { @builtin(position) position: vec4<f32>, @location(0) color: v
                 })],
                 depth_stencil_attachment: Some(wgpu::RenderPassDepthStencilAttachment {
                     view: &dv,
-                    depth_ops: None,
+                    depth_ops: (!self.read_only_depth).then_some(wgpu::Operations {
+                        load: wgpu::LoadOp::Load,
+                        store: wgpu::StoreOp::Store,
+                    }),
                     stencil_ops: None,
                 }),
                 timestamp_writes: None,
