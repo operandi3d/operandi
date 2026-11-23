@@ -209,3 +209,22 @@ undo and the viewport), and the stale-view debug check.
   Array spec rule here, so the Schematic one should get a distinct label.
 - Should Final (render/export) share Display's caches when both are
   current, or always pull separately? Today they share MeshOps results.
+
+## As built (2026-11-23)
+
+- Step 1 `eval_graph.rs`, step 2 `eval_build.rs` (a9357a98); step 5
+  `eval_state.rs` as the `Editor::eval` field under Document in
+  document_state.rs, and step 8's `operandi.eval.graph` query with a
+  bridge test (edb54136). The graph holds structure only; posing and
+  evaluation are unchanged.
+- Measured first (`eval_probe`, release, 2,000 animated items, 8,000
+  channels): a frame step poses everything in 0.47 ms, the viewport's
+  evaluated scene costs 0.07 ms a frame, a key edit 4 ms (mostly the
+  scene copy and undo record, not posing).
+- So steps 3, 4, 6 and 7 are not built yet: with today's work per frame
+  they would save well under a millisecond and add a second source of
+  truth (a cached channel value goes stale when any path changes a curve
+  without telling the graph, such as a scene swapped in whole). They pay
+  off once rigs (phase 4) give the graph expensive nodes (constraints,
+  IK, skinning, deformers); build them with the first such node, each
+  with the stale-view check from "Risks".
