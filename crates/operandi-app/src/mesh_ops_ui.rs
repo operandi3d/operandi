@@ -231,6 +231,7 @@ pub(crate) fn operator_catalog() -> crate::add_browser::Catalog {
 pub(crate) fn op_icon(id: &str) -> Option<crate::icons::Icon> {
     let slug = match id {
         "prim.cube.item" => "cube",
+        "operandi.skin.item" => "skin-mesh",
         "prim.sphere.item" => "sphere",
         "prim.cylinder.item" => "cylinder",
         "poly.bevel.item" => "bevel",

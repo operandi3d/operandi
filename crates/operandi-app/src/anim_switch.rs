@@ -1,6 +1,6 @@
-//! The animation switch: animation's UI stays hidden from normal users
-//! until launch (Jason, 2026-11-22). One function decides it:
-//! [`enabled`]. Launch day = flip [`DEFAULT_ON`].
+//! The animation switch: animation's UI shows by default (Jason,
+//! 2026-11-23; hidden until then since 2026-11-22), and the preference
+//! turns it off. One function decides it: [`enabled`].
 //!
 //! Off hides the Animate layout, the timeline strip and its clock button,
 //! the graph editor, the Animate menu, the animation keys (their chords
@@ -10,14 +10,14 @@
 //! back their pose and save their keys; every command stays registered,
 //! so scripts, the MCP bridge and tests still reach animation.
 //!
-//! On: Preferences > Defaults > Application > Experimental > Animation
-//! (preview), or `OPERANDI_ANIMATION=1` in the environment (it wins over
-//! the preference; `OPERANDI_ANIMATION=0` forces it off).
+//! Off: Preferences > Defaults > Application > Experimental > Animation,
+//! or `OPERANDI_ANIMATION=0` in the environment (it wins over the
+//! preference; `OPERANDI_ANIMATION=1` forces it on).
 use std::cell::Cell;
 
 /// Whether animation shows when neither the preference nor the
-/// environment says otherwise. Launch day: `true`.
-pub(crate) const DEFAULT_ON: bool = false;
+/// environment says otherwise.
+pub(crate) const DEFAULT_ON: bool = true;
 
 /// The environment variable that overrides everything.
 #[cfg_attr(test, allow(dead_code))]

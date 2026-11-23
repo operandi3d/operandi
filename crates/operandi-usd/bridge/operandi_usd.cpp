@@ -24,7 +24,10 @@
 #include <pxr/usd/usdGeom/primvarsAPI.h>
 #include <pxr/usd/usdGeom/subset.h>
 #include <pxr/usd/usdSkel/bindingAPI.h>
+#include <pxr/usd/usdSkel/animation.h>
 #include <pxr/usd/usdSkel/blendShape.h>
+#include <pxr/usd/usdSkel/root.h>
+#include <pxr/usd/usdSkel/skeleton.h>
 #include <pxr/usd/usdGeom/tokens.h>
 #include <pxr/usd/usdGeom/scope.h>
 #include <pxr/usd/usdGeom/xform.h>
@@ -291,6 +294,130 @@ static double json_number(const pxr::JsValue &v)
     return double(v.GetInt64());
   }
   return 0.0;
+}
+
+/* A 4x4 matrix from 16 JSON numbers, row-major. */
+static pxr::GfMatrix4d json_matrix(const pxr::JsValue &v)
+{
+  pxr::GfMatrix4d m(1.0);
+  if (!v.IsArray()) {
+    return m;
+  }
+  const pxr::JsArray &a = v.GetJsArray();
+  for (size_t i = 0; i < 16 && i < a.size(); i++) {
+    m[i / 4][i % 4] = json_number(a[i]);
+  }
+  return m;
+}
+
+/* Skeletons and skinning (BEHAVIOR-RIG-PHASE5 §7); see operandi_usd.h.
+ * Operandi's own code (not adapted from Blender). */
+int ou_define_skel(OuStage *stage, const char *json, char *error, size_t error_len)
+{
+  return guarded(error, error_len, "Couldn't write the skeletons", [&](std::string &message) {
+    using namespace pxr;
+    if (stage == nullptr || json == nullptr) {
+      message = "no stage or description";
+      return false;
+    }
+    JsParseError parse;
+    const JsValue doc = JsParseString(json, &parse);
+    if (!doc.IsObject()) {
+      message = "the description isn't JSON: " + parse.reason;
+      return false;
+    }
+    const JsObject &root = doc.GetJsObject();
+    const UsdStageRefPtr &s = stage->stage;
+    if (root.count("skelRoot")) {
+      UsdPrim prim = s->GetPrimAtPath(SdfPath(root.at("skelRoot").GetString()));
+      if (!prim) {
+        message = "no skel root prim";
+        return false;
+      }
+      prim.SetTypeName(TfToken("SkelRoot"));
+    }
+    const JsArray skeletons = root.count("skeletons") ? root.at("skeletons").GetJsArray() : JsArray();
+    for (const JsValue &sv : skeletons) {
+      const JsObject &k = sv.GetJsObject();
+      UsdSkelSkeleton skel = UsdSkelSkeleton::Define(s, SdfPath(k.at("path").GetString()));
+      VtTokenArray joints;
+      for (const JsValue &j : k.at("joints").GetJsArray()) {
+        joints.push_back(TfToken(j.GetString()));
+      }
+      skel.CreateJointsAttr(VtValue(joints));
+      VtMatrix4dArray bind, rest;
+      for (const JsValue &m : k.at("bind").GetJsArray()) {
+        bind.push_back(json_matrix(m));
+      }
+      for (const JsValue &m : k.at("rest").GetJsArray()) {
+        rest.push_back(json_matrix(m));
+      }
+      skel.CreateBindTransformsAttr(VtValue(bind));
+      skel.CreateRestTransformsAttr(VtValue(rest));
+      if (k.count("anim") && k.at("anim").IsObject()) {
+        const JsObject &a = k.at("anim").GetJsObject();
+        UsdSkelAnimation anim = UsdSkelAnimation::Define(s, SdfPath(a.at("path").GetString()));
+        anim.CreateJointsAttr(VtValue(joints));
+        const JsArray &times = a.at("times").GetJsArray();
+        const JsArray &tr = a.at("translations").GetJsArray();
+        const JsArray &ro = a.at("rotations").GetJsArray();
+        const JsArray &sc = a.at("scales").GetJsArray();
+        UsdAttribute ta = anim.CreateTranslationsAttr();
+        UsdAttribute ra = anim.CreateRotationsAttr();
+        UsdAttribute sa = anim.CreateScalesAttr();
+        for (size_t t = 0; t < times.size() && t < tr.size() && t < ro.size() && t < sc.size(); t++) {
+          const UsdTimeCode code(json_number(times[t]));
+          VtVec3fArray tv, sv3;
+          VtQuatfArray rv;
+          for (const JsValue &v : tr[t].GetJsArray()) {
+            const JsArray &x = v.GetJsArray();
+            tv.push_back(GfVec3f(json_number(x[0]), json_number(x[1]), json_number(x[2])));
+          }
+          for (const JsValue &v : ro[t].GetJsArray()) {
+            const JsArray &x = v.GetJsArray();
+            rv.push_back(GfQuatf(json_number(x[0]), json_number(x[1]), json_number(x[2]), json_number(x[3])));
+          }
+          for (const JsValue &v : sc[t].GetJsArray()) {
+            const JsArray &x = v.GetJsArray();
+            sv3.push_back(GfVec3f(json_number(x[0]), json_number(x[1]), json_number(x[2])));
+          }
+          ta.Set(tv, code);
+          ra.Set(rv, code);
+          VtVec3hArray half(sv3.size());
+          for (size_t i = 0; i < sv3.size(); i++) {
+            half[i] = GfVec3h(sv3[i]);
+          }
+          sa.Set(half, code);
+        }
+        UsdSkelBindingAPI::Apply(skel.GetPrim()).CreateAnimationSourceRel().SetTargets({anim.GetPath()});
+      }
+    }
+    const JsArray bindings = root.count("bindings") ? root.at("bindings").GetJsArray() : JsArray();
+    for (const JsValue &bv : bindings) {
+      const JsObject &b = bv.GetJsObject();
+      UsdPrim mesh = s->GetPrimAtPath(SdfPath(b.at("mesh").GetString()));
+      if (!mesh) {
+        message = "no mesh at " + b.at("mesh").GetString();
+        return false;
+      }
+      UsdSkelBindingAPI binding = UsdSkelBindingAPI::Apply(mesh);
+      binding.CreateSkeletonRel().SetTargets({SdfPath(b.at("skeleton").GetString())});
+      const int size = int(json_number(b.at("elementSize")));
+      VtIntArray indices;
+      VtFloatArray weights;
+      for (const JsValue &v : b.at("indices").GetJsArray()) {
+        indices.push_back(int(json_number(v)));
+      }
+      for (const JsValue &v : b.at("weights").GetJsArray()) {
+        weights.push_back(float(json_number(v)));
+      }
+      binding.CreateJointIndicesPrimvar(false, size).Set(indices);
+      binding.CreateJointWeightsPrimvar(false, size).Set(weights);
+      binding.CreateGeomBindTransformAttr().Set(json_matrix(b.at("geomBind")));
+      binding.CreateSkinningMethodAttr().Set(TfToken(b.at("method").GetString()));
+    }
+    return true;
+  });
 }
 
 /* Animation time samples (TL-81/82); see operandi_usd.h. Operandi's own

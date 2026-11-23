@@ -233,6 +233,9 @@ pub struct ItemGeometry {
     pub edges: Vec<EdgeVertex>,
     /// Selected polygons' sides in the selection color, drawn on top.
     pub highlight: Vec<EdgeVertex>,
+    /// Per cage polygon, its block in `highlight` (empty when it isn't
+    /// selected), so a drag rewrites only the moved polygons' sides.
+    pub highlight_ranges: Vec<std::ops::Range<usize>>,
     /// Per cage polygon, its block in `fill` and in `edges`.
     pub fill_ranges: Vec<std::ops::Range<usize>>,
     pub edge_ranges: Vec<std::ops::Range<usize>>,
@@ -283,8 +286,11 @@ pub struct Patch {
     pub from: u64,
     pub fill: Vec<std::ops::Range<usize>>,
     pub edges: Vec<std::ops::Range<usize>>,
-    /// The selection highlight was rebuilt (else it is as uploaded).
+    /// The selection highlight was rebuilt (else it is as uploaded,
+    /// apart from `highlight_ranges`).
     pub highlight: bool,
+    /// Blocks of the highlight rewritten in place (when not rebuilt).
+    pub highlight_ranges: Vec<std::ops::Range<usize>>,
 }
 
 /// A mesh in a cache key, equal only to the same allocation: comparing a
@@ -1874,6 +1880,7 @@ impl Resident {
                         .map(|&f| geometry.edge_ranges[f].clone())
                         .collect(),
                     highlight: work.highlight,
+                    highlight_ranges: work.highlight_ranges,
                 };
                 self.next_generation += 1;
                 self.patches += 1;
@@ -3055,8 +3062,9 @@ impl<'a> Source<'a> {
             .or_insert_with(|| self.materials.look(self.item.id, key.0, key.1))
     }
 
-    /// The selected polygons' wire in the selection color, drawn on top.
-    fn highlight(&self) -> Vec<EdgeVertex> {
+    /// The selected polygons' wire in the selection color, drawn on top,
+    /// and each polygon's block in it (`ItemGeometry::highlight_ranges`).
+    fn highlight(&self) -> (Vec<EdgeVertex>, Vec<std::ops::Range<usize>>) {
         let mut out = Vec::new();
         let mut unused = Vec::new();
         // Only the selected polygons, without visiting the rest of the mesh.
@@ -3070,10 +3078,14 @@ impl<'a> Source<'a> {
                 .collect(),
             None => Vec::new(),
         };
+        let mut ranges = vec![0..0; faces];
         for f in chosen {
+            let start = out.len();
+            unused.clear();
             self.face(f, None, palette::selection(), true, &mut unused, &mut out);
+            ranges[f] = start..out.len();
         }
-        out
+        (out, ranges)
     }
 }
 
@@ -3210,7 +3222,7 @@ fn build(
         out.fill_ranges.push(fill_start..out.fill.len());
         out.edge_ranges.push(edge_start..out.edges.len());
     }
-    out.highlight = source.highlight();
+    (out.highlight, out.highlight_ranges) = source.highlight();
     out.clear = source.any_clear();
     out.cut = source.any_cut();
     if let Some(net) = patches {
@@ -3248,6 +3260,8 @@ struct PatchWork {
     piece_normals: u64,
     /// Whether the selection highlight was rebuilt.
     highlight: bool,
+    /// Its blocks rewritten in place instead.
+    highlight_ranges: Vec<std::ops::Range<usize>>,
 }
 
 /// Rewrite the blocks of `dirty` polygons in place (same topology, points
@@ -3312,10 +3326,30 @@ fn patch(
     }
     // The highlight draws only selected polygons: unchanged when the
     // selection is and none of them moved (a dirty polygon is every one
-    // whose drawing changed, smooth neighbours included).
-    let highlight = !same_selection || dirty.iter().any(|&f| source.state(f).0);
+    // whose drawing changed, smooth neighbours included). With the same
+    // selection only the moved selected polygons' blocks are rewritten, so
+    // a brush or drag over a big selection stays as cheap as without one;
+    // a block that changed size rebuilds it.
+    let mut highlight = !same_selection || geometry.highlight_ranges.len() != item.mesh.faces.len();
+    let mut highlight_ranges = Vec::new();
+    if !highlight {
+        let mut unused = Vec::new();
+        for &f in dirty.iter().filter(|&&f| source.state(f).0) {
+            edges.clear();
+            unused.clear();
+            source.face(f, None, palette::selection(), true, &mut unused, &mut edges);
+            let range = geometry.highlight_ranges[f].clone();
+            if range.len() != edges.len() {
+                highlight = true;
+                break;
+            }
+            geometry.highlight[range.clone()].copy_from_slice(&edges);
+            highlight_ranges.push(range);
+        }
+    }
     if highlight {
-        geometry.highlight = source.highlight();
+        (geometry.highlight, geometry.highlight_ranges) = source.highlight();
+        highlight_ranges.clear();
     }
     // Patch polygons: the updated net and their new looks (a dirty one now
     // hidden draws nothing).
@@ -3347,6 +3381,7 @@ fn patch(
         pieces: pieces as u64,
         piece_normals: source.piece_normals_computed.get(),
         highlight,
+        highlight_ranges,
     })
 }
 
@@ -3685,6 +3720,11 @@ mod tests {
         assert_eq!(g.fill, fresh.fill);
         assert_eq!(g.edges, fresh.edges);
         assert_eq!(g.highlight, fresh.highlight);
+        // The same selection: only the moved selected quad's sides are
+        // rewritten in the highlight, not the whole of it.
+        assert!(!patch.highlight, "highlight patched, not rebuilt");
+        assert_eq!(patch.highlight_ranges, vec![0..24]);
+        assert_eq!(g.highlight_ranges, fresh.highlight_ranges);
         // A new placement rebuilds.
         assert!(
             resident

@@ -37,10 +37,25 @@ pub struct UndoAutosavePreferences {
     /// `None` uses the default folder in the app's data folder.
     pub backup_dir: Option<PathBuf>,
     pub revisions: u32,
-    /// Experimental: Animation (preview), the animation switch's
-    /// preference (anim_switch.rs).
-    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    /// Experimental: Animation, the animation switch's preference
+    /// (anim_switch.rs). On by default (Jason, 2026-11-23); turning it off
+    /// is saved.
+    #[serde(default = "yes", skip_serializing_if = "is_true")]
     pub animation_preview: bool,
+    /// RG-11: rig Compensation (Animate > Hierarchy > Compensation), kept
+    /// between sessions.
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub rig_compensation: bool,
+    /// Experimental: Python scripting (preview), the scripting switch's
+    /// preference (python_switch.rs).
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub python_preview: bool,
+}
+fn yes() -> bool {
+    true
+}
+fn is_true(b: &bool) -> bool {
+    *b
 }
 impl Default for UndoAutosavePreferences {
     fn default() -> Self {
@@ -59,7 +74,9 @@ impl Default for UndoAutosavePreferences {
             backup_dir: None,
             // Provisional (AS-Q1).
             revisions: 5,
-            animation_preview: false,
+            animation_preview: crate::anim_switch::DEFAULT_ON,
+            rig_compensation: false,
+            python_preview: false,
         }
     }
 }
@@ -472,15 +489,25 @@ impl super::Operandi {
         rows::section(ui, "Experimental", false, |ui| {
             rows::check_d(
                 ui,
-                "Animation (preview)",
+                "Animation",
                 &mut p.animation_preview,
                 d.animation_preview,
-                "Show the animation tools: the Animate layout and menu, the timeline, the \
-                 graph editor and keying. OPERANDI_ANIMATION=1 or 0 in the environment wins",
+                "The animation tools: the Animate layout and menu, the timeline, the graph \
+                 editor and keying (on by default; off hides them). OPERANDI_ANIMATION=1 or 0 \
+                 in the environment wins",
+            );
+            rows::check_d(
+                ui,
+                "Python scripting (preview)",
+                &mut p.python_preview,
+                d.python_preview,
+                "Show the Script Console and System > Run Script…, and let scripts and the \
+                 MCP bridge's python_run run. OPERANDI_PYTHON=1 or 0 in the environment wins",
             );
         });
         if self.undo_autosave != before {
             crate::anim_switch::set_preference(self.undo_autosave.animation_preview);
+            crate::python_switch::set_preference(self.undo_autosave.python_preview);
             self.save_undo_autosave();
         }
         ui.add_space(8.);

@@ -17,7 +17,7 @@ use std::sync::OnceLock;
 
 /// Must equal OU_ABI_VERSION in bridge/operandi_usd.h. Bump both whenever a
 /// shared struct, enum value or function changes.
-pub const OU_ABI_VERSION: u32 = 10;
+pub const OU_ABI_VERSION: u32 = 11;
 
 #[repr(C)]
 pub struct OuXform {
@@ -294,6 +294,12 @@ unsafe extern "C" {
         error_len: usize,
     ) -> i32;
     fn ou_define_render_settings(
+        stage: *mut OuStage,
+        json: *const c_char,
+        error: *mut c_char,
+        error_len: usize,
+    ) -> i32;
+    fn ou_define_skel(
         stage: *mut OuStage,
         json: *const c_char,
         error: *mut c_char,
@@ -872,6 +878,13 @@ impl Stage {
         })
     }
 
+    /// Writes skeletons and skin bindings (`skel_usd::json`).
+    pub fn define_skel(&self, json: &str) -> Result<()> {
+        let json = c_string(json);
+        // SAFETY: a valid C string and error buffer for the call.
+        self.call(|error| unsafe { ou_define_skel(self.0, json.as_ptr(), error, TEXT_LEN) })
+    }
+
     pub fn define_camera(&self, parent: &str, name: &str, camera: &CameraPrim) -> Result<String> {
         let name = c_string(name);
         let parent = c_string(parent);
@@ -1052,6 +1065,7 @@ pub fn write(
         materials: &materials,
         prototypes: &prototypes,
         render_camera: std::cell::RefCell::new(None),
+        skinned: Default::default(),
     };
     for prim in &plan.prims {
         write_prim(&stage, &root_path, prim, &written, 0)?;
@@ -1067,6 +1081,14 @@ pub fn write(
         };
         let path = stage.define_xform(&root_path, &holder, None)?;
         stage.define_light(&path, "Dome", dome, dome_file)?;
+    }
+    // Skeletons and skin bindings (skel_usd.rs, §7).
+    if !plan.skeletons.is_empty() {
+        stage.define_skel(&crate::skel_usd::json(
+            &root_path,
+            &plan.skeletons,
+            &written.skinned.borrow(),
+        ))?;
     }
     // The Render item (render_usd.rs), naming the render camera.
     stage.define_render_settings(&crate::render_usd::json(
@@ -1107,16 +1129,23 @@ fn plain_xform(name: &str, visible: bool) -> XformPrim {
 struct Written<'a> {
     materials: &'a [String],
     prototypes: &'a [String],
+    /// Each skinned mesh prim written, with its binding (skel_usd.rs).
+    skinned: std::cell::RefCell<Vec<(String, crate::skel_usd::SkinBinding)>>,
     /// The render camera's prim path, once written.
     render_camera: std::cell::RefCell<Option<String>>,
 }
 
-fn write_mesh(stage: &Stage, parent: &str, mesh: &MeshPrim, materials: &[String]) -> Result<()> {
+fn write_mesh(
+    stage: &Stage,
+    parent: &str,
+    mesh: &MeshPrim,
+    materials: &[String],
+) -> Result<String> {
     let path = stage.define_mesh(parent, mesh, materials)?;
     if !mesh.extras.is_empty() {
         stage.define_mesh_extras(&path, &mesh.extras)?;
     }
-    Ok(())
+    Ok(path)
 }
 
 fn write_prim(
@@ -1131,7 +1160,10 @@ fn write_prim(
     }
     let path = stage.define_xform(parent, prim, None)?;
     for mesh in &prim.meshes {
-        write_mesh(stage, &path, mesh, written.materials)?;
+        let at = write_mesh(stage, &path, mesh, written.materials)?;
+        if let Some(b) = &mesh.skin {
+            written.skinned.borrow_mut().push((at, (**b).clone()));
+        }
     }
     let visible = prim.meshes.first().is_none_or(|m| m.visible);
     for curves in &prim.curves {

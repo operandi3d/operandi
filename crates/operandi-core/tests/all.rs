@@ -182,6 +182,12 @@ mod empty_mesh_item_transform;
 mod env_texture_locator;
 #[path = "environments.rs"]
 mod environments;
+#[path = "eval_build.rs"]
+mod eval_build;
+#[path = "eval_graph.rs"]
+mod eval_graph;
+#[path = "eval_probe.rs"]
+mod eval_probe;
 #[path = "extrude_clean_spec.rs"]
 mod extrude_clean_spec;
 #[path = "eye_hides_children.rs"]
@@ -240,6 +246,18 @@ mod i2_review_fixes;
 mod icon_studio;
 #[path = "identity_positions.rs"]
 mod identity_positions;
+#[path = "ik_body.rs"]
+mod ik_body;
+#[path = "ik_chain.rs"]
+mod ik_chain;
+#[path = "ik_limits.rs"]
+mod ik_limits;
+#[path = "ik_switch.rs"]
+mod ik_switch;
+#[path = "ik_ties.rs"]
+mod ik_ties;
+#[path = "ik_two_bone.rs"]
+mod ik_two_bone;
 #[path = "incidence_effects.rs"]
 mod incidence_effects;
 #[path = "inset_clean_spec.rs"]
@@ -468,6 +486,8 @@ mod polygon_unify_basic;
 mod polygons_m17;
 #[path = "polyscale_offset_clean_spec.rs"]
 mod polyscale_offset_clean_spec;
+#[path = "pose_tool.rs"]
+mod pose_tool;
 #[path = "primitive_moved_mesh.rs"]
 mod primitive_moved_mesh;
 #[path = "primitive_settings.rs"]
@@ -494,6 +514,26 @@ mod render_outputs;
 mod render_outputs_d;
 #[path = "replicator.rs"]
 mod replicator;
+#[path = "rig_bake.rs"]
+mod rig_bake;
+#[path = "rig_expression.rs"]
+mod rig_expression;
+#[path = "rig_links.rs"]
+mod rig_links;
+#[path = "rig_milestones.rs"]
+mod rig_milestones;
+#[path = "rig_modifiers.rs"]
+mod rig_modifiers;
+#[path = "rig_phase4.rs"]
+mod rig_phase4;
+#[path = "rig_phase5_milestones.rs"]
+mod rig_phase5_milestones;
+#[path = "rig_phase6_milestones.rs"]
+mod rig_phase6_milestones;
+#[path = "rig_schematic.rs"]
+mod rig_schematic;
+#[path = "rig_setup.rs"]
+mod rig_setup;
 #[path = "scene_budget.rs"]
 mod scene_budget;
 #[path = "scene_transfer.rs"]
@@ -540,10 +580,18 @@ mod shader_settings;
 mod shader_tree_stale_selection;
 #[path = "shared_payloads.rs"]
 mod shared_payloads;
+#[path = "skeleton.rs"]
+mod skeleton;
 #[path = "sketch_extrude_clean_spec.rs"]
 mod sketch_extrude_clean_spec;
 #[path = "sketch_extrude_drag_clean_spec.rs"]
 mod sketch_extrude_drag_clean_spec;
+#[path = "skin.rs"]
+mod skin;
+#[path = "skin_bind.rs"]
+mod skin_bind;
+#[path = "skin_weights.rs"]
+mod skin_weights;
 #[path = "slice_tools.rs"]
 mod slice_tools;
 #[path = "smooth_shading.rs"]

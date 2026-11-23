@@ -68,6 +68,39 @@ enum Drag {
         time: bool,
     },
     Scrub,
+    /// GE-44: a Box Scale drag of `part` of the box.
+    BoxScale {
+        part: BoxPart,
+        bounds: [f64; 4],
+        from: Pos2,
+        to: Pos2,
+    },
+    /// GE-31: Ctrl+Shift+drag dropping copies.
+    Copies {
+        from: Pos2,
+        to: Pos2,
+    },
+    /// GE-20: Ctrl+Alt+right-drag box zoom.
+    BoxZoom {
+        from: Pos2,
+        to: Pos2,
+    },
+    /// GE-X5: a retime marker dragged.
+    Retime {
+        index: usize,
+        to: f64,
+    },
+}
+
+/// Which part of the Box Scale box a drag holds (GE-44).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum BoxPart {
+    Inside,
+    Left,
+    Right,
+    Top,
+    Bottom,
+    Corner { left: bool, top: bool },
 }
 
 /// The graph editor's own state (per window).
@@ -84,6 +117,18 @@ pub(crate) struct GraphEditor {
     pub(crate) show_shadow: bool,
     /// GE-42: related keys move together in time.
     pub(crate) link: bool,
+    /// GE-44: the Box Scale tool.
+    pub(crate) box_scale: bool,
+    /// GE-X5: the retime tool and its markers (frames).
+    pub(crate) retime: bool,
+    pub(crate) retime_marks: Vec<f64>,
+    /// GE-81: Speed for the shown position channels.
+    pub(crate) speed: bool,
+    /// GE-82: Stacked rows in view and the first row shown.
+    pub(crate) rows: usize,
+    pub(crate) row_offset: usize,
+    /// This frame's shown channels as `item:name`.
+    shown_keys: Vec<String>,
     /// GE-11 filters.
     animated_only: bool,
     hide_transforms: bool,
@@ -294,6 +339,11 @@ impl Operandi {
                 "velocity" => self.graph.velocity = toggle(self.graph.velocity),
                 "shadow" => self.graph.show_shadow = toggle(self.graph.show_shadow),
                 "link" => self.graph.link = toggle(self.graph.link),
+                "boxScale" => self.graph.box_scale = toggle(self.graph.box_scale),
+                "retime" => self.graph.retime = toggle(self.graph.retime),
+                "speed" => self.graph.speed = toggle(self.graph.speed),
+                "rows" => self.graph.rows = v.parse::<usize>().unwrap_or(6).clamp(1, 12),
+                "rowOffset" => self.graph.row_offset = v.parse().unwrap_or(0),
                 "animatedOnly" => self.graph.animated_only = toggle(self.graph.animated_only),
                 "lock" => {
                     self.graph.locked = toggle(self.graph.locked.is_some())
@@ -381,6 +431,8 @@ impl Operandi {
     /// for more than it was given, so the window never grows by itself and
     /// a resize sticks.
     fn graph_editor_ui(&mut self, ui: &mut Ui) {
+        // The shown channels, worked out once a frame (GE-X7).
+        self.graph.shown_keys = self.graph_shown().iter().map(|s| s.key.text()).collect();
         let full = ui.available_rect_before_wrap();
         let toolbar = ui
             .scope(|ui| {
@@ -557,7 +609,15 @@ impl Operandi {
             .input(|i| i.pointer.hover_pos())
             .filter(|p| map.rect.contains(*p));
         // GE-82: per-curve value maps for Normalised and Stacked.
-        let rows = shown.len().clamp(1, 6) as f32;
+        // GE-82: up to `rows` rows in view (Ctrl+wheel), from `row_offset`
+        // (Shift+wheel).
+        let row_count = if self.graph.rows == 0 {
+            6
+        } else {
+            self.graph.rows
+        };
+        let rows = shown.len().clamp(1, row_count) as f32;
+        let offset = self.graph.row_offset.min(shown.len().saturating_sub(1));
         let (stacked, normalised) = (self.graph.stacked, self.graph.normalised);
         let curve_map = move |i: usize, s: &Shown| -> Map {
             let (lo, hi) = match &s.curve {
@@ -573,7 +633,9 @@ impl Operandi {
             };
             if stacked {
                 let h = map.rect.height() / rows;
-                let top = map.rect.top() + (i as f32 % rows) * h;
+                let row = i as f32 - offset as f32;
+                // Rows scrolled out of view sit off the graph (clipped).
+                let top = map.rect.top() + row * h;
                 let pad = (hi - lo) * 0.15;
                 Map {
                     rect: Rect::from_min_size(
@@ -652,11 +714,20 @@ impl Operandi {
                 curve.clone()
             };
             let n = curve.keys.len();
+            // GE-X7: only keys in view; where keys are closer than 3 px
+            // the curve shows them and only selected keys draw.
+            let dense = m.per_frame() < 3.;
             for (j, k) in curve.keys.iter().enumerate() {
                 let f = animation::frames(rate, k.time);
+                if f < m.f0 - 1. || f > m.f1 + 1. {
+                    continue;
+                }
+                let is_sel = selected.contains(&(s.key.clone(), k.time));
+                if dense && !is_sel {
+                    continue;
+                }
                 let shown_v = keys.keys[j].value;
                 let (mut x, mut y) = (m.x(f), m.y(shown_v));
-                let is_sel = selected.contains(&(s.key.clone(), k.time));
                 if is_sel && let Some(Drag::Keys { from, to, axes }) = &self.graph.drag {
                     if axes.0 {
                         let df = ((to.x - from.x) as f64 / m.per_frame()).round();
@@ -695,7 +766,65 @@ impl Operandi {
                     CornerRadius::ZERO,
                     fill,
                 );
+                // GE-X4: an Auto slope that overshoots a neighbour.
+                if overshoots(curve, j, rate) {
+                    painter.circle_stroke(
+                        pos2(x, y),
+                        KEY_R + 3.,
+                        Stroke::new(1.2f32, theme::orange()),
+                    );
+                }
             }
+        }
+        // GE-81 Speed: distance per frame of the shown positions.
+        if self.graph.speed {
+            self.draw_speed(&painter, &map, shown);
+        }
+        // GE-44: the Box Scale box around the selected keys.
+        if let Some(b) = self.box_bounds(shown) {
+            let r = box_rect(&map, b);
+            let r = match &self.graph.drag {
+                Some(Drag::BoxScale {
+                    part,
+                    bounds,
+                    from,
+                    to,
+                }) => box_rect(
+                    &map,
+                    scaled_box(*bounds, *part, *from, *to, &map, ui.input(|i| i.modifiers)).0,
+                ),
+                _ => r,
+            };
+            painter.rect_stroke(
+                r,
+                CornerRadius::ZERO,
+                Stroke::new(1.0f32, theme::cyan()),
+                egui::StrokeKind::Middle,
+            );
+            for c in [
+                r.left_top(),
+                r.right_top(),
+                r.left_bottom(),
+                r.right_bottom(),
+                r.center_top(),
+                r.center_bottom(),
+                r.left_center(),
+                r.right_center(),
+            ] {
+                painter.rect_filled(
+                    Rect::from_center_size(c, vec2(6., 6.)),
+                    CornerRadius::ZERO,
+                    theme::cyan(),
+                );
+            }
+        }
+        if let Some(Drag::BoxZoom { from, to }) = &self.graph.drag {
+            painter.rect_stroke(
+                Rect::from_two_pos(*from, *to),
+                CornerRadius::ZERO,
+                Stroke::new(1.0f32, theme::text()),
+                egui::StrokeKind::Middle,
+            );
         }
         // The current time (and key time) lines (GE-93).
         let now = animation::frames(rate, self.editor.scene.time.current);
@@ -773,6 +902,11 @@ impl Operandi {
                 let m = curve_map(i, s);
                 let shown_c = if c.cycle { c.cycled() } else { c.clone() };
                 for (j, k) in c.keys.iter().enumerate() {
+                    // GE-X7: keys out of view can't be hit.
+                    let f = animation::frames(rate, k.time);
+                    if f < m.f0 - 1. || f > m.f1 + 1. {
+                        continue;
+                    }
                     keys.push((
                         i,
                         k.time,
@@ -824,10 +958,31 @@ impl Operandi {
                 fmt(animation::frames(rate, t))
             )
         };
-        // Wheel: zoom at the pointer (GE-20).
+        // Wheel: zoom at the pointer (GE-20); Stacked: Ctrl+wheel sets the
+        // rows in view, Shift+wheel steps through them (GE-82).
         if let Some(p) = hover {
-            let scroll = ui.input(|i| i.smooth_scroll_delta.y);
-            if scroll.abs() > 0. {
+            let scroll = ui.input(|i| i.smooth_scroll_delta.y + i.smooth_scroll_delta.x);
+            let wheel_mods = ui.input(|i| i.modifiers);
+            if self.graph.stacked && scroll.abs() > 0. && (wheel_mods.command || wheel_mods.ctrl) {
+                let rows = if self.graph.rows == 0 {
+                    6
+                } else {
+                    self.graph.rows
+                };
+                let rows = if scroll > 0. {
+                    rows.saturating_sub(1)
+                } else {
+                    rows + 1
+                };
+                self.execute(&format!("operandi.graph.view rows:{}", rows.clamp(1, 12)));
+            } else if self.graph.stacked && scroll.abs() > 0. && wheel_mods.shift {
+                let off = if scroll > 0. {
+                    self.graph.row_offset.saturating_sub(1)
+                } else {
+                    (self.graph.row_offset + 1).min(shown.len().saturating_sub(1))
+                };
+                self.execute(&format!("operandi.graph.view rowOffset:{off}"));
+            } else if scroll.abs() > 0. {
                 let k = (1.0 - scroll as f64 * 0.002).clamp(0.5, 2.0);
                 let (cf, cv) = (map.f(p.x), map.v(p.y));
                 self.graph.view = Some([
@@ -911,7 +1066,29 @@ impl Operandi {
         {
             let middle = response.dragged_by(PointerButton::Middle);
             let right = response.dragged_by(PointerButton::Secondary);
-            self.graph.drag = if mods.alt && middle && mods.shift {
+            let primary = response.dragged_by(PointerButton::Primary);
+            let boxed = self.box_bounds(shown).filter(|_| primary);
+            self.graph.drag = if right && mods.alt && (mods.ctrl || mods.command) {
+                // GE-20: box zoom.
+                Some(Drag::BoxZoom { from: p, to: p })
+            } else if let Some(b) = boxed
+                && let Some(part) = box_part(box_rect(&map, b), p)
+            {
+                Some(Drag::BoxScale {
+                    part,
+                    bounds: b,
+                    from: p,
+                    to: p,
+                })
+            } else if primary
+                && mods.shift
+                && (mods.ctrl || mods.command)
+                && key_under(p)
+                    .is_some_and(|(i, t, _)| selected.contains(&(shown[i].key.clone(), t)))
+            {
+                // GE-31: drop copies along the drag.
+                Some(Drag::Copies { from: p, to: p })
+            } else if mods.alt && middle && mods.shift {
                 Some(Drag::Zoom {
                     last: p,
                     time: false,
@@ -966,6 +1143,9 @@ impl Operandi {
         {
             match &mut self.graph.drag {
                 Some(Drag::Keys { to, .. })
+                | Some(Drag::BoxScale { to, .. })
+                | Some(Drag::Copies { to, .. })
+                | Some(Drag::BoxZoom { to, .. })
                 | Some(Drag::Box { to, .. })
                 | Some(Drag::Handle { to, .. })
                 | Some(Drag::Scale { to, .. }) => *to = p,
@@ -1007,6 +1187,48 @@ impl Operandi {
         }
         if response.drag_stopped() {
             match self.graph.drag.take() {
+                Some(Drag::BoxScale {
+                    part,
+                    bounds,
+                    from,
+                    to,
+                }) => {
+                    let (b, moved) = scaled_box(bounds, part, from, to, &map, mods);
+                    if moved {
+                        let tf = (b[1] - b[0]) / (bounds[1] - bounds[0]);
+                        let vf = (b[3] - b[2]) / (bounds[3] - bounds[2]);
+                        // Scale around the old box's low corner, then move
+                        // it onto the new one's.
+                        self.execute(&format!(
+                            "operandi.key.transform timeFactor:{tf} timePivot:{} valueFactor:{vf} valuePivot:{} frames:{} value:{}",
+                            bounds[0],
+                            bounds[2],
+                            fmt((b[0] - bounds[0]).round()),
+                            b[2] - bounds[2]
+                        ));
+                    }
+                }
+                Some(Drag::Copies { from, to }) => {
+                    let df = ((to.x - from.x) as f64 / map.per_frame()).round();
+                    let dv = -((to.y - from.y) as f64) / map.per_value();
+                    if df != 0. {
+                        self.execute(&format!(
+                            "operandi.key.dropCopies frames:{} value:{dv}",
+                            fmt(df)
+                        ));
+                    }
+                }
+                Some(Drag::BoxZoom { from, to }) => {
+                    let r = Rect::from_two_pos(from, to);
+                    if r.width() > 4. && r.height() > 4. {
+                        self.graph.view = Some([
+                            map.f(r.left()),
+                            map.f(r.right()),
+                            map.v(r.bottom()),
+                            map.v(r.top()),
+                        ]);
+                    }
+                }
                 Some(Drag::Keys { from, to, axes }) => {
                     let df = if axes.0 {
                         ((to.x - from.x) as f64 / map.per_frame()).round()
@@ -1178,6 +1400,13 @@ impl Operandi {
             }
         }
         let r = ui.interact(rect, Id::new("graph-strip"), Sense::click_and_drag());
+        // GE-X5: with the retime tool on, the strip holds retime markers:
+        // a click adds one, a drag moves one and the keys between its
+        // neighbours follow, right-click removes one.
+        if self.graph.retime {
+            self.retime_strip(ui, rect, map, &r);
+            return;
+        }
         if let Some(p) = r.interact_pointer_pos() {
             if r.drag_started() {
                 self.graph.drag = Some(Drag::Scrub);
@@ -1194,6 +1423,88 @@ impl Operandi {
                     fmt(map.f(p.x).round())
                 ));
             }
+        }
+    }
+
+    fn retime_strip(&mut self, ui: &mut Ui, rect: Rect, map: Map, r: &Response) {
+        let painter = ui.painter_at(rect);
+        let marks = self.graph.retime_marks.clone();
+        let dragging = match &self.graph.drag {
+            Some(Drag::Retime { index, to }) => Some((*index, *to)),
+            _ => None,
+        };
+        for (i, f) in marks.iter().enumerate() {
+            let f = match dragging {
+                Some((j, to)) if j == i => to,
+                _ => *f,
+            };
+            let x = map.x(f);
+            painter.add(egui::Shape::convex_polygon(
+                vec![
+                    pos2(x - 5., rect.top()),
+                    pos2(x + 5., rect.top()),
+                    pos2(x, rect.bottom()),
+                ],
+                theme::cyan(),
+                Stroke::NONE,
+            ));
+        }
+        let Some(p) = r.interact_pointer_pos() else {
+            return;
+        };
+        let under = marks.iter().position(|f| (map.x(*f) - p.x).abs() <= 6.);
+        let f = map.f(p.x).round();
+        if r.drag_started()
+            && let Some(i) = under
+        {
+            self.graph.drag = Some(Drag::Retime { index: i, to: f });
+        }
+        if r.dragged()
+            && let Some(Drag::Retime { to, .. }) = &mut self.graph.drag
+        {
+            *to = f;
+        }
+        if r.drag_stopped()
+            && let Some(Drag::Retime { index, to }) = self.graph.drag.take()
+        {
+            let from = marks[index];
+            let mut sorted = marks.clone();
+            sorted.sort_by(f64::total_cmp);
+            let rate = self.editor.scene.time.rate;
+            let s = &self.editor.scene;
+            let low = sorted
+                .iter()
+                .rev()
+                .find(|m| **m < from)
+                .copied()
+                .unwrap_or(animation::frames(rate, s.time.start).min(from - 1.));
+            let high = sorted
+                .iter()
+                .find(|m| **m > from)
+                .copied()
+                .unwrap_or(animation::frames(rate, s.time.end).max(from + 1.));
+            let to = to.clamp(low + 1., high - 1.);
+            let channels: Vec<String> = self.graph.shown_keys.clone();
+            if to != from && !channels.is_empty() {
+                self.execute(&format!(
+                    "operandi.curve.retime channels:{} low:{} high:{} from:{} to:{}",
+                    channels.join(","),
+                    fmt(low),
+                    fmt(high),
+                    fmt(from),
+                    fmt(to)
+                ));
+                self.graph.retime_marks[index] = to;
+            }
+            return;
+        }
+        if r.clicked() && under.is_none() {
+            self.graph.retime_marks.push(f);
+        }
+        if r.secondary_clicked()
+            && let Some(i) = under
+        {
+            self.graph.retime_marks.remove(i);
         }
     }
 
@@ -1254,7 +1565,7 @@ impl Operandi {
             }
             ui.separator();
             let shown_channels: Vec<String> =
-                self.graph_shown().iter().map(|s| s.key.text()).collect();
+                self.graph.shown_keys.clone();
             let list = shown_channels.join(",");
             let now = fmt(animation::frames(rate, self.editor.scene.time.current));
             if ui
@@ -1338,6 +1649,38 @@ impl Operandi {
                     lines.push(line.into());
                 }
             }
+            // GE-53: In / Out slope pop-ups; Out greys while the keys are
+            // unified (it follows In).
+            let unified = sel.iter().all(|(k, t)| {
+                self.editor
+                    .scene
+                    .animation
+                    .channels
+                    .get(k)
+                    .and_then(|c| c.curve.key_at(*t).map(|i| !c.curve.keys[i].broken))
+                    .unwrap_or(true)
+            });
+            for (side, icon) in [("in", Icon::InSlope), ("out", Icon::OutSlope)] {
+                let why = if !has {
+                    Some("Select keys first")
+                } else if side == "out" && unified {
+                    Some("The out side follows the in side while the handles are unified; Break them first")
+                } else {
+                    None
+                };
+                let r = ui
+                    .gated(why, crate::icons::button(ui, icon, ""))
+                    .on_hover_text(format!("The selected keys' {side} slope (GE-53)"));
+                egui::Popup::menu(&r).show(|ui| {
+                    for (name, slope) in operandi_core::anim_curve::Slope::NAMES {
+                        let _ = slope;
+                        if ui.button(name).clicked() {
+                            lines.push(format!("operandi.key.slope type:{name} side:{side}"));
+                            ui.close();
+                        }
+                    }
+                });
+            }
             ui.separator();
             for (side, icon) in [("pre", Icon::PreBehaviour), ("post", Icon::PostBehaviour)] {
                 let r = ui.add(crate::icons::button(ui, icon, "")).on_hover_text(format!(
@@ -1362,6 +1705,43 @@ impl Operandi {
                 lines.push("operandi.curve.cycle on:true".into());
             }
             ui.separator();
+            for (icon, on, line, tip) in [
+                (Icon::BoxScale, self.graph.box_scale, "operandi.graph.view boxScale:toggle", "Box Scale: a box around the selected keys to move and scale them (GE-44)"),
+                (Icon::Retime, self.graph.retime, "operandi.graph.view retime:toggle", "Retime: click the time strip for markers, drag one to stretch the timing (GE-X5)"),
+            ] {
+                if ui.add(crate::icons::button(ui, icon, "").selected(on)).on_hover_text(format!("{tip}\n{line}")).clicked() {
+                    lines.push(line.into());
+                }
+            }
+            // GE-83: envelope presets.
+            let presets = ui.add(crate::icons::button(ui, Icon::CurvePresets, "")).on_hover_text("Envelope presets: save the shown channels' curves, or put one on them (GE-83)");
+            let folder = self.envelope_folder();
+            egui::Popup::menu(&presets).show(|ui| {
+                if ui.button("Save Envelope…").clicked() {
+                    lines.push("@save-envelope".into());
+                    ui.close();
+                }
+                ui.separator();
+                let mut files: Vec<PathBuf> = std::fs::read_dir(&folder)
+                    .map(|d| {
+                        d.filter_map(|e| e.ok().map(|e| e.path()))
+                            .filter(|p| p.extension().is_some_and(|x| x == operandi_core::anim_graph::ENVELOPE_EXTENSION))
+                            .collect()
+                    })
+                    .unwrap_or_default();
+                files.sort();
+                if files.is_empty() {
+                    ui.weak("No envelopes saved yet");
+                }
+                for f in files {
+                    let name = f.file_stem().map_or_else(String::new, |s| s.to_string_lossy().into_owned());
+                    if ui.button(&name).clicked() {
+                        lines.push(format!("operandi.curve.applyEnvelope path:{{{}}}", f.display()));
+                        ui.close();
+                    }
+                }
+            });
+            ui.separator();
             if ui.button("Set Frame…").clicked() && has {
                 self.timeline_value_dialog("Set Frame", "Frame", "operandi.key.setFrame frame:{}");
             }
@@ -1372,9 +1752,36 @@ impl Operandi {
                 self.timeline_value_dialog("Scale Keys", "Factor", "operandi.key.scale factor:{}");
             }
         });
+        let shown: Vec<String> = self.graph.shown_keys.clone();
         for line in lines {
+            if line == "@save-envelope" {
+                let folder = self.envelope_folder();
+                let _ = std::fs::create_dir_all(&folder);
+                self.open_value_dialog(
+                    "Save Envelope",
+                    "Name",
+                    &format!(
+                        "operandi.curve.saveEnvelope channels:{} path:{{{}/{{}}.{}}}",
+                        shown.join(","),
+                        folder.display(),
+                        operandi_core::anim_graph::ENVELOPE_EXTENSION
+                    ),
+                );
+                continue;
+            }
+            // A preset goes on the shown channels at the current time.
+            if line.starts_with("operandi.curve.applyEnvelope") && !shown.is_empty() {
+                self.execute(&format!("{line} channels:{}", shown.join(",")));
+                continue;
+            }
             self.execute(&line);
         }
+    }
+
+    /// GE-83: where envelope presets are kept: "Envelopes" in the presets
+    /// folder.
+    pub(crate) fn envelope_folder(&self) -> PathBuf {
+        self.environment.paths().presets().join("Envelopes")
     }
 
     fn graph_bottom_bar(&mut self, ui: &mut Ui) {
@@ -1420,6 +1827,15 @@ impl Operandi {
                 {
                     lines.push(line);
                 }
+            }
+            if ui
+                .add(crate::icons::button(ui, Icon::CurveSpeed, "").selected(self.graph.speed))
+                .on_hover_text(
+                    "Speed: each curve's rate of change (GE-81)\noperandi.graph.view speed:toggle",
+                )
+                .clicked()
+            {
+                lines.push("operandi.graph.view speed:toggle");
             }
             for (text, on, line) in [
                 (
@@ -1627,5 +2043,190 @@ impl Operandi {
     /// Scale Keys (UIC-80; the timeline's dialog, one undo step on OK).
     fn timeline_value_dialog(&mut self, title: &'static str, label: &'static str, line: &str) {
         self.open_value_dialog(title, label, line);
+    }
+}
+
+/// GE-X4: key `j` has an Auto side and the curve next to it leaves the
+/// range between the key and that neighbour (an overshoot).
+fn overshoots(curve: &Curve, j: usize, rate: operandi_core::time_tick::FrameRate) -> bool {
+    use operandi_core::anim_curve::Slope;
+    let k = &curve.keys[j];
+    let auto = |s: Slope| s == Slope::Auto;
+    let mut sides = Vec::new();
+    if auto(k.slope_in) && j > 0 {
+        sides.push(j - 1);
+    }
+    if auto(k.slope_out) && j + 1 < curve.keys.len() {
+        sides.push(j + 1);
+    }
+    sides.into_iter().any(|n| {
+        let other = &curve.keys[n];
+        let (lo, hi) = (k.value.min(other.value), k.value.max(other.value));
+        let slack = (hi - lo).max(1e-9) * 1e-3;
+        let (a, b) = (
+            animation::frames(rate, k.time.min(other.time)),
+            animation::frames(rate, k.time.max(other.time)),
+        );
+        (1..16).any(|s| {
+            let f = a + (b - a) * s as f64 / 16.;
+            let v = curve.value_at(animation::at_frames(rate, f));
+            v < lo - slack || v > hi + slack
+        })
+    })
+}
+
+fn box_rect(m: &Map, b: [f64; 4]) -> Rect {
+    Rect::from_min_max(pos2(m.x(b[0]), m.y(b[3])), pos2(m.x(b[1]), m.y(b[2])))
+}
+
+/// Which part of the box `p` is on (GE-44), handles first.
+fn box_part(r: Rect, p: Pos2) -> Option<BoxPart> {
+    let near = |a: f32, b: f32| (a - b).abs() <= 6.;
+    let inside_x = (r.left() - 6.0..=r.right() + 6.).contains(&p.x);
+    let inside_y = (r.top() - 6.0..=r.bottom() + 6.).contains(&p.y);
+    if !(inside_x && inside_y) {
+        return None;
+    }
+    let (l, rr, t, b) = (
+        near(p.x, r.left()),
+        near(p.x, r.right()),
+        near(p.y, r.top()),
+        near(p.y, r.bottom()),
+    );
+    Some(match (l, rr, t, b) {
+        (true, _, true, _) => BoxPart::Corner {
+            left: true,
+            top: true,
+        },
+        (true, _, _, true) => BoxPart::Corner {
+            left: true,
+            top: false,
+        },
+        (_, true, true, _) => BoxPart::Corner {
+            left: false,
+            top: true,
+        },
+        (_, true, _, true) => BoxPart::Corner {
+            left: false,
+            top: false,
+        },
+        (true, ..) => BoxPart::Left,
+        (_, true, ..) => BoxPart::Right,
+        (_, _, true, _) => BoxPart::Top,
+        (_, _, _, true) => BoxPart::Bottom,
+        _ => BoxPart::Inside,
+    })
+}
+
+/// The box `bounds` (frames, values) after dragging `part` from `from` to
+/// `to`; whether it changed. Inside moves (Shift: values only, Ctrl: time
+/// only); a side scales from the opposite side; a corner scales both
+/// (Ctrl+corner warp is provisional: the same as a corner, GE-Q09).
+fn scaled_box(
+    bounds: [f64; 4],
+    part: BoxPart,
+    from: Pos2,
+    to: Pos2,
+    m: &Map,
+    mods: Modifiers,
+) -> ([f64; 4], bool) {
+    let df = ((to.x - from.x) as f64 / m.per_frame()).round();
+    let dv = -((to.y - from.y) as f64) / m.per_value();
+    let [mut f0, mut f1, mut v0, mut v1] = bounds;
+    match part {
+        BoxPart::Inside => {
+            let (df, dv) = if mods.shift {
+                (0., dv)
+            } else if mods.ctrl || mods.command {
+                (df, 0.)
+            } else {
+                (df, dv)
+            };
+            f0 += df;
+            f1 += df;
+            v0 += dv;
+            v1 += dv;
+        }
+        BoxPart::Left => f0 = (f0 + df).min(f1 - 1.),
+        BoxPart::Right => f1 = (f1 + df).max(f0 + 1.),
+        BoxPart::Top => v1 = (v1 + dv).max(v0 + 1e-6),
+        BoxPart::Bottom => v0 = (v0 + dv).min(v1 - 1e-6),
+        BoxPart::Corner { left, top } => {
+            if left {
+                f0 = (f0 + df).min(f1 - 1.);
+            } else {
+                f1 = (f1 + df).max(f0 + 1.);
+            }
+            if top {
+                v1 = (v1 + dv).max(v0 + 1e-6);
+            } else {
+                v0 = (v0 + dv).min(v1 - 1e-6);
+            }
+        }
+    }
+    let b = [f0, f1, v0, v1];
+    (b, b.iter().zip(bounds).any(|(a, c)| (a - c).abs() > 1e-9))
+}
+
+impl Operandi {
+    /// GE-44: the box around the selected keys (frames, values), while the
+    /// Box Scale tool is on and two or more keys differ in time and value.
+    fn box_bounds(&self, shown: &[Shown]) -> Option<[f64; 4]> {
+        if !self.graph.box_scale || self.graph.normalised || self.graph.stacked {
+            return None;
+        }
+        let rate = self.editor.scene.time.rate;
+        let selected = self.editor.live_selected_keys();
+        let mut b = [f64::MAX, f64::MIN, f64::MAX, f64::MIN];
+        let mut n = 0;
+        for (k, t) in &selected {
+            if !shown.iter().any(|s| s.key == *k) {
+                continue;
+            }
+            let Some(c) = self.editor.scene.animation.channels.get(k) else {
+                continue;
+            };
+            let Some(i) = c.curve.key_at(*t) else {
+                continue;
+            };
+            let (f, v) = (animation::frames(rate, *t), c.curve.keys[i].value);
+            b = [b[0].min(f), b[1].max(f), b[2].min(v), b[3].max(v)];
+            n += 1;
+        }
+        (n >= 2 && b[1] - b[0] > 1e-9 && b[3] - b[2] > 1e-9).then_some(b)
+    }
+
+    /// GE-81 Speed: for each item with a shown position channel, its
+    /// distance moved per frame (local space), drawn in cyan.
+    fn draw_speed(&self, painter: &egui::Painter, m: &Map, shown: &[Shown]) {
+        let rate = self.editor.scene.time.rate;
+        let mut items: Vec<u64> = shown
+            .iter()
+            .filter(|s| s.key.transform_part().is_some_and(|(g, _)| g == "pos"))
+            .map(|s| s.key.item)
+            .collect();
+        items.dedup();
+        let anim = &self.editor.scene.animation;
+        for id in items {
+            let at = |f: f64| -> [f64; 3] {
+                ["X", "Y", "Z"].map(|a| {
+                    let k = ChannelKey::new(id, &format!("pos.{a}"));
+                    match anim.channels.get(&k).filter(|c| !c.curve.is_empty()) {
+                        Some(c) => c.curve.value_at(animation::at_frames(rate, f)),
+                        None => animation::read(&self.editor.scene, &k).unwrap_or(0.),
+                    }
+                })
+            };
+            let pts: Vec<Pos2> = (0..=(m.rect.width() / 2.) as i32)
+                .map(|px| {
+                    let f = m.f(m.rect.left() + px as f32 * 2.);
+                    let (a, b) = (at(f - 1.), at(f));
+                    let d = ((a[0] - b[0]).powi(2) + (a[1] - b[1]).powi(2) + (a[2] - b[2]).powi(2))
+                        .sqrt();
+                    pos2(m.x(f), m.y(d))
+                })
+                .collect();
+            painter.add(egui::Shape::line(pts, Stroke::new(1.2f32, theme::cyan())));
+        }
     }
 }

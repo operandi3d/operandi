@@ -15,6 +15,11 @@ use serde::{Deserialize, Serialize};
 pub enum LocatorKind {
     /// An empty parent for grouping items (GL-01).
     Group,
+    /// A skeleton joint (SK-10..19, skeleton.rs): drawn as a sphere with a
+    /// bone to its first child.
+    Joint,
+    /// An IK goal (IK-02, ik.rs): drawn as a solid box.
+    IkGoal,
 }
 
 /// The new item's name, and the Add Item entry (GL-02).

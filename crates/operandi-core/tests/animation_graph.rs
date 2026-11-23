@@ -286,3 +286,82 @@ fn ge42_linked_moves_take_the_related_keys_along_in_time() {
     let y = &e.scene.animation.channels[&ChannelKey::new(id, "pos.Y")].curve;
     near(y.keys[1].value, 0.5);
 }
+
+#[test]
+fn ge44_transform_scales_time_and_value_in_one_step() {
+    let (mut e, id) = ball();
+    ok(
+        &mut e,
+        &format!("operandi.key.select keys:{id}:pos.Y@0,{id}:pos.Y@12,{id}:pos.Y@24"),
+    );
+    let steps = e.undo.len();
+    ok(
+        &mut e,
+        "operandi.key.transform timeFactor:2 timePivot:0 valueFactor:0.5 valuePivot:0",
+    );
+    assert_eq!(e.undo.len(), steps + 1);
+    let rate = e.scene.time.rate;
+    let c = &e.scene.animation.channels[&ChannelKey::new(id, "pos.Y")].curve;
+    let frames: Vec<i64> = c.keys.iter().map(|k| rate.frame_at(k.time)).collect();
+    assert_eq!(frames, [0, 24, 48]);
+    near(c.keys[0].value, 1.);
+}
+
+#[test]
+fn ge31_drop_copies_leaves_keys_along_the_drag() {
+    let (mut e, id) = ball();
+    ok(&mut e, &format!("operandi.key.select keys:{id}:pos.Y@0"));
+    ok(&mut e, "operandi.key.dropCopies frames:3 value:0.3");
+    let rate = e.scene.time.rate;
+    let c = &e.scene.animation.channels[&ChannelKey::new(id, "pos.Y")].curve;
+    let frames: Vec<i64> = c.keys.iter().map(|k| rate.frame_at(k.time)).collect();
+    assert_eq!(frames, [0, 1, 2, 3, 12, 24]);
+    near(c.keys[3].value, 2.3);
+    near(c.keys[1].value, 2.1);
+}
+
+#[test]
+fn gex5_retime_moves_a_frame_and_stretches_around_it() {
+    let (mut e, id) = ball();
+    ok(
+        &mut e,
+        &format!("operandi.curve.retime channels:{id}:pos.Y low:0 high:24 from:12 to:8"),
+    );
+    let rate = e.scene.time.rate;
+    let c = &e.scene.animation.channels[&ChannelKey::new(id, "pos.Y")].curve;
+    let frames: Vec<i64> = c.keys.iter().map(|k| rate.frame_at(k.time)).collect();
+    assert_eq!(frames, [0, 8, 24]);
+    assert!(line(&mut e, "operandi.curve.retime low:0 high:24 from:30 to:8").is_err());
+}
+
+#[test]
+fn ge83_envelopes_save_and_apply() {
+    let (mut e, id) = ball();
+    let dir = std::env::temp_dir().join(format!("operandi-envelope-{}", std::process::id()));
+    std::fs::create_dir_all(&dir).unwrap();
+    let path = dir.join("bounce.openvelope");
+    let p = path.display();
+    ok(
+        &mut e,
+        &format!("operandi.curve.saveEnvelope channels:{id}:pos.Y path:{{{p}}}"),
+    );
+    ok(
+        &mut e,
+        &format!("operandi.curve.applyEnvelope channels:{id}:pos.X path:{{{p}}} frame:30"),
+    );
+    let x = &e.scene.animation.channels[&ChannelKey::new(id, "pos.X")].curve;
+    assert_eq!(x.keys.len(), 3);
+    assert_eq!(e.scene.time.rate.frame_at(x.keys[0].time), 30);
+    near(x.keys[1].value, 0.);
+    assert!(
+        line(
+            &mut e,
+            &format!(
+                "operandi.curve.applyEnvelope channels:{id}:pos.X path:{{{}}}",
+                dir.join("none").display()
+            )
+        )
+        .is_err()
+    );
+    let _ = std::fs::remove_dir_all(&dir);
+}

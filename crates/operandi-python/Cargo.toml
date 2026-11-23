@@ -1,0 +1,19 @@
+[package]
+name = "operandi-python"
+version = "0.1.0"
+edition = "2024"
+license = "GPL-3.0-or-later"
+description = "Python scripting: the embedded interpreter and the `operandi` module"
+
+[dependencies]
+operandi-core = { path = "../operandi-core" }
+serde_json.workspace = true
+# CPython bindings (MIT OR Apache-2.0). Only with the `python` feature, so
+# builds without a Python to link against still compile.
+pyo3 = { version = "=0.30.1", optional = true }
+
+[features]
+# Embed CPython (scripts/fetch-python.sh, or PYO3_PYTHON for development).
+# Without it the crate builds and every script reports that Python isn't
+# in this build.
+python = ["dep:pyo3"]

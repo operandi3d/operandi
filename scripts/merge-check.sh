@@ -43,4 +43,23 @@ if [ -d development/usd/install/lib ]; then
 else
     echo; echo "== USD tests skipped: no development/usd (scripts/build-usd.sh)"
 fi
+# Python scripting: the bundled CPython (scripts/fetch-python.sh), else a
+# python3 on PATH for development.
+PY_FOR_TESTS=""
+if [ -x development/python/python/bin/python3 ]; then
+    PY_FOR_TESTS="$(cd development/python/python/bin && pwd -P)/python3"
+elif command -v python3 >/dev/null 2>&1; then
+    PY_FOR_TESTS="$(command -v python3)"
+fi
+if [ -f development/python/pyo3-config.txt ]; then
+    step "Python tests (--features python, bundled CPython)"
+    PYO3_CONFIG_FILE="$(cd development/python && pwd -P)/pyo3-config.txt" \
+        OPERANDI_PYTHON_BUILD_HOME="$(cd development/python/python && pwd -P)" \
+        "$CARGO_BIN" test --locked --workspace --features operandi-app/python
+elif [ -n "$PY_FOR_TESTS" ]; then
+    step "Python tests (--features python, $PY_FOR_TESTS)"
+    PYO3_PYTHON="$PY_FOR_TESTS" "$CARGO_BIN" test --locked --workspace --features operandi-app/python
+else
+    echo; echo "== Python tests skipped: no Python (scripts/fetch-python.sh)"
+fi
 echo; echo "merge-check: all passed."

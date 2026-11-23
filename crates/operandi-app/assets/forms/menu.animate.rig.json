@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "id": "menu.animate.rig",
+  "label": "Hierarchy",
+  "style": "menu",
+  "controls": [
+    { "command": "operandi.rig.parent", "label": "Parent" },
+    { "command": "operandi.rig.unparent", "label": "Unparent" },
+    { "command": "operandi.rig.insert", "label": "Insert" },
+    { "command": "operandi.rig.extract", "label": "Extract" },
+    { "divider": "" },
+    { "command": "operandi.rig.dynamicParentAdd", "label": "Add Parent" },
+    { "command": "operandi.rig.dynamicParentRemove", "label": "Remove Dynamic Parent" },
+    { "divider": "" },
+    { "command": "operandi.rig.compensation", "label": "Compensation" }
+  ]
+}

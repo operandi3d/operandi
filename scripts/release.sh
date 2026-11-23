@@ -21,7 +21,8 @@
 # A Mac disk image already built for the same commit by an earlier run that
 # stopped later on (in release-<tag>/upload) is reused, not rebuilt.
 #
-# This is the ONLY thing that publishes a release. Normal builds
+# This is the ONLY thing that publishes a release (scripts/test-build.sh
+# only replaces the files of the rolling "Test build" pre-release). Normal builds
 # (scripts/bundle-dev.sh, scripts/release-macos.sh, scripts/build-release.sh)
 # just leave files in ~/Developer/Operandi-Builds and never upload.
 #

@@ -4798,6 +4798,21 @@ impl Operandi {
                         });
                         continue;
                     }
+                    // IK-51: middle-drag (FK) and right-click (pins).
+                    if self.pose_active()
+                        && input::navigation(modifiers).is_none()
+                        && let Some(kind) = self.pose_press(pos, r, button, modifiers)
+                    {
+                        self.navigation = Some(input::Navigation {
+                            kind,
+                            start: pos,
+                            last: pos,
+                            modifiers,
+                            button,
+                        });
+                        ui.ctx().request_repaint();
+                        continue;
+                    }
                     // Solid Sketch: right drag scales, middle click deletes.
                     if let Some(kind) = self.solid_sketch_press(pos, r, button, modifiers) {
                         self.navigation = Some(input::Navigation {
@@ -5256,6 +5271,40 @@ impl Operandi {
                             modifiers,
                             button: PointerButton::Primary,
                         });
+                        continue;
+                    }
+                    // IK-50: the Pose tool takes the press first.
+                    if self.pose_active()
+                        && input::navigation(modifiers).is_none()
+                        && !self.text_editor_focused(ui.ctx())
+                        && let Some(kind) =
+                            self.pose_press(pos, r, PointerButton::Primary, modifiers)
+                    {
+                        self.navigation = Some(input::Navigation {
+                            kind,
+                            start: pos,
+                            last: pos,
+                            modifiers,
+                            button: PointerButton::Primary,
+                        });
+                        ui.ctx().request_repaint();
+                        continue;
+                    }
+                    // SK-10: the Skeleton tool takes a plain or Shift press;
+                    // Alt stays navigation.
+                    if self.skeleton_active()
+                        && input::navigation(modifiers).is_none()
+                        && !self.text_editor_focused(ui.ctx())
+                        && let Some(kind) = self.skeleton_press(pos, r, modifiers)
+                    {
+                        self.navigation = Some(input::Navigation {
+                            kind,
+                            start: pos,
+                            last: pos,
+                            modifiers,
+                            button: PointerButton::Primary,
+                        });
+                        ui.ctx().request_repaint();
                         continue;
                     }
                     // A Create panel utility (Paste Tool, Ruler, Align…) takes
@@ -6011,6 +6060,14 @@ impl Operandi {
                             let start = g.start;
                             self.solid_sketch_drag(d, start, pos, r);
                         }
+                        if let input::GestureKind::Skeleton(d) = &g.kind {
+                            let (d, start) = (d.clone(), g.start);
+                            self.skeleton_drag(&d, start, pos, r);
+                        }
+                        if let input::GestureKind::Pose(d) = &g.kind {
+                            let (d, start) = (d.clone(), g.start);
+                            self.pose_drag(&d, start, pos, r);
+                        }
                         if let input::GestureKind::PenDrag { point } = g.kind
                             && pos.distance(g.start) >= 1.
                         {
@@ -6074,6 +6131,20 @@ impl Operandi {
                         // NAV-07 box zoom finishes on release.
                         if let input::GestureKind::Navigate(kind) = g.kind {
                             self.navigation_release(kind, g.start, pos, r);
+                        }
+                        if let input::GestureKind::Pose(d) = &g.kind {
+                            let d = d.clone();
+                            self.pose_release(&d);
+                            self.release_pointer();
+                            ui.ctx().request_repaint();
+                            continue;
+                        }
+                        if let input::GestureKind::Skeleton(d) = &g.kind {
+                            let d = d.clone();
+                            self.skeleton_release(&d);
+                            self.release_pointer();
+                            ui.ctx().request_repaint();
+                            continue;
                         }
                         if let input::GestureKind::SolidSketch(d) = &mut g.kind {
                             let start = g.start;

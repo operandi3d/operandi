@@ -365,6 +365,7 @@ pub fn wgpu_configuration() -> egui_wgpu::WgpuConfiguration {
                 .max(have.max_storage_buffers_per_shader_stage);
             descriptor
         });
+        create.native_adapter_selector = Some(std::sync::Arc::new(crate::gpu_backend::select));
     }
     config
 }
@@ -654,6 +655,12 @@ struct Strokes {
 }
 pub struct ViewportGpu {
     pub(crate) state: egui_wgpu::RenderState,
+    /// The outline pass may bind the depth buffer read-only. Not on
+    /// DirectX 12: there that pass's command list fails to close
+    /// (E_INVALIDARG) and the device is lost on the first frame (Windows
+    /// VM, 2026-11-23), so it loads and stores depth instead. Its
+    /// pipelines never write depth, so the picture is the same.
+    read_only_depth: bool,
     triangles: wgpu::RenderPipeline,
     outlines: wgpu::RenderPipeline,
     world_fill: wgpu::RenderPipeline,
@@ -882,6 +889,7 @@ struct VertexOut { @builtin(position) position: vec4<f32>, @location(0) color: v
             [&camera_layout, &look_layout, &patch_scene_layout],
         );
         Self {
+            read_only_depth: state.adapter.get_info().backend != wgpu::Backend::Dx12,
             patch_pipelines,
             shadow_pass,
             shadow_clear_pass,
@@ -1086,7 +1094,8 @@ struct VertexOut { @builtin(position) position: vec4<f32>, @location(0) color: v
                         "Operandi resident highlight",
                         &highlight_bytes,
                         EDGE_STRIDE,
-                        wgpu::BufferUsages::VERTEX,
+                        // COPY_DST: a drag rewrites moved polygons' sides.
+                        wgpu::BufferUsages::VERTEX | wgpu::BufferUsages::COPY_DST,
                     )
                 })
             };
@@ -1116,6 +1125,13 @@ struct VertexOut { @builtin(position) position: vec4<f32>, @location(0) color: v
                 if patch.highlight {
                     b.highlight = new_highlight();
                     b.highlight_count = geometry.highlight.len() as u32;
+                } else if let Some(buffer) = &b.highlight {
+                    // Only the moved selected polygons' sides.
+                    for range in merged(&patch.highlight_ranges) {
+                        let bytes = edge_bytes(&geometry.highlight[range.clone()]);
+                        uploaded.set(uploaded.get() + bytes.len() as u64);
+                        buffer.write(queue, range.start as u32, &bytes);
+                    }
                 }
                 if let (Some(p), Some(draw)) = (&mut b.patches, &geometry.patches)
                     && let Some(sent) = p.update(queue, draw, b.built)
@@ -1813,7 +1829,10 @@ struct VertexOut { @builtin(position) position: vec4<f32>, @location(0) color: v
                 })],
                 depth_stencil_attachment: Some(wgpu::RenderPassDepthStencilAttachment {
                     view: &dv,
-                    depth_ops: None,
+                    depth_ops: (!self.read_only_depth).then_some(wgpu::Operations {
+                        load: wgpu::LoadOp::Load,
+                        store: wgpu::StoreOp::Store,
+                    }),
                     stencil_ops: None,
                 }),
                 timestamp_writes: None,

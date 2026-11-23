@@ -330,6 +330,9 @@ impl Operandi {
             // keep app-wide settings (Bevel recipes, Cone preset), the saved
             // copy and the window title right.
             match tool {
+                "python_run" if !crate::python_switch::enabled() => {
+                    return Now(Some(protocol::refusal(&message, crate::python_switch::OFF)));
+                }
                 "scene_new" => {
                     self.initialize_new_document();
                     if args.get("empty_mesh").and_then(serde_json::Value::as_bool) == Some(false) {

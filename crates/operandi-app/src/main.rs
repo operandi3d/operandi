@@ -41,6 +41,7 @@ mod backdrop_gpu;
 mod backdrop_ui;
 mod background_ui;
 mod bevel_panel;
+mod bind_dialog_ui;
 mod boolean_dialog;
 mod branding;
 mod bridge_panel;
@@ -51,6 +52,7 @@ mod camera;
 mod camera_light_handles;
 mod camera_light_ui;
 mod camera_props_ui;
+mod channel_links_ui;
 mod clip_picker;
 mod color_theme;
 mod colour_field;
@@ -107,6 +109,7 @@ mod frame_stats;
 mod free_memory;
 mod gpu;
 mod gpu_arena;
+mod gpu_backend;
 mod gpu_chunks;
 mod gpu_memory;
 mod gpu_scene;
@@ -201,6 +204,7 @@ mod polygon_align;
 mod polygon_material_dialog;
 mod polygon_part_dialog;
 mod polygon_unify_dialog;
+mod pose_tool_ui;
 mod preferences;
 #[cfg(test)]
 mod preferences_tier1_tests;
@@ -213,6 +217,10 @@ mod profile_browser;
 mod project_files;
 mod project_presets;
 mod project_ui;
+mod python_switch;
+mod python_ui;
+#[cfg(test)]
+mod python_ui_tests;
 #[cfg(feature = "qa")]
 mod qa;
 mod reduction_panel;
@@ -227,8 +235,11 @@ mod replica_safety_tests;
 mod replicator_ui;
 mod report_bug_dialog;
 mod resource_write;
+#[cfg(test)]
+mod rig_ui_tests;
 mod scale_offset_dialog;
 mod scenes;
+mod schematic_ui;
 mod scrub;
 mod sculpt_ui;
 #[cfg(test)]
@@ -247,6 +258,9 @@ mod shape_panel;
 #[cfg(test)]
 mod shifted_key_tests;
 mod side_tabs;
+#[cfg(test)]
+mod skeleton_tool_tests;
+mod skeleton_tool_ui;
 mod slice_view;
 #[cfg(test)]
 mod small_commands_tab_tests;
@@ -905,6 +919,16 @@ struct Operandi {
     timeline: timeline::Timeline,
     /// The graph editor window (graph_editor.rs).
     graph: graph_editor::GraphEditor,
+    /// The Channel Links window (channel_links_ui.rs, RG-50).
+    links: channel_links_ui::ChannelLinks,
+    /// The Schematic window (schematic_ui.rs, RG-70).
+    schematic: schematic_ui::SchematicView,
+    /// The Skeleton tool (skeleton_tool_ui.rs, SK-10).
+    skeleton: skeleton_tool_ui::SkeletonTool,
+    /// The Pose tool (pose_tool_ui.rs, IK-50).
+    pose: pose_tool_ui::PoseTool,
+    /// The Script Console and the running script (python_ui.rs).
+    python: python_ui::PythonConsole,
     anim_ui: anim_ui::AnimUi,
     /// The Form Editor (layouts stage 7, form_editor.rs).
     form_editor: form_editor::State,
@@ -1116,6 +1140,9 @@ impl Operandi {
         cc.egui_ctx.options_mut(|o| o.zoom_with_keyboard = false);
         native::install(cc.egui_ctx.clone());
         open_documents::connect(cc.egui_ctx.clone());
+        if let Some(s) = &cc.wgpu_render_state {
+            gpu_backend::watch_device_lost(&s.device);
+        }
         let gpu = cc
             .wgpu_render_state
             .as_ref()
@@ -1227,6 +1254,8 @@ impl Operandi {
             undo_autosave::UndoAutosavePreferences::load(&app.environment.paths().undo_autosave());
         // The animation switch reads its preference before the layouts load.
         anim_switch::set_preference(app.undo_autosave.animation_preview);
+        app.editor.rig_compensation = app.undo_autosave.rig_compensation;
+        python_switch::set_preference(app.undo_autosave.python_preview);
         app.update_check.prefs =
             update_check::UpdatePreferences::load(&app.environment.paths().update_preferences());
         app.view_presets = view_display::Presets::load(&app.environment.paths().viewport_presets());
@@ -1574,6 +1603,11 @@ impl Operandi {
             palettes: Default::default(),
             timeline: Default::default(),
             graph: Default::default(),
+            links: Default::default(),
+            schematic: Default::default(),
+            skeleton: Default::default(),
+            pose: Default::default(),
+            python: Default::default(),
             anim_ui: Default::default(),
             form_editor: Default::default(),
             field_rects: BTreeMap::new(),
@@ -3378,6 +3412,8 @@ impl Operandi {
         self.layouts.message_line_here = self.message_line_in_tool_properties();
         // Playback, the rows' key requests and frame jobs (anim_ui.rs).
         self.anim_frame(ctx);
+        // A running script's calls and the Script Console (python_ui.rs).
+        self.python_frame(ctx);
         self.toolbar(ctx);
         self.timeline_panel(ctx);
         // The workbench row along the top, when shown (LAY-82).

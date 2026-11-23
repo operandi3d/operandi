@@ -81,7 +81,7 @@ impl Editor {
     // ------------------------------------------------------------ steps
 
     /// Drops a live item transform tool, returning it to start again.
-    fn settle_tool(&mut self) -> Option<Tool> {
+    pub(crate) fn settle_tool(&mut self) -> Option<Tool> {
         let tool = self.live.as_ref().map(|l| l.tool)?;
         if !tool.is_transform() {
             return None;
@@ -89,7 +89,7 @@ impl Editor {
         self.dispatch(Command::Drop).ok()?;
         Some(tool)
     }
-    fn resume_tool(&mut self, tool: Option<Tool>) {
+    pub(crate) fn resume_tool(&mut self, tool: Option<Tool>) {
         if let Some(tool) = tool
             && self.live.is_none()
         {
@@ -110,6 +110,10 @@ impl Editor {
         let result = edit(self);
         match result {
             Ok(true) => {
+                // Setup mode: what the step changed becomes setup values.
+                if self.scene.animation.setup {
+                    crate::animation::setup_edit(&before, &mut self.scene);
+                }
                 if let Err(e) = self.scene.validate() {
                     self.scene = before;
                     self.anim.quiet = false;
@@ -252,7 +256,7 @@ impl Editor {
             return Err("Nothing to key".into());
         }
         for k in channels {
-            if self.scene.item(k.item).is_none() {
+            if !self.scene.owns_channels(k.item) {
                 return Err(format!("No item {}", k.item));
             }
             if animation::read(&self.scene, k).is_none()
@@ -345,7 +349,7 @@ impl Editor {
             .anim
             .selected_channels
             .iter()
-            .filter(|k| self.scene.item(k.item).is_some())
+            .filter(|k| self.scene.owns_channels(k.item))
             .cloned()
             .collect();
         if list.is_empty()

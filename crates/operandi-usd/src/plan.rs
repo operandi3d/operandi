@@ -79,6 +79,8 @@ pub struct Plan {
     /// The stage's frame rate and time range when animation is written
     /// (anim_usd.rs, TL-80).
     pub time: Option<crate::anim_usd::StageTime>,
+    /// Skeletons of skinned meshes under `/root` (skel_usd.rs).
+    pub skeletons: Vec<crate::skel_usd::SkeletonPrim>,
     pub notes: Vec<String>,
 }
 
@@ -147,6 +149,8 @@ pub struct MeshPrim {
     pub visible: bool,
     /// Maps, morphs and sets (plan_extras.rs).
     pub extras: crate::plan_extras::MeshExtras,
+    /// Its skin's joints and weights (skel_usd.rs, UsdSkelBindingAPI).
+    pub skin: Option<Box<crate::skel_usd::SkinBinding>>,
 }
 
 /// A material tag's polygons in one mesh prim.
@@ -178,6 +182,7 @@ pub fn plan(scene: &Scene, options: &IoOptions) -> Result<Plan> {
         instancers: Vec::new(),
         render: crate::render_usd::plan(scene),
         time: crate::anim_usd::stage_time(scene, options.usd_animation),
+        skeletons: Vec::new(),
         notes: Vec::new(),
     };
     let ids: BTreeSet<u64> = scene.items.iter().map(|i| i.id).collect();
@@ -192,6 +197,7 @@ pub fn plan(scene: &Scene, options: &IoOptions) -> Result<Plan> {
     let mut skipped = Skipped::default();
     let mut notes = Notes::new(scene);
     notes.frames = crate::anim_usd::frames(scene, options.usd_animation);
+    notes.skins = crate::skel_usd::skins(scene, notes.frames.as_ref());
     notes.instances = instance_groups(scene);
     notes.mesh_lights = crate::mesh_lights::carried(scene, &mut notes.lights);
     let (scattered, instancers) =
@@ -210,6 +216,7 @@ pub fn plan(scene: &Scene, options: &IoOptions) -> Result<Plan> {
             plan.prims.push(prim);
         }
     }
+    plan.skeletons = std::mem::take(&mut notes.skins.skeletons);
     plan.materials = std::mem::take(&mut notes.materials.prims);
     let surfaces = std::mem::take(&mut notes.materials.surfaces);
     // U6: each Material Group's MaterialX network: its graph layer's
@@ -353,6 +360,10 @@ fn item_prim(
             kids.push(prim);
         }
     }
+    // Joints are the skeleton's in USD (skel_usd.rs), not Xforms.
+    if notes.skins.joints.contains(&item.id) && kids.is_empty() && instancers.is_empty() {
+        return Ok(None);
+    }
     let is_mesh = item.is_mesh();
     // Cameras and lights become USD cameras and lights (stage 3).
     let camera = item.camera.as_ref().map(|c| crate::lights::CameraPrim {
@@ -399,7 +410,24 @@ fn item_prim(
                 Vec::new()
             }
             None => {
-                let (mut m, c) = mesh_prims(scene, item, notes);
+                // A skinned mesh is written in its rest shape, bound to its
+                // skeleton (skel_usd.rs).
+                let (mut m, c) = match notes.skins.items.get(&item.id).cloned() {
+                    Some((base, binding)) => {
+                        let mut rest = item.clone();
+                        rest.mesh = base.clone();
+                        let (mut m, c) = mesh_prims(scene, &rest, notes);
+                        for prim in &mut m {
+                            prim.skin = Some(Box::new(crate::skel_usd::prim_binding(
+                                &base,
+                                &binding,
+                                &prim.points,
+                            )));
+                        }
+                        (m, c)
+                    }
+                    None => mesh_prims(scene, item, notes),
+                };
                 curves = c;
                 if let Some(c) = notes.mesh_lights.get(&item.id) {
                     for mesh in &mut m {
@@ -601,6 +629,8 @@ pub(crate) struct Notes<'s> {
     mesh_lights: BTreeMap<u64, crate::mesh_lights::Carried>,
     /// The scene posed at each animation sample time (anim_usd.rs).
     frames: Option<crate::anim_usd::Frames>,
+    /// Skinned meshes and their skeletons (skel_usd.rs).
+    skins: crate::skel_usd::Skins,
 }
 impl<'s> Notes<'s> {
     fn new(scene: &'s Scene) -> Self {
@@ -608,6 +638,7 @@ impl<'s> Notes<'s> {
             materials: crate::materials::Collector::new(scene),
             mesh_lights: BTreeMap::new(),
             frames: None,
+            skins: Default::default(),
             lights: Vec::new(),
             polylines: 0,
             scattered: 0,

@@ -7,5 +7,11 @@ description = "Model Context Protocol bridge: drive operandi-core headlessly"
 
 [dependencies]
 operandi-core = { path = "../operandi-core" }
+# python_run (Python scripting preview); embeds Python with `python`.
+operandi-python = { path = "../operandi-python" }
 glam.workspace = true
 serde_json.workspace = true
+
+[features]
+# python_run runs scripts (embeds CPython, operandi-python's `python`).
+python = ["operandi-python/python"]
