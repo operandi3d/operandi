@@ -17,8 +17,8 @@
 #
 # It builds what is on GitHub, never a local-only commit, so each file's
 # source is public (the GPL). The Mac app is a QA build
-# (scripts/bundle-dev.sh with Cycles, update channel "test"), not signed
-# or notarized. The build
+# (scripts/bundle-dev.sh with Cycles), not signed or notarized. Both
+# apps are built for the "test" update channel. The build
 # happens in its own worktree, ~/Developer/Operandi-test-build, so it
 # never switches branches in your main checkout. It never touches real
 # releases such as v0.1.0, only the `test-build` tag and its release.
@@ -164,7 +164,7 @@ git checkout -q --force --detach $COMMIT
 rm -f ~/operandi-test-build.bundle
 OUT=~/operandi-test-build-out
 rm -rf "\$OUT" && mkdir -p "\$OUT"
-OPERANDI_RELEASE_OUTPUT="\$OUT" scripts/build-release.sh
+OPERANDI_DEFAULT_UPDATE_CHANNEL=test OPERANDI_RELEASE_OUTPUT="\$OUT" scripts/build-release.sh
 # A fixed name to copy back: scp from Windows doesn't expand wildcards.
 cp "\$OUT"/*.zip ~/operandi-test-build.zip
 rm -rf "\$OUT"
