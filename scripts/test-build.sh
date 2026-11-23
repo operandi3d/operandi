@@ -17,7 +17,8 @@
 #
 # It builds what is on GitHub, never a local-only commit, so each file's
 # source is public (the GPL). The Mac app is a QA build
-# (scripts/bundle-dev.sh with Cycles), not signed or notarized. The build
+# (scripts/bundle-dev.sh with Cycles, update channel "test"), not signed
+# or notarized. The build
 # happens in its own worktree, ~/Developer/Operandi-test-build, so it
 # never switches branches in your main checkout. It never touches real
 # releases such as v0.1.0, only the `test-build` tag and its release.
@@ -182,7 +183,7 @@ fi
 if [ "$WANT_MAC" = 1 ]; then
     say
     say "== macOS (scripts/bundle-dev.sh with Cycles; log: $OUT/mac.log)"
-    if ! (cd "$TREE" && OPERANDI_CYCLES=1 OPERANDI_DEV_NAME="Operandi Test Build" sh scripts/bundle-dev.sh) > "$OUT/mac.log" 2>&1; then
+    if ! (cd "$TREE" && OPERANDI_CYCLES=1 OPERANDI_DEV_NAME="Operandi Test Build" OPERANDI_DEFAULT_UPDATE_CHANNEL=test sh scripts/bundle-dev.sh) > "$OUT/mac.log" 2>&1; then
         tail -30 "$OUT/mac.log" >&2
         stop "The Mac build failed (above; whole log: $OUT/mac.log). If it's about Cycles or USD, rebuild them in the main checkout (scripts/build-cycles.sh, scripts/build-usd.sh) and run this again."
     fi
@@ -191,6 +192,7 @@ if [ "$WANT_MAC" = 1 ]; then
     BAD="$(find "$APP" | grep -iE "$FORBIDDEN" || true)"
     [ -z "$BAD" ] || { say "$BAD" >&2; stop "The Mac app has files that must not be shared (above). Nothing was uploaded."; }
     ditto -c -k --sequesterRsrc --keepParent "$APP" "$OUT/upload/$MAC_FILE"
+    MAC_BUILT="$(date +%s)"
     say "   $(du -h "$OUT/upload/$MAC_FILE" | cut -f1) $MAC_FILE"
 fi
 
@@ -208,6 +210,7 @@ if [ -n "$WIN_PID" ]; then
     BAD="$(unzip -Z1 "$OUT/windows/$WIN_FILE" | grep -iE "$FORBIDDEN" || true)"
     [ -z "$BAD" ] || { say "$BAD" >&2; stop "The Windows zip has files that must not be shared (above). Nothing was uploaded."; }
     mv "$OUT/windows/$WIN_FILE" "$OUT/upload/"
+    WIN_BUILT="$(date +%s)"
     say "   $(du -h "$OUT/upload/$WIN_FILE" | cut -f1) $WIN_FILE"
 fi
 
@@ -220,13 +223,17 @@ fi
 # ---- Upload
 say
 say "== Uploading to the \"$TITLE\" pre-release"
-# The release notes remember which commit each file came from, so a Mac-only
-# run still says where the Windows file it leaves in place was built.
+# A hidden line in the release notes remembers which commit each file came
+# from and when it was built (Unix seconds), so a Mac-only run still says
+# where the Windows file it leaves in place came from, and the app's update
+# check can compare build times:
+#   <!-- operandi-build mac=<sha> mac_time=<unix> windows=<sha> windows_time=<unix> -->
 OLD_BODY="$(gh release view "$TAG" --json body -q .body 2>/dev/null || true)"
-was() { printf '%s\n' "$OLD_BODY" | sed -n "s/^<!-- $1: \([0-9a-f]*\) -->.*/\1/p" | head -1; }
-MAC_SHA="$(was mac)"; WIN_SHA="$(was windows)"
-[ "$WANT_MAC" = 1 ] && MAC_SHA="$COMMIT"
-[ "$WANT_WINDOWS" = 1 ] && WIN_SHA="$COMMIT"
+was() { printf '%s\n' "$OLD_BODY" | grep '^<!-- operandi-build ' | head -1 | tr ' ' '\n' | sed -n "s/^$1=//p"; }
+MAC_SHA="$(was mac)"; MAC_TIME="$(was mac_time)"
+WIN_SHA="$(was windows)"; WIN_TIME="$(was windows_time)"
+[ "$WANT_MAC" = 1 ] && MAC_SHA="$COMMIT" && MAC_TIME="$MAC_BUILT"
+[ "$WANT_WINDOWS" = 1 ] && WIN_SHA="$COMMIT" && WIN_TIME="$WIN_BUILT"
 URL_BASE="https://github.com/$GH_REPO"
 line() { # platform, file, sha
     [ -n "$3" ] || return 0
@@ -249,8 +256,7 @@ NOTES="$OUT/notes.md"
     say
     say "Operandi is free software under the GNU GPL v3; each file's source is the commit linked above. Not affiliated with or endorsed by Foundry."
     say
-    [ -z "$MAC_SHA" ] || say "<!-- mac: $MAC_SHA -->"
-    [ -z "$WIN_SHA" ] || say "<!-- windows: $WIN_SHA -->"
+    say "<!-- operandi-build mac=$MAC_SHA mac_time=$MAC_TIME windows=$WIN_SHA windows_time=$WIN_TIME -->"
 } > "$NOTES"
 
 if gh release view "$TAG" >/dev/null 2>&1; then
