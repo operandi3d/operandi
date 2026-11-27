@@ -119,6 +119,14 @@ still don't select while a tool is on: select first, then pick the tool.
    where it will land.
 2. Let go to dock it, or press **Esc** to cancel.
 
+### Show or hide panels quickly
+
+1. Hold **Control+3**. The **Panels** pie opens round the pointer.
+2. Point at **Top Bar**, **Left Panel**, **Right Panel** or **Timeline**
+   and let go. Each one sits in the pie where it sits in the window.
+
+A tick marks the panels that show now. Choose one again to bring it back.
+
 ### Split the 3D view
 
 1. Choose **View > Split View**.

@@ -133,6 +133,7 @@ These are the keys Operandi starts with. You can change any of them in the **Inp
 | Pie: Selection & Transforms | **Alt+Q** |
 | Pie: Shading Style | **Control+2** |
 | Pie: Viewport Toggles | **Control+1** |
+| Pie: Panels | **Control+3** |
 | Pie: Layouts | **Control+` (backtick)** |
 | Next Tool Tab | **Control+Tab** |
 | Previous Tool Tab | **Control+Shift+Tab** |

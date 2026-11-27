@@ -601,6 +601,8 @@ pub const ACTIONS: &[(&str, &str)] = &[
     (crate::pie_menu::FALLOFFS, ""),
     (crate::pie_menu::ACTION_CENTERS, ""),
     (crate::pie_menu::MODELING, ""),
+    // Jason, 2026-11-27: its own key; Alt+Space stays for UIC-63.
+    (crate::pie_menu::PANELS, "Ctrl+3"),
     // Layouts stage 2 (UIC-18, LAY-32): "Ctrl" is the real Control key on
     // macOS (Cmd+Shift+Tab and Cmd+` are the system's).
     (crate::pie_menu::LAYOUTS, "Ctrl+`"),

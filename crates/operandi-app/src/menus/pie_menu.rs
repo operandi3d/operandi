@@ -30,10 +30,12 @@ pub const TOGGLES: &str = "Pie: Viewport Toggles";
 pub const FALLOFFS: &str = "Pie: Falloffs";
 pub const ACTION_CENTERS: &str = "Pie: Action Centers";
 pub const MODELING: &str = "Pie: Modeling";
+/// Shows or hides the window's bars and the timeline (Jason, 2026-11-27).
+pub const PANELS: &str = "Pie: Panels";
 /// The Layouts pie (layouts stage 2, UIC-18): its slots are the layouts,
 /// so it isn't built in (`Operandi::layouts_pie`).
 pub const LAYOUTS: &str = "Pie: Layouts";
-pub const ALL: [&str; 7] = [
+pub const ALL: [&str; 8] = [
     VIEW,
     SELECTION,
     SHADING,
@@ -41,6 +43,7 @@ pub const ALL: [&str; 7] = [
     FALLOFFS,
     ACTION_CENTERS,
     MODELING,
+    PANELS,
 ];
 
 /// Slots around a pie.
@@ -187,6 +190,18 @@ pub fn built_in(name: &str) -> Option<Pie> {
             s("Smooth Shift", "Smooth Shift"),
             s("Smooth", "Smooth"),
             None, // Soft drag
+        ],
+        // Each slot points the way its panel sits in the window; the
+        // diagonals are free for more panels later.
+        PANELS => vec![
+            s("Top Bar", "operandi.bar.collapse bar:top"),
+            None,
+            s("Right Panel", "operandi.bar.collapse bar:right"),
+            None,
+            s("Timeline", "operandi.anim.timeline"),
+            None,
+            s("Left Panel", "operandi.bar.collapse bar:left"),
+            None,
         ],
         _ => return None,
     };
@@ -533,6 +548,16 @@ impl Operandi {
         {
             return (None, Mark::Toggle(on));
         }
+        // The Panels pie: marked while the panel shows.
+        if let Some(bar) = lowered
+            .strip_prefix("operandi.bar.collapse bar:")
+            .and_then(crate::collapse_line::Bar::parse)
+        {
+            return (None, Mark::Toggle(!self.layouts.is_collapsed(bar)));
+        }
+        if lowered == "operandi.anim.timeline" {
+            return (None, Mark::Toggle(self.timeline.open));
+        }
         if let Some(rest) = lowered.strip_prefix("action center ") {
             let current = self.editor.action_context;
             if let Some(context) = center_named(rest) {
@@ -771,23 +796,14 @@ impl Operandi {
         ctx.request_repaint();
     }
 
-    /// A pie's key pressed: open it. True when the key was taken (opened,
-    /// or refused for a conflicting binding).
-    pub(super) fn pie_keys(&mut self, ctx: &Context) -> bool {
-        if self.has_modal()
-            || self.text_editor_focused(ctx)
-            || native_menu::tracking()
-            || self.pending.is_some()
-            || self.show_bindings
-            || self.recovery.is_some()
-            || self.recovery_warning.is_some()
-            || self.show_plane
-            || self.show_diagnostics
-            || self.show_about
-            || ctx.input(|i| i.pointer.any_down())
-        {
-            return false;
-        }
+    /// The first pie chord pressed this frame: the pie's name, whether its
+    /// key is bound to more than one action, the key (both readings), the
+    /// event's index and the chord's modifiers.
+    #[allow(clippy::type_complexity)]
+    fn pie_chord(
+        &self,
+        ctx: &Context,
+    ) -> Option<(String, bool, (Key, Option<Key>), usize, Modifiers)> {
         let mode = self.editor.scene.selection.mode;
         let live = self.editor_tool_active() || self.edge_click.is_some() || self.vertex_weld;
         let mut found = None;
@@ -836,6 +852,27 @@ impl Operandi {
                 }
             }
         });
+        found
+    }
+
+    /// A pie's key pressed: open it. True when the key was taken (opened,
+    /// or refused for a conflicting binding).
+    pub(super) fn pie_keys(&mut self, ctx: &Context) -> bool {
+        if self.has_modal()
+            || self.text_editor_focused(ctx)
+            || native_menu::tracking()
+            || self.pending.is_some()
+            || self.show_bindings
+            || self.recovery.is_some()
+            || self.recovery_warning.is_some()
+            || self.show_plane
+            || self.show_diagnostics
+            || self.show_about
+            || ctx.input(|i| i.pointer.any_down())
+        {
+            return false;
+        }
+        let found = self.pie_chord(ctx);
         let Some((name, conflict, key, at, chord_modifiers)) = found else {
             return false;
         };
@@ -891,6 +928,24 @@ impl Operandi {
         let Some(mut open) = self.pie.take() else {
             return false;
         };
+        // Another pie's chord while this one is open (Ctrl still held,
+        // a new number pressed, Leo 2026-11-27): swap to that pie in the
+        // same place; its key now closes it.
+        if let Some((name, false, key, _, chord_modifiers)) = self.pie_chord(ctx)
+            && name != open.pie.name
+            && let Some(pie) = self.pie_named(&name)
+        {
+            self.open_pie_at(ctx, pie, Some(key), Some(open.center));
+            if let Some(next) = &mut self.pie {
+                next.chord_modifiers = chord_modifiers;
+            }
+            ctx.input_mut(|i| {
+                i.events
+                    .retain(|e| !matches!(e, Event::Key { .. } | Event::Text(_)));
+            });
+            ctx.request_repaint();
+            return true;
+        }
         let enabled = self.pie_enabled(&open);
         let outcome = ctx.input(|i| {
             if let Some(p) = i.pointer.latest_pos() {
