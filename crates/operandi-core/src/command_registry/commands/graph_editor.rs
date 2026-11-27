@@ -335,6 +335,7 @@ pub(super) const COMMANDS: &[Entry] = &[
             &[jopt("channels", "string", "item:name,... (default the selected channels, else the selected items).")],
             crate::anim_commands::run,
         )
+        .undo()
         .operandi()
         .example("operandi.channel.paste channels:2:pos.X,2:pos.Y"),
     script("operandi.channel.select", Items, "Selects a channel for keying (UIC-119), or clears the channel selection.")
