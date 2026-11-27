@@ -983,6 +983,8 @@ struct Operandi {
     lower_frame: panel_registry::PanelGroup,
     scene_rect: Rect,
     scene_rows: BTreeMap<u64, Rect>,
+    /// The Items list's rows as last drawn, for drops from the 3D view (#55).
+    items_drawn_rows: Vec<tree_list::TreeRow<items_tree::ItemKey>>,
     collapsed_items: std::collections::BTreeSet<u64>,
     /// Skins opened to their joint influences in the Items list (SK-36):
     /// (mesh, op).
@@ -1858,6 +1860,7 @@ impl Operandi {
             ),
             scene_rect: Rect::NOTHING,
             scene_rows: BTreeMap::new(),
+            items_drawn_rows: Vec::new(),
             collapsed_items: Default::default(),
             open_skins: Default::default(),
             rig_row: None,

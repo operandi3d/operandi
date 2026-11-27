@@ -582,12 +582,22 @@ fn an_item_dragged_from_the_view_onto_a_list_row_is_parented() {
     let row = a.scene_rows[&other].center();
     let undo = a.editor.history.undo.len();
     draw(&mut a, &ctx, size, vec![Event::PointerMoved(on_cube)]);
-    draw(&mut a, &ctx, size, vec![pointer(on_cube, true, Modifiers::NONE)]);
+    draw(
+        &mut a,
+        &ctx,
+        size,
+        vec![pointer(on_cube, true, Modifiers::NONE)],
+    );
     for k in 1..=4 {
         let at = on_cube + (row - on_cube) * (k as f32 / 4.);
         draw(&mut a, &ctx, size, vec![Event::PointerMoved(at)]);
     }
-    draw(&mut a, &ctx, size, vec![pointer(row, false, Modifiers::NONE)]);
+    draw(
+        &mut a,
+        &ctx,
+        size,
+        vec![pointer(row, false, Modifiers::NONE)],
+    );
     draw(&mut a, &ctx, size, vec![]);
     assert_eq!(
         a.editor.scene.item(cube).unwrap().parent,
@@ -595,7 +605,10 @@ fn an_item_dragged_from_the_view_onto_a_list_row_is_parented() {
         "{}",
         a.status
     );
-    assert!(a.editor.history.undo.len() <= undo + 2, "selection + parent");
+    assert!(
+        a.editor.history.undo.len() <= undo + 2,
+        "selection + parent"
+    );
     a.run(Command::Undo);
     assert_eq!(a.editor.scene.item(cube).unwrap().parent, None);
 }

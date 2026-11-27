@@ -24,6 +24,9 @@ locators, groups) as a tree, with children under their parents. It is the
 - **Rename**: double-click the name and type.
 - **Parent an item**: drag it onto another item; drag it to the top level
   to unparent it.
+- **Parent or sort from the 3D view**: in **Items** mode, press on an
+  item in the **3D view** and drag it onto a row of the list: onto a row
+  parents it there, between two rows puts it there.
 - **Hide an item**: click its eye.
 - **Right-click** a row for that item's menu.
 
