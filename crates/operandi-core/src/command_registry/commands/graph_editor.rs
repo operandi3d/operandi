@@ -320,6 +320,23 @@ pub(super) const COMMANDS: &[Entry] = &[
         .ui()
         .operandi()
         .example("operandi.time.keyTime reset:true"),
+    script("operandi.channel.copy", Items, "Copies the values of channels: (default the selected channels) for Paste (#54).")
+        .on_editor(
+            "Copies channel values for Paste.",
+            &[jopt("channels", "string", "item:name,... (default the selected channels).")],
+            crate::anim_commands::run,
+        )
+        .ui()
+        .operandi()
+        .example("operandi.channel.copy channels:1:pos.X,1:pos.Y"),
+    script("operandi.channel.paste", Items, "Pastes the copied channel values onto channels: (default the selected channels; with none, the selected items' channels of the copied names): by name, else in order. One undo step (#54).")
+        .on_editor(
+            "Pastes copied channel values: by name, else in order; one undo step.",
+            &[jopt("channels", "string", "item:name,... (default the selected channels, else the selected items).")],
+            crate::anim_commands::run,
+        )
+        .operandi()
+        .example("operandi.channel.paste channels:2:pos.X,2:pos.Y"),
     script("operandi.channel.select", Items, "Selects a channel for keying (UIC-119), or clears the channel selection.")
         .on_editor(
             "Selects a channel for keying (UIC-119), or clears the channel selection.",

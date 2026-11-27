@@ -174,6 +174,17 @@ pub fn run(e: &mut Editor, name: &str, a: &Args) -> Out {
                 Some(k) => e.select_channel(Some(ChannelKey::parse(k)?), add),
             }
         }
+        "operandi.channel.copy" => {
+            let list = channels_or_selected(e, a)?;
+            e.copy_channels(&list)?;
+        }
+        "operandi.channel.paste" => {
+            let list = match channels_arg(a)? {
+                Some(list) => list,
+                None => e.anim.selected_channels.iter().cloned().collect(),
+            };
+            e.paste_channels(&list)?;
+        }
         "operandi.key.select" => {
             let how = match text(a, "mode").unwrap_or("replace") {
                 "replace" => KeySelect::Replace,
@@ -814,6 +825,8 @@ fn query(e: &Editor, a: &Args) -> Result<String, String> {
 /// Every animation command name, for the app's lists and tests.
 pub const NAMES: &[&str] = &[
     "operandi.anim.query",
+    "operandi.channel.copy",
+    "operandi.channel.paste",
     "operandi.channel.select",
     "operandi.curve.applyEnvelope",
     "operandi.curve.behavior",

@@ -1108,6 +1108,8 @@ pub struct AnimSession {
     pub key_time: Option<Tick>,
     /// UIC-119: channels picked by their row labels; `S` keys them.
     pub selected_channels: std::collections::BTreeSet<ChannelKey>,
+    /// #54: the channels last copied, by name, with their values.
+    pub channel_clipboard: Vec<(String, f64)>,
     /// TL-41: selected keys in the track row.
     pub selected_keys: std::collections::BTreeSet<(ChannelKey, Tick)>,
     /// TL-52: selected markers.
