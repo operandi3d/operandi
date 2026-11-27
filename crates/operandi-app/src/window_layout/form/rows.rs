@@ -130,7 +130,16 @@ fn anim_controls(ui: &mut Ui, label: &Response, circle: Pos2, row: &AnimRow) {
     }
     for r in [&light, label] {
         r.context_menu(|ui| {
-            let entries: [(&str, String); 10] = [
+            // #54: Copy takes the selected channels when this row is one of
+            // them, else this row's; Paste goes onto the same.
+            let picked = if row.selected {
+                String::new()
+            } else {
+                format!(" channels:{list}")
+            };
+            let entries: [(&str, String); 12] = [
+                ("Copy", format!("operandi.channel.copy{picked}")),
+                ("Paste", format!("operandi.channel.paste{picked}")),
                 ("Add Key", format!("operandi.key.set channels:{list}")),
                 ("Remove Key", format!("operandi.key.remove channels:{list}")),
                 ("Next Key", "operandi.time.go to:nextKey".into()),

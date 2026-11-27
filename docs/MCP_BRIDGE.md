@@ -1285,6 +1285,10 @@ used in the app; `primitive_add` always starts from the Reset values.
   - `frame` (number): Time in frames.
   - `time` (number): Time in seconds (instead of frame).
   - `reset` (boolean): Follow the current time again.
+- **`operandi.channel.copy`** — Copies channel values for Paste.
+  - `channels` (string): item:name,... (default the selected channels).
+- **`operandi.channel.paste`** — Pastes copied channel values: by name, else in order; one undo step.
+  - `channels` (string): item:name,... (default the selected channels, else the selected items).
 - **`operandi.channel.select`** — Selects a channel for keying (UIC-119), or clears the channel selection.
   - `channel` (string): item:name, or none.
   - `add` (boolean): Toggle it in the selection (default false).

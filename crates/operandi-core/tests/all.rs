@@ -101,6 +101,8 @@ mod chamfer_basic;
 #[cfg(operandi_specs)]
 #[path = "chamfer_edit_clean_spec.rs"]
 mod chamfer_edit_clean_spec;
+#[path = "channel_copy_paste.rs"]
+mod channel_copy_paste;
 #[path = "character_rig.rs"]
 mod character_rig;
 #[path = "checkpoint_boundary.rs"]

@@ -500,6 +500,70 @@ impl Editor {
         })
     }
 
+    /// #54: copies `channels`' values (by name) for Paste. Returns how many.
+    pub fn copy_channels(&mut self, channels: &[ChannelKey]) -> Result<usize> {
+        let copied: Vec<(String, f64)> = channels
+            .iter()
+            .filter_map(|k| Some((k.channel.clone(), animation::read(&self.scene, k)?)))
+            .collect();
+        if copied.is_empty() {
+            return Err("None of those channels has a value to copy".into());
+        }
+        let n = copied.len();
+        self.anim.channel_clipboard = copied;
+        Ok(n)
+    }
+
+    /// #54: pastes the copied values onto `targets`, one undo step. A target
+    /// takes the copied channel of its own name; when no target's name was
+    /// copied, they take the copied values in order. With no targets, the
+    /// selected items' channels of the copied names.
+    pub fn paste_channels(&mut self, targets: &[ChannelKey]) -> Result<()> {
+        let copied = self.anim.channel_clipboard.clone();
+        if copied.is_empty() {
+            return Err("Copy channels first".into());
+        }
+        let targets: Vec<ChannelKey> = if targets.is_empty() {
+            let items = self.scene.selected_items();
+            if items.is_empty() {
+                return Err("Select channels or items to paste onto".into());
+            }
+            items
+                .iter()
+                .flat_map(|&i| copied.iter().map(move |(n, _)| ChannelKey::new(i, n)))
+                .collect()
+        } else {
+            targets.to_vec()
+        };
+        let by_name = targets
+            .iter()
+            .any(|t| copied.iter().any(|(n, _)| *n == t.channel));
+        let pairs: Vec<(ChannelKey, f64)> = if by_name {
+            targets
+                .iter()
+                .filter_map(|t| {
+                    let v = copied.iter().find(|(n, _)| *n == t.channel)?.1;
+                    Some((t.clone(), v))
+                })
+                .collect()
+        } else {
+            targets
+                .iter()
+                .zip(copied.iter())
+                .map(|(t, (_, v))| (t.clone(), *v))
+                .collect()
+        };
+        self.anim_step("Paste Channels", move |e| {
+            let mut changed = false;
+            for (k, v) in &pairs {
+                changed |=
+                    animation::read(&e.scene, k).is_some_and(|now| animation::differs(now, *v));
+                animation::write(&mut e.scene, k, *v)?;
+            }
+            Ok(changed)
+        })
+    }
+
     /// UIC-119: picks (or with `add`, toggles) a channel for `S`.
     pub fn select_channel(&mut self, key: Option<ChannelKey>, add: bool) {
         if !add {
