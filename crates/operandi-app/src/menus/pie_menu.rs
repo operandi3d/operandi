@@ -30,10 +30,12 @@ pub const TOGGLES: &str = "Pie: Viewport Toggles";
 pub const FALLOFFS: &str = "Pie: Falloffs";
 pub const ACTION_CENTERS: &str = "Pie: Action Centers";
 pub const MODELING: &str = "Pie: Modeling";
+/// Shows or hides the window's bars and the timeline (Jason, 2026-11-27).
+pub const PANELS: &str = "Pie: Panels";
 /// The Layouts pie (layouts stage 2, UIC-18): its slots are the layouts,
 /// so it isn't built in (`Operandi::layouts_pie`).
 pub const LAYOUTS: &str = "Pie: Layouts";
-pub const ALL: [&str; 7] = [
+pub const ALL: [&str; 8] = [
     VIEW,
     SELECTION,
     SHADING,
@@ -41,6 +43,7 @@ pub const ALL: [&str; 7] = [
     FALLOFFS,
     ACTION_CENTERS,
     MODELING,
+    PANELS,
 ];
 
 /// Slots around a pie.
@@ -187,6 +190,18 @@ pub fn built_in(name: &str) -> Option<Pie> {
             s("Smooth Shift", "Smooth Shift"),
             s("Smooth", "Smooth"),
             None, // Soft drag
+        ],
+        // Each slot points the way its panel sits in the window; the
+        // diagonals are free for more panels later.
+        PANELS => vec![
+            s("Top Bar", "operandi.bar.collapse bar:top"),
+            None,
+            s("Right Panel", "operandi.bar.collapse bar:right"),
+            None,
+            s("Timeline", "operandi.anim.timeline"),
+            None,
+            s("Left Panel", "operandi.bar.collapse bar:left"),
+            None,
         ],
         _ => return None,
     };
@@ -528,6 +543,16 @@ impl Operandi {
             .and_then(|t| self.toggle_state(t))
         {
             return (None, Mark::Toggle(on));
+        }
+        // The Panels pie: marked while the panel shows.
+        if let Some(bar) = lowered
+            .strip_prefix("operandi.bar.collapse bar:")
+            .and_then(crate::collapse_line::Bar::parse)
+        {
+            return (None, Mark::Toggle(!self.layouts.is_collapsed(bar)));
+        }
+        if lowered == "operandi.anim.timeline" {
+            return (None, Mark::Toggle(self.timeline.open));
         }
         if let Some(rest) = lowered.strip_prefix("action center ") {
             let current = self.editor.action_context;

@@ -616,3 +616,47 @@ fn wireframe_toggle_works_in_item_mode() {
     assert!(shown(&a));
     assert_eq!(a.pie_status(toggle).mark, Mark::Toggle(true));
 }
+
+/// The Panels pie (Jason, 2026-11-27): Ctrl+3 shows or hides the top,
+/// left and right bars and the timeline at the bottom, each slot marked
+/// while its panel shows. Alt+Space stays free for the quick-access
+/// popover (UIC-63).
+#[test]
+fn panels_pie_shows_and_hides_the_bars_and_the_timeline() {
+    let d = input::default_bindings();
+    assert_eq!(d[pie_menu::PANELS], "Ctrl+3");
+    let pie = pie_menu::built_in(pie_menu::PANELS).unwrap();
+    let labels: Vec<Option<&str>> = (0..pie_menu::SLOTS)
+        .map(|i| pie.slot(i).map(|e| e.label.as_str()))
+        .collect();
+    assert_eq!(
+        labels,
+        [
+            Some("Top Bar"),
+            None,
+            Some("Right Panel"),
+            None,
+            Some("Timeline"),
+            None,
+            Some("Left Panel"),
+            None
+        ]
+    );
+    let mut a = box_app();
+    for i in [0, 2, 4, 6] {
+        let entry = pie.slot(i).unwrap();
+        let Mark::Toggle(before) = a.pie_status(&entry.command).mark else {
+            panic!("{} is a toggle", entry.label);
+        };
+        a.execute(&entry.command);
+        assert_eq!(
+            a.pie_status(&entry.command).mark,
+            Mark::Toggle(!before),
+            "{}: {}",
+            entry.label,
+            a.status
+        );
+        a.execute(&entry.command);
+        assert_eq!(a.pie_status(&entry.command).mark, Mark::Toggle(before));
+    }
+}
