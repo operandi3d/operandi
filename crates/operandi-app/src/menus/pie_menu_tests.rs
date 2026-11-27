@@ -660,3 +660,66 @@ fn panels_pie_shows_and_hides_the_bars_and_the_timeline() {
         assert_eq!(a.pie_status(&entry.command).mark, Mark::Toggle(before));
     }
 }
+
+/// Leo (2026-11-27): with Ctrl still held, pressing another pie's number
+/// swaps to that pie in the same place (Ctrl+1, then 3: the Panels pie);
+/// its key's release then runs the new pie's slot.
+#[test]
+fn another_pies_key_while_one_is_open_swaps_to_it() {
+    let mut a = perspective_app();
+    let ctx = Context::default();
+    // The main-row digits, as the window reports them.
+    let digit = |a: &mut Operandi, d: u8| {
+        a.native_numbers = vec![crate::native::NumberKey {
+            digit: d,
+            keypad: false,
+            pressed: true,
+        }];
+    };
+    frame(&mut a, &ctx, vec![Event::PointerMoved(AT)]);
+    digit(&mut a, 1);
+    frame(
+        &mut a,
+        &ctx,
+        vec![key_event(Key::Num1, true, Modifiers::CTRL)],
+    );
+    assert_eq!(
+        a.pie.as_ref().map(|p| p.pie.name.as_str()),
+        Some(pie_menu::TOGGLES),
+        "{}",
+        a.status
+    );
+    let center = a.pie.as_ref().unwrap().center;
+    digit(&mut a, 3);
+    frame(
+        &mut a,
+        &ctx,
+        vec![key_event(Key::Num3, true, Modifiers::CTRL)],
+    );
+    let open = a.pie.as_ref().expect("still a pie open");
+    assert_eq!(open.pie.name, pie_menu::PANELS);
+    assert_eq!(open.center, center, "in the same place");
+    // Releasing the first pie's key no longer closes it...
+    frame(
+        &mut a,
+        &ctx,
+        vec![key_event(Key::Num1, false, Modifiers::CTRL)],
+    );
+    assert!(a.pie.is_some());
+    // ...the new key's release, pointing west, runs Left Panel.
+    let left = a.pie.as_ref().unwrap().rect(6).center();
+    frame(&mut a, &ctx, vec![Event::PointerMoved(left)]);
+    let before = a.layouts.is_collapsed(crate::collapse_line::Bar::Left);
+    frame(
+        &mut a,
+        &ctx,
+        vec![key_event(Key::Num3, false, Modifiers::CTRL)],
+    );
+    assert!(a.pie.is_none());
+    assert_ne!(
+        a.layouts.is_collapsed(crate::collapse_line::Bar::Left),
+        before,
+        "{}",
+        a.status
+    );
+}
