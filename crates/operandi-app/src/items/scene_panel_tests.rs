@@ -558,3 +558,44 @@ fn item_transform_edits_every_selected_item_and_shows_mixed() {
     a.run(Command::Undo);
     assert_eq!(a.editor.scene.items, before.items);
 }
+
+/// #55 (Leo): in Item mode, pressing on an item in the 3D view and
+/// releasing over an Items list row parents it to that row's item; one
+/// undo step takes it back. Released over the view it's a plain select.
+#[test]
+fn an_item_dragged_from_the_view_onto_a_list_row_is_parented() {
+    let mut a = box_app();
+    a.run(Command::Mode(Mode::Item));
+    a.run(Command::NewMesh);
+    let cube = a.editor.scene.items[0].id;
+    let other = a.editor.scene.selection.item.unwrap();
+    let ctx = Context::default();
+    theme::install(&ctx);
+    let size = vec2(1440., 900.);
+    a.camera.view = View::Perspective;
+    for _ in 0..2 {
+        draw(&mut a, &ctx, size, vec![]);
+    }
+    // The cube's middle in the view; the other mesh's row in the list.
+    let r = a.viewport_rect;
+    let on_cube = a.camera.project(DVec3::ZERO, r).unwrap().0;
+    let row = a.scene_rows[&other].center();
+    let undo = a.editor.history.undo.len();
+    draw(&mut a, &ctx, size, vec![Event::PointerMoved(on_cube)]);
+    draw(&mut a, &ctx, size, vec![pointer(on_cube, true, Modifiers::NONE)]);
+    for k in 1..=4 {
+        let at = on_cube + (row - on_cube) * (k as f32 / 4.);
+        draw(&mut a, &ctx, size, vec![Event::PointerMoved(at)]);
+    }
+    draw(&mut a, &ctx, size, vec![pointer(row, false, Modifiers::NONE)]);
+    draw(&mut a, &ctx, size, vec![]);
+    assert_eq!(
+        a.editor.scene.item(cube).unwrap().parent,
+        Some(other),
+        "{}",
+        a.status
+    );
+    assert!(a.editor.history.undo.len() <= undo + 2, "selection + parent");
+    a.run(Command::Undo);
+    assert_eq!(a.editor.scene.item(cube).unwrap().parent, None);
+}
