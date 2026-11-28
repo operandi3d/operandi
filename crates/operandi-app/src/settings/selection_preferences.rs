@@ -107,7 +107,9 @@ pub struct SelectionPreferences {
     /// its component mode (and pick it). Provisional default off.
     pub mouse_regions: bool,
     /// Transparency: Selection, as percent opacity of the selection where a
-    /// surface hides it (x-ray). Provisional: 0, hidden as before.
+    /// surface hides it (x-ray). Provisional default 50 % (#69, Leo
+    /// 2026-11-28: the hidden selection shows through from the start; it
+    /// was 0, hidden, so it looked missing).
     pub selection_xray: u8,
     /// Pick Other Meshes in Component Modes: a Vertex, Edge or Polygon
     /// click on another mesh makes it the active mesh. Off by default
@@ -137,7 +139,7 @@ impl Default for SelectionPreferences {
             lasso_partial: false,
             point_priority: 12,
             mouse_regions: false,
-            selection_xray: 0,
+            selection_xray: 50,
             pick_other_meshes: false,
             lazy_selection: false,
             shortest_path_mode: false,
@@ -696,7 +698,8 @@ mod tests {
     #[test]
     fn selection_xray_and_new_fields_persist() {
         let d = SelectionPreferences::default();
-        assert_eq!(d.xray_opacity(), 0.);
+        // #69: half shows through by default.
+        assert!((d.xray_opacity() - 0.5).abs() < 1e-6);
         assert_eq!(d.point_priority, 12);
         assert!(!d.mouse_regions);
         let dir = std::env::temp_dir().join(format!("operandi-sel-xray-{}", std::process::id()));

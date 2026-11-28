@@ -21,6 +21,13 @@ The **Input** page sets **Mouse Navigation** (which mouse gestures orbit,
 pan and zoom; the rows under it show the current ones), opens the **Input
 Map...** to change keys, and sets up a pen tablet.
 
+## Selection seen through surfaces
+
+**Transparency: Selection** on the **Selection** page sets how much of the
+selected points, edges and polygon outlines shows where a surface hides
+them, so you can see what is selected without turning the view. It starts
+at 50%; 0% hides them, 100% draws them as strongly as in front.
+
 ## Free Orbit and Free Cursor
 
 Two mouse options on the **Remapping** page, both off at first. Each
