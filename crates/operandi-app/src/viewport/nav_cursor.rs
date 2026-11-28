@@ -5,7 +5,7 @@
 //! magnifier for zoom and so on. The signs are Operandi's own drawings,
 //! light with a dark edge so they read over any background.
 use eframe::egui::{Color32, Painter, Pos2, Shape, Stroke, Vec2, vec2};
-use std::f32::consts::{FRAC_PI_2, PI};
+use std::f32::consts::PI;
 
 use super::input::NavigationKind;
 
@@ -79,10 +79,12 @@ pub(crate) fn strokes(at: Pos2, kind: NavigationKind, stroke: Stroke) -> Vec<Sha
 /// Three quarters of a circle of radius `r` round `at` with an arrow head
 /// at its end; `reverse` runs it the other way round.
 fn circling(out: &mut Vec<Shape>, at: Pos2, r: f32, stroke: Stroke, reverse: bool) {
+    // Both end at the top, the arrow head pointing across it (Leo,
+    // 2026-11-28: a quarter turn right of where they first ended).
     let (from, span) = if reverse {
-        (FRAC_PI_2, -PI * 1.5)
+        (PI, -PI * 1.5)
     } else {
-        (-FRAC_PI_2, PI * 1.5)
+        (0., PI * 1.5)
     };
     let steps = 18;
     let point = |a: f32| at + vec2(a.cos(), a.sin()) * r;
@@ -119,6 +121,22 @@ fn head(out: &mut Vec<Shape>, tip: Pos2, dir: Vec2, stroke: Stroke) {
 mod tests {
     use super::*;
     use eframe::egui::pos2;
+
+    #[test]
+    fn the_circling_arrows_end_at_the_top() {
+        let at = pos2(100., 100.);
+        let s = Stroke::new(1_f32, Color32::WHITE);
+        for kind in [NavigationKind::Orbit, NavigationKind::Look] {
+            let Shape::Path(arc) = &strokes(at, kind, s)[0] else {
+                panic!("{kind:?}: the arc comes first")
+            };
+            let end = *arc.points.last().unwrap();
+            assert!(
+                (end.x - at.x).abs() < 0.01 && end.y < at.y,
+                "{kind:?} ends at {end:?}"
+            );
+        }
+    }
 
     #[test]
     fn every_kind_has_a_sign_and_zoom_and_pan_differ() {
