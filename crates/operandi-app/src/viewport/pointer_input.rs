@@ -1704,7 +1704,7 @@ impl Operandi {
                             // drops the selected items there.
                             if self.editor.scene.selection.mode == Mode::Item
                                 && !r.contains(pos)
-                                && self.editor.live.is_none()
+                                && self.editor.session.live.is_none()
                             {
                                 self.drop_items_from_view(pos);
                             }
