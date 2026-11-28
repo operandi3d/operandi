@@ -809,10 +809,7 @@ impl Operandi {
                     .inner_margin(4.),
             )
             .show(ctx, |ui| {
-                let rect = ui.max_rect();
-                if !self.docked_while_popped(ui, rect, crate::panel_popover::PopPanel::Toolbox) {
-                    self.toolbox(ui);
-                }
+                self.toolbox(ui);
             });
         self.right_sidebar(ctx);
     }

@@ -958,6 +958,34 @@ fn search_row<K>(ui: &mut Ui, id: &str, state: &mut TreeState<K>) -> Response {
     search
 }
 
+/// The ids a list's rows and handles start from: the spec's id, salted
+/// while a second copy of its panel draws (a panel popover beside the
+/// docked one, panel_popover.rs), so both copies stay live.
+pub(crate) fn list_id(ctx: &egui::Context, spec_id: &str) -> Id {
+    let base = Id::new(spec_id);
+    match ctx.data(|d| d.get_temp::<Id>(Id::new(COPY_SALT))) {
+        Some(salt) => base.with(salt),
+        None => base,
+    }
+}
+
+/// Where `list_id` finds the salt of the copy drawing now.
+pub(crate) const COPY_SALT: &str = "tree-list-copy-salt";
+
+/// Whether a second copy of a panel is drawing now (`list_id`).
+pub(crate) fn drawing_copy(ctx: &egui::Context) -> bool {
+    ctx.data(|d| d.get_temp::<Id>(Id::new(COPY_SALT))).is_some()
+}
+
+/// Draw `f` as a second copy of a panel: lists inside it take ids of
+/// their own, salted with `salt`.
+pub(crate) fn as_copy<R>(ctx: &egui::Context, salt: Id, f: impl FnOnce() -> R) -> R {
+    ctx.data_mut(|d| d.insert_temp(Id::new(COPY_SALT), salt));
+    let out = f();
+    ctx.data_mut(|d| d.remove::<Id>(Id::new(COPY_SALT)));
+    out
+}
+
 /// Draw the list: header row, then the tree body filling `ui`'s remaining
 /// height. Returns what the user did. `editors` collects text fields the
 /// app must treat as typing (search, rename).
@@ -1043,7 +1071,11 @@ fn header_row<K>(
     state.dividers.clear();
     for (i, (column, span)) in spec.columns.iter().zip(spans).enumerate() {
         let cell = Rect::from_x_y_ranges(*span, rect.y_range());
-        let response = ui.interact(cell, Id::new((spec.id, "heading", i)), Sense::hover());
+        let response = ui.interact(
+            cell,
+            list_id(ui.ctx(), spec.id).with(("heading", i)),
+            Sense::hover(),
+        );
         match column.heading {
             Heading::Eye => theme::list_eye(ui, cell.shrink(1.), true, false),
             Heading::Icon(i) => icons::paint_in(ui, cell.shrink(2.5), i, palette::header_text()),
@@ -1074,7 +1106,11 @@ fn header_row<K>(
             let x = span.max;
             state.dividers.push(x);
             let grab = Rect::from_x_y_ranges(x - GRAB..=x + GRAB, rect.y_range());
-            let handle = ui.interact(grab, Id::new((spec.id, "divider", i)), Sense::drag());
+            let handle = ui.interact(
+                grab,
+                list_id(ui.ctx(), spec.id).with(("divider", i)),
+                Sense::drag(),
+            );
             if handle.hovered() || handle.dragged() {
                 ui.ctx().set_cursor_icon(CursorIcon::ResizeHorizontal);
             }
@@ -1177,7 +1213,7 @@ fn body<K: Copy + Eq + Hash + Debug + 'static>(
         // The whole row: click selects, drag moves, right-click menus.
         let response = ui.interact(
             rect,
-            Id::new((spec.id, "row", row.key)),
+            list_id(ui.ctx(), spec.id).with(("row", row.key)),
             Sense::click_and_drag(),
         );
         let name_cell = Rect::from_x_y_ranges(name_span, rect.y_range());
@@ -1195,7 +1231,7 @@ fn body<K: Copy + Eq + Hash + Debug + 'static>(
         if let Some(open) = row.disclosure {
             let hit = ui.interact(
                 disclosure,
-                Id::new((spec.id, "disclosure", row.key)),
+                list_id(ui.ctx(), spec.id).with(("disclosure", row.key)),
                 Sense::click(),
             );
             icons::disclosure_in(
@@ -1243,7 +1279,7 @@ fn body<K: Copy + Eq + Hash + Debug + 'static>(
             let hit = ui
                 .interact(
                     toggle,
-                    Id::new((spec.id, "attributes", row.key)),
+                    list_id(ui.ctx(), spec.id).with(("attributes", row.key)),
                     Sense::click(),
                 )
                 .on_hover_text(if open {
@@ -1353,7 +1389,7 @@ fn body<K: Copy + Eq + Hash + Debug + 'static>(
                 Cell::Toggle { on, tip, dimmed } => {
                     let hit = ui.interact(
                         cell,
-                        Id::new((spec.id, "toggle", row.key, c)),
+                        list_id(ui.ctx(), spec.id).with(("toggle", row.key, c)),
                         Sense::click_and_drag(),
                     );
                     let shown = match &state.sweep {
@@ -1641,7 +1677,7 @@ fn drag_ghost<K: Copy + Eq + Hash + Debug + 'static>(
         first.name.clone()
     };
     let icon = first.icon;
-    egui::Area::new(Id::new((spec.id, "drag-ghost")))
+    egui::Area::new(list_id(ui.ctx(), spec.id).with(("drag-ghost",)))
         .order(egui::Order::Tooltip)
         .fixed_pos(at + vec2(10., 4.))
         .interactable(false)

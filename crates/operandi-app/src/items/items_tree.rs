@@ -67,6 +67,12 @@ impl Operandi {
     pub(super) fn items_body(&mut self, ui: &mut Ui, _area: Rect) {
         // The core's IL-07 filter holds the search; the list's search row
         // edits it.
+        // A popover copy beside the docked list (panel_popover.rs) keeps
+        // its own scroll, drag and rename state; the rows are the same.
+        let copy = tree_list::drawing_copy(ui.ctx());
+        if copy {
+            std::mem::swap(&mut self.items_tree, &mut self.items_tree_copy);
+        }
         {
             let f = &self.item_list.filter;
             let s = &mut self.items_tree.search;
@@ -106,12 +112,19 @@ impl Operandi {
             f.text_pattern = state.search.wildcard;
             f.text_case = state.search.match_case;
         }
-        // Rects for tests and the drag code elsewhere.
+        // Rects for tests and the drag code elsewhere: the copy the
+        // pointer is over (the docked one unless it is over the popover).
         let here = self.scenes.active_tab().id;
-        self.scene_rows.clear();
-        self.scene_root_rect = None;
-        self.scenes.drop_rects.clear();
-        for (key, _) in &state.rects {
+        let pointer_here = ui
+            .ctx()
+            .pointer_hover_pos()
+            .is_some_and(|p| ui.clip_rect().contains(p));
+        if !copy || pointer_here {
+            self.scene_rows.clear();
+            self.scene_root_rect = None;
+            self.scenes.drop_rects.clear();
+        }
+        for (key, _) in state.rects.iter().filter(|_| !copy || pointer_here) {
             let cell = state.cells.get(&(*key, NAME)).copied();
             match (*key, cell) {
                 (ItemKey::Item(s, id), Some(cell)) if s == here => {
@@ -127,6 +140,9 @@ impl Operandi {
             }
         }
         self.items_tree = state;
+        if copy {
+            std::mem::swap(&mut self.items_tree, &mut self.items_tree_copy);
+        }
         let order: Vec<u64> = rows
             .iter()
             .filter_map(|r| match r.key {

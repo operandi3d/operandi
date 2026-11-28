@@ -124,9 +124,8 @@ still don't select while a tool is on: select first, then pick the tool.
 1. Hold **Control+3**. The **Panels** pie opens round the pointer.
 2. Point at **Graph Editor**, **Items**, **Properties**, **Timeline** or
    **Toolbox** and let go. That panel, on its own, pops up next to the
-   pointer. The docked panels stay where they are. (If the same panel is
-   showing in the side column, it says "open in a popover" there until the
-   popover closes.)
+   pointer. The docked panels stay where they are, and both copies work:
+   a change in one shows in the other.
 3. Make your change, then move the pointer away: the popover closes.
 
 To keep it open, click the circle at the right of its title strip, or drag

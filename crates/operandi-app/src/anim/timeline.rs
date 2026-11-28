@@ -202,12 +202,7 @@ impl Operandi {
         egui::TopBottomPanel::bottom("timeline")
             .exact_height(height)
             .resizable(false)
-            .show(ctx, |ui| {
-                let rect = ui.max_rect();
-                if !self.docked_while_popped(ui, rect, crate::panel_popover::PopPanel::Timeline) {
-                    self.timeline_ui(ui);
-                }
-            });
+            .show(ctx, |ui| self.timeline_ui(ui));
     }
 
     fn timeline_scale(&self, x0: f32, x1: f32) -> Scale {
@@ -233,11 +228,18 @@ impl Operandi {
 
     pub(crate) fn timeline_ui(&mut self, ui: &mut Ui) {
         let full = ui.max_rect();
-        self.timeline.rect = full;
+        // A popover copy (panel_popover.rs) leaves the docked strip's rect.
+        if !crate::tree_list::drawing_copy(ui.ctx()) {
+            self.timeline.rect = full;
+        }
         let rate = self.editor.scene.time.rate;
         // TL-02: drag the top edge for the height.
         let edge = Rect::from_min_max(full.min, pos2(full.max.x, full.min.y + 4.));
-        let edge_r = ui.interact(edge, Id::new("timeline-edge"), Sense::drag());
+        let edge_r = ui.interact(
+            edge,
+            crate::tree_list::list_id(ui.ctx(), "timeline-edge"),
+            Sense::drag(),
+        );
         if edge_r.hovered() || edge_r.dragged() {
             ui.ctx().set_cursor_icon(egui::CursorIcon::ResizeVertical);
         }
@@ -419,7 +421,11 @@ impl Operandi {
         }
         // TL-11 click/drag: time; TL-20 middle: key time; Shift+middle
         // pan [OP]; wheel zoom around the pointer.
-        let response = ui.interact(band, Id::new("timeline-ruler"), Sense::click_and_drag());
+        let response = ui.interact(
+            band,
+            crate::tree_list::list_id(ui.ctx(), "timeline-ruler"),
+            Sense::click_and_drag(),
+        );
         let pointer = response.interact_pointer_pos().or(response.hover_pos());
         let frame_at = |x: f32| scale.f(x);
         if response.hovered() {
@@ -581,7 +587,11 @@ impl Operandi {
                 theme::text(),
             );
         }
-        let response = ui.interact(rect, Id::new("timeline-range"), Sense::click_and_drag());
+        let response = ui.interact(
+            rect,
+            crate::tree_list::list_id(ui.ctx(), "timeline-range"),
+            Sense::click_and_drag(),
+        );
         if response.double_clicked() {
             self.execute("operandi.time.range reset:true");
             return;
@@ -735,7 +745,11 @@ impl Operandi {
             }
         }
         let band = Rect::from_min_max(pos2(scale.x0, rect.min.y), pos2(scale.x1, rect.max.y));
-        let response = ui.interact(band, Id::new("timeline-markers"), Sense::click_and_drag());
+        let response = ui.interact(
+            band,
+            crate::tree_list::list_id(ui.ctx(), "timeline-markers"),
+            Sense::click_and_drag(),
+        );
         if let Some((id, _)) = hit
             && let Some(m) = shown.iter().find(|m| m.id == id)
             && !m.label.is_empty()
@@ -1039,7 +1053,7 @@ impl Operandi {
                 let open = self.timeline.expanded.contains(&id);
                 let tri = ui.interact(
                     Rect::from_min_size(pos2(text_x - 2., y), vec2(12., ROW_H)),
-                    Id::new(("timeline-expand", id)),
+                    crate::tree_list::list_id(ui.ctx(), "timeline-expand").with(id),
                     Sense::click(),
                 );
                 painter.text(
@@ -1071,7 +1085,11 @@ impl Operandi {
             );
             if i == 0 {
                 let toggle = ui
-                    .interact(label_rect, Id::new("timeline-by-type"), Sense::click())
+                    .interact(
+                        label_rect,
+                        crate::tree_list::list_id(ui.ctx(), "timeline-by-type"),
+                        Sense::click(),
+                    )
                     .on_hover_text(
                         "Click to group the rows by channel type instead of by item (TL-40)",
                     );
@@ -1154,7 +1172,11 @@ impl Operandi {
             pos2(scale.x0 - 6., rect.min.y),
             pos2(scale.x1 + 6., rect.max.y),
         );
-        let response = ui.interact(band, Id::new("timeline-tracks"), Sense::click_and_drag());
+        let response = ui.interact(
+            band,
+            crate::tree_list::list_id(ui.ctx(), "timeline-tracks"),
+            Sense::click_and_drag(),
+        );
         let pointer = response.interact_pointer_pos().or(response.hover_pos());
         let under = |p: Pos2| -> Option<usize> {
             handles.iter().position(|(row, f, _)| {

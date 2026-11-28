@@ -90,6 +90,19 @@ impl PopPanel {
         format!("{COMMAND} panel:{}", self.id())
     }
 
+    /// Whether the docked copy stays live while the popover shows (Jason,
+    /// 2026-11-28: both stay live). The rest keep one copy's state between
+    /// them, so the docked one says it is in the popover instead.
+    fn both_live(self) -> bool {
+        matches!(
+            self,
+            PopPanel::Kind(PanelKind::Items | PanelKind::Properties)
+                | PopPanel::Toolbox
+                | PopPanel::Timeline
+                | PopPanel::GraphEditor
+        )
+    }
+
     /// Its size (provisional): narrow lists, wide strips.
     fn size(self) -> Vec2 {
         match self {
@@ -195,10 +208,10 @@ impl Operandi {
     }
 
     /// Where a docked copy of `panel` would draw while its popover is
-    /// open: a line saying so instead (two copies in one window would
-    /// share their widgets' ids). True when it drew the line.
+    /// open: a line saying so instead, for the panels that can't yet show
+    /// twice (`both_live`). True when it drew the line.
     pub(crate) fn docked_while_popped(&self, ui: &mut Ui, rect: Rect, panel: PopPanel) -> bool {
-        if !self.panel_popover_open(panel) {
+        if !self.panel_popover_open(panel) || panel.both_live() {
             return false;
         }
         ui.painter().text(
@@ -243,17 +256,21 @@ impl Operandi {
                     ui.set_clip_rect(ui.max_rect().intersect(ui.clip_rect()));
                     title = crate::popup_title::title_bar(ui, open.panel.name(), open.pinned);
                     let body = ui.available_rect_before_wrap();
-                    ui.push_id(("panel-popover", open.panel.id()), |ui| match open.panel {
-                        // Its own tab ids, apart from the docked panel's.
-                        PopPanel::Kind(PanelKind::Properties) => {
-                            self.properties_body(ui, body, "popover-properties-category")
-                        }
-                        PopPanel::Kind(kind) => {
-                            (panel_registry::panel_type(kind).draw)(self, ui, body)
-                        }
-                        PopPanel::Toolbox => self.toolbox(ui),
-                        PopPanel::Timeline => self.timeline_ui(ui),
-                        PopPanel::GraphEditor => self.graph_editor_ui(ui),
+                    let salt = Id::new(("panel-popover", open.panel.id()));
+                    let ctx = ui.ctx().clone();
+                    crate::tree_list::as_copy(&ctx, salt, || {
+                        ui.push_id(salt, |ui| match open.panel {
+                            // Its own tab ids, apart from the docked panel's.
+                            PopPanel::Kind(PanelKind::Properties) => {
+                                self.properties_body(ui, body, "popover-properties-category")
+                            }
+                            PopPanel::Kind(kind) => {
+                                (panel_registry::panel_type(kind).draw)(self, ui, body)
+                            }
+                            PopPanel::Toolbox => self.toolbox(ui),
+                            PopPanel::Timeline => self.timeline_ui(ui),
+                            PopPanel::GraphEditor => self.graph_editor_ui(ui),
+                        })
                     });
                 });
             });

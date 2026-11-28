@@ -1130,6 +1130,8 @@ struct Operandi {
     /// Item list row being dragged for parenting.
     /// The Items list's view state (tree_list.rs, items_tree.rs).
     items_tree: Box<tree_list::TreeState<items_tree::ItemKey>>,
+    /// The Items popover's own list state (panel_popover.rs).
+    items_tree_copy: Box<tree_list::TreeState<items_tree::ItemKey>>,
     /// An Alt+click "show only this one" on an Items eye, and what it hid.
     item_solo: Option<(u64, Vec<u64>)>,
     /// The Groups list's view state.
@@ -1942,6 +1944,7 @@ impl Operandi {
             add_loop_settings: Default::default(),
             add_point_settings: Default::default(),
             items_tree: Default::default(),
+            items_tree_copy: Default::default(),
             item_solo: None,
             groups_tree: Default::default(),
             uv_maps_tree: Default::default(),

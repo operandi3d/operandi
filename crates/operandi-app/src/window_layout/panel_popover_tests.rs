@@ -124,3 +124,44 @@ fn timeline_and_graph_editor_pop_out() {
     frame(&mut a, &ctx, vec![]);
     assert!(a.panel_popover_open(PopPanel::Timeline));
 }
+
+/// Jason, 2026-11-28: the docked panel stays live beside its popover.
+/// The docked Items list keeps its rows (and the drag code their rects)
+/// while the Items popover shows, and the Toolbox and Timeline draw in
+/// both places at once.
+#[test]
+fn the_docked_copy_stays_live_beside_the_popover() {
+    let mut a = box_app();
+    let ctx = Context::default();
+    let at = pos2(600., 400.);
+    frame(&mut a, &ctx, vec![Event::PointerMoved(at)]);
+    let docked_rows = a.scene_rows.clone();
+    assert!(!docked_rows.is_empty(), "the docked list has rows");
+    let column = a.viewport_rect.right();
+    assert!(docked_rows.values().all(|r| r.left() >= column));
+    a.execute("operandi.panel.popover panel:items");
+    frame(&mut a, &ctx, vec![]);
+    let rect = a.panel_popover.as_ref().unwrap().rect.unwrap();
+    assert!(
+        a.scene_rows.values().all(|r| rect.contains(r.center())),
+        "over the popover, its rows are the ones picked: {:?}",
+        a.scene_rows
+    );
+    // Pinned, with the pointer back over the docked list: its rows again.
+    a.panel_popover.as_mut().unwrap().pinned = true;
+    let over = docked_rows.values().next().unwrap().center();
+    frame(&mut a, &ctx, vec![Event::PointerMoved(over)]);
+    frame(&mut a, &ctx, vec![]);
+    assert!(a.panel_popover.is_some());
+    assert_eq!(a.scene_rows, docked_rows, "the docked list is live");
+    a.panel_popover = None;
+    for id in ["toolbox", "timeline"] {
+        a.timeline.open = true;
+        frame(&mut a, &ctx, vec![Event::PointerMoved(at)]);
+        a.execute(&format!("operandi.panel.popover panel:{id}"));
+        frame(&mut a, &ctx, vec![]);
+        frame(&mut a, &ctx, vec![]);
+        assert!(a.panel_popover.is_some(), "{id}");
+        a.panel_popover = None;
+    }
+}
