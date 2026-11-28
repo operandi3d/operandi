@@ -13,14 +13,14 @@ start.
 From anyone, for any reason:
 
 - Anything from reverse engineering Modo: decompiling, disassembling,
-  debugging or tracing its binaries, reading its program files, plug-ins or
-  internal data to see how it works, and tools made for that (REA, Ghidra,
+  debugging or tracing its binaries, reading its program files, Foundry's
+  plug-ins or internal data to see how it works, and tools made for that (REA, Ghidra,
   IDA, Hopper, `otool`, `class-dump`, `strings`, hex editors on its program
   files and the like). Studying a file format so Operandi can open or save
   that format (LXO, for example) is fine; that's the file, not the program.
 - Modo source code of any kind: leaked or decompiled code, or code copied
-  from the Modo SDK's source and headers, its sample plug-ins, or projects
-  built on the SDK.
+  from the Modo SDK's source and headers or its sample plug-ins, and
+  Foundry's own kits.
 - Modo's own material: icons, images, interface artwork, presets, sample
   scenes or text copied from its documentation.
 - Confidential Foundry material: code, internal documents, or anything an
@@ -39,6 +39,13 @@ From anyone, for any reason:
   Foundry, as long as nothing confidential comes with it.
 - Open-source code under a GPL-3.0-compatible licence, following
   "Licences" in CONTRIBUTING.md.
+- Modo kits written by people other than Foundry: you may read and reuse
+  their code when the kit's licence is GPL-3.0-compatible, or when you
+  wrote the kit and bring it in under the GPL with your sign-off. Parts
+  copied from the Modo SDK stay out.
+- Work that makes Operandi more like Modo. It needs no OK from the
+  maintainer before you start, unless it would break something (existing
+  behaviour, saved scenes, scripts); merges still go through review.
 
 ## 3. If you've worked at Foundry
 

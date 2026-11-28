@@ -13,8 +13,12 @@ decides scope, merges and releases.
 work. For a contributor's agent the minimum is the Modo rules in
 [CONTRIBUTING.md](CONTRIBUTING.md) and [docs/CLEAN_ROOM.md](docs/CLEAN_ROOM.md)
 (nothing from reverse engineering Modo, nothing copied from it); keeping
-the stricter boundary is welcome. Where a rule names a folder, apply it to
-the matching place on your machine.
+the stricter boundary is welcome. A contributor's agent may read and reuse
+a Modo kit's code when its licence is GPL-compatible or the contributor
+wrote it (Foundry's own kits stay off-limits), and work that makes
+Operandi more like Modo needs no OK from the maintainer first unless it
+would break something (the maintainer, 2026-11-28). Where a rule names a
+folder, apply it to the matching place on your machine.
 
 **The job is working, tested modeling tools.** Checks and notes exist to
 support that, not to replace it. When in doubt, build the tool.
@@ -30,8 +34,10 @@ Never read, search, open or launch:
 
 - `<your study folder>` (the research project, Modo's guide, old research
   and SDK archives), or anything else outside this repo that holds Modo material;
-- the Modo application, its kits, preferences or SDK, and the Modo bridge's
-  data folder;
+- the Modo application, Foundry's own kits, Modo's preferences or SDK, and
+  the Modo bridge's data folder (a kit by someone else may be read when
+  its licence is GPL-compatible or its author brings it here; see
+  docs/CLEAN_ROOM.md);
 - the Modo user guide or HTML help (they were removed from this repo on
   2026-10-31; the Research side reads them and writes specs instead);
 - anything from reverse engineering Modo (decompiler or disassembler

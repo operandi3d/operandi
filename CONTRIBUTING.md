@@ -53,8 +53,8 @@ What we can't take:
   or digging through its program files (REA, Ghidra, IDA, Hopper and the
   like), and no code or specs that came from someone doing that. Studying
   a file format so Operandi can open or save that format is fine.
-- **Modo's code.** Leaked or decompiled source, or code copied from the
-  Modo SDK or from projects built on it.
+- **Modo's code.** Leaked or decompiled source, code copied from the Modo
+  SDK, or code from Foundry's own kits and plug-ins.
 - **Modo's own material.** Its icons, images, interface artwork, presets,
   sample content, or text copied from its documentation. Make your own,
   and describe things in your own words.
@@ -62,6 +62,18 @@ What we can't take:
   very welcome here, and your skills and 3D know-how are yours. Just don't
   bring code, internal documents or anything your agreement with Foundry
   treats as confidential.
+
+**Modo kits by other people are fine.** You may read and reuse a Modo
+kit's code when its licence is GPL-3.0-compatible, or when you wrote the
+kit yourself and bring it in under the GPL with your sign-off. Follow
+"Licences" below. Foundry's own kits stay off-limits, and so does any part
+of a kit copied from the Modo SDK.
+
+**Making Operandi more like Modo needs no OK first.** Work that brings a
+tool, name, default or workflow closer to Modo doesn't need Jason's
+approval before you start, unless it would break something (existing
+behaviour people rely on, saved scenes, scripts). Say in the pull request
+what it changes. Merging still goes through review.
 
 If you're unsure whether something is OK, ask in an issue first. If
 something slipped in, say so and we'll sort it out together. Being honest
@@ -149,7 +161,8 @@ contribute.
 ## Making a change
 
 1. Open or pick an issue first for anything bigger than a small fix, so we
-   agree on scope.
+   agree on scope. (Work that makes Operandi more like Modo can start
+   without waiting for an OK; see "Modo" above.)
 2. Work on a branch named for the feature (for example `edge-slide`),
    started from `main`.
 3. For a tool: read its spec, write 5–8 acceptance criteria (including empty
