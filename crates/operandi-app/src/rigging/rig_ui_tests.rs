@@ -217,3 +217,60 @@ fn schematic_add_selected_lands_mid_view_and_says_what_it_did() {
     assert!(lines.is_empty());
     assert_eq!(a.schematic.note.as_deref(), Some("Already on this page"));
 }
+
+/// #54: channels dragged from a Properties label and let go over the
+/// Schematic come onto the page as ports of their item; a label that was
+/// one of the selected channels brings them all. With no page yet, the drop
+/// starts a workspace.
+#[test]
+fn channels_dropped_on_the_schematic_become_ports() {
+    use crate::form::rows::ChannelDrag;
+    use operandi_core::schematic_layout::Metrics;
+    use operandi_core::schematic_pages::{self, PageId};
+    crate::anim_switch::set_for_test(true);
+    let ctx = Context::default();
+    let mut a = box_app();
+    let id = a.editor.scene.items[0].id;
+    a.execute("operandi.rig.schematicView");
+    frames(&mut a, &ctx, 2);
+    assert_eq!(a.schematic.page, None, "no rig, no page yet");
+    // Dropped on the empty Schematic: a workspace with the item on it.
+    let drag = ChannelDrag {
+        channels: vec![format!("{id}:pos.X")],
+        selected: false,
+    };
+    let line = a
+        .schematic_channels_line(&drag, egui::pos2(0., 0.))
+        .unwrap();
+    a.schematic.after_save.push(line);
+    a.schematic_run(vec!["operandi.rig.workspaceAdd name:Workspace".into()]);
+    let ws = a.editor.scene.animation.rig.workspaces[0].id;
+    assert_eq!(a.schematic.page, Some(PageId::Saved(ws)));
+    // The selected channels, from a selected label, onto that page.
+    a.execute(&format!("operandi.channel.select channel:{id}:rot.Y"));
+    a.execute(&format!(
+        "operandi.channel.select channel:{id}:scl.Z add:true"
+    ));
+    let drag = ChannelDrag {
+        channels: vec![format!("{id}:rot.Y")],
+        selected: true,
+    };
+    let line = a
+        .schematic_channels_line(&drag, egui::pos2(50., 50.))
+        .unwrap();
+    a.schematic_run(vec![line.replace("{ws}", &ws.to_string())]);
+    let view = schematic_pages::page(&a.editor.scene, PageId::Saved(ws), &Metrics::default());
+    let node = view
+        .schematic
+        .nodes
+        .iter()
+        .find(|n| n.key == format!("item:{id}"))
+        .expect("the item is on the page");
+    for port in ["pos.X", "rot.Y", "scl.Z"] {
+        assert!(
+            node.outputs.iter().any(|p| p == port),
+            "{port}: {:?}",
+            node.outputs
+        );
+    }
+}

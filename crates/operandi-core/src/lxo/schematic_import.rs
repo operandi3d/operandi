@@ -180,6 +180,7 @@ pub fn apply(
                 x,
                 y,
                 pinned: true,
+                channels: Vec::new(),
             });
         }
         clear_overlaps(&mut nodes, &height, &m);

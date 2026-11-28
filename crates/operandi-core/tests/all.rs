@@ -717,6 +717,8 @@ mod scale_to_zero;
 mod scene_budget;
 #[path = "scene_transfer.rs"]
 mod scene_transfer;
+#[path = "schematic_channels.rs"]
+mod schematic_channels;
 #[path = "schematic_layout.rs"]
 mod schematic_layout;
 #[path = "schematic_pages.rs"]

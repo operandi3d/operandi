@@ -492,6 +492,19 @@ pub(super) const COMMANDS: &[Entry] = &[
         .undo()
         .operandi()
         .example("operandi.rig.schematicArrange workspace:40"),
+    script("operandi.rig.schematicChannels", Items, "Shows channels on a Schematic workspace as ports of their items, putting items not on it yet at the drop (#54: channels dragged from Properties).")
+        .on_editor(
+            "Show channels as ports on a workspace, one undo step: each channel's item comes onto the page (at at:, else arranged below) and keeps the channel as an input and output port, wired or not.",
+            &[
+            jreq("workspace", "integer", "The workspace id."),
+            jreq("channels", "string", "item:name pairs, comma-separated: 3:pos.X,3:rot.Y."),
+            jopt("at", "string", "x/y on the page for items not on it yet."),
+        ],
+            crate::schematic_pages::run,
+        )
+        .undo()
+        .operandi()
+        .example("operandi.rig.schematicChannels workspace:40 channels:3:pos.X at:40/60"),
     script("operandi.rig.schematicPlace", Items, "Puts nodes on a Schematic workspace or moves them there (SC-10, SC-91); nodes given without a place arrive arranged.")
         .on_editor(
             "Place nodes on a workspace, one undo step: place puts each key at x/y (moving it if it is there already, marked as moved by hand unless pinned:false); nodes adds keys not on the page yet, arranged together below what is there (SC-60). Never changes the items or pieces.",

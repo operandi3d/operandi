@@ -17,6 +17,7 @@ A scene with a rig but no workspace yet shows everything on one page called **Wo
 
 - **Add Selected** puts the selected items on the page. Select them first in a 3D view or the Items list; the button is greyed until you do.
 - **Add Rig** puts the selected items' rig pieces on the page, with the items those pieces use.
+- Drag a channel's label from the **Properties** panel onto the page: its item comes onto the page where you let go (or stays where it is), with that channel as a port on both sides, ready to wire. Drag one of several selected labels to bring them all.
 - **Add ▾** adds a modifier (Expression, Blend, Math and so on) to the selected item and puts it on the page. Wire it by dragging from port to port.
 - A new rig piece that touches an item on the page shows up beside that item.
 

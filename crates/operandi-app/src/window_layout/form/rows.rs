@@ -81,6 +81,15 @@ pub(crate) struct AnimRow {
     pub selected: bool,
 }
 
+/// Channels dragged from a row's label (#54): let go over the Schematic,
+/// they show there as ports of their items. `selected`: the label was one
+/// of the selected channels, so every selected channel goes.
+#[derive(Clone, Debug)]
+pub(crate) struct ChannelDrag {
+    pub(crate) channels: Vec<String>,
+    pub(crate) selected: bool,
+}
+
 /// Marks the next row as keyable channels `row` (after `set_status`).
 pub(crate) fn anim_channel(row: AnimRow) {
     STATE.with(|s| s.borrow_mut().anim = Some(row));
@@ -121,6 +130,13 @@ fn anim_controls(ui: &mut Ui, label: &Response, circle: Pos2, row: &AnimRow) {
         request(format!("operandi.key.toggle channels:{list}"));
     }
     let light = light.on_hover_text("Click to set a key here, or remove the key on this frame");
+    // #54: drag the label into the Schematic.
+    if label.drag_started() {
+        label.dnd_set_drag_payload(ChannelDrag {
+            channels: row.channels.clone(),
+            selected: row.selected,
+        });
+    }
     if label.clicked() {
         let add = ui.input(|i| i.modifiers.shift || i.modifiers.command);
         request(format!(
@@ -374,7 +390,8 @@ pub(crate) fn frame(ui: &mut Ui, label: Option<&str>, tooltip: &str) -> (RowRect
     };
     paint_status(ui, rects.circle, status);
     if let Some(row) = take_anim() {
-        let response = response.interact(Sense::click());
+        // Click selects (UIC-119); a drag carries the channels (#54).
+        let response = response.interact(Sense::click_and_drag());
         anim_controls(ui, &response, rects.circle, &row);
         return (rects, response);
     }

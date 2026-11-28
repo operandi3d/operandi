@@ -880,6 +880,10 @@ used in the app; `primitive_add` always starts from the Reset values.
 - **`operandi.rig.schematicArrange`** — Lay out a workspace's nodes left to right by data flow, ordered to cut wire crossings, one undo step. With nodes, just those (even hand-placed ones); without, every node not moved by hand since the last Arrange, placed below the hand-placed ones.
   - `workspace` (integer, required): The workspace id (operandi.rig.workspaces).
   - `nodes` (string): Node keys to arrange, comma-separated (item:<id>, piece:<id>).
+- **`operandi.rig.schematicChannels`** — Show channels as ports on a workspace, one undo step: each channel's item comes onto the page (at at:, else arranged below) and keeps the channel as an input and output port, wired or not.
+  - `workspace` (integer, required): The workspace id.
+  - `channels` (string, required): item:name pairs, comma-separated: 3:pos.X,3:rot.Y.
+  - `at` (string): x/y on the page for items not on it yet.
 - **`operandi.rig.schematicPlace`** — Place nodes on a workspace, one undo step: place puts each key at x/y (moving it if it is there already, marked as moved by hand unless pinned:false); nodes adds keys not on the page yet, arranged together below what is there (SC-60). Never changes the items or pieces.
   - `workspace` (integer, required): The workspace id.
   - `place` (string): key@x/y pairs, comma-separated: item:3@10/20,piece:7@-40/5.
