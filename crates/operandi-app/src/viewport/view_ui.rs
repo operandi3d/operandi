@@ -44,6 +44,12 @@ impl Operandi {
             if let Some(wait) = self.camera_view_settle_in() {
                 ui.ctx().request_repaint_after(wait);
             }
+            // A texture's shader compiling in the background: look again
+            // soon, so it shows when ready without a pointer move.
+            if self.viewport_gpu.as_ref().is_some_and(|g| g.compiling()) {
+                ui.ctx()
+                    .request_repaint_after(std::time::Duration::from_millis(30));
+            }
             let painter = ui.painter_at(r);
             match self.display.settings.drawing.background {
                 view_display::Background::None => {

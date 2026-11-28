@@ -998,6 +998,17 @@ struct VertexOut { @builtin(position) position: vec4<f32>, @location(0) color: v
     pub fn image_traffic(&self) -> (u64, u64) {
         (self.materials.uploads, self.materials.patches)
     }
+    /// A material shader is compiling in the background: the views keep
+    /// drawing so it shows as soon as it is ready.
+    pub fn compiling(&self) -> bool {
+        self.materials.compiling()
+    }
+    /// Compile new material shaders on a background thread (tests switch
+    /// it on to check the wait; elsewhere off in tests).
+    #[cfg(test)]
+    pub fn set_background_compile(&mut self, on: bool) {
+        self.materials.background = on;
+    }
     /// Items drawing patches (tests).
     #[cfg(test)]
     pub fn patched_items(&self) -> usize {
@@ -3974,12 +3985,44 @@ impl ViewportGpu {
                 glass: glass_pipelines(device, layout, samples, &shader),
             })
         };
-        if self.materials.sync(
+        // A new module compiles on a background thread (a first compile
+        // can take over a second): the same work, on a clone of the device.
+        let spawn = |module: String| {
+            let (tx, rx) = std::sync::mpsc::channel();
+            let (device, layout) = (device.clone(), layout.clone());
+            std::thread::spawn(move || {
+                let source = world_shader(&module);
+                let made = match crate::material_gpu::valid(&source) {
+                    Err(e) => {
+                        crate::log_ring::log_line!(
+                            "Image layers can't be drawn in the viewport (shader error); showing average colours. {e}"
+                        );
+                        None
+                    }
+                    Ok(()) => {
+                        let shader = device.create_shader_module(wgpu::ShaderModuleDescriptor {
+                            label: Some("Operandi resident mesh shader (image layers)"),
+                            source: wgpu::ShaderSource::Wgsl(source.into()),
+                        });
+                        Some(crate::material_gpu::FillSet {
+                            fill: fill_pipeline(&device, &layout, samples, &shader),
+                            glass: glass_pipelines(&device, &layout, samples, &shader),
+                        })
+                    }
+                };
+                let _ = tx.send(made);
+            });
+            rx
+        };
+        let synced = self.materials.sync(
             device,
             &self.state.queue,
             world.materials.as_deref(),
             &compile,
-        ) {
+            &spawn,
+        );
+        let arrived = self.materials.poll(device, &self.state.queue);
+        if synced || arrived {
             self.rebuild_scene_group();
         }
         // Patches draw the same programs (subd_gpu.rs).

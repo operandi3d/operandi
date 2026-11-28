@@ -559,3 +559,50 @@ fn checker_cube(subdivided: bool) {
         "subdivided {subdivided}: both squares: {dark} dark, {light} light of {all}"
     );
 }
+
+/// Leo (2026-11-28): a new texture's shader compiles on a background
+/// thread, so the frame after adding it doesn't wait for the compile; the
+/// view draws the plain colour meanwhile and the pattern once it's ready.
+/// Skips without a graphics device.
+#[test]
+fn a_new_textures_shader_compiles_without_holding_up_frames() {
+    use operandi_core::procedural::ProceduralKind;
+    use operandi_core::shader_tree::{NewLayer, ShaderTreeEdit};
+    let Some(state) = super::performance_tests::headless_gpu() else {
+        return;
+    };
+    let mut a = Operandi::empty();
+    let mut gpu = gpu::ViewportGpu::new(state);
+    gpu.set_background_compile(true);
+    a.viewport_gpu = Some(gpu);
+    a.editor.scene.new_mesh().unwrap();
+    a.editor.scene.items[0].mesh = operandi_core::Mesh::box_mesh(DVec3::ZERO, DVec3::splat(2.), 1)
+        .unwrap()
+        .into();
+    for group in [
+        &mut a.display.settings.active,
+        &mut a.display.settings.inactive,
+    ] {
+        group.style = crate::view_display::Style::Texture;
+    }
+    let ctx = Context::default();
+    theme::install(&ctx);
+    let size = vec2(1200., 800.);
+    for _ in 0..2 {
+        super::tests::draw(&mut a, &ctx, size, vec![]);
+    }
+    a.run(Command::ShaderTree(ShaderTreeEdit::Add {
+        layer: NewLayer::Procedural(ProceduralKind::Noise),
+        selected: None,
+    }));
+    super::tests::draw(&mut a, &ctx, size, vec![]);
+    let gpu = a.viewport_gpu.as_ref().unwrap();
+    assert!(gpu.compiling(), "the module compiles in the background");
+    // It arrives within a while, and the views stop waiting.
+    let start = std::time::Instant::now();
+    while a.viewport_gpu.as_ref().unwrap().compiling() {
+        assert!(start.elapsed().as_secs() < 30, "the compile never arrived");
+        std::thread::sleep(std::time::Duration::from_millis(20));
+        super::tests::draw(&mut a, &ctx, size, vec![]);
+    }
+}
