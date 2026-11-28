@@ -513,36 +513,42 @@ fn face_4_center(rig: &Rig) -> DVec3 {
         / 4.
 }
 
-/// Jason, 2026-11-15 (VAC-Q02, provisional): a press away from the model
-/// moves the Move widget there; a press back on the selected element puts
-/// it back on the selection, while a press on an unselected element leaves
-/// it where it is.
+/// C-AUTO (AC-RULES v6, GitHub #39): with no Action Center every press
+/// off the handle moves the Move widget to the press, beside the model, on
+/// an unselected polygon and on the selected one alike, and the drag that
+/// follows moves the selection from there. (It replaces VAC-Q02, where a
+/// press on the model left the widget and one on the selection brought it
+/// back.) The other Action Centers are in `ac_press_tests.rs`.
 #[test]
-fn a_press_on_the_selection_brings_the_moved_widget_back() {
+fn every_press_moves_the_move_widget_to_the_press() {
     let mut rig = Rig::new(Mode::Polygon);
     rig.activate(Tool::Move);
     let r = rig.a.viewport_rect;
     let at_selection = |rig: &Rig| (rig.a.transform_handle_center() - face_4_center(rig)).length();
     assert!(at_selection(&rig) < 1e-9);
-    // Away from the model: the widget jumps to the press and the drag
-    // moves the selection from there.
+    // Beside the model.
     rig.drag(rig.corner(), vec2(30., 0.));
     assert!(
         at_selection(&rig) > 0.5,
         "the widget stayed on the selection"
     );
-    // On an unselected polygon (face 0): the widget stays put.
-    let face_0 = rig.a.camera.project(DVec3::new(0.5, 0.5, 0.), r).unwrap().0;
-    let before = rig.a.transform_handle_center();
-    rig.drag(face_0, vec2(0., 0.));
-    assert!((rig.a.transform_handle_center() - before).length() < 1e-9);
-    // On the selected polygon: back on the selection, and the drag that
-    // follows still moves it.
+    // On an unselected polygon (face 0), then on the selected one.
+    for target in [DVec3::new(0.5, 0.5, 0.), face_4_center(&rig)] {
+        let at = rig.a.camera.project(target, r).unwrap().0;
+        assert_eq!(rig.a.handle_hit(at, r), None);
+        rig.drag(at, vec2(0., 0.));
+        let widget = rig.a.transform_handle_center();
+        assert!((widget - target).length() < 1e-4, "{widget} at {target}");
+    }
+    // The drag in the same press still moves the selection.
     let moved = face_4_center(&rig);
-    let on_face = rig.a.camera.project(moved, r).unwrap().0;
-    rig.drag(on_face, vec2(0., 0.));
-    assert!(at_selection(&rig) < 1e-6, "{}", rig.a.status);
+    let on_face = rig
+        .a
+        .camera
+        .project(moved + DVec3::new(0.3, 0.3, 0.), r)
+        .unwrap()
+        .0;
+    assert_eq!(rig.a.handle_hit(on_face, r), None);
     rig.drag(on_face, vec2(0., -40.));
     assert!(face_4_center(&rig).y > moved.y + 0.01);
-    assert!(at_selection(&rig) < 1e-6);
 }

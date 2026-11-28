@@ -493,6 +493,21 @@ fn create_answers(r: &mut Commands) {
         })
         .unwrap_or_else(|e| panic!("{e}"));
     }
+    // #46: Mesh Paint lights while any of its variants is on (it is the
+    // button the Alt variant sits on); each variant lights by its own name.
+    r.answer("Mesh Paint", |a, _| {
+        CommandState::lit(matches!(
+            a.utility,
+            Some(create_utility::Utility::MeshPaint(_))
+        ))
+    })
+    .unwrap_or_else(|e| panic!("{e}"));
+    for name in ["Mesh Paint Instance", "Mesh Paint Instancer"] {
+        r.answer(name, |a, c| {
+            CommandState::lit(a.utility.is_some_and(|u| u.label() == c.entry.name))
+        })
+        .unwrap_or_else(|e| panic!("{e}"));
+    }
 }
 
 /// The slide tool of the selection mode (the Edit tab's Slide).
@@ -1863,6 +1878,8 @@ fn phrases(r: &mut Commands) {
     crate::skeleton_tool_ui::register(r);
     crate::bind_dialog_ui::register(r);
     crate::python_ui::register(r);
+    crate::pie_forms::register(r);
+    crate::form_icons::register(r);
     on_words(r, &["view.topologyMode"], |a, c| {
         a.set_topology_mode(c.rest)
     });
@@ -2247,6 +2264,19 @@ fn tables(r: &mut Commands) {
     });
     on(r, &["operandi.help.whatsThis"], |a, _| a.toggle_help_mode());
     on(r, &["operandi.update.check"], |a, _| a.check_for_updates());
+    // Kits (kit_commands.rs).
+    on_words(
+        r,
+        &[
+            "operandi.kit.disable",
+            "operandi.kit.enable",
+            "operandi.kit.install",
+            "operandi.kit.list",
+            "operandi.kit.openFolder",
+            "operandi.kit.reload",
+        ],
+        |a, c| a.kit_command(c.entry.name, c.rest),
+    );
     // Online libraries (online_library_ui.rs).
     on_words(
         r,

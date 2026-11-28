@@ -792,6 +792,23 @@ fn button(ui: &mut Ui, rect: Rect, id: Id, text: &str) -> Out {
 
 /// A form button: label left-aligned, the key hint right-aligned and dim
 /// (UIC-84).
+/// The width a `paint_button` needs to show `text` (and `hint`) whole.
+pub(super) fn button_width_for(ui: &Ui, text: &str, hint: Option<&str>) -> f32 {
+    let font = body(ui);
+    let width = |t: &str, f: FontId| {
+        ui.painter()
+            .layout_no_wrap(t.to_owned(), f, Color32::WHITE)
+            .size()
+            .x
+    };
+    let mut needed = (INSET + 1.) + width(text, font.clone()) + INSET;
+    if let Some(hint) = hint {
+        // A small gap between the label and its dim key.
+        needed += 2. + width(hint, FontId::new(font.size - 1.5, font.family));
+    }
+    needed.ceil()
+}
+
 pub(super) fn paint_button(
     ui: &Ui,
     rect: Rect,

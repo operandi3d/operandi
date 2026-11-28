@@ -146,7 +146,8 @@ impl<H> Clone for Registry<H> {
 }
 
 /// Namespaces no kit may use even before a built-in command takes them.
-const ALWAYS_RESERVED: &[&str] = &["operandi", "app", "kit", "plugin", "cmds", "command"];
+pub(crate) const ALWAYS_RESERVED: &[&str] =
+    &["operandi", "app", "kit", "plugin", "cmds", "command"];
 
 impl<H> Default for Registry<H> {
     fn default() -> Self {

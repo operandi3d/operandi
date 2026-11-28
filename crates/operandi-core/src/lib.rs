@@ -426,8 +426,14 @@ pub mod ik_commands;
 pub mod ik_joint;
 #[path = "rigging/ik_switch.rs"]
 pub mod ik_switch;
+#[path = "kits/kit_folder.rs"]
+pub mod kit_folder;
+#[path = "kits/kit_import.rs"]
+pub mod kit_import;
 #[path = "scene_items/kit_item.rs"]
 pub mod kit_item;
+#[path = "kits/kit_manifest.rs"]
+pub mod kit_manifest;
 #[path = "meshops/mesh_stack.rs"]
 pub mod mesh_stack;
 #[path = "meshops/mesh_stack_builtin.rs"]
@@ -761,8 +767,11 @@ pub use deform_finish::{
     RelaxMeshOptions,
 };
 pub use topology_pen::{PenEdit, PenMode, TopologyPenOptions};
+#[path = "transforms/element_center.rs"]
+pub mod element_center;
 #[path = "tools/haul.rs"]
 pub mod haul;
+pub use element_center::{CenterPress, element_axes, element_frame};
 #[path = "transforms/pivot_service.rs"]
 pub mod pivot_service;
 #[path = "tools/preset_store.rs"]

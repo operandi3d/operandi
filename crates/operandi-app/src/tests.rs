@@ -54,6 +54,8 @@ pub(super) fn draw_held(
     // And the one that hands puck button presses in as keys.
     a.space_mouse_take_events(&mut raw.events);
     a.space_mouse_take_numbers();
+    // And the bridge's pointer_stroke frames.
+    a.mcp_take_stroke_input(&mut raw);
     ctx.run(raw, |ctx| {
         a.begin_input(ctx);
         a.compose(ctx);

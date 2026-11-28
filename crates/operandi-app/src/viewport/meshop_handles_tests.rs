@@ -266,3 +266,81 @@ fn dragging_a_lattice_point_moves_it_in_one_undo_step() {
         "one step for the drag"
     );
 }
+
+/// #42: the Arc and Text ops had no handles at all. They get the centre,
+/// move arrows and plane squares (their sizes are single numbers, so no
+/// per-axis size squares).
+#[test]
+fn arc_and_text_ops_have_move_handles() {
+    for id in ["prim.arc.item", "prim.text.item"] {
+        let mut a = Operandi::empty();
+        a.run(Command::NewMesh);
+        a.run(Command::MeshOpCreate(id.into()));
+        let kinds: Vec<OpHandle> = a.meshop_handles(rect()).iter().map(|h| h.1).collect();
+        assert_eq!(
+            kinds,
+            [
+                OpHandle::Centre,
+                OpHandle::Move(0),
+                OpHandle::Move(1),
+                OpHandle::Move(2),
+                OpHandle::Plane(0),
+                OpHandle::Plane(1),
+                OpHandle::Plane(2),
+            ],
+            "{id}"
+        );
+    }
+}
+
+/// #42: dragging the Arc op's X arrow moves the whole arc: its Center and
+/// the Start and End points that set its direction, so its shape stays.
+#[test]
+fn moving_the_arc_op_carries_start_and_end_along() {
+    let mut a = Operandi::empty();
+    a.run(Command::NewMesh);
+    a.run(Command::MeshOpCreate("prim.arc.item".into()));
+    let before = op_values(&a);
+    let r = rect();
+    let (op, _) = a.selected_primitive_op().unwrap();
+    let grab = crate::viewport::meshop_handles::OpGrab {
+        op,
+        handle: OpHandle::Move(0),
+        start: before.clone(),
+        gesture: crate::colour_field::next_gesture(),
+    };
+    let q = r.center();
+    a.drag_meshop_handle(&grab, q, q + vec2(80., 0.), r);
+    let after = op_values(&a);
+    let moved = |k: &str| after[k].as_f64().unwrap() - before[k].as_f64().unwrap();
+    let dx = moved("centerX");
+    assert!(dx.abs() > 1e-6, "the centre moved along X");
+    for k in ["startX", "endX"] {
+        assert!((moved(k) - dx).abs() < 1e-9, "{k} moved with it");
+    }
+    for k in ["centerY", "centerZ", "startY", "startZ", "endY", "endZ"] {
+        assert!(moved(k).abs() < 1e-9, "{k} stays");
+    }
+}
+
+/// #42: dragging the Text op's Y arrow moves its Position.
+#[test]
+fn moving_the_text_op_sets_its_position() {
+    let mut a = Operandi::empty();
+    a.run(Command::NewMesh);
+    a.run(Command::MeshOpCreate("prim.text.item".into()));
+    let before = op_values(&a);
+    let r = rect();
+    let (op, _) = a.selected_primitive_op().unwrap();
+    let grab = crate::viewport::meshop_handles::OpGrab {
+        op,
+        handle: OpHandle::Move(1),
+        start: before.clone(),
+        gesture: crate::colour_field::next_gesture(),
+    };
+    let q = r.center();
+    a.drag_meshop_handle(&grab, q, q + vec2(0., -80.), r);
+    let after = op_values(&a);
+    let dy = after["posY"].as_f64().unwrap() - before["posY"].as_f64().unwrap();
+    assert!(dy > 1e-6, "Position Y went up: {dy}");
+}

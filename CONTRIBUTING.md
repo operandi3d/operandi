@@ -204,6 +204,13 @@ contribute.
 9. Open a pull request and fill in its checklist. Jason reviews and merges;
    `main` only changes through reviewed pull requests.
 
+**Making a kit** (an optional add-on, such as an importer for a new file
+type) doesn't need a change to Operandi at all: a kit lives in its own
+repository and people install it from a zip.
+[docs/KITS.md](docs/KITS.md) is the kit contract, and
+[`examples/kits/off_import`](examples/kits/off_import) is a small kit to
+start from.
+
 Don't commit build output (`target/`, `development/`), `.docx` files, your
 own scenes (`*.opscene` outside `fixtures/`), anything from Modo, or
 secrets.

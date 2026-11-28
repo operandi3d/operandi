@@ -172,3 +172,29 @@ fn text_gets_move_arrows_only() {
     drag(&mut a, 0, 60.);
     assert!(a.session_shape().unwrap().position.x > before.x);
 }
+
+/// #42: Arc and Teapot had no handles at all once drawn. Like Text they
+/// get the move arrows (their sizes are single numbers on the panel).
+#[test]
+fn arc_and_teapot_get_move_arrows() {
+    for kind in [ShapeKind::Arc, ShapeKind::Teapot] {
+        let mut a = box_app();
+        a.run(Command::ArmShape(kind));
+        let p = a.editor.shape.as_ref().unwrap().requested.clone();
+        // Drawn: configured once, as a drag or a panel edit does.
+        a.run(Command::ConfigureShape(p));
+        assert!(
+            a.editor.shape.as_ref().unwrap().preview.is_some(),
+            "{kind:?} drawn: {}",
+            a.status
+        );
+        let ids: Vec<usize> = a.handles(rect()).iter().map(|h| h.0).collect();
+        // Top view: X and Z arrows (Y is end-on), and no squares.
+        assert_eq!(ids, vec![0, 2], "{kind:?}: {}", a.status);
+        let before = a.session_shape().unwrap().position;
+        drag(&mut a, 0, 60.);
+        let after = a.session_shape().unwrap().position;
+        assert!(after.x > before.x, "{kind:?} moved along X");
+        assert!((after.z - before.z).abs() < 1e-9, "{kind:?} only along X");
+    }
+}

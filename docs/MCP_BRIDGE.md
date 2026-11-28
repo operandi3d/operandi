@@ -80,7 +80,10 @@ claude mcp add operandi-live -- /path/to/target/debug/operandi-mcp --attach
 - **The person at the keyboard wins.** Editing calls are refused (as
   `isError` results) while a dialog is open, a drag is in progress, or a tool
   is active in the app; the refusal names the dialog, and `scene_info`
-  reports it as `dialog` (null when none). No bridge call opens a dialog.
+  reports it as `dialog` (null when none). No bridge call opens a dialog
+  (an `app_command` line that does is an error, and the dialog waits for
+  the person). `app_command` and `pointer_stroke` act as the person does,
+  so an active tool doesn't refuse them; a dialog or a drag still does.
   `scene_new` / `scene_load` are refused while the
   document has unsaved changes, and go through the app's own New/Open paths
   so app-wide settings, the saved copy and the title stay right.
@@ -122,6 +125,8 @@ claude mcp add operandi-live -- /path/to/target/debug/operandi-mcp --attach
 | `camera_set` / `light_set` | camera or light properties, one undo step | `EditCamera` / `EditLight` (the panels' edits), `SetRenderCamera` |
 | `view_set` | app only: a view shows a named view or looks through a camera, and its `shading` style (wireframe, solid, vertex_map, shaded, texture, default, advanced, gooch, cel, reflection; the Display menu's names work too); `viewport` (index, 0 = first) picks the view and makes it active, default the active view; answers view, shading, viewport and the viewport count. Not saved with the scene, not an undo step | Camera view; `view3d.shadingStyle` |
 | `panel_show` | app only: bring a side panel's tab to the front (`items`, `shader_tree`, `groups`, `properties`), adding a closed one back to its group, so a capture or screenshot shows it; answers both groups' tabs and front tab. Layout only: runs with a dialog open, opens none | panel groups (the tab strip's click) |
+| `app_command` | app only: one of the app's own command lines, as typed on its command line (`{"line": "operandi.paint.airbrush"}`): paint tools, `operandi.paint.set`, `operandi.paint.addTexture …`, `operandi.image.*` and every other app command `command_run` can't reach; recorded in the History tab as a bridge line; answers the state echo, `line` and `status` | the app's command line (`execute_reporting`, source bridge) |
+| `pointer_stroke` | app only: press, drag and release in a viewport, one point per frame (below); answered after the release | scripted pointer events in `raw_input_hook` (`commands/mcp_pointer.rs`) |
 | `viewport_capture` | app only: PNG of the active view (current, a named view, or through a camera), saved and returned as an image | eframe screenshot, cropped to the view |
 | `render_settings_get` / `render_settings_set` | render settings: samples, denoise, adaptive threshold (scene, saved, native version 27), render camera resolution, and the Final Color output's exposure, white level, ISO and gamma; one undo step | `SetRenderSettings`, `EditCamera`, `ShaderTreeEdit::SetOutput` |
 | `render` / `render_status` | app only: Cycles render to a file at a chosen size and sample count; the answer returns the picture as an image (`include_image`, default true; `max_size`, default 1024 px longest side), as `viewport_capture` does; `render_status` gives progress and the last result, and its picture with `include_image: true` | Render > Render Viewport |
@@ -150,6 +155,40 @@ on, Cap Start off, Invert on). Its options go in `params.curve_extrude`:
 Every edit returns a short state echo: revision, active mesh counts,
 selection (the mode and every mode's own list, in pick order: each mode
 keeps its list while another is current), undo and redo depth.
+
+### Painting and other pointer work
+
+`pointer_stroke` drives the viewport as a mouse or pen does, through the
+app's real input path, so what it does is what that drag does: paint with
+a paint tool on, sculpt, select, drag a handle. `points` are view points
+from the view's top-left corner (`[[x, y], ...]`, 1 to 4000), or `world`
+points (`[[x, y, z], ...]`, metres) projected through the view's camera;
+every point must land inside the view. The first point is pressed, the
+last released (one point is a click), one point per frame. `button` is
+`left` (default), `right` or `middle`; `modifiers` lists keys held for the
+whole stroke (`shift`, `ctrl`, `alt`, `cmd`; `cmd` is Command on macOS).
+`pressure` (0-1, one number or one per point) sends the points as a pen's,
+recorded as tablet samples, so the Tablet Nozzle and sculpt brushes read
+it; without it they are a mouse's, full pressure. `viewport` (index) picks
+the view and makes it active. One stroke runs at a time.
+
+A painting session:
+
+```json
+{"tool": "primitive_add", "arguments": {"shape": "sphere"}}
+{"tool": "view_set", "arguments": {"view": "front", "shading": "texture"}}
+{"tool": "app_command", "arguments": {"line": "operandi.paint.addTexture kind:color resolution:1024 color:0,0,0"}}
+{"tool": "app_command", "arguments": {"line": "operandi.paint.airbrush"}}
+{"tool": "app_command", "arguments": {"line": "operandi.paint.set size:30 fg:1,1,1"}}
+{"tool": "pointer_stroke", "arguments": {"world": [[-0.3, 0, 0.45], [0, 0.05, 0.5], [0.3, 0, 0.45]]}}
+{"tool": "undo", "arguments": {}}
+{"tool": "app_command", "arguments": {"line": "operandi.image.saveAs filename:/tmp/skin.png"}}
+```
+
+App command lines that would open a dialog (a bare `operandi.image.new`,
+File > Save Image on an unnamed image) are errors: give their values
+(`resolution:512 name:Skin`, `filename:/x/skin.png`) instead. Clicking a
+lit tool's command again turns the tool off (UIC-24), as its button does.
 
 ### Units
 

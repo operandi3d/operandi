@@ -245,6 +245,14 @@ impl AppPaths {
             save_dialog: format!("{document_root}/development/Untitled.opscene"),
         }
     }
+    /// The Kits folder: one folder per installed kit (docs/KITS.md).
+    pub fn kits(&self) -> PathBuf {
+        self.data_root.join("Kits")
+    }
+    /// Which kits are on.
+    pub fn kit_state(&self) -> PathBuf {
+        self.data_root.join("kits.toml")
+    }
     pub fn recovery(&self) -> PathBuf {
         self.data_root.join("recovery.opscene")
     }

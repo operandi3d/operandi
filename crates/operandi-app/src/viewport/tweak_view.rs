@@ -159,6 +159,35 @@ impl Operandi {
         if ids.is_empty() {
             ids.extend(scene.active().filter(|i| scene.shows(i)).map(|i| i.id));
         }
+        self.element_pick_among(p, r, mode, &ids, &self.pick_only())
+    }
+
+    /// C-ELEM's pick: the polygon, edge or point under the pointer on any
+    /// mesh the view shows, active or not, selected or not. Every shown
+    /// item can hide what is behind it.
+    pub(crate) fn element_pick_any(&self, p: Pos2, r: Rect) -> Option<TweakPick> {
+        let scene = &self.editor.scene;
+        let ids: Vec<u64> = scene
+            .items
+            .iter()
+            .filter(|i| i.is_mesh() && scene.shows(i))
+            .map(|i| i.id)
+            .collect();
+        self.element_pick_among(p, r, TweakMode::AutoCenter, &ids, &[])
+    }
+
+    /// The element under the pointer among the meshes `ids`: a point or an
+    /// edge within reach first, else the polygon. `only` names the items
+    /// picking sees and that can hide an element (empty: every item).
+    fn element_pick_among(
+        &self,
+        p: Pos2,
+        r: Rect,
+        mode: TweakMode,
+        ids: &[u64],
+        only: &[u64],
+    ) -> Option<TweakPick> {
+        let scene = &self.editor.scene;
         let surface = self.pick_surface();
         let projector = self.camera.projector(r);
         let reach = Rect::from_center_size(p, Vec2::splat(self.pick_radius() * 2.));
@@ -167,7 +196,7 @@ impl Operandi {
         let mut points = PickCandidates::default();
         let everywhere = |_: Pos2| true;
         let mut meshes = Vec::new();
-        for &id in &ids {
+        for &id in ids {
             let Some(item) = self.grabbed_item(id) else {
                 continue;
             };
@@ -194,7 +223,7 @@ impl Operandi {
         }
         // Points and edges weighed together: Point Selection Priority
         // decides how much nearer an edge must be to beat a point.
-        let hit = self.pick_among(p, r, &surface, &points);
+        let hit = self.pick_among_items(p, r, &surface, &points, only);
         if let Some((id, Component::Vertex(v))) = hit {
             let &(_, _, _, at) = points.points.iter().find(|c| c.0 == id && c.1 == v)?;
             return Some(TweakPick {
@@ -232,7 +261,7 @@ impl Operandi {
             return None;
         }
         let (hit_item, face, depth) =
-            surface.pick_in(&self.camera, p, r, crate::picking::limit(&self.pick_only()))?;
+            surface.pick_in(&self.camera, p, r, crate::picking::limit(only))?;
         if !meshes.contains(&hit_item) {
             return None;
         }

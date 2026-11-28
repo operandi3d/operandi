@@ -146,17 +146,17 @@ fn uic201_key_hints_show_the_key_that_fires_and_follow_a_switch() {
     // A pie key set only in UV opens that pie only in UV.
     a.execute(&format!(
         "operandi.layout.setKey action:{{{}}} key:Ctrl+Alt+K",
-        crate::pie_menu::TOGGLES
+        crate::pie_menu::TOGGLES_LINE
     ));
     assert_eq!(
-        a.bindings[crate::pie_menu::TOGGLES],
+        a.bindings[crate::pie_menu::TOGGLES_LINE],
         "Ctrl+Alt+K",
         "{}",
         a.status
     );
     a.execute("layout.restore Model");
     frames(&mut a, &ctx, 1);
-    assert_eq!(a.bindings[crate::pie_menu::TOGGLES], "Ctrl+1");
+    assert_eq!(a.bindings[crate::pie_menu::TOGGLES_LINE], "Ctrl+1");
 }
 
 #[test]

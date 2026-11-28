@@ -39,6 +39,8 @@ pub(super) struct McpState {
     /// A capture asked for this frame: send the screenshot command.
     screenshot: Option<u64>,
     next_tag: u64,
+    /// A `pointer_stroke` being fed in, one frame at a time (mcp_pointer.rs).
+    pub(super) stroke: Option<crate::mcp_pointer::StrokeRun>,
 }
 
 /// A call whose answer comes on a later frame.
@@ -59,6 +61,8 @@ pub(super) enum Wait {
         /// returns no picture (`include_image: false`).
         image: Option<u32>,
     },
+    /// Answered once a `pointer_stroke`'s last frame has been handled.
+    Stroke,
 }
 
 /// A viewport capture in flight.
@@ -186,7 +190,10 @@ impl Operandi {
                 ViewportCommand::Screenshot(egui::UserData::new(McpShot(tag))),
             );
         }
-        if !self.mcp.waiting.is_empty() {
+        if self.mcp_stroke_running() {
+            // One stroke point per frame: keep the frames coming.
+            ctx.request_repaint();
+        } else if !self.mcp.waiting.is_empty() {
             ctx.request_repaint_after(Duration::from_millis(100));
         }
     }
@@ -269,6 +276,7 @@ impl Operandi {
                     "progress": self.render_progress(),
                     "note": "still rendering; render_status reports it when done",
                 }))),
+                Wait::Stroke if !self.mcp_stroke_running() => Some(Ok(self.mcp_stroke_answer())),
                 Wait::Capture(c) if now.duration_since(c.started) > CAPTURE_TIMEOUT => {
                     Some(Err("No frame was drawn for the capture; is the Operandi window hidden or minimised?".to_string()))
                 }
@@ -417,6 +425,16 @@ impl Operandi {
                     let result = self.mcp_online_library(&args);
                     return Now(Some(protocol::answer(&message, result)));
                 }
+                "app_command" => {
+                    let result = self.mcp_app_command(&args);
+                    return Now(Some(protocol::answer(&message, result)));
+                }
+                "pointer_stroke" => {
+                    return match self.mcp_pointer_stroke(&args) {
+                        Ok(()) => McpAnswer::Later(message, Wait::Stroke),
+                        Err(e) => Now(Some(protocol::refusal(&message, &e))),
+                    };
+                }
                 "panel_show" => {
                     let result = self.mcp_panel_show(&args);
                     return Now(Some(protocol::answer(&message, result)));
@@ -540,7 +558,12 @@ impl Operandi {
         if self.navigation.is_some() || self.editor.selection_start.is_some() {
             return Some("Operandi is in the middle of a mouse drag; try again".into());
         }
-        if self.editor.has_active_task() || self.edge_click.is_some() || self.vertex_weld {
+        // app_command and pointer_stroke act as the person does: they turn
+        // tools on and drag them, so an active tool doesn't stop them.
+        let acts_as_person = matches!(tool, "app_command" | "pointer_stroke");
+        if !acts_as_person
+            && (self.editor.has_active_task() || self.edge_click.is_some() || self.vertex_weld)
+        {
             return Some("A tool is active in Operandi; drop or cancel it in the app first".into());
         }
         if matches!(tool, "scene_new" | "scene_load") && self.dirty_exactly() {

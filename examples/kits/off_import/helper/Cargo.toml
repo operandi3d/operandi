@@ -1,0 +1,12 @@
+# The example kit's helper program. Its own workspace, so it never builds
+# with Operandi itself: a kit's helper is a separate program (docs/KITS.md).
+[package]
+name = "off-import-helper"
+version = "1.0.0"
+edition = "2024"
+license = "GPL-3.0-or-later"
+publish = false
+
+[workspace]
+
+[dependencies]

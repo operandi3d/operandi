@@ -1,9 +1,42 @@
-<!-- help-ids: ; template: concept ; since: 0.1.0 -->
+<!-- help-ids: operandi.kit.list, operandi.kit.install, operandi.kit.enable, operandi.kit.disable, operandi.kit.reload, operandi.kit.openFolder ; template: concept ; since: 0.1.0 -->
 # Kits and extensions
 
-A kit is an add-on: a set of commands, buttons, mesh operations or item
-kinds that extends Operandi. This version can't install kits yet. This
-page says what you can extend today, and what isn't there.
+A kit is an add-on that extends Operandi. In this version a kit can add
+file types to **File > Import**, read by a small program that comes with
+the kit. This page shows how to install and turn on a kit, what else you
+can extend today, and what isn't there yet.
+
+## Install a kit
+
+Kits come as a `.zip` file, one per kind of computer (Mac, Windows,
+Linux). There is no Kits window yet, so you install and turn kits on by
+typing commands in the command line.
+
+1. Type `operandi.kit.install path:{/Users/me/Downloads/step_import-1.0.0-macos-aarch64.zip}`.
+   Put your own file's path between the braces. The kit is copied into the
+   **Kits** folder and left off.
+2. Type `operandi.kit.list` to check it's there. The status line lists each
+   kit with its version, whether it's on, and the file types it adds.
+3. Type `operandi.kit.enable id:step_import`, using the kit's id from the
+   list. The status line says which file types **File > Import** now reads.
+
+A kit runs a program of its own on your computer when you import with it.
+Only turn on kits from people you trust. Installing a kit never turns it
+on; Operandi remembers which kits you turned on for next time.
+
+- `operandi.kit.disable id:<id>` turns a kit off. Its file types leave
+  **File > Import**; nothing else changes.
+- `operandi.kit.openFolder` shows the **Kits** folder, inside Operandi's
+  data folder. To remove a kit, quit Operandi and delete its folder there.
+- `operandi.kit.reload` reads the folder again after you change a kit by
+  hand.
+- To update a kit, install the new zip with `replace:true` added.
+
+Importing with a kit works like any other import, from **File > Import**
+or by dropping the file on the window. Operandi waits while the kit reads
+the file. If the kit fails, the import stops with the kit's own error
+message and your scene is left as it was. A kit that takes longer than its
+time limit is stopped.
 
 ## Put a script on a menu or button
 
@@ -51,6 +84,12 @@ care instead of refusing the file:
 
 Mesh operations of an unknown kind are kept the same way.
 
+## Make a kit
+
+[docs/KITS.md](https://github.com/operandi3d/operandi/blob/main/docs/KITS.md)
+explains how to make a kit, and `examples/kits/off_import` in the source
+is a small one to copy.
+
 ## For developers building Operandi
 
 If you build Operandi from source, two entry points already take additions
@@ -69,15 +108,14 @@ before you start; it covers licences and how changes get in.
 
 This version has none of the following:
 
-- a Kits folder, a kit manifest, a **Kits** menu, or a way to turn a kit
-  on and off;
+- a **Kits** window or menu (kits are managed with the commands above);
+- a progress bar or **Cancel** while a kit imports;
+- kits that export, add commands, panels or mesh operations, or draw and
+  edit kit items;
 - commands, panels or mesh operations written in Python;
-- compiled modules loaded while Operandi runs;
-- helper programs that talk to Operandi from their own process (other
-  than the test bridge);
-- drawing or editing kit items, or file formats added by a kit.
+- compiled modules loaded while Operandi runs.
 
-Until then, Python scripts and forms are the way to extend Operandi
+Until then, Python scripts and forms are the other way to extend Operandi
 without rebuilding it.
 
 ## Related

@@ -1,0 +1,41 @@
+{
+  "version": 1,
+  "id": "pie.view",
+  "label": "View Direction",
+  "style": "pie",
+  "icons": "text",
+  "controls": [
+    {
+      "command": "View Top",
+      "label": "Top"
+    },
+    {
+      "command": "View Perspective",
+      "label": "Perspective"
+    },
+    {
+      "command": "View Right",
+      "label": "Right"
+    },
+    {
+      "command": "View Front",
+      "label": "Front"
+    },
+    {
+      "command": "View Bottom",
+      "label": "Bottom"
+    },
+    {
+      "command": "View Back",
+      "label": "Back"
+    },
+    {
+      "command": "View Left",
+      "label": "Left"
+    },
+    {
+      "command": "View Camera",
+      "label": "Camera"
+    }
+  ]
+}

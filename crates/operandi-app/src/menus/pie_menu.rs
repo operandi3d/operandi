@@ -1,11 +1,15 @@
-//! Pie menus, stage 1: eight commands around the pointer on a held key.
+//! Pie menus: eight commands around the pointer on a held key.
 //!
-//! A pie is data: a name (its input-map action, so it is bound, searched and
-//! conflict-checked like any shortcut) and a list of entries. Each entry is
-//! a registered command with a label, or an empty placeholder. Only the
-//! first eight entries are used; they fill the compass slots clockwise from
-//! the top (N, NE, E, SE, S, SW, W, NW), and an empty entry leaves its slot
-//! empty.
+//! A pie is a form with style pie (UIC-308, `pie_forms.rs`): the shipped
+//! ones are files in `assets/forms` (`pie.*.json`), a user's pies and
+//! changed copies of shipped ones layer over them in the Forms folder and
+//! can be reverted (UIC-216). Its first eight controls fill the compass
+//! slots clockwise from the top (N, NE, E, SE, S, SW, W, NW): a command
+//! line, a sub-pie (UIC-310), or an empty slot that keeps its place
+//! (UIC-309). A pie opens through the line `operandi.pie.open <id>`, which
+//! the Input Map binds like any action (UIC-311). The Layouts pie is the
+//! one pie still made at run time (its slots are the layouts), opened
+//! through the same engine.
 //!
 //! Gesture: the pie opens on key-down, centred on the pointer (nudged to stay
 //! on screen). Each slot owns a 45° wedge outside a 20 px dead zone, and
@@ -18,23 +22,30 @@
 //! Running a slot is exactly the command, as its toolbar button or shortcut
 //! runs it, with that command's own undo step; the pie itself never is one.
 //!
+//! A sub-pie slot opens its pie in place, at the same centre (UIC-310);
+//! Esc, or a click back in the centre, goes back one level, and a pie never
+//! opens a pie it is already inside. The pie's name sits in the centre
+//! (UIC-313).
+//!
 //! Provisional choices are logged in SPECIFICATION_QUESTIONS.md (PM-Q*).
 use super::*;
+use crate::form::command_form::IconMode;
 use std::f32::consts::TAU;
 
-/// The built-in pies' input-map actions.
-pub const VIEW: &str = "Pie: View Direction";
-pub const SELECTION: &str = "Pie: Selection & Transforms";
-pub const SHADING: &str = "Pie: Shading Style";
-pub const TOGGLES: &str = "Pie: Viewport Toggles";
-pub const FALLOFFS: &str = "Pie: Falloffs";
-pub const ACTION_CENTERS: &str = "Pie: Action Centers";
-pub const MODELING: &str = "Pie: Modeling";
+/// The shipped pies' ids (their form files are `assets/forms/<id>.json`).
+pub const VIEW: &str = "pie.view";
+pub const SELECTION: &str = "pie.selection";
+pub const SHADING: &str = "pie.shading";
+pub const TOGGLES: &str = "pie.toggles";
+pub const FALLOFFS: &str = "pie.falloffs";
+pub const ACTION_CENTERS: &str = "pie.actionCenters";
+pub const MODELING: &str = "pie.modeling";
 /// Shows or hides the window's bars and the timeline (Jason, 2026-11-27).
-pub const PANELS: &str = "Pie: Panels";
+pub const PANELS: &str = "pie.panels";
 /// The Layouts pie (layouts stage 2, UIC-18): its slots are the layouts,
-/// so it isn't built in (`Operandi::layouts_pie`).
-pub const LAYOUTS: &str = "Pie: Layouts";
+/// so it has no file (`Operandi::layouts_pie`).
+pub const LAYOUTS: &str = "pie.layouts";
+#[cfg(test)]
 pub const ALL: [&str; 8] = [
     VIEW,
     SELECTION,
@@ -45,6 +56,84 @@ pub const ALL: [&str; 8] = [
     MODELING,
     PANELS,
 ];
+
+/// The command that opens a pie by id (UIC-311).
+pub const OPEN: &str = "operandi.pie.open";
+
+/// The Input Map lines that open the shipped pies (`input::ACTIONS`).
+pub const VIEW_LINE: &str = "operandi.pie.open pie.view";
+pub const SELECTION_LINE: &str = "operandi.pie.open pie.selection";
+pub const SHADING_LINE: &str = "operandi.pie.open pie.shading";
+pub const TOGGLES_LINE: &str = "operandi.pie.open pie.toggles";
+pub const FALLOFFS_LINE: &str = "operandi.pie.open pie.falloffs";
+pub const ACTION_CENTERS_LINE: &str = "operandi.pie.open pie.actionCenters";
+pub const MODELING_LINE: &str = "operandi.pie.open pie.modeling";
+pub const PANELS_LINE: &str = "operandi.pie.open pie.panels";
+pub const LAYOUTS_LINE: &str = "operandi.pie.open pie.layouts";
+
+/// The shipped pies before they were forms: their old Input Map action
+/// (still a command, and what a saved input map or layout key names),
+/// their id and their Input Map line.
+pub const OLD_ACTIONS: [(&str, &str, &str); 9] = [
+    ("Pie: View Direction", VIEW, VIEW_LINE),
+    ("Pie: Selection & Transforms", SELECTION, SELECTION_LINE),
+    ("Pie: Shading Style", SHADING, SHADING_LINE),
+    ("Pie: Viewport Toggles", TOGGLES, TOGGLES_LINE),
+    ("Pie: Falloffs", FALLOFFS, FALLOFFS_LINE),
+    ("Pie: Action Centers", ACTION_CENTERS, ACTION_CENTERS_LINE),
+    ("Pie: Modeling", MODELING, MODELING_LINE),
+    // Shipped after the pies became forms, but named the same way.
+    ("Pie: Panels", PANELS, PANELS_LINE),
+    ("Pie: Layouts", LAYOUTS, LAYOUTS_LINE),
+];
+
+/// The line that opens pie `id`.
+pub fn line(id: &str) -> String {
+    format!("{OPEN} {id}")
+}
+
+/// The pie an input-map action or command line opens: `operandi.pie.open
+/// <id>` (or `id:<id>`), or a shipped pie's old action name.
+pub fn pie_id(action: &str) -> Option<String> {
+    let action = action.trim();
+    if let Some((_, id, _)) = OLD_ACTIONS
+        .iter()
+        .find(|(old, _, _)| old.eq_ignore_ascii_case(action))
+    {
+        return Some((*id).to_owned());
+    }
+    let (verb, rest) = action.split_once(char::is_whitespace)?;
+    if !verb.eq_ignore_ascii_case(OPEN) {
+        return None;
+    }
+    let rest = rest.trim();
+    let rest = rest
+        .strip_prefix("id:")
+        .or_else(|| rest.strip_prefix("ID:"))
+        .unwrap_or(rest)
+        .trim()
+        .trim_matches(|c| matches!(c, '"' | '{' | '}'));
+    (!rest.is_empty() && !rest.contains(char::is_whitespace)).then(|| rest.to_owned())
+}
+
+/// Rename old pie actions in a saved key map to their lines, keeping a
+/// binding the map already has under the new name.
+pub fn migrate_keys(keys: &mut BTreeMap<String, String>) {
+    for (old, _, line) in OLD_ACTIONS {
+        if let Some(chord) = keys.remove(old) {
+            keys.entry(line.to_owned()).or_insert(chord);
+        }
+    }
+}
+
+/// What the Input Map and the guide call a shipped pie's line: its old
+/// action name ("Pie: View Direction"); `None` for other actions.
+pub fn shipped_title(action: &str) -> Option<&'static str> {
+    OLD_ACTIONS
+        .iter()
+        .find(|(_, _, line)| *line == action)
+        .map(|(old, _, _)| *old)
+}
 
 /// Slots around a pie.
 pub const SLOTS: usize = 8;
@@ -69,6 +158,15 @@ const SLOT_AT: [Vec2; SLOTS] = [
 /// Room each side of a label inside its button, and for a state mark.
 const PAD: f32 = 12.;
 const MARK_ROOM: f32 = 18.;
+/// A slot's icon, and the gap after it (UIC-309).
+const ICON: f32 = 20.;
+const ICON_GAP: f32 = 4.;
+/// Room at a sub-pie slot's outer end for its marker (UIC-310).
+const SUB_ROOM: f32 = 12.;
+/// The widest the pie's name in the centre gets (UIC-313); longer names
+/// end in "…". The sides' buttons start 80 px out, so the name and the
+/// pointer arrow beside it stay clear of them.
+const NAME_WIDTH: f32 = 130.;
 /// Clicks farther than this from the centre are "elsewhere".
 const REACH: f32 = 230.;
 /// Room kept between the pie and the window edge.
@@ -77,28 +175,50 @@ const MARGIN: f32 = 4.;
 #[derive(Clone, Debug, PartialEq)]
 pub struct Entry {
     pub label: String,
-    /// A command name `Operandi::execute` runs.
+    /// A command line `Operandi::execute` runs; for a sub-pie, the line
+    /// that opens it.
     pub command: String,
+    /// An icon slug (`icons::Icon::from_slug`) drawn per the pie's icon
+    /// mode.
+    pub icon: Option<String>,
+    /// A custom icon file, worn instead of `icon` (UIC-314).
+    pub icon_file: Option<String>,
+    /// The sub-pie this slot opens in place (UIC-310), by id.
+    pub sub: Option<String>,
+}
+
+impl Entry {
+    pub fn command(label: &str, command: &str) -> Self {
+        Self {
+            label: label.into(),
+            command: command.into(),
+            icon: None,
+            icon_file: None,
+            sub: None,
+        }
+    }
 }
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct Pie {
+    /// The pie's id (its form's).
     pub name: String,
+    /// What the centre shows (UIC-313): the form's label.
+    pub title: String,
+    /// Text, icon or both (UIC-309).
+    pub icons: IconMode,
     /// `None` is an empty placeholder that keeps its slot.
     pub entries: Vec<Option<Entry>>,
 }
 impl Pie {
-    pub fn new(name: &str, entries: &[Option<(&str, &str)>]) -> Self {
+    pub fn new(id: &str, title: &str, entries: &[Option<(&str, &str)>]) -> Self {
         Self {
-            name: name.into(),
+            name: id.into(),
+            title: title.into(),
+            icons: IconMode::Text,
             entries: entries
                 .iter()
-                .map(|e| {
-                    e.map(|(label, command)| Entry {
-                        label: label.into(),
-                        command: command.into(),
-                    })
-                })
+                .map(|e| e.map(|(label, command)| Entry::command(label, command)))
                 .collect(),
         }
     }
@@ -110,105 +230,37 @@ impl Pie {
             .flatten()
             .and_then(Option::as_ref)
     }
+    /// Whether slot `i` shows its icon, and its label (UIC-309). An icon
+    /// mode asking for an icon the slot hasn't got shows the label. A
+    /// custom file wins over a built-in icon (UIC-314).
+    pub fn shows(&self, i: usize) -> (Option<SlotIcon>, bool) {
+        let Some(e) = self.slot(i) else {
+            return (None, false);
+        };
+        let icon = e.icon_file.clone().map(SlotIcon::File).or_else(|| {
+            e.icon
+                .as_deref()
+                .and_then(icons::Icon::from_slug)
+                .map(SlotIcon::Builtin)
+        });
+        match (self.icons, icon) {
+            (IconMode::Text, _) | (_, None) => (None, true),
+            (IconMode::Icon, Some(i)) => (Some(i), false),
+            (IconMode::Both, Some(i)) => (Some(i), true),
+        }
+    }
+}
+
+/// The icon a slot wears (UIC-314).
+#[derive(Clone, Debug, PartialEq)]
+pub enum SlotIcon {
+    Builtin(icons::Icon),
+    /// A custom picture's path; a missing file draws a placeholder.
+    File(String),
 }
 
 pub fn is_pie(action: &str) -> bool {
-    ALL.contains(&action) || action == LAYOUTS
-}
-
-/// A built-in pie by its action name. Commands Operandi doesn't have yet
-/// are empty slots, so the layout stays the same when they arrive.
-pub fn built_in(name: &str) -> Option<Pie> {
-    let s = |label, command| Some((label, command));
-    let entries = match name {
-        VIEW => vec![
-            s("Top", "View Top"),
-            s("Perspective", "View Perspective"),
-            s("Right", "View Right"),
-            s("Front", "View Front"),
-            s("Bottom", "View Bottom"),
-            s("Back", "View Back"),
-            s("Left", "View Left"),
-            s("Camera", "View Camera"),
-        ],
-        SELECTION => vec![
-            s("Edges", "Edges"),
-            s("Polygons", "Polygons"),
-            s("Items", "Items"),
-            s("Move", "Move"),
-            s("Rotate", "Rotate"),
-            s("Scale", "Scale"),
-            s("Transform", "Transform"),
-            s("Vertices", "Vertices"),
-        ],
-        SHADING => vec![
-            s("Wire", "Shading Wireframe"),
-            s("Shaded", "Shading Shaded"),
-            s("Advanced", "Shading Advanced"),
-            s("Texture", "Shading Texture"),
-            s("Default", "Shading Default"),
-            s("Gooch", "Shading Gooch"),
-            s("Vertex Map", "Shading Vertex Map"),
-            s("Matcap", "Shading Reflection"),
-        ],
-        TOGGLES => vec![
-            s("Lights", "Toggle Lights"),
-            s("Cameras", "Toggle Cameras"),
-            s("Wireframe", "Toggle Wireframe Overlay"),
-            s("Vertices", "Toggle Show Verts"),
-            s("Grid", "Toggle Grid"),
-            s("Background", "Toggle Background Gradient"),
-            None, // Texture locators: Operandi has none.
-            None, // Locators: Operandi has no locator items.
-        ],
-        FALLOFFS => vec![
-            s("Clear", "Falloff None"),
-            s("Linear", "Falloff Linear"),
-            s("Cylinder", "Falloff Cylinder"),
-            s("Radial", "Falloff Radial"),
-            s("Airbrush", "Falloff Airbrush"),
-            s("Screen", "Falloff Screen"),
-            s("Element", "Falloff Element"),
-            s("Vertex Map", "Falloff Vertex Map"),
-        ],
-        ACTION_CENTERS => vec![
-            s("Automatic", "Action Center Automatic"),
-            s("Selection", "Action Center Selection"),
-            s("Selection Auto Axis", "Action Center Selection Auto Axis"),
-            s("Element", "Action Center Element"),
-            s("Screen", "Action Center Screen"),
-            s("Origin", "Action Center Origin"),
-            s("Local", "Action Center Local"),
-            None, // Pivot (VAC-Q04)
-        ],
-        MODELING => vec![
-            s("Extrude", "Extrude"),
-            s("Bevel", "Bevel"),
-            s("Edge Extend", "Extend"),
-            None, // Edge knife
-            s("Loop Slice", "Loop Slice"),
-            s("Smooth Shift", "Smooth Shift"),
-            s("Smooth", "Smooth"),
-            None, // Soft drag
-        ],
-        // Each slot points the way its panel sits in the window; the
-        // diagonals are free for more panels later.
-        PANELS => vec![
-            s("Top Bar", "operandi.bar.collapse bar:top"),
-            None,
-            s("Right Panel", "operandi.bar.collapse bar:right"),
-            None,
-            s("Timeline", "operandi.anim.timeline"),
-            None,
-            s("Left Panel", "operandi.bar.collapse bar:left"),
-            None,
-        ],
-        _ => return None,
-    };
-    let title = name.strip_prefix("Pie: ").unwrap_or(name);
-    let mut pie = Pie::new(title, &entries);
-    pie.name = name.into();
-    Some(pie)
+    pie_id(action).is_some()
 }
 
 /// Unit direction of slot `i` in screen space (y down): 0 points up.
@@ -252,6 +304,18 @@ pub fn button_width(text_width: f32, marked: bool) -> f32 {
     (text_width + 2. * PAD + mark).max(BUTTON.x)
 }
 
+/// A slot's button width: its label (when shown), its icon, a state mark
+/// and a sub-pie marker each take room (UIC-309, UIC-310).
+pub fn slot_width(text_width: Option<f32>, icon: bool, marked: bool, sub: bool) -> f32 {
+    let icon = match (icon, text_width.is_some()) {
+        (true, true) => ICON + ICON_GAP,
+        (true, false) => ICON,
+        (false, _) => 0.,
+    };
+    let sub = if sub { SUB_ROOM } else { 0. };
+    button_width(text_width.unwrap_or(0.) + icon + sub, marked)
+}
+
 /// Half the size of the box every button fits in, around the centre.
 fn extent(widths: &[f32; SLOTS]) -> Vec2 {
     (0..SLOTS)
@@ -288,8 +352,11 @@ fn place_sized(pointer: Pos2, screen: Rect, widths: &[f32; SLOTS]) -> Pos2 {
 pub enum Outcome {
     StayOpen,
     Close,
-    /// Run slot `i`'s command, then close.
+    /// Run slot `i`'s command, then close; a sub-pie slot opens its pie
+    /// in place instead (UIC-310).
     Run(usize),
+    /// Back from a sub-pie to the pie that opened it (UIC-310).
+    Back,
 }
 
 /// An open pie.
@@ -312,6 +379,9 @@ pub struct Open {
     pub chord_modifiers: Modifiers,
     /// Those modifiers have been seen held since opening.
     pub modifiers_seen: bool,
+    /// The pies this sub-pie was opened from, outermost first (UIC-310);
+    /// empty for the pie the key or line opened.
+    pub stack: Vec<Pie>,
 }
 impl Open {
     #[cfg(test)]
@@ -337,6 +407,7 @@ impl Open {
             widths,
             chord_modifiers: Modifiers::NONE,
             modifiers_seen: false,
+            stack: Vec::new(),
         };
         // Nudged from the window edge: the pointer may start outside the
         // dead zone already.
@@ -381,9 +452,42 @@ impl Open {
             _ => Outcome::Close,
         }
     }
-    /// A primary click at `at`: a slot runs; anywhere else closes.
+    /// Open `sub` in place of the pie showing, at the same centre
+    /// (UIC-310), with its own button `widths`. It waits for a click: the
+    /// key that opened the outer pie has gone up.
+    pub fn enter(&mut self, sub: Pie, widths: [f32; SLOTS]) {
+        let outer = std::mem::replace(&mut self.pie, sub);
+        self.stack.push(outer);
+        self.widths = widths;
+        self.key = None;
+        self.pressed = false;
+    }
+    /// Back one level (UIC-310): the pie this one was opened from, with
+    /// its `widths`. False when this is the outermost pie.
+    pub fn back(&mut self, widths: impl FnOnce(&Pie) -> [f32; SLOTS]) -> bool {
+        let Some(outer) = self.stack.pop() else {
+            return false;
+        };
+        self.widths = widths(&outer);
+        self.pie = outer;
+        self.pressed = false;
+        true
+    }
+    /// The pie ids open now, outermost first: a sub-pie may not open one
+    /// of these (UIC-310: a pie never contains itself).
+    pub fn open_ids(&self) -> impl Iterator<Item = &str> {
+        self.stack
+            .iter()
+            .chain(std::iter::once(&self.pie))
+            .map(|p| p.name.as_str())
+    }
+    /// A primary click at `at`: a slot runs; in a sub-pie a click in the
+    /// centre goes back one level (UIC-310); anywhere else closes.
     pub fn click(&mut self, at: Pos2, enabled: impl Fn(usize) -> bool) -> Outcome {
         self.hover(at);
+        if !self.stack.is_empty() && (at - self.center).length() <= DEAD_ZONE {
+            return Outcome::Back;
+        }
         let slot = self.button_at(at).or_else(|| {
             ((at - self.center).length() <= REACH)
                 .then(|| self.highlighted())
@@ -412,6 +516,8 @@ pub enum Mark {
 pub struct Status {
     pub enabled: bool,
     pub mark: Mark,
+    /// No command has the slot's line: drawn red, does nothing (UIC-221).
+    pub unknown: bool,
 }
 
 fn view_named(name: &str) -> Option<View> {
@@ -478,11 +584,15 @@ pub(super) fn center_name(context: &ActionContext) -> Option<&'static str> {
     .find(|n| center_named(n).as_ref() == Some(context))
 }
 
-fn center_click_named(name: &str) -> Option<action_center_click::CenterClick> {
+/// The Action Centers that aren't one fixed pair: Element takes its pick
+/// and Screen its place from the view (`action_center_click.rs`).
+fn center_from_view(name: &str) -> bool {
+    // Match arms, so `pie_phrase_choices_match_the_registry` reads the
+    // names.
+    #[allow(clippy::match_like_matches_macro)]
     match name {
-        "element" => Some(action_center_click::CenterClick::Element),
-        "screen" => Some(action_center_click::CenterClick::Screen),
-        _ => None,
+        "element" | "screen" => true,
+        _ => false,
     }
 }
 
@@ -500,15 +610,55 @@ fn mode_named(name: &str) -> Option<Mode> {
 impl Operandi {
     /// Whether an entry can run now, and the state it shows.
     pub(super) fn pie_status(&self, command: &str) -> Status {
+        let unknown = self.line_state(command).is_none();
         let (why, mark) = self.pie_state(command);
         Status {
-            enabled: why.is_none(),
+            enabled: why.is_none() && !unknown,
             mark,
+            unknown,
+        }
+    }
+    /// A slot's state in the pies open now (`open`: their ids). A sub-pie
+    /// slot can open its pie unless that pie is missing or already open
+    /// (UIC-310).
+    pub(super) fn slot_status<'a>(
+        &self,
+        entry: &Entry,
+        mut open: impl Iterator<Item = &'a str>,
+    ) -> Status {
+        match &entry.sub {
+            Some(sub) => Status {
+                enabled: self.pie_named(sub).is_some() && !open.any(|id| id == sub),
+                mark: Mark::Plain,
+                unknown: self.pie_named(sub).is_none(),
+            },
+            None => self.pie_status(&entry.command),
         }
     }
     /// Why an entry is greyed now (`None` = it can run).
     pub(super) fn pie_unavailable(&self, command: &str) -> Option<String> {
+        if self.line_state(command).is_none() {
+            return Some(format!(
+                "Unknown command: {}. This slot does nothing until a command has that name.",
+                command.trim()
+            ));
+        }
         self.pie_state(command).0
+    }
+    /// Why a slot is greyed in the pies open now (`open`: their ids).
+    fn slot_unavailable<'a>(
+        &self,
+        entry: &Entry,
+        mut open: impl Iterator<Item = &'a str>,
+    ) -> Option<String> {
+        match &entry.sub {
+            Some(sub) if self.pie_named(sub).is_none() => Some(format!("No pie called {sub}")),
+            Some(sub) if open.any(|id| id == sub) => {
+                Some(format!("{sub} is already open: a pie can't contain itself"))
+            }
+            Some(_) => None,
+            None => self.pie_unavailable(&entry.command),
+        }
     }
     /// An entry's reason for being greyed (`None` = it can run) and mark.
     fn pie_state(&self, command: &str) -> (Option<String>, Mark) {
@@ -574,7 +724,7 @@ impl Operandi {
                 };
                 return (why, Mark::Choice(active));
             }
-            if center_click_named(rest).is_some() {
+            if center_from_view(rest) {
                 return (
                     None,
                     Mark::Choice(current.center.label().eq_ignore_ascii_case(rest)),
@@ -608,16 +758,31 @@ impl Operandi {
         }
         // Input-map actions: enabled where their shortcut would run, as
         // the Cmd-click modeling menu does.
-        let why = input::ACTIONS
+        let action = input::ACTIONS
             .iter()
-            .find(|(name, _)| name.eq_ignore_ascii_case(&lowered))
-            .and_then(|(name, _)| {
-                input::unavailable_reason(
-                    name,
-                    self.editor.scene.selection.mode,
-                    self.editor_tool_active(),
-                )
-            });
+            .find(|(name, _)| name.eq_ignore_ascii_case(&lowered));
+        if action.is_none() && mode_named(&lowered).is_none() {
+            // Any other registry line (UIC-222): greyed and lit from its
+            // own answer (UIC-223); a lit one shows a filled dot.
+            return match self.line_state(command) {
+                Some(state) => (
+                    state.unavailable,
+                    if state.on {
+                        Mark::Choice(true)
+                    } else {
+                        Mark::Plain
+                    },
+                ),
+                None => (None, Mark::Plain),
+            };
+        }
+        let why = action.and_then(|(name, _)| {
+            input::unavailable_reason(
+                name,
+                self.editor.scene.selection.mode,
+                self.editor_tool_active(),
+            )
+        });
         match mode_named(&lowered) {
             Some(mode) => (why, Mark::Choice(self.editor.scene.selection.mode == mode)),
             None => (why, Mark::Plain),
@@ -655,13 +820,14 @@ impl Operandi {
     /// an action-centre change, which follows `Command::ActionContext`.
     /// Returns false for other commands.
     pub(super) fn execute_pie_command(&mut self, lowered: &str) -> bool {
-        if let Some(&name) = ALL
+        // The shipped pies' old action names ("Pie: View Direction") still
+        // open them; from the command line a pie opens tapped, waiting for
+        // a click.
+        if let Some((_, id, _)) = OLD_ACTIONS
             .iter()
-            .chain(&[LAYOUTS])
-            .find(|n| n.eq_ignore_ascii_case(lowered))
+            .find(|(old, _, _)| old.eq_ignore_ascii_case(lowered))
         {
-            // From the command line: opens tapped, waiting for a click.
-            self.pie_request = Some(name.into());
+            self.pie_request = Some((*id).into());
             return true;
         }
         if let Some(rest) = lowered.strip_prefix("view ") {
@@ -719,31 +885,50 @@ impl Operandi {
                         "Correct or revert invalid numeric fields before changing Action Center"
                             .into();
                 } else {
-                    self.run(Command::ActionContext(context));
+                    self.choose_action_context(context);
                 }
                 return true;
             }
-            if let Some(kind) = center_click_named(rest) {
-                self.choose_center_click(kind);
+            if center_from_view(rest) {
+                if !self.field_errors.is_empty() {
+                    self.status =
+                        "Correct or revert invalid numeric fields before changing Action Center"
+                            .into();
+                } else if rest == "element" {
+                    self.choose_element_center();
+                } else {
+                    self.choose_screen_center();
+                }
                 return true;
             }
         }
         false
     }
 
-    /// A pie by its action name: built in, or the Layouts pie.
-    pub(super) fn pie_named(&self, name: &str) -> Option<Pie> {
-        if name == LAYOUTS {
-            return Some(self.layouts_pie());
-        }
-        built_in(name)
-    }
-
     fn pie_enabled(&self, open: &Open) -> [bool; SLOTS] {
         std::array::from_fn(|i| {
             open.pie
                 .slot(i)
-                .is_some_and(|e| self.pie_status(&e.command).enabled)
+                .is_some_and(|e| self.slot_status(e, open.open_ids()).enabled)
+        })
+    }
+
+    /// Each slot's button width for `pie`, at the font paint uses: its
+    /// label, icon, state mark and sub-pie marker (UIC-309, UIC-310).
+    fn pie_widths(&self, ctx: &Context, pie: &Pie) -> [f32; SLOTS] {
+        std::array::from_fn(|i| {
+            pie.slot(i).map_or(BUTTON.x, |e| {
+                let (icon, label) = pie.shows(i);
+                let text = label.then(|| {
+                    ctx.fonts_mut(|f| {
+                        f.layout_no_wrap(e.label.clone(), label_font(), Color32::WHITE)
+                            .size()
+                            .x
+                    })
+                });
+                let marked = e.sub.is_none() && self.pie_status(&e.command).mark != Mark::Plain;
+                slot_width(text, icon.is_some(), marked, e.sub.is_some())
+            })
         })
     }
 
@@ -769,24 +954,85 @@ impl Operandi {
         let screen = ctx.content_rect();
         let pointer = pointer.unwrap_or(screen.center());
         // Buttons fit their labels (and a state mark), at the font paint uses.
-        let widths: [f32; SLOTS] = std::array::from_fn(|i| {
-            pie.slot(i).map_or(BUTTON.x, |e| {
-                let text = ctx.fonts_mut(|f| {
-                    f.layout_no_wrap(e.label.clone(), label_font(), Color32::WHITE)
-                        .size()
-                        .x
-                });
-                button_width(text, self.pie_status(&e.command).mark != Mark::Plain)
-            })
-        });
+        let widths = self.pie_widths(ctx, &pie);
         self.pie = Some(Open::sized(pie, pointer, screen, key, widths));
         self.menu_owned_input = true;
         ctx.request_repaint();
     }
 
-    /// The first pie chord pressed this frame: the pie's name, whether its
-    /// key is bound to more than one action, the key (both readings), the
-    /// event's index and the chord's modifiers.
+    /// A pie's key pressed: open it. True when the key was taken (opened,
+    /// or refused for a conflicting binding).
+    pub(super) fn pie_keys(&mut self, ctx: &Context) -> bool {
+        if self.has_modal()
+            || self.text_editor_focused(ctx)
+            || native_menu::tracking()
+            || self.pending.is_some()
+            || self.show_bindings
+            || self.recovery.is_some()
+            || self.recovery_warning.is_some()
+            || self.show_plane
+            || self.show_diagnostics
+            || self.show_about
+            || ctx.input(|i| i.pointer.any_down())
+        {
+            return false;
+        }
+        let found = self.pie_chord(ctx);
+        let Some((action, conflict, key, at, chord_modifiers)) = found else {
+            return false;
+        };
+        if conflict {
+            self.status =
+                "Input map conflict: assign unique keys before invoking this shortcut".into();
+            return true;
+        }
+        let id = pie_id(&action).unwrap_or_default();
+        let Some(pie) = self.pie_named(&id) else {
+            self.status = format!("No pie called {id}");
+            return true;
+        };
+        // The View and Shading pies act on the view they open over.
+        if crate::viewport_buttons::hovered_view_pie(&id) && self.pointer_over_a_view(ctx) {
+            self.activate_view(self.view_under_pointer(ctx));
+        }
+        // Centred where the pointer was when the key went down, not
+        // where this frame's later moves left it.
+        let pointer = ctx.input(|i| {
+            i.events[..at]
+                .iter()
+                .rev()
+                .find_map(|e| match e {
+                    Event::PointerMoved(p) => Some(*p),
+                    _ => None,
+                })
+                .or_else(|| {
+                    let moved_after = i.events[at..]
+                        .iter()
+                        .any(|e| matches!(e, Event::PointerMoved(_)));
+                    let latest = i.pointer.latest_pos()?;
+                    Some(if moved_after {
+                        latest - i.pointer.delta()
+                    } else {
+                        latest
+                    })
+                })
+        });
+        self.open_pie_at(ctx, pie, Some((key.0, key.1)), pointer);
+        // A quick hold, point and release can land in one frame (a busy
+        // frame batches the events): the rest of this frame goes to the
+        // new pie, so the release still runs the slot.
+        if let Some(mut open) = self.pie.take() {
+            open.chord_modifiers = chord_modifiers;
+            let enabled = self.pie_enabled(&open);
+            let outcome = ctx.input(|i| run_events(&mut open, &i.events[at + 1..], i, &enabled));
+            self.finish_pie(ctx, open, outcome);
+        }
+        true
+    }
+
+    /// The first pie chord pressed this frame: the pie's action, whether
+    /// its key is bound to more than one action, the key (both readings),
+    /// the event's index and the chord's modifiers.
     #[allow(clippy::type_complexity)]
     fn pie_chord(
         &self,
@@ -843,85 +1089,18 @@ impl Operandi {
         found
     }
 
-    /// A pie's key pressed: open it. True when the key was taken (opened,
-    /// or refused for a conflicting binding).
-    pub(super) fn pie_keys(&mut self, ctx: &Context) -> bool {
-        if self.has_modal()
-            || self.text_editor_focused(ctx)
-            || native_menu::tracking()
-            || self.pending.is_some()
-            || self.show_bindings
-            || self.recovery.is_some()
-            || self.recovery_warning.is_some()
-            || self.show_plane
-            || self.show_diagnostics
-            || self.show_about
-            || ctx.input(|i| i.pointer.any_down())
-        {
-            return false;
-        }
-        let found = self.pie_chord(ctx);
-        let Some((name, conflict, key, at, chord_modifiers)) = found else {
-            return false;
-        };
-        if conflict {
-            self.status =
-                "Input map conflict: assign unique keys before invoking this shortcut".into();
-            return true;
-        }
-        if let Some(pie) = self.pie_named(&name) {
-            // The View and Shading pies act on the view they open over.
-            if crate::viewport_buttons::hovered_view_pie(&name) && self.pointer_over_a_view(ctx) {
-                self.activate_view(self.view_under_pointer(ctx));
-            }
-            // Centred where the pointer was when the key went down, not
-            // where this frame's later moves left it.
-            let pointer = ctx.input(|i| {
-                i.events[..at]
-                    .iter()
-                    .rev()
-                    .find_map(|e| match e {
-                        Event::PointerMoved(p) => Some(*p),
-                        _ => None,
-                    })
-                    .or_else(|| {
-                        let moved_after = i.events[at..]
-                            .iter()
-                            .any(|e| matches!(e, Event::PointerMoved(_)));
-                        let latest = i.pointer.latest_pos()?;
-                        Some(if moved_after {
-                            latest - i.pointer.delta()
-                        } else {
-                            latest
-                        })
-                    })
-            });
-            self.open_pie_at(ctx, pie, Some((key.0, key.1)), pointer);
-            // A quick hold, point and release can land in one frame (a busy
-            // frame batches the events): the rest of this frame goes to the
-            // new pie, so the release still runs the slot.
-            if let Some(mut open) = self.pie.take() {
-                open.chord_modifiers = chord_modifiers;
-                let enabled = self.pie_enabled(&open);
-                let outcome =
-                    ctx.input(|i| run_events(&mut open, &i.events[at + 1..], i, &enabled));
-                self.finish_pie(ctx, open, outcome);
-            }
-        }
-        true
-    }
-
     /// While a pie is open it owns keys and clicks. True when one is open.
     pub(super) fn pie_input(&mut self, ctx: &Context) -> bool {
         let Some(mut open) = self.pie.take() else {
             return false;
         };
-        // Another pie's chord while this one is open (Ctrl still held,
-        // a new number pressed, Leo 2026-11-27): swap to that pie in the
-        // same place; its key now closes it.
-        if let Some((name, false, key, _, chord_modifiers)) = self.pie_chord(ctx)
-            && name != open.pie.name
-            && let Some(pie) = self.pie_named(&name)
+        // Another pie's chord while this one is open (Ctrl still held, a
+        // new number pressed; Leonard, 2026-11-27): swap to that pie in
+        // the same place; its key now closes it.
+        if let Some((action, false, key, _, chord_modifiers)) = self.pie_chord(ctx)
+            && let Some(id) = pie_id(&action)
+            && id != open.pie.name
+            && let Some(pie) = self.pie_named(&id)
         {
             self.open_pie_at(ctx, pie, Some(key), Some(open.center));
             if let Some(next) = &mut self.pie {
@@ -946,7 +1125,7 @@ impl Operandi {
     }
 
     /// Apply an outcome to the pie just stepped; its keys reach nothing else.
-    fn finish_pie(&mut self, ctx: &Context, open: Open, outcome: Outcome) {
+    fn finish_pie(&mut self, ctx: &Context, mut open: Open, outcome: Outcome) {
         ctx.input_mut(|i| {
             i.events
                 .retain(|e| !matches!(e, Event::Key { .. } | Event::Text(_)));
@@ -954,34 +1133,58 @@ impl Operandi {
         match outcome {
             Outcome::StayOpen => self.pie = Some(open),
             Outcome::Close => {}
-            Outcome::Run(i) => {
-                if let Some(entry) = open.pie.slot(i) {
-                    self.execute_from(operandi_core::Source::Pie, &entry.command);
-                }
+            Outcome::Back => {
+                open.back(|outer| self.pie_widths(ctx, outer));
+                self.pie = Some(open);
             }
+            Outcome::Run(i) => match open.pie.slot(i).cloned() {
+                // UIC-310: a sub-pie opens in place, at the same centre.
+                Some(Entry { sub: Some(sub), .. }) => {
+                    if let Some(why) = open
+                        .pie
+                        .slot(i)
+                        .and_then(|e| self.slot_unavailable(e, open.open_ids()))
+                    {
+                        self.status = why;
+                    } else if let Some(pie) = self.pie_named(&sub) {
+                        let widths = self.pie_widths(ctx, &pie);
+                        open.enter(pie, widths);
+                    }
+                    self.pie = Some(open);
+                }
+                Some(entry) => self.execute_from(operandi_core::Source::Pie, &entry.command),
+                None => {}
+            },
         }
         ctx.request_repaint();
     }
 
-    /// Draw the open pie (and open one asked for by name).
+    /// Draw the open pie (and open one asked for by id).
     pub(super) fn pie_window(&mut self, ctx: &Context) {
-        if let Some(name) = self.pie_request.take()
-            && let Some(pie) = self.pie_named(&name)
-        {
-            self.open_pie(ctx, pie, None);
+        self.pie_import_dialog(ctx);
+        if let Some(id) = self.pie_request.take() {
+            match self.pie_named(&id) {
+                Some(pie) => self.open_pie(ctx, pie, None),
+                None => self.status = format!("No pie called {id}"),
+            }
         }
         let Some(open) = &self.pie else {
             return;
         };
         let statuses: Vec<Option<Status>> = (0..SLOTS)
-            .map(|i| open.pie.slot(i).map(|e| self.pie_status(&e.command)))
+            .map(|i| {
+                open.pie
+                    .slot(i)
+                    .map(|e| self.slot_status(e, open.open_ids()))
+            })
             .collect();
         // A greyed slot under the pointer says why (unavailable.rs).
         let why = open
             .highlighted()
             .and_then(|i| open.pie.slot(i))
-            .and_then(|e| self.pie_unavailable(&e.command));
+            .and_then(|e| self.slot_unavailable(e, open.open_ids()));
         let open = open.clone();
+        let pictures = self.slot_pictures(ctx, &open.pie);
         let screen = ctx.content_rect();
         egui::Area::new(Id::new("pie-menu"))
             .order(Order::Foreground)
@@ -990,8 +1193,57 @@ impl Operandi {
                 // Covers the window so nothing under the pie takes the
                 // pointer while it is open.
                 ui.allocate_rect(screen, Sense::click_and_drag());
-                paint(ui.painter(), &open, &statuses, why.as_deref());
+                paint(ui, &open, &statuses, &pictures, why.as_deref());
             });
+    }
+
+    /// Each slot's custom icon picture, loaded once (UIC-314); `None` for
+    /// a slot without one or whose file is missing (a placeholder shows).
+    pub(crate) fn slot_pictures(&mut self, ctx: &Context, pie: &Pie) -> [Option<TextureId>; SLOTS] {
+        std::array::from_fn(|i| match pie.shows(i).0 {
+            Some(SlotIcon::File(path)) => self.workbench_icon(ctx, &path),
+            _ => None,
+        })
+    }
+}
+
+/// Paint a slot's icon in `at`: a built-in icon, a custom picture, or for
+/// a custom file that won't load a dashed placeholder box (UIC-314).
+pub(crate) fn paint_slot_icon(
+    ui: &Ui,
+    at: Rect,
+    icon: &SlotIcon,
+    picture: Option<TextureId>,
+    enabled: bool,
+) {
+    match (icon, picture) {
+        (SlotIcon::Builtin(icon), _) if enabled => icons::paint(ui, at, *icon),
+        (SlotIcon::Builtin(icon), _) => icons::paint_faded(ui, at, *icon),
+        (SlotIcon::File(_), Some(texture)) => {
+            let tint = if enabled {
+                Color32::WHITE
+            } else {
+                Color32::from_white_alpha(90)
+            };
+            ui.painter().image(
+                texture,
+                at,
+                Rect::from_min_max(pos2(0., 0.), pos2(1., 1.)),
+                tint,
+            );
+        }
+        (SlotIcon::File(_), None) => {
+            let stroke = Stroke::new(1.0f32, theme::disabled_text());
+            ui.painter()
+                .rect_stroke(at.shrink(1.), 2., stroke, StrokeKind::Inside);
+            ui.painter().text(
+                at.center(),
+                Align2::CENTER_CENTER,
+                "?",
+                FontId::proportional(at.height() * 0.6),
+                theme::disabled_text(),
+            );
+        }
     }
 }
 
@@ -1035,6 +1287,12 @@ fn step(open: &mut Open, event: &Event, enabled: &[bool; SLOTS]) -> Outcome {
             open.hover(*p);
             Outcome::StayOpen
         }
+        // UIC-310: Esc in a sub-pie goes back one level.
+        Event::Key {
+            key: Key::Escape,
+            pressed: true,
+            ..
+        } if !open.stack.is_empty() => Outcome::Back,
         Event::Key {
             key: Key::Escape,
             pressed: true,
@@ -1077,21 +1335,74 @@ fn label_font() -> FontId {
     FontId::proportional(13.)
 }
 
-/// Paint a pie: dead-zone ring, arrow toward the highlighted slot, labels.
-fn paint(painter: &Painter, open: &Open, statuses: &[Option<Status>], why: Option<&str>) {
+/// The pie's name in the centre (UIC-313): one line, at most
+/// `NAME_WIDTH` wide, ending in "…" when longer.
+fn name_galley(painter: &Painter, title: &str) -> std::sync::Arc<egui::Galley> {
+    let mut job = egui::text::LayoutJob::simple_singleline(
+        title.to_owned(),
+        FontId::proportional(12.),
+        theme::text(),
+    );
+    job.wrap = egui::text::TextWrapping {
+        max_width: NAME_WIDTH,
+        max_rows: 1,
+        break_anywhere: true,
+        overflow_character: Some('…'),
+    };
+    painter.layout_job(job)
+}
+
+/// How far from the centre, along unit `d`, the ray leaves `half` (a box's
+/// half size around the centre).
+fn box_exit(half: Vec2, d: Vec2) -> f32 {
+    let tx = if d.x.abs() > 1e-4 {
+        half.x / d.x.abs()
+    } else {
+        f32::INFINITY
+    };
+    let ty = if d.y.abs() > 1e-4 {
+        half.y / d.y.abs()
+    } else {
+        f32::INFINITY
+    };
+    tx.min(ty)
+}
+
+/// Paint a pie: its name in the centre with an arrow toward the
+/// highlighted slot, then the slots' buttons.
+fn paint(
+    ui: &Ui,
+    open: &Open,
+    statuses: &[Option<Status>],
+    pictures: &[Option<TextureId>; SLOTS],
+    why: Option<&str>,
+) {
+    let painter = ui.painter();
     let c = open.center;
     let fill = theme::popup_fill();
-    // A small solid dot marks the centre (the dead zone around it is
-    // invisible); the arrow beside it points at the highlighted button.
-    painter.circle(c, 5., theme::text(), Stroke::new(1.0f32, theme::border()));
+    // UIC-313: the pie's name sits in the centre (it replaced the dot; the
+    // dead zone around it is invisible).
+    let name = name_galley(painter, &open.pie.title);
+    let plate = Rect::from_center_size(c, name.size() + vec2(12., 6.));
+    painter.rect(
+        plate,
+        plate.height() / 2.,
+        fill,
+        Stroke::new(1.0f32, theme::border()),
+        StrokeKind::Inside,
+    );
+    painter.galley(c - name.size() / 2., name, theme::text());
     let highlighted = open.highlighted();
     if let Some(i) = highlighted {
+        // The arrow sits just outside the name plate, pointing at the
+        // highlighted button.
         let d = (open.rect(i).center() - c).normalized();
         let n = vec2(-d.y, d.x);
-        let tip = c + d * 17.;
-        let base = c + d * 9.;
+        let edge = box_exit(plate.size() / 2., d);
+        let tip = c + d * (edge + 9.);
+        let base = c + d * (edge + 2.);
         painter.add(Shape::convex_polygon(
-            vec![tip, base + n * 5., base - n * 5.],
+            vec![tip, base + n * 4.5, base - n * 4.5],
             theme::orange(),
             Stroke::NONE,
         ));
@@ -1103,19 +1414,20 @@ fn paint(painter: &Painter, open: &Open, statuses: &[Option<Status>], why: Optio
         };
         let r = open.rect(i);
         let lit = highlighted == Some(i);
-        let (bg, text) = match (lit, status.enabled) {
+        let (bg, mut text) = match (lit, status.enabled) {
             (true, true) => (theme::orange(), theme::on_orange()),
             (true, false) => (theme::hover(), theme::disabled_text()),
             (false, true) => (fill, theme::text()),
             (false, false) => (fill, theme::disabled_text()),
         };
-        painter.rect(
-            r,
-            6.,
-            bg,
-            Stroke::new(1.0f32, theme::border()),
-            StrokeKind::Inside,
-        );
+        // UIC-221: a line no command has shows red.
+        let border = if status.unknown {
+            text = theme::error();
+            theme::error()
+        } else {
+            theme::border()
+        };
+        painter.rect(r, 6., bg, Stroke::new(1.0f32, border), StrokeKind::Inside);
         // State marker at the left: a box for toggles, a dot for choices.
         let m = pos2(r.left() + PAD + 4., r.center().y);
         match status.mark {
@@ -1134,18 +1446,57 @@ fn paint(painter: &Painter, open: &Open, statuses: &[Option<Status>], why: Optio
                 }
             }
         }
-        // Centred, in the room right of the mark when there is one.
-        let room = match status.mark {
+        // UIC-310: a sub-pie slot carries a small outward-pointing
+        // triangle at its far end (a tiny glyph, drawn flat).
+        let mut room = match status.mark {
             Mark::Plain => r,
             _ => r.with_min_x(r.left() + MARK_ROOM),
         };
-        painter.text(
-            room.center(),
-            Align2::CENTER_CENTER,
-            &entry.label,
-            font.clone(),
-            text,
-        );
+        if entry.sub.is_some() {
+            let left = SLOT_AT[i].x < 0.;
+            let x = if left {
+                r.left() + PAD / 2. + 3.
+            } else {
+                r.right() - PAD / 2. - 3.
+            };
+            let dir = if left { -1. } else { 1. };
+            let y = r.center().y;
+            painter.add(Shape::convex_polygon(
+                vec![
+                    pos2(x + dir * 3.5, y),
+                    pos2(x - dir * 2.5, y - 4.5),
+                    pos2(x - dir * 2.5, y + 4.5),
+                ],
+                text,
+                Stroke::NONE,
+            ));
+            room = if left {
+                room.with_min_x(room.left() + SUB_ROOM)
+            } else {
+                room.with_max_x(room.right() - SUB_ROOM)
+            };
+        }
+        // Centred, in the room left by the marks: the icon, the label or
+        // both, per the pie's icon mode (UIC-309).
+        let (icon, show_label) = open.pie.shows(i);
+        let label =
+            show_label.then(|| painter.layout_no_wrap(entry.label.clone(), font.clone(), text));
+        let width = label.as_ref().map_or(0., |g| g.size().x)
+            + match (icon.is_some(), label.is_some()) {
+                (true, true) => ICON + ICON_GAP,
+                (true, false) => ICON,
+                (false, _) => 0.,
+            };
+        let mut x = room.center().x - width / 2.;
+        if let Some(icon) = icon {
+            let at = Rect::from_min_size(pos2(x, room.center().y - ICON / 2.), Vec2::splat(ICON));
+            paint_slot_icon(ui, at, &icon, pictures[i], status.enabled);
+            x += ICON + ICON_GAP;
+        }
+        if let Some(galley) = label {
+            let y = room.center().y - galley.size().y / 2.;
+            painter.galley(pos2(x, y), galley, text);
+        }
     }
     // Under the greyed slot the pointer is on: why it can't run.
     // Under the whole cluster, so it never covers another button.

@@ -417,20 +417,26 @@ impl Operandi {
             });
             let state = &self.input_map_ui;
             let only_layout = state.scope == Scope::Layout && state.only_layout;
-            let rows: Vec<&str> = input::ACTIONS
+            // UIC-311: every pie can be bound, a user's own too; its row is
+            // the line that opens it, named "Pie: <name>".
+            let all = self.input_map_actions();
+            let rows: Vec<String> = all
                 .iter()
-                .map(|&(name, _)| name)
                 .filter(|name| {
-                    visible(state, name, shown.get(*name).map_or("", String::as_str))
+                    let binding = shown.get(*name).map_or("", String::as_str);
+                    (visible(state, name, binding)
+                        || (crate::pie_menu::is_pie(name)
+                            && visible(state, &self.action_label(name), binding)))
                         && (!only_layout || self.layout_keys_draft.contains_key(*name))
                 })
+                .cloned()
                 .collect();
             let assigned = shown.values().filter(|b| !b.is_empty()).count();
             ui.label(
                 RichText::new(format!(
                     "Showing {} of {} actions · {assigned} with shortcuts",
                     rows.len(),
-                    input::ACTIONS.len()
+                    all.len()
                 ))
                 .small()
                 .color(theme::weak_text()),
@@ -640,6 +646,9 @@ impl Operandi {
             self.input_map_ui.clash = None;
             return false;
         }
+        // Rows' names, not their lines ("Pie: View Direction").
+        let others: Vec<String> = clash.others.iter().map(|o| self.action_label(o)).collect();
+        let action = self.action_label(&clash.action);
         egui::Frame::group(ui.style())
             .stroke(egui::Stroke::new(1.0_f32, theme::error()))
             .show(ui, |ui| {
@@ -647,12 +656,12 @@ impl Operandi {
                 ui.label(format!(
                     "{} is already used by {}, which can apply at the same time as {}.",
                     input::display_chord(&clash.chord),
-                    clash.others.join(", "),
-                    clash.action
+                    others.join(", "),
+                    action
                 ));
                 ui.horizontal(|ui| {
-                    let label = if clash.others.len() == 1 {
-                        format!("Remove it from {}", clash.others[0])
+                    let label = if others.len() == 1 {
+                        format!("Remove it from {}", others[0])
                     } else {
                         "Remove it from the others".into()
                     };
@@ -662,14 +671,11 @@ impl Operandi {
                                 .insert(other.clone(), String::new());
                         }
                         self.input_map_ui.clash = None;
-                        self.status = format!(
-                            "{} now runs {}",
-                            input::display_chord(&clash.chord),
-                            clash.action
-                        );
+                        self.status =
+                            format!("{} now runs {}", input::display_chord(&clash.chord), action);
                     }
                     if ui
-                        .button(format!("Undo (keep {} as it was)", clash.action))
+                        .button(format!("Undo (keep {} as it was)", action))
                         .clicked()
                     {
                         let draft = self.input_map_draft_mut();
@@ -708,7 +714,7 @@ impl Operandi {
             Scope::Global => binding != default,
             Scope::Layout => self.layout_keys_draft.contains_key(name),
         };
-        let mut label = RichText::new(name);
+        let mut label = RichText::new(self.action_label(name));
         if modified {
             label = label.color(theme::orange());
         }
@@ -840,6 +846,22 @@ impl Operandi {
         });
     }
 
+    /// Every row the Input Map lists: the factory actions, then any pie
+    /// they don't already open (a user's pies, UIC-311).
+    pub(crate) fn input_map_actions(&self) -> Vec<String> {
+        let mut rows: Vec<String> = input::ACTIONS
+            .iter()
+            .map(|&(name, _)| name.to_owned())
+            .collect();
+        for id in self.pie_ids() {
+            let line = crate::pie_menu::line(&id);
+            if !rows.contains(&line) {
+                rows.push(line);
+            }
+        }
+        rows
+    }
+
     /// Open the Input Map on the saved maps: the global one and the
     /// current layout's keys.
     pub(crate) fn open_input_map(&mut self) {
@@ -889,12 +911,13 @@ impl Operandi {
             others,
             previous,
         });
+        let name = self.action_label(action);
         let layout = &self.layouts.current;
         self.status = match scope {
-            Scope::Global if chord.is_empty() => format!("{action} has no shortcut"),
-            Scope::Global => format!("{action}: {chord} (not saved yet)"),
+            Scope::Global if chord.is_empty() => format!("{name} has no shortcut"),
+            Scope::Global => format!("{name}: {chord} (not saved yet)"),
             Scope::Layout if chord.is_empty() => {
-                format!("{action} has no key in the {layout} layout (not saved yet)")
+                format!("{name} has no key in the {layout} layout (not saved yet)")
             }
             Scope::Layout => {
                 // Global keys this one now hides in the layout.
@@ -908,10 +931,10 @@ impl Operandi {
                     .map(|(other, _)| other.clone())
                     .collect();
                 if hidden.is_empty() {
-                    format!("{action}: {chord} in the {layout} layout (not saved yet)")
+                    format!("{name}: {chord} in the {layout} layout (not saved yet)")
                 } else {
                     format!(
-                        "{action}: {chord} in the {layout} layout, instead of {} there (not saved yet)",
+                        "{name}: {chord} in the {layout} layout, instead of {} there (not saved yet)",
                         hidden.join(", ")
                     )
                 }

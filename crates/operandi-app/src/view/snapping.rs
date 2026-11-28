@@ -1081,6 +1081,37 @@ impl super::Operandi {
         moved: Option<std::collections::BTreeSet<u32>>,
         r: egui::Rect,
     ) -> Option<DVec3> {
+        let at = self.camera.project(handle, r).map(|(at, _)| at);
+        self.snap_point_at(handle, at, moved, r)
+    }
+    /// An Action Center being placed by a press at `at` (C-AUTO's press,
+    /// GitHub #39): the target under the pointer, if any. Unlike a dragged
+    /// handle, the search is where the pointer is, not where `point` (the
+    /// work-plane hit at the old centre's height) shows on screen, and the
+    /// selection's own points, edges and polygons are targets too: nothing
+    /// moves while a centre is placed, so a pivot can go onto a corner of
+    /// what it is about to turn.
+    pub(super) fn snap_placed_center(
+        &mut self,
+        point: DVec3,
+        at: egui::Pos2,
+        r: egui::Rect,
+    ) -> Option<DVec3> {
+        // Its own search, so the drag that follows builds the usual one.
+        self.snap_session = Default::default();
+        let target = self.snap_point_at(point, Some(at), Some(Default::default()), r);
+        self.snap_session = Default::default();
+        target
+    }
+    /// `snap_point` with the search at screen point `at` (none: `handle`
+    /// is out of view).
+    fn snap_point_at(
+        &mut self,
+        handle: DVec3,
+        at: Option<egui::Pos2>,
+        moved: Option<std::collections::BTreeSet<u32>>,
+        r: egui::Rect,
+    ) -> Option<DVec3> {
         self.snap_marker = None;
         if let Some(hold) = &mut self.snap_hold {
             hold.dragged = true;
@@ -1091,7 +1122,7 @@ impl super::Operandi {
             return None;
         }
         self.snap_reticle = Some(handle);
-        let (at, _) = self.camera.project(handle, r)?;
+        let at = at?;
         let found = if targets.any_service() {
             self.build_snap_session(moved);
             self.snap_handle_target(at, targets, r)

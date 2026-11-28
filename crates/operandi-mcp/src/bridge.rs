@@ -73,9 +73,11 @@ pub fn commands() -> Vec<&'static str> {
 /// renderer); the headless sidecar refuses them with [`APP_ONLY`].
 /// Kept in sorted order (case-insensitive), so parallel branches add
 /// lines in different places (AGENTS.md, "Code"); a test checks it.
-pub const APP_TOOLS: [&str; 7] = [
+pub const APP_TOOLS: [&str; 9] = [
+    "app_command",
     "online_library",
     "panel_show",
+    "pointer_stroke",
     "render",
     "render_status",
     "scene_revert",
@@ -380,6 +382,25 @@ impl Bridge {
                 json!({"type": "object", "properties": {
                     "panel": {"enum": PANEL_NAMES, "description": "items (Items list), shader_tree (Shader Tree), groups, properties, mesh_stack (Mesh Stack), preset_browser (Preset Browser), uv_maps (UV Maps), command_history (Command History), vertex_normal_tools (Vertex Normal Tools), statistics (Statistics), node_view (Node View)."}
                 }, "required": ["panel"], "additionalProperties": false}),
+            ),
+            def(
+                "app_command",
+                "Running app only: run one of the app's own command lines, as typed on its command line: the paint tools (operandi.paint.airbrush, operandi.paint.set size:30 fg:1,1,1), image commands (operandi.paint.addTexture kind:color resolution:1024 color:0,0,0, operandi.image.new resolution:512 name:Skin, operandi.image.saveAs filename:/x/skin.png, operandi.image.save) and every other app command that command_run can't reach. Recorded in the History tab as a bridge line. A line that would open a dialog (a bare operandi.image.new) is an error and the dialog waits in the app for the person: give the command its values. Runs while a tool is on (it may be what turns the tool on). Answers the scene echo, the line and the status line.",
+                json!({"type": "object", "properties": {
+                    "line": {"type": "string", "description": "The command line, e.g. \"operandi.paint.smudge\"."}
+                }, "required": ["line"], "additionalProperties": false}),
+            ),
+            def(
+                "pointer_stroke",
+                "Running app only: press, drag and release a mouse button in a viewport through the app's real input path, one point per frame (the first point is pressed, the last released; one point is a click). What it does is what that drag does in the app: paint with a paint tool on, sculpt, select, drag a tool's handle, navigate with alt. Give points in view points from the view's top-left corner, or world points projected through the view's camera. pressure (0-1, one number or one per point) sends the points as a pen's, so the Tablet Nozzle and sculpt brushes read it; without it they are a mouse's (full pressure). Answered after the release has been handled, with the scene echo and the status line. Runs while a tool is on.",
+                json!({"type": "object", "properties": {
+                    "points": {"type": "array", "items": {"type": "array", "items": {"type": "number"}, "minItems": 2, "maxItems": 2}, "description": "[[x, y], ...] in points from the view's top-left corner; 1 to 4000."},
+                    "world": {"type": "array", "items": vec3, "description": "[[x, y, z], ...] world points (metres) instead of points; each must be in front of the camera and inside the view."},
+                    "viewport": {"type": "integer", "description": "Which view (index, 0 = first); it becomes the active one. Default the active view."},
+                    "button": {"enum": ["left", "right", "middle"], "description": "Default left."},
+                    "modifiers": {"type": "array", "items": {"enum": ["shift", "ctrl", "alt", "cmd"]}, "description": "Keys held for the whole stroke; cmd is Command on macOS, Control elsewhere."},
+                    "pressure": {"description": "Pen pressure 0-1: one number for every point, or a list with one per point."}
+                }, "additionalProperties": false}),
             ),
             def(
                 "viewport_capture",

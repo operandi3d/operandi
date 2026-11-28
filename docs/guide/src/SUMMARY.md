@@ -13,6 +13,7 @@
     - [Tool steps in the Mesh Stack](panels/mesh-stack-tool-steps.md)
     - [Shader Tree](panels/shader-tree.md)
     - [Preferences](panels/preferences.md)
+    - [Pie menus](interface/pie-menus.md)
     - [Menus](menus/index.md)
         - [File menu](menus/file.md)
         - [Edit menu](menus/edit.md)

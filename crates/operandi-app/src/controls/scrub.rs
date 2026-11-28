@@ -68,6 +68,11 @@ impl Kind {
             "linear_smoothing",
             "smooth_iterations",
             "t_count",
+            // Mesh Paint's Linear Count, Array Count X/Y and Radial Count
+            // (#46: the arrows did nothing on them).
+            "mp_linear",
+            "mp_array_",
+            "mp_radial",
         ];
         if count_keys.iter().any(|k| key.contains(k)) {
             Self::Count

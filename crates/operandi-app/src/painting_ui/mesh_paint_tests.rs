@@ -177,3 +177,97 @@ fn the_buttons_wear_their_rendered_icons() {
         }
     }
 }
+
+/// #46.1: the Mesh Paint buttons light while it is on, each variant by its
+/// own name; the plain button stays lit for any of them.
+#[test]
+fn the_buttons_light_while_mesh_paint_is_on() {
+    let ctx = Context::default();
+    let mut a = app(&ctx);
+    for line in ["Mesh Paint", "Mesh Paint Instance", "Mesh Paint Instancer"] {
+        assert!(!a.line_state(line).unwrap().on, "{line} off at first");
+    }
+    a.execute("Mesh Paint");
+    assert!(a.line_state("Mesh Paint").unwrap().on, "{}", a.status);
+    assert!(!a.line_state("Mesh Paint Instance").unwrap().on);
+    a.drop_utility();
+    a.execute("Mesh Paint Instance");
+    assert!(a.line_state("Mesh Paint Instance").unwrap().on);
+    assert!(a.line_state("Mesh Paint").unwrap().on);
+    assert!(!a.line_state("Mesh Paint Instancer").unwrap().on);
+    a.drop_utility();
+    a.execute("Mesh Paint Instancer");
+    assert!(a.line_state("Mesh Paint Instancer").unwrap().on);
+    a.drop_utility();
+    assert!(!a.line_state("Mesh Paint").unwrap().on);
+}
+
+/// #46.2: turned off and on again, Mesh Paint keeps the settings it had;
+/// which variant was started still decides Create Instances / Instancer.
+#[test]
+fn it_remembers_its_settings_between_uses() {
+    let ctx = Context::default();
+    let mut a = app(&ctx);
+    a.execute("Mesh Paint");
+    let mut changed = match a.utility {
+        Some(Utility::MeshPaint(s)) => s,
+        other => panic!("{other:?}"),
+    };
+    changed.mode = PaintMode::Radial;
+    changed.radial_count = 9;
+    changed.brush_size = 42.;
+    // The panel's edits arrive through its publish step.
+    use crate::tool_form::ToolFields;
+    crate::create_utility::UtilityFields::publish(&mut a, Utility::MeshPaint(changed)).unwrap();
+    a.execute("Mesh Paint");
+    assert!(a.utility.is_none(), "the second run turns it off");
+    a.execute("Mesh Paint");
+    let Some(Utility::MeshPaint(s)) = a.utility else {
+        panic!("{}", a.status);
+    };
+    assert_eq!(s.mode, PaintMode::Radial);
+    assert_eq!(s.radial_count, 9);
+    assert_eq!(s.brush_size, 42.);
+    assert!(!s.instances && !s.replicas);
+    a.drop_utility();
+    a.execute("Mesh Paint Instance");
+    let Some(Utility::MeshPaint(s)) = a.utility else {
+        panic!("{}", a.status);
+    };
+    assert_eq!(s.radial_count, 9, "the variants share the memory");
+    assert!(s.instances && !s.replicas);
+}
+
+/// #46.3: the count fields' arrows step in whole numbers, so a drag on
+/// them changes the count instead of being refused as a fraction.
+#[test]
+fn the_count_fields_scrub_in_whole_numbers() {
+    use crate::scrub::Kind;
+    for key in ["mp_linear", "mp_array_x", "mp_array_y", "mp_radial"] {
+        assert_eq!(Kind::for_field(key, "", None), Kind::Count, "{key}");
+    }
+}
+
+/// #46.8: both instance switches say what they do, each its own tip.
+#[test]
+fn both_instance_switches_have_tooltips() {
+    use crate::tool_form::{Item, ToolFields};
+    let ctx = Context::default();
+    let mut a = app(&ctx);
+    a.execute("Mesh Paint");
+    let u = a.utility.unwrap();
+    let form = crate::create_utility::UtilityFields::form(&a, &u);
+    let tip = |label: &str| {
+        form.items
+            .iter()
+            .find_map(|i| match i {
+                Item::Field(f) if f.row.label == label => Some(f.row.tooltip.clone()),
+                _ => None,
+            })
+            .unwrap_or_else(|| panic!("{label} is on the panel"))
+    };
+    let (instances, instancer) = (tip("Create Instances"), tip("Create Instancer"));
+    assert!(!instances.is_empty(), "Create Instances has a tooltip");
+    assert!(!instancer.is_empty(), "Create Instancer has a tooltip");
+    assert_ne!(instances, instancer, "the two tips differ");
+}

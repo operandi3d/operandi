@@ -10,8 +10,9 @@
 1. Make sure the mesh you want to add to is selected in the **Items list**.
 2. Click **Arc** in the **Draw** section of the **Create** tool tab.
 3. Drag in the **3D view** to draw the arc on the **Work Plane**.
-4. Type exact values in **Tool Properties** if you need them.
-5. Click **Drop** to keep it, or **Apply** to keep it and draw another.
+4. Drag one of the arrows at its centre to move it along just X, Y or Z.
+5. Type exact values in **Tool Properties** if you need them.
+6. Click **Drop** to keep it, or **Apply** to keep it and draw another.
 
 ## Properties
 

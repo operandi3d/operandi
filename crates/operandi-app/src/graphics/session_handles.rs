@@ -11,7 +11,8 @@
 //! - The Torus squares set its Radius X/Y/Z as the panel does (Modo's
 //!   convention, NPR-TOR-03): along the axis Height, across it Cross
 //!   Section with Hole Size kept.
-//! - Text gets the move arrows only; its Size stays on the panel.
+//! - Text, Arc and Teapot get the move arrows only; their sizes stay on
+//!   the panel (#42 for Arc and Teapot).
 //! - A flat base (no height yet) keeps its green height handle instead
 //!   (session_draw.rs).
 use super::*;
@@ -28,7 +29,8 @@ pub(crate) struct SessionShape {
 }
 
 impl Operandi {
-    /// The open, drawn Cone/Ellipsoid/Torus/Capsule/Text session's shape.
+    /// The open, drawn Cone/Ellipsoid/Torus/Capsule/Text/Arc/Teapot
+    /// session's shape.
     pub(crate) fn session_shape(&self) -> Option<SessionShape> {
         if self.editor.live.is_some() || self.session_flat_base().is_some() {
             return None;
@@ -54,6 +56,10 @@ impl Operandi {
             ShapeParameters::Torus(t) => shape(t.position, Some(t.radius()), true),
             ShapeParameters::Capsule(c) => shape(c.position, Some(c.radius), false),
             ShapeParameters::Text(t) => shape(t.position, None, false),
+            // #42: Arc and Teapot had no handles; their sizes are single
+            // numbers, so like Text they get the move arrows only.
+            ShapeParameters::Arc(arc) => shape(arc.center, None, false),
+            ShapeParameters::Teapot(t) => shape(t.position, None, false),
             _ => None,
         }
     }
@@ -215,6 +221,8 @@ impl Operandi {
                     }
                 }
                 ShapeParameters::Text(t) => t.position = position,
+                ShapeParameters::Arc(arc) => arc.center = position,
+                ShapeParameters::Teapot(t) => t.position = position,
                 _ => return,
             }
             self.run(Command::ConfigureShape(p));

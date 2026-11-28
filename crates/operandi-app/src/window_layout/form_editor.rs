@@ -28,6 +28,10 @@ use crate::workbench::{bound, control_name, index_arg, on_arg, set_attr, word};
 use operandi_core::command_runtime::CommandState;
 use serde::{Deserialize, Serialize};
 
+// UIC-308..313: the ring preview and slot editor for pies.
+#[path = "form_editor_pie.rs"]
+mod pie_editor;
+
 /// The Form Editor palette's hash (`layout.window hash:formEditor`).
 pub(super) const PALETTE: &str = "formEditor";
 
@@ -73,8 +77,15 @@ pub(super) struct State {
     /// A control row being dragged: its form and index.
     drag: Option<(String, usize)>,
     /// Where each tree row drew last frame, by `<form>` or `<form>#<i>`
-    /// (tests and the drag).
+    /// (tests and the drag); a pie's ring slots by `<form>@<i>`.
     pub rects: BTreeMap<String, Rect>,
+    /// A pie slot being dragged onto another (its pie and slot).
+    pie_drag: Option<(String, usize)>,
+    /// Browse Icons' search text (UIC-314).
+    icon_search: String,
+    /// A pie slot whose editor shows a command field (`false`) or the
+    /// sub-pie pick (`true`) before it holds one.
+    pie_kind: Option<(String, usize, bool)>,
 }
 
 /// The group a form's id puts it in when no user group holds it.
@@ -83,6 +94,7 @@ pub(super) fn default_group(id: &str) -> &'static str {
         "toolbox" => "Toolbox",
         "toolbar" => "Toolbars",
         "menu" => "Menus",
+        "pie" => "Pies",
         _ => "Forms",
     }
 }
@@ -119,7 +131,7 @@ fn set_form_attr(f: &mut Form, attr: &str, value: &str) -> std::result::Result<S
         "label" => f.label = text.to_owned(),
         "style" => {
             f.style = style_named(text)
-                .ok_or_else(|| bad("vertical, horizontal, sheet, menu, flyout, hold"))?
+                .ok_or_else(|| bad("vertical, horizontal, sheet, menu, flyout, hold, pie"))?
         }
         "icons" => f.icons = icons_named(text).ok_or_else(|| bad("icon, text, both"))?,
         "iconsize" => {
@@ -242,7 +254,14 @@ impl Operandi {
             .groups
             .iter()
             .find(|g| g.forms.iter().any(|f| f == id))
-            .map_or_else(|| default_group(id).to_owned(), |g| g.name.clone())
+            .map_or_else(
+                // Pies sit together whatever their ids (UIC-308).
+                || match self.forms.get(id) {
+                    Some(f) if f.style == Style::Pie => "Pies".to_owned(),
+                    _ => default_group(id).to_owned(),
+                },
+                |g| g.name.clone(),
+            )
     }
 
     /// The tree: each group and its form ids, filtered by the search.
@@ -259,7 +278,7 @@ impl Operandi {
                 || f.label.to_lowercase().contains(&needle)
                 || mentions(f, &needle)
         };
-        let mut names: Vec<String> = ["Toolbox", "Toolbars", "Menus", "Forms"]
+        let mut names: Vec<String> = ["Toolbox", "Toolbars", "Menus", "Pies", "Forms"]
             .map(str::to_owned)
             .into_iter()
             .collect();
@@ -340,19 +359,29 @@ impl Operandi {
                     }
                     None => Style::Vertical,
                 };
+                // UIC-308/309: a new pie starts with eight empty slots.
+                let pie = style == Style::Pie;
                 let form = Form {
                     version: cf::FORM_VERSION,
                     id: id.clone(),
                     label: a[1].clone().unwrap_or_else(|| id.clone()),
                     style,
-                    icons: IconMode::default(),
+                    icons: if pie {
+                        crate::pie_forms::NEW_PIE_ICONS
+                    } else {
+                        IconMode::default()
+                    },
                     icon_size: IconSize::default(),
                     exported: false,
                     show_when: None,
                     slot: None,
                     columns: None,
                     workbench: false,
-                    controls: Vec::new(),
+                    controls: if pie {
+                        crate::pie_forms::new_pie_controls()
+                    } else {
+                        Vec::new()
+                    },
                 };
                 self.forms.save(form)?;
                 if let Some(group) = a[3].clone() {
@@ -551,6 +580,9 @@ impl Operandi {
                 {
                     std::fs::create_dir_all(folder).map_err(|e| e.to_string())?;
                 }
+                // UIC-314: custom icon files go along, beside the form.
+                let mut form = form;
+                crate::form_icons::copy_icons_beside(&mut form, &path)?;
                 std::fs::write(&path, form.to_json())
                     .map_err(|e| format!("Couldn't save {id}: {e}"))?;
                 Ok(format!("Saved form {id} to {}", path.display()))
@@ -711,6 +743,23 @@ impl Operandi {
             if ui.button("New Form").clicked() {
                 let id = std::mem::take(&mut self.form_editor.new_form);
                 self.execute(&format!("operandi.form.new id:{}", word(&id)));
+            }
+            // UIC-308: a pie is a form with style pie, eight empty slots.
+            if ui
+                .button("New Pie")
+                .on_hover_text("Makes a pie with this id: eight empty slots around its name")
+                .clicked()
+            {
+                let id = std::mem::take(&mut self.form_editor.new_form);
+                self.execute(&format!("operandi.form.new id:{} style:pie", word(&id)));
+            }
+            // UIC-312: a pie file with its sub-pies.
+            if ui
+                .button("Import Pie…")
+                .on_hover_text("Reads a pie file written by Export Pie")
+                .clicked()
+            {
+                self.execute("operandi.pie.import");
             }
         });
         ui.separator();
@@ -914,6 +963,11 @@ impl Operandi {
             self.form_editor.selected = None;
             return;
         };
+        // A pie's slots are edited in its ring (form_editor_pie.rs).
+        if form.style == Style::Pie {
+            self.form_properties(ui, &form);
+            return;
+        }
         match index.and_then(|i| form.controls.get(i).cloned().map(|c| (i, c))) {
             Some((i, c)) => self.form_control_properties(ui, &id, i, &c),
             None => self.form_properties(ui, &form),
@@ -934,23 +988,16 @@ impl Operandi {
                 "command",
                 c.command.as_deref().unwrap_or_default(),
             );
+            // Pick and History beside the line (UIC-212, UIC-160).
+            self.command_sources(ui, id, i, |line| {
+                format!(
+                    "operandi.form.set attr:command value:{} index:{i} form:{id}",
+                    word(line)
+                )
+            });
             self.form_text_field(ui, "Tooltip", id, Some(i), "tooltip", &c.tooltip);
-            self.form_text_field(
-                ui,
-                "Icon",
-                id,
-                Some(i),
-                "icon",
-                c.icon.as_deref().unwrap_or_default(),
-            );
-            self.form_text_field(
-                ui,
-                "Icon File",
-                id,
-                Some(i),
-                "iconFile",
-                c.icon_file.as_deref().unwrap_or_default(),
-            );
+            // UIC-314: built-in icon, custom file, or none.
+            self.icon_picker(ui, id, i, c);
             self.form_text_field(
                 ui,
                 "Shortcut",
@@ -1073,7 +1120,15 @@ impl Operandi {
             None,
             "style",
             &style,
-            &["vertical", "horizontal", "sheet", "menu", "flyout", "hold"],
+            &[
+                "vertical",
+                "horizontal",
+                "sheet",
+                "menu",
+                "flyout",
+                "hold",
+                "pie",
+            ],
         );
         let icons = json_word(&form.icons);
         self.form_choice(
@@ -1150,6 +1205,53 @@ impl Operandi {
         let choices: Vec<&str> = groups.iter().map(String::as_str).collect();
         self.form_choice(ui, "Group", &id, None, "group", &group, &choices);
         ui.separator();
+        if form.style == Style::Pie {
+            self.pie_form_editor(ui, form);
+        } else {
+            self.form_add_rows(ui, &id);
+        }
+        ui.horizontal(|ui| {
+            let undo = self.workbench_state("operandi.workbench.undo", &format!("form:{id}"));
+            if ui
+                .gated(undo.unavailable.as_deref(), Button::new("Undo Edit"))
+                .clicked()
+            {
+                self.execute(&format!("operandi.workbench.undo form:{id}"));
+            }
+            let revert = if shipped { "Revert" } else { "Delete Form" };
+            if ui
+                .gated(
+                    crate::unavailable::unless(changed, "This form has no changes"),
+                    Button::new(revert),
+                )
+                .clicked()
+            {
+                self.execute(&format!("operandi.form.revert {id}"));
+                if !shipped {
+                    self.form_editor.selected = None;
+                }
+            }
+        });
+        if self.form_editor.preview && form.style != Style::Pie {
+            ui.separator();
+            ui.label(RichText::new("Preview").strong());
+            let width = 260.;
+            ui.allocate_ui(vec2(width, 10.), |ui| {
+                ui.set_width(width);
+                egui::Frame::new()
+                    .fill(theme::chrome::background())
+                    .inner_margin(4.)
+                    .show(ui, |ui| {
+                        ui.push_id(("form-preview", &id), |ui| self.draw_form(ui, &id));
+                    });
+            });
+        }
+    }
+
+    /// The rows that add controls to a form (not a pie: its eight slots
+    /// are edited in its ring).
+    fn form_add_rows(&mut self, ui: &mut Ui, id: &str) {
+        let id = id.to_owned();
         // Add a command: typed, or from the Command History (UIC-160).
         ui.horizontal(|ui| {
             let edit = ui.add(
@@ -1237,41 +1339,5 @@ impl Operandi {
                 self.execute(&format!("operandi.form.export form:{id}"));
             }
         });
-        ui.horizontal(|ui| {
-            let undo = self.workbench_state("operandi.workbench.undo", &format!("form:{id}"));
-            if ui
-                .gated(undo.unavailable.as_deref(), Button::new("Undo Edit"))
-                .clicked()
-            {
-                self.execute(&format!("operandi.workbench.undo form:{id}"));
-            }
-            let revert = if shipped { "Revert" } else { "Delete Form" };
-            if ui
-                .gated(
-                    crate::unavailable::unless(changed, "This form has no changes"),
-                    Button::new(revert),
-                )
-                .clicked()
-            {
-                self.execute(&format!("operandi.form.revert {id}"));
-                if !shipped {
-                    self.form_editor.selected = None;
-                }
-            }
-        });
-        if self.form_editor.preview {
-            ui.separator();
-            ui.label(RichText::new("Preview").strong());
-            let width = 260.;
-            ui.allocate_ui(vec2(width, 10.), |ui| {
-                ui.set_width(width);
-                egui::Frame::new()
-                    .fill(theme::chrome::background())
-                    .inner_margin(4.)
-                    .show(ui, |ui| {
-                        ui.push_id(("form-preview", &id), |ui| self.draw_form(ui, &id));
-                    });
-            });
-        }
     }
 }

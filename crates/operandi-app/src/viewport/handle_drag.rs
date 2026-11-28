@@ -314,54 +314,91 @@ impl Operandi {
     }
     /// Publish one handle sample: through the captured I2 stage for Extrude
     /// when one is active, else as an ordinary live preview.
-    /// A press away from the model with a transform tool live: keep what
-    /// was done so far, put the tool's center where the press is (at the
-    /// current center's depth) and drag from there like the center handle
-    /// (Scale: uniformly). Provisional (Jason, 2026-11-03; VAC-Q02).
-    pub(super) fn relocate_transform_center(
+    /// C-AUTO's and C-SCREEN's press with transform tool `tool` on
+    /// (Automatic, None and Screen; AC-RULES v6, GitHub #39): every press
+    /// off the handle puts the tool's center where the press lands on the
+    /// work plane. The two coordinates in the plane come from that hit;
+    /// the third keeps the current center's value. With `snapped` it then
+    /// snaps to whatever is under the pointer when Snapping is on; Screen's
+    /// never does (AC-12), and takes this view's axes with it (A-SCREEN).
+    /// What was done before the press is kept as its own step, and the
+    /// same press drags from the new center like the center handle
+    /// (Scale: uniformly).
+    pub(super) fn place_center_press(
         &mut self,
         tool: Tool,
         pos: Pos2,
         r: Rect,
+        snapped: bool,
     ) -> input::GestureKind {
         let center = self.transform_handle_center();
         let (origin, direction) = self.camera.ray(pos, r);
-        let (_, _, _, forward) = self.camera.basis();
-        let along = direction.dot(forward);
-        if along.abs() < 1e-9 {
-            return input::GestureKind::Blocked;
-        }
-        let mut point = origin + direction * ((center - origin).dot(forward) / along);
-        // ACS table, Automatic/None: the click's X and Z come from where it
-        // lands on the ground work plane; the height stays the centre's.
-        let (plane, plane_height) = (
-            self.editor.scene.workplane.plane,
-            self.editor.scene.workplane.center.y,
-        );
-        if matches!(
-            self.editor.action_context.center,
-            CenterMode::Automatic | CenterMode::None
-        ) && plane == 0
-            && direction.y.abs() > 1e-6
-        {
-            let t = (plane_height - origin.y) / direction.y;
-            if t > 0. {
-                let hit = origin + direction * t;
-                point = DVec3::new(hit.x, center.y, hit.z);
+        // The work plane this view draws on: XZ, YZ or XY through the
+        // work plane's centre. `normal` is the axis square to it.
+        let normal = [1, 0, 2][self.actual_plane().min(2) as usize];
+        let height = self.workplane_center()[normal];
+        let hit = (direction[normal].abs() > 1e-9)
+            .then(|| (height - origin[normal]) / direction[normal])
+            .filter(|t| t.is_finite() && *t > 0.)
+            .map(|t| origin + direction * t);
+        let mut point = match hit {
+            Some(mut hit) => {
+                hit[normal] = center[normal];
+                hit
             }
-        }
-        // SN-12: the new center snaps (Rotate's and Scale's centre too),
-        // except Screen's (AC-12).
-        let screen = matches!(self.editor.action_context.center, CenterMode::Screen(_));
-        if !screen && let Some(snapped) = self.snap_point(point, None, r) {
-            point = snapped;
-        }
+            // The press never meets the work plane (it is seen edge-on, or
+            // lies behind the view): the press at the center's own depth.
+            None => {
+                let (_, _, _, forward) = self.camera.basis();
+                let along = direction.dot(forward);
+                if along.abs() < 1e-9 {
+                    return input::GestureKind::Blocked;
+                }
+                origin + direction * ((center - origin).dot(forward) / along)
+            }
+        };
+        // The step so far is kept before the centre moves, so the snap
+        // below sees the mesh as it now is.
         if self.editor.live.as_ref().is_some_and(|l| l.applied) {
             self.run(Command::Drop);
             self.activate(tool);
         }
-        if !self.run_ok(Command::SetActionCenter(point)) {
+        // SN-12: the new center snaps (Rotate's and Scale's centre too).
+        if snapped && let Some(target) = self.snap_placed_center(point, pos, r) {
+            point = target;
+        }
+        let placed = if snapped {
+            self.run_ok(Command::SetActionCenter(point))
+        } else {
+            self.run_ok(Command::ActionContext(self.screen_context(point)))
+        };
+        if !placed {
             return input::GestureKind::Blocked;
+        }
+        self.free_transform_drag(tool)
+    }
+    /// C-ELEM's press with transform tool `tool` on: the polygon, edge or
+    /// point under the pointer becomes the Element pick (any shown mesh,
+    /// selected or not; the selection stays as it is), and the same press
+    /// drags the tool. A press on empty space changes nothing. What was
+    /// done before the press is kept as its own step, as for a placed
+    /// centre.
+    pub(super) fn element_press(&mut self, tool: Tool, pos: Pos2, r: Rect) -> input::GestureKind {
+        let picked = self.element_pick_any(pos, r).and_then(|pick| {
+            operandi_core::element_frame(&self.editor.scene, pick.grab.item, pick.grab.element).ok()
+        });
+        let context = match picked {
+            Some(frame) => self.editor.action_context.picked(frame),
+            None => self.editor.action_context,
+        };
+        if context != self.editor.action_context {
+            if self.editor.live.as_ref().is_some_and(|l| l.applied) {
+                self.run(Command::Drop);
+                self.activate(tool);
+            }
+            if !self.run_ok(Command::ActionContext(context)) {
+                return input::GestureKind::Blocked;
+            }
         }
         self.free_transform_drag(tool)
     }

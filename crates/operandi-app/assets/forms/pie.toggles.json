@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "id": "pie.toggles",
+  "label": "Viewport Toggles",
+  "style": "pie",
+  "icons": "text",
+  "controls": [
+    {
+      "command": "Toggle Lights",
+      "label": "Lights"
+    },
+    {
+      "command": "Toggle Cameras",
+      "label": "Cameras"
+    },
+    {
+      "command": "Toggle Wireframe Overlay",
+      "label": "Wireframe"
+    },
+    {
+      "command": "Toggle Show Verts",
+      "label": "Vertices"
+    },
+    {
+      "command": "Toggle Grid",
+      "label": "Grid"
+    },
+    {
+      "command": "Toggle Background Gradient",
+      "label": "Background"
+    },
+    {
+      "space": 0
+    },
+    {
+      "space": 0
+    }
+  ]
+}

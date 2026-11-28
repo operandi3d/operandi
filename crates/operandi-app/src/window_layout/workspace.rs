@@ -1208,9 +1208,16 @@ impl Operandi {
         };
         let response = ui.gated(error.as_deref(), button);
         if response.clicked() {
-            self.run(Command::ActionContext(context));
+            self.choose_action_context(context);
         }
         response
+    }
+    /// An Action Center chosen by name (the menu, a pie). A Snaps and
+    /// Precision preset still waiting for its centre click stops waiting:
+    /// the choice is the centre now, and a later press mustn't replace it.
+    pub(super) fn choose_action_context(&mut self, context: ActionContext) {
+        self.preset_center_click = false;
+        self.run(Command::ActionContext(context));
     }
     pub(super) fn context_bar(&mut self, ui: &mut Ui) {
         // N31 (Jason, 2026-11-17): the button names the action centre in use
@@ -1274,14 +1281,32 @@ impl Operandi {
                 )
                 .on_hover_text(tip);
             }
-            // F4/F6: the centre is placed by the next viewport click.
-            for (kind, label) in [
-                (crate::action_center_click::CenterClick::Element, "Element"),
-                (crate::action_center_click::CenterClick::Screen, "Screen"),
+            // C-ELEM, C-SCREEN: in force when chosen; every press off the
+            // handle then picks or places. Tooltips per UIC-04.
+            for (label, tip) in [
+                (
+                    "Element",
+                    "The polygon, edge or point you press with a transform tool on, with axes from its normal. Press another to move there",
+                ),
+                (
+                    "Screen",
+                    "Where you press in the view with a transform tool on, with axes that face the view",
+                ),
             ] {
                 let on = current.center.label() == label;
-                if ui.add(Button::selectable(on, label)).clicked() {
-                    self.choose_center_click(kind);
+                let error = (!self.field_errors.is_empty()).then_some(
+                    "Correct or revert invalid numeric fields before changing Action Center",
+                );
+                if ui
+                    .gated(error, Button::selectable(on, label))
+                    .on_hover_text(tip)
+                    .clicked()
+                {
+                    if label == "Element" {
+                        self.choose_element_center();
+                    } else {
+                        self.choose_screen_center();
+                    }
                     ui.close();
                 }
             }

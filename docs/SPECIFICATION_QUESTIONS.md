@@ -2868,6 +2868,75 @@ Provisional:
   Longer labels widen their button outward. The pointer over a button
   picks it even where a diagonal's corner reaches into a side's wedge.
   The greyed-entry reason shows under the whole pie.
+- **PM-Q14 Pies as forms (pie engine, 2026-11-27).** A pie is a form
+  with style `pie` (UIC-308); its first eight controls are the slots,
+  clockwise from the top, and an empty slot is a `space` control. Shipped
+  pies keep icon mode Text (labels only, as before); a New Pie starts with
+  eight empty slots and Both. The Layouts pie stays generated (its slots
+  are the layouts), opened through the same engine, and can't be exported
+  or used as a sub-pie.
+- **PM-Q15 Sub-pie gesture.** Picking a sub-pie slot (releasing the key
+  over it, or clicking it) opens the sub-pie in place at the same centre
+  instead of closing (UIC-310). The key is up by then, so the sub-pie
+  waits for a click. Esc, or a click in the centre's dead zone, goes back
+  one level; in the outermost pie both still close it, as before.
+- **PM-Q16 Loops.** Setting a sub-pie that leads back to the pie is
+  refused (`operandi.form.slot`), and the Form Editor only offers pies
+  that don't. A loop that arrives another way (a hand-edited file, an
+  import over existing pies) greys the slot naming a pie that is already
+  open, with the reason.
+- **PM-Q17 Any line's state.** A slot whose line isn't one of the pies'
+  own view, shading, toggle, falloff or action-centre lines or an Input
+  Map action is greyed from its command's answer and, when the answer is
+  "on", shows a filled dot. A line no command has is red and does
+  nothing (UIC-221); an `@macro` line counts as known, as on toolbox
+  buttons (UIC-222), until macros exist.
+- **PM-Q18 The name in the centre (UIC-313).** One line, at most 130 px,
+  ending in "…" when longer, on a small plate that replaces the dot; the
+  arrow toward the highlighted slot sits just outside the plate.
+- **PM-Q19 Input Map rows.** Shipped pies keep their old row names (Pie:
+  View Direction ...); the saved map stores the line `operandi.pie.open
+  <id>`, and a map or layout key saved with the old names moves to the
+  new lines. A user pie's row comes after the factory actions, named
+  "Pie: <its name>". Assign Key opens the Input Map on that row, waiting
+  for its keys; nothing is saved until Save Input Map.
+- **PM-Q20 Pie files (UIC-312).** Export Pie writes JSON (`.oppie`):
+  version, the pie's id and its form with every sub-pie form it reaches.
+  Without a file panel it saves to the data folder's Saved Pies folder,
+  as Save Form does (LAY-Q67). Import Pie with an id that is taken asks
+  Rename / Replace / Cancel; Rename gives `<id>.2` (then .3 ...) and
+  points slots at the renamed sub-pies; Replace saves over the user's
+  copy (Revert still brings a shipped pie back).
+- **PM-Q21 Dragging slots.** In the Form Editor's ring, dragging a slot
+  onto another swaps the two (`operandi.form.swap`), so every other slot
+  keeps its place, rather than moving the rest along.
+- **PM-Q22 Sub-pie slots.** A sub-pie slot shows its own label or else
+  the sub-pie's name, with a small triangle at its outer end pointing
+  away from the centre (a tiny flat glyph, not an icon).
+- **PM-Q23 Pick (Form Editor, 2026-11-27).** Pick sits beside History
+  under a Command field (pie slots and every button control). The next
+  click on a button drawn in the window (toolbox, toolbar, workbench, the
+  in-window menus) fills the control: its line, the icon the clicked
+  button wears (its own, else its tool's), and its label only when the
+  control has none. The control is found by its line among all forms, so
+  a line on several buttons takes the first form's look. Lines the Form
+  Editor itself runs (operandi.form.*, operandi.pie.*, workbench edits)
+  still run while picking, and a key's line is never picked. The native
+  macOS menu bar's entries can't be picked (they aren't clicks in the
+  window). The pointer is the system pointing hand while picking (Jason,
+  2026-11-27), for Pick to Add too.
+- **PM-Q24 Icons (UIC-314).** Browse Icons lists the icon studio's icons
+  (rendered set), stored by the name forms already use; a custom file
+  (PNG, JPEG or SVG, drawn at up to 64 px) replaces a built-in icon on
+  that control and the other way round. Choosing a file copies it into
+  the data folder's Layouts/Icons (the same picture again reuses the copy;
+  another picture with the same name becomes name-2). Clear removes both.
+- **PM-Q25 Icons in files.** Export Pie embeds each custom file (base64,
+  by name) and Import Pie writes them into the importer's Layouts/Icons.
+  Save Form, which has no Import Form yet, copies them into a
+  "<form> icons" folder beside the saved file and names those copies.
+  A missing file draws a dashed box with "?" in the pie and the editor,
+  and the editor says "Missing file".
 
 ## Texture Locators, stage 1 (texture-locators, 2026-11-07), provisional
 
@@ -9163,6 +9232,13 @@ Spec: `docs/BEHAVIOR-USD-IMPORT.md` (Operandi's own format choice; Blender
   Constrain to Background (on/off, target, offset, double-sided) with the
   vertex tools' search along the last view pressed in.
 - **PNT-Q73** Clear Mask and Bake Falloff act on the active mesh.
+- **PNT-Q74** (test drive 2026-11-26) Zoomed in on a small image the
+  texels sit further apart on screen than the dabs (a couple of points),
+  and Smudge changed nothing. Smudge now pulls colour only once the drag
+  has gone one texel spacing (every dab when texels are dense, as
+  before), and Smudge and Clone look up to 8 points (was 2) for the
+  texel under a screen point. Provisional: the spec doesn't say how
+  sampling works between texels.
 - **USD-IQ18** (U4) A sidecar graph replaces a material only when its
   name is exactly the USD material's prim name (Blender writes both from
   the material's name; names Blender made safe for USD, with spaces or
@@ -10133,3 +10209,19 @@ for both, Element in force when chosen. Where the sheet left room:
 - ACR-Q08 Smooth Shift and Thicken's Scale about Selection Border uses the same C-BORDER (box middle of the shifted border points; it was their average, over edges used by one selected polygon).
 - ACR-Q09 **Sheet against a recorded case.** Rulebook case ACS-H-select-x-pair-rotate (Selection, Symmetry X, a tilted pair, Rotate Y 30° typed) was recorded turning about world Y. The sheet puts every tool's typed values in the one A-SEL frame, whose Y there is world Z. Built as the sheet says; the case is listed as a known gap in `ac_symmetry_rulebook.rs`. The nine Selection and Selection Border Scale cases of the same rulebook now pass with that frame (they were known gaps before).
 - ACR-Q10 A-SEL under Symmetry with a selected polygon lying across the plane (rulebook cases ACS-H-select-x-PC-scale and -pairstraddle-scale, still known gaps): the sheet doesn't say whether such a polygon's + side points and its normal count. Built: its points strictly on the + side count, and its normal too.
+
+## Action Center rule sheet v6, step 2: presses (2026-11-27, branch ac-rewrite-2, GitHub #32 and #39, provisional)
+
+Built: what a press off the handle does under each Action Center (`ActionContext::press`), Element picking on every press (C-ELEM, A-ELEM with Z on the normal), C-AUTO and C-SCREEN placing on every press, every other centre staying put. Where the sheet left room:
+
+- ACR-Q11 Screen before any press ("as C-AUTO"): the centre is Automatic's at the moment Screen is chosen and doesn't follow a later selection change until the next press. `CenterMode::Screen` holds a point; an unplaced Screen needs the data-model step.
+- ACR-Q12 A-ELEM, an edge's X: "the edge's own direction" has two ways round; built from its lower-numbered point to the other.
+- ACR-Q13 Presses pick or place while Move, Rotate, Scale or Transform is on. With no tool on a press still selects, and other tools keep their own press. The old one-shot click also worked before a tool was on; Element chosen then waits at the world origin for the first press with a transform tool.
+- ACR-Q14 The Snaps and Precision presets keep their own set-up click and their own axes (`PickedFrame::from_z`); while a preset runs, presses don't re-pick. That one click is still taken before the handles are tested.
+- ACR-Q15 C-AUTO's "work plane" is the plane the view's grid uses (XZ, YZ or XY through the work plane's centre, chosen per view unless fixed). A press that never meets it (edge-on, or behind the view) lands at the centre's own depth, facing the view.
+- ACR-Q16 A press that moves the centre first keeps what the tool did so far as its own step, as the old empty-space press did; section 7's "re-apply in the new frame" is for menu changes.
+- ACR-Q17 A placed centre snaps to the selection's own points, edges and polygons too (SN2-17 leaves what the tool moves out of a handle drag's targets; nothing moves while a centre is placed), and the search is at the pointer, not at the old centre's height above it.
+- ACR-Q18 Gone with VAC-Q02: a press on the selected element no longer puts a moved centre back (under None and Automatic every press places; under the others nothing moves).
+- ACR-Q19 Item mode is unchanged; its presses come with the Item-mode step.
+- ACR-Q20 In a UV view with a UV tool on, Element picks the UV point or edge under every click (UVT-133 was one click).
+

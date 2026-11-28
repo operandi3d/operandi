@@ -1,0 +1,41 @@
+{
+  "version": 1,
+  "id": "pie.selection",
+  "label": "Selection & Transforms",
+  "style": "pie",
+  "icons": "text",
+  "controls": [
+    {
+      "command": "Edges",
+      "label": "Edges"
+    },
+    {
+      "command": "Polygons",
+      "label": "Polygons"
+    },
+    {
+      "command": "Items",
+      "label": "Items"
+    },
+    {
+      "command": "Move",
+      "label": "Move"
+    },
+    {
+      "command": "Rotate",
+      "label": "Rotate"
+    },
+    {
+      "command": "Scale",
+      "label": "Scale"
+    },
+    {
+      "command": "Transform",
+      "label": "Transform"
+    },
+    {
+      "command": "Vertices",
+      "label": "Vertices"
+    }
+  ]
+}

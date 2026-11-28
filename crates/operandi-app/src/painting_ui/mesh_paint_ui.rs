@@ -576,12 +576,16 @@ pub(super) fn mesh_paint_form(f: &mut ToolForm<Utility>, s: &MeshPaintSettings) 
         |u: &Utility| read(u).source,
         |u, g| edit(u, |s| s.source = g),
     ))
-    .field(tf::check(
-        "mp_instances",
-        "Create Instances",
-        |u: &Utility| read(u).instances,
-        |u, on| edit(u, |s| s.instances = on),
-    ))
+    .field(
+        tf::check(
+            "mp_instances",
+            "Create Instances",
+            |u: &Utility| read(u).instances,
+            |u, on| edit(u, |s| s.instances = on),
+        )
+        // #46.8: it had no tooltip, unlike Create Instancer below.
+        .tip("Each copy is a new instance item of its background mesh instead of geometry added to the selected mesh"),
+    )
     .field(
         tf::check(
             "mp_replicas",
@@ -590,7 +594,7 @@ pub(super) fn mesh_paint_form(f: &mut ToolForm<Utility>, s: &MeshPaintSettings) 
             |u, on| edit(u, |s| s.replicas = on),
         )
         .tip(
-            "Each stroke makes one Instancer: a point per copy of the background meshes (G8 RP-7)",
+            "Each stroke makes one Instancer item, with a point per copy, instead of separate copies (G8 RP-7)",
         ),
     )
     .field(

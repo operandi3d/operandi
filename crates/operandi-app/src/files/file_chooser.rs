@@ -78,6 +78,14 @@ pub(super) enum Choose {
         name: String,
         eps: bool,
     },
+    /// A pie file (Export Pie / Import Pie, UIC-312): where to save one,
+    /// `name` suggested, or with no name one to open.
+    PieFile {
+        folder: PathBuf,
+        name: Option<String>,
+    },
+    /// A picture for a control's custom icon (UIC-314): PNG, JPEG or SVG.
+    IconFile { folder: PathBuf },
     /// A folder (new ones can be made in the panel), starting in `folder`.
     Folder {
         folder: PathBuf,
@@ -161,6 +169,12 @@ pub(super) enum Purpose {
     /// (painting.rs). The tab travels with the answer (Astra P8-001).
     #[cfg(feature = "painting")]
     PaintImage(u64, u64),
+    /// Export Pie: write the pie in `pie_edit.export` there.
+    ExportPie,
+    /// Import Pie: read the chosen pie file.
+    ImportPie,
+    /// Choose File… for the control in `pie_edit.icon_target` (UIC-314).
+    FormIcon,
 }
 
 /// A native panel shown as a sheet on the window. It doesn't block: a modal
@@ -207,11 +221,16 @@ impl Pending {
 /// the interchange formats) although choosing them worked. Upper-case
 /// spellings are listed for platforms that match case-sensitively.
 fn readable(scene: bool) -> Vec<String> {
-    let mut list: Vec<&str> = vec!["lxo"];
+    let mut list: Vec<String> = vec!["lxo".into()];
     if scene {
-        list.push("opscene");
+        list.push("opscene".into());
     }
-    list.extend(operandi_core::interchange::IMPORT_EXTENSIONS);
+    // Built-in types, then those of kits that are on (KIT-1).
+    list.extend(
+        operandi_core::interchange::import_extensions()
+            .into_iter()
+            .map(|(ext, _)| ext),
+    );
     list.iter()
         .flat_map(|e| [e.to_string(), e.to_ascii_uppercase()])
         .collect()
@@ -297,6 +316,40 @@ pub(super) fn start(request: Choose, purpose: Purpose) -> Pending {
                     .set_title("Load Photometry File")
                     .set_directory(folder)
                     .add_filter("IES photometry", &["ies", "IES"])
+                    .pick_file();
+                Box::pin(async move { path(f.await) })
+            }
+            Choose::PieFile { folder, name } => {
+                let types = [crate::pie_forms::EXTENSION, "json"];
+                match name {
+                    Some(name) => {
+                        let f = D::new()
+                            .set_title("Export Pie")
+                            .set_directory(folder)
+                            .set_file_name(name)
+                            .add_filter("Operandi pie", &types)
+                            .save_file();
+                        Box::pin(async move { path(f.await) })
+                    }
+                    None => {
+                        let f = D::new()
+                            .set_title("Import Pie")
+                            .set_directory(folder)
+                            .add_filter("Operandi pie", &types)
+                            .pick_file();
+                        Box::pin(async move { path(f.await) })
+                    }
+                }
+            }
+            Choose::IconFile { folder } => {
+                let types: Vec<String> = ["png", "jpg", "jpeg", "svg"]
+                    .iter()
+                    .flat_map(|e| [e.to_string(), e.to_ascii_uppercase()])
+                    .collect();
+                let f = D::new()
+                    .set_title("Choose Icon")
+                    .set_directory(folder)
+                    .add_filter("PNG, JPEG or SVG picture", &types)
                     .pick_file();
                 Box::pin(async move { path(f.await) })
             }
@@ -629,6 +682,9 @@ impl super::Operandi {
             Purpose::LoadPreset(group) => self.load_preset_from(path, group, true),
             Purpose::ImportNodeGraph(selected) => self.import_node_graph_from(&path, selected),
             Purpose::RunScript => self.python_run_file(&path),
+            Purpose::ExportPie => self.export_pie_chosen(path),
+            Purpose::ImportPie => self.import_pie_chosen(path),
+            Purpose::FormIcon => self.form_icon_chosen(path),
             Purpose::ImportMaterialX(beside) => self.import_materialx_from(&path, beside),
             Purpose::ExportMaterialX(node) => self.export_materialx_to(path, node),
             Purpose::PresetBrowserRoot => {
@@ -745,10 +801,8 @@ mod tests {
         assert_eq!(&imports[..2], ["lxo", "LXO"]);
         assert_eq!(&open[..4], ["lxo", "LXO", "opscene", "OPSCENE"]);
         assert_eq!(&open[4..], &imports[2..]);
-        assert_eq!(
-            imports.len(),
-            2 + 2 * operandi_core::interchange::IMPORT_EXTENSIONS.len()
-        );
+        // Built-in types first; a kit's (kit_commands_tests) may follow.
+        assert!(imports.len() >= 2 + 2 * operandi_core::interchange::IMPORT_EXTENSIONS.len());
         for (pair, extension) in imports[2..]
             .as_chunks::<2>()
             .0

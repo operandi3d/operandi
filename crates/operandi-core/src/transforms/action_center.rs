@@ -36,6 +36,8 @@ pub enum CenterMode {
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
 pub struct PickedPoint([i64; 3]);
 impl PickedPoint {
+    /// The world origin.
+    pub const ORIGIN: Self = Self([0; 3]);
     pub fn new(p: DVec3) -> Self {
         Self(p.to_array().map(|c| (c * 1e9).round() as i64))
     }
@@ -93,6 +95,12 @@ pub enum AxisOrientation {
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
 pub struct PickedFrame([[i64; 3]; 3]);
 impl PickedFrame {
+    /// The World axes.
+    pub const WORLD: Self = Self([
+        [1_000_000_000, 0, 0],
+        [0, 1_000_000_000, 0],
+        [0, 0, 1_000_000_000],
+    ]);
     /// The frame whose Z is `z` (normalised); X and Y are any right-handed
     /// pair across it, X kept as level as it can be. `None` for a zero axis.
     pub fn from_z(z: DVec3) -> Option<Self> {

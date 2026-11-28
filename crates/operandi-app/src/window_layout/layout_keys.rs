@@ -33,7 +33,9 @@ fn usable<'a>(
     layout: &'a Keys,
 ) -> impl Iterator<Item = (&'a String, &'a String)> + 'a {
     layout.iter().filter(|(action, chord)| {
-        global.contains_key(*action) && (chord.is_empty() || input::chord(chord).is_some())
+        // A user pie's line may have no global key at all (UIC-311).
+        (global.contains_key(*action) || crate::pie_menu::is_pie(action))
+            && (chord.is_empty() || input::chord(chord).is_some())
     })
 }
 
@@ -96,10 +98,14 @@ pub fn mark(global: &Keys, layout: &Keys, action: &str) -> Option<Mark> {
 impl Operandi {
     /// The current layout's own keys (empty for shipped layouts).
     pub(crate) fn current_layout_keys(&self) -> Keys {
-        self.layouts
+        let mut keys = self
+            .layouts
             .find(&self.layouts.current)
             .map(|e| e.doc().keys.clone())
-            .unwrap_or_default()
+            .unwrap_or_default();
+        // A layout saved before pies were forms names their old actions.
+        crate::pie_menu::migrate_keys(&mut keys);
+        keys
     }
 
     /// Make `bindings` the global map with the current layout's keys on
@@ -172,14 +178,21 @@ impl Operandi {
         key: Option<&str>,
         layout: &str,
     ) -> Result<(), String> {
-        let Some(&(action, _)) = input::ACTIONS
+        // Any pie's line too (UIC-311), a user pie's included.
+        let pie_line = crate::pie_menu::pie_id(action)
+            .filter(|id| self.pie_named(id).is_some())
+            .map(|id| crate::pie_menu::line(&id));
+        let Some(action) = input::ACTIONS
             .iter()
             .find(|(a, _)| a.eq_ignore_ascii_case(action.trim()))
+            .map(|(a, _)| (*a).to_owned())
+            .or(pie_line)
         else {
             return Err(format!(
                 "operandi.layout.setKey: no Input Map action {action}"
             ));
         };
+        let action = action.as_str();
         let chord = match key.map(str::trim) {
             None => None,
             Some(k) if k.eq_ignore_ascii_case("none") || k.is_empty() => Some(String::new()),

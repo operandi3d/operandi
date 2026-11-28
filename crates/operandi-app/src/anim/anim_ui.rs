@@ -147,12 +147,44 @@ pub(crate) fn register(r: &mut Commands) {
 
 /// An Animate menu dialog (UIC-80..97): its fields, and how OK builds its
 /// one command line.
-#[derive(Clone, Debug)]
 pub(crate) struct AnimDialog {
     kind: String,
     title: &'static str,
     /// (label, argument, value).
     fields: Vec<(&'static str, &'static str, String)>,
+    /// The shared command dialog showing `fields` (#50: these were plain
+    /// windows, against UIC-81..85). Time Settings has none: its rows
+    /// apply as they change, so it keeps its own window.
+    pub(crate) form: Option<form::Dialog>,
+}
+
+impl AnimDialog {
+    /// The one command OK runs: the dialog's command and each non-empty
+    /// field as `arg:value` (braced when it has spaces).
+    pub(crate) fn command_line(&self) -> String {
+        let command = match self.kind.as_str() {
+            "ranges" => "operandi.time.settings",
+            "render" => "operandi.render.frameRange",
+            _ => "operandi.view.playblast",
+        };
+        let mut line = command.to_owned();
+        for (_, arg, value) in &self.fields {
+            let v = match &self.form {
+                Some(form) => form.values.text(arg),
+                None => value.as_str(),
+            }
+            .trim();
+            if v.is_empty() {
+                continue;
+            }
+            if v.contains(' ') {
+                line.push_str(&format!(" {arg}:{{{v}}}"));
+            } else {
+                line.push_str(&format!(" {arg}:{v}"));
+            }
+        }
+        line
+    }
 }
 
 /// A running frame render or playblast.
@@ -255,10 +287,18 @@ impl Operandi {
                 return;
             }
         };
+        let form = (kind != "settings").then(|| {
+            let rows = fields
+                .iter()
+                .map(|(label, arg, value)| form::Row::text(arg, label, value).fresh())
+                .collect();
+            self.form_dialog(title, rows)
+        });
         self.anim_ui.dialog = Some(AnimDialog {
             kind: kind.to_owned(),
             title,
             fields,
+            form,
         });
     }
 
@@ -266,58 +306,28 @@ impl Operandi {
         let Some(mut d) = self.anim_ui.dialog.take() else {
             return;
         };
-        let mut done: Option<bool> = None;
-        let mut open = true;
-        egui::Window::new(d.title)
-            .collapsible(false)
-            .resizable(false)
-            .open(&mut open)
-            .show(ctx, |ui| {
-                if d.kind == "settings" {
-                    self.time_settings(ui);
-                    return;
-                }
-                egui::Grid::new("anim-dialog")
-                    .num_columns(2)
-                    .show(ui, |ui| {
-                        for (label, _, value) in d.fields.iter_mut() {
-                            ui.label(*label);
-                            let r = ui.text_edit_singleline(value);
-                            self.text_editors.insert(r.id);
-                            ui.end_row();
-                        }
-                    });
-                ui.horizontal(|ui| {
-                    if ui.button("OK").clicked() || ui.input(|i| i.key_pressed(Key::Enter)) {
-                        done = Some(true);
-                    }
-                    if ui.button("Cancel").clicked() {
-                        done = Some(false);
-                    }
-                });
-            });
-        if !open {
-            done = Some(false);
-        }
+        let done = if let Some(mut form) = d.form.take() {
+            // UIC-81..85: the shared dialog, as every other command's.
+            let outcome = self.show_form(ctx, &mut form);
+            d.form = Some(form);
+            match outcome {
+                form::Outcome::Ok => Some(true),
+                form::Outcome::Cancel => Some(false),
+                _ => None,
+            }
+        } else {
+            // Time Settings: its rows apply as they change.
+            let mut open = true;
+            egui::Window::new(d.title)
+                .collapsible(false)
+                .resizable(false)
+                .open(&mut open)
+                .show(ctx, |ui| self.time_settings(ui));
+            (!open).then_some(false)
+        };
         match done {
             Some(true) => {
-                let command = match d.kind.as_str() {
-                    "ranges" => "operandi.time.settings",
-                    "render" => "operandi.render.frameRange",
-                    _ => "operandi.view.playblast",
-                };
-                let mut line = command.to_owned();
-                for (_, arg, value) in &d.fields {
-                    let v = value.trim();
-                    if v.is_empty() {
-                        continue;
-                    }
-                    if v.contains(' ') {
-                        line.push_str(&format!(" {arg}:{{{v}}}"));
-                    } else {
-                        line.push_str(&format!(" {arg}:{v}"));
-                    }
-                }
+                let line = d.command_line();
                 self.execute(&line);
             }
             Some(false) => {}

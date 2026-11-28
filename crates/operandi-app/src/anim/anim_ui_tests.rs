@@ -158,6 +158,40 @@ fn every_animate_menu_entry_runs_a_known_command() {
     }
 }
 
+/// #50: Time Ranges, Render Frame Range and Playblast use the shared
+/// command dialog (UIC-81..85: button column on the right, OK and Cancel
+/// with their keys, no close box), and OK still runs one command line
+/// built from the fields.
+#[test]
+fn animate_dialogs_use_the_shared_command_dialog() {
+    let ctx = Context::default();
+    let (mut a, _) = items_app();
+    frames(&mut a, &ctx, 1);
+    for (kind, title, line) in [
+        ("ranges", "Time Ranges", "operandi.time.settings"),
+        ("render", "Render Frame Range", "operandi.render.frameRange"),
+        ("playblast", "Playblast", "operandi.view.playblast"),
+    ] {
+        a.execute(&format!("operandi.anim.dialog kind:{kind}"));
+        let d = a.anim_ui.dialog.as_ref().expect(kind);
+        let form = d
+            .form
+            .as_ref()
+            .unwrap_or_else(|| panic!("{kind}: a shared dialog"));
+        assert_eq!(form.title, title);
+        let built = d.command_line();
+        assert!(built.starts_with(line), "{kind}: {built}");
+        assert!(
+            built.contains(" start:"),
+            "{kind}: the fields go into the line: {built}"
+        );
+        a.anim_ui.dialog = None;
+    }
+    // Time Settings edits live (its rows apply at once), so it keeps its own panel.
+    a.execute("operandi.anim.dialog kind:settings");
+    assert!(a.anim_ui.dialog.as_ref().unwrap().form.is_none());
+}
+
 /// PLAN "per-document" rule: key in scene A, switch to B, undo in B, A's
 /// keys untouched; each tab keeps its own time (audit risk P2-001 is about
 /// undo following the wrong document; this checks the animation side).

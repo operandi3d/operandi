@@ -37,7 +37,7 @@ fn cases() -> Vec<Value> {
     doc["cases"].as_array().unwrap().clone()
 }
 
-const Q3: &str = "ACS-Q3: the custom axis frame (reference: tool Z along the axis, tool X world X made perpendicular; Operandi: Element from_z, Local ACS-12)";
+const Q3: &str = "ACS-Q3: the custom axis frame (reference: tool Z along the axis, tool X world X made perpendicular; Operandi: Local ACS-12)";
 const Q4: &str = "ACS-Q4: moved item, the reference picked the primary side from the centre's world X; Operandi tests it against the item's plane (ACS-08)";
 const Q5: &str = "ACR-Q09: AC-RULES v6 has every tool's typed values in the one A-SEL frame (the + side's, S-02), which the nine Selection / Selection Border Scale cases now match; this Rotate case was recorded turning about world Y instead";
 const Q6: &str = "ACR-Q10: A-SEL under Symmetry with a selected polygon lying across the plane: which of its points and whether its normal count (AC-RULES v6 S-02 doesn't say)";
@@ -46,10 +46,9 @@ const Q6: &str = "ACR-Q10: A-SEL under Symmetry with a selected polygon lying ac
 ///
 /// AC-RULES v6 (2026-11-27) took nine Selection and Selection Border Scale
 /// cases off this list: A-SEL from the + side's points gives the frame
-/// they were recorded with.
+/// they were recorded with. Step 2 took the two Element Scale cases off:
+/// A-ELEM's frame (Z the normal, X world X laid square) is theirs.
 const KNOWN_GAPS: &[(&str, &str)] = &[
-    ("ACS-H-element-x-pair-scale-clickFquad", Q3),
-    ("ACS-H-element-x-pair-scale-clickNquad", Q3),
     ("ACS-H-local-x-pair-scale", Q3),
     ("ACS-H-select-x-pair-rotate", Q5),
     ("ACS-H-select-x-PC-scale", Q6),
@@ -376,10 +375,10 @@ fn run_hands_on(case: &Value) -> std::result::Result<(), String> {
             let f = (0..mesh.faces.len())
                 .find(|&f| mesh.center(f).distance(at) < 1e-6)
                 .ok_or("no polygon at the shown centre")?;
-            ActionContext {
-                center: CenterMode::Element(PickedPoint::new(at)),
-                axis: AxisOrientation::Element(PickedFrame::from_z(mesh.normal(f)).unwrap()),
-            }
+            let item = e.scene.active().unwrap().id;
+            let pick = element_frame(&e.scene, item, TweakElement::Polygon(f as u32))
+                .map_err(|x| x.to_string())?;
+            ActionContext::ELEMENT_UNPICKED.picked(pick)
         }
         other => return Err(format!("unknown mode {other}")),
     };

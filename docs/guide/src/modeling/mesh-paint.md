@@ -18,6 +18,10 @@
 **Alt**-click **Mesh Paint** for **Mesh Paint Instance**, which places
 instance items instead of copying geometry.
 
+The button stays lit while the tool is on. Mesh Paint keeps the settings
+you last used, so turning it off and on again carries on where you left
+off.
+
 ## Properties
 
 | Name | What it does | Default |
@@ -35,7 +39,8 @@ instance items instead of copying geometry.
 | Parameter rows | Let **Falloff**, **Pressure**, **Slope** or **Altitude** change the copies' **Density**, **Size** or **Rotation**. | Falloff and Pressure → Density |
 | **Linear Count**, **Array Count X/Y**, **Radial Count** | How many copies the **Linear**, **Array** and **Radial** modes place. | 2; 2 × 2; 6 |
 | **Geometry Source** | With several background meshes: **All BG Layers** or **Random BG Layer**. | Random BG Layer |
-| **Create Instances**, **Create Instancer** | Place instance items, or one instancer, instead of geometry. | Off |
+| **Create Instances** | Each copy is a new instance item of its background mesh instead of geometry added to the selected mesh. | Off |
+| **Create Instancer** | Each stroke makes one **Instancer** item, with a point per copy, instead of separate copies. | Off |
 | **Parent** | Where new instance items go: **Off**, **Hierarchy**, **Root** or **Primary**. | Off |
 
 ## Tips

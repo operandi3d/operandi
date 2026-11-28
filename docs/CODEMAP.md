@@ -41,6 +41,7 @@ at the top of `src/`.
 | `duplication/` | Duplicate, Radial, Replicator and mesh instances. |
 | `edges/` | Edge tools, bridges and chamfers. |
 | `geometry/` | The mesh, its topology memo, packing and subdivision surfaces. |
+| `kits/` | Kits: the `kit.toml` manifest, the Kits folder, installing, helper-program importers (docs/KITS.md). |
 | `materials/` | Materials, shader tree, shader evaluation, MaterialX and OpenPBR. |
 | `meshops/` | The mesh stack (MeshOps) and the evaluation graph. |
 | `nodes/` | Node graphs, the node view and node materials. |
@@ -70,6 +71,7 @@ at the top of `src/`.
 | `graphics/` | GPU drawing: scene buffers, subdivision, materials, grid, matcaps. |
 | `input_devices/` | Keyboard, mouse, tablet and 3D mouse input. |
 | `items/` | Item list, item properties, groups, mesh stack and replicators. |
+| `kits/` | The `operandi.kit.*` commands and loading kits at start-up. |
 | `materials/` | Shading panel, materials and display shading. |
 | `menus/` | Menus: app, native, help, modeling and pie menus. |
 | `nodes/` | Node editor, graph editor and MaterialX UI. |
@@ -129,6 +131,7 @@ at the top of `src/`.
 | Workbenches (layouts stage 4: Edit Workbench, Pick to Add, reorder, right-click properties, tool-pipe presets, the top row; `operandi.workbench.*`) | `operandi-app/src/window_layout/workbench.rs`, `assets/forms/toolbox.workbench.json`, `toolbar.workbench.json`; property rows via `tool_form.rs` `only_field` |
 | Form Editor (layouts stage 7: System > Form Editor palette, tree/search/Find Form, properties, `operandi.form.*`), menus drawn from forms (`menu.*` forms, `menu_from_form`, `Action::Line`) | `operandi-app/src/window_layout/form_editor.rs`, `app_menu.rs`, `assets/forms/menu.*.json`, `command_handlers.rs` `menu_answers` |
 | Menus as forms: the whole menu bar (`menu.bar` and `menu.*` forms), live lists (`LISTS`), `{title}` placeholders, the in-window bar, menu snapshots | `operandi-app/src/menus/menu_forms.rs`, `menu_forms_tests.rs`, `menu_snapshots/`, `app_menu.rs`, `native_menu.rs`, `command_handlers.rs` `menu_commands` / `menu_answers` |
+| Pie menus as forms (UIC-308..313: shipped `pie.*` forms, sub-pies, the name in the centre, `operandi.pie.*`, `operandi.form.slot`/`swap`, Export/Import Pie, the Form Editor's ring) | `operandi-app/assets/forms/pie.*.json`, `operandi-app/src/menus/pie_menu.rs` (widget, gesture), `pie_forms.rs` (forms, commands, files), `window_layout/form_editor_pie.rs` (ring editor, Pick, icon picker), `window_layout/form_icons.rs` (custom icons, Pick, `operandi.form.pick`/`setIcon`/`chooseIcon`), `operandi-core/src/command_registry/commands/pies.rs` |
 | Palettes (layouts stage 6: palette files, open/close toggle, Toggle Palettes, Layout > Windows/Palettes, floating views app-wide across switches, `layout.window`) | `operandi-app/src/window_layout/palettes.rs`, `assets/palettes/*.json`, `floating.rs` (side-panel palettes), `uv_editor.rs` |
 | Per-layout key maps (layouts stage 5: `keys` in a layout file, the effective `bindings`, `operandi.layout.setKey` / `clearKeys`; the Input Map's "Keys for" scope) | `operandi-app/src/window_layout/layout_keys.rs`, `input_map_editor.rs` |
 | User layouts, layout bar, quick switcher, pieces, content arrow (`operandi.layout.*`, `operandi.viewport.*`, `operandi.panel.kind`) | `operandi-app/src/window_layout/layouts_edit.rs` |

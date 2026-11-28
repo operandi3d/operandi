@@ -2045,7 +2045,7 @@ impl Operandi {
             self.draw_duplicate(&painter, r);
             // G9 GD-1: guide lines draw with any tool.
             self.draw_guides(&painter, r);
-            self.draw_utility(&painter, r);
+            self.draw_utility(&painter, r, response.hover_pos());
             self.draw_curve_tool(
                 &painter,
                 r,

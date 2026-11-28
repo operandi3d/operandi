@@ -100,7 +100,7 @@ impl super::Operandi {
             || self.draw.is_some()
             || self.utility.is_some()
             || self.edge_click.is_some()
-            || self.center_click.is_some()
+            || self.preset_center_click
             || self.falloff_hit(pos, r).is_some()
             || self.item_handle_hit(pos, r).is_some()
         {

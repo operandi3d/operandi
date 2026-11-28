@@ -1,0 +1,28 @@
+# The example kit: imports OFF files (Object File Format, a simple
+# text mesh format) through a small helper program. Copy this folder to
+# start a kit of your own; docs/KITS.md explains every field.
+
+[kit]
+id = "off_import"
+name = "OFF Import (example)"
+version = "1.0.0"
+api_version = 1
+licence = "GPL-3.0-or-later"
+authors = ["The Operandi contributors"]
+description = "Example kit: reads .off mesh files. A template for importer kits."
+homepage = "https://github.com/operandi3d/operandi/tree/main/examples/kits/off_import"
+
+[[importer]]
+label = "OFF meshes"
+extensions = ["off"]
+output = "ply"
+timeout_seconds = 120
+
+# One helper per platform; build-kit.sh puts this machine's there. A kit
+# zip only needs the helper for the platform it's for.
+[importer.helper]
+macos-aarch64 = "bin/macos-aarch64/off-import-helper"
+macos-x86_64 = "bin/macos-x86_64/off-import-helper"
+linux-x86_64 = "bin/linux-x86_64/off-import-helper"
+linux-aarch64 = "bin/linux-aarch64/off-import-helper"
+windows-x86_64 = "bin/windows-x86_64/off-import-helper.exe"

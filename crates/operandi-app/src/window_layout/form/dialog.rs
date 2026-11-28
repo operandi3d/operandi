@@ -335,11 +335,20 @@ impl Dialog {
             .into_iter()
             .map(|(a, b)| (a.to_owned(), b.map(str::to_owned)))
             .collect();
-        let button_width = if self.p.question {
-            QUESTION_BUTTON_WIDTH
-        } else {
-            BUTTON_WIDTH
-        };
+        // UIC-83/84: one column, every button its width. It grows to the
+        // widest label so none runs past its edge ("Skip This Build",
+        // Leo 2026-11-27); the table's width stays the minimum.
+        let button_width = buttons
+            .iter()
+            .map(|(name, hint)| widgets::button_width_for(ui, name, hint.as_deref()))
+            .fold(
+                if self.p.question {
+                    QUESTION_BUTTON_WIDTH
+                } else {
+                    BUTTON_WIDTH
+                },
+                f32::max,
+            );
         let layout = layout::dialog_layout_with(&sizes, buttons.len(), button_width);
         let (whole, _) = ui.allocate_exact_size(
             vec2(layout.width, TITLE_HEIGHT + layout.height),
@@ -876,6 +885,36 @@ mod tests {
             !nodes
                 .iter()
                 .any(|x| x.role() == Role::Button && x.label() == Some("Cancel"))
+        );
+    }
+
+    #[test]
+    fn a_long_extra_button_label_fits_its_button() {
+        // Leo, 2026-11-27: "Skip This Build" ran past its button's edge
+        // in the Update Available dialog. The column grows to the widest
+        // label; 70 stays the minimum, so short labels look as before.
+        let ctx = context();
+        let mut d = Dialog::confirm("Update Available", "A new build is available.")
+            .extras(&["Skip This Build"]);
+        frame(&ctx, &mut d, vec![]);
+        let (_, nodes) = frame(&ctx, &mut d, vec![]);
+        let skip = rect(find(&nodes, Role::Button, "Skip This Build"));
+        let ok = rect(find(&nodes, Role::Button, "OK"));
+        // At the body size "Skip This Build" is about 90 pt of text.
+        assert!(
+            skip.width() > layout::dialog::BUTTON_WIDTH + 10.,
+            "wider than the plain column: {}",
+            skip.width()
+        );
+        assert_eq!(ok.width(), skip.width(), "one column, one width (UIC-84)");
+        let mut short = Dialog::confirm("Close All", "Close all open scenes?").extras(&["Discard"]);
+        frame(&ctx, &mut short, vec![]);
+        let (_, nodes) = frame(&ctx, &mut short, vec![]);
+        let ok = rect(find(&nodes, Role::Button, "OK"));
+        assert_eq!(
+            ok.width(),
+            layout::dialog::BUTTON_WIDTH,
+            "short labels: as before"
         );
     }
 

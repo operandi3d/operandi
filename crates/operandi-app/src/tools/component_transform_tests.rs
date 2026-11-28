@@ -330,11 +330,15 @@ fn move_drags_freely_from_the_model_off_the_handles() {
     // Front view: right is +X, up is +Y, no depth change.
     assert!(moved.x > 0.05 && moved.y > 0.05, "{moved} {}", a.status);
     assert!(moved.z.abs() < 1e-9, "{moved}");
-    // The press on the model keeps the center where it was (it then
-    // follows the moved point).
+    // C-AUTO (AC-RULES v6; it was "the press on the model keeps the
+    // center"): with no Action Center every press puts the center under
+    // the pointer, at its own depth; it then follows the moved point.
     let live = a.editor.live.as_ref().expect("Move stays active");
     assert_eq!(live.tool, Tool::Move);
-    assert!((live.action_frame.unwrap().center - (center + moved)).length() < 1e-9);
+    let (origin, _) = a.camera.ray(start, a.viewport_rect);
+    let placed = DVec3::new(origin.x, origin.y, center.z);
+    let now = live.action_frame.unwrap().center;
+    assert!((now - (placed + moved)).length() < 1e-4, "{now}");
 }
 
 #[test]

@@ -27,6 +27,8 @@ mod a37_combined;
 mod absolute_scaling_spec;
 #[path = "ac_rules_step1.rs"]
 mod ac_rules_step1;
+#[path = "ac_rules_step2.rs"]
+mod ac_rules_step2;
 #[path = "ac_symmetry_rulebook.rs"]
 mod ac_symmetry_rulebook;
 #[path = "action_center_islands.rs"]
@@ -319,6 +321,8 @@ mod item_tabs_tier3;
 mod item_transforms_measured;
 #[path = "join_symmetry.rs"]
 mod join_symmetry;
+#[path = "kits.rs"]
+mod kits;
 #[path = "last_mesh.rs"]
 mod last_mesh;
 #[path = "last_mesh_delete.rs"]

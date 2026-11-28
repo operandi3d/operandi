@@ -85,6 +85,29 @@ Version 1, 2026-11-07. Behaviour only. Open questions and exceptions are tracked
   pointer, with up to 8 entries in a ring. Only the first 8 entries of a
   pie's list are used, and disabled entries still take their slot. The
   default view pie is on Ctrl+Space. [ref] Details: PM spec.
+- **UIC-308** A pie is a form with style pie (UIC-210). Shipped pies are
+  files; user pies and changed copies of shipped ones layer over them and
+  can be reverted (UIC-216). No pie is hard-coded.
+- **UIC-309** A pie slot holds one command line, any line the registry
+  knows, including a user alias or @macro (UIC-222), shown as text, icon
+  or both; or it is empty and keeps its place.
+- **UIC-310** A slot may open another pie (a sub-pie). It opens in place,
+  at the same centre; Esc, or moving back to the centre and releasing,
+  goes back one level. A pie can never contain itself.
+- **UIC-311** Any pie, shipped or user-made, can be bound to a key through
+  the Input Map (the line operandi.pie.open <id>), with the normal clash
+  warning; per-layout keys apply (UIC-201).
+- **UIC-312** Export Pie / Import Pie write and read one file holding the
+  pie and all its sub-pies.
+- **UIC-313** The pie's name sits in the centre, with its slots radiating
+  out around it. A sub-pie shows its own name there.
+  [Owner-approved, 2026-11-27: UIC-308..313]
+- **UIC-314** A control's icon (pie slot, toolbox, toolbar or menu
+  button) is chosen from a searchable grid of built-in icons or from a
+  custom image file, or cleared. Pick (UIC-212) fills it with the picked
+  button's icon. A custom file is copied into the user's data folder and
+  travels inside exported pies and forms; a missing file shows a
+  placeholder. [OP] [Owner-approved, 2026-11-27]
 
 ## 3. Tabs and buttons
 
@@ -379,7 +402,10 @@ showing its key. Nothing else.
   the column's width; its label is left-aligned, and its key is shown
   right-aligned in dim text: **"Ret"** on OK, **"Esc"** on Cancel. [ref]
   Any extra buttons (rare: e.g. Apply, Reset) go below Cancel, same style
-  [OP].
+  [OP]. The column is 70 wide (UIC-94) unless a label and its key don't
+  fit: then the whole column grows to the widest button, so every button
+  stays the same width and no label runs past its edge (e.g. "Skip This
+  Build") [OP, the maintainer 2026-11-27].
 - **UIC-85** Keys: Enter = OK and Esc = Cancel, wherever focus is in the
   dialog. [ref] While a field is being typed in, the first Enter only
   commits that field; the next Enter is OK [OP][Q].
@@ -428,7 +454,7 @@ showing its key. Nothing else.
   | Gap label → field | 8 |
   | Field column width | at least 200 |
   | Divider gap (each side) | 6 |
-  | Button column width | 70 |
+  | Button column width | at least 70; wider to fit the longest label (UIC-84) |
   | Button height / gap between buttons | 20 / 4 |
   | Checkbox box | 14 square |
 

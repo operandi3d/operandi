@@ -58,7 +58,10 @@ fn page() -> String {
         }
         out.push_str(&format!(
             "| {} | **{}** |\n",
-            action.replace('|', "\\|"),
+            // A pie's line reads as its name ("Pie: View Direction").
+            crate::pie_menu::shipped_title(action)
+                .unwrap_or(action)
+                .replace('|', "\\|"),
             guide_chord(chord)
         ));
     }

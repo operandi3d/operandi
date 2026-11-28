@@ -285,11 +285,15 @@ impl Editor {
     }
     /// The one direction a tool means by "the action axis" (Twist Bevel's
     /// Rotation Axis = Action Axis), from the action frame: its Y, world Y
-    /// by default. With Selection axes it is the frame's Z, the column
-    /// that carries a flat selection's normal under A-SEL (AC-RULES v6);
-    /// the normal was on Y before, so those tools keep turning about it.
+    /// by default. With Selection or Element axes it is the frame's Z, the
+    /// column that carries the normal under A-SEL and A-ELEM (AC-RULES
+    /// v6); the normal was on Y before, so those tools keep turning about
+    /// it.
     pub fn action_axis(&self, frame: crate::ActionFrame) -> DVec3 {
-        if self.action_context.axis == crate::AxisOrientation::Selection {
+        if matches!(
+            self.action_context.axis,
+            crate::AxisOrientation::Selection | crate::AxisOrientation::Element(_)
+        ) {
             frame.basis.z_axis
         } else {
             frame.basis.y_axis

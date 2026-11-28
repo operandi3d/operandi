@@ -60,7 +60,7 @@ pub(super) struct State {
     pub(super) picking: bool,
     /// A primary click landed this frame: Pick to Add takes only clicks,
     /// never a key's line.
-    click_now: bool,
+    pub(crate) click_now: bool,
     /// Earlier versions of edited forms, newest last (`operandi.workbench.undo`).
     undo: Vec<Form>,
     /// While a property control draws: the one Tool Properties field to
@@ -234,6 +234,8 @@ impl Operandi {
     pub(super) fn workbench_frame_begin(&mut self, ctx: &Context) {
         self.workbench.click_now = ctx.input(|i| i.pointer.primary_clicked());
         self.workbench.rects.clear();
+        // The Form Editor's Pick (UIC-212, UIC-314) stops the same way.
+        self.form_pick_frame_begin(ctx);
         if self.workbench.picking && ctx.input_mut(|i| i.consume_key(Modifiers::NONE, Key::Escape))
         {
             self.workbench.picking = false;
@@ -253,9 +255,11 @@ impl Operandi {
             self.workbench.draft = None;
             self.workbench_set_draft(draft);
         }
-        if !self.workbench.picking {
+        if !self.workbench.picking && !self.form_picking() {
             return;
         }
+        // Picking shows the system's pointing hand (Jason, 2026-11-27).
+        ctx.set_cursor_icon(CursorIcon::PointingHand);
         let hovered = ctx.viewport(|v| v.interact_widgets.hovered.clone());
         let under = hovered
             .iter()
@@ -280,6 +284,10 @@ impl Operandi {
     pub(super) fn workbench_take_pick(&mut self, line: &str) -> bool {
         // Find Form takes a clicked button to the Form Editor (LAY-83).
         if self.form_editor_take_find(line) {
+            return true;
+        }
+        // The Form Editor's Pick fills a control from it (UIC-314).
+        if self.form_pick_take(line) {
             return true;
         }
         if !self.workbench.picking || !self.workbench.click_now {
@@ -1192,15 +1200,15 @@ impl Operandi {
         }
     }
 
-    /// A custom icon's texture, loaded once (PNG or JPEG, shrunk to 64 px).
-    fn workbench_icon(&mut self, ctx: &Context, path: &str) -> Option<TextureId> {
+    /// A custom icon's texture, loaded once (PNG, JPEG or SVG, at most
+    /// 64 px); `None` when the file is missing or unreadable, so the caller
+    /// draws its placeholder (UIC-314).
+    pub(crate) fn workbench_icon(&mut self, ctx: &Context, path: &str) -> Option<TextureId> {
         self.workbench
             .icons
             .entry(path.to_owned())
             .or_insert_with(|| {
-                let picture = image::open(path).ok()?.thumbnail(64, 64).to_rgba8();
-                let size = [picture.width() as usize, picture.height() as usize];
-                let image = ColorImage::from_rgba_unmultiplied(size, picture.as_raw());
+                let image = custom_icon_picture(std::path::Path::new(path))?;
                 Some(ctx.load_texture(format!("workbench-icon {path}"), image, Default::default()))
             })
             .as_ref()
@@ -1773,4 +1781,35 @@ pub(super) fn set_attr(
         }
     }
     Ok(format!("{name}: {attr} set"))
+}
+
+/// A custom icon file as a picture of at most 64 px: PNG or JPEG through
+/// `image`, SVG through resvg (UIC-314). `None` for a missing or broken
+/// file.
+pub(crate) fn custom_icon_picture(path: &std::path::Path) -> Option<ColorImage> {
+    const MAX: u32 = 64;
+    let svg = path
+        .extension()
+        .is_some_and(|e| e.eq_ignore_ascii_case("svg"));
+    if svg {
+        let text = std::fs::read_to_string(path).ok()?;
+        let tree = resvg::usvg::Tree::from_str(&text, &Default::default()).ok()?;
+        let size = tree.size();
+        let scale = MAX as f32 / size.width().max(size.height()).max(1.);
+        let w = ((size.width() * scale).round() as u32).max(1);
+        let h = ((size.height() * scale).round() as u32).max(1);
+        let mut pixmap = resvg::tiny_skia::Pixmap::new(w, h)?;
+        resvg::render(
+            &tree,
+            resvg::tiny_skia::Transform::from_scale(scale, scale),
+            &mut pixmap.as_mut(),
+        );
+        return Some(ColorImage::from_rgba_premultiplied(
+            [w as usize, h as usize],
+            pixmap.data(),
+        ));
+    }
+    let picture = image::open(path).ok()?.thumbnail(MAX, MAX).to_rgba8();
+    let size = [picture.width() as usize, picture.height() as usize];
+    Some(ColorImage::from_rgba_unmultiplied(size, picture.as_raw()))
 }

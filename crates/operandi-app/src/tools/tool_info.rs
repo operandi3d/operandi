@@ -485,7 +485,7 @@ pub(super) const TOOLS: [ToolInfo; 63] = [
 ];
 
 /// The entry for `tool`.
-pub(super) fn info(tool: Tool) -> &'static ToolInfo {
+pub(crate) fn info(tool: Tool) -> &'static ToolInfo {
     TOOLS
         .iter()
         .find(|t| t.tool == tool)
@@ -493,7 +493,7 @@ pub(super) fn info(tool: Tool) -> &'static ToolInfo {
 }
 
 /// The tool started by a typed command-line name, if any.
-pub(super) fn by_name(name: &str) -> Option<Tool> {
+pub(crate) fn by_name(name: &str) -> Option<Tool> {
     TOOLS
         .iter()
         .find(|t| t.names.contains(&name))

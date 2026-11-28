@@ -372,7 +372,7 @@ fn uic18_quick_switcher_lists_by_recent_use_and_switches_on_release() {
 fn uic18_the_layouts_pie_runs_layout_restore() {
     let root = data_root();
     let (mut a, ctx) = app(&root);
-    assert_eq!(a.bindings[crate::pie_menu::LAYOUTS], "Ctrl+`");
+    assert_eq!(a.bindings[crate::pie_menu::LAYOUTS_LINE], "Ctrl+`");
     let pie = a.layouts_pie();
     let commands: Vec<&str> = pie
         .entries

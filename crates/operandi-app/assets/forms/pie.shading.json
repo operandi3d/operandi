@@ -1,0 +1,41 @@
+{
+  "version": 1,
+  "id": "pie.shading",
+  "label": "Shading Style",
+  "style": "pie",
+  "icons": "text",
+  "controls": [
+    {
+      "command": "Shading Wireframe",
+      "label": "Wire"
+    },
+    {
+      "command": "Shading Shaded",
+      "label": "Shaded"
+    },
+    {
+      "command": "Shading Advanced",
+      "label": "Advanced"
+    },
+    {
+      "command": "Shading Texture",
+      "label": "Texture"
+    },
+    {
+      "command": "Shading Default",
+      "label": "Default"
+    },
+    {
+      "command": "Shading Gooch",
+      "label": "Gooch"
+    },
+    {
+      "command": "Shading Vertex Map",
+      "label": "Vertex Map"
+    },
+    {
+      "command": "Shading Reflection",
+      "label": "Matcap"
+    }
+  ]
+}

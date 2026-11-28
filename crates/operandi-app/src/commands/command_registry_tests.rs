@@ -256,7 +256,7 @@ fn every_parser_name_is_in_the_registry() {
             .iter()
             .map(|(c, _)| c.to_string()),
     );
-    names.extend(pie_menu::ALL.iter().map(|c| c.to_string()));
+    names.extend(pie_menu::OLD_ACTIONS.iter().map(|(c, _, _)| c.to_string()));
     names.extend(input::NAV_LOCK_HIDE_ACTIONS.iter().map(|c| c.to_string()));
     // The Input Map: every action is a command, except the Image Viewer's
     // keys, which only that window handles.

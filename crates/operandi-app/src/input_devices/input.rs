@@ -592,20 +592,23 @@ pub const ACTIONS: &[(&str, &str)] = &[
     // DRILL-08: no shortcuts in the spec.
     ("Solid Drill", ""),
     ("Axis Drill", ""),
-    // Pie menus, stage 1 (pie_menu.rs). "Ctrl" is the real Control key on
-    // macOS (Cmd+Space is Spotlight). The other three start unassigned.
-    (crate::pie_menu::VIEW, "Ctrl+Space"),
-    (crate::pie_menu::SELECTION, "Alt+Q"),
-    (crate::pie_menu::SHADING, "Ctrl+2"),
-    (crate::pie_menu::TOGGLES, "Ctrl+1"),
-    (crate::pie_menu::FALLOFFS, ""),
-    (crate::pie_menu::ACTION_CENTERS, ""),
-    (crate::pie_menu::MODELING, ""),
+    // Pie menus (pie_menu.rs): each is the line that opens it (UIC-311),
+    // so any pie, a user's too, binds like an action; the Input Map shows
+    // these as "Pie: View Direction" and so on. "Ctrl" is the real Control
+    // key on macOS (Cmd+Space is Spotlight). The other three start
+    // unassigned.
+    (crate::pie_menu::VIEW_LINE, "Ctrl+Space"),
+    (crate::pie_menu::SELECTION_LINE, "Alt+Q"),
+    (crate::pie_menu::SHADING_LINE, "Ctrl+2"),
+    (crate::pie_menu::TOGGLES_LINE, "Ctrl+1"),
+    (crate::pie_menu::FALLOFFS_LINE, ""),
+    (crate::pie_menu::ACTION_CENTERS_LINE, ""),
+    (crate::pie_menu::MODELING_LINE, ""),
     // Jason, 2026-11-27: its own key; Alt+Space stays for UIC-63.
-    (crate::pie_menu::PANELS, "Ctrl+3"),
+    (crate::pie_menu::PANELS_LINE, "Ctrl+3"),
     // Layouts stage 2 (UIC-18, LAY-32): "Ctrl" is the real Control key on
     // macOS (Cmd+Shift+Tab and Cmd+` are the system's).
-    (crate::pie_menu::LAYOUTS, "Ctrl+`"),
+    (crate::pie_menu::LAYOUTS_LINE, "Ctrl+`"),
     // Ctrl+Shift+Tab pages the tool tabs now (tool-tab-cycling v1.1,
     // Jason 2026-11-25): the switcher keeps Layout > Recent Layouts….
     ("Layout Switcher", ""),
@@ -717,6 +720,9 @@ pub fn load_bindings(path: &std::path::Path) -> std::collections::BTreeMap<Strin
         .ok()
         .and_then(|bytes| serde_json::from_slice(&bytes).ok())
         .unwrap_or_default();
+    // Pies became forms (UIC-311): a map saved before then names the
+    // shipped pies' old actions; they become the lines that open them.
+    crate::pie_menu::migrate_keys(&mut stored);
     let mut bindings = default_bindings();
     // Ctrl+Shift+Tab moved from the Layout Switcher to Previous Tool Tab
     // (2026-11-25): a map saved with the switcher's old factory key lets
@@ -821,10 +827,10 @@ pub fn load_bindings(path: &std::path::Path) -> std::collections::BTreeMap<Strin
         "Solid Drill",
         "Axis Drill",
         "Reset Tool Attributes",
-        crate::pie_menu::VIEW,
-        crate::pie_menu::SELECTION,
-        crate::pie_menu::SHADING,
-        crate::pie_menu::TOGGLES,
+        crate::pie_menu::VIEW_LINE,
+        crate::pie_menu::SELECTION_LINE,
+        crate::pie_menu::SHADING_LINE,
+        crate::pie_menu::TOGGLES_LINE,
         crate::tool_tab_cycle::NEXT,
         crate::tool_tab_cycle::PREVIOUS,
     ]

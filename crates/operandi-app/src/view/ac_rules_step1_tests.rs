@@ -102,8 +102,8 @@ fn selection_border_with_symmetry_draws_arrows_square_to_the_faces() {
 }
 
 /// C-ELEM / A-ELEM: choosing Element puts it in force at once, at the
-/// world origin with World axes, whatever was on before; the next click
-/// still picks.
+/// world origin with World axes, whatever was on before. (What presses do
+/// after that is in `ac_press_tests.rs`.)
 #[test]
 fn choosing_element_is_the_world_origin_until_something_is_picked() {
     let mut a = app(prongs(), vec![0, 1]);
@@ -111,31 +111,21 @@ fn choosing_element_is_the_world_origin_until_something_is_picked() {
         center: CenterMode::SelectionBorder,
         axis: AxisOrientation::Selection,
     }));
-    a.choose_center_click(crate::action_center_click::CenterClick::Element);
-    assert_eq!(
-        a.editor.action_context,
-        ActionContext {
-            center: CenterMode::Element(operandi_core::PickedPoint::default()),
-            axis: AxisOrientation::World,
-        }
-    );
-    assert_eq!(
-        a.center_click,
-        Some(crate::action_center_click::CenterClick::Element)
-    );
+    a.choose_element_center();
+    assert_eq!(a.editor.action_context, ActionContext::ELEMENT_UNPICKED);
     a.activate(Tool::Rotate);
     assert_eq!(a.transform_handle_center(), DVec3::ZERO);
     for (axis, world) in [DVec3::X, DVec3::Y, DVec3::Z].into_iter().enumerate() {
-        assert_eq!(a.handle_axis(axis), world);
+        close(a.handle_axis(axis), world, "World axes");
     }
-    // Choosing it again keeps what is in force.
-    let picked = ActionContext {
-        center: CenterMode::Element(operandi_core::PickedPoint::new(DVec3::new(1., 2., 3.))),
-        axis: AxisOrientation::World,
-    };
+    // Choosing it again keeps the last pick.
+    let picked = ActionContext::ELEMENT_UNPICKED.picked(operandi_core::ActionFrame {
+        center: DVec3::new(1., 2., 3.),
+        basis: operandi_core::element_axes(DVec3::X, DVec3::ZERO),
+    });
     a.run(Command::Cancel);
     a.run(Command::ActionContext(picked));
-    a.choose_center_click(crate::action_center_click::CenterClick::Element);
+    a.choose_element_center();
     assert_eq!(a.editor.action_context, picked);
 }
 

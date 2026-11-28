@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "id": "pie.modeling",
+  "label": "Modeling",
+  "style": "pie",
+  "icons": "text",
+  "controls": [
+    {
+      "command": "Extrude",
+      "label": "Extrude"
+    },
+    {
+      "command": "Bevel",
+      "label": "Bevel"
+    },
+    {
+      "command": "Extend",
+      "label": "Edge Extend"
+    },
+    {
+      "space": 0
+    },
+    {
+      "command": "Loop Slice",
+      "label": "Loop Slice"
+    },
+    {
+      "command": "Smooth Shift",
+      "label": "Smooth Shift"
+    },
+    {
+      "command": "Smooth",
+      "label": "Smooth"
+    },
+    {
+      "space": 0
+    }
+  ]
+}

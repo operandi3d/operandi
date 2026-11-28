@@ -129,6 +129,14 @@ and [RELEASE_BUILDS.md](RELEASE_BUILDS.md).
 sidecar (for tests and batch work) or inside the running app over a local
 socket. [MCP_BRIDGE.md](MCP_BRIDGE.md) lists the tools.
 
+## Kits
+
+Kits are optional add-ons installed into a Kits folder in the data folder
+and turned on by the user. Kit API 1 lets a kit add file types to import:
+a helper program in the kit's own process converts the file into one
+Operandi reads (`kit_manifest`, `kit_folder`, `kit_import` in core;
+`operandi.kit.*` in the app). [KITS.md](KITS.md) is the contract.
+
 ## Where the specs fit
 
 Behaviour comes from behaviour specs (one folder per tool or system,

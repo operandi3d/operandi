@@ -51,6 +51,44 @@ fn vec3(values: &serde_json::Value, prefix: &str) -> Option<DVec3> {
     Some(DVec3::new(c("X")?, c("Y")?, c("Z")?))
 }
 
+/// Where a primitive op keeps its centre, and every point that moves with
+/// it: `cen` for most primitives, `pos` for Text, and for Arc its `center`
+/// with the Start and End points that set its direction (#42: Arc and
+/// Text had no handles because only `cen` was looked for).
+fn centre_keys(values: &serde_json::Value) -> Option<(&'static str, &'static [&'static str])> {
+    const KEYS: [(&str, &[&str]); 3] = [
+        ("cen", &["cen"]),
+        ("center", &["center", "start", "end"]),
+        ("pos", &["pos"]),
+    ];
+    KEYS.into_iter()
+        .find(|(key, _)| vec3(values, key).is_some())
+}
+
+/// The op's centre (mesh space).
+fn centre_of(values: &serde_json::Value) -> Option<DVec3> {
+    vec3(values, centre_keys(values)?.0)
+}
+
+/// The changes that move the op's centre, and what goes with it, by `d`.
+fn moved_by(
+    values: &serde_json::Value,
+    d: DVec3,
+    changes: &mut serde_json::Map<String, serde_json::Value>,
+) {
+    let Some((_, moving)) = centre_keys(values) else {
+        return;
+    };
+    for prefix in moving {
+        let Some(p) = vec3(values, prefix) else {
+            continue;
+        };
+        for k in 0..3 {
+            changes.insert(format!("{prefix}{}", AXES[k]), (p[k] + d[k]).into());
+        }
+    }
+}
+
 /// A Lattice step's values and its control points (mesh space).
 fn lattice_of(values: &serde_json::Value) -> Option<operandi_core::meshop_lattice::LatticeOp> {
     values.get("divX")?;
@@ -94,7 +132,7 @@ impl Operandi {
         }
         let values = op.kind.values();
         if !falloff_step && !lattice {
-            vec3(&values, "cen")?;
+            centre_of(&values)?;
         }
         Some((
             OpRef {
@@ -122,7 +160,7 @@ impl Operandi {
                     .map(|(i, p)| (world.transform_point3(p), OpHandle::Lattice(i))),
             );
         }
-        if let Some(centre) = vec3(&values, "cen") {
+        if let Some(centre) = centre_of(&values) {
             self.shape_handles(world, centre, &values, r, &mut out);
         }
         if let Some(w) = op_falloff(&values) {
@@ -231,14 +269,8 @@ impl Operandi {
         let v = &grab.start;
         let mut changes = serde_json::Map::new();
         match grab.handle {
-            OpHandle::Centre => {
-                let Some(c) = vec3(v, "cen") else { return };
-                for a in 0..3 {
-                    changes.insert(format!("cen{}", AXES[a]), (c[a] + delta[a]).into());
-                }
-            }
+            OpHandle::Centre => moved_by(v, delta, &mut changes),
             OpHandle::Move(a) | OpHandle::Plane(a) => {
-                let Some(c) = vec3(v, "cen") else { return };
                 // Along the arrow's axis only, or across the plane.
                 let mut d = DVec3::ZERO;
                 if let OpHandle::Move(_) = grab.handle {
@@ -247,9 +279,7 @@ impl Operandi {
                     d = delta;
                     d[a] = 0.;
                 }
-                for k in 0..3 {
-                    changes.insert(format!("cen{}", AXES[k]), (c[k] + d[k]).into());
-                }
+                moved_by(v, d, &mut changes);
             }
             OpHandle::Size(a) => {
                 let Some(s) = vec3(v, "size") else { return };

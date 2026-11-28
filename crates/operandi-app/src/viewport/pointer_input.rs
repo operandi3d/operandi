@@ -1052,10 +1052,9 @@ impl Operandi {
                         // FO-05: the press after choosing a geometric
                         // falloff draws it.
                         self.begin_falloff_draw(pos, r)
-                    } else if let Some(click) = self.center_click
-                        && modifiers.is_none()
-                    {
-                        self.place_action_center(click, pos, r);
+                    } else if self.preset_center_click && modifiers.is_none() {
+                        // A Snaps and Precision preset's set-up click.
+                        self.place_preset_center(pos, r);
                         input::GestureKind::Blocked
                     } else if let Some(grab) = self.item_handle_hit(pos, r)
                         && modifiers.is_none()
@@ -1337,26 +1336,47 @@ impl Operandi {
                         // constrained (axis lock, snapped turns; Scale's
                         // haul is uniform either way).
                         {
-                            // Off the handles: away from the model the center
-                            // jumps to the press; on the model it stays. Both
-                            // then drag freely in the view plane (Jason,
-                            // 2026-11-03). HM-02: a Shift haul adds to the
+                            // Off the handles (a press on a handle was taken
+                            // above, so a handle always wins): the Action
+                            // Center's rule says what the press does to the
+                            // centre (AC-RULES v6, `ActionContext::press`),
+                            // then the press drags the tool freely in the
+                            // view plane. HM-02: a Shift haul adds to the
                             // continued drag where it is; the center stays.
-                            let picked = (!continues).then(|| self.pick_component(pos, r));
-                            if !continues && self.element_falloff().is_some() {
+                            use operandi_core::CenterPress;
+                            if continues {
+                                self.free_transform_drag(l.tool)
+                            } else if self.element_falloff().is_some() {
                                 // FO-45: a press picks the element under the
                                 // pointer and the drag moves it.
                                 self.begin_element_falloff_drag(l.tool, pos, r)
-                            } else {
-                                match picked {
-                                    Some(None) => self.relocate_transform_center(l.tool, pos, r),
-                                    // A press on the selected element puts a
-                                    // moved center back on the selection (Jason,
-                                    // 2026-11-15; provisional, VAC-Q02).
-                                    Some(Some((id, c))) if self.is_selected_component(id, c) => {
+                            } else if self.editor.scene.selection.mode == Mode::Item {
+                                // Items keep their presses until the rule
+                                // sheet's Item-mode step (ACR-Q19): beside
+                                // the items the center jumps to the press;
+                                // on a selected item a moved center goes
+                                // back (VAC-Q02); on another it stays.
+                                match self.pick_component(pos, r) {
+                                    None => self.place_center_press(l.tool, pos, r, true),
+                                    Some((id, c)) if self.is_selected_component(id, c) => {
                                         self.run(Command::ResetActionCenter);
                                         self.free_transform_drag(l.tool)
                                     }
+                                    Some(_) => self.free_transform_drag(l.tool),
+                                }
+                            } else {
+                                match self.editor.action_context.press() {
+                                    // A Snaps and Precision preset sets its
+                                    // own centre with its one click.
+                                    CenterPress::Pick if self.snap_preset.is_none() => {
+                                        self.element_press(l.tool, pos, r)
+                                    }
+                                    CenterPress::Place { snapped } => {
+                                        self.place_center_press(l.tool, pos, r, snapped)
+                                    }
+                                    // Selection, Selection Border, Origin,
+                                    // Parent, Local and Pivot: the centre
+                                    // stays where its rule puts it.
                                     _ => self.free_transform_drag(l.tool),
                                 }
                             }

@@ -69,6 +69,9 @@ mod symmetry_ui;
 use crate::prefs_file::PrefsFile;
 use snaps_panel::SnapPreset;
 #[cfg(test)]
+#[path = "view/ac_press_tests.rs"]
+mod ac_press_tests;
+#[cfg(test)]
 #[path = "view/ac_rules_step1_tests.rs"]
 mod ac_rules_step1_tests;
 #[path = "view/action_center_click.rs"]
@@ -296,6 +299,8 @@ mod item_list_ui;
 mod items_tree;
 #[path = "input_devices/key_toggles.rs"]
 mod key_toggles;
+#[path = "kits/kit_commands.rs"]
+mod kit_commands;
 #[path = "selections/lasso.rs"]
 mod lasso;
 #[path = "window_layout/layout.rs"]
@@ -328,6 +333,11 @@ mod material_gpu_tests;
 mod material_layout;
 #[path = "commands/mcp.rs"]
 mod mcp;
+#[path = "commands/mcp_pointer.rs"]
+mod mcp_pointer;
+#[cfg(test)]
+#[path = "commands/mcp_pointer_tests.rs"]
+mod mcp_pointer_tests;
 #[path = "menus/menu_forms.rs"]
 mod menu_forms;
 #[path = "polygons/mesh_cleanup_dialog.rs"]
@@ -413,6 +423,8 @@ mod path_tool_view;
 mod pen_interactive_ui;
 #[path = "view/picking.rs"]
 mod picking;
+#[path = "menus/pie_forms.rs"]
+mod pie_forms;
 #[path = "menus/pie_menu.rs"]
 mod pie_menu;
 #[path = "uv/planar_texture_ui.rs"]
@@ -616,6 +628,9 @@ mod painting_brush;
 #[cfg(all(test, feature = "painting"))]
 #[path = "painting_ui/painting_brush_tests.rs"]
 mod painting_brush_tests;
+#[cfg(all(test, feature = "painting"))]
+#[path = "painting_ui/painting_drive_tests.rs"]
+mod painting_drive_tests;
 #[cfg(all(test, feature = "painting"))]
 #[path = "painting_ui/painting_highlight_tests.rs"]
 mod painting_highlight_tests;
@@ -926,7 +941,9 @@ struct Operandi {
     /// Solid Sketch's pick-up question (solid_sketch_ui.rs).
     solid_sketch_ask: Option<solid_sketch_ui::SketchAsk>,
     /// Element or Screen action center waiting for its viewport click.
-    center_click: Option<action_center_click::CenterClick>,
+    /// A Snaps and Precision preset waits for the click that sets its
+    /// centre (`snaps_panel.rs`).
+    preset_center_click: bool,
     /// A Bevel handle drag was released (used when `bevel_redrag_stacks`).
     bevel_dragged: bool,
     /// Does a handle drag after a released one start a new bevel?
@@ -1062,6 +1079,9 @@ struct Operandi {
     retopo_stroke: Vec<DVec3>,
     /// Mesh Paint's click or stroke in progress (mesh_paint_ui.rs).
     mesh_paint: mesh_paint_ui::Gesture,
+    /// Mesh Paint's settings from its last use this session (#46): the
+    /// next start picks them up.
+    mesh_paint_memory: Option<operandi_core::mesh_paint::MeshPaintSettings>,
     /// Topology Pen's drag, weld and pre-highlight state.
     pen: topology_pen_ui::PenUi,
     /// Save Environment Preset…'s options dialog (environment_preset_ui.rs).
@@ -1361,6 +1381,8 @@ struct Operandi {
     /// The open pie menu (pie_menu.rs), and one asked for by name.
     pie: Option<pie_menu::Open>,
     pie_request: Option<String>,
+    /// Export Pie / Import Pie in progress (pie_forms.rs).
+    pie_edit: pie_forms::State,
     segment_detent_pixels: f64,
     native_numbers: Vec<native::NumberKey>,
     /// Numeric Enter as Tab: a keypad Enter press turned into Tab whose
@@ -1565,6 +1587,7 @@ impl Operandi {
             app.set_mcp(&cc.egui_ctx, true);
         }
         let _ = std::fs::create_dir_all(app.environment.paths().data_root());
+        app.load_kits();
         app.first_run_tip();
         app.viewport_preferences = viewport_preferences::ViewportPreferences::load(
             &app.environment.paths().viewport_display(),
@@ -1795,7 +1818,7 @@ impl Operandi {
             set_position: None,
             scale_offset: None,
             solid_sketch_ask: None,
-            center_click: None,
+            preset_center_click: false,
             bevel_dragged: false,
             bevel_redrag_stacks: BEVEL_REDRAG_STACKS,
             set_material: None,
@@ -1889,6 +1912,7 @@ impl Operandi {
             select_dialog: None,
             retopo_stroke: Vec::new(),
             mesh_paint: Default::default(),
+            mesh_paint_memory: None,
             pen: Default::default(),
             env_preset_dialog: None,
             gi_hint_shown: false,
@@ -2056,6 +2080,7 @@ impl Operandi {
             modeling_menu_requested: false,
             pie: None,
             pie_request: None,
+            pie_edit: Default::default(),
             segment_detent_pixels: 12.,
             native_numbers: Vec::new(),
             keypad_enter_held: false,
@@ -4011,6 +4036,8 @@ impl eframe::App for Operandi {
         if let Some(bench) = &mut self.drag_bench {
             input.events.append(&mut bench.events);
         }
+        // The MCP bridge's pointer_stroke (mcp_pointer.rs).
+        self.mcp_take_stroke_input(input);
         // Puck buttons press their shortcuts as keys (space_mouse/buttons.rs).
         self.space_mouse_take_events(&mut input.events);
         self.native_numbers = native::take_numbers();
@@ -4154,8 +4181,16 @@ mod floating;
 #[path = "window_layout/form_editor.rs"]
 mod form_editor;
 #[cfg(test)]
+#[path = "window_layout/form_editor_pie_tests.rs"]
+mod form_editor_pie_tests;
+#[cfg(test)]
 #[path = "window_layout/form_editor_tests.rs"]
 mod form_editor_tests;
+#[path = "window_layout/form_icons.rs"]
+mod form_icons;
+#[cfg(test)]
+#[path = "window_layout/form_icons_tests.rs"]
+mod form_icons_tests;
 #[path = "nodes/graph_editor.rs"]
 mod graph_editor;
 #[path = "create_tools/guides_ui.rs"]
@@ -4489,6 +4524,9 @@ mod item_list_header_tests;
 #[path = "input_devices/key_toggles_tests.rs"]
 mod key_toggles_tests;
 #[cfg(test)]
+#[path = "kits/kit_commands_tests.rs"]
+mod kit_commands_tests;
+#[cfg(test)]
 #[path = "selections/lasso_ui_tests.rs"]
 mod lasso_ui_tests;
 #[cfg(test)]
@@ -4715,6 +4753,9 @@ mod performance_tests;
 #[path = "tools/perf_snapshot_tests.rs"]
 mod perf_snapshot_tests;
 
+#[cfg(test)]
+#[path = "menus/pie_engine_tests.rs"]
+mod pie_engine_tests;
 #[cfg(test)]
 #[path = "menus/pie_menu_tests.rs"]
 mod pie_menu_tests;

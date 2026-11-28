@@ -1,0 +1,41 @@
+{
+  "version": 1,
+  "id": "pie.falloffs",
+  "label": "Falloffs",
+  "style": "pie",
+  "icons": "text",
+  "controls": [
+    {
+      "command": "Falloff None",
+      "label": "Clear"
+    },
+    {
+      "command": "Falloff Linear",
+      "label": "Linear"
+    },
+    {
+      "command": "Falloff Cylinder",
+      "label": "Cylinder"
+    },
+    {
+      "command": "Falloff Radial",
+      "label": "Radial"
+    },
+    {
+      "command": "Falloff Airbrush",
+      "label": "Airbrush"
+    },
+    {
+      "command": "Falloff Screen",
+      "label": "Screen"
+    },
+    {
+      "command": "Falloff Element",
+      "label": "Element"
+    },
+    {
+      "command": "Falloff Vertex Map",
+      "label": "Vertex Map"
+    }
+  ]
+}

@@ -216,7 +216,7 @@ pub(super) const COMMANDS: &[Entry] = &[
         .operandi()
         .args(&[arg("axis", ArgType::Choice(&["off", "x", "y", "z"]), N)])
         .example("symmetry off").ui(),
-    action("Action Center", Tools, "Sets the action centre (element and screen wait for a click).")
+    action("Action Center", Tools, "Sets the action centre (element then picks, and screen places, on each press with a transform tool on).")
         .operandi()
         .args(&[arg(
             "center",

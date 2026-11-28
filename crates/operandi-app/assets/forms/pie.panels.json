@@ -1,0 +1,37 @@
+{
+  "version": 1,
+  "id": "pie.panels",
+  "label": "Panels",
+  "style": "pie",
+  "icons": "text",
+  "controls": [
+    {
+      "command": "operandi.bar.collapse bar:top",
+      "label": "Top Bar"
+    },
+    {
+      "space": 0
+    },
+    {
+      "command": "operandi.bar.collapse bar:right",
+      "label": "Right Panel"
+    },
+    {
+      "space": 0
+    },
+    {
+      "command": "operandi.anim.timeline",
+      "label": "Timeline"
+    },
+    {
+      "space": 0
+    },
+    {
+      "command": "operandi.bar.collapse bar:left",
+      "label": "Left Panel"
+    },
+    {
+      "space": 0
+    }
+  ]
+}

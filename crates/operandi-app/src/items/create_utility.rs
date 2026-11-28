@@ -296,6 +296,10 @@ impl ToolFields for UtilityFields {
         }
         if app.utility.is_some() {
             app.utility = Some(u);
+            // #46: Mesh Paint keeps its settings for the next start.
+            if let Utility::MeshPaint(s) = u {
+                app.mesh_paint_memory = Some(s);
+            }
         }
         Ok(())
     }
@@ -519,25 +523,27 @@ impl Operandi {
             "protractor" => Utility::Protractor(Default::default()),
             "tack tool" => Utility::Tack(Default::default()),
             "retopo sketch" => Utility::RetopoSketch,
-            "mesh paint" => Utility::MeshPaint(Default::default()),
+            // #46: each variant starts from Mesh Paint's last settings;
+            // which one was started decides the two instance switches.
+            "mesh paint" => self.mesh_paint_start(false, false),
             "guides" => self.guides_utility(),
-            "mesh paint instance" => {
-                Utility::MeshPaint(operandi_core::mesh_paint::MeshPaintSettings {
-                    instances: true,
-                    ..Default::default()
-                })
-            }
+            "mesh paint instance" => self.mesh_paint_start(true, false),
             // G8 RP-7: every background mesh can be picked, one per dab.
             // "Mesh Paint Replica": its name before 2026-11-23.
-            "mesh paint instancer" | "mesh paint replica" => {
-                Utility::MeshPaint(operandi_core::mesh_paint::MeshPaintSettings {
-                    replicas: true,
-                    ..Default::default()
-                })
-            }
+            "mesh paint instancer" | "mesh paint replica" => self.mesh_paint_start(false, true),
             _ => Utility::Dimensions { orient: false },
         };
         self.activate_utility(utility);
+    }
+
+    /// Mesh Paint's settings for a start: the last ones used (or the
+    /// defaults) with the variant's instance switches.
+    fn mesh_paint_start(&self, instances: bool, replicas: bool) -> Utility {
+        Utility::MeshPaint(operandi_core::mesh_paint::MeshPaintSettings {
+            instances,
+            replicas,
+            ..self.mesh_paint_memory.unwrap_or_default()
+        })
     }
 
     pub(super) fn drop_utility(&mut self) {
@@ -958,7 +964,9 @@ impl Operandi {
 
     // ----------------------------------------------------------- drawing
 
-    pub(super) fn draw_utility(&self, painter: &egui::Painter, r: Rect) {
+    /// `view_hover`: the pointer while it is over the view itself (none
+    /// while it works a panel field), for overlays that follow it.
+    pub(super) fn draw_utility(&self, painter: &egui::Painter, r: Rect, view_hover: Option<Pos2>) {
         let Some(utility) = self.utility else {
             return;
         };
@@ -1127,10 +1135,9 @@ impl Operandi {
                 }
             }
             Utility::RetopoSketch => self.draw_retopo_stroke(painter, r),
-            Utility::MeshPaint(_) => {
-                let hover = painter.ctx().pointer_hover_pos();
-                self.draw_mesh_paint(painter, hover, r)
-            }
+            // #46.4: the brush circle only over the view, not over a field
+            // whose arrows are being dragged.
+            Utility::MeshPaint(_) => self.draw_mesh_paint(painter, view_hover, r),
             Utility::PasteTool(_)
             | Utility::GroundAlign(_)
             | Utility::Tack(_)

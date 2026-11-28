@@ -428,16 +428,18 @@ impl Operandi {
 }
 
 impl Operandi {
-    /// UVT-133 Element action centre clicked in a UV view while a tool runs
-    /// there: the UV point (or edge middle) under the pointer, at (U, V, 0).
-    /// Returns false when the click isn't for that.
+    /// UVT-133 with the Element action centre on and a tool running in a
+    /// UV view: a click picks the UV point (or edge middle) under the
+    /// pointer, at (U, V, 0), every time (C-ELEM). Returns false when the
+    /// click isn't for that, or lands on nothing.
     pub(super) fn uv_place_element_center(&mut self, r: Rect, uv: &UvView, p: Pos2) -> bool {
-        if self.center_click != Some(crate::action_center_click::CenterClick::Element)
-            || !self.uv_tool_live()
+        if !matches!(
+            self.editor.action_context.center,
+            operandi_core::CenterMode::Element(_)
+        ) || !self.uv_tool_live()
         {
             return false;
         }
-        self.center_click = None;
         let Some(proxy) = self.editor.uv_tool_proxy() else {
             return false;
         };
@@ -449,10 +451,7 @@ impl Operandi {
             Some(TweakElement::Edge(a, b)) => {
                 (mesh.vertices[a as usize] + mesh.vertices[b as usize]) * 0.5
             }
-            _ => {
-                self.status = "Nothing under the pointer to centre on".into();
-                return true;
-            }
+            _ => return false,
         };
         let context = operandi_core::ActionContext {
             center: operandi_core::CenterMode::Element(operandi_core::PickedPoint::new(point)),

@@ -199,6 +199,12 @@ pub(crate) enum Style {
     /// hold or right-click for a menu of them all. On its own, drawn as
     /// Vertical.
     Hold,
+    /// A pie menu (UIC-308): its first eight controls are the slots,
+    /// clockwise from the top. A command is a slot running that line, a
+    /// sub-form whose style is pie a slot opening that sub-pie (UIC-310),
+    /// and a `space` an empty slot that keeps its place (UIC-309). In a
+    /// panel it is drawn as Vertical.
+    Pie,
 }
 
 /// Icon, text or both (LAY-80).

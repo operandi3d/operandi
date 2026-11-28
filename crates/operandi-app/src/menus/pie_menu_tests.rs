@@ -6,6 +6,13 @@ use crate::pie_menu::{self, Mark, Outcome, Pie};
 use crate::tests::{box_app, draw, pointer};
 
 const SIZE: Vec2 = vec2(1200., 800.);
+
+/// A shipped pie, read from its form file.
+fn built_in(id: &str) -> Pie {
+    Operandi::empty()
+        .pie_named(id)
+        .unwrap_or_else(|| panic!("no pie {id}"))
+}
 const AT: Pos2 = pos2(600., 400.);
 
 fn key_event(key: Key, pressed: bool, modifiers: Modifiers) -> Event {
@@ -149,13 +156,13 @@ fn toggle_entries_show_and_flip_their_state() {
     let mut a = perspective_app();
     let ctx = Context::default();
     a.display.settings.drawing.show_verts = true;
-    let pie = pie_menu::built_in(pie_menu::TOGGLES).unwrap();
+    let pie = built_in(pie_menu::TOGGLES);
     let vertices = pie.slot(3).unwrap();
     assert_eq!(vertices.label, "Vertices");
     assert_eq!(a.pie_status(&vertices.command).mark, Mark::Toggle(true));
     let undo = a.editor.history.undo.len();
     a.bindings
-        .insert(pie_menu::TOGGLES.into(), "Ctrl+Alt+T".into());
+        .insert(pie_menu::TOGGLES_LINE.into(), "Ctrl+Alt+T".into());
     frame(&mut a, &ctx, vec![Event::PointerMoved(AT)]);
     frame(
         &mut a,
@@ -191,7 +198,7 @@ fn toggle_entries_show_and_flip_their_state() {
 fn choice_entries_mark_the_active_one() {
     let mut a = perspective_app();
     let marks = |a: &Operandi, name| {
-        let pie = pie_menu::built_in(name).unwrap();
+        let pie = built_in(name);
         (0..pie_menu::SLOTS)
             .map(|i| pie.slot(i).map(|e| a.pie_status(&e.command).mark))
             .collect::<Vec<_>>()
@@ -230,7 +237,7 @@ fn only_eight_entries_show() {
             ))
         })
         .collect();
-    let pie = Pie::new("Ten", &entries);
+    let pie = Pie::new("ten", "Ten", &entries);
     let shown: Vec<_> = (0..pie_menu::SLOTS)
         .filter_map(|i| pie.slot(i).map(|e| e.label.clone()))
         .collect();
@@ -243,6 +250,7 @@ fn only_eight_entries_show() {
 fn empty_entries_keep_their_slot() {
     let e = |l| Some((l, "Top View"));
     let pie = Pie::new(
+        "gaps",
         "Gaps",
         &[e("A"), None, e("B"), None, e("C"), None, e("D"), None],
     );
@@ -257,7 +265,7 @@ fn empty_entries_keep_their_slot() {
     assert_eq!(at(vec2(-60., 0.)), Some("D"));
     assert_eq!(at(vec2(60., -60.)), None, "NE is empty");
     // Trailing missing entries are empty slots too.
-    let short = Pie::new("Short", &[e("A")]);
+    let short = Pie::new("short", "Short", &[e("A")]);
     assert!((1..pie_menu::SLOTS).all(|i| short.slot(i).is_none()));
     // An empty slot highlights nothing, and releasing over it closes.
     let mut open = pie_menu::Open::new(
@@ -315,7 +323,7 @@ fn disabled_entries_cannot_be_picked() {
     let mut a = box_app();
     let ctx = Context::default();
     a.run(Command::Mode(Mode::Edge));
-    let pie = pie_menu::built_in(pie_menu::MODELING).unwrap();
+    let pie = built_in(pie_menu::MODELING);
     let bevel = pie.slot(1).unwrap();
     assert_eq!(bevel.label, "Bevel");
     assert!(
@@ -329,7 +337,7 @@ fn disabled_entries_cannot_be_picked() {
     let scene = a.editor.scene.clone();
     let undo = a.editor.history.undo.len();
     a.bindings
-        .insert(pie_menu::MODELING.into(), "Ctrl+Alt+M".into());
+        .insert(pie_menu::MODELING_LINE.into(), "Ctrl+Alt+M".into());
     frame(&mut a, &ctx, vec![Event::PointerMoved(AT)]);
     let mods = Modifiers::CTRL | Modifiers::ALT;
     frame(&mut a, &ctx, vec![key_event(Key::M, true, mods)]);
@@ -360,15 +368,15 @@ fn pie_on_a_used_key_conflicts() {
         "factory pie keys are free: {:?}",
         input_map_editor::problems(&bindings)
     );
-    bindings.insert(pie_menu::VIEW.into(), "W".into());
+    bindings.insert(pie_menu::VIEW_LINE.into(), "W".into());
     assert_eq!(
-        input_map_editor::clashes(&bindings, pie_menu::VIEW, "W"),
+        input_map_editor::clashes(&bindings, pie_menu::VIEW_LINE, "W"),
         vec!["Move".to_owned()]
     );
-    assert!(input_map_editor::problems(&bindings).contains_key(pie_menu::VIEW));
+    assert!(input_map_editor::problems(&bindings).contains_key(pie_menu::VIEW_LINE));
     assert!(!input::bindings_valid(&bindings));
     // Pies show in the editor's list as "Any mode".
-    assert_eq!(input_map_editor::context(pie_menu::VIEW), "Any mode");
+    assert_eq!(input_map_editor::context(pie_menu::VIEW_LINE), "Any mode");
     a.bindings = bindings;
     frame(&mut a, &ctx, vec![Event::PointerMoved(AT)]);
     frame(&mut a, &ctx, vec![key_event(Key::W, true, Modifiers::NONE)]);
@@ -396,14 +404,14 @@ fn ctrl_space_is_a_chord_plain_space_is_not() {
     );
     // The factory keys.
     let d = input::default_bindings();
-    assert_eq!(d[pie_menu::VIEW], "Ctrl+Space");
-    assert_eq!(d[pie_menu::SELECTION], "Alt+Q");
-    assert_eq!(d[pie_menu::SHADING], "Ctrl+2");
-    assert_eq!(d[pie_menu::TOGGLES], "Ctrl+1");
+    assert_eq!(d[pie_menu::VIEW_LINE], "Ctrl+Space");
+    assert_eq!(d[pie_menu::SELECTION_LINE], "Alt+Q");
+    assert_eq!(d[pie_menu::SHADING_LINE], "Ctrl+2");
+    assert_eq!(d[pie_menu::TOGGLES_LINE], "Ctrl+1");
     for name in [
-        pie_menu::FALLOFFS,
-        pie_menu::ACTION_CENTERS,
-        pie_menu::MODELING,
+        pie_menu::FALLOFFS_LINE,
+        pie_menu::ACTION_CENTERS_LINE,
+        pie_menu::MODELING_LINE,
     ] {
         assert_eq!(d[name], "", "{name}");
     }
@@ -419,8 +427,8 @@ fn saved_maps_keep_their_keys() {
     std::fs::write(&path, r#"{"Edges":"Ctrl+2"}"#).unwrap();
     let loaded = input::load_bindings(&path);
     assert_eq!(loaded["Edges"], "Ctrl+2");
-    assert_eq!(loaded[pie_menu::SHADING], "");
-    assert_eq!(loaded[pie_menu::TOGGLES], "Ctrl+1");
+    assert_eq!(loaded[pie_menu::SHADING_LINE], "");
+    assert_eq!(loaded[pie_menu::TOGGLES_LINE], "Ctrl+1");
     let _ = std::fs::remove_dir_all(&dir);
 }
 
@@ -446,9 +454,14 @@ fn opening_closes_other_popups() {
 #[test]
 fn built_in_entries_are_real_commands() {
     for name in pie_menu::ALL {
-        let pie = pie_menu::built_in(name).unwrap();
+        let pie = built_in(name);
         assert_eq!(pie.name, name);
-        assert!(input::ACTIONS.iter().any(|(a, _)| *a == name), "{name}");
+        assert!(
+            input::ACTIONS
+                .iter()
+                .any(|(a, _)| *a == pie_menu::line(name)),
+            "{name}"
+        );
         for i in 0..pie_menu::SLOTS {
             let Some(entry) = pie.slot(i) else { continue };
             let mut a = box_app();
@@ -624,8 +637,8 @@ fn wireframe_toggle_works_in_item_mode() {
 #[test]
 fn panels_pie_shows_and_hides_the_bars_and_the_timeline() {
     let d = input::default_bindings();
-    assert_eq!(d[pie_menu::PANELS], "Ctrl+3");
-    let pie = pie_menu::built_in(pie_menu::PANELS).unwrap();
+    assert_eq!(d[pie_menu::PANELS_LINE], "Ctrl+3");
+    let pie = built_in(pie_menu::PANELS);
     let labels: Vec<Option<&str>> = (0..pie_menu::SLOTS)
         .map(|i| pie.slot(i).map(|e| e.label.as_str()))
         .collect();
@@ -661,7 +674,7 @@ fn panels_pie_shows_and_hides_the_bars_and_the_timeline() {
     }
 }
 
-/// Leo (2026-11-27): with Ctrl still held, pressing another pie's number
+/// Leonard (2026-11-27): with Ctrl still held, pressing another pie's number
 /// swaps to that pie in the same place (Ctrl+1, then 3: the Panels pie);
 /// its key's release then runs the new pie's slot.
 #[test]

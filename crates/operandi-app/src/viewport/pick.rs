@@ -242,16 +242,27 @@ impl Operandi {
         surface: &picking::Surface,
         candidates: &PickCandidates,
     ) -> Option<(u64, Component)> {
+        // With picking limited to the active mesh, other meshes don't hide
+        // its points and edges either, as they don't block its polygons.
+        self.pick_among_items(p, r, surface, candidates, &self.pick_only())
+    }
+    /// `pick_among` where only the items in `only` can hide a candidate
+    /// (every item when it is empty).
+    pub(crate) fn pick_among_items(
+        &self,
+        p: Pos2,
+        r: Rect,
+        surface: &picking::Surface,
+        candidates: &PickCandidates,
+        only: &[u64],
+    ) -> Option<(u64, Component)> {
         let radius = self.pick_radius();
         // Point Selection Priority: a point counts this much nearer when
         // weighed against edges (it only matters when both are candidates).
         let priority = self.selection_preferences.point_priority as f32;
         let mut best: Option<(f32, u64, Component)> = None;
         let mut nearest_point = radius;
-        // With picking limited to the active mesh, other meshes don't hide
-        // its points and edges either, as they don't block its polygons.
-        let only = self.pick_only();
-        let only = crate::picking::limit(&only);
+        let only = crate::picking::limit(only);
         for &(id, v, q, world) in &candidates.points {
             let d = q.distance(p);
             if d < nearest_point && surface.visible_in(&self.camera, world, r, only) {

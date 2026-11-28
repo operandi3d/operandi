@@ -121,11 +121,11 @@ impl Operandi {
     }
 
     fn leave_snap_preset(&mut self) {
-        if let Some((_, before)) = self.snap_preset.take()
-            && self.editor.action_context != before
-        {
-            self.center_click = None;
-            self.run(Command::ActionContext(before));
+        if let Some((_, before)) = self.snap_preset.take() {
+            self.preset_center_click = false;
+            if self.editor.action_context != before {
+                self.run(Command::ActionContext(before));
+            }
         }
     }
 
@@ -204,7 +204,7 @@ impl Operandi {
             p.absolute_handles = Some(handles);
             self.run(Command::Preview(p));
         }
-        self.await_center_click(action_center_click::CenterClick::Element);
+        self.preset_center_click = true;
         self.status = format!(
             "{}: click a vertex, edge or polygon to centre on it; snapping is on",
             preset.label()
@@ -214,11 +214,12 @@ impl Operandi {
     /// The preset's centre click: the element under the pointer (Auto
     /// Center, Q3), its centre and its normal as the axes' Z.
     pub(super) fn place_preset_center(&mut self, pos: Pos2, r: Rect) {
+        // The click stays armed until it lands on an element.
         let Some(pick) = self.tweak_pick_in(pos, r, TweakMode::AutoCenter) else {
             self.status = "Nothing under the pointer to centre on".into();
-            self.center_click = Some(action_center_click::CenterClick::Element);
             return;
         };
+        self.preset_center_click = false;
         let scene = &self.editor.scene;
         let Some(item) = scene.item(pick.grab.item) else {
             return;

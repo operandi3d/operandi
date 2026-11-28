@@ -1222,9 +1222,7 @@ impl Operandi {
             .iter()
             .map(|(l, c)| Some((l.as_str(), c.as_str())))
             .collect();
-        let mut pie = crate::pie_menu::Pie::new("Layouts", &entries);
-        pie.name = crate::pie_menu::LAYOUTS.into();
-        pie
+        crate::pie_menu::Pie::new(crate::pie_menu::LAYOUTS, "Layouts", &entries)
     }
 
     // ------------------------------------------------------- dialogs
