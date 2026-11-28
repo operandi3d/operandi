@@ -193,7 +193,7 @@ fn mt13_12_a_line_over_nothing_makes_nothing() {
 /// Runs the tool with `p` and drops it.
 fn run(e: &mut Editor, p: ContourParameters) -> std::result::Result<(), String> {
     e.dispatch(Command::Activate(Tool::Contour))?;
-    let mut params = e.live.as_ref().unwrap().params.clone();
+    let mut params = e.session.live.as_ref().unwrap().params.clone();
     *params.contour = p;
     e.dispatch(Command::Preview(params))?;
     e.dispatch(Command::Drop)
@@ -235,7 +235,7 @@ fn the_tool_is_one_undo_step_and_cancel_leaves_nothing() {
     assert!(e.scene.active().unwrap().mesh.faces.is_empty());
     // Cancel: nothing is added.
     e.dispatch(Command::Activate(Tool::Contour)).unwrap();
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     *p.contour = params();
     e.dispatch(Command::Preview(p)).unwrap();
     assert_eq!(e.scene.active().unwrap().mesh.faces.len(), 1, "previewed");

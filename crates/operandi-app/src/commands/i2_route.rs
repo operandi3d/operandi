@@ -6,7 +6,7 @@ pub(super) fn capture(
     axis: usize,
     unmodified: bool,
 ) -> Result<(Parameters, Option<ExtrudeStageTicket>)> {
-    let live = editor.live.as_ref().ok_or("No live handle owner")?;
+    let live = editor.session.live.as_ref().ok_or("No live handle owner")?;
     if live.tool == Tool::Extrude
         && axis == 2
         && unmodified
@@ -16,6 +16,7 @@ pub(super) fn capture(
         editor.dispatch(Command::BeginExtrude)?;
     }
     let params = editor
+        .session
         .live
         .as_ref()
         .ok_or("No live handle owner")?
@@ -114,7 +115,10 @@ mod app_boundary_tests {
         capture(&mut a.editor, 2, true).unwrap();
         a.fields.insert("extent2".into(), "250 mm".into());
         assert!(a.confirm_fields());
-        assert_eq!(a.editor.live.as_ref().unwrap().params.extent.z, 0.25);
+        assert_eq!(
+            a.editor.session.live.as_ref().unwrap().params.extent.z,
+            0.25
+        );
         assert_eq!(
             a.editor
                 .presets
@@ -132,10 +136,13 @@ mod app_boundary_tests {
         a.fields.insert("extent2".into(), "250 mm".into());
         assert!(a.confirm_fields());
         a.run(Command::Undo);
-        assert_eq!(a.editor.live.as_ref().unwrap().params.extent.z, 0.);
+        assert_eq!(a.editor.session.live.as_ref().unwrap().params.extent.z, 0.);
         assert!(a.fields.is_empty());
         a.run(Command::Redo);
-        assert_eq!(a.editor.live.as_ref().unwrap().params.extent.z, 0.25);
+        assert_eq!(
+            a.editor.session.live.as_ref().unwrap().params.extent.z,
+            0.25
+        );
         a.fields.insert("extent2".into(), "0.5 m".into());
         let before = a.editor.clone();
         let fields = a.fields.clone();
@@ -172,7 +179,7 @@ mod app_boundary_tests {
     #[test]
     fn i2_route_unsupported_prebegin_profile_keeps_existing_handle_lifecycle() {
         let mut a = app();
-        let mut p = a.editor.live.as_ref().unwrap().params.clone();
+        let mut p = a.editor.session.live.as_ref().unwrap().params.clone();
         p.extrude_sides = 3;
         a.run(Command::ConfigureExtrude(p));
         let (_, ticket) = capture(&mut a.editor, 2, true).unwrap();
@@ -236,7 +243,10 @@ mod event_tests {
             vec![pointer(start, true, Modifiers::NONE)],
         );
         assert_eq!(a.editor.scene, fixed("G1"));
-        assert_eq!(a.editor.live.as_ref().unwrap().params.extent, DVec3::ZERO);
+        assert_eq!(
+            a.editor.session.live.as_ref().unwrap().params.extent,
+            DVec3::ZERO
+        );
         assert!(a.i2_gesture_ticket.is_some());
         let ticket = a.i2_gesture_ticket.unwrap();
         let request = a.editor.identities.request;
@@ -311,7 +321,7 @@ mod event_tests {
             ],
         );
         assert_eq!(a.editor.scene, expected);
-        assert!(a.editor.live.is_none());
+        assert!(a.editor.session.live.is_none());
         assert_eq!(a.editor.history.undo.len(), 1);
     }
 }
@@ -338,7 +348,7 @@ mod review_tests {
     }
     fn park(a: &mut Operandi) {
         capture(&mut a.editor, 2, true).unwrap();
-        let mut p = a.editor.live.as_ref().unwrap().params.clone();
+        let mut p = a.editor.session.live.as_ref().unwrap().params.clone();
         p.extent = DVec3::Z * 0.5;
         a.run(Command::ConfigureExtrude(p));
         a.run(Command::Undo);
@@ -357,11 +367,11 @@ mod review_tests {
         ] {
             let mut a = app();
             match kind {
-                "extent_x" => a.editor.live.as_mut().unwrap().params.extent.x = 0.25,
-                "extent_y" => a.editor.live.as_mut().unwrap().params.extent.y = -0.25,
+                "extent_x" => a.editor.session.live.as_mut().unwrap().params.extent.x = 0.25,
+                "extent_y" => a.editor.session.live.as_mut().unwrap().params.extent.y = -0.25,
                 "vertex_mode" => {
                     a.editor.scene.selection.mode = Mode::Vertex;
-                    a.editor.live.as_mut().unwrap().base.selection.mode = Mode::Vertex;
+                    a.editor.session.live.as_mut().unwrap().base.selection.mode = Mode::Vertex;
                 }
                 "nonplanar" | "concave" => {
                     let f = a.editor.scene.items[0].mesh.faces
@@ -377,7 +387,7 @@ mod review_tests {
                             + mesh.vertices[f[3] as usize])
                             / 3.;
                     }
-                    a.editor.live.as_mut().unwrap().base = a.editor.scene.clone();
+                    a.editor.session.live.as_mut().unwrap().base = a.editor.scene.clone();
                 }
                 "falloff" => {
                     a.editor.spatial_falloff = Some(Falloff::Linear(LinearFalloff {
@@ -388,7 +398,7 @@ mod review_tests {
                 }
                 _ => {
                     a.editor.scene.items[0].mesh.uv_maps.remove("Texture");
-                    a.editor.live.as_mut().unwrap().base = a.editor.scene.clone();
+                    a.editor.session.live.as_mut().unwrap().base = a.editor.scene.clone();
                 }
             }
             // Match the independently written legacy path, including a kernel
@@ -418,10 +428,12 @@ mod review_tests {
             assert_eq!(a.editor.scene, legacy.scene, "legacy Scene {kind}");
             assert_eq!(
                 a.editor
+                    .session
                     .live
                     .as_ref()
                     .map(|l| (&l.base, &l.params, &l.preview_error)),
                 legacy
+                    .session
                     .live
                     .as_ref()
                     .map(|l| (&l.base, &l.params, &l.preview_error)),
@@ -491,7 +503,7 @@ mod review_tests {
             // general rule, which drops Move (drop_keys.rs, UIC-24) and
             // leaves the scene alone.
             assert!(a.editor.scene == before.scene, "parked={parked}");
-            assert!(a.editor.live.is_none(), "parked={parked}");
+            assert!(a.editor.session.live.is_none(), "parked={parked}");
         }
     }
     #[test]
@@ -583,7 +595,7 @@ mod review_tests {
         // Ordinary numeric confirmation still uses its existing semantic path.
         a.fields.insert("extent2".into(), "0.5 m".into());
         assert!(a.confirm_fields());
-        assert_eq!(a.editor.live.as_ref().unwrap().params.extent.z, 0.5);
+        assert_eq!(a.editor.session.live.as_ref().unwrap().params.extent.z, 0.5);
     }
 
     #[test]
@@ -628,7 +640,8 @@ mod review_tests {
     #[test]
     fn rf02_begin_preview_error_is_not_reclassified_as_legacy_fallback() {
         let mut a = app();
-        a.editor.live.as_mut().unwrap().preview_error = Some("existing preview error".into());
+        a.editor.session.live.as_mut().unwrap().preview_error =
+            Some("existing preview error".into());
         let before = a.editor.clone();
         let bank = format!("{:?}", a.editor.identities);
         assert!(capture(&mut a.editor, 2, true).is_err());
@@ -641,7 +654,7 @@ mod review_tests {
         a.run(Command::Drop);
         a.run(Command::Activate(Tool::Move));
         let base = a.editor.scene.clone();
-        let mut p = a.editor.live.as_ref().unwrap().params.clone();
+        let mut p = a.editor.session.live.as_ref().unwrap().params.clone();
         p.delta.x = 0.25;
         a.run(Command::Preview(p.clone()));
         a.navigation = Some(input::Navigation {
@@ -654,7 +667,7 @@ mod review_tests {
         a.fields.insert("delta0".into(), "0.25 m".into());
         a.run(Command::Cancel);
         assert!(a.navigation.is_none());
-        assert!(a.editor.live.is_none());
+        assert!(a.editor.session.live.is_none());
         assert_eq!(a.editor.scene, base);
         assert!(a.fields.is_empty());
         assert!(a.editor.history.undo.is_empty());
@@ -722,15 +735,15 @@ mod review_tests {
         a.fields.insert("delta0".into(), "0.125 m".into());
         a.run(Command::Undo);
         assert_eq!(a.editor.scene, before.scene, "{}", a.status);
-        assert_eq!(a.editor.live.as_ref().unwrap().tool, Tool::Move);
-        assert!(!a.editor.live.as_ref().unwrap().applied);
+        assert_eq!(a.editor.session.live.as_ref().unwrap().tool, Tool::Move);
+        assert!(!a.editor.session.live.as_ref().unwrap().applied);
         assert_eq!(a.status, "Undo · Move is still active");
         assert!(a.navigation.is_none() && a.i2_gesture_ticket.is_none());
         // Cancel bypasses invalid text and retains its established closure.
         a.fields.insert("delta0".into(), "abc".into());
         a.run(Command::Cancel);
         assert!(a.fields.is_empty());
-        assert!(a.editor.live.is_none());
+        assert!(a.editor.session.live.is_none());
         assert_eq!(a.editor.scene, before.scene);
     }
 }

@@ -36,7 +36,7 @@ fn counts(e: &Editor) -> (usize, usize) {
 }
 
 fn live_params(e: &Editor) -> Parameters {
-    e.live.as_ref().unwrap().params.clone()
+    e.session.live.as_ref().unwrap().params.clone()
 }
 
 /// TA-01/TA-02: Inset then Shift in the panel, before any viewport click,
@@ -68,7 +68,7 @@ fn polygon_inset_then_shift_before_any_click_is_one_bevel() {
 
     // Drop: one undo step; Undo restores the cube, Redo the bevel.
     e.dispatch(Command::Drop).unwrap();
-    assert!(e.live.is_none());
+    assert!(e.session.live.is_none());
     assert_eq!(e.history.undo.len(), undo + 1);
     let bevelled = e.scene.clone();
     e.dispatch(Command::Undo).unwrap();
@@ -239,13 +239,13 @@ fn undo_takes_back_one_panel_edit_at_a_time() {
     e.dispatch(Command::ConfigureBevel(p)).unwrap();
 
     e.dispatch(Command::Undo).unwrap();
-    assert_eq!(e.live.as_ref().map(|l| l.tool), Some(Tool::Bevel));
+    assert_eq!(e.session.live.as_ref().map(|l| l.tool), Some(Tool::Bevel));
     assert_eq!(live_params(&e).shift, 0.);
     assert_eq!(live_params(&e).inset, 0.1);
     assert_eq!(e.scene.active().unwrap().mesh, inset_only);
 
     e.dispatch(Command::Undo).unwrap();
-    assert_eq!(e.live.as_ref().map(|l| l.tool), Some(Tool::Bevel));
+    assert_eq!(e.session.live.as_ref().map(|l| l.tool), Some(Tool::Bevel));
     assert_eq!(live_params(&e).inset, 0.);
     assert_eq!(e.scene.active().unwrap().mesh, cube);
 
@@ -286,7 +286,7 @@ fn stacked_bevels_undo_one_edit_at_a_time() {
     assert_eq!(live_params(&e).inset, 0.1);
     e.dispatch(Command::Undo).unwrap(); // the first Inset
     assert_eq!(e.scene.active().unwrap().mesh, cube);
-    assert_eq!(e.live.as_ref().map(|l| l.tool), Some(Tool::Bevel));
+    assert_eq!(e.session.live.as_ref().map(|l| l.tool), Some(Tool::Bevel));
 
     // Redo all three, Drop: TA-07, one undo step per bevel.
     for _ in 0..3 {

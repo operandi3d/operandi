@@ -329,6 +329,7 @@ fn interactive_primitive(
     let mut fresh = crate::Bridge::new().editor;
     fresh.dispatch(Command::Activate(tool))?;
     let reset = fresh
+        .session
         .live
         .as_ref()
         .map(|l| l.params.clone())
@@ -337,6 +338,7 @@ fn interactive_primitive(
     // the Reset values.
     e.dispatch(Command::Activate(tool))?;
     let mut p = e
+        .session
         .live
         .as_ref()
         .map(|l| l.params.clone())

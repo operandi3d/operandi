@@ -270,13 +270,27 @@ pub enum SelKind {
     /// with no value counts as 0).
     #[serde(rename = "operandi.vmapValue.selop")]
     VertexMapValue { map: String, min: f64, max: f64 },
+    // ---- Tidy batch (MESHOPS-TIDY-SPEC 2026-11-27, MOQ-69).
+    /// Elements whose weight in the op's own falloff (a copy taken when
+    /// added; Use Active Falloff / Clear Falloff change it) is at least
+    /// `threshold` (a fraction), measured at each element's centre in the
+    /// mesh's own space (TB-01..05). No falloff picks nothing.
+    #[serde(rename = "pmodel.falloffSelOp")]
+    Falloff {
+        threshold: f64,
+        #[serde(default)]
+        falloff: Option<crate::ShapeWeights>,
+    },
+    /// The edge loops grown from the selection so far (TB-10..20).
+    #[serde(rename = "selop.loopConditional.item")]
+    ConditionalLoop(crate::meshop_conditional_loop::LoopRules),
 }
 fn yes() -> bool {
     true
 }
 impl SelKind {
     /// The kinds Add Selection offers, with their labels.
-    pub fn menu() -> [(&'static str, SelKind); 27] {
+    pub fn menu() -> [(&'static str, SelKind); 29] {
         [
             (
                 "Select by Index",
@@ -428,6 +442,17 @@ impl SelKind {
                     max: 1.,
                 },
             ),
+            (
+                "Select by Falloff",
+                SelKind::Falloff {
+                    threshold: 0.5,
+                    falloff: None,
+                },
+            ),
+            (
+                "Select Conditional Loop",
+                SelKind::ConditionalLoop(Default::default()),
+            ),
         ]
     }
     pub fn label(&self) -> &'static str {
@@ -459,6 +484,8 @@ impl SelKind {
             Self::Coplanar { .. } => "Select Coplanar Polygons",
             Self::HardEdges {} => "Select by Hard Edges",
             Self::VertexMapValue { .. } => "Select Vertex Map Value",
+            Self::Falloff { .. } => "Select by Falloff",
+            Self::ConditionalLoop(_) => "Select Conditional Loop",
         }
     }
 }
@@ -1149,6 +1176,43 @@ impl SelOp {
                         .collect();
                     out = el.of_points(&points);
                 }
+            }
+            SelKind::Falloff { threshold, falloff } => {
+                finite(&[*threshold], "Select by Falloff")?;
+                // TB-03: no falloff picks nothing.
+                if let Some(w) = falloff {
+                    w.validate()?;
+                    let weight = w.weigher(glam::DMat4::IDENTITY);
+                    let used = (el.element == SelElement::Point).then(|| mesh.used_points());
+                    out = el
+                        .centres()
+                        .iter()
+                        .enumerate()
+                        .map(|(i, c)| {
+                            used.as_ref().is_none_or(|u| u[i]) && weight(*c) >= *threshold - 1e-9
+                        })
+                        .collect();
+                }
+            }
+            SelKind::ConditionalLoop(rules) => {
+                // TB-10: the seeds are the selection so far, as edges.
+                let seeds: Vec<bool> = match el.element {
+                    SelElement::Edge => below.to_vec(),
+                    SelElement::Polygon => {
+                        let mut s = vec![false; el.edges.len()];
+                        for (f, _) in below.iter().enumerate().filter(|(_, b)| **b) {
+                            el.face_edges(f).for_each(|e| s[e as usize] = true);
+                        }
+                        s
+                    }
+                    SelElement::Point => el
+                        .edges
+                        .iter()
+                        .map(|&(a, b)| below[a as usize] && below[b as usize])
+                        .collect(),
+                };
+                let loops = crate::meshop_conditional_loop::grow(rules, mesh, &el.edges, &seeds);
+                out = el.of_edges(&loops);
             }
         }
         Ok(out)

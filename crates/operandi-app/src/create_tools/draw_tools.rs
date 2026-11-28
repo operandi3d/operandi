@@ -356,9 +356,9 @@ impl Operandi {
         }
         self.drop_draw();
         self.utility = None;
-        if self.editor.has_active_task() {
+        if self.editor.session.has_active_task() {
             self.run(Command::Drop);
-            if self.editor.has_active_task() {
+            if self.editor.session.has_active_task() {
                 return;
             }
         }
@@ -456,7 +456,8 @@ impl Operandi {
     /// Called once a frame: forget a curve that Undo took away, and turn
     /// the tool off when a modeling tool comes on.
     pub(super) fn keep_draw_valid(&mut self) {
-        if self.draw.is_some() && (self.editor.has_active_task() || self.utility.is_some()) {
+        if self.draw.is_some() && (self.editor.session.has_active_task() || self.utility.is_some())
+        {
             self.draw = None;
             return;
         }

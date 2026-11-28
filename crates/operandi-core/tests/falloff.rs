@@ -325,7 +325,7 @@ fn fal_t01_polygon_bevel() {
         let p = Parameters {
             shift,
             inset,
-            ..e.live.as_ref().unwrap().params.clone()
+            ..e.session.live.as_ref().unwrap().params.clone()
         };
         e.dispatch(Command::Preview(p)).unwrap();
         e.dispatch(Command::Drop).unwrap();
@@ -364,7 +364,7 @@ fn fal_t02_edge_bevel_scaled_width() {
         e.scene.selection.edges = vec![edge];
         e.dispatch(Command::SpatialFalloff(falloff)).unwrap();
         e.dispatch(Command::Activate(Tool::EdgeBevel)).unwrap();
-        let mut p = e.live.as_ref().unwrap().params.clone();
+        let mut p = e.session.live.as_ref().unwrap().params.clone();
         p.chamfer.offset = width;
         e.dispatch(Command::Preview(p)).unwrap();
         e.dispatch(Command::Drop).unwrap();
@@ -411,7 +411,7 @@ fn fal_t03_vertex_bevel_interior_point() {
     e.dispatch(Command::Activate(Tool::VertexBevel)).unwrap();
     let p = Parameters {
         inset: 0.2,
-        ..e.live.as_ref().unwrap().params.clone()
+        ..e.session.live.as_ref().unwrap().params.clone()
     };
     e.dispatch(Command::Preview(p)).unwrap();
     e.dispatch(Command::Drop).unwrap();

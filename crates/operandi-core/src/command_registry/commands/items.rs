@@ -195,6 +195,20 @@ pub(super) const COMMANDS: &[Entry] = &[
             jopt("mesh", "integer", "Accepted, not used yet."),
         ],
         ),
+    // Wrap's Rebind button as a command (MOQ-68 batch 14), so scripts can
+    // bind; Operandi's own name.
+    script("deformer.rebind", Modeling, "Rebinds a Wrap mesh operation to its Target, as things are now.")
+        .operandi()
+        .undo()
+        .headless(
+            "Rebind a Wrap mesh operation, as its Rebind button does: stick each point of the step's input to its nearest spot on the Target as they are now, and save that binding with the step. Refuses when the op isn't a Wrap or has no Target.",
+            &[jopt(
+                "deformer",
+                "string",
+                "The Wrap op, op:<item>:<op>; default the selected one.",
+            )],
+        )
+        .example("deformer.rebind deformer:op:2:5"),
     script("mesh.freeze", Modeling, "Freezes the selected mesh's whole Mesh Stack.")
         .undo()
         .headless(

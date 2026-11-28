@@ -428,8 +428,15 @@ impl Editor {
         };
         let mut selops = op.selops.clone();
         let label = match edit {
-            SelOpEdit::Add(s) => {
+            SelOpEdit::Add(mut s) => {
                 check(&s)?;
+                // Select by Falloff takes a copy of the active falloff
+                // when added, as the Falloff step does (TB-01).
+                if let SelKind::Falloff { falloff, .. } = &mut s.kind
+                    && falloff.is_none()
+                {
+                    *falloff = self.primitive_weights();
+                }
                 let label = format!("Add {}", s.kind.label());
                 selops.push(s);
                 label
@@ -792,6 +799,24 @@ pub(crate) fn script_command(
             op: op_or_selected("deformer")?,
             duplicate: opt_bool(a, "duplicate")?.unwrap_or(false),
         },
+        "deformer.rebind" => {
+            let op = op_or_selected("deformer")?;
+            let stack = e
+                .scene
+                .item(op.item)
+                .and_then(|it| it.mesh_stack.as_ref())
+                .ok_or("The item has no Mesh Stack")?;
+            let index = stack.index_of(op.op).ok_or("The mesh operation is gone")?;
+            if stack.ops[index].kind.type_id() != crate::meshop_wrap::WRAP_ID {
+                return Err("Only a Wrap mesh operation can be rebound".into());
+            }
+            let mut values = serde_json::Map::new();
+            values.insert(
+                "binding".into(),
+                crate::meshop_wrap::bind(&e.scene, op.item, op.op)?,
+            );
+            Command::MeshOpSet { op, values }
+        }
         // Registry rev 3: the menu's Mirror and Array (a Clone Effector
         // with its generator).
         "mirror.clone.create" => Command::MeshOpCreate("mirror.clone.item".into()),

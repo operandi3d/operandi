@@ -41,7 +41,16 @@ fn vac_t08_13_geometry_and_independent_axes() {
             } else {
                 DVec3::new(3., 2., 0.)
             };
-            close(e.live.as_ref().unwrap().action_frame.unwrap().center, c);
+            close(
+                e.session
+                    .live
+                    .as_ref()
+                    .unwrap()
+                    .action_frame
+                    .unwrap()
+                    .center,
+                c,
+            );
             let p = Parameters {
                 delta: match tool {
                     Tool::Scale => DVec3::splat(2.),
@@ -105,13 +114,29 @@ fn vac_t08_13_geometry_and_independent_axes() {
         .unwrap();
         e.dispatch(Command::Activate(Tool::Move)).unwrap();
         let before = e.scene.clone();
-        let c = e.live.as_ref().unwrap().action_frame.unwrap().center;
+        let c = e
+            .session
+            .live
+            .as_ref()
+            .unwrap()
+            .action_frame
+            .unwrap()
+            .center;
         e.dispatch(Command::ActionContext(ActionContext {
             center,
             axis: AxisOrientation::Workplane(1),
         }))
         .unwrap();
-        close(e.live.as_ref().unwrap().action_frame.unwrap().center, c);
+        close(
+            e.session
+                .live
+                .as_ref()
+                .unwrap()
+                .action_frame
+                .unwrap()
+                .center,
+            c,
+        );
         e.dispatch(Command::Preview(Parameters {
             delta: DVec3::X,
             ..Default::default()
@@ -160,7 +185,13 @@ fn vac_t12_asymmetric_average_t16_empty_scope_and_t22_refusal() {
     // Automatic"): None takes the bounding-box centre, not the vertex
     // average (4, 1, 0) VAC-T12 had.
     close(
-        e.live.as_ref().unwrap().action_frame.unwrap().center,
+        e.session
+            .live
+            .as_ref()
+            .unwrap()
+            .action_frame
+            .unwrap()
+            .center,
         DVec3::new(5., 1.5, 0.),
     );
     e.dispatch(Command::Cancel).unwrap();
@@ -168,7 +199,13 @@ fn vac_t12_asymmetric_average_t16_empty_scope_and_t22_refusal() {
     e.dispatch(Command::Activate(Tool::Move)).unwrap();
     // Nothing selected: the whole mesh's box centre (ACS table).
     close(
-        e.live.as_ref().unwrap().action_frame.unwrap().center,
+        e.session
+            .live
+            .as_ref()
+            .unwrap()
+            .action_frame
+            .unwrap()
+            .center,
         DVec3::new(5., 1.5, 0.),
     );
     e.dispatch(Command::Cancel).unwrap();
@@ -179,7 +216,7 @@ fn vac_t12_asymmetric_average_t16_empty_scope_and_t22_refusal() {
     e.scene.selection.mode = Mode::Item;
     e.scene.selection.item = None;
     assert!(e.dispatch(Command::Activate(Tool::Move)).is_err());
-    assert!(e.live.is_none());
+    assert!(e.session.live.is_none());
 }
 #[test]
 fn vac_t19_21_bevel_replacement_cancel_history_attributes_and_context_survival() {
@@ -193,7 +230,13 @@ fn vac_t19_21_bevel_replacement_cancel_history_attributes_and_context_survival()
     e.dispatch(Command::Activate(Tool::Bevel)).unwrap();
     // M18 captures polygon frames as well; geometry/history regression unchanged.
     close(
-        e.live.as_ref().unwrap().action_frame.unwrap().center,
+        e.session
+            .live
+            .as_ref()
+            .unwrap()
+            .action_frame
+            .unwrap()
+            .center,
         DVec3::ZERO,
     );
     for inset in [0.125, 0.25, 0.125] {
@@ -217,7 +260,13 @@ fn vac_t19_21_bevel_replacement_cancel_history_attributes_and_context_survival()
     assert_eq!(e.action_context, context);
     e.dispatch(Command::Activate(Tool::Rotate)).unwrap();
     close(
-        e.live.as_ref().unwrap().action_frame.unwrap().center,
+        e.session
+            .live
+            .as_ref()
+            .unwrap()
+            .action_frame
+            .unwrap()
+            .center,
         DVec3::ZERO,
     );
 }
@@ -261,7 +310,7 @@ fn acs_availability_matches_dispatch_without_mutating_stage_or_history() {
             // A-SEL (AC-RULES v6): the cap and the side next to it make an
             // L. It is thinnest along their shared normal direction (Z)
             // and longest across the L (X); Y is what is left.
-            let basis = e.live.as_ref().unwrap().action_frame.unwrap().basis;
+            let basis = e.session.live.as_ref().unwrap().action_frame.unwrap().basis;
             close(basis.x_axis, DVec3::new(1., -1., 0.).normalize());
             close(basis.y_axis, -DVec3::Z);
             close(basis.z_axis, DVec3::new(1., 1., 0.).normalize());
@@ -289,12 +338,12 @@ fn acs_availability_matches_dispatch_without_mutating_stage_or_history() {
                 assert!(e == current);
                 e.dispatch(Command::ActionContext(choice)).unwrap();
                 assert_eq!(
-                    e.live.as_ref().unwrap().base,
-                    before.live.as_ref().unwrap().base
+                    e.session.live.as_ref().unwrap().base,
+                    before.session.live.as_ref().unwrap().base
                 );
                 assert_eq!(
-                    e.live.as_ref().unwrap().params,
-                    before.live.as_ref().unwrap().params
+                    e.session.live.as_ref().unwrap().params,
+                    before.session.live.as_ref().unwrap().params
                 );
                 assert_eq!(e.history.undo.len(), before.history.undo.len());
                 if tool != Tool::Move {
@@ -313,7 +362,7 @@ fn acs_availability_matches_dispatch_without_mutating_stage_or_history() {
     e.validate_action_context(selection).unwrap();
     e.dispatch(Command::ActionContext(selection)).unwrap();
     e.dispatch(Command::Activate(Tool::Move)).unwrap();
-    let frame = e.live.as_ref().unwrap().action_frame.unwrap();
+    let frame = e.session.live.as_ref().unwrap().action_frame.unwrap();
     assert!((frame.basis - glam::DMat3::IDENTITY).abs_diff_eq(glam::DMat3::ZERO, 1e-12));
 }
 
@@ -342,7 +391,7 @@ fn acs_invalid_recomputed_transform_preserves_entire_editor() {
     assert!(e.dispatch(Command::ActionContext(origin)).is_err());
     assert!(e == before);
     e.dispatch(Command::Cancel).unwrap();
-    assert_eq!(e.scene, before.live.unwrap().base);
+    assert_eq!(e.scene, before.session.live.unwrap().base);
 }
 #[test]
 fn act_auto_01_02_automatic_uses_the_bounding_box_centre() {
@@ -358,7 +407,13 @@ fn act_auto_01_02_automatic_uses_the_bounding_box_centre() {
     .unwrap();
     e.dispatch(Command::Activate(Tool::Rotate)).unwrap();
     close(
-        e.live.as_ref().unwrap().action_frame.unwrap().center,
+        e.session
+            .live
+            .as_ref()
+            .unwrap()
+            .action_frame
+            .unwrap()
+            .center,
         DVec3::new(2., 1., 0.),
     );
     e.dispatch(Command::Cancel).unwrap();
@@ -372,7 +427,13 @@ fn act_auto_01_02_automatic_uses_the_bounding_box_centre() {
     e.scene.active_mut().unwrap().mesh = mesh.into();
     e.dispatch(Command::Activate(Tool::Scale)).unwrap();
     close(
-        e.live.as_ref().unwrap().action_frame.unwrap().center,
+        e.session
+            .live
+            .as_ref()
+            .unwrap()
+            .action_frame
+            .unwrap()
+            .center,
         DVec3::new(2.5, 1., 0.),
     );
     assert!(e.scene.selection.faces.is_empty());
@@ -413,7 +474,7 @@ fn acs_selection_in_edge_and_vertex_mode() {
             .unwrap_or_else(|err| panic!("{mode:?}: {err}"));
         e.dispatch(Command::ActionContext(selection)).unwrap();
         e.dispatch(Command::Activate(Tool::Rotate)).unwrap();
-        let frame = e.live.as_ref().unwrap().action_frame.unwrap();
+        let frame = e.session.live.as_ref().unwrap().action_frame.unwrap();
         match mode {
             Mode::Edge => {
                 let pa = mesh.vertices[a as usize];
@@ -450,7 +511,7 @@ fn acs_selection_in_edge_and_vertex_mode() {
         e.validate_action_context(selection).unwrap();
         e.dispatch(Command::ActionContext(selection)).unwrap();
         e.dispatch(Command::Activate(Tool::Move)).unwrap();
-        let frame = e.live.as_ref().unwrap().action_frame.unwrap();
+        let frame = e.session.live.as_ref().unwrap().action_frame.unwrap();
         close(frame.center, DVec3::new(3., 1., 0.));
         close(frame.basis.y_axis, DVec3::Y);
         e.dispatch(Command::Cancel).unwrap();
@@ -461,7 +522,14 @@ fn acs_selection_in_edge_and_vertex_mode() {
         .unwrap();
         e.dispatch(Command::Activate(Tool::Move)).unwrap();
         close(
-            e.live.as_ref().unwrap().action_frame.unwrap().basis.y_axis,
+            e.session
+                .live
+                .as_ref()
+                .unwrap()
+                .action_frame
+                .unwrap()
+                .basis
+                .y_axis,
             DVec3::Y,
         );
         e.dispatch(Command::Cancel).unwrap();
@@ -478,7 +546,14 @@ fn acs_selection_in_edge_and_vertex_mode() {
     .unwrap();
     e.dispatch(Command::Activate(Tool::Rotate)).unwrap();
     close(
-        e.live.as_ref().unwrap().action_frame.unwrap().basis.y_axis,
+        e.session
+            .live
+            .as_ref()
+            .unwrap()
+            .action_frame
+            .unwrap()
+            .basis
+            .y_axis,
         DVec3::Y,
     );
     e.dispatch(Command::Cancel).unwrap();
@@ -491,7 +566,7 @@ fn acs_selection_in_edge_and_vertex_mode() {
     e.validate_action_context(selection).unwrap();
     e.dispatch(Command::ActionContext(selection)).unwrap();
     e.dispatch(Command::Activate(Tool::Move)).unwrap();
-    let frame = e.live.as_ref().unwrap().action_frame.unwrap();
+    let frame = e.session.live.as_ref().unwrap().action_frame.unwrap();
     let pa = mesh.vertices[a as usize];
     let pb = mesh.vertices[b as usize];
     close(frame.center, (pa + pb) / 2. + DVec3::Y * 5.);

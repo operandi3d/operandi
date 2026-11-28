@@ -79,3 +79,49 @@ fn steps_that_add_points_are_not_shaped_and_say_so() {
     assert!(notes[0].text.contains("isn't shaped"));
     assert!(r.mesh.vertices.len() > cube().vertices.len());
 }
+
+/// #43: Polygon Bevel and Smooth Shift take the Falloff below too (their
+/// tools do): on the cube, the top's bevel shifts by the full amount, the
+/// bottom's by none, and the step isn't marked as unshaped.
+#[test]
+fn bevel_and_smooth_shift_follow_the_falloff_below() {
+    for (id, values) in [
+        ("poly.bevel.item", json!({ "shift": 0.2, "inset": 0.0 })),
+        ("poly.smshift.item", json!({ "shift": 0.2 })),
+    ] {
+        let c = cube();
+        let (mut e, item) = with_base(c.clone());
+        e.dispatch(Command::SpatialFalloff(Some(ramp()))).unwrap();
+        add(&mut e, item, "falloff.meshop.item", json!({}));
+        add(&mut e, item, id, values.clone());
+        let m = ok(&e, item);
+        let top = m.vertices.iter().map(|p| p.y).fold(f64::MIN, f64::max);
+        let bottom = m.vertices.iter().map(|p| p.y).fold(f64::MAX, f64::min);
+        assert!(
+            (top - 0.7).abs() < 1e-6,
+            "{id}: the top shifts in full: {top}"
+        );
+        assert!(
+            (bottom + 0.5).abs() < 1e-6,
+            "{id}: the bottom doesn't move: {bottom}"
+        );
+        let r = e
+            .mesh_stack
+            .current(&e.scene, e.scene.item(item).unwrap())
+            .unwrap();
+        assert!(
+            !format!("{:?}", r.statuses[1]).contains("isn't shaped"),
+            "{id}: {:?}",
+            r.statuses[1]
+        );
+        // Without the falloff both ends move.
+        let (mut e, item) = with_base(c.clone());
+        add(&mut e, item, id, values);
+        let plain = ok(&e, item);
+        let bottom = plain.vertices.iter().map(|p| p.y).fold(f64::MAX, f64::min);
+        assert!(
+            (bottom + 0.7).abs() < 1e-6,
+            "{id}: full shift without it: {bottom}"
+        );
+    }
+}

@@ -355,14 +355,14 @@ fn slide_button_follows_the_mode_and_freeze_dialog() {
     // Greyed in Polygon mode: a click does nothing.
     let r = rect(&a, "Edit Slide").center();
     click(&mut a, &ctx, r, Modifiers::NONE);
-    assert!(a.editor.live.is_none());
+    assert!(a.editor.session.live.is_none());
     a.run(Command::Mode(Mode::Edge));
     let edge = a.editor.scene.active().unwrap().mesh.edges()[0];
     a.editor.scene.selection.edges = vec![edge];
     frame(&mut a, &ctx, Modifiers::NONE, vec![]);
     click(&mut a, &ctx, r, Modifiers::NONE);
     assert_eq!(
-        a.editor.live.as_ref().map(|l| l.tool),
+        a.editor.session.live.as_ref().map(|l| l.tool),
         Some(Tool::EdgeSlide),
         "{}",
         a.status

@@ -21,7 +21,7 @@ fn points(e: &Editor) -> Vec<DVec3> {
     e.scene.active().unwrap().mesh.vertices.clone()
 }
 fn live(e: &Editor) -> Parameters {
-    e.live.as_ref().unwrap().params.clone()
+    e.session.live.as_ref().unwrap().params.clone()
 }
 fn mine() -> Falloff {
     RadialFalloff {
@@ -47,7 +47,7 @@ fn tp10_12_soft_move_gives_back_the_users_falloff_or_none() {
         assert_ne!(e.spatial_falloff, user);
         e.dispatch(Command::Drop).unwrap();
         assert_eq!(e.spatial_falloff, user);
-        assert!(e.preset.is_none());
+        assert!(e.session.preset.is_none());
     }
 }
 
@@ -150,7 +150,7 @@ fn tp01_old_names_and_ids_start_the_same_row() {
         .unwrap();
     b.dispatch(Command::ActivateDeform(DeformPreset::SoftMove))
         .unwrap();
-    assert_eq!(a.preset, b.preset);
+    assert_eq!(a.session.preset, b.session.preset);
     assert_eq!(a.spatial_falloff, b.spatial_falloff);
     assert!(
         Editor::default()
@@ -168,7 +168,7 @@ fn flare_pushes_the_top_fully_and_the_foot_not_at_all() {
     let user = e.action_context;
     let before = points(&e);
     preset(&mut e, "Flare");
-    assert_eq!(e.live.as_ref().unwrap().tool, Tool::Push);
+    assert_eq!(e.session.live.as_ref().unwrap().tool, Tool::Push);
     assert_eq!(e.live_tool_label(), Some("Flare"));
     assert_eq!(e.action_context.center, CenterMode::Automatic);
     let Some(Falloff::Linear(f)) = e.spatial_falloff else {

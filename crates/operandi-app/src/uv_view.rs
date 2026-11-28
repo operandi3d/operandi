@@ -520,7 +520,13 @@ impl Operandi {
     /// The map a UV view shows on the active mesh: its selected map (UVE-1
     /// section 1), or the one an open UV tool edits.
     fn uv_view_map(&self, _view: &UvView) -> Option<String> {
-        if let Some(space) = self.editor.live.as_ref().and_then(|l| l.params.uv.as_ref()) {
+        if let Some(space) = self
+            .editor
+            .session
+            .live
+            .as_ref()
+            .and_then(|l| l.params.uv.as_ref())
+        {
             return Some(space.map.clone());
         }
         let mesh = &self.editor.scene.active()?.mesh;
@@ -667,7 +673,14 @@ impl Operandi {
                         if handle.is_none() {
                             uv.tweak_clicked = None;
                         }
-                        let base = self.editor.live.as_ref().expect("UV tool").params.clone();
+                        let base = self
+                            .editor
+                            .session
+                            .live
+                            .as_ref()
+                            .expect("UV tool")
+                            .params
+                            .clone();
                         self.hold_pointer();
                         self.clear_fields();
                         Drag::Tweak {
@@ -685,7 +698,7 @@ impl Operandi {
             } else if let Some(drag) = self.uv_pin_press(r, uv, at, mods) {
                 self.hold_pointer();
                 drag
-            } else if self.uv_brush.is_some() && self.editor.live.is_none() {
+            } else if self.uv_brush.is_some() && self.editor.session.live.is_none() {
                 let mut points = std::collections::BTreeSet::new();
                 self.uv_brush_collect(r, uv, at, &mut points);
                 Drag::Brush {
@@ -696,7 +709,14 @@ impl Operandi {
                 self.hold_pointer();
                 drag
             } else if self.uv_haul_tool() {
-                let base = self.editor.live.as_ref().expect("UV tool").params.clone();
+                let base = self
+                    .editor
+                    .session
+                    .live
+                    .as_ref()
+                    .expect("UV tool")
+                    .params
+                    .clone();
                 self.hold_pointer();
                 Drag::Haul {
                     start: at,
@@ -711,7 +731,14 @@ impl Operandi {
                 // tears the selection off for this drag (UVT-41); Ctrl alone
                 // constrains Move to one axis and steps Rotate.
                 let handle = self.uv_handle_at(r, uv, pivot, at);
-                let mut params = self.editor.live.as_ref().expect("UV tool").params.clone();
+                let mut params = self
+                    .editor
+                    .session
+                    .live
+                    .as_ref()
+                    .expect("UV tool")
+                    .params
+                    .clone();
                 let tear = (mods.command || mods.ctrl) && mods.shift;
                 if let Some(space) = params.uv.as_mut()
                     && tear
@@ -756,7 +783,7 @@ impl Operandi {
             }
             uv.drag = Some(if let Some(drag) = boxed {
                 drag
-            } else if let Some(b) = self.uv_brush.filter(|_| self.editor.live.is_none()) {
+            } else if let Some(b) = self.uv_brush.filter(|_| self.editor.session.live.is_none()) {
                 Drag::BrushSize {
                     start: b.size,
                     from: at,
@@ -871,6 +898,7 @@ impl Operandi {
                     // from them.
                     if self
                         .editor
+                        .session
                         .live
                         .as_ref()
                         .is_some_and(|l| l.tool.is_transform())
@@ -941,6 +969,7 @@ impl Operandi {
     /// Whether a transform tool is open in UV space.
     pub(super) fn uv_tool_live(&self) -> bool {
         self.editor
+            .session
             .live
             .as_ref()
             .is_some_and(|l| l.params.uv.is_some())
@@ -950,7 +979,7 @@ impl Operandi {
     /// while a UV view is active (`in_uv`), and back in 3D when a 3D view
     /// is; once it has changed something it stays where it started.
     pub(super) fn sync_uv_tool_space(&mut self, in_uv: bool) {
-        let Some(live) = self.editor.live.as_ref() else {
+        let Some(live) = self.editor.session.live.as_ref() else {
             return;
         };
         // Smooth shows its result at once; the core redoes it in the new
@@ -982,7 +1011,7 @@ impl Operandi {
     /// frame, which the core works out in UV space. `None` when no tool is
     /// open in UV space.
     pub(super) fn uv_tool_pivot(&self) -> Option<DVec2> {
-        let live = self.editor.live.as_ref()?;
+        let live = self.editor.session.live.as_ref()?;
         live.params.uv.as_ref()?;
         if !matches!(
             live.tool,
@@ -995,7 +1024,7 @@ impl Operandi {
 
     /// Where the handles sit now: the pivot moved by the tool's offset.
     fn uv_handle_center(&self, pivot: DVec2) -> DVec2 {
-        let Some(live) = self.editor.live.as_ref() else {
+        let Some(live) = self.editor.session.live.as_ref() else {
             return pivot;
         };
         let (offset, _, _) = operandi_core::uv_edit::tool_values(live.tool, &live.params);
@@ -1004,7 +1033,7 @@ impl Operandi {
 
     /// The handle under `p` (screen), or `Free`.
     fn uv_handle_at(&self, r: Rect, uv: &UvView, pivot: DVec2, p: Pos2) -> Handle {
-        let Some(tool) = self.editor.live.as_ref().map(|l| l.tool) else {
+        let Some(tool) = self.editor.session.live.as_ref().map(|l| l.tool) else {
             return Handle::Free;
         };
         let c = uv.to_screen(r, self.uv_handle_center(pivot));
@@ -1072,7 +1101,7 @@ impl Operandi {
         constrain: bool,
         step: bool,
     ) -> Option<operandi_core::Parameters> {
-        let tool = self.editor.live.as_ref()?.tool;
+        let tool = self.editor.session.live.as_ref()?.tool;
         let mut out = base.clone();
         let (a, b) = (uv.to_uv(r, start), uv.to_uv(r, p));
         let centre = pivot + operandi_core::uv_edit::tool_values(tool, base).0;
@@ -1640,7 +1669,7 @@ impl Operandi {
         let Some(pivot) = self.uv_tool_pivot() else {
             return;
         };
-        let Some(tool) = self.editor.live.as_ref().map(|l| l.tool) else {
+        let Some(tool) = self.editor.session.live.as_ref().map(|l| l.tool) else {
             return;
         };
         let c = uv.to_screen(r, self.uv_handle_center(pivot));
@@ -1756,7 +1785,7 @@ impl Operandi {
                 let title = format!("UV: {}", shown.as_deref().unwrap_or("(none)"));
                 // UVS-1 section 4: the map button picks the mesh's selected
                 // map (the same as the UV Maps list) or makes a new one.
-                let idle = self.editor.live.is_none();
+                let idle = self.editor.session.live.is_none();
                 let mut pick: Option<UvMapEdit> = None;
                 egui::ComboBox::from_id_salt(("uv-map", self.drawing_view))
                     .selected_text(title)

@@ -278,9 +278,9 @@ fn refusal_keeps_scene_history_redo_and_shows_no_acknowledgment() {
     // again.
     a.editor.scene.selection.faces = vec![0, 1];
     a.run(Command::ArmReduction);
-    assert!(a.editor.reduction.is_some(), "{}", a.status);
+    assert!(a.editor.session.reduction.is_some(), "{}", a.status);
     a.execute("poly.align");
-    assert!(a.editor.reduction.is_some(), "{}", a.status);
+    assert!(a.editor.session.reduction.is_some(), "{}", a.status);
     assert!(a.align_notice.is_none());
 }
 

@@ -125,7 +125,7 @@ impl crate::Editor {
         task_before: Option<crate::ActiveTask>,
         ok: bool,
     ) {
-        let opened = self.active_task() != task_before;
+        let opened = self.session.active_task() != task_before;
         if ok && (opened || mesh_edited(adopted, &self.scene)) {
             return;
         }

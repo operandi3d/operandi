@@ -138,11 +138,11 @@ fn sa_t09_t12_discrete_apply_history_invalid_recovery_and_exact_roundtrip() {
     assert_eq!(e.scene, first);
     e.dispatch(Command::Redo).unwrap();
     assert_eq!(e.scene, second);
-    assert!(e.spike.is_none());
+    assert!(e.session.spike.is_none());
     e.dispatch(Command::ArmSpike).unwrap();
     let checkpoints = e.history.undo.len();
     assert!(e.dispatch(Command::ConfigureSpike(f64::NAN)).is_err());
-    assert_eq!(e.spike.as_ref().unwrap().requested, 0.25);
+    assert_eq!(e.session.spike.as_ref().unwrap().requested, 0.25);
     e.dispatch(Command::ConfigureSpike(f64::MAX)).unwrap();
     assert!(e.dispatch(Command::Apply).is_err());
     assert_eq!(e.scene, second);
@@ -153,7 +153,7 @@ fn sa_t09_t12_discrete_apply_history_invalid_recovery_and_exact_roundtrip() {
     e.dispatch(Command::ArmSpike).unwrap();
     let path = std::env::temp_dir().join(format!("operandi-spike-{}.opscene", std::process::id()));
     e.save_committed(&path).unwrap();
-    assert!(e.spike.is_none());
+    assert!(e.session.spike.is_none());
     assert_eq!(persistence::load(&path).unwrap(), second);
     std::fs::remove_file(path).unwrap();
     e.scene.selection.item = None;

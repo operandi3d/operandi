@@ -1174,9 +1174,12 @@ impl Operandi {
                 p.pinned = true;
                 p.at = Some(rect.min);
             }
-            TitleAction::Drag(delta) if pinned => {
-                // VP-10..19: a pinned panel drags by its title bar.
+            TitleAction::Drag(delta) => {
+                // VP-10..19: the panel drags by its title bar. An unpinned
+                // one pins as it moves, so it stays where it is dropped
+                // (#60, UIC-185: only a pinned popover moves).
                 let p = &mut self.corner.properties;
+                p.pinned = true;
                 p.at = Some(p.at.unwrap_or(rect.min) + delta);
             }
             _ => {}
@@ -2342,6 +2345,48 @@ mod tests {
         click(&mut a, &ctx, pin);
         assert_eq!(a.corner.properties.view, None);
         assert!(!a.corner.properties.pinned);
+    }
+
+    #[test]
+    fn dragging_the_title_bar_pins_and_moves_it() {
+        // #60 (Leo): an unpinned panel's title-bar drag did nothing; a
+        // drag now pins it where it is dropped, as the circle would.
+        let (mut a, ctx) = two_views();
+        let over = a.corner.areas[&0].center();
+        press_o(&mut a, &ctx, over);
+        settle(&mut a, &ctx);
+        assert!(!a.corner.properties.pinned);
+        let panel = a.corner.popover_rect.expect("shown");
+        let grab = pos2(panel.center().x - 60., panel.top() + 8. + 10.);
+        draw(&mut a, &ctx, SIZE, vec![Event::PointerMoved(grab)]);
+        draw(
+            &mut a,
+            &ctx,
+            SIZE,
+            vec![pointer(grab, true, Modifiers::NONE)],
+        );
+        for dy in [10., 30., 60.] {
+            draw(
+                &mut a,
+                &ctx,
+                SIZE,
+                vec![Event::PointerMoved(grab + vec2(-20., dy))],
+            );
+        }
+        draw(
+            &mut a,
+            &ctx,
+            SIZE,
+            vec![pointer(grab + vec2(-20., 60.), false, Modifiers::NONE)],
+        );
+        draw(&mut a, &ctx, SIZE, vec![]);
+        assert!(a.corner.properties.pinned, "the drag pinned it");
+        let moved = a.corner.popover_rect.expect("still open").min;
+        assert!(
+            (moved - panel.min - vec2(-20., 60.)).length() < 2.,
+            "{:?} → {moved:?}",
+            panel.min
+        );
     }
 
     #[test]

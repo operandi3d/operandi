@@ -39,7 +39,7 @@ fn bridge_app(ctx: &Context) -> Operandi {
     a.camera.view = View::Front;
     a.editor.history.undo.clear();
     a.execute("Bridge");
-    assert!(a.editor.bridge.is_some(), "{}", a.status);
+    assert!(a.editor.session.bridge.is_some(), "{}", a.status);
     for _ in 0..3 {
         draw(&mut a, ctx, SIZE, vec![]);
     }
@@ -78,7 +78,7 @@ fn a_click_applies_bridge_and_keeps_it_live() {
     let mut a = bridge_app(&ctx);
     let before = a.editor.scene.clone();
     click(&mut a, &ctx);
-    assert!(a.editor.bridge.is_some(), "{}", a.status);
+    assert!(a.editor.session.bridge.is_some(), "{}", a.status);
     assert!(a.editor.bridge_result_live(), "{}", a.status);
     assert_ne!(a.editor.scene, before, "{}", a.status);
     assert!(faces(&a) > 2);
@@ -101,7 +101,10 @@ fn values_reshape_the_live_bridge_in_one_step() {
     click(&mut a, &ctx);
     let at = a.viewport_rect.center();
     drag(&mut a, &ctx, at, vec2(40., 0.), Modifiers::NONE);
-    assert_eq!(a.editor.bridge.as_ref().unwrap().requested.segments, 3);
+    assert_eq!(
+        a.editor.session.bridge.as_ref().unwrap().requested.segments,
+        3
+    );
     // Four sides, three segments: twelve bridge polygons.
     assert_eq!(faces(&a), 12, "{}", a.status);
     a.execute("bridge segments 1");
@@ -125,7 +128,10 @@ fn a_drag_before_the_click_only_sets_segments() {
     let before = a.editor.scene.clone();
     let at = a.viewport_rect.center();
     drag(&mut a, &ctx, at, vec2(40., 0.), Modifiers::NONE);
-    assert_eq!(a.editor.bridge.as_ref().unwrap().requested.segments, 3);
+    assert_eq!(
+        a.editor.session.bridge.as_ref().unwrap().requested.segments,
+        3
+    );
     assert_eq!(a.editor.scene, before);
     assert!(a.editor.history.undo.is_empty());
     click(&mut a, &ctx);
@@ -143,14 +149,14 @@ fn drop_keeps_and_cancel_removes_the_live_bridge() {
     click(&mut a, &ctx);
     let applied = a.editor.scene.clone();
     a.execute("tool.drop");
-    assert!(a.editor.bridge.is_none());
+    assert!(a.editor.session.bridge.is_none());
     assert_eq!(a.editor.scene, applied);
     assert_eq!(a.editor.history.undo.len(), 1);
 
     let mut b = bridge_app(&ctx);
     click(&mut b, &ctx);
     b.run(Command::Cancel);
-    assert!(b.editor.bridge.is_none());
+    assert!(b.editor.session.bridge.is_none());
     assert_eq!(b.editor.scene, before);
     assert!(b.editor.history.undo.is_empty());
 }
@@ -164,7 +170,7 @@ fn a_click_that_cannot_bridge_keeps_the_tool() {
     a.editor.scene.selection.faces = vec![0];
     let before = a.editor.scene.clone();
     click(&mut a, &ctx);
-    assert!(a.editor.bridge.is_some());
+    assert!(a.editor.session.bridge.is_some());
     assert_eq!(a.editor.scene, before);
     assert!(a.editor.history.undo.is_empty());
     assert!(a.status.starts_with("Bridge: "), "{}", a.status);
@@ -178,7 +184,7 @@ fn a_modified_click_does_not_apply() {
     let before = a.editor.scene.clone();
     let at = a.viewport_rect.center();
     drag(&mut a, &ctx, at, Vec2::ZERO, Modifiers::SHIFT);
-    assert!(a.editor.bridge.is_some());
+    assert!(a.editor.session.bridge.is_some());
     assert_eq!(a.editor.scene, before);
     assert!(a.editor.history.undo.is_empty());
 }
@@ -210,7 +216,7 @@ fn spike_app(ctx: &Context) -> Operandi {
     a.camera.view = View::Front;
     a.editor.history.undo.clear();
     a.execute("Spike");
-    assert!(a.editor.spike.is_some(), "{}", a.status);
+    assert!(a.editor.session.spike.is_some(), "{}", a.status);
     for _ in 0..3 {
         draw(&mut a, ctx, SIZE, vec![]);
     }
@@ -230,7 +236,7 @@ fn spike_click_applies_and_strength_reshapes_it() {
     let mut a = spike_app(&ctx);
     let before = a.editor.scene.clone();
     click(&mut a, &ctx);
-    assert!(a.editor.spike.is_some());
+    assert!(a.editor.session.spike.is_some());
     assert_eq!(faces(&a), 4, "{}", a.status);
     assert_eq!(a.editor.history.undo.len(), 1);
     assert!(a.editor.spike_result_live());
@@ -281,14 +287,14 @@ fn reduction_click_after_a_drag_applies() {
     a.run(Command::Mode(Mode::Polygon));
     a.editor.history.undo.clear();
     a.execute("tool.set poly.reduct on");
-    assert!(a.editor.reduction.is_some(), "{}", a.status);
+    assert!(a.editor.session.reduction.is_some(), "{}", a.status);
     for _ in 0..3 {
         draw(&mut a, &ctx, SIZE, vec![]);
     }
     let before = a.editor.scene.clone();
     click(&mut a, &ctx);
     assert!(
-        a.editor.reduction.as_ref().unwrap().initialized(),
+        a.editor.session.reduction.as_ref().unwrap().initialized(),
         "{}",
         a.status
     );
@@ -300,6 +306,6 @@ fn reduction_click_after_a_drag_applies() {
     assert!(a.editor.history.undo.is_empty());
     click(&mut a, &ctx);
     assert_eq!(a.editor.history.undo.len(), 1, "{}", a.status);
-    assert!(a.editor.reduction.is_some());
+    assert!(a.editor.session.reduction.is_some());
     assert_ne!(a.editor.scene, before);
 }

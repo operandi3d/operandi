@@ -78,7 +78,7 @@ fn act_c02_numeric_drop_then_target_refusal_preserves_original_owner() {
             e.dispatch(Command::ArmEllipsoid).unwrap();
             e.dispatch(Command::ConfigureEllipsoid(EllipsoidParameters::default()))
                 .unwrap();
-            assert!(e.ellipsoid.as_ref().unwrap().preview.is_some());
+            assert!(e.session.ellipsoid.as_ref().unwrap().preview.is_some());
         } else {
             e.dispatch(Command::ArmSpike).unwrap();
             e.dispatch(Command::ConfigureSpike(0.25)).unwrap();
@@ -88,7 +88,7 @@ fn act_c02_numeric_drop_then_target_refusal_preserves_original_owner() {
         // Ellipsoid also appends and records before target validation refuses.
         let mut dropped = e.clone();
         dropped.dispatch(Command::Drop).unwrap();
-        assert!(dropped.spike.is_none() && dropped.ellipsoid.is_none());
+        assert!(dropped.session.spike.is_none() && dropped.session.ellipsoid.is_none());
         assert_eq!(
             dropped.history.undo.len(),
             e.history.undo.len() + usize::from(ellipsoid)

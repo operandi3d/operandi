@@ -6,12 +6,20 @@ impl Editor {
     pub(crate) fn preview(&mut self, p: Parameters, apply: bool) -> Result<()> {
         // Bend's centre is the action centre: the frame follows `bend.base`
         // however it changed (panel fields, a click, undo inside the tool).
-        let bend_center =
-            (self.live.as_ref().is_some_and(|l| l.tool == Tool::Bend)).then_some(p.bend.base);
+        let bend_center = (self
+            .session
+            .live
+            .as_ref()
+            .is_some_and(|l| l.tool == Tool::Bend))
+        .then_some(p.bend.base);
         let result = self.preview_tool(p, apply);
         if result.is_ok()
             && let Some(center) = bend_center
-            && let Some(frame) = self.live.as_mut().and_then(|l| l.action_frame.as_mut())
+            && let Some(frame) = self
+                .session
+                .live
+                .as_mut()
+                .and_then(|l| l.action_frame.as_mut())
         {
             frame.center = center;
         }
@@ -23,7 +31,7 @@ impl Editor {
         self.constrain_preview()
     }
     pub(super) fn preview_tool(&mut self, p: Parameters, apply: bool) -> Result<()> {
-        let live = self.live.as_ref().ok_or("No active tool")?;
+        let live = self.session.live.as_ref().ok_or("No active tool")?;
         // Started from a UV view: the pipe runs on the map's UVs (UVT-130,
         // uv_pipe.rs).
         if p.uv.is_some() && crate::uv_pipe::runs_on_uvs(live.tool) {
@@ -45,7 +53,7 @@ impl Editor {
     /// One live tool preview on the primary mesh.
     pub(crate) fn preview_one(&mut self, mut p: Parameters, apply: bool) -> Result<()> {
         let inferred = self.inferred_mode();
-        let live = self.live.as_ref().ok_or("No active tool")?;
+        let live = self.session.live.as_ref().ok_or("No active tool")?;
         let mut scene = live.base.clone();
         // An inferred start: the tool and every layer see its own mode.
         if let Some(mode) = inferred {
@@ -81,7 +89,11 @@ impl Editor {
             }
             Tool::Box => {
                 if !apply && !live.applied && p.cube_shape() == live.params.cube_shape() {
-                    self.live.as_mut().ok_or("No active primitive")?.params = p;
+                    self.session
+                        .live
+                        .as_mut()
+                        .ok_or("No active primitive")?
+                        .params = p;
                     return Ok(());
                 }
                 // The Cube's one generator, shared with its MeshOp (#14),
@@ -117,7 +129,7 @@ impl Editor {
                 // turn each half about its own centre, the far half
                 // mirrored, instead of both about the point between them.
                 let frame = live.action_frame.ok_or("Missing action frame")?;
-                let at_zero = self.extend_from_click;
+                let at_zero = self.session.extend_from_click;
                 let symmetry = self.active_symmetry();
                 crate::symmetry_sides::two_pass(&mut scene, symmetry, |scene, mirrored| {
                     let edges = scene.selection.edges.clone();
@@ -186,7 +198,7 @@ impl Editor {
                     make_uvs: p.edge_extend.make_uvs,
                 };
                 let world = scene.world_matrix(item.id)?;
-                let (mut mesh, outer) = if self.extend_from_click {
+                let (mut mesh, outer) = if self.session.extend_from_click {
                     crate::edge_extend_at_zero(&item.mesh, &edges, world, &shape)?
                 } else {
                     crate::edge_extend_shaped(&item.mesh, &edges, world, &shape)?
@@ -882,7 +894,7 @@ impl Editor {
                         self.identities.current = ids.clone();
                         self.identities.observe(&self.scene)?;
                     }
-                    let l = self.live.as_mut().unwrap();
+                    let l = self.session.live.as_mut().unwrap();
                     l.identity_preview = None;
                     l.params = p;
                     l.applied = true;
@@ -964,7 +976,7 @@ impl Editor {
                     .current
                     .meshes
                     .insert(item.id, ids.clone().into());
-                self.live.as_mut().unwrap().identity_preview =
+                self.session.live.as_mut().unwrap().identity_preview =
                     Some((result.correspondence.clone(), ids));
                 scene.active_mut().unwrap().mesh = result.mesh.into();
                 // While the tool is live the moving caps stay selected (a
@@ -1165,65 +1177,55 @@ impl Editor {
                             crate::texture_locator::clamp_size(item.transform.scale);
                     }
                 } else {
-                    // Every active mesh with a selection moves about the one
-                    // shared frame (multi_transform.rs); just the primary
-                    // when it is the only one.
-                    let targets: Vec<(u64, std::collections::BTreeSet<u32>)> =
-                        match live.base.component_transform_meshes() {
-                            Some(ids) => ids
-                                .into_iter()
-                                .map(|id| Ok((id, live.base.mesh_transform_vertices(id)?)))
-                                .collect::<Result<_>>()?,
-                            None => vec![(
-                                scene.active().ok_or("Select a mesh")?.id,
-                                crate::transform_vertices(&live.base)?,
-                            )],
-                        };
-                    for (item_id, mut vertices) in targets {
-                        // FO-47/48/45: Soft Selection, Coplanar and Element
-                        // falloffs also move the points they reach outside
-                        // the selection.
-                        if let Some(f) = self.active_falloff().filter(|f| f.reaches()) {
-                            vertices.extend(f.reach(&live.base, item_id)?);
-                        }
-                        // The action frame is in world space: move each point there,
-                        // apply the transform, and map the result back to local.
-                        let world = live.base.world_matrix(item_id)?;
-                        if world.determinant() == 0. || !world.determinant().is_finite() {
-                            return Err("Component tools need an invertible item transform".into());
-                        }
-                        let item = scene.item_mut(item_id).ok_or("Select a mesh")?;
-                        let frame = live.action_frame.ok_or("Missing action frame")?;
-                        let angles = if live.tool == Tool::Transform {
-                            p.rotation_delta
-                        } else {
-                            p.delta
-                        };
-                        let rotation = glam::DQuat::from_euler(
-                            glam::EulerRot::XYZ,
-                            angles.x.to_radians(),
-                            angles.y.to_radians(),
-                            angles.z.to_radians(),
-                        );
-                        // The pivot service's mirror rules (ACS-03..06): the
-                        // primary side is the side the pivot is on; selected
-                        // points there take the values as entered (typed or
-                        // dragged alike), the other side's are mirrored,
+                    // The pivot service resolved the drag's base once into
+                    // groups (pivot_service.rs): every mesh the tool moves,
+                    // its pivots, the points each drives and each point's
+                    // Symmetry role. The values are applied once per group;
+                    // nothing here works out targets, clusters, mirror
+                    // roles or frames.
+                    let pivots = self.live_pivots().ok_or("Missing action frame")??;
+                    let angles = if live.tool == Tool::Transform {
+                        p.rotation_delta
+                    } else {
+                        p.delta
+                    };
+                    let rotation = glam::DQuat::from_euler(
+                        glam::EulerRot::XYZ,
+                        angles.x.to_radians(),
+                        angles.y.to_radians(),
+                        angles.z.to_radians(),
+                    );
+                    // FAL-M-02 / FAL-B2-02/03: with a falloff each point moves to
+                    // p + w·(T(p) − p), its weight's share of the full
+                    // transform. With Symmetry the weight is read at the
+                    // point's positive-side position (FAL-B2-04).
+                    let falloff = self.active_falloff();
+                    // TW-Q1: Twist and Swirl turn each point by weight ×
+                    // Angle instead of blending positions (deform.rs).
+                    let angle_weighted = live.tool == Tool::Rotate
+                        && self
+                            .session
+                            .preset
+                            .as_ref()
+                            .is_some_and(|p| p.angle_by_weight);
+                    // #24: a scale reaching 0 flattens polygons on
+                    // purpose; they are marked as deliberate degenerate
+                    // polygons, as Inset 0 and Poly Haul do.
+                    let factors = match live.tool {
+                        Tool::Scale => Some(p.delta),
+                        Tool::Transform => Some(p.scale_delta),
+                        _ => None,
+                    };
+                    let collapses = factors.is_some_and(|f| f.min_element() <= 1e-12);
+                    for target_item in &pivots.items {
+                        let item_id = target_item.item;
+                        // The mirror rules (S-03..S-06): selected points on
+                        // the primary side take the values as entered (typed
+                        // or dragged alike), the other side's are mirrored,
                         // edited and mirrored back, and seam points go back
-                        // onto the plane. Several meshes share one frame and
-                        // each mirrors in its own space (MAM-Q09).
-                        let symmetry = self.active_symmetry();
-                        let map = crate::pivot_service::MirrorMap::new(
-                            &live.base,
-                            item_id,
-                            symmetry,
-                            frame.center,
-                        )?;
-                        // FAL-M-02 / FAL-B2-02/03: with a falloff each point moves to
-                        // p + w·(T(p) − p), its weight's share of the full
-                        // transform. With Symmetry the weight is read at the
-                        // point's positive-side position (FAL-B2-04).
-                        let falloff = self.active_falloff();
+                        // onto the plane.
+                        let map = &target_item.map;
+                        let world = map.world;
                         // VMF-03: a Vertex Map falloff reads the point's own
                         // value (copied out, the mesh is edited below).
                         // The selection-driven falloffs read the drag's
@@ -1232,114 +1234,94 @@ impl Editor {
                             Some(f) => f.prepare(&live.base, item_id)?,
                             None => Default::default(),
                         };
-                        // TW-Q1: Twist and Swirl turn each point by weight ×
-                        // Angle instead of blending positions (deform.rs).
-                        let angle_weighted = live.tool == Tool::Rotate
-                            && self.preset.as_ref().is_some_and(|p| p.angle_by_weight);
-                        // Local: each connected piece about its own centre (F7).
-                        let pieces =
-                            (self.action_context.center == crate::CenterMode::Local).then(|| {
-                                let selection = if live.base.selection.item == Some(item_id) {
-                                    live.base.selection.clone()
-                                } else {
-                                    live.base.selection.sole(item_id)
+                        let item = scene.item_mut(item_id).ok_or("Select a mesh")?;
+                        let mut collapsed: Vec<u32> = Vec::new();
+                        for group in &target_item.groups {
+                            for target in &group.targets {
+                                let i = target.point;
+                                let stored = &mut item.mesh.vertices[i as usize];
+                                // A point from the other side is edited in
+                                // its group's twin frame once it has been
+                                // mirrored over (S-04, S-09).
+                                let frame = match target.role {
+                                    crate::pivot_service::Role::Other => group.twin,
+                                    _ => group.frame,
                                 };
-                                crate::local_piece_frames(&item.mesh, &vertices, &selection)
-                            });
-                        // #24: a scale reaching 0 flattens polygons on
-                        // purpose; they are marked as deliberate degenerate
-                        // polygons, as Inset 0 and Poly Haul do.
-                        let factors = match live.tool {
-                            Tool::Scale => Some(p.delta),
-                            Tool::Transform => Some(p.scale_delta),
-                            _ => None,
-                        };
-                        let collapsed: Option<Vec<u32>> = factors
-                            .filter(|f| f.min_element() <= 1e-12)
-                            .map(|_| vertices.iter().copied().collect());
-                        for i in vertices {
-                            let stored = &mut item.mesh.vertices[i as usize];
-                            let role = map.role(*stored);
-                            // Local: a point from the other side is edited in
-                            // its island's mirror image (it is mirrored into
-                            // the partner island first, ACS-04, ACS-10/11).
-                            let frame = match pieces.as_ref().and_then(|p| p.get(&i)) {
-                                Some(&piece) if role == crate::pivot_service::Role::Other => {
-                                    piece.mirrored(symmetry).frame(world, frame.basis)
-                                }
-                                Some(&piece) => piece.frame(world, frame.basis),
-                                None => frame,
-                            };
-                            // ACS-13: the weight is read where the point's
-                            // primary-side image is.
-                            let sample = map.falloff_sample(*stored);
-                            let w = falloff.as_ref().map_or(1., |f| {
-                                f.weight_at_local(
-                                    world.transform_point3(sample),
-                                    sample,
-                                    i,
-                                    prepared.inputs(),
-                                )
-                            });
-                            let edit = |start: DVec3| -> DVec3 {
-                                let v = start;
-                                let moved = match live.tool {
-                                    Tool::Transform => {
-                                        frame.center
-                                            + frame.basis
-                                                * (rotation
+                                // ACS-13: the weight is read where the point's
+                                // primary-side image is.
+                                let sample = map.falloff_sample_on(target.side, *stored);
+                                let w = falloff.as_ref().map_or(1., |f| {
+                                    f.weight_at_local(
+                                        world.transform_point3(sample),
+                                        sample,
+                                        i,
+                                        prepared.inputs(),
+                                    )
+                                });
+                                let edit = |start: DVec3| -> DVec3 {
+                                    let v = start;
+                                    let moved = match live.tool {
+                                        Tool::Transform => {
+                                            frame.center
+                                                + frame.basis
+                                                    * (rotation
+                                                        * ((frame.basis.transpose()
+                                                            * (v - frame.center))
+                                                            * p.scale_delta)
+                                                        + p.delta)
+                                        }
+                                        Tool::Move => v + frame.basis * p.delta,
+                                        Tool::Rotate if angle_weighted => {
+                                            let turned = angles * w;
+                                            let rotation = glam::DQuat::from_euler(
+                                                glam::EulerRot::XYZ,
+                                                turned.x.to_radians(),
+                                                turned.y.to_radians(),
+                                                turned.z.to_radians(),
+                                            );
+                                            frame.center
+                                                + frame.basis
+                                                    * (rotation
+                                                        * (frame.basis.transpose()
+                                                            * (v - frame.center)))
+                                        }
+                                        Tool::Rotate => {
+                                            frame.center
+                                                + frame.basis
+                                                    * (rotation
+                                                        * (frame.basis.transpose()
+                                                            * (v - frame.center)))
+                                        }
+                                        Tool::Scale => {
+                                            frame.center
+                                                + frame.basis
                                                     * ((frame.basis.transpose()
                                                         * (v - frame.center))
-                                                        * p.scale_delta)
-                                                    + p.delta)
+                                                        * p.delta)
+                                        }
+                                        _ => v,
+                                    };
+                                    if angle_weighted {
+                                        moved
+                                    } else {
+                                        start + (moved - start) * w
                                     }
-                                    Tool::Move => v + frame.basis * p.delta,
-                                    Tool::Rotate if angle_weighted => {
-                                        let turned = angles * w;
-                                        let rotation = glam::DQuat::from_euler(
-                                            glam::EulerRot::XYZ,
-                                            turned.x.to_radians(),
-                                            turned.y.to_radians(),
-                                            turned.z.to_radians(),
-                                        );
-                                        frame.center
-                                            + frame.basis
-                                                * (rotation
-                                                    * (frame.basis.transpose()
-                                                        * (v - frame.center)))
-                                    }
-                                    Tool::Rotate => {
-                                        frame.center
-                                            + frame.basis
-                                                * (rotation
-                                                    * (frame.basis.transpose()
-                                                        * (v - frame.center)))
-                                    }
-                                    Tool::Scale => {
-                                        frame.center
-                                            + frame.basis
-                                                * ((frame.basis.transpose() * (v - frame.center))
-                                                    * p.delta)
-                                    }
-                                    _ => v,
                                 };
-                                if angle_weighted {
-                                    moved
-                                } else {
-                                    start + (moved - start) * w
+                                *stored = map.apply_as(target.role, *stored, edit);
+                                if collapses {
+                                    collapsed.push(i);
                                 }
-                            };
-                            *stored = map.apply(*stored, edit);
+                            }
                         }
-                        if let Some(moved) = collapsed {
-                            mark_collapsed(&mut item.mesh, &moved);
+                        if collapses {
+                            mark_collapsed(&mut item.mesh, &collapsed);
                         }
                     }
                 }
             }
         }
         // A drag that only moves points skips re-checking every polygon.
-        if let Some(live) = &self.live {
+        if let Some(live) = &self.session.live {
             for item in &scene.items {
                 if let Some(before) = live.base.item(item.id) {
                     item.mesh.shared().prove_points_moved(before.mesh.shared());
@@ -1347,7 +1329,7 @@ impl Editor {
             }
         }
         // ACS-31: a dragged guide's twin follows in the preview too.
-        if let Some(live) = &self.live {
+        if let Some(live) = &self.session.live {
             crate::character_rig::sync(&mut scene, &live.base);
         }
         scene.validate()?;
@@ -1357,7 +1339,7 @@ impl Editor {
         if twist_note.is_some() {
             self.symmetry_note = twist_note;
         }
-        let l = self.live.as_mut().ok_or("No tool")?;
+        let l = self.session.live.as_mut().ok_or("No tool")?;
         l.params = p;
         l.preview_error = None;
         l.applied = true;

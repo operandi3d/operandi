@@ -133,7 +133,7 @@ fn live_tool_remove_drop_undo_and_cancel() {
         e.scene.selection.faces = vec![1];
         e.synchronize_identities().unwrap();
         e.dispatch(Command::Activate(Tool::PolyHaul)).unwrap();
-        let mut p = e.live.as_ref().unwrap().params.clone();
+        let mut p = e.session.live.as_ref().unwrap().params.clone();
         p.poly_haul_mode = PolyHaulMode::Remove;
         p.poly_haul_target = HaulTarget::Polygon(1);
         e.dispatch(Command::Preview(p)).unwrap();

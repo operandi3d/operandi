@@ -11,7 +11,11 @@ pub(super) struct EllipsoidFields;
 impl ToolFields for EllipsoidFields {
     type P = EllipsoidParameters;
     fn params(app: &Operandi) -> Option<EllipsoidParameters> {
-        app.editor.ellipsoid.as_ref().map(|s| s.requested.clone())
+        app.editor
+            .session
+            .ellipsoid
+            .as_ref()
+            .map(|s| s.requested.clone())
     }
     fn form(app: &Operandi, _: &EllipsoidParameters) -> ToolForm<EllipsoidParameters> {
         type P = EllipsoidParameters;
@@ -118,7 +122,7 @@ impl ToolFields for EllipsoidFields {
             Vec::new(),
             None,
         );
-        let session = app.editor.ellipsoid.as_ref();
+        let session = app.editor.session.ellipsoid.as_ref();
         let ready = app.field_errors.is_empty() && session.is_none_or(|s| s.error.is_none());
         f.wide(Button::command("Apply", Command::Apply).enabled_if(
             ready,
@@ -185,6 +189,7 @@ impl ToolFields for EllipsoidFields {
     }
     fn settled(app: &mut Operandi) -> bool {
         app.editor
+            .session
             .ellipsoid
             .as_ref()
             .is_none_or(|s| s.error.is_none())
@@ -222,17 +227,24 @@ mod tests {
             a.fields.insert(k.into(), v.into());
         }
         assert!(a.confirm_fields());
-        let p = a.editor.ellipsoid.as_ref().unwrap().requested.clone();
+        let p = a
+            .editor
+            .session
+            .ellipsoid
+            .as_ref()
+            .unwrap()
+            .requested
+            .clone();
         assert_eq!(p.position, DVec3::new(1., -2., 3.));
         assert_eq!(p.radius, DVec3::new(2., 3., 4.));
         assert_eq!(p.bulge_top, 0.37);
         assert_eq!(p.bulge_side, 0.81);
-        let mesh = a.editor.ellipsoid.as_ref().unwrap().preview.clone();
+        let mesh = a.editor.session.ellipsoid.as_ref().unwrap().preview.clone();
         a.fields.insert("ell_segments".into(), "4.5".into());
         a.execute("Apply");
         assert_eq!(a.editor.scene, base);
         assert!(a.field_errors.contains_key("ell_segments"));
-        assert_eq!(a.editor.ellipsoid.as_ref().unwrap().preview, mesh);
+        assert_eq!(a.editor.session.ellipsoid.as_ref().unwrap().preview, mesh);
         a.fields.insert("ell_segments".into(), "4".into());
         assert!(a.confirm_fields());
         assert!(a.field_errors.is_empty());
@@ -245,7 +257,7 @@ mod tests {
             a.fields.insert(key.into(), value.into());
             assert!(a.confirm_fields());
         }
-        let p = &a.editor.ellipsoid.as_ref().unwrap().requested;
+        let p = &a.editor.session.ellipsoid.as_ref().unwrap().requested;
         assert_eq!(p.position, DVec3::new(1.5, -1.5, 8.));
         assert_eq!(p.radius, DVec3::new(1.5, 3.5, -1.));
         assert_eq!(p.max().z, 7.);
@@ -259,14 +271,21 @@ mod tests {
         assert_eq!(a.editor.scene, base);
         a.execute("Redo");
         assert_eq!(a.editor.scene, expected);
-        assert!(a.editor.ellipsoid.is_none());
+        assert!(a.editor.session.ellipsoid.is_none());
     }
     #[test]
     fn ea_t09_t11_signed_compensation_choice_correction_pending_text_and_cancel() {
         let mut a = app();
         a.fields.insert("ell_gaps".into(), "7".into());
         assert!(a.confirm_fields());
-        let mut p = a.editor.ellipsoid.as_ref().unwrap().requested.clone();
+        let mut p = a
+            .editor
+            .session
+            .ellipsoid
+            .as_ref()
+            .unwrap()
+            .requested
+            .clone();
         p.compensation = true;
         p.make_uvs = false;
         assert!(a.publish_form::<EllipsoidFields>(p, vec![]));
@@ -275,18 +294,18 @@ mod tests {
         let (mut p, keys) = a.form_candidate::<EllipsoidFields>().unwrap();
         p.make_uvs = true;
         assert!(!a.publish_form::<EllipsoidFields>(p, keys));
-        let valid = a.editor.ellipsoid.as_ref().unwrap().preview.clone();
+        let valid = a.editor.session.ellipsoid.as_ref().unwrap().preview.clone();
         let (mut p, keys) = a.form_candidate::<EllipsoidFields>().unwrap();
         p.compensation = false;
         assert!(a.publish_form::<EllipsoidFields>(p, keys));
         assert!(a.field_errors.is_empty());
-        assert_ne!(a.editor.ellipsoid.as_ref().unwrap().preview, valid);
+        assert_ne!(a.editor.session.ellipsoid.as_ref().unwrap().preview, valid);
         a.fields
             .insert("ell_radius0".into(), "not a quantity".into());
         a.execute("Drop");
-        assert!(a.editor.ellipsoid.is_some());
+        assert!(a.editor.session.ellipsoid.is_some());
         a.execute("Cancel");
-        assert!(a.editor.ellipsoid.is_none());
+        assert!(a.editor.session.ellipsoid.is_none());
         assert!(a.field_errors.is_empty());
         assert!(a.editor.scene.active().unwrap().mesh.faces.is_empty());
     }
@@ -299,7 +318,7 @@ mod tests {
         a.fields.insert("ell_side".into(), "-2".into());
         a.fields.insert("ell_gaps".into(), "60".into());
         assert!(a.confirm_fields());
-        let p = &a.editor.ellipsoid.as_ref().unwrap().requested;
+        let p = &a.editor.session.ellipsoid.as_ref().unwrap().requested;
         assert_eq!(
             (p.sides, p.segments, p.bulge_top, p.bulge_side, p.gaps),
             (3, 2, -1.5, -1.5, 50.)
@@ -308,12 +327,12 @@ mod tests {
         a.execute("Ellipsoid Reset");
         assert!(a.field_errors.is_empty());
         assert_eq!(
-            a.editor.ellipsoid.as_ref().unwrap().requested,
+            a.editor.session.ellipsoid.as_ref().unwrap().requested,
             EllipsoidParameters::default()
         );
         // Unit insertion drops the open Ellipsoid first, then inserts.
         a.execute("Ellipsoid New Unit");
-        assert!(a.editor.ellipsoid.is_none());
+        assert!(a.editor.session.ellipsoid.is_none());
         assert_eq!(a.editor.scene.active().unwrap().name, "Ellipsoid");
         assert_eq!(a.editor.scene.active().unwrap().mesh.vertices.len(), 266);
     }
@@ -378,12 +397,20 @@ mod tests {
                 PolygonRepresentation::CatmullClark,
             ] {
                 for axis in 0..3 {
-                    let mut p = a.editor.ellipsoid.as_ref().unwrap().requested.clone();
+                    let mut p = a
+                        .editor
+                        .session
+                        .ellipsoid
+                        .as_ref()
+                        .unwrap()
+                        .requested
+                        .clone();
                     p.polygon = polygon;
                     p.axis = axis;
                     assert!(a.publish_form::<EllipsoidFields>(p, vec![]));
                     assert!(
                         a.editor
+                            .session
                             .ellipsoid
                             .as_ref()
                             .unwrap()

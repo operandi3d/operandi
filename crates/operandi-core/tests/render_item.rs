@@ -87,6 +87,7 @@ fn every_row_saves_and_reopens() {
         direct_caustics: Default::default(),
         preview_convergence: 0.5,
         preview_time_limit: 0.25,
+        post: Default::default(),
     };
     e.dispatch(Command::SetRenderSettings(settings.clone()))
         .unwrap();

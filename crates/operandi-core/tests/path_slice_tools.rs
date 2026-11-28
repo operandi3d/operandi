@@ -64,10 +64,10 @@ fn mesh(e: &Editor) -> &Mesh {
     &e.scene.active().unwrap().mesh
 }
 fn params(e: &Editor) -> Parameters {
-    e.live.as_ref().unwrap().params.clone()
+    e.session.live.as_ref().unwrap().params.clone()
 }
 fn gesture(e: &mut Editor, p: Parameters) {
-    e.tweak_held = true;
+    e.session.tweak_held = true;
     e.dispatch(Command::Preview(p)).unwrap();
     e.end_tweak();
 }
@@ -135,7 +135,7 @@ fn no_path_changes_nothing_and_cancel_restores() {
         assert_ne!(*mesh(&e), before, "{tool:?} cuts");
         e.dispatch(Command::Cancel).unwrap();
         assert_eq!(*mesh(&e), before, "{tool:?} cancel");
-        assert!(e.live.is_none());
+        assert!(e.session.live.is_none());
     }
 }
 
@@ -160,7 +160,10 @@ fn pen_slice_cuts_top_and_bottom_or_front_only_and_drop_is_one_step() {
     // Mid-tool undo takes back the option and keeps the tool.
     e.dispatch(Command::Undo).unwrap();
     assert_eq!(mesh(&e).faces.len(), 10);
-    assert_eq!(e.live.as_ref().map(|l| l.tool), Some(Tool::PenSlice));
+    assert_eq!(
+        e.session.live.as_ref().map(|l| l.tool),
+        Some(Tool::PenSlice)
+    );
     e.dispatch(Command::Drop).unwrap();
     assert_eq!(e.history.undo.len(), steps + 1);
     assert_eq!(e.history.undo.last().unwrap().label, "Pen Slice");

@@ -108,7 +108,7 @@ impl Operandi {
                     "The copies are made; values now update them live",
                 ),
         ]);
-        let live = self.editor.live.as_ref();
+        let live = self.editor.session.live.as_ref();
         if let Some(error) = live.and_then(|l| l.preview_error.as_ref()) {
             f.error(error.clone());
         } else if operandi_core::duplicate::nothing_to_copy(&self.editor.scene) {

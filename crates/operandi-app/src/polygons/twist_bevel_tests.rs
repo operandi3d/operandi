@@ -10,7 +10,7 @@ fn rect() -> Rect {
 }
 
 fn live(a: &Operandi) -> &operandi_core::Live {
-    a.editor.live.as_ref().expect("live tool")
+    a.editor.session.live.as_ref().expect("live tool")
 }
 
 /// The box with its top polygon (+Y) selected in Polygon mode, and that
@@ -59,7 +59,7 @@ fn refuses_outside_polygon_mode() {
     let mut a = box_app();
     a.run(Command::Mode(Mode::Edge));
     a.activate(Tool::TwistBevel);
-    assert!(a.editor.live.is_none(), "{}", a.status);
+    assert!(a.editor.session.live.is_none(), "{}", a.status);
 }
 
 /// Switching on changes nothing; a panel edit is live at once; Drop keeps
@@ -79,7 +79,7 @@ fn panel_edit_drop_and_undo() {
     assert_eq!(faces(&a), 6 + 16, "{}", a.status);
     assert_eq!(a.editor.scene.selection.faces, vec![top]);
     a.run(Command::Drop);
-    assert!(a.editor.live.is_none(), "{}", a.status);
+    assert!(a.editor.session.live.is_none(), "{}", a.status);
     assert_eq!(faces(&a), 22);
     a.run(Command::Undo);
     assert_eq!(
@@ -135,7 +135,7 @@ fn empty_selection_refuses_a_closed_box_with_a_message() {
     a.run(Command::Mode(Mode::Polygon));
     a.editor.scene.selection.faces.clear();
     a.activate(Tool::TwistBevel);
-    if a.editor.live.is_some() {
+    if a.editor.session.live.is_some() {
         let mut p = live(&a).params.clone();
         p.twist_bevel.shift = 1.;
         a.run(Command::Preview(p));
@@ -207,7 +207,13 @@ fn cap_handles_follow_the_bend() {
     let straight = shift_start(&a);
     set(&mut a, |o| o.bend = 90.);
     assert!(
-        a.editor.live.as_ref().unwrap().preview_error.is_none(),
+        a.editor
+            .session
+            .live
+            .as_ref()
+            .unwrap()
+            .preview_error
+            .is_none(),
         "{}",
         a.status
     );

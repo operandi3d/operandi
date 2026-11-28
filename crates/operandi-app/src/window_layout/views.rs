@@ -9,11 +9,6 @@ use super::*;
 use crate::unavailable::Gate;
 use operandi_layout::Pane;
 
-/// Torn-off views stay above the main window, like the palettes, so one
-/// can't get lost behind it on a single screen (VST-Q05, Jason
-/// 2026-11-11: yes). They still go anywhere on any screen, outside the
-/// main window too.
-const TORN_OFF_VIEWS_ON_TOP: bool = true;
 /// The bottom row shared by the mode bar and the message line.
 pub(crate) const MODE_BAR_HEIGHT: f32 = 26.;
 
@@ -574,7 +569,6 @@ impl Operandi {
                 position,
                 // Never smaller than what its panels need (VST-27).
                 min_size: operandi_layout::window_min(&tree),
-                on_top: TORN_OFF_VIEWS_ON_TOP,
             };
             let shown = self.os_window(ctx, spec, |app, ctx| {
                 CentralPanel::default()
@@ -1079,6 +1073,9 @@ impl Operandi {
                     self.sync_uv_tool_space(false);
                     self.view_ui(ui);
                     self.view_properties_popover(ui, view);
+                    // The one-time Trackball Rotation offer, in the view
+                    // just orbited (trackball_offer.rs).
+                    self.trackball_offer_ui(ui.ctx(), self.viewport_rect);
                 }
             });
             self.cameras.insert(view, self.camera.clone());

@@ -345,7 +345,7 @@ fn slice_and_duplicate_tools_draw_no_move_gizmo() {
         a.activate(tool);
         draw(&mut a, &ctx, size, vec![]);
         assert_eq!(
-            a.editor.live.as_ref().map(|l| l.tool),
+            a.editor.session.live.as_ref().map(|l| l.tool),
             Some(tool),
             "{} didn't start",
             tool.label()

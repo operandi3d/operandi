@@ -55,7 +55,7 @@ const AXIS_PIXELS: f64 = 80.;
 impl Operandi {
     /// Which precision handles the live tool shows.
     fn planar_on(&self) -> bool {
-        let Some(l) = &self.editor.live else {
+        let Some(l) = &self.editor.session.live else {
             return false;
         };
         l.tool == Tool::Rotate
@@ -71,7 +71,7 @@ impl Operandi {
             && self.planar_on()
     }
     fn absolute_on(&self) -> Option<AbsoluteHandles> {
-        let l = self.editor.live.as_ref()?;
+        let l = self.editor.session.live.as_ref()?;
         (l.tool == Tool::Scale)
             .then_some(l.params.absolute_handles)
             .flatten()
@@ -99,13 +99,14 @@ impl Operandi {
     /// The precision handles as (id, world point, label).
     pub(crate) fn precision_points(&self, r: Rect) -> Vec<(usize, DVec3, String)> {
         let mut out = Vec::new();
-        if self.editor.live.is_none() {
+        if self.editor.session.live.is_none() {
             return out;
         }
         let center = self.transform_handle_center();
         if let Some(abs) = self.absolute_on() {
             let factor = self
                 .editor
+                .session
                 .live
                 .as_ref()
                 .map_or(DVec3::ONE, |l| l.params.delta);
@@ -134,6 +135,7 @@ impl Operandi {
             let rest = self.planar_rest();
             let angle = self
                 .editor
+                .session
                 .live
                 .as_ref()
                 .map_or(0., |l| l.params.delta.z.to_radians());
@@ -389,7 +391,7 @@ impl Operandi {
             self.status = "The axis handles are on the same point; drag one away".into();
             return;
         };
-        if self.editor.live.as_ref().is_some_and(|l| l.applied) {
+        if self.editor.session.live.as_ref().is_some_and(|l| l.applied) {
             // Keep the turn so far as its own step, then turn about the new axis.
             self.run(Command::Drop);
             self.activate(Tool::Rotate);

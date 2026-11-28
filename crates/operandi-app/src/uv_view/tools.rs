@@ -89,6 +89,7 @@ impl Operandi {
     /// The live tool when it is `tool` in UV space.
     pub(crate) fn uv_tool_is(&self, tool: Tool) -> bool {
         self.editor
+            .session
             .live
             .as_ref()
             .is_some_and(|l| l.tool == tool && l.params.uv.is_some())
@@ -96,7 +97,7 @@ impl Operandi {
 
     /// UVT-131: what a press with Element Move would grab under `p`.
     pub(super) fn uv_tweak_pick(&mut self, r: Rect, uv: &UvView, p: Pos2) -> Option<TweakGrab> {
-        let mode = self.editor.live.as_ref()?.params.tweak_options.mode;
+        let mode = self.editor.session.live.as_ref()?.params.tweak_options.mode;
         let proxy = self.editor.uv_tool_proxy()?;
         let element = pick(&proxy, mode, r, uv, p)?;
         Some(TweakGrab {
@@ -171,7 +172,7 @@ impl Operandi {
         params.tweak = Some(grab);
         params.delta = glam::DVec3::new(d.x, d.y, 0.);
         // What moves was worked out at the first frame; keep it.
-        let live = self.editor.live.as_ref();
+        let live = self.editor.session.live.as_ref();
         params.tweak_plan = live.and_then(|l| l.params.tweak_plan.clone());
         if let (Some(space), Some(now)) =
             (params.uv.as_mut(), live.and_then(|l| l.params.uv.as_ref()))
@@ -193,6 +194,7 @@ impl Operandi {
         let dx = (to.x - from.x) as f64;
         let Some(mut params) = self
             .editor
+            .session
             .live
             .as_ref()
             .filter(|l| l.tool == Tool::Tweak)
@@ -237,6 +239,7 @@ impl Operandi {
         // The UV tab's solvers take Iterations from a drag in any view.
         if self
             .editor
+            .session
             .live
             .as_ref()
             .is_some_and(|l| matches!(l.tool, Tool::UvUnwrap | Tool::UvRelax | Tool::UvPelt))
@@ -270,11 +273,17 @@ impl Operandi {
         let mut params = base.clone();
         let dx = (p.x - start.x) as f64 / 200.;
         let du = (p.x - start.x) as f64 / uv.zoom.max(1e-9);
-        let tool = self.editor.live.as_ref().map(|l| l.tool);
+        let tool = self.editor.session.live.as_ref().map(|l| l.tool);
         if let Some(t) = tool
             && let Some(next) = self.uv_iterations_drag(base, t, (p.x - start.x) as f64)
         {
-            if self.editor.live.as_ref().is_some_and(|l| l.params != next) {
+            if self
+                .editor
+                .session
+                .live
+                .as_ref()
+                .is_some_and(|l| l.params != next)
+            {
                 self.run(Command::Preview(next));
                 self.clear_fields();
             }
@@ -307,12 +316,17 @@ impl Operandi {
         }
         if let (Some(space), Some(now)) = (
             params.uv.as_mut(),
-            self.editor.live.as_ref().and_then(|l| l.params.uv.as_ref()),
+            self.editor
+                .session
+                .live
+                .as_ref()
+                .and_then(|l| l.params.uv.as_ref()),
         ) {
             space.proxy = now.proxy.clone();
         }
         if self
             .editor
+            .session
             .live
             .as_ref()
             .is_some_and(|l| l.params == params)
@@ -329,6 +343,7 @@ impl Operandi {
         use theme::viewport as palette;
         let Some(proxy) = self
             .editor
+            .session
             .live
             .as_ref()
             .filter(|l| l.tool == Tool::Tweak)
@@ -412,6 +427,7 @@ impl Operandi {
         if let Some(Drag::TweakRange { center, .. }) = uv.drag {
             let options = self
                 .editor
+                .session
                 .live
                 .as_ref()
                 .map(|l| l.params.tweak_options)
@@ -615,7 +631,7 @@ impl Operandi {
             return None;
         }
         let (lo, hi) = self.editor.uv_box_base()?;
-        let b = self.editor.live.as_ref()?.params.uv_box;
+        let b = self.editor.session.live.as_ref()?.params.uv_box;
         let corners =
             [lo, DVec2::new(hi.x, lo.y), hi, DVec2::new(lo.x, hi.y)].map(|c| b.apply(c, lo, hi));
         let pivot = b.pivot_of(lo, hi) + b.offset;
@@ -631,7 +647,7 @@ impl Operandi {
         secondary: bool,
     ) -> Option<Drag> {
         let (corners, pivot, bounds) = self.uv_box_now()?;
-        let base = Box::new(self.editor.live.as_ref()?.params.clone());
+        let base = Box::new(self.editor.session.live.as_ref()?.params.clone());
         let s = corners.map(|c| uv.to_screen(r, c));
         let near = |p: Pos2, d: f32| p.distance(at) <= d;
         let grab = if secondary {
@@ -779,12 +795,17 @@ impl Operandi {
         }
         if let (Some(space), Some(now)) = (
             params.uv.as_mut(),
-            self.editor.live.as_ref().and_then(|l| l.params.uv.as_ref()),
+            self.editor
+                .session
+                .live
+                .as_ref()
+                .and_then(|l| l.params.uv.as_ref()),
         ) {
             space.proxy = now.proxy.clone();
         }
         if self
             .editor
+            .session
             .live
             .as_ref()
             .is_some_and(|l| l.params == params)
@@ -813,6 +834,7 @@ impl Operandi {
         }
         let show = self
             .editor
+            .session
             .live
             .as_ref()
             .is_some_and(|l| l.params.uv_box.show_rotation_handle);
@@ -869,6 +891,7 @@ impl Operandi {
     /// Relax with Interactive on (UVS-1 §3).
     fn relax_interactive(&self) -> bool {
         self.editor
+            .session
             .live
             .as_ref()
             .is_some_and(|l| l.tool == Tool::UvRelax && l.params.uv_relax.interactive)
@@ -898,7 +921,7 @@ impl Operandi {
         if !self.relax_interactive() {
             return false;
         }
-        let live = self.editor.live.as_ref().expect("checked");
+        let live = self.editor.session.live.as_ref().expect("checked");
         let mut params = live.params.clone();
         let near_pin = params
             .uv_relax
@@ -948,6 +971,7 @@ impl Operandi {
         self.status = format!(
             "{} pins · drag a pin to pull the map",
             self.editor
+                .session
                 .live
                 .as_ref()
                 .map_or(0, |l| l.params.uv_relax.pins.len())
@@ -966,7 +990,7 @@ impl Operandi {
         if !self.relax_interactive() || mods.command || mods.ctrl {
             return None;
         }
-        let params = self.editor.live.as_ref()?.params.clone();
+        let params = self.editor.session.live.as_ref()?.params.clone();
         let index = params
             .uv_relax
             .pins
@@ -986,6 +1010,7 @@ impl Operandi {
         }
         for pin in &self
             .editor
+            .session
             .live
             .as_ref()
             .expect("checked")

@@ -2706,7 +2706,7 @@ pub enum ShaderTreeEdit {
 
 impl crate::Editor {
     pub(crate) fn edit_shader_tree(&mut self, edit: ShaderTreeEdit) -> crate::Result<()> {
-        if self.pen_draft.is_some() {
+        if self.session.pen_draft.is_some() {
             return Err("Finish or Cancel Pen before editing the shader tree".into());
         }
         if self.i2_active() {

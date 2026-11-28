@@ -18,7 +18,7 @@ pub(super) fn capture(app: &mut Operandi, ctx: &Context) {
         "epoch":app.editor.identities.epoch,"publication":app.editor.identities.publication,"request":app.editor.identities.request,"next_id":app.editor.identities.next_id().ok(),
         "identities":app.editor.identities.current,"scene":app.editor.scene,
         "undo":checkpoints(&app.editor.history.undo),"redo":checkpoints(&app.editor.history.redo),
-        "live":app.editor.live.as_ref().map(|l|serde_json::json!({"tool":l.tool.label(),"applied":l.applied,"extent":l.params.extent,"mode":format!("{:?}",l.params.extrude_mode),"sides":l.params.extrude_sides,"uvs":format!("{:?}",l.params.extrude_uvs),"preview_error":l.preview_error})),
+        "live":app.editor.session.live.as_ref().map(|l|serde_json::json!({"tool":l.tool.label(),"applied":l.applied,"extent":l.params.extent,"mode":format!("{:?}",l.params.extrude_mode),"sides":l.params.extrude_sides,"uvs":format!("{:?}",l.params.extrude_uvs),"preview_error":l.preview_error})),
         "i2":app.editor.i2.selected.as_ref().map(|s|serde_json::json!({"key":s.key,"anchor":s.anchor,"cursor":s.cursor,"ever_parked":s.ever_parked,"base":s.base.scene,"begun":s.begun.scene,"movement":s.movement.as_ref().map(|m|&m.scene),"base_ids":s.base.identities,"begun_ids":s.begun.identities,"frame":s.frame.map(|f|serde_json::json!({"center":f.center,"basis":f.basis})),"plan":s.plan,"armed_extent":s.armed_params.extent,"movement_extent":s.movement_params.as_ref().map(|p|p.extent)})),
         "i2_prior":app.editor.i2.prior.as_ref().map(|s|serde_json::json!({"key":s.key,"cursor":s.cursor})),
         "stage_next":app.editor.i2.serial.next().ok(),

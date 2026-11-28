@@ -138,6 +138,7 @@ fn ctrl_constrains_move_and_steps_rotate() {
     // step's.
     let step = |a: &Operandi| {
         a.editor
+            .session
             .last_transform_step
             .as_ref()
             .unwrap()
@@ -527,7 +528,15 @@ fn uvt131_element_move_drags_the_uv_point_under_the_pointer() {
         &ctx,
         &[middle, middle + vec2(20., 0.), middle + vec2(40., 0.)],
     );
-    let range = a.editor.live.as_ref().unwrap().params.tweak_options.range;
+    let range = a
+        .editor
+        .session
+        .live
+        .as_ref()
+        .unwrap()
+        .params
+        .tweak_options
+        .range;
     let want = 40. * crate::viewport::tweak_view::TWEAK_RANGE_RATE / v.zoom;
     assert!((range - want).abs() < 1e-9, "{range} vs {want}");
 }
@@ -551,7 +560,14 @@ fn uvt131_element_move_picks_uvs_where_they_moved_to() {
     let mut a = uv_app(&ctx);
     a.run(Command::Activate(Tool::Tweak));
     draw(&mut a, &ctx, SIZE, vec![]);
-    a.editor.live.as_mut().unwrap().params.tweak_options.mode = operandi_core::TweakMode::Polygon;
+    a.editor
+        .session
+        .live
+        .as_mut()
+        .unwrap()
+        .params
+        .tweak_options
+        .mode = operandi_core::TweakMode::Polygon;
     let v = view(&a);
     let hover = |a: &mut Operandi, p: Pos2| {
         draw(a, &ctx, SIZE, vec![Event::PointerMoved(p)]);
@@ -661,7 +677,7 @@ fn jitter_started_in_a_uv_view_edits_uvs_and_greys_range_z() {
     let c = v.to_screen(v.rect, DVec2::splat(0.5));
     // Drag right widens Range in UV units.
     drag(&mut a, &ctx, c, c + vec2(15., 0.), Modifiers::NONE);
-    let r = a.editor.live.as_ref().unwrap().params.jitter.range;
+    let r = a.editor.session.live.as_ref().unwrap().params.jitter.range;
     assert!(r.x > 0. && r.z == 0., "{r}");
     assert_ne!(uvs(&a), before);
     assert_eq!(a.editor.scene.active().unwrap().mesh.vertices, points);
@@ -720,11 +736,27 @@ fn unwrap_tool_drag_in_a_uv_view_changes_iterations() {
     let mut a = uv_app(&ctx);
     a.run(Command::Activate(Tool::UvUnwrap));
     draw(&mut a, &ctx, SIZE, vec![]);
-    let start = a.editor.live.as_ref().unwrap().params.uv_unwrap.iterations;
+    let start = a
+        .editor
+        .session
+        .live
+        .as_ref()
+        .unwrap()
+        .params
+        .uv_unwrap
+        .iterations;
     let v = view(&a);
     let c = v.to_screen(v.rect, DVec2::splat(0.5));
     drag(&mut a, &ctx, c, c + vec2(-40., 0.), Modifiers::NONE);
-    let now = a.editor.live.as_ref().unwrap().params.uv_unwrap.iterations;
+    let now = a
+        .editor
+        .session
+        .live
+        .as_ref()
+        .unwrap()
+        .params
+        .uv_unwrap
+        .iterations;
     assert_eq!(
         now as f64,
         start as f64 - 40. / crate::uv_tool_forms::PIXELS_PER_ITERATION

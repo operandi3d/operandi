@@ -157,7 +157,7 @@ fn a_pick_moves_the_tool_and_the_next_pick_moves_it_again() {
     e.dispatch(Command::ActionContext(ActionContext::ELEMENT_UNPICKED))
         .unwrap();
     e.dispatch(Command::Activate(Tool::Rotate)).unwrap();
-    let live = |e: &Editor| e.live.as_ref().unwrap().action_frame.unwrap();
+    let live = |e: &Editor| e.session.live.as_ref().unwrap().action_frame.unwrap();
     assert_eq!(live(&e).center, DVec3::ZERO);
     assert_eq!(live(&e).basis, DMat3::IDENTITY);
 
@@ -183,7 +183,7 @@ fn a_pick_moves_the_tool_and_the_next_pick_moves_it_again() {
     // Rotate Z by 90° turns the selected polygon about its own normal
     // through its middle (the last pick).
     let before = e.scene.active().unwrap().mesh.vertices.clone();
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     p.delta = dvec3(0., 0., 90.);
     e.dispatch(Command::Preview(p)).unwrap();
     let after = &e.scene.active().unwrap().mesh.vertices;
@@ -209,7 +209,7 @@ fn a_pick_fills_only_the_element_part_of_a_mixed_action_center() {
         e.dispatch(Command::ActionContext(context.picked(pick)))
             .unwrap();
         e.dispatch(Command::Activate(Tool::Scale)).unwrap();
-        let f = e.live.as_ref().unwrap().action_frame.unwrap();
+        let f = e.session.live.as_ref().unwrap().action_frame.unwrap();
         e.dispatch(Command::Cancel).unwrap();
         f
     };

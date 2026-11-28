@@ -71,16 +71,42 @@ fn command_surface_units_and_readonly_errors() {
     assert_eq!(a.command_active(), Some(8));
     a.execute("tool.attr poly.smshift scale 0.5");
     assert_eq!(
-        a.editor.live.as_ref().unwrap().params.smooth_shift.scale,
+        a.editor
+            .session
+            .live
+            .as_ref()
+            .unwrap()
+            .params
+            .smooth_shift
+            .scale,
         0.5
     );
     a.execute("tool.attr poly.smshift scale 50%");
     assert_eq!(
-        a.editor.live.as_ref().unwrap().params.smooth_shift.scale,
+        a.editor
+            .session
+            .live
+            .as_ref()
+            .unwrap()
+            .params
+            .smooth_shift
+            .scale,
         0.5
     );
     a.execute("tool.attr poly.smshift shift {0.1m + 100mm}");
-    assert!((a.editor.live.as_ref().unwrap().params.smooth_shift.offset - 0.2).abs() < 1e-9);
+    assert!(
+        (a.editor
+            .session
+            .live
+            .as_ref()
+            .unwrap()
+            .params
+            .smooth_shift
+            .offset
+            - 0.2)
+            .abs()
+            < 1e-9
+    );
     let scene = a.editor.scene.clone();
     let active = a.command_active();
     for text in [
@@ -105,7 +131,7 @@ fn review_regressions_before_fixes() {
     let mut a = box_app();
     a.editor.scene.selection.faces = vec![5];
     a.execute("spike");
-    assert!(a.editor.spike.is_some());
+    assert!(a.editor.session.spike.is_some());
     a.fields.insert("spi_strength".into(), "0".into());
     a.confirmed_fields.insert("spi_strength".into(), "0".into());
     a.execute("tool.attr poly.spikey factor 0.25");
@@ -123,7 +149,15 @@ fn review_surface_fields_all_attributes_and_drafts() {
         let mut a = box_app();
         a.editor.scene.selection.faces = vec![5];
         a.execute(tool);
-        assert!(a.editor.live.as_ref().unwrap().tool.is_smooth_shift());
+        assert!(
+            a.editor
+                .session
+                .live
+                .as_ref()
+                .unwrap()
+                .tool
+                .is_smooth_shift()
+        );
         for (key, text) in [
             ("sst_offset", "0"),
             ("sst_scale", "100"),
@@ -151,7 +185,7 @@ fn review_surface_fields_all_attributes_and_drafts() {
             assert_eq!(a.status, "1");
         }
         let before = a.editor.scene.clone();
-        let old = a.editor.live.as_ref().unwrap().params.smooth_shift;
+        let old = a.editor.session.live.as_ref().unwrap().params.smooth_shift;
         a.fields.insert("sst_offset".into(), "bad draft".into());
         for cmd in [
             "help tool.attr",
@@ -166,7 +200,10 @@ fn review_surface_fields_all_attributes_and_drafts() {
             assert_eq!(a.editor.scene, before);
         }
         a.execute("tool.attr poly.smshift shift 0.4m");
-        assert_eq!(a.editor.live.as_ref().unwrap().params.smooth_shift, old);
+        assert_eq!(
+            a.editor.session.live.as_ref().unwrap().params.smooth_shift,
+            old
+        );
     }
 }
 #[test]
@@ -391,13 +428,27 @@ fn acceptance_properties_expected_values_and_pending_drafts() {
         a.fields.insert("sst_offset".into(), "-0.3 m".into());
         assert!(a.confirm_fields());
         assert_eq!(
-            a.editor.live.as_ref().unwrap().params.smooth_shift.offset,
+            a.editor
+                .session
+                .live
+                .as_ref()
+                .unwrap()
+                .params
+                .smooth_shift
+                .offset,
             -0.3
         );
         a.fields.insert("sst_offset".into(), "-0.4 m".into());
         a.execute("tool.attr poly.smshift scale 50%");
         assert_eq!(
-            a.editor.live.as_ref().unwrap().params.smooth_shift.offset,
+            a.editor
+                .session
+                .live
+                .as_ref()
+                .unwrap()
+                .params
+                .smooth_shift
+                .offset,
             -0.4
         );
         assert_eq!(a.fields["sst_scale"], "50 %");
@@ -418,19 +469,19 @@ fn acceptance_properties_expected_values_and_pending_drafts() {
     let mut a = box_app();
     a.editor.scene.selection.faces = vec![5];
     a.execute("spike");
-    assert!(a.editor.spike.is_some());
+    assert!(a.editor.session.spike.is_some());
     a.fields.insert("spi_strength".into(), "0".into());
     a.confirmed_fields.insert("spi_strength".into(), "0".into());
     a.fields.insert("spi_strength".into(), "0.1".into());
     a.execute("tool.attr poly.spikey factor 0.25");
-    assert_eq!(a.editor.spike.as_ref().unwrap().requested, 0.25);
+    assert_eq!(a.editor.session.spike.as_ref().unwrap().requested, 0.25);
     assert_eq!(a.fields["spi_strength"], "0.25");
     assert_eq!(a.confirmed_fields["spi_strength"], "0.25");
     a.execute("tool.attr poly.spikey factor ?");
     assert_eq!(a.status, "0.25");
     a.fields.insert("spi_strength".into(), "0.4".into());
     assert!(a.confirm_fields());
-    assert_eq!(a.editor.spike.as_ref().unwrap().requested, 0.4);
+    assert_eq!(a.editor.session.spike.as_ref().unwrap().requested, 0.4);
     a.fields.insert("spi_strength".into(), "bad".into());
     let before = a.editor.clone();
     a.execute("tool.attr poly.spikey factor 0.8");
@@ -464,10 +515,14 @@ fn acceptance_reset_and_lifecycle_shared_routes() {
         // MN-05.4: tool.reset is its own named step, so compare what it
         // did rather than the tool's undo history.
         assert!(a.editor.scene == b.editor.scene, "reset {id}");
-        assert_eq!(a.editor.active_task(), b.editor.active_task(), "{id}");
         assert_eq!(
-            a.editor.live.as_ref().map(|l| &l.params),
-            b.editor.live.as_ref().map(|l| &l.params),
+            a.editor.session.active_task(),
+            b.editor.session.active_task(),
+            "{id}"
+        );
+        assert_eq!(
+            a.editor.session.live.as_ref().map(|l| &l.params),
+            b.editor.session.live.as_ref().map(|l| &l.params),
             "{id}"
         );
         let before = a.editor.clone();
@@ -499,7 +554,7 @@ fn acceptance_reset_and_lifecycle_shared_routes() {
             );
         }
         if phase > 1 {
-            let mut p = a.editor.live.as_ref().unwrap().params.clone();
+            let mut p = a.editor.session.live.as_ref().unwrap().params.clone();
             p.extent = DVec3::Z * 0.5;
             a.run(Command::ConfigureExtrude(p));
             assert_eq!(a.status, "Ready", "movement must succeed");
@@ -507,7 +562,7 @@ fn acceptance_reset_and_lifecycle_shared_routes() {
             assert_eq!(stage.cursor, 2);
             assert!(stage.movement.is_some());
             assert_eq!(
-                a.editor.live.as_ref().unwrap().params.extent,
+                a.editor.session.live.as_ref().unwrap().params.extent,
                 DVec3::Z * 0.5
             );
             assert_eq!(
@@ -623,7 +678,7 @@ fn acceptance_surface_typed_equivalence_and_switch_confirmation() {
             let mut b = Operandi::empty();
             b.editor = a.editor.clone();
             a.execute(&format!("tool.attr poly.smshift {attr} {value}"));
-            let mut p = b.editor.live.as_ref().unwrap().params.smooth_shift;
+            let mut p = b.editor.session.live.as_ref().unwrap().params.smooth_shift;
             match attr {
                 "shift" => p.offset = -0.2,
                 "scale" => p.scale = 0.5,

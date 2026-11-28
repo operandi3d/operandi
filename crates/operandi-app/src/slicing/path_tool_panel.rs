@@ -125,7 +125,7 @@ impl Operandi {
             .tip("Remove every path point and start again")
             .enabled_if(!t.curve.points.is_empty(), "The path has no points yet"),
         ]);
-        let live = self.editor.live.as_ref();
+        let live = self.editor.session.live.as_ref();
         if let Some(error) = live.and_then(|l| l.preview_error.as_ref()) {
             f.error(error.clone());
         }

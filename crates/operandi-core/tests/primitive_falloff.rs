@@ -13,7 +13,7 @@ fn editor() -> Editor {
 }
 fn live_cylinder(e: &mut Editor) {
     e.dispatch(Command::Activate(Tool::Cylinder)).unwrap();
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     p.radial = Some(RadialParameters {
         radius: DVec3::new(0.5, 0.75, 0.5),
         sides: 12,
@@ -47,7 +47,7 @@ fn the_falloff_can_be_turned_on_moved_and_off_without_dropping_the_tool() {
 
     e.dispatch(Command::SpatialFalloff(Some(ramp(0.75))))
         .unwrap();
-    assert!(e.live.is_some(), "the tool stays live");
+    assert!(e.session.live.is_some(), "the tool stays live");
     assert!(top_radius(&e) < 1e-9, "Scale 0% at the full end: a point");
 
     // Moving the falloff's Start (its handle) re-shapes the live preview.
@@ -68,14 +68,14 @@ fn the_falloff_can_be_turned_on_moved_and_off_without_dropping_the_tool() {
         },
     ))))
     .unwrap();
-    assert!(e.live.is_some());
+    assert!(e.session.live.is_some());
 
     e.dispatch(Command::SpatialFalloff(None)).unwrap();
-    assert!(e.live.is_some());
+    assert!(e.session.live.is_some());
     assert!((top_radius(&e) - 0.5).abs() < 1e-9, "off again: unshaped");
 
     // Back to the primitive's own values, then on again and Drop.
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     p.radial.as_mut().unwrap().sides = 16;
     e.dispatch(Command::Preview(p)).unwrap();
     e.dispatch(Command::SpatialFalloff(Some(ramp(0.75))))
@@ -83,7 +83,7 @@ fn the_falloff_can_be_turned_on_moved_and_off_without_dropping_the_tool() {
     let shown = e.scene.active().unwrap().mesh.clone();
     let history = e.history.undo.len();
     e.dispatch(Command::Drop).unwrap();
-    assert!(e.live.is_none());
+    assert!(e.session.live.is_none());
     assert_eq!(e.scene.active().unwrap().mesh.vertices, shown.vertices);
     assert_eq!(e.history.undo.len(), history + 1, "one undo step");
     e.dispatch(Command::Undo).unwrap();
@@ -95,7 +95,7 @@ fn cube_and_sphere_follow_the_falloff_too() {
     for tool in [Tool::Box, Tool::Sphere] {
         let mut e = editor();
         e.dispatch(Command::Activate(tool)).unwrap();
-        let mut p = e.live.as_ref().unwrap().params.clone();
+        let mut p = e.session.live.as_ref().unwrap().params.clone();
         p.size = DVec3::splat(1.5);
         p.shape_falloff.offset = DVec3::new(1., 0., 0.);
         e.dispatch(Command::Preview(p)).unwrap();
@@ -104,7 +104,7 @@ fn cube_and_sphere_follow_the_falloff_too() {
             .unwrap();
         let shaped = &e.scene.active().unwrap().mesh.vertices;
         assert_ne!(&plain, shaped, "{tool:?}");
-        assert!(e.live.is_some(), "{tool:?}");
+        assert!(e.session.live.is_some(), "{tool:?}");
     }
 }
 
@@ -116,7 +116,7 @@ fn falloffs_that_need_existing_points_leave_the_shape_alone_and_say_why() {
         SelectionFalloff::default(),
     ))))
     .unwrap();
-    assert!(e.live.is_some());
+    assert!(e.session.live.is_some());
     assert!((top_radius(&e) - 0.5).abs() < 1e-9);
     assert!(e.primitive_falloff_note().unwrap().contains("Selection"));
 }

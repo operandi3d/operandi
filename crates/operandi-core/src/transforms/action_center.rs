@@ -89,6 +89,11 @@ pub enum AxisOrientation {
     Parent,
     /// The mesh item's own axes (Pivot; ACS table).
     Item,
+    /// A-LOCAL: each cluster's own axes (`local_clusters`). With a centre
+    /// rule that has one centre, the axes of the cluster holding the
+    /// last-selected element (AC-RULES v6, "Mixing rules"). Resolved by
+    /// the pivot service.
+    Local,
 }
 /// An orthonormal frame stored in nanometre steps like `PickedPoint`, so
 /// contexts stay comparable. Columns X, Y, Z.
@@ -131,6 +136,7 @@ impl AxisOrientation {
             Self::Screen(_) => "Screen",
             Self::Parent => "Parent",
             Self::Item => "Item",
+            Self::Local => "Local",
         }
     }
     pub fn basis(self) -> Result<DMat3> {
@@ -144,6 +150,7 @@ impl AxisOrientation {
             )),
             Self::Element(frame) | Self::Screen(frame) => Ok(frame.basis()),
             Self::Parent | Self::Item => Err("Item axes come from the item hierarchy".into()),
+            Self::Local => Err("Local axes come from the selection's clusters".into()),
             _ => Err("Unsupported action-axis plane".into()),
         }
     }
@@ -152,6 +159,14 @@ impl AxisOrientation {
 pub struct ActionContext {
     pub center: CenterMode,
     pub axis: AxisOrientation,
+}
+impl ActionContext {
+    /// The Local Action Center: each cluster about its own centre
+    /// (C-LOCAL) with its own axes (A-LOCAL).
+    pub const LOCAL: Self = Self {
+        center: CenterMode::Local,
+        axis: AxisOrientation::Local,
+    };
 }
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct ActionFrame {
@@ -224,19 +239,6 @@ pub fn selection_basis(scene: &Scene) -> Result<DMat3> {
         None,
     ))
 }
-/// A frame with Y along normal `y`, Z as near world Z as it can be (world
-/// X when Y is along Z). Local's lone points use it (`piece_axes`); the
-/// Selection axes no longer do (A-SEL, `selection_basis`).
-fn basis_from_up(y: DVec3) -> DMat3 {
-    let projected = DVec3::Z - y * y.z;
-    let z = if projected.length() > 1e-8 {
-        projected.normalize()
-    } else {
-        (DVec3::X - y * y.x).normalize()
-    };
-    let x = y.cross(z).normalize();
-    DMat3::from_cols(x, y, x.cross(y).normalize())
-}
 impl ActionContext {
     pub fn resolve(self, scene: &Scene) -> Result<ActionFrame> {
         let item = scene
@@ -291,10 +293,12 @@ impl ActionContext {
             // AC-22: Selection Center Auto Axis takes its centre from the
             // selection but its axes from the chosen axis rule (World major
             // axes by default), never from the selection's normals.
-            basis: if self.axis == AxisOrientation::Selection {
-                selection_basis(scene)?
-            } else {
-                self.axis.basis()?
+            basis: match self.axis {
+                AxisOrientation::Selection => selection_basis(scene)?,
+                // The tool's own axes; the pivot service puts each
+                // cluster's axes in their place (`PivotRequest::resolve`).
+                AxisOrientation::Local => DMat3::IDENTITY,
+                axis => axis.basis()?,
             },
         })
     }
@@ -309,23 +313,23 @@ pub fn box_centre(points: impl Iterator<Item = DVec3>) -> DVec3 {
     (lo + hi) / 2.
 }
 
-/// Local (AC-scale-Local, AC-rotate-Local, ACL-01..04): each moved point's
-/// piece frame, pieces joined by edges whose both ends move. A piece moves,
-/// turns and scales about the middle of its own item-space bounding box
-/// (as Selection, AC-Q20) and with its own axes (`piece_axes`): the
-/// principal directions of its points, local Y the one nearest the equal
-/// vote of its polygons' normals (the selected ones in Polygon mode, those
-/// around the selected edges or points otherwise, every polygon with
-/// nothing selected), local X the other one nearest the item's X. A piece
-/// with neither a spread nor a normal keeps the tool's axes; a straight
-/// line turns the tool axis nearest it onto itself (AC-73). Item space;
-/// `LocalPiece::frame` places it in the world. Built once per preview,
-/// from the selection's neighbourhood.
-pub fn local_piece_frames(
+/// Local (C-LOCAL / A-LOCAL, AC-RULES v6): each moved point's cluster,
+/// clusters joined through the selection itself. A cluster moves, turns
+/// and scales about the middle of its own item-space bounding box (as
+/// Selection, AC-Q20) and with its own axes (`piece_axes`): local Z the
+/// equal vote of its polygons' normals (the selected ones in Polygon mode,
+/// those around the selected edges or points otherwise, every polygon with
+/// nothing selected), local X the direction it spreads in across Z that is
+/// nearest the item's X, local Y = Z × X. A piece with neither a spread
+/// nor a normal keeps the tool's axes; a straight line turns the tool axis
+/// nearest it onto itself (AC-73). Item space; `LocalPiece::frame` places
+/// it in the world. Built once per drag base by the pivot service, from
+/// the selection's neighbourhood.
+pub fn local_clusters(
     mesh: &crate::Mesh,
     moved: &BTreeSet<u32>,
     selection: &crate::Selection,
-) -> std::collections::BTreeMap<u32, LocalPiece> {
+) -> LocalClusters {
     use std::collections::BTreeMap;
     let index: BTreeMap<u32, usize> = moved.iter().enumerate().map(|(i, &v)| (v, i)).collect();
     let mut parent: Vec<usize> = (0..moved.len()).collect();
@@ -463,33 +467,52 @@ pub fn local_piece_frames(
             } else {
                 piece_axes(&cloud, up)
             };
-            // The column that carries the normal (`normal_on_nearest_axis`).
-            let normal_axis = match (axes, up) {
-                (Some(a), Some(n)) => (0..3)
-                    .max_by(|&i, &j| a.col(i).dot(n).abs().total_cmp(&a.col(j).dot(n).abs()))
-                    .unwrap_or(1),
-                _ => 1,
-            };
-            (
-                r,
-                LocalPiece {
-                    center,
-                    axes,
-                    line,
-                    normal_axis,
-                },
-            )
+            (r, LocalPiece { center, axes, line })
         })
         .collect();
-    points
+    // Clusters are numbered in the order of their lowest point, so a
+    // cluster keeps its number however the selection was made.
+    let mut number: BTreeMap<usize, usize> = BTreeMap::new();
+    let mut out = LocalClusters::default();
+    for (i, &v) in points.iter().enumerate() {
+        let r = root(&mut parent, i);
+        let cluster = *number.entry(r).or_insert_with(|| {
+            out.pieces.push(pieces[&r]);
+            out.pieces.len() - 1
+        });
+        out.of.insert(v, cluster);
+    }
+    out
+}
+
+/// The clusters of a Local selection (`local_clusters`): each cluster's
+/// piece, and which cluster every moved point belongs to. Two clusters
+/// that happen to have the same centre and axes are still two.
+#[derive(Clone, Debug, Default, PartialEq)]
+pub struct LocalClusters {
+    pub pieces: Vec<LocalPiece>,
+    /// Moved point → index into `pieces`.
+    pub of: std::collections::BTreeMap<u32, usize>,
+}
+
+/// Each moved point's piece (`local_clusters`, without the clusters'
+/// identity).
+pub fn local_piece_frames(
+    mesh: &crate::Mesh,
+    moved: &BTreeSet<u32>,
+    selection: &crate::Selection,
+) -> std::collections::BTreeMap<u32, LocalPiece> {
+    let clusters = local_clusters(mesh, moved, selection);
+    clusters
+        .of
         .iter()
-        .enumerate()
-        .map(|(i, &v)| (v, pieces[&root(&mut parent, i)]))
+        .map(|(&v, &cluster)| (v, clusters.pieces[cluster]))
         .collect()
 }
 
 /// One Local piece in item space: its box middle and its axes (columns X,
-/// Y, Z, right-handed; `None`: the tool's own axes).
+/// Y, Z, right-handed, Z the polygons' normal; `None`: the tool's own
+/// axes).
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct LocalPiece {
     pub center: DVec3,
@@ -497,9 +520,6 @@ pub struct LocalPiece {
     /// A straight line (one edge, or edges in a row): its direction, item
     /// space. Its frame is the tool's axes turned onto it (AC-73).
     pub line: Option<DVec3>,
-    /// Which column of `axes` is the polygons' normal (1, Y, unless the
-    /// normal is nearer the item's Z or X).
-    pub normal_axis: usize,
 }
 impl LocalPiece {
     /// The piece's world frame for an item with world matrix `world`;
@@ -512,23 +532,15 @@ impl LocalPiece {
                 basis: line_frame_basis(fallback, linear * along),
             };
         }
-        // The normal goes to the world by the inverse transpose; the next
-        // axis by the item's own matrix, then squared up against it.
+        // The normal (Z) goes to the world by the inverse transpose; X by
+        // the item's own matrix, then squared up against it.
         let basis = self
             .axes
             .and_then(|a| {
-                let k = self.normal_axis.min(2);
-                let (k1, k2) = ((k + 1) % 3, (k + 2) % 3);
-                let n = (linear.inverse().transpose() * a.col(k)).normalize_or_zero();
-                let c2 = n.cross(linear * a.col(k1)).normalize_or_zero();
+                let z = (linear.inverse().transpose() * a.z_axis).normalize_or_zero();
+                let y = z.cross(linear * a.x_axis).normalize_or_zero();
                 let ok = |v: DVec3| v.is_finite() && v != DVec3::ZERO;
-                (ok(n) && ok(c2)).then(|| {
-                    let mut cols = [DVec3::ZERO; 3];
-                    cols[k] = n;
-                    cols[k1] = c2.cross(n);
-                    cols[k2] = c2;
-                    DMat3::from_cols(cols[0], cols[1], cols[2])
-                })
+                (ok(z) && ok(y)).then(|| DMat3::from_cols(y.cross(z), y, z))
             })
             .unwrap_or(fallback);
         ActionFrame {
@@ -537,23 +549,20 @@ impl LocalPiece {
         }
     }
     /// Its mirror image across `symmetry` (the frame a point brought over
-    /// from the other side is transformed in, SYM-TR-02), kept
+    /// from the other side is transformed in, SYM-TR-02 / S-09): the frame
+    /// the mirrored cluster would get by `piece_axes`. Z is the mirrored
+    /// normal and X the mirrored X, pointed by `local_x_sign`, so a
+    /// mirrored cluster's frame is its partner's; Y = Z × X keeps it
     /// right-handed.
     pub fn mirrored(self, symmetry: crate::Symmetry) -> Self {
         Self {
             center: symmetry.mirror(self.center),
             axes: self.axes.map(|a| {
-                // X keeps pointing along +X (ACL-02), so a mirrored
-                // island's frame is its partner's.
-                let mut x = symmetry.mirror_vector(a.x_axis);
-                if x.x < 0. {
-                    x = -x;
-                }
-                let y = symmetry.mirror_vector(a.y_axis);
-                DMat3::from_cols(x, y, x.cross(y))
+                let z = symmetry.mirror_vector(a.z_axis);
+                let x = local_x_sign(symmetry.mirror_vector(a.x_axis));
+                DMat3::from_cols(x, z.cross(x), z)
             }),
             line: self.line.map(|d| symmetry.mirror_vector(d)),
-            normal_axis: self.normal_axis,
         }
     }
 }
@@ -573,30 +582,50 @@ pub const LOCAL_CANCELLED: f64 = 1. / 3.;
 /// as equal (ACL-03, ACL-Q3).
 const LOCAL_TIE: f64 = 1e-4;
 
-/// A Local piece's item-space axes (ACL-02/03, provisional ACL-Q1..Q4):
-/// the principal directions of its points (each point weighs the same).
-/// Y is the one nearest `up` (its polygons' normal), pointed with it, or
-/// the one of least spread when the piece has no normal. X is, of the
-/// other two, the one nearest the item's X, pointed along +X; when both
-/// are as near, the one of more spread (an L of three quads takes its
-/// long diagonal); when both spread the same (a square, turned or not),
-/// the item's X laid into the piece's plane. Z = X × Y. With no spread
-/// (one point), D18-A's frame from the normal; with neither, `None`.
-/// Straight lines take `line_frame_basis` instead.
+/// A Local piece's item-space axes (A-LOCAL, AC-RULES v6; columns X, Y, Z).
+///
+/// The axes are the principal directions of its points (each point weighs
+/// the same). Z is the one nearest `up`, the vote of its polygons'
+/// normals, pointed with it, at any tilt: on a flat cluster the normal
+/// itself; on a bent one the cluster's own thin direction (ACS-10/11 were
+/// recorded with it). X is, of the other two, the one nearest the item's
+/// X, pointed along +X. Y = Z × X.
+///
+/// Equal spread (a square, turned or not; one point): the item's X laid
+/// square to Z, or the item's Z when Z runs along X (`element_axes`, as
+/// A-ELEM).
+///
+/// Both directions as near X: the one nearer the item's Z, so a wall
+/// facing straight along X gets its level direction (provisional, ACR-Q30:
+/// the sheet names no second choice); still equal, the one of more spread
+/// (an L of three quads takes its long diagonal, ACL-03).
+///
+/// No normal (wires, or normals that cancel, FG-Q02): Z is the direction
+/// of least spread, pointed along +Y. Neither a spread nor a normal:
+/// `None`. Straight lines take `line_frame_basis` instead.
+///
+/// Until 2026-11-28 the normal went on the item axis nearest it (Y for a
+/// floor, X or Z for a wall; AC-Q5), which gave a wall facing −X the
+/// opposite Z of one facing +X: opposite cube walls turned opposite ways
+/// about the direction they share (Jason's report).
 fn piece_axes(points: &[DVec3], up: Option<DVec3>) -> Option<DMat3> {
-    let from_up = || up.map(basis_from_up);
+    let level = |z: DVec3| crate::element_center::element_axes(z, DVec3::ZERO);
+    let from_normal = || up.map(level);
     if points.len() < 2 {
-        return from_up();
+        return from_normal();
     }
     let axes = principal_axes(points);
     let most = axes[0].0;
     if !(most.is_finite() && most > 1e-18) {
-        return from_up();
+        return from_normal();
     }
     // A straight line (one edge, or edges in a row) never gets here: its
     // frame is `line_frame_basis` (AC-73).
-    let y_at = match up {
-        // Ties go to the one of least spread (searched from the end).
+    //
+    // The principal direction that stands for the normal: the one nearest
+    // the vote (ties go to the one of least spread, searched from the
+    // end), or the one of least spread without a vote.
+    let z_at = match up {
         Some(n) => (0..3)
             .rev()
             .max_by(|&a, &b| {
@@ -606,64 +635,51 @@ fn piece_axes(points: &[DVec3], up: Option<DVec3>) -> Option<DMat3> {
             .unwrap_or(2),
         None => 2,
     };
-    let mut y = axes[y_at].1;
-    let toward = up.unwrap_or(DVec3::Y);
-    if y.dot(toward) < 0. {
-        y = -y;
+    let mut z = axes[z_at].1;
+    let toward = match up {
+        Some(n) => z.dot(n),
+        None => [z.y, z.z, z.x]
+            .into_iter()
+            .find(|c| c.abs() > 1e-9)
+            .unwrap_or(1.),
+    };
+    if toward < 0. {
+        z = -z;
     }
-    let rest: Vec<usize> = (0..3).filter(|&k| k != y_at).collect();
-    let (a, b) = (rest[0], rest[1]);
-    let in_plane = DVec3::X - y * y.x;
-    let x = if (axes[a].0 - axes[b].0).abs() <= LOCAL_TIE * most && in_plane.length() > 1e-6 {
-        in_plane
-    } else {
-        let (da, db) = (axes[a].1.x.abs(), axes[b].1.x.abs());
+    let rest: Vec<usize> = (0..3).filter(|&k| k != z_at).collect();
+    let (first, second) = (axes[rest[0]], axes[rest[1]]);
+    if (first.0 - second.0).abs() <= LOCAL_TIE * most {
+        return Some(level(z));
+    }
+    let nearer = |part: fn(DVec3) -> f64| {
+        let (da, db) = (part(first.1).abs(), part(second.1).abs());
         if db > da + LOCAL_TIE {
-            axes[b].1
+            Some(second.1)
+        } else if da > db + LOCAL_TIE {
+            Some(first.1)
         } else {
-            axes[a].1
+            None
         }
     };
-    let mut x = (x - y * x.dot(y)).normalize_or_zero();
+    let x = nearer(|d| d.x)
+        .or_else(|| nearer(|d| d.z))
+        .unwrap_or(first.1);
+    // Principal directions are square to each other; squared up once more
+    // so the frame is exactly orthonormal.
+    let x = local_x_sign((x - z * x.dot(z)).normalize_or_zero());
     if x == DVec3::ZERO || !x.is_finite() {
-        return from_up();
+        return from_normal();
     }
-    if x.x < 0. {
-        x = -x;
-    }
-    Some(normal_on_nearest_axis(x, y))
+    Some(DMat3::from_cols(x, z.cross(x), z))
 }
 
-/// Which local axis carries a polygon cluster's normal (Jason, 2026-11-21,
-/// provisional AC-Q5): the item axis nearest the normal, as a line takes
-/// the axis nearest it (AC-73). A cluster facing up keeps Y on its normal
-/// (ACS-11/12: Rotate Y turns about the normal); one on a wall facing Z
-/// puts Z on its normal, Y up the wall as far as the surface allows and X
-/// around it; one facing X puts X on its normal and Y up. Ties keep Y,
-/// then Z. `x` and `y` come from `piece_axes` (X the in-plane principal
-/// direction nearest item X, Y the normal).
-fn normal_on_nearest_axis(x: DVec3, normal: DVec3) -> DMat3 {
-    let (ax, ay, az) = (normal.x.abs(), normal.y.abs(), normal.z.abs());
-    if ay >= ax && ay >= az {
-        return DMat3::from_cols(x, normal, x.cross(normal));
+/// Local X's sign: along the item's +X; with no X part, along +Z, then
+/// +Y (the order `piece_axes` picks its direction in).
+fn local_x_sign(x: DVec3) -> DVec3 {
+    match [x.x, x.z, x.y].into_iter().find(|c| c.abs() > 1e-9) {
+        Some(c) if c < 0. => -x,
+        _ => x,
     }
-    if az >= ax {
-        // Z out of the surface; X the in-plane direction nearest item X,
-        // turned so Y = Z × X points up.
-        let mut x = x;
-        if normal.cross(x).y < 0. {
-            x = -x;
-        }
-        let y = normal.cross(x);
-        return DMat3::from_cols(x, y, normal);
-    }
-    // X out of the surface; Y the in-plane direction nearest up.
-    let other = normal.cross(x).normalize_or_zero();
-    let mut y = if other.y.abs() > x.y.abs() { other } else { x };
-    if y.y < 0. {
-        y = -y;
-    }
-    DMat3::from_cols(normal, y, normal.cross(y))
 }
 
 /// Whether `points` lie on one line with some length (one edge, or edges

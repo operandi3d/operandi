@@ -44,7 +44,7 @@ fn editor(center: CenterMode) -> Editor {
     e
 }
 fn preview(e: &mut Editor, f: impl FnOnce(&mut Parameters)) {
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     f(&mut p);
     e.dispatch(Command::Preview(p)).unwrap();
 }
@@ -126,12 +126,12 @@ fn ext_rs_04_shift_click_extends_again_from_the_new_loop() {
     // The same values again, at once, relative to the first new loop.
     assert_square(&outer_points(&e), 0.25, -2.);
     assert_eq!(mesh(&e).faces.len(), 9);
-    let live = e.live.as_ref().unwrap();
+    let live = e.session.live.as_ref().unwrap();
     assert_eq!(live.params.scale_delta, DVec3::splat(0.5));
     assert_eq!(*live.base.active().unwrap().mesh, first);
     // Drop keeps both; Undo takes them back one extension at a time.
     e.dispatch(Command::Drop).unwrap();
-    assert!(e.live.is_none());
+    assert!(e.session.live.is_none());
     assert_square(&outer_points(&e), 0.25, -2.);
     e.dispatch(Command::Undo).unwrap();
     assert_eq!(mesh(&e), first);
@@ -260,7 +260,7 @@ fn bad_values_are_refused_and_change_nothing() {
     };
     assert!(edge_extend_shaped(&m, &LOOP, glam::DMat4::IDENTITY, &shape).is_err());
     let mut e = editor(CenterMode::Automatic);
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     p.scale_delta.x = f64::INFINITY;
     assert!(e.dispatch(Command::Preview(p)).is_err());
     assert_eq!(mesh(&e), square());

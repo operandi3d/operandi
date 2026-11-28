@@ -396,7 +396,6 @@ impl Operandi {
             size,
             position,
             min_size: [420., 200.],
-            on_top: false,
         };
         let shown = self.os_window(ctx, spec, |app, ctx| {
             egui::CentralPanel::default()

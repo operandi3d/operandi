@@ -72,7 +72,7 @@ fn check_with(o: &Value, inspect: &mut dyn FnMut(&Mesh)) -> std::result::Result<
     e.dispatch(Command::Activate(Tool::Bevel))?;
     let s = &o["settings"];
     let flag = |k: &str, default: bool| s.get(k).map_or(default, |v| v.as_f64() == Some(1.));
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     p.shift = s["shift"].as_f64().unwrap_or(0.);
     p.inset = s["inset"].as_f64().unwrap_or(0.);
     p.group_polygons = flag("group", true);
@@ -238,7 +238,7 @@ fn empty_selection_bevel_undo() {
     e.dispatch(Command::Mode(Mode::Polygon)).unwrap();
     let before = e.scene.clone();
     e.dispatch(Command::Activate(Tool::Bevel)).unwrap();
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     p.inset = 0.1;
     // A whole closed box grouped has no border to bevel, so ungroup it.
     p.group_polygons = false;

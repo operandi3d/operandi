@@ -466,7 +466,7 @@ fn tool_channel_edits_survive_moves_and_undo_inside_the_tool() {
     set_width(&mut e, id, 2.0).unwrap();
     assert_eq!(width(&e, id), 2.0);
     // A move afterwards keeps the new width.
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     p.delta = DVec3::new(1.0, 0.0, 0.0);
     e.dispatch(Command::Preview(p)).unwrap();
     assert_eq!(width(&e, id), 2.0);
@@ -475,7 +475,7 @@ fn tool_channel_edits_survive_moves_and_undo_inside_the_tool() {
     assert_eq!(width(&e, id), 2.0);
     e.dispatch(Command::Undo).unwrap();
     assert_eq!(width(&e, id), 1.0);
-    assert!(e.live.is_some());
+    assert!(e.session.live.is_some());
     e.dispatch(Command::Redo).unwrap();
     assert_eq!(width(&e, id), 2.0);
     // Drop keeps it as one document step.

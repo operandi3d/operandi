@@ -133,6 +133,10 @@ pub struct InputPreferences {
     /// default; files from before it load it on.
     #[serde(default = "key_toggles_default")]
     pub key_toggles: bool,
+    /// The one-time "Try Trackball Rotation?" offer has been shown
+    /// (trackball_offer.rs). Files from before it load it unshown.
+    #[serde(default)]
+    pub trackball_offered: bool,
 }
 fn key_toggles_default() -> bool {
     true
@@ -147,6 +151,7 @@ impl Default for InputPreferences {
             pen_eraser_action: Default::default(),
             pen_pressure_size: false,
             key_toggles: true,
+            trackball_offered: false,
         }
     }
 }

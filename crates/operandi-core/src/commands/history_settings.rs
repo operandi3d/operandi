@@ -63,23 +63,23 @@ impl Editor {
     /// transform tool that stays armed with nothing pending.
     pub fn backup_ready(&self) -> bool {
         let armed_transform = self
-            .live
+            .session.live
             .as_ref()
             .is_some_and(|l| l.tool.is_transform() && !self.transform_change_pending())
             // Drags kept as tweaks aren't recorded until Drop.
-            && !self.tweaks.can_undo();
+            && !self.session.tweaks.can_undo();
         self.selection_start.is_none()
-            && (!self.has_active_task() || (armed_transform && self.active_task_is_live()))
+            && (!self.session.has_active_task() || (armed_transform && self.active_task_is_live()))
     }
     fn active_task_is_live(&self) -> bool {
-        self.cone.is_none()
-            && self.ellipsoid.is_none()
-            && self.shape.is_none()
-            && self.spike.is_none()
-            && self.bridge.is_none()
-            && self.reduction.is_none()
-            && self.pen_draft.is_none()
-            && self.solid_sketch.is_none()
+        self.session.cone.is_none()
+            && self.session.ellipsoid.is_none()
+            && self.session.shape.is_none()
+            && self.session.spike.is_none()
+            && self.session.bridge.is_none()
+            && self.session.reduction.is_none()
+            && self.session.pen_draft.is_none()
+            && self.session.solid_sketch.is_none()
     }
 }
 

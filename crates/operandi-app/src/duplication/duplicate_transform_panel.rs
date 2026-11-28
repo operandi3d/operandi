@@ -58,7 +58,7 @@ impl Operandi {
             ]);
         }
         let scene = &self.editor.scene;
-        let live = self.editor.live.as_ref();
+        let live = self.editor.session.live.as_ref();
         if let Some(error) = live.and_then(|l| l.preview_error.as_ref()) {
             f.error(error.clone());
         } else if dt::nothing_to_move(scene) {

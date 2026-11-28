@@ -63,7 +63,7 @@ fn vac_t19_t20_bevel_handle_drags_edit_correct_parameters_and_cap() {
         let h = app.handles(rect).into_iter().find(|h| h.0 == axis).unwrap();
         assert_eq!(app.handle_hit(h.2, rect), Some(axis));
         assert_eq!(h.3, if axis == 0 { "Shift" } else { "Inset" });
-        let base = app.editor.live.as_ref().unwrap().params.clone();
+        let base = app.editor.session.live.as_ref().unwrap().params.clone();
         app.update_handle(
             axis,
             base,
@@ -73,7 +73,7 @@ fn vac_t19_t20_bevel_handle_drags_edit_correct_parameters_and_cap() {
             Tool::Bevel,
             rect,
         );
-        let p = &app.editor.live.as_ref().unwrap().params;
+        let p = &app.editor.session.live.as_ref().unwrap().params;
         assert!(if axis == 0 {
             p.shift > 0. && p.inset == 0.
         } else {

@@ -4,9 +4,9 @@ use crate::form::Unit;
 use crate::tool_form::{self as tf, ToolFields, ToolForm};
 impl Operandi {
     pub(super) fn start_interactive_pen(&mut self) {
-        let already = self.editor.pen_draft.is_some();
+        let already = self.editor.session.pen_draft.is_some();
         self.run(Command::PenStart);
-        if !already && self.editor.pen_draft.is_some() {
+        if !already && self.editor.session.pen_draft.is_some() {
             self.clear_fields();
             self.tool_properties_open = true;
         }
@@ -14,7 +14,7 @@ impl Operandi {
     /// The Pen draft's drawing-plane normal: the plane fixed by its first
     /// point, else the plane the view would draw on now.
     pub(super) fn pen_plane_normal(&self) -> DVec3 {
-        let plane = match (&self.editor.pen_draft, self.pen_plane) {
+        let plane = match (&self.editor.session.pen_draft, self.pen_plane) {
             (Some(d), Some((plane, _))) if !d.points().is_empty() => plane,
             _ => self.actual_plane(),
         };
@@ -39,7 +39,7 @@ impl Operandi {
     }
     /// Note the view a Pen point is drawn in, for Make UVs (BD-62).
     pub(super) fn sync_pen_uv_view(&mut self) {
-        let Some(draft) = &self.editor.pen_draft else {
+        let Some(draft) = &self.editor.session.pen_draft else {
             return;
         };
         let mut options = draft.options();
@@ -51,7 +51,7 @@ impl Operandi {
     }
     /// Keep the draft's wall plane in step with the drawing plane.
     pub(super) fn sync_pen_plane(&mut self) {
-        let Some(draft) = &self.editor.pen_draft else {
+        let Some(draft) = &self.editor.session.pen_draft else {
             return;
         };
         let mut options = draft.options();
@@ -64,7 +64,7 @@ impl Operandi {
     /// Right-drag with Pen walls: Offset follows the pointer's sideways
     /// travel (one undo-free option change per move, like the panel field).
     pub(super) fn pen_offset_drag(&mut self, start_offset: f64, metres_per_pixel: f64, dx: f32) {
-        let Some(draft) = &self.editor.pen_draft else {
+        let Some(draft) = &self.editor.session.pen_draft else {
             return;
         };
         let mut options = draft.options();
@@ -94,7 +94,7 @@ pub(super) struct PenP {
 impl ToolFields for PenFields {
     type P = PenP;
     fn params(app: &Operandi) -> Option<PenP> {
-        let draft = app.editor.pen_draft.as_ref()?;
+        let draft = app.editor.session.pen_draft.as_ref()?;
         let current = draft.current();
         Some(PenP {
             options: draft.options(),
@@ -351,7 +351,7 @@ impl ToolFields for PenFields {
         f
     }
     fn publish(app: &mut Operandi, p: PenP) -> Result<()> {
-        let draft = app.editor.pen_draft.clone().ok_or("Pen ended")?;
+        let draft = app.editor.session.pen_draft.clone().ok_or("Pen ended")?;
         let mut options = p.options;
         if !options.output.surface() {
             options.wall = WallMode::Off;

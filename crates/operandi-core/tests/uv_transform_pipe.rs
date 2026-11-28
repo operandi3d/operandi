@@ -115,7 +115,7 @@ fn near(a: DVec2, b: DVec2) -> bool {
 fn uv_preview(e: &mut Editor, start: Command, edit: impl FnOnce(&Editor, &mut Parameters)) {
     e.dispatch(start).unwrap();
     e.dispatch(Command::UvToolSpace(Some(None))).unwrap();
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     edit(e, &mut p);
     e.dispatch(Command::Preview(p)).unwrap();
 }
@@ -383,7 +383,7 @@ fn the_same_tools_in_3d_still_move_points() {
     e.scene.selection.faces = vec![0];
     let before = uvs(&e);
     e.dispatch(Command::Activate(Tool::Move)).unwrap();
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     p.delta = DVec3::new(0., 1., 0.);
     e.dispatch(Command::Preview(p)).unwrap();
     e.dispatch(Command::Drop).unwrap();
@@ -399,21 +399,34 @@ fn uvt133_origin_and_element_centres_are_uv_points() {
             axis: AxisOrientation::World,
         }))
         .unwrap();
-        e.live.as_ref().unwrap().action_frame.unwrap().center
+        e.session
+            .live
+            .as_ref()
+            .unwrap()
+            .action_frame
+            .unwrap()
+            .center
     };
     let mut e = editor_with(strip(true), Mode::Polygon);
     e.scene.selection.faces = vec![1];
     e.dispatch(Command::Activate(Tool::Scale)).unwrap();
     e.dispatch(Command::UvToolSpace(Some(None))).unwrap();
     // Selection: the UV selection's centre (the right island).
-    let c = e.live.as_ref().unwrap().action_frame.unwrap().center;
+    let c = e
+        .session
+        .live
+        .as_ref()
+        .unwrap()
+        .action_frame
+        .unwrap()
+        .center;
     assert!((c - DVec3::new(1.25, 0.25, 0.)).length() < 1e-9, "{c}");
     assert_eq!(centre(&mut e, CenterMode::Origin), DVec3::ZERO);
     let picked = PickedPoint::new(DVec3::new(1., 0.5, 0.));
     let c = centre(&mut e, CenterMode::Element(picked));
     assert!((c - DVec3::new(1., 0.5, 0.)).length() < 1e-9, "{c}");
     // Scaling by 2 about that corner keeps it and doubles the rest.
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     p.delta = DVec3::new(2., 2., 1.);
     e.dispatch(Command::Preview(p)).unwrap();
     let u = uvs(&e);
@@ -524,7 +537,7 @@ fn soft_drag_in_a_uv_view_moves_by_the_uv_stamped_screen_weights() {
     // A 3D stamp of every point at full weight must not reach the UVs.
     stamps.insert((0, id), vec![1.; points.len()]);
     e.dispatch(Command::FalloffStamps(stamps)).unwrap();
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     p.delta = DVec3::new(0.1, 0., 0.);
     e.dispatch(Command::Preview(p)).unwrap();
     e.dispatch(Command::Drop).unwrap();
@@ -549,9 +562,9 @@ fn uvt137_slides_uv_map_field_names_the_map_and_pins_the_space() {
     e.dispatch(Command::Activate(Tool::EdgeSlide)).unwrap();
     e.dispatch(Command::UvToolSpace(Some(Some("Texture".into()))))
         .unwrap();
-    let space = e.live.as_ref().unwrap().params.uv.clone().unwrap();
+    let space = e.session.live.as_ref().unwrap().params.uv.clone().unwrap();
     assert!(space.pinned && space.map == "Texture");
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     p.shift = 0.5;
     e.dispatch(Command::Preview(p)).unwrap();
     e.dispatch(Command::Drop).unwrap();
@@ -560,7 +573,17 @@ fn uvt137_slides_uv_map_field_names_the_map_and_pins_the_space() {
     // The view's own switch doesn't pin.
     e.dispatch(Command::Activate(Tool::EdgeSlide)).unwrap();
     e.dispatch(Command::UvToolSpace(Some(None))).unwrap();
-    assert!(!e.live.as_ref().unwrap().params.uv.as_ref().unwrap().pinned);
+    assert!(
+        !e.session
+            .live
+            .as_ref()
+            .unwrap()
+            .params
+            .uv
+            .as_ref()
+            .unwrap()
+            .pinned
+    );
 }
 
 #[test]

@@ -545,3 +545,56 @@ fn material_rows_sit_in_tabs_and_sections() {
     a.properties_tab = "Rays".into();
     assert!(has(&texts(&mut a), "Reflection Rays"));
 }
+
+/// #56 (UIC-116): an Image Map's Image field has a Browse… button on the
+/// row under it, which opens the file panel for a picture straight away
+/// (before, the only way was the last entry of the Image list).
+#[test]
+fn image_map_has_a_browse_button_under_its_image_field() {
+    let (mut a, ctx) = shading_app();
+    a.shading_add(NewLayer::ImageMap);
+    let out = draw(&mut a, &ctx, SIZE, vec![]);
+    let out = if text_at(&out, "Browse…").is_some() {
+        out
+    } else {
+        draw(&mut a, &ctx, SIZE, vec![])
+    };
+    let image = text_at(&out, "Image").expect("the Image row");
+    let browse = text_at(&out, "Browse…").expect("a Browse… button");
+    assert!(browse.y > image.y, "under the Image field");
+    let answer: crate::file_chooser::HeldAnswer = Default::default();
+    a.held_panel = Some(answer);
+    click(&mut a, &ctx, browse);
+    assert!(
+        a.choosing.is_some(),
+        "the picture panel is open: {}",
+        a.status
+    );
+}
+
+/// #56 (Jason, 2026-11-27): adding an Image Map asks for its picture at
+/// once; cancelling keeps the empty layer.
+#[test]
+fn adding_an_image_map_asks_for_its_picture() {
+    let (mut a, ctx) = shading_app();
+    let answer: crate::file_chooser::HeldAnswer = Default::default();
+    a.held_panel = Some(answer.clone());
+    a.shading_add(NewLayer::ImageMap);
+    let layer = a.shading.selected[0];
+    assert!(
+        a.choosing.is_some(),
+        "the picture panel opened: {}",
+        a.status
+    );
+    *answer.borrow_mut() = Some(None);
+    a.poll_choice(&ctx);
+    assert!(a.choosing.is_none());
+    assert!(
+        a.editor.scene.shader_tree.get(layer).is_some(),
+        "cancel keeps the layer"
+    );
+    // Other layers don't ask.
+    a.held_panel = Some(Default::default());
+    a.shading_add(NewLayer::Gradient);
+    assert!(a.choosing.is_none());
+}

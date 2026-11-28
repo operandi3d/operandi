@@ -370,7 +370,7 @@ fn slide_tool_uses_the_extras_from_parameters() {
     let mut e = editor(g3());
     e.scene.selection.edges = COLUMN.to_vec();
     e.dispatch(Command::Activate(Tool::EdgeSlide)).unwrap();
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     p.shift = -0.5;
     p.slide_extras.stop_negative = true;
     e.dispatch(Command::Preview(p)).unwrap();

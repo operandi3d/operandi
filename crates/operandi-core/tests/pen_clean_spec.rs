@@ -134,7 +134,7 @@ fn a_new_pen_session_starts_empty() {
     e.dispatch(Command::PenCapture(DVec3::X)).unwrap();
     e.dispatch(Command::Cancel).unwrap();
     e.dispatch(Command::PenStart).unwrap();
-    assert!(e.pen_draft.as_ref().unwrap().points().is_empty());
+    assert!(e.session.pen_draft.as_ref().unwrap().points().is_empty());
     let d = PenOptions::default();
     assert_eq!(
         (d.output, d.flip, d.close, d.wall),

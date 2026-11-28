@@ -83,7 +83,7 @@ fn selected_box(mode: Mode) -> Operandi {
 }
 
 fn tool_on(a: &Operandi) -> bool {
-    a.editor.has_active_task() || a.utility.is_some() || a.draw.is_some()
+    a.editor.session.has_active_task() || a.utility.is_some() || a.draw.is_some()
 }
 
 /// The tools a modelling session goes through, by their buttons' names.

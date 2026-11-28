@@ -80,7 +80,7 @@ impl Editor {
         if self.i2_active() {
             return Err("Finish or Cancel Extrude before Split".into());
         }
-        if self.pen_draft.is_some() {
+        if self.session.pen_draft.is_some() {
             return Err("Finish or Cancel Pen before Split".into());
         }
         self.require_idle()?;

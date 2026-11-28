@@ -134,6 +134,7 @@ impl Operandi {
     /// The live Topology Pen options (defaults when the pen isn't up).
     pub(super) fn pen_options(&self) -> TopologyPenOptions {
         self.editor
+            .session
             .live
             .as_ref()
             .filter(|_| self.topology_pen_open())
@@ -152,7 +153,7 @@ impl Operandi {
     /// Drop the pen, run one edit and start the pen again; the status
     /// keeps the edit's own message.
     fn pen_commit(&mut self, edit: PenEdit, done: &str) -> bool {
-        let row = self.editor.preset.as_ref().map(|p| p.id.clone());
+        let row = self.editor.session.preset.as_ref().map(|p| p.id.clone());
         self.run(Command::Drop);
         let ok = self.run_ok(Command::TopologyPen(Box::new(edit)));
         let message = self.status.clone();
@@ -300,7 +301,7 @@ impl Operandi {
         }
         match self.tweak_pick(pos, r).map(|p| p.grab.element) {
             Some(TweakElement::Edge(a, b)) => {
-                let row = self.editor.preset.as_ref().map(|p| p.id.clone());
+                let row = self.editor.session.preset.as_ref().map(|p| p.id.clone());
                 self.run(Command::Drop);
                 self.run(Command::AddEdgeLoop { a, b, t: 0.5 });
                 if let Some(id) = row {
@@ -739,7 +740,7 @@ impl Operandi {
                 None => self.status = "Topology Pen Split: release on a point; nothing cut".into(),
             },
             PenDrag::AddLoop { a, b, t, .. } => {
-                let row = self.editor.preset.as_ref().map(|p| p.id.clone());
+                let row = self.editor.session.preset.as_ref().map(|p| p.id.clone());
                 self.run(Command::Drop);
                 let ok = self.run_ok(Command::AddEdgeLoop { a, b, t });
                 let message = self.status.clone();
@@ -747,7 +748,7 @@ impl Operandi {
                     self.activate_preset(&id);
                 }
                 // The Position field shows where the loop went.
-                if let Some(l) = self.editor.live.as_mut() {
+                if let Some(l) = self.editor.session.live.as_mut() {
                     l.params.topology_pen.position = t;
                 }
                 self.status = if ok {
@@ -781,7 +782,7 @@ impl Operandi {
                     }
                     TweakElement::Edge(a, b) => {
                         // One edge: the existing strip (TC-45).
-                        let row = self.editor.preset.as_ref().map(|p| p.id.clone());
+                        let row = self.editor.session.preset.as_ref().map(|p| p.id.clone());
                         self.run(Command::Drop);
                         let ok = self.run_ok(Command::TopologyDuplicate { item, a, b, offset });
                         let message = self.status.clone();
@@ -819,6 +820,7 @@ impl Operandi {
         let o = self.pen_options();
         let Some(base) = self
             .editor
+            .session
             .live
             .as_ref()
             .and_then(|l| l.base.item(pick.grab.item))
@@ -883,7 +885,7 @@ impl Operandi {
     pub(super) fn pen_tweak_release(&mut self, pick: viewport::tweak_view::TweakPick) -> bool {
         let welds = std::mem::take(&mut self.pen.weld);
         self.pen.weld_at = None;
-        let Some(live) = self.editor.live.as_ref() else {
+        let Some(live) = self.editor.session.live.as_ref() else {
             return false;
         };
         let delta = live.params.delta;
@@ -895,7 +897,7 @@ impl Operandi {
                 .and_then(|i| pick.grab.element.points(&i.mesh).ok())
                 .unwrap_or_default();
             self.pen.last = Some((item, points));
-            if let Some(l) = self.editor.live.as_mut() {
+            if let Some(l) = self.editor.session.live.as_mut() {
                 l.params.topology_pen.offset = delta;
             }
             return false;
@@ -952,7 +954,7 @@ impl Operandi {
                 label: "Topology Pen Offset".into(),
             },
             "Topology Pen: moved by Offset",
-        ) && let Some(l) = self.editor.live.as_mut()
+        ) && let Some(l) = self.editor.session.live.as_mut()
         {
             l.params.topology_pen.offset = offset;
         }

@@ -68,7 +68,7 @@ impl Rig {
         self.frame(vec![]);
     }
     fn tool(&self) -> Option<Tool> {
-        self.a.editor.live.as_ref().map(|l| l.tool)
+        self.a.editor.session.live.as_ref().map(|l| l.tool)
     }
     fn mesh(&self) -> Vec<DVec3> {
         self.a.editor.scene.active().unwrap().mesh.vertices.clone()

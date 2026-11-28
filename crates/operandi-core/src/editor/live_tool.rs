@@ -6,7 +6,8 @@ impl Editor {
     /// A live Cube, Sphere or Cylinder: like the transform tools it keeps
     /// running through Undo/Redo and restarts on the restored scene.
     pub(super) fn live_primitive_tool(&self) -> Option<Tool> {
-        self.live
+        self.session
+            .live
             .as_ref()
             .map(|l| l.tool)
             .filter(|t| t.is_primitive())
@@ -23,16 +24,16 @@ impl Editor {
         let Some(label) = self.primitive_session().and_then(|s| s.pending_preview) else {
             return Ok(None);
         };
-        if numeric_only && self.live.is_some() {
+        if numeric_only && self.session.live.is_some() {
             return Ok(None);
         }
-        if let Some(s) = &mut self.ellipsoid {
+        if let Some(s) = &mut self.session.ellipsoid {
             s.preview = None;
-        } else if let Some(s) = &mut self.shape {
+        } else if let Some(s) = &mut self.session.shape {
             s.preview = None;
-        } else if let Some(s) = &mut self.cone {
+        } else if let Some(s) = &mut self.session.cone {
             s.preview = None;
-        } else if let Some(l) = self.live.take() {
+        } else if let Some(l) = self.session.live.take() {
             self.scene = l.base;
             if let Some(ids) = l.identity_base {
                 self.identities.current = ids;
@@ -48,29 +49,29 @@ impl Editor {
     /// it otherwise (MTU-Q6, provisional). Its values stay; nothing is
     /// previewed until a value changes.
     pub(super) fn rebase_numeric_primitive(&mut self) {
-        if let Some(s) = &self.ellipsoid
+        if let Some(s) = &self.session.ellipsoid
             && self.ellipsoid_target_ok(s.target).is_err()
         {
-            self.ellipsoid = None;
+            self.session.ellipsoid = None;
         }
-        if let Some(s) = &self.shape
+        if let Some(s) = &self.session.shape
             && self.shape_target_ok(s.target, s.kind()).is_err()
         {
-            self.shape = None;
+            self.session.shape = None;
         }
-        if let Some(s) = &self.cone
+        if let Some(s) = &self.session.cone
             && !self
                 .scene
                 .items
                 .iter()
                 .any(|i| i.id == s.target && self.scene.shows(i))
         {
-            self.cone = None;
+            self.session.cone = None;
         }
         for preview in [
-            self.ellipsoid.as_mut().map(|s| &mut s.preview),
-            self.shape.as_mut().map(|s| &mut s.preview),
-            self.cone.as_mut().map(|s| &mut s.preview),
+            self.session.ellipsoid.as_mut().map(|s| &mut s.preview),
+            self.session.shape.as_mut().map(|s| &mut s.preview),
+            self.session.cone.as_mut().map(|s| &mut s.preview),
         ]
         .into_iter()
         .flatten()
@@ -82,13 +83,15 @@ impl Editor {
     /// A live transform tool shows a change not yet recorded as a step
     /// (a typed field value, or a drag still in progress).
     pub fn transform_change_pending(&self) -> bool {
-        self.live
+        self.session
+            .live
             .as_ref()
             .is_some_and(|l| l.tool.is_transform() && l.base != self.scene)
     }
 
     pub(super) fn live_transform_tool(&self) -> Option<Tool> {
-        self.live
+        self.session
+            .live
             .as_ref()
             .map(|l| l.tool)
             .filter(|t| t.is_transform())
@@ -101,6 +104,7 @@ impl Editor {
     /// fields restart from zero after each drag.
     pub(crate) fn commit_transform_step(&mut self) -> Result<()> {
         let live = self
+            .session
             .live
             .as_ref()
             .filter(|l| l.tool.is_transform())
@@ -112,7 +116,7 @@ impl Editor {
             return Ok(());
         }
         self.scene.validate()?;
-        self.last_transform_step = Some(Box::new(crate::transform_repeat::TransformStep {
+        self.session.last_transform_step = Some(Box::new(crate::transform_repeat::TransformStep {
             tool: live.tool,
             base: live.base.clone(),
             params: live.params.clone(),
@@ -155,7 +159,7 @@ impl Editor {
         // as one step.
         next.identity_base = Some(self.identities.current.clone());
         next.identity_preview = None;
-        self.live = Some(next);
+        self.session.live = Some(next);
         Ok(())
     }
 
@@ -163,23 +167,33 @@ impl Editor {
     /// restored scene (its center comes from the restored selection). If
     /// the restored scene can't host the tool it stays dropped.
     pub(super) fn resume_transform(&mut self, tool: Tool) {
-        if self.live.is_none() {
+        if self.session.live.is_none() {
             let _ = self.handle_activate(tool);
         }
     }
 
     /// Change the action center and axis.
     pub(super) fn handle_action_context(&mut self, context: crate::ActionContext) -> Result<()> {
-        if self.cone.is_some() {
+        if self.session.cone.is_some() {
             return Err("Numeric Cone uses world coordinates; context changes during this session remain uncharacterized".into());
         }
         // Resolve before publishing context so invalid Selection requests
         // preserve the live stage, previous context and history atomically.
         let frame = self.action_context_frame(context)?;
         let previous_context = self.action_context;
-        let previous_frame = self.live.as_ref().and_then(|live| live.action_frame);
-        let previous_bend_center = self.live.as_ref().map(|live| live.params.bend.base);
+        let previous_frame = self
+            .session
+            .live
+            .as_ref()
+            .and_then(|live| live.action_frame);
+        let previous_placed = self
+            .session
+            .live
+            .as_ref()
+            .and_then(|live| live.placed_centre);
+        let previous_bend_center = self.session.live.as_ref().map(|live| live.params.bend.base);
         let parameters = self
+            .session
             .live
             .as_ref()
             .filter(|live| {
@@ -195,14 +209,18 @@ impl Editor {
             })
             .map(|live| live.params.clone());
         self.action_context = context;
-        if let Some(live) = &mut self.live {
+        if let Some(live) = &mut self.session.live {
             live.action_frame = frame;
             live.placed_centre = None;
         }
         // Bend: its centre is the action centre, so a new centre mode moves
         // it (and re-bends from there once applied).
         let parameters = parameters.or_else(|| {
-            let live = self.live.as_mut().filter(|l| l.tool == Tool::Bend)?;
+            let live = self
+                .session
+                .live
+                .as_mut()
+                .filter(|l| l.tool == Tool::Bend)?;
             let center = live.action_frame?.center;
             live.params.bend.base = center;
             live.applied.then(|| live.params.clone())
@@ -211,11 +229,14 @@ impl Editor {
             && let Err(error) = self.preview(parameters, false)
         {
             // Transform preview validates its local candidate before
-            // publishing scene/params. Restore only the frame/context
-            // staged above; never clone or commit the undo history.
+            // publishing scene/params. Restore what was staged above (the
+            // context, the frame and the placed-centre marker, so a
+            // refused change leaves the whole live state as it was);
+            // never clone or commit the undo history.
             self.action_context = previous_context;
-            if let Some(live) = &mut self.live {
+            if let Some(live) = &mut self.session.live {
                 live.action_frame = previous_frame;
+                live.placed_centre = previous_placed;
                 if let Some(center) = previous_bend_center {
                     live.params.bend.base = center;
                 }
@@ -279,7 +300,7 @@ impl Editor {
                 "Use Move, Rotate or Transform on the camera or light".into()
             }
         };
-        let live = self.live.as_ref().ok_or_else(refusal)?;
+        let live = self.session.live.as_ref().ok_or_else(refusal)?;
         let tool_ok = match edit {
             ItemChannelEdit::Transform(_) => live.tool.transforms_items(),
             _ => crate::camera_light::tool_shows_item_channels(live.tool),
@@ -309,7 +330,7 @@ impl Editor {
         }
         scene.validate()?;
         self.scene = *scene;
-        if let Some(live) = self.live.as_mut() {
+        if let Some(live) = self.session.live.as_mut() {
             live.base = *base;
         }
         Ok(())
@@ -323,26 +344,27 @@ impl Editor {
     /// the live tool and re-targets it: a transform tool is live with no
     /// preset browser or selection drag open (UIC-306).
     pub fn selection_keeps_tool(&self) -> bool {
-        self.preset.is_none()
+        self.session.preset.is_none()
             && self.selection_start.is_none()
             && self
+                .session
                 .live
                 .as_ref()
                 .is_some_and(|l| l.tool.transforms_items())
     }
 
     pub(super) fn retarget_transform(&mut self, tool: Tool, cmd: Command) -> Result<()> {
-        let live = self.live.as_ref().ok_or("No live tool")?;
+        let live = self.session.live.as_ref().ok_or("No live tool")?;
         let negative_scale = live.params.negative_scale;
         let tweak_options = live.params.tweak_options;
         let mut staged = Box::new(self.clone());
         staged.dispatch(Command::Drop)?;
-        if staged.has_active_task() || staged.i2_active() {
+        if staged.session.has_active_task() || staged.i2_active() {
             return Err("Finish the current tool before changing the selection".into());
         }
         staged.dispatch(cmd)?;
         if staged.dispatch(Command::Activate(tool)).is_ok()
-            && let Some(live) = staged.live.as_mut()
+            && let Some(live) = staged.session.live.as_mut()
         {
             live.params.negative_scale = negative_scale;
             live.params.tweak_options = tweak_options;
@@ -363,7 +385,7 @@ impl Editor {
 
     /// Sketch Extrude along an explicit world path in one step.
     pub(super) fn handle_sketch_extrude_once(&mut self, path: Vec<DVec3>) -> Result<()> {
-        if self.live.is_some() {
+        if self.session.live.is_some() {
             return Err("Finish or Cancel the active tool first".into());
         }
         if path.len() < 2 {
@@ -371,7 +393,7 @@ impl Editor {
         }
         let mut staged = self.clone();
         staged.dispatch(Command::Activate(Tool::SketchExtrude))?;
-        let mut params = staged.live.as_ref().unwrap().params.clone();
+        let mut params = staged.session.live.as_ref().unwrap().params.clone();
         params.sketch_path = path;
         staged.dispatch(Command::Preview(params))?;
         staged.dispatch(Command::Drop)?;
@@ -381,7 +403,7 @@ impl Editor {
 
     /// Change the live Extrude stage's numeric parameters.
     pub(super) fn handle_configure_extrude(&mut self, p: Parameters) -> Result<()> {
-        let live = self.live.as_ref().ok_or("Arm Extrude first")?;
+        let live = self.session.live.as_ref().ok_or("Arm Extrude first")?;
         if live.tool != Tool::Extrude {
             return Err("Arm Extrude first".into());
         }
@@ -401,7 +423,7 @@ impl Editor {
         if live.applied {
             self.preview(p.clone(), false)?;
         } else {
-            self.live.as_mut().unwrap().params = p.clone();
+            self.session.live.as_mut().unwrap().params = p.clone();
         }
         *self.presets.get_mut::<crate::ExtrudePreset>() = p;
         Ok(())
@@ -410,7 +432,7 @@ impl Editor {
     /// Stage the drop in a clone. The live task, history and revision remain
     /// owned by this editor until the atomic filesystem write succeeds.
     pub fn save_committed(&mut self, path: &std::path::Path) -> Result<()> {
-        if self.live.as_ref().is_some_and(|l| {
+        if self.session.live.as_ref().is_some_and(|l| {
             l.params
                 .radial
                 .is_some_and(|p| p.radius.min_element() == 0.)
@@ -426,17 +448,17 @@ impl Editor {
         Ok(())
     }
     pub fn require_idle(&self) -> Result<()> {
-        if self.bridge.is_some() {
+        if self.session.bridge.is_some() {
             return Err("Drop or Cancel Bridge first".into());
         }
-        if self.reduction.is_some() {
+        if self.session.reduction.is_some() {
             return Err("Drop or Cancel Polygon Reduction first".into());
         }
-        if self.live.is_some()
-            || self.cone.is_some()
-            || self.ellipsoid.is_some()
-            || self.shape.is_some()
-            || self.spike.is_some()
+        if self.session.live.is_some()
+            || self.session.cone.is_some()
+            || self.session.ellipsoid.is_some()
+            || self.session.shape.is_some()
+            || self.session.spike.is_some()
         {
             Err("Drop or Cancel the active tool first".into())
         } else {

@@ -144,6 +144,11 @@ pub struct RenderSettings {
     /// Preview tab, Max Render Time (RI-P02) in minutes; 0 is no limit.
     /// Never used by F9.
     pub preview_time_limit: f64,
+    /// Bloom and Glare, applied to the finished picture (the Render
+    /// window's Image Processing tab; post_effects.rs). Native version 68;
+    /// left out of files while off at their defaults.
+    #[serde(skip_serializing_if = "crate::post_effects::PostEffects::is_default")]
+    pub post: crate::post_effects::PostEffects,
 }
 
 impl Default for RenderSettings {
@@ -164,6 +169,7 @@ impl Default for RenderSettings {
             // time limit.
             preview_convergence: 1.0,
             preview_time_limit: 0.0,
+            post: Default::default(),
         }
     }
 }
@@ -233,7 +239,7 @@ impl RenderSettings {
                 "Max Render Time must be 0 to {MAX_PREVIEW_MINUTES} minutes"
             ));
         }
-        Ok(())
+        self.post.validate()
     }
 
     pub fn is_default(&self) -> bool {

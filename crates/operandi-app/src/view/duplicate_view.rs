@@ -120,6 +120,7 @@ impl Operandi {
     /// The live Duplicate tool, if one is active.
     pub(super) fn duplicate_tool(&self) -> Option<Tool> {
         self.editor
+            .session
             .live
             .as_ref()
             .map(|l| l.tool)
@@ -129,7 +130,7 @@ impl Operandi {
     /// The source's world bounds in the session's base scene (the selected
     /// items in Item mode), remembered while the base mesh is the same.
     fn duplicate_bounds(&self) -> Option<(DVec3, DVec3)> {
-        let live = self.editor.live.as_ref()?;
+        let live = self.editor.session.live.as_ref()?;
         let item = live.base.active()?;
         let key = (
             item.id,

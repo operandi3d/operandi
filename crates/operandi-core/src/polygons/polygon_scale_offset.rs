@@ -374,7 +374,7 @@ impl Editor {
         if self.i2_active() {
             return Err("Finish or Cancel the Extrude stage before Scale Offset".into());
         }
-        if self.pen_draft.is_some() {
+        if self.session.pen_draft.is_some() {
             return Err("Drop or Cancel Pen before Scale Offset".into());
         }
         self.require_idle()?;

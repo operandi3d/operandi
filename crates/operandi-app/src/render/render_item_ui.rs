@@ -46,7 +46,7 @@ impl Operandi {
 
     /// The rows of the Render item's `tab`.
     pub(super) fn render_item_rows(&mut self, ui: &mut Ui, tab: &str) {
-        let idle = self.editor.live.is_none();
+        let idle = self.editor.session.live.is_none();
         let before = self.editor.scene.render.clone();
         let mut s = before.clone();
         let defaults = RenderSettings::new_scene();

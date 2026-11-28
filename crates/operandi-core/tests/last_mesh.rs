@@ -10,7 +10,7 @@ fn add_cube(e: &mut Editor, x: f64) -> u64 {
     e.dispatch(Command::Preview(Parameters {
         position: DVec3::new(x, 0., 0.),
         size: DVec3::splat(2.),
-        ..e.live.as_ref().unwrap().params.clone()
+        ..e.session.live.as_ref().unwrap().params.clone()
     }))
     .unwrap();
     e.dispatch(Command::Drop).unwrap();

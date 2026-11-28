@@ -475,6 +475,7 @@ impl super::Operandi {
         if o.current_tool {
             let tool = self
                 .editor
+                .session
                 .live
                 .as_ref()
                 .map_or("No tool", |l| l.tool.label());

@@ -88,7 +88,7 @@ fn mesh(e: &Editor) -> &Mesh {
     &e.scene.active().unwrap().mesh
 }
 fn params(e: &Editor) -> Parameters {
-    e.live.as_ref().unwrap().params.clone()
+    e.session.live.as_ref().unwrap().params.clone()
 }
 fn set(e: &mut Editor, f: impl FnOnce(&mut symmetrize_tool::Symmetrize)) {
     let mut p = params(e);
@@ -234,8 +234,8 @@ fn an_empty_mesh_is_refused_and_unchanged() {
     let mut e = editor(Mesh::default(), Mode::Polygon);
     let before = e.scene.clone();
     let _ = e.dispatch(Command::Activate(Tool::Symmetrize));
-    if e.live.is_some() {
-        assert!(e.live.as_ref().unwrap().preview_error.is_some());
+    if e.session.live.is_some() {
+        assert!(e.session.live.as_ref().unwrap().preview_error.is_some());
         e.dispatch(Command::Drop).ok();
     }
     assert_eq!(e.scene.items[0].mesh, before.items[0].mesh);

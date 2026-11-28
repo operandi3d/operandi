@@ -268,7 +268,7 @@ fn primitive_projected_preview_excludes_hidden_flat_and_smooth_faces() {
         a.camera.distance = 7.;
         a.display.settings.active.style = style;
         a.run(Command::Activate(Tool::Box));
-        assert_eq!(a.editor.live.as_ref().unwrap().tool, Tool::Box);
+        assert_eq!(a.editor.session.live.as_ref().unwrap().tool, Tool::Box);
         let ctx = Context::default();
         theme::install(&ctx);
         PROJECTED_VERTEX_COUNTS.set(Some([0, 0]));

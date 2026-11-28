@@ -43,7 +43,7 @@ impl Editor {
                 "Can't resume an Ellipsoid with zero radius; use Reset or enter the values".into(),
             );
         }
-        self.ellipsoid = Some(NumericEllipsoid::armed(
+        self.session.ellipsoid = Some(NumericEllipsoid::armed(
             target,
             self.presets.get::<crate::EllipsoidPreset>().clone(),
         ));
@@ -67,7 +67,12 @@ impl Editor {
         crate::user_defaults::primitive_symmetry(self.active_symmetry()).doubled(mesh)
     }
     pub(crate) fn configure_ellipsoid(&mut self, p: EllipsoidParameters) -> Result<()> {
-        let target = self.ellipsoid.as_ref().ok_or("Arm Ellipsoid first")?.target;
+        let target = self
+            .session
+            .ellipsoid
+            .as_ref()
+            .ok_or("Arm Ellipsoid first")?
+            .target;
         let p = p.normalized();
         let result = self
             .ellipsoid_target(target)
@@ -78,7 +83,11 @@ impl Editor {
                 self.ellipsoid_scene(target, mesh.clone())?;
                 Ok(mesh)
             });
-        let session = self.ellipsoid.as_mut().ok_or("Arm Ellipsoid first")?;
+        let session = self
+            .session
+            .ellipsoid
+            .as_mut()
+            .ok_or("Arm Ellipsoid first")?;
         session.publish(p, result, false)
     }
     fn ellipsoid_scene(&self, target: u64, mesh: Mesh) -> Result<Scene> {
@@ -90,7 +99,7 @@ impl Editor {
         Ok(candidate)
     }
     pub fn ellipsoid_preview_scene(&self) -> Result<Option<Scene>> {
-        let Some(s) = &self.ellipsoid else {
+        let Some(s) = &self.session.ellipsoid else {
             return Ok(None);
         };
         s.preview
@@ -99,7 +108,11 @@ impl Editor {
             .transpose()
     }
     pub(crate) fn commit_ellipsoid(&mut self, drop: bool) -> Result<()> {
-        let s = self.ellipsoid.as_ref().ok_or("Arm Ellipsoid first")?;
+        let s = self
+            .session
+            .ellipsoid
+            .as_ref()
+            .ok_or("Arm Ellipsoid first")?;
         if let Some(e) = &s.error {
             return Err(format!(
                 "Correct Ellipsoid fields or Cancel before Apply/Drop: {e}"
@@ -115,14 +128,14 @@ impl Editor {
         }
         *self.presets.get_mut::<crate::EllipsoidPreset>() = p;
         if drop {
-            self.ellipsoid = None;
-        } else if let Some(s) = &mut self.ellipsoid {
+            self.session.ellipsoid = None;
+        } else if let Some(s) = &mut self.session.ellipsoid {
             s.preview = None;
         }
         Ok(())
     }
     pub(crate) fn insert_ellipsoid_unit(&mut self, destination: UnitDestination) -> Result<()> {
-        if self.has_active_task() || self.selection_start.is_some() {
+        if self.session.has_active_task() || self.selection_start.is_some() {
             return Err(
                 "Finish the current tool and the selection gesture before Ellipsoid unit insertion"
                     .into(),

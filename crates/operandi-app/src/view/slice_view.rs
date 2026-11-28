@@ -59,6 +59,7 @@ impl Operandi {
     /// The live Slice tool, if one is active.
     pub(super) fn slice_tool(&self) -> Option<Tool> {
         self.editor
+            .session
             .live
             .as_ref()
             .map(|l| l.tool)
@@ -77,20 +78,20 @@ impl Operandi {
 
     /// The session's base mesh and its world matrix.
     pub(super) fn slice_base(&self) -> Option<(&Mesh, glam::DMat4)> {
-        let live = self.editor.live.as_ref()?;
+        let live = self.editor.session.live.as_ref()?;
         let item = live.base.active()?;
         Some((&item.mesh, live.base.world_matrix(item.id).ok()?))
     }
 
     pub(super) fn slice_params(&self) -> Option<Parameters> {
-        self.editor.live.as_ref().map(|l| l.params.clone())
+        self.editor.session.live.as_ref().map(|l| l.params.clone())
     }
 
     /// The session's base item (its own id marked, so its smooth surface
     /// is evaluated once and kept apart from the cut preview's) and its
     /// world matrix.
     fn slice_base_item(&self) -> Option<(operandi_core::Item, glam::DMat4)> {
-        let live = self.editor.live.as_ref()?;
+        let live = self.editor.session.live.as_ref()?;
         let item = live.base.active()?;
         let matrix = live.base.world_matrix(item.id).ok()?;
         let mut base = item.clone();

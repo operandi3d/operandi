@@ -472,7 +472,7 @@ impl Editor {
     pub fn pen_mirror_preview(&self) -> Option<PenMirrorPreview> {
         let symmetry = self.active_symmetry();
         symmetry.axis?;
-        let draft = self.pen_draft.as_ref()?;
+        let draft = self.session.pen_draft.as_ref()?;
         if draft.points.is_empty() {
             return None;
         }
@@ -509,14 +509,14 @@ impl Editor {
     pub(crate) fn interactive_pen_command(&mut self, command: Command) -> Result<()> {
         match command {
             Command::PenStart => {
-                if self.pen_draft.is_some() {
+                if self.session.pen_draft.is_some() {
                     return Ok(());
                 }
                 if self.selection_start.is_some() {
                     return Err("Finish selection before Pen".into());
                 }
                 // Another open tool was dropped first by `tool_switch`.
-                if self.has_active_task() || self.i2_active() {
+                if self.session.has_active_task() || self.i2_active() {
                     return Err("Finish the current task before Pen".into());
                 }
                 self.scene.validate()?;
@@ -531,7 +531,7 @@ impl Editor {
                 if self.scene.world_matrix(item.id)?.determinant() == 0. {
                     return Err("Pen needs an invertible mesh transform".into());
                 }
-                self.pen_draft = Some(PenDraft {
+                self.session.pen_draft = Some(PenDraft {
                     target: item.id,
                     points: Vec::new(),
                     current: None,
@@ -549,7 +549,11 @@ impl Editor {
                 }
                 // Constrain to Background: each new point lands on it.
                 let point = self.constrain_new_point(point)?;
-                let draft = self.pen_draft.as_mut().ok_or("Activate Pen first")?;
+                let draft = self
+                    .session
+                    .pen_draft
+                    .as_mut()
+                    .ok_or("Activate Pen first")?;
                 // Points on top of each other are kept (pen-2026-11-05 rule 6).
                 if draft.points.len() >= 4096 {
                     return Err("Pen keeps at most 4096 points".into());
@@ -571,7 +575,11 @@ impl Editor {
                     Some(p) if p.is_finite() => Some(self.constrain_strip_partner(point, p)?),
                     other => other,
                 };
-                let draft = self.pen_draft.as_mut().ok_or("Activate Pen first")?;
+                let draft = self
+                    .session
+                    .pen_draft
+                    .as_mut()
+                    .ok_or("Activate Pen first")?;
                 if partner.is_some_and(|p| !p.is_finite() || p.abs().max_element() > 1e9) {
                     return Err("The strip's next point would leave the scene range".into());
                 }
@@ -601,7 +609,11 @@ impl Editor {
                     return Err("Capture a finite point within the scene range".into());
                 }
                 let point = self.constrain_new_point(point)?;
-                let draft = self.pen_draft.as_mut().ok_or("Activate Pen first")?;
+                let draft = self
+                    .session
+                    .pen_draft
+                    .as_mut()
+                    .ok_or("Activate Pen first")?;
                 if !draft.options.strip() {
                     return Err("Ctrl+click ends a Make Quads strip; turn Make Quads on".into());
                 }
@@ -623,7 +635,11 @@ impl Editor {
                 Ok(())
             }
             Command::PenSelect(index) => {
-                let draft = self.pen_draft.as_mut().ok_or("Activate Pen first")?;
+                let draft = self
+                    .session
+                    .pen_draft
+                    .as_mut()
+                    .ok_or("Activate Pen first")?;
                 if index >= draft.points.len() {
                     return Err("Current Point is outside the captured points".into());
                 }
@@ -639,7 +655,11 @@ impl Editor {
                     return Err("Pen coordinates must be finite and in range".into());
                 }
                 let point = self.constrain_new_point(point)?;
-                let draft = self.pen_draft.as_ref().ok_or("Activate Pen first")?;
+                let draft = self
+                    .session
+                    .pen_draft
+                    .as_ref()
+                    .ok_or("Activate Pen first")?;
                 let index = draft.current.ok_or("Capture a point before refinement")?;
                 if draft.points[index] == point {
                     return Ok(());
@@ -659,7 +679,11 @@ impl Editor {
                     _ => None,
                 }
                 .filter(|p| p.abs().max_element() <= 1e9);
-                let draft = self.pen_draft.as_mut().ok_or("Activate Pen first")?;
+                let draft = self
+                    .session
+                    .pen_draft
+                    .as_mut()
+                    .ok_or("Activate Pen first")?;
                 // DPM-13: one undo step per drag, however many moves.
                 if !draft.refining {
                     draft.remember();
@@ -672,7 +696,11 @@ impl Editor {
                 Ok(())
             }
             Command::PenDelete { index, and_after } => {
-                let draft = self.pen_draft.as_mut().ok_or("Activate Pen first")?;
+                let draft = self
+                    .session
+                    .pen_draft
+                    .as_mut()
+                    .ok_or("Activate Pen first")?;
                 if index >= draft.points.len() {
                     return Err("No Pen point there to delete".into());
                 }
@@ -696,7 +724,11 @@ impl Editor {
             }
             Command::PenOptions(options) => {
                 options.validate()?;
-                let draft = self.pen_draft.as_mut().ok_or("Activate Pen first")?;
+                let draft = self
+                    .session
+                    .pen_draft
+                    .as_mut()
+                    .ok_or("Activate Pen first")?;
                 // Strip points come in pairs; reading them another way
                 // mid-draft would scramble the polygon (provisional).
                 if !draft.points.is_empty() && options.strip() != draft.options.strip() {
@@ -711,7 +743,11 @@ impl Editor {
                 Ok(())
             }
             Command::PenReverse => {
-                let draft = self.pen_draft.as_mut().ok_or("Activate Pen first")?;
+                let draft = self
+                    .session
+                    .pen_draft
+                    .as_mut()
+                    .ok_or("Activate Pen first")?;
                 draft.refining = false;
                 draft.guessing = None;
                 if draft.options.strip() {
@@ -731,7 +767,11 @@ impl Editor {
                 Ok(())
             }
             Command::Undo => {
-                let draft = self.pen_draft.as_mut().ok_or("Activate Pen first")?;
+                let draft = self
+                    .session
+                    .pen_draft
+                    .as_mut()
+                    .ok_or("Activate Pen first")?;
                 draft.refining = false;
                 draft.guessing = None;
                 // DPM-13/T14: step back over the last add, drag or delete;
@@ -755,7 +795,7 @@ impl Editor {
                 Ok(())
             }
             Command::Cancel => {
-                self.pen_draft = None;
+                self.session.pen_draft = None;
                 Ok(())
             }
             Command::Drop => self.finish_interactive_pen(),
@@ -763,7 +803,11 @@ impl Editor {
         }
     }
     fn finish_interactive_pen(&mut self) -> Result<()> {
-        let draft = self.pen_draft.as_ref().ok_or("Activate Pen first")?;
+        let draft = self
+            .session
+            .pen_draft
+            .as_ref()
+            .ok_or("Activate Pen first")?;
         let mut options = draft.build_options();
         options.validate()?;
         let count = draft.points.len();
@@ -775,7 +819,7 @@ impl Editor {
                 options.flip = false;
                 options.make_quads = false;
             } else {
-                self.pen_draft = None;
+                self.session.pen_draft = None;
                 return Ok(());
             }
         }
@@ -841,7 +885,7 @@ impl Editor {
         }
         candidate.validate()?;
         let before = std::mem::replace(&mut self.scene, candidate);
-        self.pen_draft = None;
+        self.session.pen_draft = None;
         let label = match options.output {
             _ if options.wall != WallMode::Off => "Pen Wall",
             _ if options.strip() => "Pen Quads",

@@ -62,6 +62,17 @@ impl Operandi {
             self.pick_component_on(p, r, surface)
         }
     }
+    /// The item a hovered polygon of `id` pre-highlights whole: in Item mode
+    /// the pointer's item lights up as one, the way it shows once selected
+    /// (Jason, 2026-11-27), unless a click there would pass over it (Select
+    /// No, CP-A01) or a tool is live.
+    pub(crate) fn whole_item_rollover(&self, id: u64) -> Option<u64> {
+        let scene = &self.editor.scene;
+        (scene.selection.mode == Mode::Item
+            && self.editor.session.live.is_none()
+            && scene.item(id).is_some_and(|i| i.is_viewport_selectable()))
+        .then_some(id)
+    }
     pub(crate) fn closest_rollovers(&self) -> bool {
         self.selection_preferences.rollovers == crate::selection_preferences::Rollovers::Closest
             && self.editor.scene.selection.mode != Mode::Item

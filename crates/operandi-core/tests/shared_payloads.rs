@@ -44,7 +44,7 @@ fn untouched_mesh_and_identities_stay_shared_through_i2_and_history() {
     let stage = e.i2.selected.as_ref().unwrap();
     for (label, scene) in [
         ("current", &e.scene),
-        ("live base", &e.live.as_ref().unwrap().base),
+        ("live base", &e.session.live.as_ref().unwrap().base),
         ("stage base", &stage.base.scene),
         ("stage begun", &stage.begun.scene),
         ("stage movement", &stage.movement.as_ref().unwrap().scene),

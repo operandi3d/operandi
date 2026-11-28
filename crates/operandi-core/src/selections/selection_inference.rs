@@ -293,7 +293,7 @@ impl Editor {
         let Some(from) = self.inference.as_ref().map(|i| i.from) else {
             return;
         };
-        let Some(was) = self.live.as_ref().map(|l| l.base.selection.clone()) else {
+        let Some(was) = self.session.live.as_ref().map(|l| l.base.selection.clone()) else {
             return;
         };
         self.restore_source(from, &was);
@@ -358,14 +358,14 @@ impl Editor {
     /// The open tool's own mode, when its start was inferred. The viewport
     /// draws the inferred elements as that mode's selection (SI-Q05).
     pub fn inferred_mode(&self) -> Option<Mode> {
-        self.inferred_mode_for(self.live.as_ref()?.tool)
+        self.inferred_mode_for(self.session.live.as_ref()?.tool)
     }
 
     /// The status line while a tool works on an inferred selection
     /// (SI-08), or `None`.
     pub fn inference_note(&self) -> Option<&str> {
         let i = self.inference.as_ref()?;
-        (self.live.as_ref().map(|l| l.tool) == Some(i.tool)).then_some(i.note.as_str())
+        (self.session.live.as_ref().map(|l| l.tool) == Some(i.tool)).then_some(i.note.as_str())
     }
 }
 

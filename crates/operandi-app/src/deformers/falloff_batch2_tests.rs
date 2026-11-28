@@ -12,7 +12,7 @@ fn app_with(tool: Tool) -> Operandi {
     let mut a = box_app();
     a.run(Command::Mode(Mode::Vertex));
     a.activate(tool);
-    assert_eq!(a.editor.live.as_ref().map(|l| l.tool), Some(tool));
+    assert_eq!(a.editor.session.live.as_ref().map(|l| l.tool), Some(tool));
     a
 }
 
@@ -135,7 +135,10 @@ fn right_drag_changes_soft_selection_radius() {
         vec![button(from + vec2(60., 0.), false)],
     );
     assert!(radius(&a) > 0.1, "{} {}", radius(&a), a.status);
-    assert_eq!(a.editor.live.as_ref().map(|l| l.tool), Some(Tool::Move));
+    assert_eq!(
+        a.editor.session.live.as_ref().map(|l| l.tool),
+        Some(Tool::Move)
+    );
 }
 
 /// FO-45: with Move and an Element falloff, a press on the box picks the

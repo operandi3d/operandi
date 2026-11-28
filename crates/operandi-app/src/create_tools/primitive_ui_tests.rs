@@ -51,7 +51,7 @@ fn t11_019_plane_drag_world_sizes_and_parallel_refusal() {
             ],
         );
         assert_eq!(a.viewport_rect, r, "viewport frame changed during draw");
-        let p = &a.editor.live.as_ref().unwrap().params;
+        let p = &a.editor.session.live.as_ref().unwrap().params;
         assert!(
             (p.position - center).length() < 1e-5,
             "plane {plane}: {p:?}; rect {r:?}"
@@ -115,7 +115,7 @@ fn m15_flat_draw_is_live_before_release_and_click_does_not_repeat() {
         ],
     );
     assert_eq!(a.editor.scene.active().unwrap().mesh.faces.len(), 1);
-    assert_eq!(a.editor.live.as_ref().unwrap().params.size.y, 0.);
+    assert_eq!(a.editor.session.live.as_ref().unwrap().params.size.y, 0.);
     let live = a.editor.scene.clone();
     draw(
         &mut a,
@@ -162,7 +162,10 @@ fn m15_cube_owns_right_drag_and_detents_replace_current_preview() {
         vec2(1440., 900.),
         vec![event(p, true), Event::PointerMoved(p + vec2(24., -12.))],
     );
-    assert_eq!(a.editor.live.as_ref().unwrap().params.segments, [3, 1, 2]);
+    assert_eq!(
+        a.editor.session.live.as_ref().unwrap().params.segments,
+        [3, 1, 2]
+    );
     assert!(a.editor.selection_start.is_none());
     draw(
         &mut a,
@@ -170,7 +173,10 @@ fn m15_cube_owns_right_drag_and_detents_replace_current_preview() {
         vec2(1440., 900.),
         vec![Event::PointerMoved(p), event(p, false)],
     );
-    assert_eq!(a.editor.live.as_ref().unwrap().params.segments, [1; 3]);
+    assert_eq!(
+        a.editor.session.live.as_ref().unwrap().params.segments,
+        [1; 3]
+    );
     // Existing six faces plus one current six-face preview, never another copy.
     assert_eq!(a.editor.scene.active().unwrap().mesh.faces.len(), 12);
 }
@@ -207,7 +213,7 @@ fn m15_cube_side_picking_tracks_logical_scale_and_resizing() {
                 pointer(end, false, Modifiers::NONE),
             ],
         );
-        let params = &a.editor.live.as_ref().unwrap().params;
+        let params = &a.editor.session.live.as_ref().unwrap().params;
         assert!(
             (params.position.x - params.size.x * 0.5 + 1.).abs() < 1e-8,
             "{size:?}/{scale}"
@@ -240,7 +246,7 @@ fn m16_shared_numeric_radius_bounds_resolution_and_invalid_input() {
             a.fields.insert(key.into(), text.into());
             assert!(a.confirm_fields(), "{}: {}", tool.label(), a.status);
         }
-        let p = &a.editor.live.as_ref().unwrap().params;
+        let p = &a.editor.session.live.as_ref().unwrap().params;
         assert_eq!(p.position, DVec3::new(1., 2., -3.));
         assert_eq!(p.radial.unwrap().radius, DVec3::new(1., 1.5, 2.));
         assert_eq!(
@@ -249,7 +255,7 @@ fn m16_shared_numeric_radius_bounds_resolution_and_invalid_input() {
         );
         a.fields.insert("min0".into(), "-2 m".into());
         assert!(a.confirm_fields());
-        let p = &a.editor.live.as_ref().unwrap().params;
+        let p = &a.editor.session.live.as_ref().unwrap().params;
         assert_eq!(p.position.x, 0.);
         assert_eq!(p.radial.unwrap().radius.x, 2.);
         assert_eq!(p.position.x + p.radial.unwrap().radius.x, 2.);
@@ -286,7 +292,7 @@ fn m16_shared_numeric_radius_bounds_resolution_and_invalid_input() {
         // 2026-11-21); nothing was typed, so the scene is as it was.
         draw(&mut a, &ctx, vec2(1440., 900.), vec![key(Key::Q)]);
         assert!(
-            a.editor.live.is_none(),
+            a.editor.session.live.is_none(),
             "Q in a number field drops the tool"
         );
         let _ = &scene;
@@ -324,7 +330,7 @@ fn m16_draft_plane_capture_numeric_solid_and_off_handle_refusal() {
                     Event::PointerMoved(end),
                 ],
             );
-            let draft = a.editor.live.as_ref().unwrap().params.clone();
+            let draft = a.editor.session.live.as_ref().unwrap().params.clone();
             assert_eq!(draft.radial.unwrap().radius[normal], 0.);
             // drag-creation-2026-11-06: the flat base is real geometry.
             assert_ne!(a.editor.scene, base);
@@ -335,13 +341,13 @@ fn m16_draft_plane_capture_numeric_solid_and_off_handle_refusal() {
                 vec![pointer(end, false, Modifiers::NONE)],
             );
             assert_eq!(
-                a.editor.live.as_ref().unwrap().params,
+                a.editor.session.live.as_ref().unwrap().params,
                 draft,
                 "stable release"
             );
             a.fields.insert(format!("radius{normal}"), "1 m".into());
             assert!(a.confirm_fields());
-            assert!(a.editor.live.as_ref().unwrap().applied);
+            assert!(a.editor.session.live.as_ref().unwrap().applied);
             let solid = a.editor.scene.clone();
             let remote = r.center() + vec2(170., 120.);
             draw(
@@ -439,7 +445,7 @@ fn par_t01_t02_pointer_only_depth_resize_history_persistence_and_prior_mesh() {
                 ],
             );
             let normal = if plane == 0 { 1 } else { 2 };
-            let base = a.editor.live.as_ref().unwrap().params.clone();
+            let base = a.editor.session.live.as_ref().unwrap().params.clone();
             assert_eq!(base.radial.unwrap().radius[normal], 0.);
             let handle = a
                 .handles(r)
@@ -461,7 +467,7 @@ fn par_t01_t02_pointer_only_depth_resize_history_persistence_and_prior_mesh() {
                     pointer(end, false, Modifiers::NONE),
                 ],
             );
-            let solid = a.editor.live.as_ref().unwrap().params.clone();
+            let solid = a.editor.session.live.as_ref().unwrap().params.clone();
             assert!(
                 solid.radial.unwrap().radius.min_element() > 0.,
                 "{} {:?}: {}",
@@ -561,7 +567,7 @@ fn vp2_automatic_new_scene_draws_on_the_view_plane_and_retains_explicit_fixed_st
                 pointer(end, false, Modifiers::NONE),
             ],
         );
-        let params = &a.editor.live.as_ref().unwrap().params;
+        let params = &a.editor.session.live.as_ref().unwrap().params;
         assert_eq!(params.size[normal], 0.);
         for axis in 0..3 {
             if axis != normal {
@@ -653,7 +659,7 @@ fn vp2_flat_cube_center_square_grows_depth_instead_of_crossing_the_minimum_bound
                     pointer(end, false, mods),
                 ],
             );
-            let p = &a.editor.live.as_ref().unwrap().params;
+            let p = &a.editor.session.live.as_ref().unwrap().params;
             let moving = ctrl || mode == BoxHandleMode::MoveAll;
             let expected_size = if moving {
                 0.
@@ -733,7 +739,7 @@ fn vp2_primitive_handle_labels_have_tooltips_without_viewport_ink() {
         let mut a = box_app();
         a.camera.view = View::Perspective;
         a.activate(tool);
-        let mut p = a.editor.live.as_ref().unwrap().params.clone();
+        let mut p = a.editor.session.live.as_ref().unwrap().params.clone();
         if let Some(radial) = p.radial.as_mut() {
             radial.radius = DVec3::ONE;
         } else {
@@ -793,7 +799,7 @@ fn n21_drawn_round_primitives_have_move_arrows_at_their_centre() {
                 tool.label()
             );
         }
-        let before = a.editor.live.as_ref().unwrap().params.clone();
+        let before = a.editor.session.live.as_ref().unwrap().params.clone();
         let tip = handles.iter().find(|h| h.0 == 0).unwrap().2;
         let to = tip + vec2(60., 0.);
         draw(&mut a, &ctx, size, vec![Event::PointerMoved(tip)]);
@@ -813,7 +819,7 @@ fn n21_drawn_round_primitives_have_move_arrows_at_their_centre() {
             size,
             vec![pointer(to, false, Modifiers::NONE)],
         );
-        let after = &a.editor.live.as_ref().unwrap().params;
+        let after = &a.editor.session.live.as_ref().unwrap().params;
         assert!(
             after.position.x > before.position.x + 0.01,
             "{}: {:?}",

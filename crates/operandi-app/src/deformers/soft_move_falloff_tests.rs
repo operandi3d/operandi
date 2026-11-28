@@ -21,7 +21,7 @@ fn placed(at: DVec3) -> Operandi {
         a.editor.is_armed(),
         "{} {:?}",
         a.status,
-        a.editor.live.as_ref().map(|l| l.tool)
+        a.editor.session.live.as_ref().map(|l| l.tool)
     );
     a.run(Command::ToolClick {
         point: at,
@@ -98,7 +98,7 @@ fn tp19_with_no_tool_the_centre_is_the_falloffs() {
         .into(),
     )));
     a.camera.view = View::Front;
-    if a.editor.live.is_some() {
+    if a.editor.session.live.is_some() {
         a.run(Command::Drop);
     }
     let q = a.camera.project(DVec3::ZERO, r).unwrap().0;

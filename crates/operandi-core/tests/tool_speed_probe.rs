@@ -182,7 +182,7 @@ fn tool_preview_costs() {
             println!("TOOL {tool:?}: activate refused: {err}");
             continue;
         }
-        let Some(base) = e.live.as_ref().map(|l| l.params.clone()) else {
+        let Some(base) = e.session.live.as_ref().map(|l| l.params.clone()) else {
             println!("TOOL {tool:?}: no live session");
             continue;
         };

@@ -129,9 +129,17 @@ pub struct OutputSettings {
     pub clamp: bool,
     pub clamp_threshold: f64,
     pub unpremultiply: bool,
+    /// Old files only: the output's own Bloom, removed (Jason, BG-Q2:
+    /// Bloom lives in the Render window's Image Processing tab,
+    /// `RenderSettings::post`). Read so those files still open, moved
+    /// into the scene's Bloom on load (`Scene::move_old_output_bloom`),
+    /// never written and never applied here.
+    #[serde(skip_serializing)]
     pub bloom: bool,
+    #[serde(skip_serializing)]
     pub bloom_threshold: f64,
     /// Fraction of the picture's diagonal.
+    #[serde(skip_serializing)]
     pub bloom_radius: f64,
     pub vignette: f64,
     pub input_black: f64,
@@ -234,12 +242,6 @@ impl OutputSettings {
                 PercentIn(&mut self.clamp_threshold, 0., 100.),
             ),
             ("Unpremultiply Colors", Bool(&mut self.unpremultiply)),
-            ("Bloom", Bool(&mut self.bloom)),
-            (
-                "Bloom Threshold",
-                PercentIn(&mut self.bloom_threshold, 0., 100.),
-            ),
-            ("Bloom Radius", Percent(&mut self.bloom_radius)),
             ("Vignette Amount", Percent(&mut self.vignette)),
             (
                 "Input Black Level",
@@ -633,7 +635,9 @@ pub fn depth_value(metres: f64, s: &OutputSettings) -> f64 {
 
 /// Applies the output's image processing to a linear RGBA picture, in
 /// RQ-1's order: exposure, input levels, hue / saturation / colorize, tone
-/// map, bloom, vignette, gamma, output levels, clamp; Unpremultiply last.
+/// map, vignette, gamma, output levels, clamp; Unpremultiply last. Bloom
+/// is no longer an output setting: the Render window adds it to the
+/// finished picture (post_effects.rs, BG-Q2).
 /// Off (or all at their starting values) it leaves the picture as it is.
 pub fn process(s: &OutputSettings, rgba: &mut [f32], width: u32, height: u32) {
     if !s.image_processing {
@@ -692,9 +696,6 @@ pub fn process(s: &OutputSettings, rgba: &mut [f32], width: u32, height: u32) {
             px[k] = c[k] as f32;
         }
     }
-    if s.bloom {
-        bloom(s, rgba, width, height);
-    }
     let (w, h) = (width.max(1) as f64, height.max(1) as f64);
     let half_diag = (w * w + h * h).sqrt() / 2.;
     for (i, px) in rgba.chunks_mut(4).enumerate() {
@@ -726,52 +727,6 @@ pub fn process(s: &OutputSettings, rgba: &mut [f32], width: u32, height: u32) {
             px[k] = c[k] as f32;
         }
     }
-}
-
-/// Adds a glow of the parts brighter than the threshold, blurred over the
-/// radius (a box blur run three times, about a Gaussian).
-fn bloom(s: &OutputSettings, rgba: &mut [f32], width: u32, height: u32) {
-    let (w, h) = (width as usize, height as usize);
-    if w == 0 || h == 0 {
-        return;
-    }
-    let radius = ((s.bloom_radius * ((w * w + h * h) as f64).sqrt() / 3.).round() as usize).max(1);
-    let t = s.bloom_threshold as f32;
-    let mut glow: Vec<[f32; 3]> = rgba
-        .chunks(4)
-        .map(|p| [0, 1, 2].map(|k| (p[k] - t).max(0.)))
-        .collect();
-    for _ in 0..3 {
-        glow = box_blur(&glow, w, h, radius, true);
-        glow = box_blur(&glow, w, h, radius, false);
-    }
-    for (p, g) in rgba.chunks_mut(4).zip(&glow) {
-        for k in 0..3 {
-            p[k] += g[k];
-        }
-    }
-}
-
-fn box_blur(src: &[[f32; 3]], w: usize, h: usize, r: usize, rows: bool) -> Vec<[f32; 3]> {
-    let mut out = vec![[0.; 3]; src.len()];
-    let (outer, inner) = if rows { (h, w) } else { (w, h) };
-    let at = |o: usize, i: usize| if rows { o * w + i } else { i * w + o };
-    for o in 0..outer {
-        for i in 0..inner {
-            let lo = i.saturating_sub(r);
-            let hi = (i + r).min(inner - 1);
-            let mut sum = [0.; 3];
-            for j in lo..=hi {
-                let p = src[at(o, j)];
-                for k in 0..3 {
-                    sum[k] += p[k];
-                }
-            }
-            let n = (hi - lo + 1) as f32;
-            out[at(o, i)] = sum.map(|v| v / n);
-        }
-    }
-    out
 }
 
 #[cfg(test)]
@@ -831,7 +786,9 @@ mod tests {
     }
 
     #[test]
-    fn bloom_spreads_bright_pixels_and_vignette_darkens_corners() {
+    fn old_output_bloom_no_longer_glows_and_vignette_darkens_corners() {
+        // Bloom moved to the Render window (BG-Q2): an old file's output
+        // Bloom does nothing here, and isn't written back.
         let s = OutputSettings {
             bloom: true,
             bloom_radius: 0.2,
@@ -842,7 +799,9 @@ mod tests {
         let centre = ((4 * w + 4) * 4) as usize;
         p[centre] = 10.;
         process(&s, &mut p, w, h);
-        assert!(p[centre + 4] > 0., "neighbour glows");
+        assert_eq!(p[centre + 4], 0., "no glow");
+        let text = serde_json::to_string(&s).unwrap();
+        assert!(!text.contains("bloom"), "{text}");
         let s = OutputSettings {
             vignette: 1.,
             ..Default::default()

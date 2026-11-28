@@ -569,7 +569,7 @@ fn pts(e: &Editor) -> Vec<DVec3> {
     e.scene.active().unwrap().mesh.vertices.clone()
 }
 fn live(e: &Editor) -> Parameters {
-    e.live.as_ref().unwrap().params.clone()
+    e.session.live.as_ref().unwrap().params.clone()
 }
 
 #[test]
@@ -633,7 +633,7 @@ fn quantize_and_align_tools_refuse_item_mode_and_empty_runs() {
     e.scene.selection.mode = Mode::Edge;
     // No edges selected: nothing to align.
     assert!(e.dispatch(Command::Activate(Tool::LinearAlign)).is_err());
-    assert!(e.live.is_none());
+    assert!(e.session.live.is_none());
     e.scene.selection.edges = vec![(0, 1), (1, 2)];
     e.dispatch(Command::Activate(Tool::LinearAlign)).unwrap();
     e.dispatch(Command::Drop).unwrap();
@@ -768,7 +768,7 @@ fn soft_selection_soft_drag_and_element_push_rows_put_their_layers_in_place() {
         e.scene.selection.vertices = vec![4];
         e.dispatch(Command::ActivatePreset(id.into())).unwrap();
         // Armed rows wait for the click (CS-01); either way the layers are on.
-        if let Some(l) = &e.live {
+        if let Some(l) = &e.session.live {
             assert_eq!(l.tool, tool, "{id}");
         }
         match (check, e.spatial_falloff) {

@@ -15,15 +15,15 @@ const HEIGHT_HANDLE_PIXELS: f32 = 14.;
 impl Operandi {
     /// The flat session base's centre (world) and normal axis, if any.
     pub(super) fn session_flat_base(&self) -> Option<(DVec3, usize)> {
-        if let Some(s) = &self.editor.cone {
+        if let Some(s) = &self.editor.session.cone {
             let p = &s.requested;
             return (p.size[p.axis.min(2)] == 0.).then_some((p.position, p.axis.min(2)));
         }
-        if let Some(s) = &self.editor.ellipsoid {
+        if let Some(s) = &self.editor.session.ellipsoid {
             let p = &s.requested;
             return (p.radius[p.axis.min(2)] == 0.).then_some((p.position, p.axis.min(2)));
         }
-        match &self.editor.shape.as_ref()?.requested {
+        match &self.editor.session.shape.as_ref()?.requested {
             ShapeParameters::Torus(t) => (t.height == 0.).then_some((t.position, t.axis.min(2))),
             ShapeParameters::Capsule(c) => {
                 let a = c.axis.min(2);
@@ -66,17 +66,17 @@ impl Operandi {
         let mut center = base;
         center[axis] += height * 0.5;
         let half = height.abs() * 0.5;
-        if let Some(s) = &self.editor.cone {
+        if let Some(s) = &self.editor.session.cone {
             let mut p = s.requested.clone();
             p.size[axis] = half;
             p.position = center;
             self.run(Command::ConfigureCone(p));
-        } else if let Some(s) = &self.editor.ellipsoid {
+        } else if let Some(s) = &self.editor.session.ellipsoid {
             let mut p = s.requested.clone();
             p.radius[axis] = half;
             p.position = center;
             self.run(Command::ConfigureEllipsoid(p));
-        } else if let Some(s) = &self.editor.shape {
+        } else if let Some(s) = &self.editor.session.shape {
             let mut p = s.requested.clone();
             match &mut p {
                 ShapeParameters::Torus(t) => {

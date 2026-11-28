@@ -58,7 +58,7 @@ fn run(c: &Value) -> std::result::Result<(), String> {
     if id == "UP03" {
         // Leave the Cube tool at other settings first (rule 9).
         e.dispatch(Command::Activate(Tool::Box)).unwrap();
-        let mut p = e.live.as_ref().unwrap().params.clone();
+        let mut p = e.session.live.as_ref().unwrap().params.clone();
         p.size.x = 3.;
         p.segments = [2, 2, 2];
         e.dispatch(Command::Preview(p)).map_err(|x| x.to_string())?;

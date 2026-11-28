@@ -15,7 +15,9 @@ on the left. Every tool page in this guide lists its rows.
   value back. Dragging a field's arrows updates it as you drag.
   Fields take expressions, such as `250 mm` or `1 m/4`.
 - Sections for the falloff and other layers the tool uses, when it has
-  them.
+  them. In the **3D view**, a falloff's points (a **Linear** falloff's
+  start and end, a **Radial** or **Cylinder** falloff's center) snap to
+  points, edges and polygons as you drag them while **Snapping** is on.
 - Its buttons: **Apply** (run once with these values), **Drop Tool** (keep
   the result and close the tool), **Cancel** (take the result back) and,
   where the tool has one, **Reset**.

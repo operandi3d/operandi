@@ -104,6 +104,7 @@ impl Operandi {
     /// The live Tweak options (defaults when Tweak isn't live).
     pub(crate) fn tweak_options(&self) -> operandi_core::TweakOptions {
         self.editor
+            .session
             .live
             .as_ref()
             .filter(|l| l.tool == Tool::Tweak)
@@ -289,6 +290,7 @@ impl Operandi {
         };
         let Some(base) = self
             .editor
+            .session
             .live
             .as_ref()
             .filter(|l| l.tool == Tool::Tweak)
@@ -352,11 +354,13 @@ impl Operandi {
         // What moves was worked out at the first frame; keep it.
         params.tweak_plan = self
             .editor
+            .session
             .live
             .as_ref()
             .and_then(|l| l.params.tweak_plan.clone());
         if self
             .editor
+            .session
             .live
             .as_ref()
             .is_some_and(|l| l.params == params)
@@ -474,6 +478,7 @@ impl Operandi {
         }
         let Some(mut params) = self
             .editor
+            .session
             .live
             .as_ref()
             .filter(|l| l.tool == Tool::Tweak)

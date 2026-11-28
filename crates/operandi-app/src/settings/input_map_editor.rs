@@ -870,6 +870,20 @@ impl Operandi {
         self.show_bindings = true;
     }
 
+    /// Wait for the next chord to assign to `action` (Esc cancels).
+    pub(crate) fn record_keys_for(&mut self, action: String) {
+        self.input_map_ui.recording = Some(Recording::Action(action));
+    }
+
+    /// The action the Input Map is waiting for keys for, if any.
+    #[cfg(test)]
+    pub(crate) fn recording_keys_for(&self) -> Option<&str> {
+        match &self.input_map_ui.recording {
+            Some(Recording::Action(action)) => Some(action),
+            _ => None,
+        }
+    }
+
     /// The map the rows show: the global draft, or the layout's keys over
     /// it.
     pub(crate) fn input_map_shown(&self) -> BTreeMap<String, String> {

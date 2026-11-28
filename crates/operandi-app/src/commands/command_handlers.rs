@@ -113,11 +113,11 @@ const MENU_SELECTION_LINES: &[&str] = &[
 /// bridge session is open (the menus' old rule, `unavailable::TOOL_ACTIVE`).
 fn selection_why(a: &Operandi) -> Option<&'static str> {
     crate::unavailable::unless(
-        a.editor.live.is_none()
-            && a.editor.ellipsoid.is_none()
-            && a.editor.shape.is_none()
-            && a.editor.spike.is_none()
-            && a.editor.bridge.is_none(),
+        a.editor.session.live.is_none()
+            && a.editor.session.ellipsoid.is_none()
+            && a.editor.session.shape.is_none()
+            && a.editor.session.spike.is_none()
+            && a.editor.session.bridge.is_none(),
         crate::unavailable::TOOL_ACTIVE,
     )
 }
@@ -211,8 +211,9 @@ fn answers(r: &mut Commands) {
         for name in tool_info::info(tool).names {
             r.answer(name, |a, c| {
                 CommandState::lit(
-                    tool_info::by_name(&c.lowered())
-                        .is_some_and(|t| a.editor.live.as_ref().is_some_and(|l| l.tool == t)),
+                    tool_info::by_name(&c.lowered()).is_some_and(|t| {
+                        a.editor.session.live.as_ref().is_some_and(|l| l.tool == t)
+                    }),
                 )
             })
             .unwrap_or_else(|e| panic!("{e}"));
@@ -238,7 +239,10 @@ fn answers(r: &mut Commands) {
         .expect("Select Symmetrical is a command");
     r.answer(symmetrical, |a, _| {
         CommandState::unless(crate::unavailable::first([
-            crate::unavailable::unless(a.editor.live.is_none(), crate::unavailable::TOOL_ACTIVE),
+            crate::unavailable::unless(
+                a.editor.session.live.is_none(),
+                crate::unavailable::TOOL_ACTIVE,
+            ),
             crate::unavailable::unless(
                 a.editor.symmetry.axis.is_some(),
                 "Turn Symmetry on (X, Y or Z) first",
@@ -267,8 +271,13 @@ fn answers(r: &mut Commands) {
             .unwrap_or_else(|| panic!("tool preset {id} is in the table"));
         r.answer(&row.label, |a, c| {
             CommandState::lit(
-                operandi_core::tool_preset::row(c.entry.name)
-                    .is_some_and(|row| a.editor.preset.as_ref().is_some_and(|p| p.id == row.id)),
+                operandi_core::tool_preset::row(c.entry.name).is_some_and(|row| {
+                    a.editor
+                        .session
+                        .preset
+                        .as_ref()
+                        .is_some_and(|p| p.id == row.id)
+                }),
             )
         })
         .unwrap_or_else(|e| panic!("{e}"));
@@ -282,7 +291,12 @@ fn answers(r: &mut Commands) {
             } else {
                 Tool::LinearAlign
             };
-            let live = a.editor.live.as_ref().is_some_and(|l| l.tool == tool);
+            let live = a
+                .editor
+                .session
+                .live
+                .as_ref()
+                .is_some_and(|l| l.tool == tool);
             let s = &a.editor.scene.selection;
             let usable = match s.mode {
                 Mode::Vertex => s.vertices.len() >= 2,
@@ -346,7 +360,7 @@ fn answers(r: &mut Commands) {
     let lit: [(&str, StateHandler); 5] = [
         ("Weld", |a, _| CommandState::lit(a.vertex_weld)),
         ("Bridge", |a, _| {
-            CommandState::lit(a.editor.bridge.is_some())
+            CommandState::lit(a.editor.session.bridge.is_some())
         }),
         ("Add Loop", |a, _| {
             CommandState::lit(a.edge_click == Some(edge_panel::EdgeClick::AddLoop))
@@ -370,11 +384,13 @@ fn answers(r: &mut Commands) {
     // (layouts stage 3 batch 5; the old rows read the state themselves).
     let lit: [(&str, StateHandler); 9] = [
         ("Polygon Pen", |a, _| {
-            CommandState::lit(a.editor.pen_draft.is_some())
+            CommandState::lit(a.editor.session.pen_draft.is_some())
         }),
-        ("Spike", |a, _| CommandState::lit(a.editor.spike.is_some())),
+        ("Spike", |a, _| {
+            CommandState::lit(a.editor.session.spike.is_some())
+        }),
         ("Polygon Reduction", |a, _| {
-            CommandState::lit(a.editor.reduction.is_some())
+            CommandState::lit(a.editor.session.reduction.is_some())
         }),
         ("Set Position", |a, _| {
             CommandState::lit(a.set_position.is_some())
@@ -431,7 +447,7 @@ fn answers(r: &mut Commands) {
     // The UV island buttons wait for the active tool to drop.
     r.answer("operandi.uv.preset", |a, _| {
         CommandState::unless(crate::unavailable::unless(
-            a.editor.live.is_none(),
+            a.editor.session.live.is_none(),
             crate::unavailable::TOOL_ACTIVE,
         ))
     })
@@ -440,7 +456,7 @@ fn answers(r: &mut Commands) {
     for name in UV_OP_COMMANDS {
         r.answer(name, |a, _| {
             CommandState::unless(crate::unavailable::unless(
-                a.editor.live.is_none(),
+                a.editor.session.live.is_none(),
                 crate::unavailable::TOOL_ACTIVE,
             ))
         })
@@ -453,16 +469,24 @@ fn answers(r: &mut Commands) {
 /// themselves).
 fn create_answers(r: &mut Commands) {
     fn shape(a: &Operandi, kind: ShapeKind) -> CommandState {
-        CommandState::lit(a.editor.shape.as_ref().is_some_and(|s| s.kind() == kind))
+        CommandState::lit(
+            a.editor
+                .session
+                .shape
+                .as_ref()
+                .is_some_and(|s| s.kind() == kind),
+        )
     }
     fn draw(a: &Operandi, kind: draw_tools::DrawKind) -> CommandState {
         CommandState::lit(a.draw.as_ref().is_some_and(|d| d.kind == kind))
     }
     let lit: [(&str, StateHandler); 16] = [
         ("Ellipsoid", |a, _| {
-            CommandState::lit(a.editor.ellipsoid.is_some())
+            CommandState::lit(a.editor.session.ellipsoid.is_some())
         }),
-        ("Cone", |a, _| CommandState::lit(a.editor.cone.is_some())),
+        ("Cone", |a, _| {
+            CommandState::lit(a.editor.session.cone.is_some())
+        }),
         ("Torus", |a, _| shape(a, ShapeKind::Torus)),
         ("Capsule", |a, _| shape(a, ShapeKind::Capsule)),
         ("Arc", |a, _| shape(a, ShapeKind::Arc)),
@@ -470,7 +494,7 @@ fn create_answers(r: &mut Commands) {
         ("Text", |a, _| shape(a, ShapeKind::Text)),
         ("Teapot", |a, _| shape(a, ShapeKind::Teapot)),
         ("Solid Sketch", |a, _| {
-            CommandState::lit(a.editor.solid_sketch.is_some())
+            CommandState::lit(a.editor.session.solid_sketch.is_some())
         }),
         ("Curve", |a, _| draw(a, draw_tools::DrawKind::Curve)),
         ("Bezier Curve", |a, _| draw(a, draw_tools::DrawKind::Bezier)),
@@ -536,7 +560,10 @@ fn mode_is(a: &Operandi, modes: &str) -> bool {
 
 /// Idle: no tool live (the Edit tab's commands wait for it to drop).
 fn idle(a: &Operandi) -> Option<&'static str> {
-    crate::unavailable::unless(a.editor.live.is_none(), crate::unavailable::TOOL_ACTIVE)
+    crate::unavailable::unless(
+        a.editor.session.live.is_none(),
+        crate::unavailable::TOOL_ACTIVE,
+    )
 }
 
 /// The Edit tab's answers (layouts stage 3 batch 6; the old rows read the
@@ -550,7 +577,7 @@ fn edit_answers(r: &mut Commands) {
                 "Switch to Vertices or Edges mode (Polygon Slide isn't built yet)",
             )
             .map(str::to_owned),
-            on: tool.is_some_and(|t| a.editor.live.as_ref().is_some_and(|l| l.tool == t)),
+            on: tool.is_some_and(|t| a.editor.session.live.as_ref().is_some_and(|l| l.tool == t)),
             title: None,
         }
     })
@@ -696,7 +723,7 @@ fn sculpt_answers(r: &mut Commands) {
 fn remesh_state(a: &Operandi, kind: crate::remesh_dialog::RemeshKind) -> CommandState {
     CommandState {
         unavailable: crate::unavailable::unless(
-            a.editor.live.is_none() && a.remesh_job.is_none(),
+            a.editor.session.live.is_none() && a.remesh_job.is_none(),
             crate::unavailable::TOOL_ACTIVE,
         )
         .map(str::to_owned),
@@ -860,7 +887,7 @@ fn menu_answers(r: &mut Commands) {
     // unavailable rule via `unavailable::unless`).
     r.answer("Reset Tool Attributes", |a, _| {
         CommandState::unless(crate::unavailable::unless(
-            a.editor.has_active_task(),
+            a.editor.session.has_active_task(),
             "No tool is active, so there is nothing to reset",
         ))
     })
@@ -1185,7 +1212,7 @@ fn file_answers(r: &mut Commands) {
 /// live tool nor only locked items.
 fn item_answers(r: &mut Commands) {
     fn reason(a: &Operandi, freeze: bool) -> Option<String> {
-        if a.editor.live.is_some() {
+        if a.editor.session.live.is_some() {
             return Some(crate::unavailable::TOOL_ACTIVE.to_owned());
         }
         let items: Vec<&operandi_core::Item> = a
@@ -1457,6 +1484,7 @@ fn phrases(r: &mut Commands) {
         a.tool_properties_open = true;
         a.surface_mini_properties = a
             .editor
+            .session
             .live
             .as_ref()
             .is_some_and(|l| l.tool.is_smooth_shift());
@@ -1481,7 +1509,7 @@ fn phrases(r: &mut Commands) {
     // MN-05.3: with no tool active the key does nothing (the menu entry is
     // greyed then; `tool.reset` still says why).
     on(r, &["reset tool attributes"], |a, _| {
-        if a.editor.has_active_task() {
+        if a.editor.session.has_active_task() {
             a.run(Command::ResetToolAttributes);
         }
     });
@@ -1670,8 +1698,10 @@ fn phrases(r: &mut Commands) {
             View::Right
         };
     });
+    // SC-054 "Perspective (press again: camera)": once for Perspective,
+    // again for the scene's camera (Camera view, CL-17), and again back.
     on(r, &["perspective view"], |a, _| {
-        a.camera.view = View::Perspective;
+        a.perspective_or_camera_view()
     });
     on(r, &["shaded view"], |a, _| {
         a.display.set_style(view_display::Style::Shaded, false)
@@ -2162,6 +2192,7 @@ fn tables(r: &mut Commands) {
         let name = a.editor.uv_seam_name();
         if let Some(mut p) = a
             .editor
+            .session
             .live
             .as_ref()
             .filter(|l| l.tool == tool)

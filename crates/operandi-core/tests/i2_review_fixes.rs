@@ -20,7 +20,7 @@ fn armed() -> Editor {
 fn moved() -> Editor {
     let mut e = armed();
     e.dispatch(Command::BeginExtrude).unwrap();
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     p.extent = DVec3::Z * 0.5;
     e.dispatch(Command::ConfigureExtrude(p)).unwrap();
     e
@@ -85,12 +85,12 @@ fn pr01_refusal_retains_merely_armed_move_owner_and_restoration_resumes() {
     }))
     .unwrap();
     refused_redo(&mut e);
-    assert_eq!(e.live.as_ref().unwrap().tool, Tool::Move);
+    assert_eq!(e.session.live.as_ref().unwrap().tool, Tool::Move);
     e.dispatch(Command::ActionContext(Default::default()))
         .unwrap();
     assert!(e.i2_can_redo());
     e.dispatch(Command::Redo).unwrap();
-    assert_eq!(e.live.as_ref().unwrap().tool, Tool::Extrude);
+    assert_eq!(e.session.live.as_ref().unwrap().tool, Tool::Extrude);
     assert_eq!(e.i2.selected.as_ref().unwrap().cursor, 1);
 }
 #[test]
@@ -180,7 +180,7 @@ fn rf03_established_numeric_switches_finish_once_and_cancel_new_owner_only() {
             assert_eq!(e.identities.current, accepted_ids);
             assert_eq!(e.history.undo.len(), 1);
             assert!(e.i2.selected.is_none());
-            assert!(e.live.is_none());
+            assert!(e.session.live.is_none());
             e.dispatch(Command::Cancel).unwrap();
             assert_eq!(e.scene, accepted);
             e.dispatch(Command::Undo).unwrap();
@@ -189,7 +189,11 @@ fn rf03_established_numeric_switches_finish_once_and_cancel_new_owner_only() {
             e.dispatch(Command::Redo).unwrap();
             assert_eq!(e.scene, accepted);
             assert_eq!(e.identities.current, accepted_ids);
-            assert!(e.live.is_none() && e.spike.is_none() && e.ellipsoid.is_none());
+            assert!(
+                e.session.live.is_none()
+                    && e.session.spike.is_none()
+                    && e.session.ellipsoid.is_none()
+            );
         }
     }
 }
@@ -215,7 +219,7 @@ fn rf03_cone_drops_the_stage_and_new_mesh_idle_contract_is_preserved() {
     let mut e = moved();
     e.dispatch(Command::ArmCone).unwrap();
     assert!(!e.i2_active());
-    assert!(e.cone.is_some());
+    assert!(e.session.cone.is_some());
     let mut e = moved();
     let before = e.clone();
     assert!(e.dispatch(Command::NewMesh).is_err());

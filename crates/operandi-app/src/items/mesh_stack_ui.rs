@@ -109,6 +109,178 @@ fn direction(ui: &mut Ui, label: &str, x: &mut f64, y: &mut f64, z: &mut f64, d:
     }
 }
 
+/// Select by Falloff's rows (TB-01..05): Threshold and the op's own
+/// falloff copy, with Use Active Falloff and Clear Falloff (UIC-14 greyed
+/// with a reason when they can't act).
+fn selop_falloff_rows(
+    ui: &mut Ui,
+    threshold: &mut f64,
+    falloff: &mut Option<operandi_core::ShapeWeights>,
+    active: Option<&operandi_core::ShapeWeights>,
+) {
+    use crate::form::{Unit, rows};
+    use crate::unavailable::Gate as _;
+    let mut percent = *threshold * 100.;
+    rows::number_d(
+        ui,
+        "Threshold",
+        &mut percent,
+        50.,
+        Unit::Percent,
+        0.0..=100.0,
+        "Picks what the falloff weighs at least this much (at each element's centre)",
+    );
+    *threshold = percent / 100.;
+    let shown = falloff.as_ref().map_or_else(
+        || "None".to_owned(),
+        |w| {
+            let mut names = vec![w.first.label()];
+            names.extend(w.added.iter().map(|a| a.0.label()));
+            names.join(" + ")
+        },
+    );
+    rows::value(ui, "Falloff", &shown);
+    ui.gated_ui(
+        crate::unavailable::unless(
+            active.is_some(),
+            "Turn on a Linear, Radial, Cylinder or Noise falloff from the Falloff menu first",
+        ),
+        |ui| {
+            if rows::button(ui, "Use Active Falloff")
+                .on_hover_text("Copy the falloff from the Falloff menu into this selection")
+                .clicked()
+            {
+                *falloff = active.cloned();
+            }
+        },
+    );
+    ui.gated_ui(
+        crate::unavailable::unless(falloff.is_some(), "This selection has no falloff"),
+        |ui| {
+            if rows::button(ui, "Clear Falloff")
+                .on_hover_text("Remove the falloff; the selection then picks nothing")
+                .clicked()
+            {
+                *falloff = None;
+            }
+        },
+    );
+}
+
+/// Select Conditional Loop's rows (TB-10..20), in the reference's order.
+fn conditional_loop_rows(ui: &mut Ui, r: &mut operandi_core::meshop_conditional_loop::LoopRules) {
+    use crate::form::{Unit, rows};
+    use operandi_core::meshop_conditional_loop::LoopMethod;
+    rows::check_d(
+        ui,
+        "Loop Both Directions",
+        &mut r.loop_both_dirs,
+        true,
+        "Grow from both ends of each edge",
+    );
+    rows::check_d(
+        ui,
+        "Start Direction",
+        &mut r.direction_ab,
+        true,
+        "With one direction: on grows from the edge's first point, off from its second",
+    );
+    rows::choice_d(
+        ui,
+        "Loop Method",
+        &mut r.method,
+        &LoopMethod::Angle,
+        &LoopMethod::ALL,
+        "Middle: straight through 4-edge points only. Angle, Dot Product: the straightest edge",
+    );
+    rows::number_d(
+        ui,
+        "Max Loop Count",
+        &mut r.cap_loop_count,
+        0,
+        Unit::Count,
+        0..=u32::MAX,
+        "Edges each way, counting the start edge; 0 = no limit",
+    );
+    rows::check_d(
+        ui,
+        "Stop At Selection",
+        &mut r.stop_at_selection,
+        true,
+        "Stop where selected edges meet",
+    );
+    rows::number_d(
+        ui,
+        "Selection Count",
+        &mut r.stop_at_selection_count,
+        2,
+        Unit::Count,
+        1..=u32::MAX,
+        "How many selected edges must meet",
+    );
+    rows::check_d(
+        ui,
+        "Shared Polygon",
+        &mut r.stop_at_shared_polygon,
+        true,
+        "Stop before an edge of the same polygon",
+    );
+    rows::check_d(
+        ui,
+        "Sharp Angles",
+        &mut r.stop_at_sharp_angles,
+        true,
+        "Stop before a turn of 90° or more",
+    );
+    rows::check_d(
+        ui,
+        "Stop At Selection Set",
+        &mut r.stop_at_selection_set,
+        true,
+        "Stop where edges of a selection set meet",
+    );
+    rows::text_d(
+        ui,
+        "Set Name",
+        &mut r.stop_at_set_name,
+        "",
+        "The edge selection set; empty never stops",
+    );
+    rows::number_d(
+        ui,
+        "Set Count",
+        &mut r.stop_at_set_count,
+        2,
+        Unit::Count,
+        1..=u32::MAX,
+        "How many set edges must meet",
+    );
+    rows::check_d(
+        ui,
+        "Stop At Cut Map",
+        &mut r.stop_at_seam_map,
+        true,
+        "Stop where seam edges meet",
+    );
+    rows::text_d(
+        ui,
+        "Cut Map Name",
+        &mut r.stop_at_seam_name,
+        "UV Seam",
+        "The UV seam map",
+    );
+    rows::number_d(
+        ui,
+        "Seam Count",
+        &mut r.stop_at_seam_count,
+        2,
+        Unit::Count,
+        1..=u32::MAX,
+        "How many seam edges must meet",
+    );
+    rows::note(ui, "Grows each edge selected so far into an edge loop.");
+}
+
 /// Three rows for a position, "<label> X" then "Y" and "Z", each keyed on
 /// its whole name (#21), defaulting to the origin.
 fn position_rows(
@@ -134,6 +306,7 @@ fn selection_ops(
     ui: &mut Ui,
     op: &operandi_core::mesh_stack::MeshOp,
     below: &[operandi_core::mesh_stack::MeshOp],
+    active_falloff: Option<&operandi_core::ShapeWeights>,
 ) -> (Option<SelOpEdit>, Option<egui::Rect>) {
     use crate::form::{Unit, rows};
     // #19: what this op's selection numbers (polygons, edges or points).
@@ -407,6 +580,10 @@ fn selection_ops(
                     rows::text_d(ui, "Weight Map", map, "Weight", "The weight map it reads");
                     min_max(ui, min, max, 0.5, 1., Unit::Scalar, "weight value (1 = 100%)");
                 }
+                SelKind::Falloff { threshold, falloff } => {
+                    selop_falloff_rows(ui, threshold, falloff, active_falloff);
+                }
+                SelKind::ConditionalLoop(rules) => conditional_loop_rows(ui, rules),
             }
             // #19: the order matters for Subtract and Multiply. The
             // steps are listed first to last, top to bottom, so the arrows
@@ -547,7 +724,7 @@ pub(crate) fn op_icon(id: &str) -> Option<crate::icons::Icon> {
         "deform.spline.item" => "curve",
         "deform.bezier.item" => "bezier-curve",
         "deform.curveConstraint.item" => "curve-extrude",
-        "uv.create.item" => "uv-project",
+        "uv.create.item" | "uvtransform" => "uv-project",
         "uv.relax.item" => "uv-relax",
         "uv.pelt.item" => "uv-pelt",
         "uvflip.meshop.item" => "uv-flip-u",
@@ -558,7 +735,7 @@ pub(crate) fn op_icon(id: &str) -> Option<crate::icons::Icon> {
         "setvmap.seam.item" => "uv-split",
         "setvmap.vnorm.item" => "harden-normals",
         "pmodel.geodesic.mOp" => "paint-target",
-        "cRebuild.mOp" | "curvefill" | "curveWinding.meshop.item" => "curve",
+        "cRebuild.mOp" | "curve.rebuildSpan" | "curvefill" | "curveWinding.meshop.item" => "curve",
         "pmodel.edgeToCurve.item" => "edges-to-curves",
         "curveBoolean.meshop.item" => "curve-boolean",
         "curveconvert.meshop.item" => "bezier-curve",
@@ -570,7 +747,7 @@ pub(crate) fn op_icon(id: &str) -> Option<crate::icons::Icon> {
         | "curve.nsided.item"
         | "curve.star.item" => "bezier-curve",
         "curve.extrude.item" => "sketch-extrude",
-        "curve.sweep" => "curve-extrude",
+        "curve.sweep" | "laceGeom" => "curve-extrude",
         "curve.clone.item" | "pen.clone.item" | "scatter.clone.item" => "clone",
         "surfaceConstraint.meshop.item" => "pen",
         "uvrect.meshop.item" | "uvfit.meshop.item" | "vertexmaptransfer" => "tree-uv-map",
@@ -1166,7 +1343,8 @@ impl Operandi {
                         "Polygon numbers can point at other polygons once an op below changes \
                          the topology. Select polygons in Edit Base Mesh to set them.",
                     );
-                    let (edit, open) = selection_ops(ui, op, &stack.ops[..index]);
+                    let active = self.editor.primitive_weights();
+                    let (edit, open) = selection_ops(ui, op, &stack.ops[..index], active.as_ref());
                     selop_edit = edit;
                     selop_open = open;
                 });

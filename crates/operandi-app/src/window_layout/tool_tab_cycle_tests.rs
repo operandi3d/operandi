@@ -138,7 +138,7 @@ fn the_active_tool_stays_and_a_tool_properties_field_keeps_focus() {
     a.editor.scene.selection.faces = vec![5];
     a.activate(Tool::Bevel);
     a.run(Command::Preview(
-        a.editor.live.as_ref().unwrap().params.clone(),
+        a.editor.session.live.as_ref().unwrap().params.clone(),
     ));
     for _ in 0..2 {
         keys(&mut a, &ctx, vec![]);
@@ -156,7 +156,10 @@ fn the_active_tool_stays_and_a_tool_properties_field_keeps_focus() {
     assert!(focused.is_some(), "the field is being edited");
     keys(&mut a, &ctx, vec![ctrl_tab()]);
     assert_eq!(a.category, Category::Topology, "{}", a.status);
-    assert_eq!(a.editor.live.as_ref().map(|l| l.tool), Some(Tool::Bevel));
+    assert_eq!(
+        a.editor.session.live.as_ref().map(|l| l.tool),
+        Some(Tool::Bevel)
+    );
     assert_eq!(ctx.memory(|m| m.focused()), focused, "focus stays");
 }
 

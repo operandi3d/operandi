@@ -123,10 +123,10 @@ fn tack_rejects_nonpositive_size_without_publishing_pending_edits() {
 fn only_the_topology_pen_preset_opens_topology_pen_gestures() {
     let mut app = tests::box_app();
     app.run(Command::Mode(Mode::Polygon));
-    assert!(app.editor.preset.is_none());
+    assert!(app.editor.session.preset.is_none());
     assert!(!app.topology_pen_open());
     app.execute("soft move");
-    assert!(app.editor.preset.is_some(), "{}", app.status);
+    assert!(app.editor.session.preset.is_some(), "{}", app.status);
     assert!(!app.topology_pen_open());
     app.execute("topology pen");
     assert!(app.topology_pen_open(), "{}", app.status);

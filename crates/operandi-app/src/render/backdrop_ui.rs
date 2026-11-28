@@ -738,7 +738,7 @@ impl Operandi {
             return;
         };
         let id = item.id;
-        let idle = self.editor.live.is_none();
+        let idle = self.editor.session.live.is_none();
         crate::form::rows::section(ui, "Backdrop", false, |ui| {
             ui.gated_ui(crate::unavailable::unless(idle, crate::unavailable::TOOL_ACTIVE), |ui| {
                 ui.spacing_mut().item_spacing.y = 2.;
@@ -1412,7 +1412,7 @@ mod tests {
             a.run(Command::Mode(mode));
             a.activate(tool);
             assert_eq!(
-                a.editor.live.as_ref().map(|l| l.tool),
+                a.editor.session.live.as_ref().map(|l| l.tool),
                 Some(tool),
                 "{}",
                 a.status

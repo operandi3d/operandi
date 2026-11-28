@@ -27,15 +27,21 @@ fn item(e: &Editor, id: u64) -> &Item {
     e.scene.items.iter().find(|i| i.id == id).unwrap()
 }
 fn tool(e: &Editor) -> Option<Tool> {
-    e.live.as_ref().map(|l| l.tool)
+    e.session.live.as_ref().map(|l| l.tool)
 }
 fn preview(e: &mut Editor, f: impl FnOnce(&mut Parameters)) {
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     f(&mut p);
     e.dispatch(Command::Preview(p)).unwrap();
 }
 fn center(e: &Editor) -> DVec3 {
-    e.live.as_ref().unwrap().action_frame.unwrap().center
+    e.session
+        .live
+        .as_ref()
+        .unwrap()
+        .action_frame
+        .unwrap()
+        .center
 }
 
 #[test]
@@ -48,7 +54,7 @@ fn move_retargets_to_the_clicked_item() {
     e.dispatch(Command::SelectItem(Some(b))).unwrap();
     assert_eq!(tool(&e), Some(Tool::Move));
     assert_eq!(e.scene.selection.item, Some(b));
-    assert_eq!(e.live.as_ref().unwrap().params.delta, DVec3::ZERO);
+    assert_eq!(e.session.live.as_ref().unwrap().params.delta, DVec3::ZERO);
     assert!((center(&e) - DVec3::new(10., 0., 0.)).length() < 1e-9);
     // A's move is recorded as its own step.
     assert_eq!(e.history.undo.len(), 1);
@@ -90,7 +96,7 @@ fn rotate_and_scale_retarget_with_fresh_values() {
 
         e.dispatch(Command::SelectItem(Some(b))).unwrap();
         assert_eq!(tool(&e), Some(t), "{t:?}");
-        let p = &e.live.as_ref().unwrap().params;
+        let p = &e.session.live.as_ref().unwrap().params;
         let zero = if t == Tool::Scale {
             DVec3::ONE
         } else {
@@ -142,9 +148,9 @@ fn deselecting_drops_the_tool_without_error() {
 fn options_carry_over() {
     let (mut e, _a, b) = fixture(Mode::Item);
     e.dispatch(Command::Activate(Tool::Scale)).unwrap();
-    e.live.as_mut().unwrap().params.negative_scale = true;
+    e.session.live.as_mut().unwrap().params.negative_scale = true;
     e.dispatch(Command::SelectItem(Some(b))).unwrap();
-    assert!(e.live.as_ref().unwrap().params.negative_scale);
+    assert!(e.session.live.as_ref().unwrap().params.negative_scale);
     // An untouched tool records nothing on the way.
     assert!(e.history.undo.is_empty());
 }
@@ -154,11 +160,11 @@ fn a_drop_failure_refuses_and_changes_nothing() {
     let (mut e, _a, b) = fixture(Mode::Item);
     e.dispatch(Command::Activate(Tool::Move)).unwrap();
     preview(&mut e, |p| p.delta = DVec3::Y);
-    e.live.as_mut().unwrap().preview_error = Some("bad field".into());
+    e.session.live.as_mut().unwrap().preview_error = Some("bad field".into());
     let before = e.clone();
     assert!(e.dispatch(Command::SelectItem(Some(b))).is_err());
     assert_eq!(e.scene, before.scene);
-    assert!(e.live == before.live);
+    assert!(e.session.live == before.session.live);
     assert_eq!(e.history.undo.len(), before.history.undo.len());
 }
 
@@ -187,5 +193,10 @@ fn other_tools_settle_for_item_clicks() {
     e.dispatch(Command::Activate(Tool::Bevel)).unwrap();
     e.dispatch(Command::SelectItem(Some(b))).unwrap();
     assert_eq!(e.scene.selection.item, Some(b));
-    assert!(e.live.as_ref().is_none_or(|l| l.tool == Tool::Bevel));
+    assert!(
+        e.session
+            .live
+            .as_ref()
+            .is_none_or(|l| l.tool == Tool::Bevel)
+    );
 }

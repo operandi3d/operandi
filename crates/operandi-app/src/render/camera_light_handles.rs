@@ -210,7 +210,7 @@ impl Operandi {
     /// The selected camera or light's handles, when Move, Rotate or
     /// Transform is active on it in Item mode.
     pub(super) fn item_handles(&self, r: Rect) -> Option<Handles> {
-        let live = self.editor.live.as_ref()?;
+        let live = self.editor.session.live.as_ref()?;
         let scene = &self.editor.scene;
         if !tool_shows_item_channels(live.tool) || scene.selection.mode != Mode::Item {
             return None;
@@ -403,7 +403,7 @@ mod tests {
         let h = a.item_handles(r).expect("handles with Move active");
         let at = a.camera.project(grab(&h, Grab::AreaWidth), r).unwrap().0;
         assert_eq!(a.item_handle_hit(at, r), Some(Grab::AreaWidth));
-        let before = a.editor.tweaks.undo_steps();
+        let before = a.editor.session.tweaks.undo_steps();
         a.pointer_held = true;
         for dx in [10., 25., 40.] {
             a.drag_item_handle(Grab::AreaWidth, at + vec2(dx, 0.), r);
@@ -412,11 +412,11 @@ mod tests {
         a.editor.end_tweak();
         let width = a.editor.scene.item(id).unwrap();
         assert!(width.light.as_ref().unwrap().width > 1.0);
-        assert_eq!(a.editor.tweaks.undo_steps(), before + 1);
+        assert_eq!(a.editor.session.tweaks.undo_steps(), before + 1);
         a.run(Command::Undo);
         let item = a.editor.scene.item(id).unwrap();
         assert_eq!(item.light.as_ref().unwrap().width, 1.0);
-        assert!(a.editor.live.is_some(), "the tool stays");
+        assert!(a.editor.session.live.is_some(), "the tool stays");
         // No handles without a channel tool.
         a.run(Command::Cancel);
         assert!(a.item_handles(r).is_none());

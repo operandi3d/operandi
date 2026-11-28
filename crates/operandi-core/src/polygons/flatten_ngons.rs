@@ -149,7 +149,7 @@ impl Editor {
     /// Read-only Flatten Ngons plan for the current scene. Never mutates the
     /// editor; the command executes this same plan.
     pub fn flatten_ngons_plan(&self) -> Result<FlattenPlan> {
-        if self.i2_active() || self.pen_draft.is_some() {
+        if self.i2_active() || self.session.pen_draft.is_some() {
             return Err("Finish or Cancel the active tool before Flatten Ngons".into());
         }
         self.require_idle()?;

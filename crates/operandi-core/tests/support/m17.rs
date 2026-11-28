@@ -65,10 +65,10 @@ pub fn set(
     sides: u32,
     grouped: bool,
 ) {
-    if e.live.is_none() {
+    if e.session.live.is_none() {
         e.dispatch(Command::Activate(tool)).unwrap();
     }
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     p.shift = shift;
     p.inset = inset;
     p.extent = extent;

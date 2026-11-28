@@ -188,7 +188,7 @@ fn vertex_tool_shortcuts_and_handle_drags() {
         draw(&mut a, &ctx, size, vec![Event::PointerMoved(viewport)]);
         press(&mut a, &ctx, size, event);
         assert_eq!(
-            a.editor.live.as_ref().map(|l| l.tool),
+            a.editor.session.live.as_ref().map(|l| l.tool),
             Some(tool),
             "{}",
             a.status
@@ -215,7 +215,7 @@ fn vertex_tool_shortcuts_and_handle_drags() {
             size,
             vec![pointer(end + along, false, Modifiers::NONE)],
         );
-        let p = &a.editor.live.as_ref().unwrap().params;
+        let p = &a.editor.session.live.as_ref().unwrap().params;
         let moved = match tool {
             Tool::VertexBevel | Tool::VertexExtrude => p.inset,
             _ => p.shift,
@@ -234,7 +234,7 @@ fn vertex_tool_shortcuts_and_handle_drags() {
     draw(&mut a, &ctx, size, vec![Event::PointerMoved(viewport)]);
     press(&mut a, &ctx, size, chord(Key::X, Modifiers::SHIFT));
     assert_eq!(
-        a.editor.live.as_ref().map(|l| l.tool),
+        a.editor.session.live.as_ref().map(|l| l.tool),
         Some(Tool::Extrude),
         "{}",
         a.status
@@ -250,7 +250,7 @@ fn create_clicks_add_points_and_weld_clicks_join_them() {
     draw(&mut a, &ctx, size, vec![]);
     a.execute("tool.set vert.create on");
     assert_eq!(
-        a.editor.live.as_ref().map(|l| l.tool),
+        a.editor.session.live.as_ref().map(|l| l.tool),
         Some(Tool::VertexCreate),
         "{}",
         a.status
@@ -260,7 +260,14 @@ fn create_clicks_add_points_and_weld_clicks_join_them() {
         click(&mut a, &ctx, size, at, Modifiers::NONE);
     }
     assert_eq!(
-        a.editor.live.as_ref().unwrap().params.sketch_path.len(),
+        a.editor
+            .session
+            .live
+            .as_ref()
+            .unwrap()
+            .params
+            .sketch_path
+            .len(),
         3,
         "{}",
         a.status
@@ -467,7 +474,7 @@ fn vertex_bevel_drags_anywhere_in_the_viewport() {
     draw(&mut a, &ctx, size, vec![Event::PointerMoved(corner)]);
     press(&mut a, &ctx, size, key(Key::B));
     assert_eq!(
-        a.editor.live.as_ref().map(|l| l.tool),
+        a.editor.session.live.as_ref().map(|l| l.tool),
         Some(Tool::VertexBevel)
     );
     draw(&mut a, &ctx, size, vec![]);
@@ -479,7 +486,7 @@ fn vertex_bevel_drags_anywhere_in_the_viewport() {
         draw(a, &ctx, size, vec![Event::PointerMoved(to)]);
         draw(a, &ctx, size, vec![pointer(to, false, Modifiers::NONE)]);
         draw(a, &ctx, size, vec![Event::PointerMoved(corner)]);
-        a.editor.live.as_ref().unwrap().params.inset
+        a.editor.session.live.as_ref().unwrap().params.inset
     };
     let wide = drag(&mut a, 60.);
     assert!(wide > 0., "{}", a.status);
@@ -552,7 +559,7 @@ fn every_m3_vertex_row_is_callable_from_the_command_line() {
     // tool.set on/off for a live vertex tool, through the shared catalog.
     a.execute("tool.set vert.bevel on");
     assert_eq!(
-        a.editor.live.as_ref().map(|l| l.tool),
+        a.editor.session.live.as_ref().map(|l| l.tool),
         Some(Tool::VertexBevel),
         "{}",
         a.status
@@ -560,7 +567,7 @@ fn every_m3_vertex_row_is_callable_from_the_command_line() {
     a.execute("tool.set vert.bevel ?");
     assert_eq!(a.status, "1");
     a.execute("tool.set vert.bevel off");
-    assert!(a.editor.live.is_none());
+    assert!(a.editor.session.live.is_none());
     // Malformed input refuses before mutation.
     let before = a.editor.scene.clone();
     for bad in [
@@ -694,11 +701,19 @@ fn create_xyz_fields_move_the_last_point_and_escape_cancels() {
     click(&mut a, &ctx, size, center, Modifiers::NONE);
     click(&mut a, &ctx, size, center + vec2(80., 0.), Modifiers::NONE);
     draw(&mut a, &ctx, size, vec![]);
-    let first = a.editor.live.as_ref().unwrap().params.sketch_path[0];
+    let first = a.editor.session.live.as_ref().unwrap().params.sketch_path[0];
     a.fields.insert("create_point0".into(), "1 m".into());
     a.fields.insert("create_point2".into(), "0.5 m".into());
     assert!(a.confirm_fields(), "{}", a.status);
-    let path = a.editor.live.as_ref().unwrap().params.sketch_path.clone();
+    let path = a
+        .editor
+        .session
+        .live
+        .as_ref()
+        .unwrap()
+        .params
+        .sketch_path
+        .clone();
     assert_eq!(path[0], first, "earlier points stay put");
     assert_eq!((path[1].x, path[1].z), (1., 0.5));
     a.run(Command::Drop);
@@ -716,10 +731,20 @@ fn create_xyz_fields_move_the_last_point_and_escape_cancels() {
         center + vec2(-60., 40.),
         Modifiers::NONE,
     );
-    assert_eq!(a.editor.live.as_ref().unwrap().params.sketch_path.len(), 1);
+    assert_eq!(
+        a.editor
+            .session
+            .live
+            .as_ref()
+            .unwrap()
+            .params
+            .sketch_path
+            .len(),
+        1
+    );
     draw(&mut a, &ctx, size, vec![Event::PointerMoved(center)]);
     press(&mut a, &ctx, size, key(Key::Escape));
-    assert!(a.editor.live.is_none(), "{}", a.status);
+    assert!(a.editor.session.live.is_none(), "{}", a.status);
     assert_eq!(
         a.editor.scene.active().unwrap().mesh,
         before.active().unwrap().mesh
@@ -902,7 +927,7 @@ fn weld_and_edge_clicks_refuse_while_a_numeric_task_is_open() {
     // Gap closed 2026-10-31: these only refused for live tools and Pen.
     let mut a = app(grid(), vec![5]);
     a.run(Command::ArmCone);
-    assert!(a.editor.has_active_task(), "{}", a.status);
+    assert!(a.editor.session.has_active_task(), "{}", a.status);
     a.toggle_weld();
     assert!(!a.vertex_weld);
     assert!(a.status.contains("Drop or Cancel"), "{}", a.status);

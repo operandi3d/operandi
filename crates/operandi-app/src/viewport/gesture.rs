@@ -134,7 +134,7 @@ impl Operandi {
         &self,
         scene: &operandi_core::Scene,
     ) -> Option<(operandi_core::Item, glam::DMat4)> {
-        let live = self.editor.live.as_ref()?;
+        let live = self.editor.session.live.as_ref()?;
         if !live.tool.transforms_items() || scene.selection.mode == Mode::Item {
             return None;
         }

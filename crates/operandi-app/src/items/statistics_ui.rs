@@ -926,7 +926,7 @@ impl Operandi {
                     };
                     row.cells[COUNT] = Cell::Custom;
                     row.cells[SEL] = Cell::Custom;
-                    row.renamable = r.is_named() && self.editor.live.is_none();
+                    row.renamable = r.is_named() && self.editor.session.live.is_none();
                     let tally = report.and_then(|rep| rep.get(r));
                     let (c, s) = tally_text(tally);
                     row.style.empty = tally.is_some_and(|t| t.count == 0) && applies;

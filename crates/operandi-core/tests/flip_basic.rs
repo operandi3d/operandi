@@ -897,9 +897,9 @@ fn touching_exception_refusal_preserves_editor_history_and_redo() {
         };
         assert!(e.dispatch(Command::Preview(p)).is_err());
         // Failed live previews publish only the existing diagnostic field.
-        assert!(e.live.as_ref().unwrap().preview_error.is_some());
-        before.live.as_mut().unwrap().preview_error =
-            e.live.as_ref().unwrap().preview_error.clone();
+        assert!(e.session.live.as_ref().unwrap().preview_error.is_some());
+        before.session.live.as_mut().unwrap().preview_error =
+            e.session.live.as_ref().unwrap().preview_error.clone();
         assert!(
             e == before,
             "{tool:?} refusal changed editor state beyond its diagnostic"

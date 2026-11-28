@@ -124,7 +124,7 @@ fn cone_apply_and_drop_capture_complete_steps() {
     let steps = e.history.undo.len();
     e.dispatch(Command::Drop).unwrap();
     assert_eq!(e.history.undo.len(), steps);
-    assert!(e.cone.is_none());
+    assert!(e.session.cone.is_none());
     restore(
         &mut e,
         HistoryRequest::Undo,
@@ -135,7 +135,7 @@ fn cone_apply_and_drop_capture_complete_steps() {
     restore(&mut e, HistoryRequest::Redo, "Cone", &applied, &applied_ids);
     // Drop with a preview shown keeps it as one "Cone" step.
     // Undo/Redo of an Apply never reopens Cone.
-    assert!(e.cone.is_none());
+    assert!(e.session.cone.is_none());
     e.dispatch(Command::ArmCone).unwrap();
     e.dispatch(Command::ConfigureCone(ConeParameters {
         position: glam::DVec3::new(3., 0., 0.),
@@ -163,7 +163,7 @@ fn i2_local_restore_then_finish_publishes_one_complete_base_to_result_checkpoint
     }))
     .unwrap();
     e.dispatch(Command::BeginExtrude).unwrap();
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     p.extent = DVec3::Z * 0.5;
     e.dispatch(Command::Preview(p)).unwrap();
     let result = e.scene.clone();
@@ -206,10 +206,10 @@ fn substantive_surface_mode_outer_publication_failure_preserves_accepted_state()
     for tool in [Tool::SmoothShift, Tool::Thicken] {
         let mut e = fixture();
         e.dispatch(Command::Activate(tool)).unwrap();
-        let mut p = e.live.as_ref().unwrap().params.clone();
+        let mut p = e.session.live.as_ref().unwrap().params.clone();
         p.smooth_shift.offset = 0.1;
         e.dispatch(Command::Preview(p)).unwrap();
-        assert_ne!(e.scene, e.live.as_ref().unwrap().base);
+        assert_ne!(e.scene, e.session.live.as_ref().unwrap().base);
         assert_eq!(
             e.mode_route_eligibility(),
             ModeRouteEligibility::DropsToolFirst
@@ -232,7 +232,7 @@ fn substantive_surface_mode_outer_publication_failure_preserves_accepted_state()
         );
         nested_control.dispatch(Command::Mode(Mode::Edge)).unwrap();
         assert_eq!(nested_control.identities.publication, u64::MAX);
-        assert!(nested_control.live.is_none());
+        assert!(nested_control.session.live.is_none());
         assert_eq!(nested_control.scene.selection.mode, Mode::Edge);
         completed_ids(&nested_control);
         assert_eq!(
@@ -243,7 +243,7 @@ fn substantive_surface_mode_outer_publication_failure_preserves_accepted_state()
         assert_eq!(e.scene.selection, before.scene.selection);
         assert_eq!(e.identities.current, before.identities.current);
         assert!(e.history.undo == before.history.undo && e.history.redo == before.history.redo);
-        assert!(e.live == before.live && e.i2 == before.i2);
+        assert!(e.session.live == before.session.live && e.i2 == before.i2);
         assert_eq!(e.revision, before.revision);
         assert_eq!(e.identities.publication, before.identities.publication);
         assert_eq!(e.identities.request, before.identities.request);

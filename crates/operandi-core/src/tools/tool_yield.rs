@@ -25,10 +25,13 @@ impl Editor {
     /// gesture held, a preset row (its Drop restores remembered context),
     /// or a Pen or Solid Sketch draft (drafts finish or cancel themselves).
     pub(crate) fn restart_command(&self) -> Option<Command> {
-        if self.tweak_held || self.selection_start.is_some() || self.preset.is_some() {
+        if self.session.tweak_held
+            || self.selection_start.is_some()
+            || self.session.preset.is_some()
+        {
             return None;
         }
-        Some(match self.active_task()? {
+        Some(match self.session.active_task()? {
             ActiveTask::Live(tool) => Command::Activate(tool),
             ActiveTask::Cone => Command::ArmCone,
             ActiveTask::Ellipsoid => Command::ArmEllipsoid,
@@ -47,7 +50,7 @@ impl Editor {
     pub(crate) fn yield_tool_for(&mut self, restart: Command, cmd: Command) -> Result<()> {
         let mut staged = Box::new(self.clone());
         staged.dispatch(Command::Drop)?;
-        if staged.has_active_task() || staged.i2_active() {
+        if staged.session.has_active_task() || staged.i2_active() {
             return Err("Finish the current tool first".into());
         }
         staged.dispatch(cmd)?;

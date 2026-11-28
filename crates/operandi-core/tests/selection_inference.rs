@@ -67,7 +67,7 @@ fn mesh(e: &Editor) -> Mesh {
 /// Starts `tool`, drags it by `amount` (inset or offset) and drops it.
 fn run(e: &mut Editor, tool: Tool, amount: f64) {
     e.dispatch(Command::Activate(tool)).unwrap();
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     p.inset = amount;
     p.chamfer.offset = amount;
     e.dispatch(Command::Preview(p)).unwrap();
@@ -97,7 +97,7 @@ fn m01_vertex_bevel_from_polygons_matches_their_points() {
         e.inference_note(),
         Some("Vertex Bevel on 4 points from 1 polygon")
     );
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     p.inset = 0.2;
     e.dispatch(Command::Preview(p)).unwrap();
     assert_eq!(e.scene.selection.mode, Mode::Polygon);
@@ -147,7 +147,7 @@ fn nothing_selected_behaves_as_the_tools_own_mode() {
     let mut e = editor(grid(), Mode::Polygon);
     let before = e.scene.clone();
     assert!(e.dispatch(Command::Activate(Tool::VertexBevel)).is_err());
-    assert!(e.live.is_none());
+    assert!(e.session.live.is_none());
     assert_eq!(e.scene, before);
     // Edge Bevel with nothing selected bevels every edge (TA-06), from
     // Polygon and Vertex mode alike.
@@ -353,7 +353,7 @@ fn every_inferring_tool_runs_or_refuses_cleanly_from_each_mode() {
             match e.dispatch(Command::Activate(card.tool)) {
                 Ok(()) => {
                     started += 1;
-                    let mut p = e.live.as_ref().unwrap().params.clone();
+                    let mut p = e.session.live.as_ref().unwrap().params.clone();
                     p.inset = 0.1;
                     p.shift = 0.1;
                     p.chamfer.offset = 0.1;

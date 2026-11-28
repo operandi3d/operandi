@@ -135,11 +135,11 @@ fn preset_row_starts_the_preset_and_a_second_click_drops_it() {
     let mut a = deform_tab(&ctx);
     click(&mut a, &ctx, "Twist");
     assert_eq!(a.editor.live_tool_label(), Some("Twist"), "{}", a.status);
-    assert_eq!(a.editor.live.as_ref().unwrap().tool, Tool::Rotate);
+    assert_eq!(a.editor.session.live.as_ref().unwrap().tool, Tool::Rotate);
     assert!(matches!(a.editor.spatial_falloff, Some(Falloff::Linear(_))));
     // Tool Properties shows the preset and its falloff.
     click(&mut a, &ctx, "Twist");
-    assert!(a.editor.live.is_none());
+    assert!(a.editor.session.live.is_none());
     assert!(a.editor.spatial_falloff.is_none());
     // A neutral session leaves no step behind.
     assert!(a.editor.history.undo.is_empty());
@@ -151,10 +151,13 @@ fn push_drags_up_to_push_out_and_drop_is_one_step() {
     let mut a = deform_tab(&ctx);
     let before = a.editor.scene.active().unwrap().mesh.vertices.clone();
     click(&mut a, &ctx, "Push");
-    assert_eq!(a.editor.live.as_ref().map(|l| l.tool), Some(Tool::Push));
+    assert_eq!(
+        a.editor.session.live.as_ref().map(|l| l.tool),
+        Some(Tool::Push)
+    );
     let at = corner(&a);
     drag(&mut a, &ctx, at, vec2(0., -60.));
-    let shift = a.editor.live.as_ref().unwrap().params.shift;
+    let shift = a.editor.session.live.as_ref().unwrap().params.shift;
     assert!(shift > 0., "{}", a.status);
     let after = a.editor.scene.active().unwrap().mesh.vertices.clone();
     for (p, q) in before.iter().zip(&after) {
@@ -170,15 +173,39 @@ fn smooth_drags_right_to_raise_strength() {
     let ctx = Context::default();
     let mut a = deform_tab(&ctx);
     click(&mut a, &ctx, "Smooth");
-    assert_eq!(a.editor.live.as_ref().map(|l| l.tool), Some(Tool::Smooth));
+    assert_eq!(
+        a.editor.session.live.as_ref().map(|l| l.tool),
+        Some(Tool::Smooth)
+    );
     let at = corner(&a);
     drag(&mut a, &ctx, at, vec2(100., 0.));
-    let strength = a.editor.live.as_ref().unwrap().params.smooth.strength;
+    let strength = a
+        .editor
+        .session
+        .live
+        .as_ref()
+        .unwrap()
+        .params
+        .smooth
+        .strength;
     assert!(strength > 1.4 && strength < 1.6, "{strength}");
     // Each press-to-release is one step of the tool; Undo keeps it.
     a.run(Command::Undo);
-    assert_eq!(a.editor.live.as_ref().map(|l| l.tool), Some(Tool::Smooth));
-    assert_eq!(a.editor.live.as_ref().unwrap().params.smooth.strength, 1.);
+    assert_eq!(
+        a.editor.session.live.as_ref().map(|l| l.tool),
+        Some(Tool::Smooth)
+    );
+    assert_eq!(
+        a.editor
+            .session
+            .live
+            .as_ref()
+            .unwrap()
+            .params
+            .smooth
+            .strength,
+        1.
+    );
 }
 
 #[test]
@@ -219,7 +246,7 @@ fn sculpt_opens_the_brush_sculpt_tab() {
     click(&mut a, &ctx, SCULPT);
     assert_eq!(a.category, toolbox::Category::Sculpt);
     assert_eq!(a.layouts.tool_set, toolbox::ToolSet::Brush);
-    assert!(a.editor.live.is_none());
+    assert!(a.editor.session.live.is_none());
     assert!(a.editor.scene == before.scene);
 }
 
@@ -252,7 +279,7 @@ fn soft_drag_flyout_picks_shear_and_keeps_it_on_the_face() {
     assert_eq!(a.toolbox_rects["Shear"], rect(&a, "flyout:Soft Drag"));
     assert!(a.line_state("Shear").unwrap().on);
     click(&mut a, &ctx, "flyout:Soft Drag");
-    assert!(a.editor.live.is_none());
+    assert!(a.editor.session.live.is_none());
     click(&mut a, &ctx, "flyout:Soft Drag");
     assert_eq!(a.editor.live_tool_label(), Some("Shear"));
 }
@@ -333,7 +360,7 @@ fn flex_button_starts_flex_and_drops_back() {
         operandi_core::CenterMode::SelectionBorder
     );
     click(&mut a, &ctx, "Flex");
-    assert!(a.editor.live.is_none());
+    assert!(a.editor.session.live.is_none());
     assert_eq!(a.editor.spatial_falloff, None);
     assert_eq!(a.editor.action_context, action);
 }
@@ -382,7 +409,7 @@ fn right_drag_changes_selection_falloff_steps() {
 }
 
 fn bend(a: &Operandi) -> operandi_core::BendOptions {
-    a.editor.live.as_ref().unwrap().params.bend
+    a.editor.session.live.as_ref().unwrap().params.bend
 }
 fn screen(a: &Operandi, p: DVec3) -> Pos2 {
     a.camera.project(p, a.viewport_rect).unwrap().0
@@ -424,7 +451,10 @@ fn bend_ring_spine_centre_and_shortcut() {
     assert_eq!(fitted.axis, 2);
     assert_eq!(a.editor.scene.active().unwrap().mesh.vertices, before);
     // The ring: top to right is a quarter turn clockwise.
-    let ring = a.bend_ring(&a.editor.live.as_ref().unwrap().params, a.viewport_rect);
+    let ring = a.bend_ring(
+        &a.editor.session.live.as_ref().unwrap().params,
+        a.viewport_rect,
+    );
     let c = screen(&a, fitted.base);
     let radius = ring.iter().map(|p| p.distance(c)).fold(0., f32::max);
     assert!(radius > 40., "ring radius {radius}");
@@ -514,7 +544,7 @@ fn bend_script_centre_axis_reset_and_axis_along_spine() {
     assert_eq!(a.editor.live_tool_label(), Some("Bend"), "{}", a.status);
     // Up the box from its foot (the fitted spine is whatever the work
     // plane gives; BN-24).
-    let mut p = a.editor.live.as_ref().unwrap().params.clone();
+    let mut p = a.editor.session.live.as_ref().unwrap().params.clone();
     p.bend.spine = DVec3::new(0., 2., 0.);
     a.run(Command::Preview(p));
     a.execute("tool.attr xfrm.bend operandi.center1 -1");
@@ -523,7 +553,14 @@ fn bend_script_centre_axis_reset_and_axis_along_spine() {
     assert_eq!(bend(&a).base, DVec3::new(0., -1., 0.), "{}", a.status);
     assert_eq!(bend(&a).axis, 0, "{}", a.status);
     assert_eq!(
-        a.editor.live.as_ref().unwrap().action_frame.unwrap().center,
+        a.editor
+            .session
+            .live
+            .as_ref()
+            .unwrap()
+            .action_frame
+            .unwrap()
+            .center,
         DVec3::new(0., -1., 0.)
     );
     // Axis X curls the box toward -Z; the bottom (y = -1) stays.
@@ -570,7 +607,7 @@ fn hands_on_rows_start_their_presets() {
     ] {
         click(&mut a, &ctx, key);
         assert_eq!(
-            a.editor.preset.as_ref().map(|p| p.id.as_str()),
+            a.editor.session.preset.as_ref().map(|p| p.id.as_str()),
             Some(id),
             "{key}: {}",
             a.status
@@ -617,7 +654,10 @@ fn holding_a_flyout_opens_its_list() {
         SIZE,
         vec![pointer(point, false, Modifiers::NONE)],
     );
-    assert!(a.editor.live.is_none(), "the release didn't start Bulge");
+    assert!(
+        a.editor.session.live.is_none(),
+        "the release didn't start Bulge"
+    );
 }
 
 /// Quick Align and Ground Align light while their mode is on, from their

@@ -3,7 +3,7 @@ use crate::*;
 impl Editor {
     pub fn bridge_eligibility(&self) -> Result<()> {
         self.scene.validate()?;
-        let s = self.bridge.as_ref().ok_or("Arm Bridge first")?;
+        let s = self.session.bridge.as_ref().ok_or("Arm Bridge first")?;
         self.scene
             .active()
             .filter(|i| i.visible && i.id == s.target)
@@ -34,7 +34,7 @@ impl Editor {
             .filter(|i| i.visible)
             .ok_or("Select a visible mesh for Bridge")?
             .id;
-        self.bridge = Some(NumericBridge::armed(
+        self.session.bridge = Some(NumericBridge::armed(
             target,
             *self.presets.get::<crate::BridgePreset>(),
         ));
@@ -44,7 +44,7 @@ impl Editor {
         if !p.tension.is_finite() || p.twist == i32::MIN {
             return Err("Bridge requires finite Tension and normalized Twist".into());
         }
-        let session = self.bridge.as_mut().ok_or("Arm Bridge first")?;
+        let session = self.session.bridge.as_mut().ok_or("Arm Bridge first")?;
         let changed = session.requested != p;
         session.requested = p;
         *self.presets.get_mut::<crate::BridgePreset>() = p;
@@ -58,19 +58,19 @@ impl Editor {
 
     /// UIC-78: the last Apply's result is still live (`live_apply.rs`).
     pub fn bridge_result_live(&self) -> bool {
-        self.live_step_shown(self.bridge.as_ref().and_then(|s| s.applied_step))
+        self.live_step_shown(self.session.bridge.as_ref().and_then(|s| s.applied_step))
     }
 
     /// The cheap half of `bridge_result_live`, for the panel's every-frame
     /// look.
     pub fn bridge_step_newest(&self) -> bool {
-        self.live_step_newest(self.bridge.as_ref().and_then(|s| s.applied_step))
+        self.live_step_newest(self.session.bridge.as_ref().and_then(|s| s.applied_step))
     }
 
     /// Bridge the live result's starting selection again with `p`, folded
     /// into the same undo step.
     fn remake_bridge(&mut self, p: BridgeParameters) -> Result<()> {
-        let fold = self.bridge.as_ref().and_then(|s| s.applied_step);
+        let fold = self.session.bridge.as_ref().and_then(|s| s.applied_step);
         let fold = fold.ok_or("No Bridge result")?;
         let last = self
             .history
@@ -111,14 +111,19 @@ impl Editor {
         // selected now (the result's own selection).
         // Nothing or a single polygon selected: nothing happens, no message
         // (bridge-2026-11-05, BR18/BR19). The panel still explains why.
-        if self.bridge.is_some()
+        if self.session.bridge.is_some()
             && self.scene.selection.mode == Mode::Polygon
             && self.scene.selection.faces.len() < 2
         {
             return Ok(());
         }
         self.bridge_eligibility()?;
-        let p = self.bridge.as_ref().ok_or("Arm Bridge first")?.requested;
+        let p = self
+            .session
+            .bridge
+            .as_ref()
+            .ok_or("Arm Bridge first")?
+            .requested;
         let edges = self.scene.selection.mode == Mode::Edge;
         let id = self.scene.active().ok_or("Missing Bridge target")?.id;
         let candidate = self.bridged_scene(p)?;
@@ -133,7 +138,7 @@ impl Editor {
         // Its own gesture, so edits while it's live fold into this step.
         let fold = self.live_apply_fold();
         self.record_folded("Bridge Apply", before, fold);
-        if let Some(s) = self.bridge.as_mut() {
+        if let Some(s) = self.session.bridge.as_mut() {
             s.applied_step = Some(fold);
         }
         Ok(())

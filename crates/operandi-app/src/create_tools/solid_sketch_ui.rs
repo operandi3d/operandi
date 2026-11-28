@@ -2,7 +2,7 @@
 //! starting it (button, menu, `tool.set`), the pick-up question, viewport
 //! clicks and drags, the node handles, the overlay and Tool Properties.
 //!
-//! The tool's state lives in the core session (`Editor::solid_sketch`);
+//! The tool's state lives in the core session (`ToolSession::solid_sketch`);
 //! every gesture ends in `Command::SolidSketch` edits. A drag's first edit
 //! is a step of its own inside the tool and its later frames join it
 //! (`continuing`), so Undo takes back one drag (spec 7).
@@ -20,8 +20,9 @@
 //! - Edit Mode Destroy: left click on a node deletes it; empty space does
 //!   nothing (Q8, provisional).
 //!
-//! Handles on the current node (spec 5.2): red square = Size X, blue =
-//! Size Z, green = Twist; rings rotate the node's branch only with Rotate
+//! Handles on the current node (spec 5.2; #45, Jason 2026-11-27): red,
+//! green and blue squares = Size X, Y and Z; a dark green dot beyond the
+//! green square = Twist, dragged left and right; rings rotate the node's branch only with Rotate
 //! Handles on (usual axis colours: red about X, green about Y, blue about
 //! Z; Jason chose these over the documented reverse, Q12).
 use super::*;
@@ -40,6 +41,12 @@ const CLICK_SLOP: f32 = 3.;
 const RING_SCALE: f64 = 1.35;
 /// Right-drag scale: ×e per 100 points to the right.
 const SCALE_RATE: f64 = 0.01;
+/// The Twist dot sits this far (points) beyond the green square, along
+/// the same screen direction (provisional, #45).
+const TWIST_GAP: f32 = 18.;
+/// Twist drag: radians per point dragged right (half a degree; provisional,
+/// #45).
+const TWIST_RATE: f64 = std::f64::consts::PI / 360.;
 
 /// What a press on the sketch grabbed.
 #[derive(Clone, Debug, PartialEq)]
@@ -70,13 +77,8 @@ pub enum SketchGrab {
         center: DVec3,
         dir: DVec3,
     },
-    /// The Twist square: angle on screen round the node's centre.
-    Twist {
-        start: f64,
-        center: Pos2,
-        from: f32,
-        sign: f64,
-    },
+    /// The Twist dot: left and right drags turn the node (#45).
+    Twist { start: f64, from_x: f32 },
     /// A rotate ring about world `axis` through `center`; `last` is the
     /// angle applied so far.
     Ring {
@@ -101,6 +103,7 @@ pub struct SketchDrag {
 #[derive(Clone, Copy, Debug, PartialEq)]
 enum HandleHit {
     SizeX,
+    SizeY,
     SizeZ,
     Twist,
     /// Ring about frame axis 0 = X, 1 = Y, 2 = Z.
@@ -140,7 +143,7 @@ const CREATE_SNAP_PX: f32 = 8.;
 impl Operandi {
     /// Starts Solid Sketch; asks first when the mesh holds a sketch.
     pub(super) fn start_solid_sketch(&mut self, preset: bool) {
-        if self.editor.solid_sketch.is_some() {
+        if self.editor.session.solid_sketch.is_some() {
             // The tool's own button drops it (one rule for every tool).
             self.run(Command::Drop);
             return;
@@ -222,6 +225,7 @@ impl Operandi {
     /// World centres of the live sketch's nodes.
     fn sketch_centres(&self) -> Vec<DVec3> {
         self.editor
+            .session
             .solid_sketch
             .as_ref()
             .map(|s| s.world_centres())
@@ -233,7 +237,7 @@ impl Operandi {
     /// and the sketch's other nodes. The sketch's own mesh is left out, so
     /// a node never snaps onto the skin being rebuilt around it.
     fn sketch_snap(&mut self, at: DVec3, moving: Option<usize>, r: Rect) -> Option<DVec3> {
-        let session = self.editor.solid_sketch.as_ref()?;
+        let session = self.editor.session.solid_sketch.as_ref()?;
         let target = session.target();
         let centres = self.sketch_centres();
         // Node centres aren't mesh points: nothing moving is a mesh target
@@ -292,7 +296,7 @@ impl Operandi {
     /// The link (by its child) under `pos`, and the world point on it
     /// nearest the pointer's ray.
     fn sketch_link_at(&self, pos: Pos2, r: Rect) -> Option<(usize, DVec3)> {
-        let session = self.editor.solid_sketch.as_ref()?;
+        let session = self.editor.session.solid_sketch.as_ref()?;
         let centres = session.world_centres();
         let (o, d) = self.camera.ray(pos, r);
         let mut best: Option<(usize, DVec3, f32)> = None;
@@ -313,8 +317,8 @@ impl Operandi {
 
     /// The current node's frame in world space: centre, axes (unit) and
     /// half-sizes.
-    fn sketch_current_frame(&self) -> Option<(usize, DVec3, [DVec3; 3], DVec3)> {
-        let session = self.editor.solid_sketch.as_ref()?;
+    pub(super) fn sketch_current_frame(&self) -> Option<(usize, DVec3, [DVec3; 3], DVec3)> {
+        let session = self.editor.session.solid_sketch.as_ref()?;
         let index = session.current()?;
         let frame = session.sketch().frames(session.options().auto_align)[index];
         let world = session.world();
@@ -345,6 +349,22 @@ impl Operandi {
             .collect()
     }
 
+    /// Where the current node's Twist dot is on screen: TWIST_GAP points
+    /// beyond the green square, away from the centre (straight up when the
+    /// node's Y is seen end-on).
+    pub(super) fn sketch_twist_handle(&self, r: Rect) -> Option<Pos2> {
+        let (_, c, axes, s) = self.sketch_current_frame()?;
+        let centre = self.camera.project(c, r)?.0;
+        let green = self.camera.project(c + axes[1] * s.y, r)?.0;
+        let away = green - centre;
+        let dir = if away.length() > 1. {
+            away.normalized()
+        } else {
+            vec2(0., -1.)
+        };
+        Some(green + dir * TWIST_GAP)
+    }
+
     /// Which handle of the current node is under `pos`.
     fn sketch_handle_at(&self, pos: Pos2, r: Rect) -> Option<HandleHit> {
         let (_, c, axes, s) = self.sketch_current_frame()?;
@@ -358,8 +378,13 @@ impl Operandi {
         let candidates = [
             (None, distance(c)),
             (Some(HandleHit::SizeX), distance(c + axes[0] * s.x)),
+            (Some(HandleHit::SizeY), distance(c + axes[1] * s.y)),
             (Some(HandleHit::SizeZ), distance(c + axes[2] * s.z)),
-            (Some(HandleHit::Twist), distance(c + axes[1] * s.y)),
+            (
+                Some(HandleHit::Twist),
+                self.sketch_twist_handle(r)
+                    .map_or(f32::INFINITY, |q| q.distance(pos)),
+            ),
         ];
         if let Some((hit, _)) = candidates
             .into_iter()
@@ -370,6 +395,7 @@ impl Operandi {
         }
         let rotate = self
             .editor
+            .session
             .solid_sketch
             .as_ref()
             .is_some_and(|s| s.options().rotate_handles);
@@ -416,7 +442,7 @@ impl Operandi {
         button: PointerButton,
         modifiers: Modifiers,
     ) -> Option<input::GestureKind> {
-        let session = self.editor.solid_sketch.as_ref()?;
+        let session = self.editor.session.solid_sketch.as_ref()?;
         if input::navigation(modifiers).is_some() || modifiers.mac_cmd {
             return None;
         }
@@ -514,7 +540,7 @@ impl Operandi {
                 ) {
                     return Some(input::GestureKind::Blocked);
                 }
-                let index = self.editor.solid_sketch.as_ref()?.current()?;
+                let index = self.editor.session.solid_sketch.as_ref()?.current()?;
                 Some(input::GestureKind::SolidSketch(Box::new(SketchDrag {
                     grab: SketchGrab::Create { index, center: at },
                     started: true,
@@ -527,7 +553,7 @@ impl Operandi {
     /// Ctrl press: insert on the link under the pointer, or on the link
     /// out of the node under it (spec 5.1).
     fn sketch_insert_press(&mut self, pos: Pos2, r: Rect) -> Option<SketchGrab> {
-        let session = self.editor.solid_sketch.as_ref()?;
+        let session = self.editor.session.solid_sketch.as_ref()?;
         let plane = self.actual_plane();
         let edit = if let Some(node) = self.sketch_node_at(pos, r) {
             let centre = self.sketch_centres()[node];
@@ -572,7 +598,7 @@ impl Operandi {
         if !self.sketch_edit(edit, false) {
             return None;
         }
-        let index = self.editor.solid_sketch.as_ref()?.current()?;
+        let index = self.editor.session.solid_sketch.as_ref()?.current()?;
         Some(SketchGrab::Create { index, center })
     }
 
@@ -584,21 +610,21 @@ impl Operandi {
                 center: c,
                 dir: axes[0],
             },
+            HandleHit::SizeY => SketchGrab::Size {
+                axis: 1,
+                center: c,
+                dir: axes[1],
+            },
             HandleHit::SizeZ => SketchGrab::Size {
                 axis: 2,
                 center: c,
                 dir: axes[2],
             },
             HandleHit::Twist => {
-                let center = self.camera.project(c, r)?.0;
-                let (_, forward) = self.camera.ray(center, r);
-                let session = self.editor.solid_sketch.as_ref()?;
+                let session = self.editor.session.solid_sketch.as_ref()?;
                 SketchGrab::Twist {
                     start: session.sketch().nodes[index].twist,
-                    center,
-                    from: (pos - center).angle(),
-                    // Screen angles turn clockwise; the run may face away.
-                    sign: if axes[0].dot(forward) > 0. { 1. } else { -1. },
+                    from_x: pos.x,
                 }
             }
             HandleHit::Ring(k) => {
@@ -627,7 +653,7 @@ impl Operandi {
             return;
         }
         let continuing = drag.started;
-        let Some(session) = self.editor.solid_sketch.as_ref() else {
+        let Some(session) = self.editor.session.solid_sketch.as_ref() else {
             return;
         };
         let current_node = session.current().map(|i| session.sketch().nodes[i].clone());
@@ -710,22 +736,14 @@ impl Operandi {
             }
             SketchGrab::Twist {
                 start: twist,
-                center,
-                from,
-                sign,
+                from_x,
             } => {
                 let Some(node) = current_node else { return };
-                let mut turn = ((pos - *center).angle() - *from) as f64;
-                while turn > std::f64::consts::PI {
-                    turn -= std::f64::consts::TAU;
-                }
-                while turn < -std::f64::consts::PI {
-                    turn += std::f64::consts::TAU;
-                }
+                // #45: right turns one way, left the other.
                 SketchEdit::SetNode {
                     center: node.center,
                     size: node.size,
-                    twist: *twist + turn * *sign,
+                    twist: *twist + f64::from(pos.x - *from_x) * TWIST_RATE,
                 }
             }
             SketchGrab::Ring {
@@ -771,7 +789,7 @@ impl Operandi {
     }
 
     fn sketch_status(&self) -> String {
-        let Some(session) = self.editor.solid_sketch.as_ref() else {
+        let Some(session) = self.editor.session.solid_sketch.as_ref() else {
             return "Ready".into();
         };
         let n = session.sketch().len();
@@ -793,7 +811,7 @@ impl Operandi {
         r: Rect,
         hover: Option<Pos2>,
     ) -> Option<String> {
-        let session = self.editor.solid_sketch.as_ref()?;
+        let session = self.editor.session.solid_sketch.as_ref()?;
         let centres = session.world_centres();
         let project = |p: DVec3| self.camera.project(p, r).map(|(q, _)| q);
         let link = Stroke::new(1.5_f32, palette::selection().gamma_multiply(0.8));
@@ -840,18 +858,33 @@ impl Operandi {
         }
         for (hit, at, colour) in [
             (HandleHit::SizeX, c + axes[0] * s.x, x),
-            (HandleHit::Twist, c + axes[1] * s.y, y),
+            (HandleHit::SizeY, c + axes[1] * s.y, y),
             (HandleHit::SizeZ, c + axes[2] * s.z, z),
         ] {
             let Some(q) = project(at) else { continue };
             let half = if hovered == Some(hit) { 5. } else { 4. };
             painter.rect_filled(Rect::from_center_size(q, vec2(half, half) * 2.), 0., colour);
         }
+        // #45: Twist's own dot, a darker green beyond the green square.
+        if let Some(q) = self.sketch_twist_handle(r) {
+            let dark = Color32::from_rgb(
+                (f32::from(y.r()) * 0.55) as u8,
+                (f32::from(y.g()) * 0.55) as u8,
+                (f32::from(y.b()) * 0.55) as u8,
+            );
+            let radius = if hovered == Some(HandleHit::Twist) {
+                6.
+            } else {
+                5.
+            };
+            painter.circle_filled(q, radius, dark);
+        }
         hovered.map(|h| {
             match h {
                 HandleHit::SizeX => "Size X · drag to stretch the node along its run",
+                HandleHit::SizeY => "Size Y · drag to stretch the node across its run",
                 HandleHit::SizeZ => "Size Z · drag to stretch the node across its run",
-                HandleHit::Twist => "Twist · drag round the node to spin its cross-section",
+                HandleHit::Twist => "Twist · drag left or right to spin its cross-section",
                 HandleHit::Ring(_) => "Rotate · drag to turn the node and swing its branch",
             }
             .to_string()
@@ -866,7 +899,7 @@ impl Operandi {
         attr: &str,
         value: &str,
     ) -> Option<std::result::Result<Option<String>, String>> {
-        let session = self.editor.solid_sketch.as_ref()?;
+        let session = self.editor.session.solid_sketch.as_ref()?;
         let mut o = session.options().clone();
         let number = |v: &str| numeric::parse_quantity(v, numeric::Quantity::Scalar);
         let query = value == "?";
@@ -1036,7 +1069,7 @@ pub(super) struct SketchP {
 impl ToolFields for SolidSketchFields {
     type P = SketchP;
     fn params(app: &Operandi) -> Option<SketchP> {
-        let s = app.editor.solid_sketch.as_ref()?;
+        let s = app.editor.session.solid_sketch.as_ref()?;
         let node = s.current().map(|i| s.sketch().nodes[i].clone());
         Some(SketchP {
             options: s.options().clone(),

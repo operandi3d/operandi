@@ -562,7 +562,7 @@ impl crate::Editor {
     /// The proxy for the live tool's UV space, reusing the one the
     /// parameters carry while it still fits the tool's base scene.
     fn uv_proxy(&self, space: &crate::uv_edit::UvToolSpace) -> Result<std::sync::Arc<UvProxy>> {
-        let live = self.live.as_ref().ok_or("No active tool")?;
+        let live = self.session.live.as_ref().ok_or("No active tool")?;
         match &space.proxy {
             Some(proxy) if proxy.fits(&live.base, &space.map, space.tear_off) => Ok(proxy.clone()),
             _ => Ok(std::sync::Arc::new(UvProxy::build(
@@ -578,7 +578,7 @@ impl crate::Editor {
     /// layer mirrors the edit instead, uv_symmetry.rs), and the moved
     /// proxy points are written back as U and V of the map.
     pub(crate) fn preview_uv(&mut self, mut p: crate::Parameters, apply: bool) -> Result<()> {
-        let live = self.live.as_ref().ok_or("No active tool")?;
+        let live = self.session.live.as_ref().ok_or("No active tool")?;
         let tool = live.tool;
         let space = p.uv.as_mut().ok_or("Not a UV tool")?;
         let proxy = self.uv_proxy(space)?;
@@ -595,7 +595,7 @@ impl crate::Editor {
         }
         let mut run = p.clone();
         flatten(tool, &mut run);
-        let live = self.live.as_mut().expect("checked above");
+        let live = self.session.live.as_mut().expect("checked above");
         let real_base = std::mem::replace(&mut live.base, proxy.scene.clone());
         let symmetry = std::mem::take(&mut self.symmetry);
         // Screen falloffs drawn in the UV view weigh proxy points.
@@ -609,7 +609,7 @@ impl crate::Editor {
         let result = self.preview_one(run, apply);
         self.falloff_stamps = stamps;
         self.symmetry = symmetry;
-        let live = self.live.as_mut().expect("the tool stays live");
+        let live = self.session.live.as_mut().expect("the tool stays live");
         live.base = real_base;
         result?;
         // Keep the values as entered (not flattened); keep what the run
@@ -636,7 +636,7 @@ impl crate::Editor {
         &self,
         context: crate::ActionContext,
     ) -> Result<Option<crate::ActionFrame>> {
-        let Some(live) = self.live.as_ref() else {
+        let Some(live) = self.session.live.as_ref() else {
             return Ok(None);
         };
         let Some(space) = live.params.uv.as_ref() else {
@@ -652,7 +652,7 @@ impl crate::Editor {
     /// frame and a preset's fitted falloff are worked out again in the new
     /// space.
     pub(crate) fn uv_tool_space(&mut self, space: Option<Option<String>>) -> Result<()> {
-        let live = self.live.as_ref().ok_or("Start a tool first")?;
+        let live = self.session.live.as_ref().ok_or("Start a tool first")?;
         let tool = live.tool;
         if !runs_on_uvs(tool) {
             return Err(format!("{} doesn't work on UVs yet", tool.label()));
@@ -695,7 +695,7 @@ impl crate::Editor {
         };
         // A preset's Linear / Radial falloff is fitted to the selection in
         // the space the tool now works in (UVT-132).
-        let falloff = match self.preset.as_ref() {
+        let falloff = match self.session.preset.as_ref() {
             Some(preset) if preset.previous_falloff.is_some() => {
                 preset.row().fitted_falloff(&fit_scene)?
             }
@@ -704,7 +704,7 @@ impl crate::Editor {
         if let Some(f) = falloff {
             self.spatial_falloff = Some(f);
         }
-        let live = self.live.as_mut().expect("checked above");
+        let live = self.session.live.as_mut().expect("checked above");
         live.params.uv = map.map(|map| crate::uv_edit::UvToolSpace {
             map,
             pinned,
@@ -739,9 +739,9 @@ impl crate::Editor {
     /// made again when the tool's start scene changes. `None` outside UV
     /// space.
     pub fn uv_tool_proxy(&mut self) -> Option<std::sync::Arc<UvProxy>> {
-        let space = self.live.as_ref()?.params.uv.clone()?;
+        let space = self.session.live.as_ref()?.params.uv.clone()?;
         let proxy = self.uv_proxy(&space).ok()?;
-        self.live.as_mut()?.params.uv.as_mut()?.proxy = Some(proxy.clone());
+        self.session.live.as_mut()?.params.uv.as_mut()?.proxy = Some(proxy.clone());
         Some(proxy)
     }
 }

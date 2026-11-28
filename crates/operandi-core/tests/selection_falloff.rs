@@ -44,7 +44,7 @@ fn points(e: &Editor) -> Vec<DVec3> {
     e.scene.active().unwrap().mesh.vertices.clone()
 }
 fn live(e: &Editor) -> Parameters {
-    e.live.as_ref().unwrap().params.clone()
+    e.session.live.as_ref().unwrap().params.clone()
 }
 fn selection(steps: u32, shape: FalloffShape) -> Falloff {
     Falloff::Selection(SelectionFalloff { steps, shape })
@@ -230,7 +230,7 @@ fn fx01_flex_bends_the_selection_and_drops_back_to_the_users_setup() {
     let user_action = e.action_context;
     e.dispatch(Command::ActivateDeform(DeformPreset::Flex))
         .unwrap();
-    assert_eq!(e.live.as_ref().unwrap().tool, Tool::Transform);
+    assert_eq!(e.session.live.as_ref().unwrap().tool, Tool::Transform);
     assert_eq!(e.live_tool_label(), Some("Flex"));
     assert_eq!(
         e.spatial_falloff,
@@ -256,7 +256,7 @@ fn fx01_flex_bends_the_selection_and_drops_back_to_the_users_setup() {
             .all(|(a, b)| (*a - *b).length() > 1e-6)
     );
     e.dispatch(Command::Drop).unwrap();
-    assert!(e.live.is_none());
+    assert!(e.session.live.is_none());
     assert_eq!(e.spatial_falloff, None);
     assert_eq!(e.action_context, user_action);
     e.dispatch(Command::Undo).unwrap();
@@ -273,7 +273,7 @@ fn flex_refuses_item_mode_and_takes_another_axis() {
         e.dispatch(Command::ActivateDeform(DeformPreset::Flex))
             .is_err()
     );
-    assert!(e.live.is_none());
+    assert!(e.session.live.is_none());
     let mut e = strip();
     e.dispatch(Command::ActivateDeform(DeformPreset::Flex))
         .unwrap();

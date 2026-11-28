@@ -527,7 +527,7 @@ fn part_006_active_tool_draft_is_preserved_by_refusal() {
     let ctx = context();
     let mut a = app(&source);
     a.execute("spike");
-    assert!(a.editor.spike.is_some(), "{}", a.status);
+    assert!(a.editor.session.spike.is_some(), "{}", a.status);
     a.fields
         .insert("spi_strength".into(), "not a number".into());
     let editor = a.editor.clone();

@@ -36,7 +36,7 @@ impl Operandi {
 
     /// Shared Bridge property transport for legacy and canonical commands.
     pub(super) fn bridge_property(&mut self, name: &str, value: &str, legacy: bool) {
-        let Some(session) = self.editor.bridge.as_ref() else {
+        let Some(session) = self.editor.session.bridge.as_ref() else {
             self.status = "Activate Bridge first".into();
             return;
         };
@@ -118,7 +118,7 @@ impl Operandi {
         if !self.confirm_fields() {
             return;
         }
-        let mut accepted = self.editor.bridge.as_ref().unwrap().requested;
+        let mut accepted = self.editor.session.bridge.as_ref().unwrap().requested;
         match name {
             "segments" => accepted.segments = p.segments,
             "twist" => accepted.twist = p.twist,
@@ -156,6 +156,7 @@ impl Operandi {
         self.editor.bridge_eligibility()?;
         let p = self
             .editor
+            .session
             .bridge
             .as_ref()
             .ok_or("Arm Bridge first")?
@@ -179,6 +180,7 @@ impl Operandi {
         self.editor.bridge_eligibility()?;
         let p = self
             .editor
+            .session
             .bridge
             .as_ref()
             .ok_or("Arm Bridge first")?
@@ -206,7 +208,7 @@ pub(super) struct BridgeFields;
 impl ToolFields for BridgeFields {
     type P = BridgeParameters;
     fn params(app: &Operandi) -> Option<BridgeParameters> {
-        app.editor.bridge.as_ref().map(|s| s.requested)
+        app.editor.session.bridge.as_ref().map(|s| s.requested)
     }
     fn form(app: &Operandi, _: &BridgeParameters) -> ToolForm<BridgeParameters> {
         let mut f = ToolForm::new();
@@ -438,8 +440,14 @@ mod tests {
         a.fields.insert("bri_segments".into(), "1+2".into());
         a.fields.insert("bri_tension".into(), "25%*2".into());
         assert!(a.confirm_fields());
-        assert_eq!(a.editor.bridge.as_ref().unwrap().requested.segments, 3);
-        assert_eq!(a.editor.bridge.as_ref().unwrap().requested.tension, 0.5);
+        assert_eq!(
+            a.editor.session.bridge.as_ref().unwrap().requested.segments,
+            3
+        );
+        assert_eq!(
+            a.editor.session.bridge.as_ref().unwrap().requested.tension,
+            0.5
+        );
         assert_eq!(a.editor.scene, before);
         a.fields.insert("bri_twist".into(), "-2147483648".into());
         assert!(a.confirm_fields());
@@ -473,7 +481,7 @@ mod tests {
         assert_eq!(a.editor.scene, after);
         a.execute("bridge reset");
         assert_eq!(
-            a.editor.bridge.as_ref().unwrap().requested,
+            a.editor.session.bridge.as_ref().unwrap().requested,
             BridgeParameters::default()
         );
     }
@@ -512,8 +520,8 @@ mod tests {
             a.execute(canonical);
             b.execute(legacy);
             assert_eq!(
-                a.editor.bridge.as_ref().unwrap().requested,
-                b.editor.bridge.as_ref().unwrap().requested,
+                a.editor.session.bridge.as_ref().unwrap().requested,
+                b.editor.session.bridge.as_ref().unwrap().requested,
                 "{canonical}"
             );
         }
@@ -541,9 +549,15 @@ mod tests {
         a.fields.insert("bri_twist".into(), "-1".into());
         assert!(a.confirm_fields());
         a.execute("tool.attr edge.bridge tension 50%");
-        assert_eq!(a.editor.bridge.as_ref().unwrap().requested.tension, 0.5);
+        assert_eq!(
+            a.editor.session.bridge.as_ref().unwrap().requested.tension,
+            0.5
+        );
         a.execute("tool.attr edge.bridge segments 0");
-        assert_eq!(a.editor.bridge.as_ref().unwrap().requested.segments, 0);
+        assert_eq!(
+            a.editor.session.bridge.as_ref().unwrap().requested.segments,
+            0
+        );
         a.execute("tool.attr edge.bridge orient ?");
         assert_eq!(a.status, "1");
         a.execute("tool.apply");
@@ -555,13 +569,13 @@ mod tests {
         assert_eq!(a.editor.scene, after);
         a.execute("tool.reset edge.bridge");
         assert_eq!(
-            a.editor.bridge.as_ref().unwrap().requested,
+            a.editor.session.bridge.as_ref().unwrap().requested,
             BridgeParameters::default()
         );
         a.execute("tool.set edge.bridge off");
-        assert!(a.editor.bridge.is_none());
+        assert!(a.editor.session.bridge.is_none());
         a.execute("tool.set preset:edge.bridge mode:on");
-        assert!(a.editor.bridge.is_some());
+        assert!(a.editor.session.bridge.is_some());
         a.execute("tool.set edge.bridge ?");
         assert_eq!(a.status, "1");
     }
@@ -575,8 +589,8 @@ mod tests {
         alias.execute("tool.drop");
         canonical.execute("tool.set preset:edge.bridge mode:on");
         alias.execute("Bridge");
-        assert!(canonical.editor.bridge.is_some());
-        assert_eq!(canonical.editor.bridge, alias.editor.bridge);
+        assert!(canonical.editor.session.bridge.is_some());
+        assert_eq!(canonical.editor.session.bridge, alias.editor.session.bridge);
         assert_eq!(canonical.editor.scene, source);
         let menu = canonical.menu_model(&Context::default());
         let bridge = menu
@@ -594,12 +608,26 @@ mod tests {
         canonical.execute("tool.attr edge.bridge mode curve");
         canonical.execute("tool.attr edge.bridge mode smooth");
         assert_eq!(
-            canonical.editor.bridge.as_ref().unwrap().requested.mode,
+            canonical
+                .editor
+                .session
+                .bridge
+                .as_ref()
+                .unwrap()
+                .requested
+                .mode,
             BridgeMode::Smooth
         );
         canonical.execute("tool.attr edge.bridge tension -0.5");
         assert_eq!(
-            canonical.editor.bridge.as_ref().unwrap().requested.tension,
+            canonical
+                .editor
+                .session
+                .bridge
+                .as_ref()
+                .unwrap()
+                .requested
+                .tension,
             -0.5
         );
         canonical.fields.insert("bri_segments".into(), "bad".into());
@@ -634,9 +662,9 @@ mod tests {
             a.execute(input);
             assert_eq!(a.fields[key], expected, "{input}");
             assert_eq!(a.confirmed_fields[key], expected, "{input}");
-            let p = a.editor.bridge.as_ref().unwrap().requested;
+            let p = a.editor.session.bridge.as_ref().unwrap().requested;
             assert!(a.confirm_fields());
-            assert_eq!(a.editor.bridge.as_ref().unwrap().requested, p);
+            assert_eq!(a.editor.session.bridge.as_ref().unwrap().requested, p);
         }
         for mode in ["linear", "curve", "smooth"] {
             a.execute(&format!("tool.attr edge.bridge mode {mode}"));
@@ -740,7 +768,7 @@ mod tests {
         let mut other = app();
         other.execute("tool.drop");
         other.execute("spike");
-        assert!(other.editor.spike.is_some());
+        assert!(other.editor.session.spike.is_some());
         other.fields.insert("spi_strength".into(), "invalid".into());
         assert!(!other.confirm_fields());
         let prior = other.editor.clone();
@@ -791,7 +819,7 @@ mod tests {
         a.editor.history.undo.clear();
         a.execute("Bridge");
         assert!(a.bridge_panel_eligibility().is_ok());
-        let p = a.editor.bridge.as_ref().unwrap().requested;
+        let p = a.editor.session.bridge.as_ref().unwrap().requested;
         let form = BridgeFields::form(&a, &p);
         let greyed: Vec<&str> = form
             .fields()

@@ -46,9 +46,9 @@ fn an_armed_tool_says_click_to_start() {
     a.run(Command::Mode(Mode::Polygon));
     a.editor.scene.selection.faces = vec![0];
     a.editor.auto_activate_flags = true;
-    a.editor.armed = Some(Tool::Bevel);
+    a.editor.session.armed = Some(Tool::Bevel);
     a.activate(Tool::Bevel);
-    a.editor.armed = Some(Tool::Bevel);
+    a.editor.session.armed = Some(Tool::Bevel);
     let r = a.viewport_rect;
     if a.editor.is_armed() {
         let text = a.other_handle_tip(r.center(), r).unwrap();

@@ -147,7 +147,7 @@ fn n29_bevel_keeps_named_selection_sets() {
     e.dispatch(Command::Symmetry(Symmetry::default())).unwrap();
     e.scene.selection.faces = vec![0];
     e.dispatch(Command::Activate(Tool::Bevel)).unwrap();
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     p.shift = 0.2;
     p.inset = 0.1;
     e.dispatch(Command::Preview(p)).unwrap();

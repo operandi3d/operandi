@@ -173,7 +173,7 @@ fn uv_symmetry_mirrors_a_uv_edit_to_its_partner() {
     e.scene.selection.vertices = vec![2];
     e.dispatch(Command::Activate(Tool::Move)).unwrap();
     e.dispatch(Command::UvToolSpace(Some(None))).unwrap();
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     p.delta = DVec3::new(-0.1, 0.05, 0.);
     e.dispatch(Command::Preview(p)).unwrap();
     e.dispatch(Command::Drop).unwrap();

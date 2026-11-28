@@ -64,7 +64,7 @@ fn t17_real_24_corner_cylinder_cap_and_successful_staged_save() {
     std::fs::create_dir(&folder).unwrap();
     let path = folder.join("cylinder.opscene");
     e.save_committed(&path).unwrap();
-    assert!(e.live.is_none());
+    assert!(e.session.live.is_none());
     assert_eq!(e.history.undo.len(), 2);
     assert_eq!(persistence::load(&path).unwrap(), scene);
     e.dispatch(Command::Undo).unwrap();

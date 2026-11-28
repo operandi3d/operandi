@@ -1,5 +1,18 @@
 # Milestone progress ledger
 
+- **Local's axes as the rule sheet has them (2026-11-28, branch ac-rewrite-3b, on step 3):** Jason's report: a cube's opposite X walls under Local leaned opposite ways about the direction they share. A-LOCAL now: Z the cluster's normal at any tilt, X along the surface nearest the item's X and pointed to +X, Y = Z × X (`piece_axes`; AC-Q5's "normal on the nearest item axis" is gone). Opposite walls share their X, so the red ring turns them the same way; typed and dragged tests on X walls, Z walls and top+bottom (`ac_local_opposite_walls.rs`, `ac_local_walls_tests.rs`). Visible change: under Local blue is now the normal everywhere (a floor polygon had Y up). Rulebook: the Local Scale case recorded with Z on the normal passes; the typed Local Rotate Y 30 case is a known gap (ACR-Q29). Provisional: ACR-Q29, ACR-Q30.
+- **Action Center rule sheet v6, step 3: one pivot service (2026-11-27, branch ac-rewrite-3):**
+  `PivotRequest::resolve` answers once per drag base with the handle and,
+  per mesh, groups (stable identity, frame, twin frame, targets with
+  their Symmetry role and side); `Editor::live_pivots` keeps it on the
+  live tool and checks it against what it read. Move, Rotate, Scale
+  (Stretch) and Transform's preview, handle and handle drag read only
+  that; the preview no longer gathers targets, clusters, mirror roles or
+  frames. Local's axes are `AxisOrientation::Local`, so Local centre +
+  another axis and another centre + Local axes work (mixing rules). A
+  refused live switch restores the placed-centre marker. Behaviour is
+  otherwise unchanged. Not yet: Item mode, the menu table, falloff side
+  sampling, S-09's mirrored frame. Provisional: ACR-Q21..Q27.
 - **Kit framework, slice 1 (2026-11-27, branch kits-framework-1):** kit
   API 1 (docs/KITS.md). `kit.toml` manifest with strict checks, a Kits
   folder in the data folder, `kits.toml` for which kits are on (off after
@@ -4913,3 +4926,13 @@ Design: docs/MATERIALX_GRAPHS.md (stages 1-5).
 ## 2026-11-25 — Tool tab cycling (branch claude/project-thread-rjq1h8)
 
 - Ctrl+Tab opens the next tool tab, Ctrl+Shift+Tab the previous one (the real Control key on a Mac), wrapping at the ends, in strip order; only the strip's tabs count, and one tab or no strip does nothing. Each press switches at once, repeats step one tab each, the active tool stays, fields are confirmed first (as a click). Focus on a control in the old tab's drawer goes back to the viewport; elsewhere it stays. Works with a text or number field focused; a modal dialog, menu, pop-up or pie keeps the keys, and a mouse drag ignores them. Plain Tab is unchanged. Input Map actions "Next Tool Tab" / "Previous Tool Tab" (rebindable, shown in the tab tooltips); egui's Ctrl+Tab focus stepping and the Layout Switcher's default key are gone (tool_tab_cycle.rs). Provisional: TTC-Q01..Q06. GUI check: docs/TOOL_TAB_CYCLING_GUI_QA.md.
+
+## 2026-11-27 — Mesh Stack tidy batch (branch claude/project-thread-sygf4i)
+
+- Works (spec meshops-tidy-2026-11-27, TB-xx): Select by Falloff (`pmodel.falloffSelOp`, own falloff copy, Threshold at element centres) and Select Conditional Loop (`selop.loopConditional.item`, Middle/Angle/Dot, max count, stop rules) selection ops; UV Transform deformer (`uvtransform`, points onto a Target by its UV map); Curve Rebuild Spans (`curve.rebuildSpan`, Count/Distance, offsets, Alignment Mesh, Falloff By Parameter, Bezier out); Lace Geometry (`laceGeom`, capped tube along a Guide Mesh curve, four profiles, UVs); `deformer.rebind` (Wrap's Rebind for scripts). Tests: core `meshop_tidy_selops`, `meshop_uv_transform`, `meshop_curve_rebuild_spans`, `meshop_lace`, batch 14.
+- Provisional: MOQ-69 (TB-Q1..Q6 suggested answers and Operandi readings). Not built: Lace Custom Profile and presets, Span Reduction (no effect in the spec either). GUI check: docs/MESH_STACK_SUITE_GUI_QA.md "Tidy batch".
+## 2026-11-27 — Bloom and Glare (branch render-bloom-glare)
+
+- Render window ▸ Image Processing tab: Bloom (Threshold, Intensity, Radius as a share of the width, Tint) and Glare (Threshold, Intensity, Streaks 2/4/6/8, Angle, Length, Tint), on the linear picture before the view transform (`operandi_core::post_effects`, multi-threaded: Gaussian pyramid for Bloom, four-tap streak passes for Glare). Off by default; saved with the scene as `RenderSettings::post` (native v68). Each change is one "Render Settings" undo step and re-applies at once: the Recent Frames cache keeps the picture as rendered.
+- Final Color only; Save Image... in picture formats (PNG, JPEG, TIFF, Targa, BMP) and renders saved to Pictures / an MCP path include them; float files (EXR, Multilayer, HDR) stay as rendered (Jason, BG-Q4). `render_settings_get/set` take `bloom_*` / `glare_*`. Live renders show them while applying costs under 60 ms.
+- Jason 2026-11-27: BG-Q1 approved as built; Q3, Q5..Q8 kept as built (Q8 later); BG-Q2: the Final Color output's own Bloom rows are removed; an old scene's output Bloom becomes the tab's Bloom on open (`Scene::move_old_output_bloom`). GUI check: docs/BLOOM_GLARE_GUI_QA.md. Guide: rendering/image-processing.md.

@@ -7,7 +7,8 @@
 //!   IV-35a): Display Channels and Show Clipping;
 //! - the history strip (IV-08..13b) on the left with Save Image... and
 //!   Load Image... above it (IV-36, IV-38);
-//! - the side panel's tabs on the right; only Statistics is live (IV-35b);
+//! - the side panel's tabs on the right: Image Processing (Bloom and Glare,
+//!   post_effects_ui.rs) and Statistics (IV-35b); Compare comes later;
 //! - the picture (IV-06): wheel and Cmd+Alt-drag zoom, middle-drag pan, a
 //!   plain drag that draws the render region (or pans when Region is off),
 //!   and the pixel readout under it (IV-07).
@@ -458,7 +459,16 @@ impl Operandi {
             .unwrap_or_default()
     }
 
+    /// What the window shows: with Bloom and Glare for Final Color when
+    /// they are on (post_effects_ui.rs).
     pub(crate) fn shown_pixels(&self) -> Option<(u32, u32, &[f32])> {
+        let (w, h, raw) = self.shown_raw_pixels()?;
+        let post = self.post_pixels().filter(|p| p.len() == raw.len());
+        Some((w, h, post.unwrap_or(raw)))
+    }
+
+    /// The shown output as rendered, without Bloom and Glare.
+    pub(crate) fn shown_raw_pixels(&self) -> Option<(u32, u32, &[f32])> {
         let k = self.render.shown;
         if self.shows_picture() {
             let p = self.render.picture.as_ref()?;
@@ -626,7 +636,15 @@ impl Operandi {
                 None => Err("Nothing to save".into()),
             },
         };
-        let result = pixels.and_then(|(w, h, px)| {
+        let post = &self.editor.scene.render.post;
+        let result = pixels.and_then(|(w, h, mut px)| {
+            // Final Color in a picture format (PNG, JPEG, TIFF...) saves as
+            // the window shows it, Bloom and Glare included. Float files
+            // (EXR, HDR) and the other outputs keep the rendered numbers
+            // (Jason, BG-Q4).
+            if d.output.is_none() && !d.format.is_float() {
+                operandi_core::post_effects::apply(post, &mut px, w, h);
+            }
             image_viewer::save_output(
                 &path,
                 &px,
@@ -678,6 +696,7 @@ impl Operandi {
                 (s.width, s.height, names, pixels, s.meta.clone(), Some(s.id))
             }
         };
+        // Every layer as rendered, Bloom and Glare left out (BG-Q4).
         let window = self.render.viewer.view();
         let encoded: Vec<Vec<f32>> = pixels
             .into_iter()
@@ -867,7 +886,9 @@ impl Operandi {
         let mut builder = egui::ViewportBuilder::default()
             .with_title(title)
             .with_inner_size(size)
-            .with_min_inner_size([360., 260.]);
+            .with_min_inner_size([360., 260.])
+            // UIC-189: above the main window, not above other apps.
+            .with_window_level(self.floating_window_level());
         if let Some(p) = position {
             builder = builder.with_position(p);
         }
@@ -878,6 +899,7 @@ impl Operandi {
                 ctx.send_viewport_cmd(egui::ViewportCommand::Focus);
             }
             self.ensure_loaded();
+            self.refresh_post();
             let focused = ctx.input(|i| i.viewport().focused == Some(true));
             if focused && !ctx.wants_keyboard_input() && self.render.viewer.save_dialog.is_none() {
                 let keys = ctx.input(|i| viewer_keys(&i.events, &self.bindings));
@@ -1497,7 +1519,7 @@ impl Operandi {
         }
     }
 
-    /// The side panel's tabs; only Statistics is live in stage 1. Tabs
+    /// The side panel's tabs; Compare isn't built yet. Tabs
     /// change only when the user picks one (UIC-21).
     fn viewer_side_panel(&mut self, ui: &mut egui::Ui) {
         let hints = [
@@ -1521,9 +1543,7 @@ impl Operandi {
         });
         ui.separator();
         match self.render.viewer.saved.tab {
-            Tab::ImageProcessing => {
-                ui.weak("Image Processing (exposure, gamma, bloom and the rest) comes in a later stage.");
-            }
+            Tab::ImageProcessing => self.image_processing_tab(ui),
             Tab::Compare => {
                 ui.weak("Compare (two slots side by side or wiped) comes in a later stage.");
             }

@@ -72,7 +72,7 @@ fn bend_on_box() -> Editor {
     e
 }
 fn bend(e: &Editor) -> BendOptions {
-    e.live.as_ref().unwrap().params.bend
+    e.session.live.as_ref().unwrap().params.bend
 }
 
 /// BN-24 / CS-20: each click refits, the first and every later one, before
@@ -94,7 +94,7 @@ fn every_click_refits_the_spine_and_resets_the_axis() {
     assert_eq!(bend(&e).base, DVec3::new(1.37, 0.95, 0.5));
     assert_eq!(bend(&e).axis, 2);
     // The user picks X, then bends.
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     p.bend.axis = 0;
     p.bend.angle = 45.;
     e.dispatch(Command::Preview(p)).unwrap();

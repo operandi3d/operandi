@@ -191,7 +191,7 @@ fn run(tool: Tool) {
 
     // First ordinary viewport click establishes the live 0.1 m stage.
     click(&mut a, &ctx, empty);
-    assert!(a.editor.live.as_ref().is_some_and(|l| l.applied));
+    assert!(a.editor.session.live.as_ref().is_some_and(|l| l.applied));
     let stage_01 = a.editor.scene.clone();
     assert!(
         containing_faces(&stage_01, world, out).is_empty(),
@@ -205,7 +205,7 @@ fn run(tool: Tool) {
     a.fields.insert("sst_offset".into(), "0.2m".into());
     draw(&mut a, &ctx, SIZE, vec![key(Key::Enter)]);
     draw(&mut a, &ctx, SIZE, vec![]);
-    let live = a.editor.live.as_ref().unwrap();
+    let live = a.editor.session.live.as_ref().unwrap();
     assert!(live.applied && live.tool == tool, "{tool:?}");
     assert!((live.params.smooth_shift.offset - 0.2).abs() < 1e-12);
     assert!(!a.text_editor_focused(&ctx), "{tool:?}: Return kept focus");
@@ -243,7 +243,7 @@ fn run(tool: Tool) {
 
     // Viewport Q drops the valid 0.2 m preview.
     tap(&mut a, &ctx, Key::Q, empty);
-    assert!(a.editor.live.is_none(), "{tool:?}: Q did not drop");
+    assert!(a.editor.session.live.is_none(), "{tool:?}: Q did not drop");
     assert_eq!(
         a.editor.scene.active().unwrap().mesh,
         replaced.active().unwrap().mesh

@@ -185,15 +185,15 @@ fn ca_d02_preview_retention_every_apply_route_recovery_cancel() {
     let committed = e.scene.clone();
     let p = params();
     e.dispatch(Command::ConfigureCone(p.clone())).unwrap();
-    let last = e.cone.as_ref().unwrap().preview.clone();
+    let last = e.session.cone.as_ref().unwrap().preview.clone();
     let history = e.history.undo.clone();
     let invalid = ConeParameters {
         gaps: 50.,
         ..p.clone()
     };
     assert!(e.dispatch(Command::ConfigureCone(invalid)).is_err());
-    assert_eq!(e.cone.as_ref().unwrap().requested.gaps, 50.);
-    assert_eq!(e.cone.as_ref().unwrap().preview, last);
+    assert_eq!(e.session.cone.as_ref().unwrap().requested.gaps, 50.);
+    assert_eq!(e.session.cone.as_ref().unwrap().preview, last);
     for _ in 0..2 {
         assert!(e.dispatch(Command::Apply).is_err());
         assert_eq!(e.scene, committed);
@@ -201,7 +201,7 @@ fn ca_d02_preview_retention_every_apply_route_recovery_cancel() {
     }
     e.dispatch(Command::ConfigureCone(ConeParameters { gaps: 7., ..p }))
         .unwrap();
-    assert!(e.cone.as_ref().unwrap().error.is_none());
+    assert!(e.session.cone.as_ref().unwrap().error.is_none());
     e.dispatch(Command::Apply).unwrap();
     assert_eq!(e.scene.active().unwrap().mesh.vertices.len(), 25);
     let after = e.scene.clone();
@@ -218,7 +218,7 @@ fn ca_d02_preview_retention_every_apply_route_recovery_cancel() {
         ..params()
     }))
     .unwrap_err();
-    assert!(e.cone.as_ref().unwrap().preview.is_none());
+    assert!(e.session.cone.as_ref().unwrap().preview.is_none());
     assert_eq!(e.scene.active().unwrap().mesh.vertices.len(), 0);
     e.dispatch(Command::ConfigureCone(ConeParameters {
         gaps: 50.,
@@ -246,7 +246,7 @@ fn ca_t18_numeric_apply_history_is_not_live_draw_history() {
     assert_eq!(scene.active().unwrap().mesh.vertices.len(), 56);
     // Drop after Apply shows no preview, so it records nothing.
     e.dispatch(Command::Drop).unwrap();
-    assert!(e.cone.is_none());
+    assert!(e.session.cone.is_none());
     assert_eq!(e.scene, scene);
     e.dispatch(Command::Undo).unwrap();
     assert_eq!(e.scene.active().unwrap().mesh.vertices.len(), 25);
@@ -256,7 +256,7 @@ fn ca_t18_numeric_apply_history_is_not_live_draw_history() {
 #[test]
 fn ca_t16_world_numeric_frame_and_transformed_target() {
     let mut e = editor();
-    e.cone = None;
+    e.session.cone = None;
     let id = e.scene.active().unwrap().id;
     e.scene.active_mut().unwrap().transform = scene::Transform {
         translation: DVec3::new(10., 0., 0.),
@@ -285,7 +285,7 @@ fn ca_t16_world_numeric_frame_and_transformed_target() {
 #[test]
 fn ca_t14_supported_single_subset_source_preservation_and_t15_persistence() {
     let mut e = editor();
-    e.cone = None;
+    e.session.cone = None;
     let mut src = Mesh::box_mesh(DVec3::ZERO, DVec3::ONE, 0).unwrap();
     src.attributes.representations = vec![PolygonRepresentation::Face; 6];
     src.attributes.representations[1] = PolygonRepresentation::Subdivs;
@@ -400,7 +400,8 @@ fn ca_t02_retained_type_weight_and_selected_map_without_texture() {
     p.selected_uv_map = Some("AltUV".into());
     e.dispatch(Command::ConfigureCone(p.clone())).unwrap();
     assert!(
-        e.cone
+        e.session
+            .cone
             .as_ref()
             .unwrap()
             .preview
@@ -414,7 +415,8 @@ fn ca_t02_retained_type_weight_and_selected_map_without_texture() {
     p.polygon = PolygonRepresentation::Face;
     e.dispatch(Command::ConfigureCone(p.clone())).unwrap();
     assert!(
-        e.cone
+        e.session
+            .cone
             .as_ref()
             .unwrap()
             .preview
@@ -424,7 +426,7 @@ fn ca_t02_retained_type_weight_and_selected_map_without_texture() {
             .creases
             .is_empty()
     );
-    assert_eq!(e.cone.as_ref().unwrap().requested.edge_weight, -50.);
+    assert_eq!(e.session.cone.as_ref().unwrap().requested.edge_weight, -50.);
     p.polygon = PolygonRepresentation::CatmullClark;
     p.edge_weight = 150.;
     e.dispatch(Command::ConfigureCone(p)).unwrap();

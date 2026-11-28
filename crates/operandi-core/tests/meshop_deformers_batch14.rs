@@ -142,3 +142,32 @@ fn wrap_binding_is_saved_with_the_step_and_undoes() {
     );
     assert_ne!(result(&e, id).0, followed);
 }
+
+/// Scripts can press Rebind: `deformer.rebind` binds exactly as the button
+/// does, in one undo step, and refuses ops that aren't a Wrap.
+#[test]
+fn wrap_rebind_command_binds_like_the_button() {
+    let (mut e, id, _, op) = setup();
+    let line = format!("deformer.rebind deformer:op:{}:{}", op.item, op.op);
+    command_line::run_line(&mut e, &line)
+        .expect("headless")
+        .unwrap();
+    let values = e.scene.item(id).unwrap().mesh_stack.as_ref().unwrap().ops[0]
+        .kind
+        .values();
+    assert_eq!(values["binding"], bind(&e.scene, op.item, op.op).unwrap());
+    assert_eq!(result(&e, id).1.last(), Some(&OpStatus::Ok));
+    e.dispatch(Command::Undo).unwrap();
+    let values = e.scene.item(id).unwrap().mesh_stack.as_ref().unwrap().ops[0]
+        .kind
+        .values();
+    assert_eq!(values["binding"], json!([]), "one undo step");
+    // Not a Wrap: refused, nothing changes.
+    let twist = add(&mut e, id, "deform.twist.item", json!({}));
+    let line = format!("deformer.rebind deformer:op:{}:{}", twist.item, twist.op);
+    assert!(
+        command_line::run_line(&mut e, &line)
+            .expect("headless")
+            .is_err()
+    );
+}

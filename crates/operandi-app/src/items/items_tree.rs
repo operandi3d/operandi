@@ -300,8 +300,8 @@ impl Operandi {
                 row.tip = Some(kit.needs_text());
             }
             row.accepts_children = true;
-            row.draggable = self.editor.live.is_none();
-            row.renamable = self.editor.live.is_none();
+            row.draggable = self.editor.session.live.is_none();
+            row.renamable = self.editor.session.live.is_none();
             rows.push(row);
             if !self.collapsed_items.contains(&id) {
                 self.rig_rows(scene, id, depth + 1, rig, rows);
@@ -347,7 +347,7 @@ impl Operandi {
                     row.style.dimmed = !enabled || missing;
                     row.cells[EYE] = eye(enabled, "this rig piece");
                     row.selected = selected(key);
-                    row.renamable = self.editor.live.is_none();
+                    row.renamable = self.editor.session.live.is_none();
                     row.fixed = true;
                     row.tip = Some(if missing {
                         format!("{kind}: made by another Operandi; kept as it is")
@@ -884,7 +884,7 @@ impl Operandi {
         self.menu_owned_input = true;
         self.parent_menu(ui, item.id, item.parent);
         // Note 10: every selected item when the clicked one is selected.
-        if self.editor.live.is_none()
+        if self.editor.session.live.is_none()
             && let Some(color) = crate::editor_color_ui::submenu(ui, item.common.editor_color)
         {
             let items = self.menu_targets(item.id);

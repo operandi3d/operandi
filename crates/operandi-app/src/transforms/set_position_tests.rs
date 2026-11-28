@@ -79,12 +79,12 @@ fn parked_app() -> Operandi {
         }))
         .unwrap();
     a.editor.dispatch(Command::BeginExtrude).unwrap();
-    let mut p = a.editor.live.as_ref().unwrap().params.clone();
+    let mut p = a.editor.session.live.as_ref().unwrap().params.clone();
     p.extent = DVec3::Z * 0.5;
     a.editor.dispatch(Command::ConfigureExtrude(p)).unwrap();
     a.editor.dispatch(Command::Undo).unwrap();
     a.editor.dispatch(Command::Undo).unwrap();
-    assert!(a.editor.i2_can_redo() && a.editor.live.is_none());
+    assert!(a.editor.i2_can_redo() && a.editor.session.live.is_none());
     a
 }
 #[test]
@@ -144,7 +144,7 @@ fn pen_part_position_composition_and_active_pen_refusal() {
     a.editor.scene.selection.mode = Mode::Polygon;
     a.camera.view = View::Front;
     a.execute("tool.set prim.pen on");
-    assert!(a.editor.pen_draft.is_some(), "{}", a.status);
+    assert!(a.editor.session.pen_draft.is_some(), "{}", a.status);
     for point in [
         DVec3::new(-1., -1., 0.),
         DVec3::new(1., -1., 0.),
@@ -153,12 +153,12 @@ fn pen_part_position_composition_and_active_pen_refusal() {
     ] {
         a.editor.dispatch(Command::PenCapture(point)).unwrap();
     }
-    let draft = a.editor.pen_draft.clone();
+    let draft = a.editor.session.pen_draft.clone();
     let scene = a.editor.scene.clone();
     let undo = a.editor.history.undo.clone();
     let redo = a.editor.history.redo.clone();
     a.execute("vert.set z 2m false false");
-    assert_eq!(a.editor.pen_draft, draft);
+    assert_eq!(a.editor.session.pen_draft, draft);
     assert_eq!(a.editor.scene, scene);
     assert!(a.editor.history.undo == undo);
     assert!(a.editor.history.redo == redo);

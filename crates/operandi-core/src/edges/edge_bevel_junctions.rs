@@ -221,6 +221,70 @@ fn end_uv(
     None
 }
 
+/// Where the round profile between side points `a` and `b` turns: a point
+/// on the selected edge from `v` toward `other`.
+///
+/// The forum's oval-corner report (2026-11-27): the corner used to sit
+/// level with the midpoint of `a` and `b`. Where the two side points sit at
+/// different places along the edge (Loop Slide sliding them along slanted
+/// side edges, as at a hexagon's corner), it was then nearer one side than
+/// the other and the profile came out as a lopsided oval. Now it is the
+/// point on the edge as far from `a` as from `b` (at a plain end where both
+/// slid the same distance, the old point itself), so the profile is a true
+/// circular arc tangent to both sides; the arc's plane leans a little along
+/// the edge. Where that point is far from the side points (they're level
+/// but at unequal distances from the edge, so no such circle exists), it
+/// keeps the midpoint level and [`profile`] draws the roundest curve that
+/// fits, an elliptic arc.
+///
+/// `at_point` (Edge Bevel with Loop Slide on, EBC-Q-RND1 answered
+/// 2026-11-28): both side points slid from `v` itself, and the profile
+/// turns about `v`: the quarter circle stretched to the two distances
+/// (round when they're equal), unless the surface is flat across the edge.
+fn profile_corner(v: DVec3, other: DVec3, a: DVec3, b: DVec3, at_point: bool) -> DVec3 {
+    let axis = (other - v).normalize_or_zero();
+    let (ra, rb) = (a - v, b - v);
+    let level = ((a + b) / 2. - v).dot(axis);
+    let (sa, sb) = (ra.dot(axis), rb.dot(axis));
+    // Side points level along the edge (a straight end, or where three
+    // strips meet, EBC-B3-04) keep the measured corner level with them.
+    if at_point && (sa - sb).abs() > 1e-9 * (ra.length() + rb.length()) {
+        // The fold across the edge: the side points' directions seen along
+        // the edge (a flat surface folds 0° however far along they slid).
+        let across = |r: DVec3| (r - axis * r.dot(axis)).normalize_or_zero();
+        let (ua, ub) = (across(ra), across(rb));
+        let fold = std::f64::consts::PI - ua.dot(ub).clamp(-1., 1.).acos();
+        if fold > 1e-3 {
+            return v;
+        }
+    }
+    // Distances from the edge line: how far the side points are from it.
+    let (ha, hb) = ((ra - axis * sa).length(), (rb - axis * sb).length());
+    let reach = ha.max(hb);
+    let even = if (sa - sb).abs() > 1e-12 * reach.max(1e-300) {
+        // |a - c| = |b - c| for c = v + axis s.
+        Some((ra.length_squared() - rb.length_squared()) / (2. * (sa - sb)))
+    } else {
+        None
+    };
+    // Lean the profile at most half its reach from the side points' level:
+    // beyond that the strip would twist more than it gains in roundness.
+    // Less where the surface hardly folds across the edge, none where it is
+    // flat: there the profile is the straight chord, and a leaning corner
+    // would bend it sideways within the surface.
+    let (ua, ub) = (
+        (a - (v + axis * level)).normalize_or_zero(),
+        (b - (v + axis * level)).normalize_or_zero(),
+    );
+    let fold = std::f64::consts::PI - ua.dot(ub).clamp(-1., 1.).acos();
+    let lean = 0.5 * reach * (fold / std::f64::consts::FRAC_PI_2).min(1.);
+    let s = match even {
+        Some(s) if (s - level).abs() <= lean && fold > 1e-3 => s,
+        _ => level,
+    };
+    v + axis * s
+}
+
 /// Profile rows strictly between `q1` and `q2` around `corner`: equal angles
 /// on the arc tangent to both sides (EBC-P-01), offset from the chord scaled
 /// by `depth` percent (EBC-P-03); a rational arc for unequal sides. With
@@ -247,7 +311,6 @@ pub(crate) fn profile(
         (q1 - corner).normalize_or_zero(),
         (q2 - corner).normalize_or_zero(),
     );
-    let weight = ((1. + u.dot(w)).max(0.) * 0.5).sqrt();
     let (d1, d2) = (q1.distance(corner), q2.distance(corner));
     let half = u.dot(w).clamp(-1., 1.).acos() / 2.;
     let arc =
@@ -255,14 +318,35 @@ pub(crate) fn profile(
             let center = corner + (u + w).normalize() * (d1 / half.cos());
             (center, q1 - center, q2 - center)
         });
+    // Unequal sides: no circle touches both sides at q1 and q2, so the
+    // rows go on the same arc stretched to fit (an ellipse tangent to both
+    // sides at q1 and q2), at the stretched arc's equal angles. A point at
+    // angle φ on a circular arc of half-angle α (from -α at q1 to α at q2)
+    // is corner + λ1 (q1 - corner) + λ2 (q2 - corner) with the λs below,
+    // whatever the side lengths, so unequal sides give the stretched arc.
+    // It used to be a rational curve weighted cos(θ/2) for the corner's
+    // angle θ (right only at 90°) with rows at even curve steps, so other
+    // corners came out pointed or flat (the forum's oval corners,
+    // 2026-11-27).
+    let alpha = std::f64::consts::FRAC_PI_2 - half;
     (1..rows)
         .map(|k| {
             let t = k as f64 / rows as f64;
-            let s = 1. - t;
             if let Some((center, a0, a1)) = arc {
                 let axis = a0.cross(a1).normalize_or_zero();
                 toward(center + glam::DQuat::from_axis_angle(axis, a0.angle_between(a1) * t) * a0)
+            } else if alpha > 1e-6 && alpha < std::f64::consts::FRAC_PI_2 - 1e-6 {
+                let phi = alpha * (2. * t - 1.);
+                let (sa, ca) = alpha.sin_cos();
+                let sum = (1. - phi.cos() * ca) / (sa * sa);
+                let diff = phi.sin() / sa;
+                let (l1, l2) = ((sum - diff) / 2., (sum + diff) / 2.);
+                toward(corner + (q1 - corner) * l1 + (q2 - corner) * l2)
             } else {
+                // Sides in line (or folded flat): the old rational curve,
+                // which keeps its rows where they always were.
+                let weight = ((1. + u.dot(w)).max(0.) * 0.5).sqrt();
+                let s = 1. - t;
                 let chord = q1.lerp(q2, t);
                 let curve = (q1 * s * s + corner * (2. * weight * s * t) + q2 * t * t)
                     / (s * s + 2. * weight * s * t + t * t);
@@ -270,6 +354,62 @@ pub(crate) fn profile(
             }
         })
         .collect()
+}
+
+#[cfg(test)]
+mod profile_tests {
+    use super::*;
+
+    /// Unequal sides at any corner angle: the rows are the circular arc
+    /// stretched to fit, so in the frame of the two sides they lie on the
+    /// unit circle about the far corner of the parallelogram, at equal
+    /// angles.
+    #[test]
+    fn unequal_sides_give_the_stretched_arc() {
+        for deg in [60f64, 90., 120., 150.] {
+            let th = deg.to_radians();
+            let (u, w) = (DVec3::X, DVec3::new(th.cos(), th.sin(), 0.));
+            let (a, b) = (0.3, 0.1);
+            let rows = 6;
+            let pts = profile(DVec3::ZERO, u * a, w * b, rows, 100., false);
+            let alpha = std::f64::consts::FRAC_PI_2 - th / 2.;
+            for (k, p) in pts.iter().enumerate() {
+                // Coordinates along the two sides.
+                let det = u.x * w.y - u.y * w.x;
+                let l1 = (p.x * w.y - p.y * w.x) / det / a;
+                let l2 = (u.x * p.y - u.y * p.x) / det / b;
+                // The same coordinates of the circular arc's point.
+                let phi = alpha * (2. * (k + 1) as f64 / rows as f64 - 1.);
+                let (sa, ca) = alpha.sin_cos();
+                let sum = (1. - phi.cos() * ca) / (sa * sa);
+                let diff = phi.sin() / sa;
+                assert!((l1 - (sum - diff) / 2.).abs() < 1e-12, "{deg}° row {k}");
+                assert!((l2 - (sum + diff) / 2.).abs() < 1e-12, "{deg}° row {k}");
+            }
+            // At 90° that is an ellipse quarter about (a, b).
+            if deg == 90. {
+                for p in &pts {
+                    let e = ((p.x - a) / a).powi(2) + ((p.y - b) / b).powi(2);
+                    assert!((e - 1.).abs() < 1e-12, "{p}");
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn equal_sides_lean_onto_the_point_between_them() {
+        // Side points slid the same distance along two edges that leave the
+        // old point at different angles to the selected edge: the corner is
+        // the old point, as far from both.
+        let v = DVec3::ZERO;
+        let a = DVec3::new(0.0866, 0., 0.05).normalize() * 0.1;
+        let b = DVec3::new(0., 0.1, 0.);
+        let c = profile_corner(v, DVec3::Z, a, b, false);
+        assert!(c.length() < 1e-12, "{c}");
+        // Level but unequal: no such point, the corner stays level.
+        let c = profile_corner(v, DVec3::Z, DVec3::X * 0.3, DVec3::Y * 0.1, false);
+        assert!(c.length() < 1e-12, "{c}");
+    }
 }
 
 /// One polygon corner at a point: the polygon and the points before and
@@ -1341,10 +1481,17 @@ fn general_with(
                 // a corner where the polygon bends less than 180° slides the
                 // width along both edges, as measured, so the strip narrows
                 // at the bend. Loop Slide off keeps the full width (above).
+                // EBC-Q-RND1 (answered 2026-11-28): the sum is |ua + ub| =
+                // 2·cos(φ/2) Insets along the bisector for the polygon's
+                // corner angle φ, floored at one Inset, so corners wider
+                // than 120° (a many-sided cap's rim) move exactly the Inset,
+                // as the wall side does, and their profiles are round.
                 let convex = (ua + ub).dot(na + nb) > 1e-12;
-                let offset = if (chamfer && !parallel) || (!chamfer && options.loop_slide && convex)
-                {
+                let offset = if chamfer && !parallel {
                     (ua + ub) * base
+                } else if !chamfer && options.loop_slide && convex {
+                    let sum = ua + ub;
+                    sum * (base * (1. / sum.length().max(1e-12)).max(1.))
                 } else {
                     let cos = na.dot(nb);
                     let d = if cos > -1. + 1e-9 {
@@ -1556,10 +1703,7 @@ fn general_with(
             } else {
                 let mut ids = Vec::new();
                 let (a, b) = (out.vertices[q1 as usize], out.vertices[q2 as usize]);
-                // The profile's corner is on the selected edge, level with the
-                // two side points (the point itself at a plain end).
-                let axis = (p(other) - p(v)).normalize_or_zero();
-                let corner = p(v) + axis * ((a + b) / 2. - p(v)).dot(axis);
+                let corner = profile_corner(p(v), p(other), a, b, !chamfer && options.loop_slide);
                 // No Mitering (the tester's report, 2026-11-24: straight was
                 // good but flat): a strip ending on a rounded outline keeps
                 // its round, but in the upright plane through its two end

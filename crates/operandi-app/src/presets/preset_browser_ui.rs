@@ -444,7 +444,6 @@ impl Operandi {
             size: self.preset_browser.window_size,
             position: self.preset_browser.window_pos,
             min_size: [360., 240.],
-            on_top: true,
         };
         let shown = self.os_window(ctx, spec, |app, ctx| {
             // Where the window is on screen, for drops between windows.

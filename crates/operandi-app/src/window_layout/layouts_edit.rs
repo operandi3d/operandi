@@ -309,7 +309,7 @@ impl Operandi {
     }
 
     fn tool_busy(&self) -> bool {
-        self.editor.live.is_some() || self.pointer_held
+        self.editor.session.live.is_some() || self.pointer_held
     }
 
     fn free_layout_name(

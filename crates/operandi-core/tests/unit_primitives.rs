@@ -23,7 +23,7 @@ fn fixture() -> Editor {
 }
 fn retain_resolution(e: &mut Editor, tool: Tool) {
     e.dispatch(Command::Activate(tool)).unwrap();
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     p.position = DVec3::new(10., 12., 14.);
     p.size = DVec3::new(2., 3., 4.);
     p.segments = [2, 3, 4];
@@ -65,7 +65,7 @@ fn pm_t13_t15_t17_canonical_existing_origin_retained_resolution_attributes_and_h
             destination: UnitDestination::ExistingMesh,
         })
         .unwrap();
-        assert!(e.live.is_none());
+        assert!(e.session.live.is_none());
         assert_eq!(e.scene.items.len(), before.scene.items.len());
         assert_eq!(e.scene.selection, before.scene.selection);
         assert_eq!(e.scene.workplane, before.scene.workplane);
@@ -109,7 +109,7 @@ fn pm_t13_t15_t17_canonical_existing_origin_retained_resolution_attributes_and_h
         assert_eq!(e.scene, before.scene);
         e.dispatch(Command::Redo).unwrap();
         assert_eq!(e.scene, result);
-        assert!(e.live.is_none());
+        assert!(e.session.live.is_none());
         let path = std::env::temp_dir().join(format!(
             "operandi-unit-{}-{tool:?}.opscene",
             std::process::id()
@@ -162,7 +162,7 @@ fn pm_t14_t15_new_mesh_and_geometry_are_one_action_with_existing_naming_selectio
         assert_eq!(e.scene.selection.mode, before.scene.selection.mode);
         assert!(e.scene.selection.faces.is_empty());
         canonical(tool, &item.mesh, 0);
-        assert!(e.live.is_none());
+        assert!(e.session.live.is_none());
         assert_eq!(e.history.undo.len(), before.history.undo.len() + 1);
         let id = item.id;
         let result = e.scene.clone();
@@ -170,7 +170,7 @@ fn pm_t14_t15_new_mesh_and_geometry_are_one_action_with_existing_naming_selectio
         assert_eq!(e.scene, before.scene);
         e.dispatch(Command::Redo).unwrap();
         assert_eq!(e.scene, result);
-        assert!(e.live.is_none());
+        assert!(e.session.live.is_none());
         e.dispatch(Command::Undo).unwrap();
         e.dispatch(Command::InsertUnit {
             tool,
@@ -259,7 +259,7 @@ fn pm_t10_t15_failure_is_exactly_atomic_for_targets_tasks_profiles_and_budgets()
     })
     .unwrap();
     assert_eq!(e.scene.items.len(), 1);
-    assert!(e.live.is_none());
+    assert!(e.session.live.is_none());
 }
 
 #[test]
@@ -287,11 +287,29 @@ fn pm_t16_metre_storage_and_faceted_envelope_do_not_depend_on_display_conversion
         // kept Sides/Segments too; radii stay the starting sample values.
         e.dispatch(Command::Activate(tool)).unwrap();
         if tool == Tool::Sphere {
-            assert_eq!(e.live.as_ref().unwrap().params.radial.unwrap().segments, 3);
+            assert_eq!(
+                e.session
+                    .live
+                    .as_ref()
+                    .unwrap()
+                    .params
+                    .radial
+                    .unwrap()
+                    .segments,
+                3
+            );
         }
         if tool == Tool::Cylinder {
             assert_eq!(
-                e.live.as_ref().unwrap().params.radial.unwrap().radius.y,
+                e.session
+                    .live
+                    .as_ref()
+                    .unwrap()
+                    .params
+                    .radial
+                    .unwrap()
+                    .radius
+                    .y,
                 0.75
             );
         }

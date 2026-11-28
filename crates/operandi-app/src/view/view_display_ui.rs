@@ -46,14 +46,11 @@ impl Operandi {
     /// (`Scene::active_item_set`), for loops over every item.
     pub(super) fn item_look_as(&self, id: u64, active: bool) -> Option<Group> {
         let selection = &self.editor.scene.selection;
-        // Show Meshes off: no mesh item draws (cameras, lights and
-        // backdrops have their own switches).
-        if !self.display.settings.drawing.meshes
-            && self
-                .editor
-                .scene
-                .item(id)
-                .is_none_or(|i| i.camera.is_none() && i.light.is_none() && i.backdrop.is_none())
+        if self
+            .editor
+            .scene
+            .item(id)
+            .is_none_or(|i| self.show_meshes_hides(i))
         {
             return None;
         }
@@ -63,6 +60,16 @@ impl Operandi {
             // stays active (last_mesh.rs).
             .group(active)
             .map(|g| self.display.effective(g, selection.mode))
+    }
+
+    /// Show Meshes off: no mesh item draws (cameras, lights and backdrops
+    /// have their own switches). Both drawing paths ask (#57: the
+    /// graphics-card path didn't, so the switch did nothing there).
+    pub(super) fn show_meshes_hides(&self, item: &operandi_core::Item) -> bool {
+        !self.display.settings.drawing.meshes
+            && item.camera.is_none()
+            && item.light.is_none()
+            && item.backdrop.is_none()
     }
 
     /// An item's plain wire colour on the CPU drawing paths, as the GPU

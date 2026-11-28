@@ -486,12 +486,12 @@ fn parked_extrude_redo_survives_zero_cancel_and_refusal() {
     a.execute(ACTION);
     assert!(a.scale_offset.is_none(), "active Extrude stage owns input");
     assert!(a.editor == active);
-    let mut p = a.editor.live.as_ref().unwrap().params.clone();
+    let mut p = a.editor.session.live.as_ref().unwrap().params.clone();
     p.extent = DVec3::Z * 0.5;
     a.editor.dispatch(Command::ConfigureExtrude(p)).unwrap();
     a.editor.dispatch(Command::Undo).unwrap();
     a.editor.dispatch(Command::Undo).unwrap();
-    assert!(a.editor.i2_can_redo() && a.editor.live.is_none());
+    assert!(a.editor.i2_can_redo() && a.editor.session.live.is_none());
     let parked = a.editor.clone();
     a.execute(ACTION);
     frame(&mut a, &c, vec![]);

@@ -35,7 +35,7 @@ fn bridge_blocks_parked_i2_resume_and_cancel_closes_bridge() {
     e.dispatch(Command::Undo).unwrap();
     assert_eq!(e.i2.selected.as_ref().unwrap().cursor, 0);
     e.dispatch(Command::ArmBridge).unwrap();
-    assert!(e.bridge.is_some());
+    assert!(e.session.bridge.is_some());
     let before = e.scene.clone();
     let failure = e
         .dispatch_history_reported(HistoryRequest::Redo)
@@ -47,7 +47,7 @@ fn bridge_blocks_parked_i2_resume_and_cancel_closes_bridge() {
     assert_eq!(e.scene, before);
     let cancel = e.dispatch_history_reported(HistoryRequest::Cancel).unwrap();
     assert!(cancel.foreground_closed);
-    assert!(e.bridge.is_none());
+    assert!(e.session.bridge.is_none());
     assert_eq!(e.scene, before);
 }
 
@@ -68,8 +68,8 @@ fn bridge_switches_from_active_i2_without_overlapping_owners() {
     .unwrap();
     e.dispatch(Command::BeginExtrude).unwrap();
     e.dispatch(Command::ArmBridge).unwrap();
-    assert!(e.bridge.is_some());
-    assert!(e.live.is_none());
+    assert!(e.session.bridge.is_some());
+    assert!(e.session.live.is_none());
     assert!(!e.i2.selected.as_ref().is_some_and(|s| s.cursor > 0));
     e.scene.validate().unwrap();
 }

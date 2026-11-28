@@ -43,7 +43,7 @@ impl Operandi {
         if !self.input_preferences.key_toggles {
             return;
         }
-        let after = self.editor.active_task();
+        let after = self.editor.session.active_task();
         match after {
             Some(task) if after != before => {
                 self.key_hold = Some(KeyHold {
@@ -65,7 +65,7 @@ impl Operandi {
             return;
         };
         let (key, released) = (hold.key, hold.released);
-        if self.editor.active_task() != Some(hold.task) {
+        if self.editor.session.active_task() != Some(hold.task) {
             // Dropped, cancelled or switched some other way meanwhile.
             self.key_hold = None;
             return;
@@ -111,7 +111,7 @@ impl Operandi {
         self.run(Command::Drop);
         if RETURN_TO_PREVIOUS_TOOL
             && let Some(ActiveTask::Live(tool)) = hold.previous
-            && self.editor.active_task().is_none()
+            && self.editor.session.active_task().is_none()
         {
             self.activate(tool);
         }

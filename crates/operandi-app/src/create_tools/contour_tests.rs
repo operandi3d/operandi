@@ -21,7 +21,7 @@ fn a_drag_across_the_background_lays_a_curve_on_release() {
     super::toolbox_form_tests::button_by_line(&a, "operandi.topology.tool \"Contour\"");
     a.execute("Contour");
     assert_eq!(
-        a.editor.live.as_ref().map(|l| l.tool),
+        a.editor.session.live.as_ref().map(|l| l.tool),
         Some(Tool::Contour),
         "{}",
         a.status

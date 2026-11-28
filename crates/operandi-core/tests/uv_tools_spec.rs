@@ -109,7 +109,7 @@ fn add_box(e: &mut Editor) {
         .unwrap();
     e.dispatch(Command::Preview(operandi_core::Parameters {
         size: DVec3::splat(1.0),
-        ..e.live.as_ref().unwrap().params.clone()
+        ..e.session.live.as_ref().unwrap().params.clone()
     }))
     .unwrap();
     e.dispatch(Command::Apply).unwrap();

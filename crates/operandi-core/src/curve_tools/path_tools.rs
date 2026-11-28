@@ -290,7 +290,17 @@ pub fn sections(tool: &PathTool, sweep: bool) -> Result<Vec<Section>> {
         ));
     }
     if c.kind == PathKind::Pen {
-        return Ok(pen_sections(&c.points, c.closed));
+        let mut out = pen_sections(&c.points, c.closed);
+        // A closed sweep path returns to its start (the provisional reading
+        // above): the last span runs from the last point back to the first,
+        // as the smooth kinds' sections already do (#51).
+        if sweep
+            && c.closed
+            && let Some(&first) = out.first()
+        {
+            out.push(first);
+        }
+        return Ok(out);
     }
     let kind = c.curve_kind();
     let spans = curves::span_count(&c.points, kind, c.closed);

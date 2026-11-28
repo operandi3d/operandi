@@ -12,7 +12,7 @@ fn cube() -> (Editor, u64) {
     e.dispatch(Command::Preview(Parameters {
         position: DVec3::ZERO,
         size: DVec3::splat(2.),
-        ..e.live.as_ref().unwrap().params.clone()
+        ..e.session.live.as_ref().unwrap().params.clone()
     }))
     .unwrap();
     e.dispatch(Command::Drop).unwrap();
@@ -412,7 +412,7 @@ fn topology_edits_carry_or_refuse() {
     let r = e.dispatch(Command::Preview(Parameters {
         inset: 0.1,
         shift: 0.1,
-        ..e.live.as_ref().unwrap().params.clone()
+        ..e.session.live.as_ref().unwrap().params.clone()
     }));
     assert!(r.is_err(), "bevel over locked polygon must be refused");
     e.dispatch(Command::Cancel).ok();

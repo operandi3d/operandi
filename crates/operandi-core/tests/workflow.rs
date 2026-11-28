@@ -67,7 +67,7 @@ fn vs_001_exact_history_roundtrip() {
     assert_eq!(e.scene, beveled);
     e.dispatch(Command::Redo).unwrap();
     assert_eq!(e.scene, final_scene);
-    assert!(e.live.is_none());
+    assert!(e.session.live.is_none());
     let bytes = persistence::encode(&e.scene).unwrap();
     assert_eq!(persistence::decode(&bytes).unwrap(), e.scene);
     // Connected closed manifold, outward signed volume and Euler characteristic.
@@ -377,7 +377,7 @@ fn m11_history_hidden_items_identity_and_scene_state() {
         let mesh = e.scene.active().unwrap().mesh.clone();
         // The first Undo undoes the activation: the tool closes (MU-MID-03).
         e.dispatch(Command::Undo).unwrap();
-        assert!(e.live.is_none());
+        assert!(e.session.live.is_none());
         assert_eq!(e.scene.active().unwrap().mesh, mesh);
         e.dispatch(Command::Undo).unwrap();
         assert!(e.scene.active().unwrap().mesh.vertices.is_empty());
@@ -452,17 +452,17 @@ fn m11_failed_staged_save_preserves_exact_live_ownership_and_existing_destinatio
     assert_eq!(e.scene, before.scene);
     assert_eq!(e.revision, before.revision);
     assert_eq!(
-        e.live.as_ref().unwrap().base,
-        before.live.as_ref().unwrap().base
+        e.session.live.as_ref().unwrap().base,
+        before.session.live.as_ref().unwrap().base
     );
     assert_eq!(
-        e.live.as_ref().unwrap().params,
-        before.live.as_ref().unwrap().params
+        e.session.live.as_ref().unwrap().params,
+        before.session.live.as_ref().unwrap().params
     );
     assert_eq!(e.history.undo.len(), before.history.undo.len());
     std::fs::remove_file(temp).unwrap();
     e.save_committed(&path).unwrap();
-    assert!(e.live.is_none());
+    assert!(e.session.live.is_none());
     assert_eq!(e.history.undo.len(), before.history.undo.len() + 1);
     assert_eq!(persistence::load(&path).unwrap(), e.scene);
     std::fs::remove_file(path).unwrap();
@@ -529,7 +529,7 @@ fn m11_oversized_item_transform_and_duplicate_selection_are_rejected_atomically(
         e.dispatch(Command::Mode(Mode::Item)).unwrap();
         e.dispatch(Command::Activate(tool)).unwrap();
         let before = e.scene.clone();
-        let params = e.live.as_ref().unwrap().params.clone();
+        let params = e.session.live.as_ref().unwrap().params.clone();
         assert!(
             e.dispatch(Command::Preview(Parameters {
                 delta: DVec3::splat(1e308),
@@ -538,7 +538,7 @@ fn m11_oversized_item_transform_and_duplicate_selection_are_rejected_atomically(
             .is_err()
         );
         assert_eq!(e.scene, before);
-        assert_eq!(e.live.as_ref().unwrap().params, params);
+        assert_eq!(e.session.live.as_ref().unwrap().params, params);
     }
     let mut e = box_editor();
     e.scene.selection.faces = vec![5, 5];

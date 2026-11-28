@@ -137,7 +137,7 @@ fn a_tool_session_records_tool_on_values_at_mouse_up_and_tool_off() {
     a.camera.view = View::Front;
     draw(&mut a, &ctx, SIZE, vec![]);
     a.execute("tool.set TransformMove on");
-    assert!(a.editor.live.is_some(), "{}", a.status);
+    assert!(a.editor.session.live.is_some(), "{}", a.status);
     draw(&mut a, &ctx, SIZE, vec![]);
     let before = a.history.log.records.len();
     let from = a.viewport_rect.center();

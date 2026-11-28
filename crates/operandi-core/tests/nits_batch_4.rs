@@ -134,7 +134,14 @@ fn polygon_stage_handles_follow_the_picked_side_with_symmetry() {
 
     for tool in [Tool::Move, Tool::Rotate, Tool::Scale, Tool::Transform] {
         e.dispatch(Command::Activate(tool)).unwrap();
-        let centre = e.live.as_ref().unwrap().action_frame.unwrap().center;
+        let centre = e
+            .session
+            .live
+            .as_ref()
+            .unwrap()
+            .action_frame
+            .unwrap()
+            .center;
         assert_eq!(centre, DVec3::new(1.5, 0.5, 0.), "{tool:?}");
         e.dispatch(Command::Cancel).unwrap();
     }
@@ -167,7 +174,7 @@ fn polygon_stage_handles_follow_the_picked_side_with_symmetry() {
     assert_eq!(without_symmetry.symmetry_handle_centre(), None);
 
     e.dispatch(Command::Activate(Tool::Bevel)).unwrap();
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     p.shift = 0.2;
     p.inset = 0.1;
     e.dispatch(Command::Preview(p.clone())).unwrap();
@@ -243,7 +250,7 @@ fn n27_extend_scale_works_about_each_sides_own_centre() {
     })
     .unwrap();
     e.dispatch(Command::Activate(Tool::EdgeExtend)).unwrap();
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     p.delta = DVec3::new(0., 1., 0.);
     p.scale_delta = DVec3::new(0.5, 1., 1.);
     e.dispatch(Command::Preview(p)).unwrap();

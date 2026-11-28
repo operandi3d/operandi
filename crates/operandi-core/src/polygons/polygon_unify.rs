@@ -81,7 +81,7 @@ fn same_cycle(a: &[u32], b: &[u32]) -> bool {
 }
 impl Editor {
     pub fn unify_target(&self) -> Result<UnifyTarget> {
-        if self.pen_draft.is_some() || self.i2_active() {
+        if self.session.pen_draft.is_some() || self.i2_active() {
             return Err("Finish or Cancel the active tool before Unify".into());
         }
         self.require_idle()?;

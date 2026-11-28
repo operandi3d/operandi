@@ -109,7 +109,7 @@ fn assert_row(got: &[DVec2], want: &[(f64, f64)]) {
 fn uv_tool(e: &mut Editor, tool: Tool, edit: impl FnOnce(&mut Parameters)) {
     e.dispatch(Command::Activate(tool)).unwrap();
     e.dispatch(Command::UvToolSpace(Some(None))).unwrap();
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     edit(&mut p);
     e.dispatch(Command::Preview(p)).unwrap();
 }
@@ -222,7 +222,7 @@ fn uvt41_tear_off_moves_only_the_selected_polygons_corners() {
     e.scene.selection.faces = vec![0];
     e.dispatch(Command::Activate(Tool::Move)).unwrap();
     e.dispatch(Command::UvToolSpace(Some(None))).unwrap();
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     p.uv.as_mut().unwrap().tear_off = true;
     p.delta = DVec3::new(0., 0.25, 0.);
     e.dispatch(Command::Preview(p)).unwrap();
@@ -245,7 +245,7 @@ fn only_the_selected_map_changes_and_grid_snap_lands_on_tenths() {
         .unwrap();
     e.dispatch(Command::Activate(Tool::Move)).unwrap();
     e.dispatch(Command::UvToolSpace(Some(None))).unwrap();
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     p.uv.as_mut().unwrap().grid_snap = Some(0.1);
     p.delta = DVec3::new(0.234, 0.0, 0.);
     e.dispatch(Command::Preview(p)).unwrap();
@@ -283,7 +283,7 @@ fn uv_space_needs_a_map_and_a_transform_tool() {
     e.dispatch(Command::Cancel).unwrap();
     let mut e = editor_with(plane());
     e.dispatch(Command::Activate(Tool::Bevel)).ok();
-    if e.live.is_some() {
+    if e.session.live.is_some() {
         assert!(e.dispatch(Command::UvToolSpace(Some(None))).is_err());
     }
 }

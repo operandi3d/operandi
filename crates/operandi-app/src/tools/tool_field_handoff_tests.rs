@@ -114,12 +114,12 @@ fn drawn(tool: Tool) -> (Operandi, Context) {
     let from = a.camera.project(DVec3::new(-0.5, 0., -0.5), r).unwrap().0;
     let to = a.camera.project(DVec3::new(0.5, 0., 0.5), r).unwrap().0;
     drag(&mut a, &ctx, from, to);
-    assert!(a.editor.live.as_ref().expect("tool open").applied);
+    assert!(a.editor.session.live.as_ref().expect("tool open").applied);
     (a, ctx)
 }
 
 fn position(a: &Operandi) -> DVec3 {
-    a.editor.live.as_ref().unwrap().params.position
+    a.editor.session.live.as_ref().unwrap().params.position
 }
 
 /// Drag the X move arrow 60 points right; the shape must follow.

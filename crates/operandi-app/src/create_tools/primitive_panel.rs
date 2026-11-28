@@ -12,7 +12,11 @@ const BUDGET: &str = "Sides and Segments require positive integers within the pr
 const SEGMENTS: &str = "Segments require a positive integer within the preview budget";
 
 fn live_primitive(app: &Operandi) -> Option<&Live> {
-    app.editor.live.as_ref().filter(|l| l.tool.is_primitive())
+    app.editor
+        .session
+        .live
+        .as_ref()
+        .filter(|l| l.tool.is_primitive())
 }
 
 impl ToolFields for PrimitiveFields {

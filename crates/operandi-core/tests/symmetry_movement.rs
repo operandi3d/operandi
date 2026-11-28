@@ -45,7 +45,7 @@ fn symmetric(m: &Mesh) {
 }
 fn extrude(e: &mut Editor, extent: DVec3) {
     e.dispatch(Command::Activate(Tool::Extrude)).unwrap();
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     p.extent = extent;
     e.dispatch(Command::Preview(p)).unwrap();
     e.dispatch(Command::Drop).unwrap();
@@ -108,7 +108,7 @@ fn edge_extend_offset_is_mirrored() {
     e.dispatch(Command::Mode(Mode::Edge)).unwrap();
     e.scene.selection.edges = edges;
     e.dispatch(Command::Activate(Tool::EdgeExtend)).unwrap();
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     p.delta = dvec3(1., 0., 0.);
     e.dispatch(Command::Preview(p)).unwrap();
     e.dispatch(Command::Drop).unwrap();
@@ -138,7 +138,7 @@ fn edge_and_vertex_slide_stay_symmetric() {
     e.dispatch(Command::Mode(Mode::Edge)).unwrap();
     e.scene.selection.edges = edges;
     e.dispatch(Command::Activate(Tool::EdgeSlide)).unwrap();
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     p.shift = 0.5;
     e.dispatch(Command::Preview(p)).unwrap();
     e.dispatch(Command::Drop).unwrap();
@@ -154,7 +154,7 @@ fn edge_and_vertex_slide_stay_symmetric() {
     e.dispatch(Command::Mode(Mode::Vertex)).unwrap();
     e.scene.selection.vertices = points;
     e.dispatch(Command::Activate(Tool::VertexSlide)).unwrap();
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     p.delta = dvec3(1., 0., 0.);
     p.shift = 0.4;
     e.dispatch(Command::Preview(p)).unwrap();
@@ -172,7 +172,7 @@ fn loop_slice_cuts_the_mirror_loop_too() {
     let mut e = editor(m.clone(), Symmetry::x());
     e.dispatch(Command::Mode(Mode::Edge)).unwrap();
     e.dispatch(Command::Activate(Tool::LoopSlice)).unwrap();
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     p.slice.loop_slice.rings = vec![(a, b)];
     p.slice.loop_slice.set_count(1);
     p.slice.loop_slice.set_position(0, 0.25);
@@ -187,7 +187,7 @@ fn loop_slice_cuts_the_mirror_loop_too() {
     let mut e = editor(m.clone(), Symmetry::OFF);
     e.dispatch(Command::Mode(Mode::Edge)).unwrap();
     e.dispatch(Command::Activate(Tool::LoopSlice)).unwrap();
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     p.slice.loop_slice.rings = vec![(a, b)];
     e.dispatch(Command::Preview(p)).unwrap();
     e.dispatch(Command::Drop).unwrap();

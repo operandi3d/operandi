@@ -71,7 +71,7 @@ fn pmq_02_three_clicks_make_one_quad_facing_the_strip_order() {
     click(&mut e, 0., 0.);
     click(&mut e, 1., 0.);
     click(&mut e, 0., 1.);
-    let draft = e.pen_draft.clone().unwrap();
+    let draft = e.session.pen_draft.clone().unwrap();
     assert_eq!(draft.points().len(), 4, "the click adds its partner");
     assert_eq!(draft.current(), Some(2), "the clicked point is current");
     e.dispatch(Command::Drop).unwrap();
@@ -115,12 +115,12 @@ fn pmq_04_ctrl_click_ends_the_strip_with_a_triangle() {
         click(&mut e, x, y);
     }
     e.dispatch(Command::PenCaptureEnd(v(0.5, 3.))).unwrap();
-    let draft = e.pen_draft.clone().unwrap();
+    let draft = e.session.pen_draft.clone().unwrap();
     assert!(draft.strip_ended());
     // No more points once the triangle closes the end.
     assert!(e.dispatch(Command::PenCapture(v(0., 4.))).is_err());
     assert!(e.dispatch(Command::PenCaptureEnd(v(0., 4.))).is_err());
-    assert_eq!(e.pen_draft.as_ref(), Some(&draft));
+    assert_eq!(e.session.pen_draft.as_ref(), Some(&draft));
     e.dispatch(Command::Drop).unwrap();
     let m = mesh(&e);
     let sides: Vec<_> = m.faces.iter().map(|f| f.vertices.len()).collect();
@@ -161,7 +161,7 @@ fn undo_takes_back_one_click_and_the_strip_is_one_undo_step() {
         click(&mut e, x, y);
     }
     e.dispatch(Command::PenCaptureEnd(v(0.5, 3.))).unwrap();
-    let count = |e: &Editor| e.pen_draft.as_ref().unwrap().points().len();
+    let count = |e: &Editor| e.session.pen_draft.as_ref().unwrap().points().len();
     assert_eq!(count(&e), 7);
     e.dispatch(Command::Undo).unwrap();
     assert_eq!(count(&e), 6, "the triangle's point");
@@ -192,7 +192,7 @@ fn cancel_and_short_drafts_leave_the_scene_alone() {
         click(&mut e, x, y);
     }
     e.dispatch(Command::Cancel).unwrap();
-    assert!(e.pen_draft.is_none() && e.scene == before);
+    assert!(e.session.pen_draft.is_none() && e.scene == before);
     // A starting edge alone leaves its two points, as for the Pen.
     start(&mut e, quads());
     click(&mut e, 0., 0.);
@@ -215,7 +215,7 @@ fn make_quads_applies_to_polygon_types_without_walls() {
     for (x, y) in [(0., 0.), (1., 0.), (0., 1.)] {
         click(&mut e, x, y);
     }
-    assert_eq!(e.pen_draft.as_ref().unwrap().points().len(), 3);
+    assert_eq!(e.session.pen_draft.as_ref().unwrap().points().len(), 3);
     e.dispatch(Command::Cancel).unwrap();
     // Wall Mode together with Make Quads isn't specified (PMQ-Q1).
     let both = PenOptions {
@@ -253,7 +253,7 @@ fn make_quads_cant_change_mid_draft() {
     let mut e = editor();
     start(&mut e, quads());
     click(&mut e, 0., 0.);
-    let draft = e.pen_draft.clone();
+    let draft = e.session.pen_draft.clone();
     assert!(
         e.dispatch(Command::PenOptions(PenOptions::default()))
             .is_err()
@@ -264,7 +264,7 @@ fn make_quads_cant_change_mid_draft() {
         ..quads()
     };
     assert!(e.dispatch(Command::PenOptions(polyline)).is_err());
-    assert_eq!(e.pen_draft, draft);
+    assert_eq!(e.session.pen_draft, draft);
     // Other options still change.
     let flipped = PenOptions {
         flip: true,
@@ -284,7 +284,7 @@ fn dragging_flip_and_reverse_keep_the_strip_whole() {
     e.dispatch(Command::PenSelect(3)).unwrap();
     e.dispatch(Command::PenRefine(v(2., 1.))).unwrap();
     assert_eq!(
-        e.pen_draft.as_ref().unwrap().points(),
+        e.session.pen_draft.as_ref().unwrap().points(),
         &[v(0., 0.), v(1., 0.), v(0., 1.), v(2., 1.)]
     );
     // The viewer-facing reverse flips the polygons, not the point pairs, so
@@ -292,7 +292,7 @@ fn dragging_flip_and_reverse_keep_the_strip_whole() {
     // strip by the last rung as dragged (PMQ-Q4).
     e.dispatch(Command::PenReverse).unwrap();
     click(&mut e, 0., 2.);
-    assert_eq!(e.pen_draft.as_ref().unwrap().points()[5], v(2., 2.));
+    assert_eq!(e.session.pen_draft.as_ref().unwrap().points()[5], v(2., 2.));
     e.dispatch(Command::Drop).unwrap();
     let m = mesh(&e);
     assert!(m.normal(0).z < -0.99 && m.normal(1).z < -0.99);
@@ -352,7 +352,7 @@ fn arc_strip(width: f64, step: f64, sweep: f64) -> Editor {
 /// Each guessed partner lies across the strip from its click, within one
 /// step of the circle's radius, and every quad is convex, facing one way.
 fn check_arc(e: &mut Editor, width: f64, step: f64) {
-    let points = e.pen_draft.as_ref().unwrap().points().to_vec();
+    let points = e.session.pen_draft.as_ref().unwrap().points().to_vec();
     let lag = (step.abs() + 1.).to_radians().cos();
     for k in 1..points.len() / 2 {
         let (l, r) = (points[2 * k], points[2 * k + 1]);
@@ -411,7 +411,7 @@ fn a_strip_that_bends_back_and_forth_follows_each_bend() {
     ] {
         click(&mut e, x, y);
     }
-    let points = e.pen_draft.as_ref().unwrap().points().to_vec();
+    let points = e.session.pen_draft.as_ref().unwrap().points().to_vec();
     for k in 1..points.len() / 2 {
         let rung = points[2 * k + 1] - points[2 * k];
         assert!((rung.length() - 0.4).abs() < 1e-9);
@@ -441,26 +441,29 @@ fn the_drag_after_a_click_carries_its_partner() {
     }
     // Still the click's drag: the partner is guessed again from here.
     e.dispatch(Command::PenRefine(v(0., 2.))).unwrap();
-    let points = e.pen_draft.as_ref().unwrap().points().to_vec();
+    let points = e.session.pen_draft.as_ref().unwrap().points().to_vec();
     assert_eq!(&points[2..], &[v(0., 2.), v(1., 2.)]);
     // One undo step for the click and its drag.
     e.dispatch(Command::Undo).unwrap();
-    assert_eq!(e.pen_draft.as_ref().unwrap().points().len(), 2);
+    assert_eq!(e.session.pen_draft.as_ref().unwrap().points().len(), 2);
     // A turning click's drag turns the partner too.
     click(&mut e, 0., 1.);
     click(&mut e, -1., 1.);
     // Clicked at (-1, 1) the strip turns 90°: the rung (1, 0) turns to (0, 1).
-    close_to(e.pen_draft.as_ref().unwrap().points()[5], v(-1., 2.));
+    close_to(
+        e.session.pen_draft.as_ref().unwrap().points()[5],
+        v(-1., 2.),
+    );
     // Dragged to (-1, 2) it turns only 45°.
     e.dispatch(Command::PenRefine(v(-1., 2.))).unwrap();
-    let points = e.pen_draft.as_ref().unwrap().points().to_vec();
+    let points = e.session.pen_draft.as_ref().unwrap().points().to_vec();
     let half = 0.5f64.sqrt();
     let guessed = v(-1. + half, 2. + half);
     close_to(points[5], guessed);
     // A later drag of the same point leaves its partner alone (PMQ-Q4).
     e.dispatch(Command::PenSelect(4)).unwrap();
     e.dispatch(Command::PenRefine(v(-1., 3.))).unwrap();
-    let after = e.pen_draft.as_ref().unwrap().points().to_vec();
+    let after = e.session.pen_draft.as_ref().unwrap().points().to_vec();
     assert_eq!(after[4], v(-1., 3.));
     close_to(after[5], guessed);
 }

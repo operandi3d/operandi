@@ -67,7 +67,7 @@ fn sphere() -> Mesh {
 
 fn run(e: &mut Editor, tool: Tool, edit: impl FnOnce(&mut Parameters)) {
     e.dispatch(Command::Activate(tool)).unwrap();
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     edit(&mut p);
     e.dispatch(Command::Preview(p)).unwrap();
     e.dispatch(Command::Drop).unwrap();
@@ -296,7 +296,7 @@ fn uvt43_box_transform_moves_scales_and_turns_the_selected_uvs() {
     e.dispatch(Command::Activate(Tool::UvBoxTransform)).unwrap();
     e.dispatch(Command::UvToolSpace(Some(None))).unwrap();
     assert_eq!(e.uv_box_base(), Some((DVec2::ZERO, DVec2::splat(0.5))));
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     p.uv_box.offset = DVec2::new(0.1, 0.);
     p.uv_box.scale = DVec2::new(2., 1.);
     p.uv_box.anchor = Some(DVec2::ZERO);

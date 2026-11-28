@@ -211,12 +211,7 @@ fn any_pie_binds_in_the_input_map() {
     assert_eq!(a.camera.view, View::Top);
     // Bare Assign Key waits for the keys on the pie's row.
     a.execute("operandi.pie.assignKey pie.view");
-    assert_eq!(
-        a.input_map_ui.recording,
-        Some(crate::input_map_editor::Recording::Action(
-            pie_menu::VIEW_LINE.to_owned()
-        ))
-    );
+    assert_eq!(a.recording_keys_for(), Some(pie_menu::VIEW_LINE));
 }
 
 /// P1: a saved input map and a layout's keys that name the old pie
@@ -433,7 +428,7 @@ fn unknown_lines_show_red_and_do_nothing() {
     frame(&mut a, &ctx, vec![key_event(Key::D, true, mods)]);
     frame(&mut a, &ctx, vec![Event::PointerMoved(AT + vec2(120., 0.))]);
     frame(&mut a, &ctx, vec![key_event(Key::D, false, mods)]);
-    assert!(a.editor.live.is_some(), "{}", a.status);
+    assert!(a.editor.session.live.is_some(), "{}", a.status);
 }
 
 /// The pie widget's own steps for a sub-pie: `enter` keeps the centre,

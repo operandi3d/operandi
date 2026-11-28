@@ -8,6 +8,7 @@ pub(super) struct SurfaceFields;
 
 fn surface(app: &Operandi) -> Option<&Live> {
     app.editor
+        .session
         .live
         .as_ref()
         .filter(|l| l.tool.is_smooth_shift())
@@ -223,7 +224,7 @@ mod tests {
                 assert_eq!(a.status, "Ready");
             }
             assert_eq!(a.editor.scene, source);
-            let p = a.editor.live.as_ref().unwrap().params.smooth_shift;
+            let p = a.editor.session.live.as_ref().unwrap().params.smooth_shift;
             assert_eq!(p.offset, 0.2);
             assert_eq!(p.scale, 0.5);
             assert!(p.sharp && p.angle_weight && p.both_sides);
@@ -241,7 +242,7 @@ mod tests {
             a.fields.insert("sst_offset".into(), "0.2m".into());
             a.run(Command::Apply);
             assert_ne!(a.editor.scene, source);
-            assert!(!a.editor.live.as_ref().unwrap().applied);
+            assert!(!a.editor.session.live.as_ref().unwrap().applied);
             assert_eq!(a.editor.history.undo.last().unwrap().label, tool.label());
             a.execute("tool properties");
             assert!(a.surface_mini_properties);
@@ -271,7 +272,7 @@ mod tests {
                     pointer(empty, false, Modifiers::NONE),
                 ],
             );
-            assert!(a.editor.live.as_ref().unwrap().applied);
+            assert!(a.editor.session.live.as_ref().unwrap().applied);
             assert_ne!(a.editor.scene, source);
             a.execute("smooth shift offset 0.2m");
             let first = a.editor.scene.clone();
@@ -301,13 +302,20 @@ mod tests {
             // Reset continuation and retained clone are separate operations.
             a.activate(tool);
             a.execute("smooth shift offset 0.1m");
-            let p = a.editor.live.as_ref().unwrap().params.clone();
+            let p = a.editor.session.live.as_ref().unwrap().params.clone();
             a.run(Command::Preview(p));
             let stage = a.editor.scene.clone();
             a.run(Command::CloneSmoothShift);
-            assert!(a.editor.live.as_ref().unwrap().applied);
+            assert!(a.editor.session.live.as_ref().unwrap().applied);
             assert_eq!(
-                a.editor.live.as_ref().unwrap().params.smooth_shift.offset,
+                a.editor
+                    .session
+                    .live
+                    .as_ref()
+                    .unwrap()
+                    .params
+                    .smooth_shift
+                    .offset,
                 0.1
             );
             a.run(Command::Cancel);

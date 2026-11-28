@@ -356,7 +356,7 @@ impl super::Operandi {
         brush_hides_selection(BrushInUse {
             paint_tool: self.painting.brush.tool.is_some(),
             limited_by_selection: self.sculpt.brush.is_some(),
-            other_task: self.editor.has_active_task(),
+            other_task: self.editor.session.has_active_task(),
         })
     }
     #[cfg(not(feature = "painting"))]
@@ -369,7 +369,7 @@ impl super::Operandi {
     pub(super) fn brush_hides_locators(&self) -> bool {
         #[cfg(feature = "painting")]
         return (self.painting.brush.tool.is_some() || self.sculpt.brush.is_some())
-            && !self.editor.has_active_task()
+            && !self.editor.session.has_active_task()
             && !self.painting.prefs.show_locators;
         #[cfg(not(feature = "painting"))]
         false

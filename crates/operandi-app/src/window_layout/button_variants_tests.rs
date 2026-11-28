@@ -515,7 +515,7 @@ fn mb_q8_shift_adds_an_item_and_ctrl_a_unit_in_this_mesh() {
             a.status
         );
         assert_eq!(a.editor.history.undo.len(), undo + 1, "{name}");
-        assert!(a.editor.live.is_none(), "{name}: no drag");
+        assert!(a.editor.session.live.is_none(), "{name}: no drag");
         // Ctrl: into the current mesh.
         let (mut a, ctx) = create_panel();
         let faces = a.editor.scene.active().unwrap().mesh.faces.len();
@@ -525,7 +525,7 @@ fn mb_q8_shift_adds_an_item_and_ctrl_a_unit_in_this_mesh() {
             a.editor.scene.active().unwrap().mesh.faces.len() > faces,
             "{name}"
         );
-        assert!(a.editor.live.is_none(), "{name}: no drag");
+        assert!(a.editor.session.live.is_none(), "{name}: no drag");
     }
 }
 
@@ -548,7 +548,10 @@ fn mb_q8_primitive_keys_are_read_at_press_and_labels_swap_while_typing() {
         vec![pointer(p, false, Modifiers::NONE)],
     );
     assert_eq!(a.editor.scene.items.len(), items + 1, "{}", a.status);
-    assert!(a.editor.cone.is_none(), "Shift at press: no Cone session");
+    assert!(
+        a.editor.session.cone.is_none(),
+        "Shift at press: no Cone session"
+    );
 
     ctx.memory_mut(|m| m.request_focus(Id::new("command-entry")));
     frame(&mut a, &ctx, Modifiers::NONE, vec![]);

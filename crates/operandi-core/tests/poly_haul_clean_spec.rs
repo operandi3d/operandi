@@ -20,13 +20,13 @@ fn offset_starts_at_zero_and_reset_returns_to_it() {
     let mut e = editor();
     let source = e.scene.active().unwrap().mesh.vertices.clone();
     e.dispatch(Command::Activate(Tool::PolyHaul)).unwrap();
-    assert_eq!(e.live.as_ref().unwrap().params.poly_haul_offset, 0.);
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    assert_eq!(e.session.live.as_ref().unwrap().params.poly_haul_offset, 0.);
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     p.poly_haul_offset = 0.25;
     e.dispatch(Command::Preview(p)).unwrap();
     assert_ne!(e.scene.active().unwrap().mesh.vertices, source);
     e.dispatch(Command::ResetPolyHaul).unwrap();
-    assert_eq!(e.live.as_ref().unwrap().params.poly_haul_offset, 0.);
+    assert_eq!(e.session.live.as_ref().unwrap().params.poly_haul_offset, 0.);
     assert_eq!(e.scene.active().unwrap().mesh.vertices, source);
 }
 

@@ -5,7 +5,11 @@ impl Editor {
         match cmd {
             Command::ConfigureSmoothShift(p) => self.configure_surface(p)?,
             Command::ResetSmoothShift => {
-                let l = self.live.as_ref().ok_or("Arm Smooth Shift or Thicken")?;
+                let l = self
+                    .session
+                    .live
+                    .as_ref()
+                    .ok_or("Arm Smooth Shift or Thicken")?;
                 let key = l.tool.label();
                 // TP-15: with no named state, Reset gives the tool's own
                 // starting values; Thicken's come from its preset row.
@@ -25,6 +29,7 @@ impl Editor {
             }
             Command::CloneSmoothShift => {
                 let l = self
+                    .session
                     .live
                     .as_ref()
                     .filter(|l| l.tool.is_smooth_shift())
@@ -33,7 +38,7 @@ impl Editor {
                 let mut staged = self.clone();
                 staged.dispatch(Command::Continue)?;
                 staged.configure_surface(p)?;
-                let p = staged.live.as_ref().unwrap().params.clone();
+                let p = staged.session.live.as_ref().unwrap().params.clone();
                 staged.dispatch(Command::Preview(p))?;
                 *self = staged;
             }
@@ -42,6 +47,7 @@ impl Editor {
                     return Err("Use a Tool State name of 1–256 bytes".into());
                 }
                 let l = self
+                    .session
                     .live
                     .as_ref()
                     .filter(|l| l.tool.is_smooth_shift())
@@ -54,6 +60,7 @@ impl Editor {
             }
             Command::SurfaceStateRecall(name) => {
                 let key = self
+                    .session
                     .live
                     .as_ref()
                     .filter(|l| l.tool.is_smooth_shift())
@@ -75,6 +82,7 @@ impl Editor {
             }
             Command::SurfaceStateDelete => {
                 let key = self
+                    .session
                     .live
                     .as_ref()
                     .filter(|l| l.tool.is_smooth_shift())
@@ -93,6 +101,7 @@ impl Editor {
                     return Err("Use a Tool State name of 1–256 bytes".into());
                 }
                 let key = self
+                    .session
                     .live
                     .as_ref()
                     .filter(|l| l.tool.is_smooth_shift())
@@ -129,13 +138,19 @@ impl Editor {
     }
     pub(crate) fn configure_surface(&mut self, p: SmoothShiftParameters) -> Result<()> {
         if let Err(e) = p.validate() {
-            if let Some(l) = self.live.as_mut().filter(|l| l.tool.is_smooth_shift()) {
+            if let Some(l) = self
+                .session
+                .live
+                .as_mut()
+                .filter(|l| l.tool.is_smooth_shift())
+            {
                 l.preview_error = Some(e.clone());
             }
             return Err(e);
         }
 
         let live = self
+            .session
             .live
             .as_ref()
             .filter(|l| l.tool.is_smooth_shift())
@@ -146,7 +161,7 @@ impl Editor {
         if live.applied {
             self.dispatch(Command::Preview(params))?;
         } else {
-            let l = self.live.as_mut().unwrap();
+            let l = self.session.live.as_mut().unwrap();
             l.params = params;
             l.preview_error = None;
         }

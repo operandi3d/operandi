@@ -1047,7 +1047,7 @@ impl crate::Editor {
     /// no mesh, and changes nothing when nothing would move.
     pub(crate) fn relax_mesh(&mut self, options: RelaxMeshOptions) -> Result<()> {
         options.validate()?;
-        if self.live.is_some() {
+        if self.session.live.is_some() {
             return Err("Drop the active tool before Relax Mesh".into());
         }
         if self.scene.selection.mode == Mode::Item {

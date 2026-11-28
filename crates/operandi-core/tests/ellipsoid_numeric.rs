@@ -415,7 +415,7 @@ fn ea_t10_t11_sparse_source_selected_destination_replacement_history_and_reopen(
         assert_eq!(e.scene, base);
         e.dispatch(Command::Redo).unwrap();
         assert_eq!(e.scene, expected);
-        assert!(e.ellipsoid.is_none());
+        assert!(e.session.ellipsoid.is_none());
         assert_eq!(
             persistence::decode(&persistence::encode(&e.scene).unwrap()).unwrap(),
             expected
@@ -465,17 +465,17 @@ fn ea_t01_reset_units_destinations_and_single_checkpoint() {
             assert_eq!(e.scene.active().unwrap().name, "Ellipsoid");
             assert_eq!(e.scene.items[0], before.items[0]);
         }
-        assert!(e.ellipsoid.is_none());
+        assert!(e.session.ellipsoid.is_none());
         assert_eq!(e.history.undo.len(), 1);
         e.dispatch(Command::Undo).unwrap();
         assert_eq!(e.scene, before);
         e.dispatch(Command::Redo).unwrap();
         assert_eq!(e.scene, result);
-        assert!(e.ellipsoid.is_none());
+        assert!(e.session.ellipsoid.is_none());
         e.dispatch(Command::ArmEllipsoid).unwrap();
         e.dispatch(Command::ConfigureEllipsoid(explicit())).unwrap();
         e.dispatch(Command::ResetEllipsoid).unwrap();
-        assert_eq!(e.ellipsoid.as_ref().unwrap().requested, p);
+        assert_eq!(e.session.ellipsoid.as_ref().unwrap().requested, p);
         e.dispatch(Command::Cancel).unwrap();
         assert_eq!(e.scene, result);
     }
@@ -486,7 +486,7 @@ fn ea_t11_invalid_recovery_cancellation_drop_save_and_context_guards() {
     let base = e.scene.clone();
     e.dispatch(Command::ArmEllipsoid).unwrap();
     e.dispatch(Command::ConfigureEllipsoid(explicit())).unwrap();
-    let valid = e.ellipsoid.as_ref().unwrap().preview.clone();
+    let valid = e.session.ellipsoid.as_ref().unwrap().preview.clone();
     for p in [
         EllipsoidParameters {
             sides: u32::MAX,
@@ -509,11 +509,11 @@ fn ea_t11_invalid_recovery_cancellation_drop_save_and_context_guards() {
     ] {
         assert!(e.dispatch(Command::ConfigureEllipsoid(p)).is_err());
         assert_eq!(e.scene, base);
-        assert_eq!(e.ellipsoid.as_ref().unwrap().preview, valid);
+        assert_eq!(e.session.ellipsoid.as_ref().unwrap().preview, valid);
         assert!(e.dispatch(Command::Drop).is_err());
         assert!(e.dispatch(Command::Apply).is_err());
         e.dispatch(Command::ConfigureEllipsoid(explicit())).unwrap();
-        assert!(e.ellipsoid.as_ref().unwrap().error.is_none());
+        assert!(e.session.ellipsoid.as_ref().unwrap().error.is_none());
     }
     for cmd in [Command::Redo, Command::SelectItem(None), Command::Continue] {
         assert!(e.dispatch(cmd).is_err());
@@ -540,7 +540,7 @@ fn ea_t11_invalid_recovery_cancellation_drop_save_and_context_guards() {
     assert_eq!(e.scene, base);
     e.dispatch(Command::Redo).unwrap();
     assert_eq!(e.scene, expected);
-    assert!(e.ellipsoid.is_none());
+    assert!(e.session.ellipsoid.is_none());
     // A moved mesh takes the Ellipsoid now (primitive_moved_mesh.rs); an
     // empty selection, a hidden mesh and a non-default action center don't.
     for setup in 0..3 {
@@ -570,7 +570,13 @@ fn ea_t12_numeric_plane_independence_and_bounded_reflected_lobes() {
             e.dispatch(Command::ArmEllipsoid).unwrap();
             e.dispatch(Command::ConfigureEllipsoid(explicit())).unwrap();
             assert_eq!(
-                e.ellipsoid.as_ref().unwrap().preview.as_ref().unwrap(),
+                e.session
+                    .ellipsoid
+                    .as_ref()
+                    .unwrap()
+                    .preview
+                    .as_ref()
+                    .unwrap(),
                 &base
             );
         }

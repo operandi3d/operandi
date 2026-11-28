@@ -400,3 +400,39 @@ fn displacement_moves_the_surface_in_advanced() {
         "displaced {pushed} vs flat {flat}"
     );
 }
+
+/// The empty perspective view's pixels with Draw Faded Grid on or off.
+fn grid_pixels(fade: bool) -> Option<Vec<u8>> {
+    let state = super::performance_tests::headless_gpu()?;
+    let mut a = Operandi::empty();
+    a.viewport_gpu = Some(gpu::ViewportGpu::new(state));
+    a.display.settings.drawing.faded_grid = fade;
+    a.camera.view = crate::camera::View::Perspective;
+    let ctx = Context::default();
+    theme::install(&ctx);
+    for _ in 0..3 {
+        super::tests::draw(&mut a, &ctx, vec2(800., 600.), vec![]);
+    }
+    Some(a.viewport_gpu.as_ref().unwrap().read_views().remove(0).2)
+}
+
+/// #58: Draw Faded Grid makes a visible difference in the default
+/// perspective view (the fade began six focus distances away, past where
+/// the grid is seen, so the switch did nothing). Skips without a
+/// graphics device.
+#[test]
+fn faded_grid_visibly_fades_the_default_view() {
+    let (Some(faded), Some(plain)) = (grid_pixels(true), grid_pixels(false)) else {
+        return;
+    };
+    let changed = faded
+        .chunks(4)
+        .zip(plain.chunks(4))
+        .filter(|(p, q)| p.iter().zip(q.iter()).any(|(a, b)| a.abs_diff(*b) > 2))
+        .count();
+    let total = faded.len() / 4;
+    assert!(
+        changed * 50 > total,
+        "only {changed} of {total} pixels differ"
+    );
+}

@@ -37,7 +37,7 @@ fn scene(points: &[[f64; 3]], polygons: &[&[u32]], pos: DVec3, rot_y_deg: f64) -
     e.scene.selection.faces = (0..polygons.len() as u32).collect();
     e.dispatch(Command::ActionContext(ActionContext {
         center: CenterMode::Local,
-        axis: AxisOrientation::World,
+        axis: AxisOrientation::Local,
     }))
     .unwrap();
     e
@@ -56,7 +56,7 @@ fn moved(e: &mut Editor, delta: DVec3) -> (Vec<DVec3>, Vec<DVec3>) {
     };
     let before = world(e);
     e.dispatch(Command::Activate(Tool::Move)).unwrap();
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     p.delta = delta;
     e.dispatch(Command::Preview(p)).unwrap();
     e.dispatch(Command::Drop).unwrap();

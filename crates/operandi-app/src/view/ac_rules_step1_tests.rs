@@ -77,7 +77,14 @@ fn selection_border_with_symmetry_draws_arrows_square_to_the_faces() {
     }));
     for tool in [Tool::Move, Tool::Rotate, Tool::Scale] {
         a.activate(tool);
-        let frame = a.editor.live.as_ref().unwrap().action_frame.unwrap();
+        let frame = a
+            .editor
+            .session
+            .live
+            .as_ref()
+            .unwrap()
+            .action_frame
+            .unwrap();
         for axis in 0..3 {
             let arrow = a.handle_axis(axis);
             close(
@@ -141,7 +148,10 @@ fn bevel_arrows_under_selection_axes_follow_the_normal() {
         axis: AxisOrientation::Selection,
     }));
     a.activate(Tool::Bevel);
-    assert_eq!(a.editor.live.as_ref().map(|l| l.tool), Some(Tool::Bevel));
+    assert_eq!(
+        a.editor.session.live.as_ref().map(|l| l.tool),
+        Some(Tool::Bevel)
+    );
     let normal = {
         let item = a.editor.scene.active().unwrap();
         item.mesh.normal(1)

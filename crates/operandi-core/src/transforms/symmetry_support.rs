@@ -43,18 +43,19 @@ impl Editor {
     /// Symmetry notice (Solid Sketch, SS-SYM-04/08). `None` when there is
     /// nothing to say.
     pub fn symmetry_notice(&self) -> Option<String> {
-        if let Some(session) = &self.solid_sketch {
+        if let Some(session) = &self.session.solid_sketch {
             return session.symmetry_notice();
         }
         self.symmetry.axis?;
         let fixing = self
+            .session
             .live
             .as_ref()
             .is_none_or(|l| l.tool == crate::Tool::SymmetryTool);
         if !fixing && !self.symmetry_unpaired.is_empty() {
             return Some(unpaired_message(self.symmetry_unpaired.len()));
         }
-        let (support, name) = task_support(self.active_task()?);
+        let (support, name) = task_support(self.session.active_task()?);
         (support == SymmetrySupport::Ignores).then(|| crate::symmetry::ignores_message(name))
     }
 }
@@ -73,7 +74,7 @@ impl Editor {
     /// status bar warns and the viewport marks them). The Symmetry Tool
     /// keeps its own list.
     pub(crate) fn note_unpaired_points(&mut self) {
-        let Some(live) = &self.live else {
+        let Some(live) = &self.session.live else {
             self.symmetry_unpaired.clear();
             return;
         };

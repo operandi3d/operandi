@@ -39,10 +39,10 @@ fn header_names_the_active_tool_and_falls_back_with_none() {
     assert_eq!(header_text(&mut a), "Tool Properties");
 
     a.run(Command::ArmShape(ShapeKind::Capsule));
-    assert!(a.editor.shape.is_some(), "{}", a.status);
+    assert!(a.editor.session.shape.is_some(), "{}", a.status);
     assert_eq!(header_text(&mut a), "Capsule");
     a.run(Command::Cancel);
-    assert!(a.editor.shape.is_none());
+    assert!(a.editor.session.shape.is_none());
     assert_eq!(header_text(&mut a), "Tool Properties");
 
     a.run(Command::ArmCone);

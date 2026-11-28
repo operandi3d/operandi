@@ -109,6 +109,7 @@ impl Operandi {
         let gain = self.camera.distance / (r.height() as f64 * 0.9);
         let mut amount = self
             .editor
+            .session
             .live
             .as_ref()
             .map(|l| l.params.poly_haul_amount)
@@ -148,6 +149,7 @@ impl Operandi {
     fn preview_haul(&mut self, drag: &HaulDrag, amount: operandi_core::HaulAmount) {
         let Some(live) = self
             .editor
+            .session
             .live
             .as_ref()
             .filter(|l| l.tool == Tool::PolyHaul)

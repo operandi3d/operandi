@@ -313,7 +313,13 @@ fn run(e: &mut Editor, act: &Act) -> Result<()> {
     match act {
         Act::Tool(tool, set) => {
             e.dispatch(Command::Activate(*tool))?;
-            let mut p = e.live.as_ref().ok_or("no live tool")?.params.clone();
+            let mut p = e
+                .session
+                .live
+                .as_ref()
+                .ok_or("no live tool")?
+                .params
+                .clone();
             set(&mut p);
             e.dispatch(Command::Preview(p))?;
             e.dispatch(Command::Drop)

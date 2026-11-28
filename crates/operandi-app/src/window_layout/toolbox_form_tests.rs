@@ -413,7 +413,10 @@ fn uv_tab_buttons_run_their_lines() {
     // 2026-11-24) starts its tool; the started one is lit (its command's
     // answer).
     a.execute("Rotate");
-    assert_eq!(a.editor.live.as_ref().map(|l| l.tool), Some(Tool::Rotate));
+    assert_eq!(
+        a.editor.session.live.as_ref().map(|l| l.tool),
+        Some(Tool::Rotate)
+    );
     assert!(a.line_state("Rotate").unwrap().on);
     assert!(!a.line_state("Move").unwrap().on);
     // While a tool is live the island buttons are greyed with the reason,
@@ -581,7 +584,7 @@ fn edge_tab_click_tools_and_bridge_light_from_their_commands() {
     }
     assert!(!a.line_state("Bridge").unwrap().on);
     click_line(&mut a, &ctx, "Bridge", Modifiers::NONE);
-    assert!(a.editor.bridge.is_some(), "{}", a.status);
+    assert!(a.editor.session.bridge.is_some(), "{}", a.status);
     assert!(a.line_state("Bridge").unwrap().on);
     // Set Position... opens Set Vertex Position.
     a.run(Command::Cancel);
@@ -652,22 +655,22 @@ fn polygon_tab_rows_run_their_commands_and_light_while_open() {
     let rows: [(&str, Open, Close); 9] = [
         (
             "Polygon Pen",
-            |a| a.editor.pen_draft.is_some(),
+            |a| a.editor.session.pen_draft.is_some(),
             |a| a.run(Command::Cancel),
         ),
         (
             "Spike",
-            |a| a.editor.spike.is_some(),
+            |a| a.editor.session.spike.is_some(),
             |a| a.run(Command::Cancel),
         ),
         (
             "Bridge",
-            |a| a.editor.bridge.is_some(),
+            |a| a.editor.session.bridge.is_some(),
             |a| a.run(Command::Cancel),
         ),
         (
             "Polygon Reduction",
-            |a| a.editor.reduction.is_some(),
+            |a| a.editor.session.reduction.is_some(),
             |a| a.run(Command::Cancel),
         ),
         (
@@ -836,7 +839,7 @@ fn edit_tab_slide_follows_the_mode_and_rows_wait_for_the_tool() {
     assert!(a.line_enabled("operandi.mode.is vertex"));
     click_tall(&mut a, &ctx, "Edit Slide", Modifiers::NONE);
     assert_eq!(
-        a.editor.live.as_ref().map(|l| l.tool),
+        a.editor.session.live.as_ref().map(|l| l.tool),
         Some(Tool::VertexSlide)
     );
     assert!(a.line_state("Edit Slide").unwrap().on);
@@ -976,6 +979,7 @@ fn tube_hold_cell_runs_tube_and_lists_solid_sketch() {
     click_line(&mut a, &ctx, "Tube", Modifiers::NONE);
     assert!(
         a.editor
+            .session
             .shape
             .as_ref()
             .is_some_and(|s| s.kind() == ShapeKind::Tube),
@@ -999,12 +1003,15 @@ fn tube_hold_cell_runs_tube_and_lists_solid_sketch() {
         listed.contains("Solid Sketch"),
         "the menu lists Solid Sketch"
     );
-    assert!(a.editor.shape.is_none(), "a right-click runs nothing");
+    assert!(
+        a.editor.session.shape.is_none(),
+        "a right-click runs nothing"
+    );
     // Pick Solid Sketch from the open menu by running its line, as the menu
     // does; the cell then lights.
     a.execute("Solid Sketch");
     draw(&mut a, &ctx, SIZE, vec![]);
-    assert!(a.editor.solid_sketch.is_some(), "{}", a.status);
+    assert!(a.editor.session.solid_sketch.is_some(), "{}", a.status);
     assert!(a.line_state("Solid Sketch").unwrap().on);
 }
 
@@ -1086,7 +1093,7 @@ fn n24_holding_a_pop_up_cell_opens_its_list() {
     );
     draw(&mut a, &ctx, SIZE, vec![]);
     assert!(
-        a.editor.shape.is_none(),
+        a.editor.session.shape.is_none(),
         "the release ending the hold runs nothing"
     );
 }

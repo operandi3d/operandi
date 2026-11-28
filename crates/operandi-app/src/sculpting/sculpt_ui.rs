@@ -255,7 +255,7 @@ fn pct(
     })
 }
 
-/// A row of a toolbox brush's form (SCT §3); `Divider` separates groups.
+/// A row of a brush's form (SCT §3, SI §2); `Divider` separates groups.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub(crate) enum Row {
     SculptMode,
@@ -274,16 +274,93 @@ pub(crate) enum Row {
     Continuous,
     CurveConstraint,
     NormalizeWeights,
+    /// Smooth's Soft Filter (SCT-50): image-only, greyed.
+    SoftFilter,
+    /// Move's Rigid UVs (SCT-49): UV-only, greyed.
+    RigidUvs,
+    /// Inflate's Paint Mode (SCT-51, SI-20): image-only, greyed.
+    PaintMode,
+    /// Set Color, Color, Alpha (SI-21..23): image-only, greyed.
+    SetColor,
+    Color,
+    Alpha,
+    /// Lock Borders and Lock Corners (SCT-01, SI-24): the Sculpt tab's
+    /// switches, at the bottom of every sculpt brush's form.
+    Locks,
     Divider,
 }
 
-/// The rows of a toolbox brush's form, in order (SCT-12..48): the brush
-/// section and the Stroke section. `None` for the foundation brushes,
-/// whose forms are SC-101's.
-pub(crate) fn toolbox_rows(brush: SculptBrush) -> Option<(Vec<Row>, Vec<Row>)> {
+/// Why the image-only rows are greyed (SCT-07; shown greyed, not hidden:
+/// Jason's "match", SI-Q3).
+const IMAGE_ONLY: &str = "Image sculpting isn't in Operandi yet";
+
+/// The rows of a brush's form, in order (SCT-12..48, SI-10..24): the brush
+/// section and the Stroke section (empty: the Stroke rows sit in the brush
+/// section after a divider).
+pub(crate) fn toolbox_rows(brush: SculptBrush) -> (Vec<Row>, Vec<Row>) {
     use Row::*;
     let stroke = vec![Step, Continuous, CurveConstraint];
-    Some(match brush {
+    let (mut rows, stroke) = match brush {
+        // SI §2: one block with dividers.
+        SculptBrush::Inflate => (
+            vec![
+                SculptMode,
+                OffsetMode,
+                OffsetDistance,
+                OffsetAmount,
+                SmoothAmount,
+                SmoothMode,
+                DensityMode,
+                Divider,
+                Step,
+                Continuous,
+                CurveConstraint,
+                Divider,
+                PaintMode,
+                Divider,
+                SetColor,
+                Color,
+                Alpha,
+            ],
+            vec![],
+        ),
+        // SPM-10..21: Inflate's rows with Normal Mode, no Paint Mode.
+        SculptBrush::Push => (
+            vec![
+                SculptMode,
+                OffsetMode,
+                OffsetDistance,
+                OffsetAmount,
+                SmoothAmount,
+                SmoothMode,
+                NormalMode,
+                DensityMode,
+                Divider,
+                Step,
+                Continuous,
+                CurveConstraint,
+                Divider,
+                SetColor,
+                Color,
+                Alpha,
+            ],
+            vec![],
+        ),
+        // SPM-22..24: Smooth's short form.
+        SculptBrush::Smooth => (vec![SculptMode, OffsetAmount, SoftFilter], vec![]),
+        // SPM-25..30: no offset-mode, smoothing-mode, density or stroke
+        // rows (Move doesn't lay dabs).
+        SculptBrush::Move => (
+            vec![
+                SculptMode,
+                MoveMode,
+                MoveBackFaces,
+                OffsetAmount,
+                SmoothAmount,
+                RigidUvs,
+            ],
+            vec![],
+        ),
         SculptBrush::Fold => (
             vec![
                 SculptMode,
@@ -369,49 +446,85 @@ pub(crate) fn toolbox_rows(brush: SculptBrush) -> Option<(Vec<Row>, Vec<Row>)> {
             ],
             vec![],
         ),
-        // VMT-03: the Vertex Map Tools' forms (Erase has none).
+        // VMT-03: the Vertex Map Tools' forms (Erase has none, and they
+        // have no locks).
         SculptBrush::VmPaint
         | SculptBrush::VmSmooth
         | SculptBrush::VmScaleDown
-        | SculptBrush::VmSetValue => (vec![OffsetAmount, NormalizeWeights], vec![]),
-        SculptBrush::VmErase => (vec![], vec![]),
-        SculptBrush::Smooth | SculptBrush::Push | SculptBrush::Inflate | SculptBrush::Move => {
-            return None;
-        }
-    })
+        | SculptBrush::VmSetValue => return (vec![OffsetAmount, NormalizeWeights], vec![]),
+        SculptBrush::VmErase => return (vec![], vec![]),
+    };
+    // SCT-01, SI-24: the locks close every sculpt brush's form.
+    rows.extend([Divider, Locks]);
+    (rows, stroke)
 }
 
-/// The field for one toolbox-brush row.
+/// What a form row reads besides the brush's settings.
+struct RowCtx {
+    /// A pen has come near a tablet this session (SC-62).
+    pen_seen: bool,
+}
+
+/// The field for one brush row; `None` for dividers and the locks (drawn
+/// by `locks_item`).
 fn row_field(
     row: Row,
     brush: SculptBrush,
     p: &BrushSettings,
-    pen_seen: bool,
+    ctx: &RowCtx,
 ) -> Option<tf::Field<BrushSettings>> {
     use operandi_core::sculpt::{CurveConstraint, MoveMode, SculptMode};
     let adaptive = p.offset_mode == OffsetMode::Adaptive;
     // Attenuate relabels the shared fields (SCT-45).
     let attenuate = brush == SculptBrush::Attenuate;
+    // Move follows the pointer instead of laying dabs (SC-123, SCQ-01).
+    let grab = brush.kind() == operandi_core::sculpt::BrushKind::Grab;
+    let grab_why = "Move follows the pointer; Offset Amount scales how far (provisional, SCQ-01)";
+    let no_dabs = "Move doesn't lay dabs";
+    // The brushes the SI / SPM specs cover.
+    let foundation = matches!(
+        brush,
+        SculptBrush::Inflate | SculptBrush::Push | SculptBrush::Smooth | SculptBrush::Move
+    );
     Some(match row {
-        Row::Divider => return None,
-        Row::SculptMode => tf::choice(
-            "sculpt_mode",
-            "Sculpt Mode",
-            &[
-                (SculptMode::Automatic, "Automatic"),
-                (SculptMode::Mesh, "Mesh"),
-                (SculptMode::ImageFast, "Image Map (Fast)"),
-                (SculptMode::ImageDetails, "Image Map (Details)"),
-                (SculptMode::Curves, "Curves"),
-            ],
-            |p: &BrushSettings| p.sculpt_mode,
-            |p, m| p.sculpt_mode = m,
-        )
-        .tip("What the brush sculpts. Operandi sculpts mesh points")
-        // SCT-07: image-only choices greyed with a note.
-        .greyed_option(2, "Image sculpting isn't in Operandi yet")
-        .greyed_option(3, "Image sculpting isn't in Operandi yet")
-        .greyed_option(4, "Curve sculpting isn't in Operandi yet"),
+        Row::Divider | Row::Locks => return None,
+        Row::SculptMode => {
+            // SI-10, SPM: the four foundation brushes list three choices;
+            // the toolbox brushes five (SCT §2, SI-Q2).
+            let three = foundation;
+            let modes: &[(SculptMode, &str)] = if three {
+                &[
+                    (SculptMode::Automatic, "Automatic"),
+                    (SculptMode::Mesh, "Mesh"),
+                    (SculptMode::ImageDetails, "Image Map (Details)"),
+                ]
+            } else {
+                &[
+                    (SculptMode::Automatic, "Automatic"),
+                    (SculptMode::Mesh, "Mesh"),
+                    (SculptMode::ImageFast, "Image Map (Fast)"),
+                    (SculptMode::ImageDetails, "Image Map (Details)"),
+                    (SculptMode::Curves, "Curves"),
+                ]
+            };
+            let field = tf::choice(
+                "sculpt_mode",
+                "Sculpt Mode",
+                modes,
+                |p: &BrushSettings| p.sculpt_mode,
+                |p, m| p.sculpt_mode = m,
+            )
+            .tip("What the brush sculpts. Operandi sculpts mesh points");
+            // SCT-07: image-only choices greyed with a note.
+            if three {
+                field.greyed_option(2, IMAGE_ONLY)
+            } else {
+                field
+                    .greyed_option(2, IMAGE_ONLY)
+                    .greyed_option(3, IMAGE_ONLY)
+                    .greyed_option(4, "Curve sculpting isn't in Operandi yet")
+            }
+        }
         Row::MoveMode => tf::choice(
             "sculpt_move_mode",
             "Move Mode",
@@ -444,7 +557,8 @@ fn row_field(
             |p: &BrushSettings| p.offset_mode,
             |p, m| p.offset_mode = m,
         )
-        .tip("Adaptive: a percentage of the brush size. Absolute: a fixed distance"),
+        .tip("Adaptive: a percentage of the brush size. Absolute: a fixed distance")
+        .enabled_if(!grab, grab_why),
         Row::OffsetDistance => tf::number(
             "sculpt_offset_distance",
             "Offset Distance",
@@ -457,8 +571,12 @@ fn row_field(
         )
         .tip("How far a dab moves the points, whatever the brush size")
         .enabled_if(
-            !adaptive,
-            "Offset Mode is Adaptive: Offset Amount sets the strength",
+            !grab && !adaptive,
+            if grab {
+                grab_why
+            } else {
+                "Offset Mode is Adaptive: Offset Amount sets the strength"
+            },
         ),
         Row::OffsetAmount => {
             let label = match brush {
@@ -469,16 +587,23 @@ fn row_field(
                 SculptBrush::VmSetValue => "Value",
                 _ => "Offset Amount",
             };
-            let shows_mode = toolbox_rows(brush).is_some_and(|(r, _)| r.contains(&Row::OffsetMode));
+            let tip = match brush {
+                SculptBrush::Smooth => "How strongly each dab smooths. Ctrl: keep volume",
+                SculptBrush::Move => "How closely the grabbed points follow the pointer",
+                _ => {
+                    "Strength as a percentage of the brush size. Middle-drag in the viewport to change it"
+                }
+            };
+            let shows_mode = toolbox_rows(brush).0.contains(&Row::OffsetMode);
             pct(
                 "sculpt_offset_amount",
                 label,
                 |p| p.offset_amount,
                 |p, v| p.offset_amount = v,
             )
-            .tip("Strength as a percentage of the brush size. Middle-drag in the viewport to change it")
+            .tip(tip)
             .enabled_if(
-                adaptive || !shows_mode,
+                grab || adaptive || !shows_mode,
                 "Offset Mode is Absolute: Offset Distance sets the strength",
             )
         }
@@ -499,6 +624,7 @@ fn row_field(
         )
         .tip("How strongly Shift (or Uniform) smooths"),
         Row::SmoothMode => {
+            // SI-15: Shift Key, Low Pressure, Uniform.
             let mode = tf::choice(
                 "sculpt_smooth_mode",
                 "Smooth Mode",
@@ -514,7 +640,9 @@ fn row_field(
                 "Shift Key: Shift smooths. Low Pressure: light pen strokes smooth, \
                  hard ones sculpt. Uniform: every stroke smooths a little too",
             );
-            if pen_seen {
+            // SC-62, SC-102 (UIC-117): Low Pressure needs a tablet; it greys
+            // until a pen has come near one this session.
+            if ctx.pen_seen {
                 mode
             } else {
                 mode.greyed_option(
@@ -546,67 +674,154 @@ fn row_field(
             SculptBrush::Spin => "The axis the brush spins around",
             SculptBrush::Clay => "The direction Clay builds along",
             _ => "Which way the brush pushes",
-        }),
-        Row::DensityMode => tf::choice(
-            "sculpt_density_mode",
-            "Density Mode",
-            &[
-                (DensityMode::Additive, "Additive"),
-                (DensityMode::Attenuate, "Attenuated"),
-                (DensityMode::MaxStroke, "Maximum Stroke"),
-            ],
-            |p: &BrushSettings| p.density_mode,
-            |p, m| p.density_mode = m,
-        )
-        .tip(
-            "Additive: crossing a stroke adds more. Attenuated: stops at the full offset. \
-             Maximum Stroke: never more than the strongest dab",
-        ),
+        })
+        .enabled_if(!grab, "Move doesn't use a direction"),
+        Row::DensityMode => {
+            // SI-16: Maximum Map is image-only, listed greyed (SCT-07). It
+            // has no engine value, so it can't be picked.
+            let modes: [(Option<DensityMode>, &str); 4] = [
+                (Some(DensityMode::Additive), "Additive"),
+                (Some(DensityMode::Attenuate), "Attenuated"),
+                (Some(DensityMode::MaxStroke), "Maximum Stroke"),
+                (None, "Maximum Map"),
+            ];
+            tf::choice(
+                "sculpt_density_mode",
+                "Density Mode",
+                &modes,
+                |p: &BrushSettings| Some(p.density_mode),
+                |p, m| {
+                    if let Some(m) = m {
+                        p.density_mode = m;
+                    }
+                },
+            )
+            .tip(
+                "Additive: crossing a stroke adds more. Attenuated: stops at the full offset. \
+                 Maximum Stroke: never more than the strongest dab",
+            )
+            .greyed_option(3, IMAGE_ONLY)
+            .enabled_if(!grab, no_dabs)
+        }
         Row::Step => pct(
             "sculpt_step",
             "Interpolation Step",
             |p| p.step,
             |p, v| p.step = v,
         )
-        .tip("Gap between dabs as a percentage of the brush size. Smaller is smoother"),
+        .tip("Gap between dabs as a percentage of the brush size. Smaller is smoother")
+        .enabled_if(!grab, no_dabs),
         Row::Continuous => tf::check(
             "sculpt_continuous",
             "Continuous Stroke",
             |p: &BrushSettings| p.continuous,
             |p, on| p.continuous = on,
         )
-        .tip("Join the dabs into a solid line even with a large step"),
+        .tip("Join the dabs into a solid line even with a large step")
+        .enabled_if(!grab, no_dabs),
         Row::CurveConstraint => tf::choice(
             "sculpt_curve_constraint",
             "Curve Constraint",
-            &[
-                (CurveConstraint::None, "None"),
-                (CurveConstraint::Background2D, "Background 2D"),
-                (CurveConstraint::Background3D, "Background 3D"),
-            ],
+            // SI-19 / SPM: 3D before 2D on the foundation brushes; SCT §2
+            // lists 2D first on the toolbox brushes.
+            if foundation {
+                &[
+                    (CurveConstraint::None, "None"),
+                    (CurveConstraint::Background3D, "Background 3D"),
+                    (CurveConstraint::Background2D, "Background 2D"),
+                ]
+            } else {
+                &[
+                    (CurveConstraint::None, "None"),
+                    (CurveConstraint::Background2D, "Background 2D"),
+                    (CurveConstraint::Background3D, "Background 3D"),
+                ]
+            },
             |p: &BrushSettings| p.curve_constraint,
             |p, c| p.curve_constraint = c,
         )
         .tip("Guide strokes along a curve")
         .greyed_option(1, "Background constraints come in a later version")
         .greyed_option(2, "Background constraints come in a later version"),
+        // The image- and UV-only rows: shown greyed with why (SCT-07,
+        // UIC-117, SI-Q3). They hold no setting until those features exist.
+        Row::SoftFilter => tf::check("sculpt_soft_filter", "Soft Filter", |_| false, |_, _| {})
+            .tip("Smooths an image map's detail more gently")
+            .enabled_if(false, IMAGE_ONLY),
+        Row::RigidUvs => tf::check("sculpt_rigid_uvs", "Rigid UVs", |_| false, |_, _| {})
+            .tip("Keeps the moved points' UVs fixed")
+            .enabled_if(false, "UV sculpting isn't in Operandi yet"),
+        Row::PaintMode => tf::choice(
+            "sculpt_paint_mode",
+            "Paint Mode",
+            &[((), "Automatic")],
+            |_| (),
+            |_, ()| {},
+        )
+        .tip("How image sculpting and image painting combine")
+        .enabled_if(false, IMAGE_ONLY),
+        Row::SetColor => tf::check("sculpt_set_color", "Set Color", |_| false, |_, _| {})
+            .tip("Paint a colour into an image map while sculpting")
+            .enabled_if(false, IMAGE_ONLY),
+        Row::Color => tf::value("sculpt_color", "Color", "1.0 0.0 0.0")
+            .tip("The colour Set Color paints")
+            .enabled_if(false, IMAGE_ONLY),
+        Row::Alpha => pct("sculpt_alpha", "Alpha", |_| 1., |_, _| {})
+            .tip("How strongly Set Color paints")
+            .enabled_if(false, IMAGE_ONLY),
     })
 }
 
-/// A toolbox brush's rows as form items, with dividers.
+/// Lock Borders and Lock Corners (SC-72..74, SI-24): the Sculpt tab's
+/// switches, so ticking one here ticks it there. Side by side on one row,
+/// Borders left (SPM-01): a departure from UIC-115's stacked checkboxes,
+/// approved by Jason 2026-11-28.
+fn locks_item() -> tf::Item<BrushSettings> {
+    tf::Item::Custom(std::rc::Rc::new(|app: &mut Operandi, ui: &mut Ui| {
+        let mut changes = Vec::new();
+        crate::option_row::row(ui, "", |ui| {
+            for (corners, label, tip) in [
+                (false, "Lock Borders", "Points on open edges never move"),
+                (
+                    true,
+                    "Lock Corners",
+                    "Border points used by one polygon never move",
+                ),
+            ] {
+                let s = &app.sculpt.settings;
+                let mut on = if corners {
+                    s.lock_corners
+                } else {
+                    s.lock_borders
+                };
+                if ui.checkbox(&mut on, label).on_hover_text(tip).changed() {
+                    changes.push((corners, on));
+                }
+            }
+        });
+        for (corners, on) in changes {
+            app.set_sculpt_lock(corners, on);
+        }
+    }))
+}
+
+/// A brush's rows as form items, with dividers.
 fn toolbox_items(
     rows: &[Row],
     brush: SculptBrush,
     p: &BrushSettings,
-    pen_seen: bool,
+    ctx: &RowCtx,
 ) -> Vec<tf::Item<BrushSettings>> {
     let mut f = ToolForm::<BrushSettings>::new();
     for &row in rows {
-        match row_field(row, brush, p, pen_seen) {
-            Some(field) => {
+        match (row, row_field(row, brush, p, ctx)) {
+            (_, Some(field)) => {
                 f.field(field);
             }
-            None => {
+            (Row::Locks, None) => {
+                f.push(locks_item());
+            }
+            (_, None) => {
                 f.separator();
             }
         }
@@ -614,187 +829,77 @@ fn toolbox_items(
     f.items
 }
 
-fn brush_section(
-    brush: SculptBrush,
-    p: &BrushSettings,
-    pen_seen: bool,
-) -> Vec<tf::Item<BrushSettings>> {
-    let mut f = ToolForm::<BrushSettings>::new();
-    let amount = pct(
-        "sculpt_offset_amount",
-        "Offset Amount",
-        |p| p.offset_amount,
-        |p, v| p.offset_amount = v,
-    );
-    if brush == SculptBrush::Smooth {
-        // SC-120: Smooth's strength is its Offset Amount; it has no other
-        // brush rows.
-        f.field(amount.tip("How strongly each dab smooths. Ctrl: keep volume"));
-        return f.items;
+/// The tip's section title (SI §2: "Smooth Brush", or "Hard Brush" with
+/// the hard tip).
+pub(crate) fn tip_title(kind: TipKind) -> &'static str {
+    match kind {
+        TipKind::Smooth => "Smooth Brush",
+        TipKind::Hard => "Hard Brush",
     }
-    if brush == SculptBrush::Move
-        && let Some(mode) = row_field(Row::MoveMode, brush, p, pen_seen)
-    {
-        // SCT-49: Move Mode first.
-        f.field(mode);
-        if let Some(back) = row_field(Row::MoveBackFaces, brush, p, pen_seen) {
-            f.field(back);
-        }
-    }
-    let grab = brush.kind() == operandi_core::sculpt::BrushKind::Grab;
-    let grab_why = "Move follows the pointer; Offset Amount scales how far (provisional, SCQ-01)";
-    let adaptive = p.offset_mode == OffsetMode::Adaptive;
-    f.field(
-        tf::choice(
-            "sculpt_offset_mode",
-            "Offset Mode",
-            &[
-                (OffsetMode::Adaptive, "Adaptive"),
-                (OffsetMode::Absolute, "Absolute"),
-            ],
-            |p: &BrushSettings| p.offset_mode,
-            |p, m| p.offset_mode = m,
-        )
-        .tip("Adaptive: a percentage of the brush size. Absolute: a fixed distance")
-        .enabled_if(!grab, grab_why),
-    )
-    .field(
-        tf::number(
-            "sculpt_offset_distance",
-            "Offset Distance",
-            Unit::Distance,
-            |p: &BrushSettings| p.offset_distance,
-            |p, v| {
-                p.offset_distance = v;
-                p.validate()
-            },
-        )
-        .tip("How far a dab moves the points, whatever the brush size")
-        .enabled_if(
-            !grab && !adaptive,
-            if grab {
-                grab_why
-            } else {
-                "Offset Mode is Adaptive: Offset Amount sets the strength"
-            },
-        ),
-    )
-    .field(
-        amount
-            .tip("Strength as a percentage of the brush size. Middle-drag in the viewport to change it")
-            .enabled_if(
-                grab || adaptive,
-                "Offset Mode is Absolute: Offset Distance sets the strength",
-            ),
-    )
-    .field(
-        pct(
-            "sculpt_smooth_amount",
-            "Smooth Amount",
-            |p| p.smooth_amount,
-            |p, v| p.smooth_amount = v,
-        )
-        .tip("How strongly Shift (or Uniform) smooths"),
-    )
-    .field({
-        let mode = tf::choice(
-            "sculpt_smooth_mode",
-            "Smooth Mode",
-            &[
-                (SmoothMode::ShiftKey, "Shift Key"),
-                (SmoothMode::Uniform, "Uniform"),
-                (SmoothMode::LowPressure, "Low Pressure"),
-            ],
-            |p: &BrushSettings| p.smooth_mode,
-            |p, m| p.smooth_mode = m,
-        )
-        .tip(
-            "Shift Key: Shift smooths. Uniform: every stroke smooths a little too. \
-             Low Pressure: light pen strokes smooth, hard ones sculpt",
-        );
-        // SC-62, SC-102 (UIC-117): Low Pressure needs a tablet; it greys
-        // until a pen has come near one this session.
-        if pen_seen {
-            mode
-        } else {
-            mode.greyed_option(
-                2,
-                "Needs a pen tablet: bring the pen near the tablet to use it",
-            )
-        }
-    });
-    let normal_tip = match brush {
-        SculptBrush::Inflate => "Inflate always moves each point along its own normal",
-        _ => "Move doesn't use a direction",
-    };
-    f.field(
-        tf::choice(
-            "sculpt_normal_mode",
-            "Normal Mode",
-            &[
-                (NormalMode::BrushCenter, "Brush Center"),
-                (NormalMode::Vertex, "Vertex"),
-                (NormalMode::Average, "Average"),
-                (NormalMode::Screen, "Screen"),
-                (NormalMode::MouseDown, "Mouse Down"),
-                (NormalMode::X, "X"),
-                (NormalMode::Y, "Y"),
-                (NormalMode::Z, "Z"),
-            ],
-            move |p: &BrushSettings| {
-                if brush == SculptBrush::Inflate {
-                    NormalMode::Vertex
-                } else {
-                    p.normal_mode
-                }
-            },
-            |p, m| p.normal_mode = m,
-        )
-        .tip("Which way the brush pushes")
-        .enabled_if(brush.uses_normal_mode(), normal_tip),
-    )
-    .field(
-        tf::choice(
-            "sculpt_density_mode",
-            "Density Mode",
-            &[
-                (DensityMode::Additive, "Additive"),
-                (DensityMode::Attenuate, "Attenuate"),
-                (DensityMode::MaxStroke, "Max Stroke"),
-            ],
-            |p: &BrushSettings| p.density_mode,
-            |p, m| p.density_mode = m,
-        )
-        .tip("Additive: crossing a stroke adds more. Attenuate: stops at the full offset. Max Stroke: never more than the strongest dab")
-        .enabled_if(!grab, "Move doesn't lay dabs"),
-    );
-    f.items
 }
 
-fn stroke_section(brush: SculptBrush) -> Vec<tf::Item<BrushSettings>> {
-    let grab = brush.kind() == operandi_core::sculpt::BrushKind::Grab;
-    let mut f = ToolForm::<BrushSettings>::new();
-    f.field(
-        pct(
-            "sculpt_step",
-            "Interpolation Step",
-            |p| p.step,
-            |p, v| p.step = v,
-        )
-        .tip("Gap between dabs as a percentage of the brush size. Smaller is smoother")
-        .enabled_if(!grab, "Move doesn't lay dabs"),
-    )
-    .field(
-        tf::check(
-            "sculpt_continuous",
-            "Continuous Stroke",
-            |p: &BrushSettings| p.continuous,
-            |p, on| p.continuous = on,
-        )
-        .tip("Join the dabs into a solid line even with a large step")
-        .enabled_if(!grab, "Move doesn't lay dabs"),
-    );
-    f.items
+/// The Brush Settings pop-up button (SI-34): In/Out Weight and Slope, the
+/// tip's own falloff. Editing one makes the shape Custom. A popover under
+/// the button (UIC-181) whose changes apply live (UIC-182); no undo step,
+/// like every brush setting (SC-91).
+fn brush_settings_item() -> tf::Item<BrushSettings> {
+    tf::Item::Custom(std::rc::Rc::new(|app: &mut Operandi, ui: &mut Ui| {
+        let Some(brush) = app.sculpt.brush else {
+            return;
+        };
+        let response = crate::option_row::button(ui, "Brush Settings")
+            .on_hover_text("Edit the falloff's In/Out Weight and Slope (makes the shape Custom)");
+        // UIC-116: a button that opens a panel shows ▾ at its right end.
+        ui.painter().text(
+            response.rect.right_center() - egui::vec2(8., 0.),
+            egui::Align2::RIGHT_CENTER,
+            "▾",
+            egui::TextStyle::Button.resolve(ui.style()),
+            ui.visuals().text_color(),
+        );
+        egui::Popup::from_toggle_button_response(&response)
+            .close_behavior(egui::PopupCloseBehavior::CloseOnClickOutside)
+            .show(|ui| {
+                ui.set_min_width(220.);
+                let c = app.sculpt.settings.brush(brush).tip.custom;
+                // Weights are shares of full strength; slopes plain numbers
+                // (the brush engine's CustomProfile, PNT-80).
+                let rows: [(&str, f64, bool); 4] = [
+                    ("In Weight", c.in_weight, true),
+                    ("Out Weight", c.out_weight, true),
+                    ("In Slope", c.in_slope, false),
+                    ("Out Slope", c.out_slope, false),
+                ];
+                for (k, (label, v, weight)) in rows.into_iter().enumerate() {
+                    let mut x = if weight { v * 100. } else { v };
+                    let changed = crate::option_row::field_row(ui, label, |ui| {
+                        let drag = if weight {
+                            crate::numeric_tab::DragValue::new(&mut x)
+                                .speed(0.5)
+                                .range(0. ..=100.)
+                                .suffix(" %")
+                        } else {
+                            crate::numeric_tab::DragValue::new(&mut x)
+                                .speed(0.01)
+                                .range(-4. ..=4.)
+                        };
+                        ui.add(drag).changed()
+                    })
+                    .inner;
+                    if changed {
+                        let tip = &mut app.sculpt.settings.brush_mut(brush).tip;
+                        let v = if weight { x / 100. } else { x };
+                        match k {
+                            0 => tip.custom.in_weight = v,
+                            1 => tip.custom.out_weight = v,
+                            2 => tip.custom.in_slope = v,
+                            _ => tip.custom.out_slope = v,
+                        }
+                        tip.shape = TipShape::Custom;
+                    }
+                }
+            });
+    }))
 }
 
 fn tip_section(p: &BrushSettings) -> Vec<tf::Item<BrushSettings>> {
@@ -825,20 +930,26 @@ fn tip_section(p: &BrushSettings) -> Vec<tf::Item<BrushSettings>> {
         )
         .tip("Keep the brush the same size on the model when zooming"),
     );
+    let bias = pct("sculpt_bias", "Bias", |p| p.tip.bias, |p, v| p.tip.bias = v)
+        .tip("Bends the falloff: 50 % leaves it as it is, higher makes it fuller");
     match p.tip.kind {
         TipKind::Smooth => {
+            // SI-30..34: Bias, then Shape Preset and Brush Settings.
             let shapes: Vec<(TipShape, &str)> =
                 TipShape::ALL.iter().map(|s| (*s, s.label())).collect();
-            f.field(
+            f.field(bias).field(
                 tf::choice(
                     "sculpt_shape",
-                    "Shape",
+                    "Shape Preset",
                     &shapes,
                     |p: &BrushSettings| p.tip.shape,
                     |p, s| p.tip.shape = s,
                 )
+                // Brush Settings edits make the shape Custom (not a preset).
+                .otherwise(TipShape::Custom.label())
                 .tip("The falloff from the brush centre to its rim"),
             );
+            f.push(brush_settings_item());
         }
         TipKind::Hard => {
             f.field(
@@ -849,13 +960,10 @@ fn tip_section(p: &BrushSettings) -> Vec<tf::Item<BrushSettings>> {
                     |p, v| p.tip.soft_border = v,
                 )
                 .tip("How much of the radius ramps down at the edge"),
-            );
+            )
+            .field(bias);
         }
     }
-    f.field(
-        pct("sculpt_bias", "Bias", |p| p.tip.bias, |p, v| p.tip.bias = v)
-            .tip("Bends the falloff: 50 % leaves it as it is, higher makes it fuller"),
-    );
     f.items
 }
 
@@ -869,25 +977,15 @@ impl ToolFields for SculptFields {
         let Some(brush) = app.sculpt.brush else {
             return f;
         };
-        let pen_seen = crate::tablet::seen();
-        if let Some((rows, stroke)) = toolbox_rows(brush) {
-            f.section(
-                title(brush),
-                false,
-                toolbox_items(&rows, brush, p, pen_seen),
-            );
-            if !stroke.is_empty() {
-                f.section("Stroke", false, toolbox_items(&stroke, brush, p, pen_seen));
-            }
-        } else {
-            f.section(title(brush), false, brush_section(brush, p, pen_seen));
-            f.section("Stroke", false, stroke_section(brush));
-        }
-        let tip = match p.tip.kind {
-            TipKind::Smooth => "Tip: Smooth",
-            TipKind::Hard => "Tip: Hard",
+        let ctx = RowCtx {
+            pen_seen: crate::tablet::seen(),
         };
-        f.section(tip, false, tip_section(p));
+        let (rows, stroke) = toolbox_rows(brush);
+        f.section(title(brush), false, toolbox_items(&rows, brush, p, &ctx));
+        if !stroke.is_empty() {
+            f.section("Stroke", false, toolbox_items(&stroke, brush, p, &ctx));
+        }
+        f.section(tip_title(p.tip.kind), false, tip_section(p));
         f
     }
     fn publish(app: &mut Operandi, p: BrushSettings) -> std::result::Result<(), String> {
@@ -948,9 +1046,9 @@ impl Operandi {
         self.utility = None;
         self.edge_click = None;
         self.vertex_weld = false;
-        if self.editor.has_active_task() {
+        if self.editor.session.has_active_task() {
             self.run(Command::Drop);
-            if self.editor.has_active_task() {
+            if self.editor.session.has_active_task() {
                 return;
             }
         }
@@ -977,7 +1075,7 @@ impl Operandi {
     pub(super) fn keep_sculpt_exclusive(&mut self) {
         if self.sculpt.brush.is_some()
             && self.navigation.is_none()
-            && (self.editor.has_active_task()
+            && (self.editor.session.has_active_task()
                 || self.utility.is_some()
                 || self.draw.is_some()
                 || self.edge_click.is_some()

@@ -175,7 +175,7 @@ impl Editor {
     ) -> Result<()> {
         match cmd {
             Command::SolidSketchStart { options, resume } => {
-                if self.solid_sketch.is_some() {
+                if self.session.solid_sketch.is_some() {
                     return Ok(());
                 }
                 self.start_solid_sketch(options, resume)
@@ -183,7 +183,11 @@ impl Editor {
             Command::SolidSketch { edit, continuing } => self.solid_sketch_edit(edit, continuing),
             Command::Undo | Command::Redo => {
                 let undo = matches!(cmd, Command::Undo);
-                let session = self.solid_sketch.as_mut().ok_or("Solid Sketch ended")?;
+                let session = self
+                    .session
+                    .solid_sketch
+                    .as_mut()
+                    .ok_or("Solid Sketch ended")?;
                 let label = "Solid Sketch".to_string();
                 let effect = if undo {
                     match session.undo.pop() {
@@ -235,7 +239,7 @@ impl Editor {
         if self.selection_start.is_some() {
             return Err("Finish selection before Solid Sketch".into());
         }
-        if self.has_active_task() || self.i2_active() {
+        if self.session.has_active_task() || self.i2_active() {
             return Err("Finish the current task before Solid Sketch".into());
         }
         self.scene.validate()?;
@@ -288,7 +292,7 @@ impl Editor {
         // SS-SYM-08/09: a sketch with twins keeps its plane; one without
         // takes the current Symmetry setting's.
         let twin_new = twins_new_nodes(&mut sketch, mirror);
-        self.solid_sketch = Some(SketchSession {
+        self.session.solid_sketch = Some(SketchSession {
             twin_new,
             target: item.id,
             before: self.scene.clone(),
@@ -319,6 +323,7 @@ impl Editor {
 
     fn solid_sketch_edit(&mut self, edit: SketchEdit, continuing: bool) -> Result<()> {
         let session = self
+            .session
             .solid_sketch
             .as_ref()
             .ok_or("Activate Solid Sketch first")?;
@@ -443,12 +448,16 @@ impl Editor {
             next.undo.push(session.snapshot());
         }
         next.redo.clear();
-        let previous = self.solid_sketch.replace(next);
+        let previous = self.session.solid_sketch.replace(next);
         if let Err(e) = self.rebuild_solid_sketch() {
-            self.solid_sketch = previous;
+            self.session.solid_sketch = previous;
             return Err(e);
         }
-        let options = self.solid_sketch.as_ref().map(|s| s.options.clone());
+        let options = self
+            .session
+            .solid_sketch
+            .as_ref()
+            .map(|s| s.options.clone());
         if let Some(o) = options {
             self.solid_sketch_options = o;
         }
@@ -457,7 +466,11 @@ impl Editor {
 
     /// Puts base + cage into the target mesh of `self.scene`.
     fn rebuild_solid_sketch(&mut self) -> Result<()> {
-        let session = self.solid_sketch.as_ref().ok_or("Solid Sketch ended")?;
+        let session = self
+            .session
+            .solid_sketch
+            .as_ref()
+            .ok_or("Solid Sketch ended")?;
         let cage = session.sketch.cage(&session.options)?;
         let mut mesh = session.base.clone();
         crate::append_geometry(&mut mesh, cage)?;
@@ -471,13 +484,21 @@ impl Editor {
     }
 
     fn cancel_solid_sketch(&mut self) -> Result<()> {
-        let session = self.solid_sketch.take().ok_or("Solid Sketch ended")?;
+        let session = self
+            .session
+            .solid_sketch
+            .take()
+            .ok_or("Solid Sketch ended")?;
         self.scene = session.before;
         Ok(())
     }
 
     fn drop_solid_sketch(&mut self) -> Result<()> {
-        let session = self.solid_sketch.as_ref().ok_or("Solid Sketch ended")?;
+        let session = self
+            .session
+            .solid_sketch
+            .as_ref()
+            .ok_or("Solid Sketch ended")?;
         let target = session.target;
         let data = crate::solid_sketch_store::StoredSketch {
             sketch: session.sketch.clone(),
@@ -498,7 +519,11 @@ impl Editor {
             item.mesh = mesh.into();
         }
         candidate.validate()?;
-        let session = self.solid_sketch.take().ok_or("Solid Sketch ended")?;
+        let session = self
+            .session
+            .solid_sketch
+            .take()
+            .ok_or("Solid Sketch ended")?;
         if candidate == session.before {
             self.scene = candidate;
             return Ok(());

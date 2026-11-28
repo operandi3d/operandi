@@ -46,7 +46,12 @@ fn fixture(center: CenterMode) -> Editor {
     e.scene.selection.faces = vec![0, 1, 2];
     e.dispatch(Command::ActionContext(ActionContext {
         center,
-        axis: AxisOrientation::World,
+        // Local by name is Local's centre with Local's axes.
+        axis: if center == CenterMode::Local {
+            AxisOrientation::Local
+        } else {
+            AxisOrientation::World
+        },
     }))
     .unwrap();
     e
@@ -64,7 +69,7 @@ fn close(a: DVec3, b: DVec3, what: &str) {
 /// Runs `tool` with `delta` and returns the world points after.
 fn run(e: &mut Editor, tool: Tool, delta: DVec3) -> Vec<DVec3> {
     e.dispatch(Command::Activate(tool)).unwrap();
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     p.delta = delta;
     e.dispatch(Command::Preview(p)).unwrap();
     e.dispatch(Command::Drop).unwrap();
@@ -84,7 +89,13 @@ fn selection_centres_on_the_item_space_box() {
     let want = w.transform_point3(DVec3::new(2.5, 0.5, 0.5));
     e.dispatch(Command::Activate(Tool::Rotate)).unwrap();
     close(
-        e.live.as_ref().unwrap().action_frame.unwrap().center,
+        e.session
+            .live
+            .as_ref()
+            .unwrap()
+            .action_frame
+            .unwrap()
+            .center,
         want,
         "frame centre",
     );
@@ -105,22 +116,27 @@ fn selection_centres_on_the_item_space_box() {
     let mut e = fixture(CenterMode::SelectionAutoAxis);
     e.dispatch(Command::Activate(Tool::Rotate)).unwrap();
     close(
-        e.live.as_ref().unwrap().action_frame.unwrap().center,
+        e.session
+            .live
+            .as_ref()
+            .unwrap()
+            .action_frame
+            .unwrap()
+            .center,
         want,
         "auto axis centre",
     );
 }
 
-/// The frame a Local piece should use: its item-space box middle, Y along
-/// its world normal and X along the item's X (ACL-02/03: both fixture
-/// islands' principal direction nearest item X, or a tie), Z = X × Y.
+/// The frame a Local piece should use (A-LOCAL): its item-space box
+/// middle, Z along its world normal and X along the item's X (both fixture
+/// islands' principal direction nearest item X, or a tie), Y = Z × X.
 fn piece_frame(w: DMat4, lo: DVec3, hi: DVec3, normal: DVec3) -> (DVec3, DMat3) {
-    let y = (DMat3::from_mat4(w) * normal).normalize();
-    let z = (DMat3::from_mat4(w) * DVec3::X).cross(y).normalize();
-    let x = y.cross(z).normalize();
+    let z = (DMat3::from_mat4(w) * normal).normalize();
+    let y = z.cross(DMat3::from_mat4(w) * DVec3::X).normalize();
     (
         w.transform_point3((lo + hi) / 2.),
-        DMat3::from_cols(x, y, x.cross(y).normalize()),
+        DMat3::from_cols(y.cross(z), y, z),
     )
 }
 
@@ -199,7 +215,7 @@ fn local_with_symmetry_mirrors_each_islands_frame() {
     e.scene.selection.faces = vec![0, 1, 2, 3];
     e.dispatch(Command::ActionContext(ActionContext {
         center: CenterMode::Local,
-        axis: AxisOrientation::World,
+        axis: AxisOrientation::Local,
     }))
     .unwrap();
     e.symmetry.axis = Some(0);

@@ -168,27 +168,27 @@ fn rotation_snap_angle_steps_a_ctrl_rotate_drag() {
     let (mut a, _) = moving_cube();
     a.run(Command::Activate(Tool::Rotate));
     let r = a.viewport_rect;
-    let base = a.editor.live.as_ref().unwrap().params.clone();
+    let base = a.editor.session.live.as_ref().unwrap().params.clone();
     let center = a.camera.project(DVec3::ZERO, r).unwrap().0;
     let start = center + vec2(80., 0.);
     let end = center + vec2(80., 27.);
     a.handle_constrain = true;
     a.update_handle(1, base.clone(), start, end, Tool::Rotate, r);
-    let snapped = a.editor.live.as_ref().unwrap().params.delta[1];
+    let snapped = a.editor.session.live.as_ref().unwrap().params.delta[1];
     assert!(
         snapped != 0. && (snapped / 15.).fract().abs() < 1e-9,
         "{snapped}"
     );
     a.handle_preferences.rotation_snap = 5.;
     a.update_handle(1, base.clone(), start, end, Tool::Rotate, r);
-    let fine = a.editor.live.as_ref().unwrap().params.delta[1];
+    let fine = a.editor.session.live.as_ref().unwrap().params.delta[1];
     assert!(
         (fine / 5.).fract().abs() < 1e-9 && fine != snapped,
         "{fine}"
     );
     a.handle_constrain = false;
     a.update_handle(1, base, start, end, Tool::Rotate, r);
-    let free = a.editor.live.as_ref().unwrap().params.delta[1];
+    let free = a.editor.session.live.as_ref().unwrap().params.delta[1];
     assert!((free / 5.).fract().abs() > 1e-6, "{free}");
 }
 

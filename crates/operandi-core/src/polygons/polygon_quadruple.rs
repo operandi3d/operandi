@@ -95,8 +95,8 @@ impl Editor {
         };
         let faces = &self.scene.selection.faces;
         !self.i2_active()
-            && self.pen_draft.is_none()
-            && self.live.is_none()
+            && self.session.pen_draft.is_none()
+            && self.session.live.is_none()
             && self.selection_start.is_none()
             && self.scene.selection.mode == Mode::Polygon
             && !faces.is_empty()
@@ -113,7 +113,7 @@ impl Editor {
         if self.i2_active() {
             return Err("Finish or Cancel Extrude before Quadruple".into());
         }
-        if self.pen_draft.is_some() {
+        if self.session.pen_draft.is_some() {
             return Err("Finish or Cancel Pen before Quadruple".into());
         }
         self.require_idle()?;

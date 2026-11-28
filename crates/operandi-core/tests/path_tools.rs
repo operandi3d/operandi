@@ -70,9 +70,9 @@ fn extrude_preset(points: Vec<DVec3>, steps: u32) -> PathTool {
 
 fn run(e: &mut Editor, tool: Tool, set: impl FnOnce(&mut DuplicateParameters)) {
     e.dispatch(Command::Activate(tool)).unwrap();
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     set(&mut p.duplicate);
-    e.tweak_held = true;
+    e.session.tweak_held = true;
     e.dispatch(Command::Preview(p)).unwrap();
     e.end_tweak();
     e.dispatch(Command::Drop).unwrap();
@@ -407,7 +407,7 @@ fn shared_empty_selection_cancel_undo_and_reopen() {
     let mut e = editor(quad_at(DVec3::ZERO), Mode::Polygon);
     let before = mesh(&e).clone();
     e.dispatch(Command::Activate(Tool::CurveExtrude)).unwrap();
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     p.duplicate.curve_extrude = extrude_preset(path3(), 4);
     assert!(e.dispatch(Command::Preview(p)).is_err() || mesh(&e) == &before);
     e.dispatch(Command::Cancel).unwrap();
@@ -430,7 +430,14 @@ fn shared_empty_selection_cancel_undo_and_reopen() {
     assert_eq!(mesh(&e), &before);
     // The path isn't kept for the next session; the options are.
     e.dispatch(Command::Activate(Tool::CurveExtrude)).unwrap();
-    let p = &e.live.as_ref().unwrap().params.duplicate.curve_extrude;
+    let p = &e
+        .session
+        .live
+        .as_ref()
+        .unwrap()
+        .params
+        .duplicate
+        .curve_extrude;
     assert!(p.curve.points.is_empty());
     assert_eq!(p.steps.number, 4);
 }
@@ -479,12 +486,12 @@ fn ce9_pen_extrude_makes_one_section_per_point_turned_along_the_path() {
     e.dispatch(Command::ActivatePreset("PenExtrude".into()))
         .unwrap();
     assert_eq!(e.live_tool_label(), Some("Pen Extrude"));
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     let t = &p.duplicate.curve_extrude;
     assert_eq!(t.curve.kind, PathKind::Pen);
     assert!(!t.sweep.cap_start && t.sweep.cap_end);
     p.duplicate.curve_extrude.curve.points = path3();
-    e.tweak_held = true;
+    e.session.tweak_held = true;
     e.dispatch(Command::Preview(p)).unwrap();
     e.end_tweak();
     e.dispatch(Command::Drop).unwrap();

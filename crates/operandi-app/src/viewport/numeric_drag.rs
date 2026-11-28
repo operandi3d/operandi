@@ -14,13 +14,13 @@ const BRIDGE_DRAG_SEGMENTS: f32 = 64.;
 impl Operandi {
     /// Start the drag for whichever numeric session is armed.
     pub(crate) fn begin_numeric_drag(&mut self, pos: Pos2, r: Rect) -> input::GestureKind {
-        if let Some(spike) = &self.editor.spike {
+        if let Some(spike) = &self.editor.session.spike {
             return input::GestureKind::Numeric(NumericDrag::Spike(spike.requested));
         }
-        if let Some(bridge) = &self.editor.bridge {
+        if let Some(bridge) = &self.editor.session.bridge {
             return input::GestureKind::Numeric(NumericDrag::Bridge(bridge.requested));
         }
-        if let Some(reduction) = &self.editor.reduction {
+        if let Some(reduction) = &self.editor.session.reduction {
             // The press initializes from the selected mesh (RED-002's
             // stationary release still works: it finds it initialized).
             if !reduction.initialized() {
@@ -29,7 +29,7 @@ impl Operandi {
                 }
                 self.status = self.reduction_status();
             }
-            let Some(session) = &self.editor.reduction else {
+            let Some(session) = &self.editor.session.reduction else {
                 return input::GestureKind::Blocked;
             };
             let Some(count) = session.source.as_ref().map(|s| s.count) else {
@@ -37,7 +37,7 @@ impl Operandi {
             };
             return input::GestureKind::Numeric(NumericDrag::Reduction(session.parameters, count));
         }
-        if self.editor.shape.is_some() {
+        if self.editor.session.shape.is_some() {
             let plane = self.actual_plane();
             return match self.work_point(pos, r, plane, self.workplane_center()) {
                 Some(anchor) if self.tube_points().is_some() => {
@@ -70,6 +70,7 @@ impl Operandi {
                 let strength = base - d.y as f64 * 0.01;
                 if self
                     .editor
+                    .session
                     .spike
                     .as_ref()
                     .is_some_and(|s| s.requested != strength)
@@ -84,6 +85,7 @@ impl Operandi {
                     as u32;
                 if self
                     .editor
+                    .session
                     .bridge
                     .as_ref()
                     .is_some_and(|b| b.requested.segments != segments)
@@ -101,6 +103,7 @@ impl Operandi {
                     .clamp(1., *count as f64) as u32;
                 if self
                     .editor
+                    .session
                     .reduction
                     .as_ref()
                     .is_some_and(|s| s.parameters.number != number)
@@ -131,7 +134,7 @@ impl Operandi {
 
     /// The live Tube's control points, when the shape session is a Tube.
     fn tube_points(&self) -> Option<&[DVec3]> {
-        match &self.editor.shape.as_ref()?.requested {
+        match &self.editor.session.shape.as_ref()?.requested {
             ShapeParameters::Tube(t) => Some(&t.points),
             _ => None,
         }
@@ -159,7 +162,7 @@ impl Operandi {
     }
 
     fn set_tube_points(&mut self, edit: impl FnOnce(&mut Vec<DVec3>)) {
-        let Some(session) = &self.editor.shape else {
+        let Some(session) = &self.editor.session.shape else {
             return;
         };
         let mut p = session.requested.clone();
@@ -263,7 +266,7 @@ impl Operandi {
         if size < 1e-6 {
             return;
         }
-        let Some(session) = &self.editor.shape else {
+        let Some(session) = &self.editor.session.shape else {
             return;
         };
         let normal = match plane {

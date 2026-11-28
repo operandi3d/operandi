@@ -13,7 +13,7 @@ fn live_cylinder() -> Operandi {
     let mut a = Operandi::empty();
     a.run(Command::NewMesh);
     a.activate(Tool::Cylinder);
-    let mut p = a.editor.live.as_ref().unwrap().params.clone();
+    let mut p = a.editor.session.live.as_ref().unwrap().params.clone();
     p.radial = Some(operandi_core::RadialParameters {
         radius: DVec3::new(0.5, 0.75, 0.5),
         sides: 12,
@@ -58,7 +58,7 @@ fn a_falloff_handle_drag_reshapes_the_live_cylinder_and_keeps_the_tool() {
         ..Default::default()
     };
     a.run(Command::SpatialFalloff(Some(field.into())));
-    assert!(a.editor.live.is_some(), "{}", a.status);
+    assert!(a.editor.session.live.is_some(), "{}", a.status);
     let shaped = a.editor.scene.active().unwrap().mesh.vertices.clone();
     let handles = a.falloff_handles(r);
     let (at, _) = handles[0];
@@ -69,8 +69,8 @@ fn a_falloff_handle_drag_reshapes_the_live_cylinder_and_keeps_the_tool() {
         "the falloff's Start is pickable"
     );
     a.drag_falloff(0, field.into(), q, q + vec2(0., -80.), r);
-    assert!(a.editor.live.is_some(), "still the Cylinder tool");
-    assert_eq!(a.editor.live.as_ref().unwrap().tool, Tool::Cylinder);
+    assert!(a.editor.session.live.is_some(), "still the Cylinder tool");
+    assert_eq!(a.editor.session.live.as_ref().unwrap().tool, Tool::Cylinder);
     assert_ne!(
         a.editor.scene.active().unwrap().mesh.vertices,
         shaped,
@@ -91,7 +91,7 @@ fn the_falloff_section_starts_folded_and_greys_without_a_usable_falloff() {
     a.run(Command::SpatialFalloff(Some(
         operandi_core::Falloff::Selection(SelectionFalloff::default()),
     )));
-    assert!(a.editor.live.is_some());
+    assert!(a.editor.session.live.is_some());
     assert!(
         falloff_section(&a).1.iter().all(|on| !on),
         "Selection: greyed"
@@ -110,7 +110,11 @@ fn armed_torus() -> Operandi {
         operandi_core::ShapeParameters::Torus(t),
     ));
     assert!(
-        a.editor.shape.as_ref().is_some_and(|s| s.preview.is_some()),
+        a.editor
+            .session
+            .shape
+            .as_ref()
+            .is_some_and(|s| s.preview.is_some()),
         "{}",
         a.status
     );
@@ -118,6 +122,7 @@ fn armed_torus() -> Operandi {
 }
 fn torus_preview(a: &Operandi) -> Vec<DVec3> {
     a.editor
+        .session
         .shape
         .as_ref()
         .unwrap()
@@ -139,7 +144,7 @@ fn a_falloff_handle_drag_reshapes_the_open_torus_and_keeps_the_tool() {
         ..Default::default()
     };
     a.run(Command::SpatialFalloff(Some(field.into())));
-    assert!(a.editor.shape.is_some(), "{}", a.status);
+    assert!(a.editor.session.shape.is_some(), "{}", a.status);
     let shaped = torus_preview(&a);
     assert_ne!(shaped, plain, "the falloff shapes the preview");
     let (at, _) = a.falloff_handles(r)[0];
@@ -150,7 +155,7 @@ fn a_falloff_handle_drag_reshapes_the_open_torus_and_keeps_the_tool() {
         "the falloff's Start is pickable"
     );
     a.drag_falloff(0, field.into(), q, q + vec2(0., -80.), r);
-    assert!(a.editor.shape.is_some(), "still the Torus tool");
+    assert!(a.editor.session.shape.is_some(), "still the Torus tool");
     assert_ne!(torus_preview(&a), shaped, "the preview follows the drag");
 }
 

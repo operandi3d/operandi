@@ -102,7 +102,7 @@ fn pair(symmetry: Symmetry, center: CenterMode) -> Editor {
 }
 
 fn frame(e: &Editor) -> ActionFrame {
-    e.live.as_ref().unwrap().action_frame.unwrap()
+    e.session.live.as_ref().unwrap().action_frame.unwrap()
 }
 fn points(e: &Editor) -> Vec<DVec3> {
     e.scene.active().unwrap().mesh.vertices.to_vec()
@@ -116,7 +116,7 @@ fn same_axes(got: DMat3, want: DMat3, what: &str) {
     close(got.z_axis, want.z_axis, &format!("{what}, Z"));
 }
 fn preview(e: &mut Editor, delta: DVec3) {
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     p.delta = delta;
     e.dispatch(Command::Preview(p)).unwrap();
 }
@@ -445,7 +445,7 @@ fn border_centre(mesh: Mesh, mode: Mode, select: impl FnOnce(&mut Selection)) ->
     // The tool really scales about it.
     let before = points(&e);
     preview(&mut e, DVec3::splat(0.5));
-    let moved = transform_vertices(&e.live.as_ref().unwrap().base).unwrap();
+    let moved = transform_vertices(&e.session.live.as_ref().unwrap().base).unwrap();
     for &v in &moved {
         let v = v as usize;
         close(

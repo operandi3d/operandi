@@ -462,7 +462,7 @@ fn lay83_find_form_jumps_to_the_clicked_buttons_form_without_running_it() {
     let c = &form(&a, &id).controls[index.unwrap()];
     assert!(c.form.is_some(), "the row holding Cube");
     assert!(
-        a.editor.live.is_none() && a.editor.shape.is_none(),
+        a.editor.session.live.is_none() && a.editor.session.shape.is_none(),
         "Cube didn't start"
     );
     assert!(a.palette_open(crate::form_editor::PALETTE));

@@ -102,10 +102,13 @@ fn move_offset_scrubs_live_and_each_drag_undoes_alone() {
     release(&mut a, &ctx, pos);
     // The scrub is one tweak of Move, recorded when Move drops.
     assert_eq!(a.editor.history.undo.len(), history);
-    assert!(a.editor.tweaks.can_undo());
+    assert!(a.editor.session.tweaks.can_undo());
     assert!((top_y(&a) - before_y - 0.5).abs() < 1e-9);
-    assert_eq!(a.editor.live.as_ref().unwrap().tool, Tool::Move);
-    assert_eq!(a.editor.live.as_ref().unwrap().params.delta, DVec3::ZERO);
+    assert_eq!(a.editor.session.live.as_ref().unwrap().tool, Tool::Move);
+    assert_eq!(
+        a.editor.session.live.as_ref().unwrap().params.delta,
+        DVec3::ZERO
+    );
     assert!(a.scrub.is_none());
     // A second drag is a second step; Undo takes back only that one.
     let at = start_scrub(&mut a, &ctx, "delta1");
@@ -163,13 +166,13 @@ fn escape_puts_the_value_back() {
     a.editor.scene.selection.faces = vec![5];
     a.activate(Tool::Bevel);
     a.run(Command::Preview(
-        a.editor.live.as_ref().unwrap().params.clone(),
+        a.editor.session.live.as_ref().unwrap().params.clone(),
     ));
-    let start = a.editor.live.as_ref().unwrap().params.shift;
+    let start = a.editor.session.live.as_ref().unwrap().params.shift;
     let history = a.editor.history.undo.len();
     let at = start_scrub(&mut a, &ctx, "shift");
     move_to(&mut a, &ctx, at + vec2(25., 0.), Modifiers::NONE);
-    assert!((a.editor.live.as_ref().unwrap().params.shift - start - 0.25).abs() < 1e-9);
+    assert!((a.editor.session.live.as_ref().unwrap().params.shift - start - 0.25).abs() < 1e-9);
     frame(
         &mut a,
         &ctx,
@@ -177,13 +180,13 @@ fn escape_puts_the_value_back() {
         Modifiers::NONE,
     );
     assert_eq!(
-        a.editor.live.as_ref().unwrap().tool,
+        a.editor.session.live.as_ref().unwrap().tool,
         Tool::Bevel,
         "Escape didn't cancel the tool"
     );
-    assert_eq!(a.editor.live.as_ref().unwrap().params.shift, start);
+    assert_eq!(a.editor.session.live.as_ref().unwrap().params.shift, start);
     move_to(&mut a, &ctx, at + vec2(60., 0.), Modifiers::NONE);
-    assert_eq!(a.editor.live.as_ref().unwrap().params.shift, start);
+    assert_eq!(a.editor.session.live.as_ref().unwrap().params.shift, start);
     release(&mut a, &ctx, at + vec2(60., 0.));
     assert_eq!(a.editor.history.undo.len(), history);
     assert_eq!(a.fields["shift"], workspace::number_text(start, " m"));
@@ -199,7 +202,7 @@ fn counts_step_whole_numbers_and_stop_at_the_limit() {
     a.editor.scene.selection.faces = vec![5];
     a.activate(Tool::Bevel);
     a.run(Command::Preview(
-        a.editor.live.as_ref().unwrap().params.clone(),
+        a.editor.session.live.as_ref().unwrap().params.clone(),
     ));
     a.fields.insert("inset".into(), "0.1 m".into());
     assert!(a.confirm_fields());
@@ -207,14 +210,44 @@ fn counts_step_whole_numbers_and_stop_at_the_limit() {
     let segments = || "bevel_segments";
     let at = start_scrub(&mut a, &ctx, segments());
     move_to(&mut a, &ctx, at + vec2(10., 0.), Modifiers::NONE);
-    assert_eq!(a.editor.live.as_ref().unwrap().params.bevel.segments, 3);
+    assert_eq!(
+        a.editor
+            .session
+            .live
+            .as_ref()
+            .unwrap()
+            .params
+            .bevel
+            .segments,
+        3
+    );
     assert_eq!(a.fields[segments()], "3");
     move_to(&mut a, &ctx, at + vec2(-200., 0.), Modifiers::NONE);
-    assert_eq!(a.editor.live.as_ref().unwrap().params.bevel.segments, 1);
+    assert_eq!(
+        a.editor
+            .session
+            .live
+            .as_ref()
+            .unwrap()
+            .params
+            .bevel
+            .segments,
+        1
+    );
     assert_eq!(a.fields[segments()], "1");
     assert!(a.field_errors.is_empty(), "{:?}", a.field_errors);
     move_to(&mut a, &ctx, at + vec2(-195., 0.), Modifiers::NONE);
-    assert_eq!(a.editor.live.as_ref().unwrap().params.bevel.segments, 2);
+    assert_eq!(
+        a.editor
+            .session
+            .live
+            .as_ref()
+            .unwrap()
+            .params
+            .bevel
+            .segments,
+        2
+    );
     release(&mut a, &ctx, at + vec2(-195., 0.));
     assert_eq!(a.editor.history.undo.len(), history);
     a.run(Command::Drop);
@@ -223,6 +256,6 @@ fn counts_step_whole_numbers_and_stop_at_the_limit() {
         history + 1,
         "{} live={:?}",
         a.status,
-        a.editor.live.as_ref().map(|l| l.tool)
+        a.editor.session.live.as_ref().map(|l| l.tool)
     );
 }

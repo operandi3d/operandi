@@ -277,7 +277,8 @@ pub struct PaletteInfo {
     pub hash: String,
     /// The window's size the first time it opens, in points (LAY-51).
     pub size: [f32; 2],
-    /// The window stays above the main window.
+    /// Older files' "stays above the main window". Read and kept, but every
+    /// floating window now stays above the main window (UIC-189).
     #[serde(default, skip_serializing_if = "is_false")]
     pub on_top: bool,
 }

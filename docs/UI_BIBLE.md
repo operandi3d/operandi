@@ -918,6 +918,11 @@ Added 2026-11-14, the maintainer's OK.
   Its place is kept per view as a fraction of the view, clamped inside it,
   as layout state (UIC-73), not scene data. Changes in it apply live, one
   undo step each (UIC-182). [OP]
+- **UIC-189** **Floating windows stay above the main window** (the
+  maintainer, 2026-11-27). A floating window (UIC-183), including Preview
+  and Render, stays in front of Operandi's main window, so clicking the
+  main window never buries it. It stays above Operandi only, not above
+  other apps. [OP]
 
 ## 14. Layouts
 
@@ -1195,5 +1200,5 @@ Added 2026-11-23. *Applies from: when the guide skeleton merges.*
 1 General UIC-01..07 · 2 Menus/layouts UIC-10..19 · 3 Tabs/buttons
 UIC-20..27 · 4 Lists/trees UIC-30..42 · 5 Fields UIC-50..59 · 6 Popovers
 UIC-60..66 · 7 Viewports/windows UIC-70..78 · 8 Dialogs UIC-80..99 · 9 Property
-panels UIC-100..126 · 10 Tree lists UIC-130..157 · 11 Commands UIC-160..165 · 12 Rendering UIC-170..174 · 13 Popovers vs floating windows UIC-180..188 · 14 Layouts UIC-190..219 · 15 Command history and macros UIC-220..239 · 16 Future doors UIC-240..259 · 18 User Guide UIC-300..305. Gaps in numbering are left for
+panels UIC-100..126 · 10 Tree lists UIC-130..157 · 11 Commands UIC-160..165 · 12 Rendering UIC-170..174 · 13 Popovers vs floating windows UIC-180..189 · 14 Layouts UIC-190..219 · 15 Command history and macros UIC-220..239 · 16 Future doors UIC-240..259 · 18 User Guide UIC-300..305. Gaps in numbering are left for
 later rules in the same topic; never renumber an existing rule.

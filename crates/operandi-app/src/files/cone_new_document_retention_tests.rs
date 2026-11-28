@@ -91,12 +91,12 @@ fn old_document() -> Operandi {
 fn apply_and_drop_cone(a: &mut Operandi) {
     a.execute("Cone");
     assert_eq!(
-        a.editor.cone.as_ref().unwrap().target,
+        a.editor.session.cone.as_ref().unwrap().target,
         5,
         "the second mesh, after the camera, light and environment"
     );
     let want = requested();
-    let mut choices = a.editor.cone.as_ref().unwrap().requested.clone();
+    let mut choices = a.editor.session.cone.as_ref().unwrap().requested.clone();
     choices.axis = want.axis;
     choices.polygon = want.polygon;
     choices.bottom_cap = want.bottom_cap;
@@ -119,11 +119,11 @@ fn apply_and_drop_cone(a: &mut Operandi) {
         a.fields.insert(key.into(), value.into());
     }
     assert!(a.confirm_fields(), "{}", a.status);
-    assert_eq!(a.editor.cone.as_ref().unwrap().requested, want);
+    assert_eq!(a.editor.session.cone.as_ref().unwrap().requested, want);
     a.execute("Apply");
     assert!(!a.editor.scene.items[4].mesh.faces.is_empty());
     a.execute("Drop");
-    assert!(a.editor.cone.is_none());
+    assert!(a.editor.session.cone.is_none());
     assert_eq!(
         *a.editor.presets.get::<operandi_core::ConePreset>(),
         want,
@@ -147,8 +147,11 @@ fn assert_clean_new_document(a: &Operandi) {
     assert!(!a.dirty());
     assert!(a.path.is_none());
     assert!(a.editor.history.undo.is_empty() && a.editor.history.redo.is_empty());
-    assert!(a.editor.live.is_none());
-    assert!(a.editor.cone.is_none(), "no old Cone session or preview");
+    assert!(a.editor.session.live.is_none());
+    assert!(
+        a.editor.session.cone.is_none(),
+        "no old Cone session or preview"
+    );
 }
 
 #[test]
@@ -172,7 +175,7 @@ fn file_new_discard_retains_pure_cone_attributes_only() {
 
     // Reactivate on the new first mesh and read the panel's own widgets.
     a.execute("Cone");
-    let session = a.editor.cone.as_ref().expect("Cone armed");
+    let session = a.editor.session.cone.as_ref().expect("Cone armed");
     assert_eq!(session.target, 1);
     assert_eq!(session.requested, retained);
     assert!(session.preview.is_none() && session.error.is_none());
@@ -301,7 +304,7 @@ fn active_settings() -> ConeParameters {
 
 /// Choices through ConfigureCone, numbers through panel field confirmation.
 fn configure_active_cone(a: &mut Operandi, want: &ConeParameters) {
-    let mut choices = a.editor.cone.as_ref().unwrap().requested.clone();
+    let mut choices = a.editor.session.cone.as_ref().unwrap().requested.clone();
     choices.axis = want.axis;
     choices.polygon = want.polygon;
     choices.bottom_cap = want.bottom_cap;
@@ -326,7 +329,7 @@ fn configure_active_cone(a: &mut Operandi, want: &ConeParameters) {
         a.fields.insert(key.into(), value.to_string());
     }
     assert!(a.confirm_fields(), "{}", a.status);
-    let session = a.editor.cone.as_ref().unwrap();
+    let session = a.editor.session.cone.as_ref().unwrap();
     assert_eq!(&session.requested, want);
     assert!(session.preview.is_some() && session.error.is_none());
 }
@@ -342,7 +345,7 @@ fn new_beside(a: &mut Operandi) {
 /// buttons and Min/Max are checked through parameters only, not display.
 fn assert_reactivated_panel(a: &mut Operandi, ctx: &Context, want: &ConeParameters) {
     a.execute("Cone");
-    let session = a.editor.cone.as_ref().expect("Cone armed");
+    let session = a.editor.session.cone.as_ref().expect("Cone armed");
     assert_eq!(session.target, 1);
     assert_eq!(&session.requested, want);
     assert!(session.preview.is_none() && session.error.is_none());
@@ -466,7 +469,7 @@ fn applied_active_cone_discard_retains_current_not_dropped_settings() {
     };
     configure_active_cone(&mut a, &want);
     a.execute("Apply");
-    assert!(a.editor.cone.is_some(), "Apply keeps Cone active");
+    assert!(a.editor.session.cone.is_some(), "Apply keeps Cone active");
     assert_eq!(
         *a.editor.presets.get::<operandi_core::ConePreset>(),
         requested()
@@ -494,5 +497,5 @@ fn applied_active_cone_discard_retains_current_not_dropped_settings() {
     a.run(Command::Drop);
     assert!(a.switch_scene(0));
     assert_eq!(a.editor.scene, scene);
-    assert_eq!(a.editor.cone.as_ref().unwrap().requested, want);
+    assert_eq!(a.editor.session.cone.as_ref().unwrap().requested, want);
 }

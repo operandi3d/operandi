@@ -141,6 +141,11 @@ pub(crate) struct State {
     pub window: egui::Vec2,
     /// Where the user dragged it (top-left); `None` = beside its button.
     pub place: Option<Pos2>,
+    /// It was drawn open last frame, so a frame drawn open without it is
+    /// the one it opened on.
+    shown: bool,
+    /// The search field takes the keyboard on the next draw.
+    focus_search: bool,
 }
 impl Default for State {
     fn default() -> Self {
@@ -163,6 +168,8 @@ impl Default for State {
             selected: None,
             window: vec2(450., 600.),
             place: None,
+            shown: false,
+            focus_search: false,
         }
     }
 }
@@ -214,9 +221,18 @@ impl State {
             self.go(c, now[..now.len() - 1].to_vec());
         }
     }
+    /// The browser opened: the search row shows with the keyboard in its
+    /// field, so typing goes straight into the search (AB-11.2). The filter
+    /// toggle still hides it afterwards.
+    pub(crate) fn opened(&mut self) {
+        self.filter = true;
+        self.focus_search = true;
+    }
     /// Closing clears the search (AB-23).
     pub(crate) fn close(&mut self) {
         self.open = false;
+        self.shown = false;
+        self.focus_search = false;
         let s = std::mem::take(&mut self.search);
         if !s.trim().is_empty() {
             self.recent.retain(|r| r != &s);
@@ -274,7 +290,12 @@ pub(crate) fn show(
 ) -> Outcome {
     let mut out = Outcome::default();
     if !state.open {
+        state.shown = false;
         return out;
+    }
+    if !state.shown {
+        state.shown = true;
+        state.opened();
     }
     // AB-10: to the side of the button, kept on screen.
     let screen = ctx.content_rect();
@@ -320,6 +341,9 @@ pub(crate) fn show(
             state.place = Some(rect.min);
         }
         crate::popup_title::TitleAction::Drag(delta) => {
+            // #60: a drag pins it too, so it stays where it is dropped
+            // (UIC-185: only a pinned popover moves).
+            state.pinned = true;
             state.place = Some(state.place.unwrap_or(rect.min) + delta);
         }
         crate::popup_title::TitleAction::None => {}
@@ -389,6 +413,7 @@ fn body(ui: &mut Ui, c: &Catalog, s: &mut State, out: &mut Outcome) {
                     .on_hover_text("Show the search row");
                 if f.clicked() {
                     s.filter ^= true;
+                    s.focus_search = s.filter;
                 }
             });
         });
@@ -424,6 +449,9 @@ fn body(ui: &mut Ui, c: &Catalog, s: &mut State, out: &mut Outcome) {
                         }
                     }
                 });
+            }
+            if std::mem::take(&mut s.focus_search) {
+                field.request_focus();
             }
             record("search", field.rect);
             crate::numeric_tab::register(ui, &field, Some(&s.search));
@@ -934,5 +962,50 @@ mod tests {
         s.open = true;
         s.close();
         assert!(s.search.is_empty() && s.recent == ["cube"]);
+    }
+
+    #[test]
+    fn ab_11_2_opening_shows_the_search_row_with_the_keyboard_in_it() {
+        let c = catalog();
+        let ctx = egui::Context::default();
+        let mut s = State {
+            filter: false,
+            ..Default::default()
+        };
+        let frame = |s: &mut State, events: Vec<egui::Event>| {
+            let input = egui::RawInput {
+                screen_rect: Some(Rect::from_min_size(Pos2::ZERO, vec2(1200., 900.))),
+                events,
+                ..Default::default()
+            };
+            let _ = ctx.run(input, |ctx| {
+                show(
+                    ctx,
+                    "test",
+                    "Add",
+                    Rect::from_min_size(Pos2::ZERO, vec2(10., 10.)),
+                    &c,
+                    s,
+                );
+            });
+        };
+        s.open = true;
+        frame(&mut s, vec![]);
+        assert!(s.filter, "the search row shows");
+        // Typing goes straight into the search field.
+        frame(&mut s, vec![egui::Event::Text("cu".into())]);
+        assert_eq!(s.search, "cu");
+        // The filter toggle still hides the row, and closing clears it.
+        s.filter = false;
+        frame(&mut s, vec![egui::Event::Text("x".into())]);
+        assert_eq!(s.search, "cu");
+        s.close();
+        assert!(s.search.is_empty());
+        // Opened again: the row is back, with the keyboard.
+        s.open = true;
+        frame(&mut s, vec![]);
+        frame(&mut s, vec![egui::Event::Text("b".into())]);
+        assert!(s.filter);
+        assert_eq!(s.search, "b");
     }
 }

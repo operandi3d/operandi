@@ -51,7 +51,7 @@ fn near(a: DVec3, b: DVec3) -> bool {
 fn run_tool(tool: Tool, points: Vec<u32>, edit: impl Fn(&mut Parameters)) -> Editor {
     let mut e = editor(points);
     e.dispatch(Command::Activate(tool)).unwrap();
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     edit(&mut p);
     e.dispatch(Command::Preview(p))
         .unwrap_or_else(|err| panic!("{tool:?}: {err}"));

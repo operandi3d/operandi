@@ -59,7 +59,7 @@ fn drag(a: &mut Operandi, ctx: &Context, from: Pos2, to: Pos2) {
 }
 
 fn live_params(a: &Operandi) -> Parameters {
-    a.editor.live.as_ref().unwrap().params.clone()
+    a.editor.session.live.as_ref().unwrap().params.clone()
 }
 
 fn close(a: DVec3, b: DVec3) -> bool {

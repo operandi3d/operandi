@@ -32,8 +32,10 @@ fn shade(pixel:vec4<f32>)->Shaded {
  let minor=lattice(p,footprint,grid.eye.w);
  let major=lattice(p,footprint,grid.eye.w*5.);
  let coarse=lattice(p,footprint,grid.eye.w*25.);
- // view.y: Draw Faded Grid (1 fades with distance, 0 doesn't).
- let fade=select(1.,1.-smoothstep(grid.up.w*6.,grid.up.w*35.,length(point-grid.eye.xyz)),grid.view.y>0.5);
+ // view.y: Draw Faded Grid (1 fades with distance, 0 doesn't). up.w is
+ // the focus distance: the fade runs from one to four of them (#58: from
+ // six to 35 it began past where the grid shows, so it did nothing).
+ let fade=select(1.,1.-smoothstep(grid.up.w*1.,grid.up.w*4.,length(point-grid.eye.xyz)),grid.view.y>0.5);
  var alpha=max(minor*0.16,max(major*0.32,coarse*0.44))*fade*grid.options.x*grid.options.z;
  var premultiplied=grid.color.rgb*alpha;
  if grid.color.w>0.5 {

@@ -146,7 +146,7 @@ impl Editor {
     /// The meshes a one-shot command runs on, or `None` for the ordinary
     /// single-mesh path.
     pub(crate) fn command_mesh_targets(&self, cmd: &Command) -> Option<Vec<u64>> {
-        if self.has_active_task() || self.selection_start.is_some() {
+        if self.session.has_active_task() || self.selection_start.is_some() {
             return None;
         }
         let component_mode = self.scene.selection.mode != Mode::Item;
@@ -294,7 +294,7 @@ impl Editor {
             sole.handle_activate(tool)
                 .map_err(|e| format!("{}: {e}", self.scene.mesh_name(id)))?;
             if first.is_none() {
-                first = sole.live.take();
+                first = sole.session.live.take();
             }
         }
         let mut live = first.ok_or("Select a mesh")?;
@@ -306,9 +306,15 @@ impl Editor {
             live.action_frame = Some(Self::extrude_frame(self.action_context, tool, &self.scene)?);
         }
         self.scene = live.base.clone();
-        self.live = Some(live);
+        self.session.live = Some(live);
         if tool.shows_result_at_once() {
-            let p = self.live.as_ref().ok_or("No active tool")?.params.clone();
+            let p = self
+                .session
+                .live
+                .as_ref()
+                .ok_or("No active tool")?
+                .params
+                .clone();
             self.preview(p, false)?;
         }
         Ok(())
@@ -322,10 +328,20 @@ impl Editor {
         p: Parameters,
         apply: bool,
     ) -> Result<()> {
-        let base = self.live.as_ref().ok_or("No active tool")?.base.clone();
+        let base = self
+            .session
+            .live
+            .as_ref()
+            .ok_or("No active tool")?
+            .base
+            .clone();
         let mut selection = base.selection.clone();
         let mut scene = base.clone();
-        let extrude = self.live.as_ref().is_some_and(|l| l.tool == Tool::Extrude);
+        let extrude = self
+            .session
+            .live
+            .as_ref()
+            .is_some_and(|l| l.tool == Tool::Extrude);
         let mut caps = MultiExtrude {
             previews: self
                 .multi_extrude
@@ -340,7 +356,7 @@ impl Editor {
                 // (and the identities it observes) matches the last one's.
                 let mut sole = scene.clone();
                 sole.selection = base.selection.sole(id);
-                let live = self.live.as_mut().ok_or("No active tool")?;
+                let live = self.session.live.as_mut().ok_or("No active tool")?;
                 live.base = sole;
                 if extrude {
                     live.identity_preview = caps.previews.remove(&id).flatten();
@@ -349,7 +365,7 @@ impl Editor {
                     .map_err(|e| format!("{}: {e}", base.mesh_name(id)))?;
                 if extrude {
                     let faces = &self.scene.selection.faces;
-                    let live = self.live.as_ref().ok_or("No active tool")?;
+                    let live = self.session.live.as_ref().ok_or("No active tool")?;
                     caps.moved.insert(id, self.extrude_moved_caps.clone());
                     let dropped = crate::editor::extrude_caps_on_drop(live, faces)
                         .unwrap_or_else(|| faces.clone());
@@ -361,7 +377,7 @@ impl Editor {
             }
             Ok(())
         })();
-        self.live.as_mut().ok_or("No active tool")?.base = base;
+        self.session.live.as_mut().ok_or("No active tool")?.base = base;
         result?;
         scene.selection = selection;
         scene.validate()?;

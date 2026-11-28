@@ -60,7 +60,7 @@ fn cube() -> Operandi {
 /// explicitly through the canonical command route.
 fn arm(a: &mut Operandi, ctx: &Context) {
     a.menu_action(ctx, app_menu::line_action("Bridge"));
-    assert!(a.editor.bridge.is_some(), "{}", a.status);
+    assert!(a.editor.session.bridge.is_some(), "{}", a.status);
     for (attr, value) in [
         ("segments", "1"),
         ("twist", "0"),
@@ -77,7 +77,10 @@ fn arm(a: &mut Operandi, ctx: &Context) {
             a.status
         );
     }
-    assert_eq!(a.editor.bridge.as_ref().unwrap().requested, s1_parameters());
+    assert_eq!(
+        a.editor.session.bridge.as_ref().unwrap().requested,
+        s1_parameters()
+    );
     draw(a, ctx, SIZE, vec![]);
     assert!(
         a.field_rects.contains_key("bri_twist"),
@@ -176,7 +179,7 @@ impl Frozen {
             "{what}: redo"
         );
         assert_eq!(
-            a.editor.bridge, self.editor.bridge,
+            a.editor.session.bridge, self.editor.session.bridge,
             "{what}: Bridge session"
         );
         assert!(
@@ -258,14 +261,14 @@ fn editor_differences(a: &Editor, b: &Editor) -> Vec<&'static str> {
         spatial_falloff,
         surface_states,
         surface_state,
-        bridge,
-        spike,
+        session.bridge,
+        session.spike,
         spike_strength,
-        ellipsoid,
-        cone,
+        session.ellipsoid,
+        session.cone,
         scene,
         action_context,
-        live,
+        session.live,
         history.undo,
         history.redo,
         revision,
@@ -340,7 +343,10 @@ fn invalid_draft_blocks_apply_then_escape_and_correction_apply_once() {
                 .contains("Bridge")
         );
         assert!(a.editor.history.redo.is_empty());
-        assert_eq!(a.editor.bridge.as_ref().unwrap().requested, s1_parameters());
+        assert_eq!(
+            a.editor.session.bridge.as_ref().unwrap().requested,
+            s1_parameters()
+        );
         assert!(a.field_errors.is_empty());
     }
 }
@@ -364,7 +370,10 @@ fn invalid_draft_save_keeps_destination_bytes_history_and_redo() {
         assert!(a.save(path.clone()), "{field}: {}", a.status);
         let applied_bytes = std::fs::read(&path).unwrap();
         // Existing contract: a successful Save commits by dropping the session.
-        assert!(a.editor.bridge.is_none(), "{field}: valid Save kept Bridge");
+        assert!(
+            a.editor.session.bridge.is_none(),
+            "{field}: valid Save kept Bridge"
+        );
         assert_eq!(persistence::load(&path).unwrap(), expected);
         assert_eq!(a.saved, expected);
 
@@ -398,7 +407,7 @@ fn invalid_draft_save_keeps_destination_bytes_history_and_redo() {
         );
         before.assert_unchanged(&a, field);
         assert_eq!(labels(&a.editor.history.redo), redo, "{field}: redo lost");
-        assert!(a.editor.bridge.is_some(), "{field}: hidden Drop");
+        assert!(a.editor.session.bridge.is_some(), "{field}: hidden Drop");
         assert_eq!(a.fields[field], bad);
         assert!(a.field_errors.contains_key(field));
         assert_eq!(a.status, a.field_errors[field]);
@@ -459,7 +468,10 @@ fn invalid_twist_blocks_menu_undo_and_selection_refusals_recover() {
     a.menu_action(&ctx, app_menu::line_action("app.undo"));
     assert_eq!(a.editor.scene, source);
     // Observed contract: menu Undo/Redo keep the armed session and parameters.
-    assert_eq!(a.editor.bridge.as_ref().unwrap().requested, s1_parameters());
+    assert_eq!(
+        a.editor.session.bridge.as_ref().unwrap().requested,
+        s1_parameters()
+    );
     a.run(Command::Apply);
     assert_eq!(a.editor.scene, expected, "Apply after Undo");
     assert!(a.editor.history.redo.is_empty());
@@ -485,11 +497,14 @@ fn invalid_twist_blocks_menu_undo_and_selection_refusals_recover() {
                 labels(&armed.editor.history.undo),
                 "{faces:?} {route}: undo"
             );
-            assert_eq!(b.editor.bridge, armed.editor.bridge, "{faces:?} {route}");
+            assert_eq!(
+                b.editor.session.bridge, armed.editor.session.bridge,
+                "{faces:?} {route}"
+            );
         }
 
         b.execute("tool.drop");
-        assert!(b.editor.bridge.is_none());
+        assert!(b.editor.session.bridge.is_none());
         b.editor.scene.selection.faces = vec![0, 1];
         let eligible = b.editor.scene.clone();
         arm(&mut b, &ctx);

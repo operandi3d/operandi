@@ -173,7 +173,7 @@ impl Editor {
         if self.i2_active() {
             return Err("Finish or Cancel the Extrude stage before Mesh Cleanup".into());
         }
-        if self.pen_draft.is_some() {
+        if self.session.pen_draft.is_some() {
             return Err("Finish or Cancel Pen before Mesh Cleanup".into());
         }
         self.require_idle()?;

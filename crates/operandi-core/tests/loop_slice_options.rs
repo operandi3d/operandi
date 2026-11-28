@@ -69,7 +69,7 @@ fn mesh(e: &Editor) -> &Mesh {
     &e.scene.active().unwrap().mesh
 }
 fn params(e: &Editor) -> Parameters {
-    e.live.as_ref().unwrap().params.clone()
+    e.session.live.as_ref().unwrap().params.clone()
 }
 fn set(e: &mut Editor, change: impl FnOnce(&mut LoopSlice)) {
     let mut p = params(e);

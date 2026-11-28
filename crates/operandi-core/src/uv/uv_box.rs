@@ -87,7 +87,7 @@ impl crate::Editor {
     /// The live Box Transform's box at the session start (the selected UVs'
     /// bounds on the UV proxy), or `None` outside it.
     pub fn uv_box_base(&mut self) -> Option<(DVec2, DVec2)> {
-        if self.live.as_ref()?.tool != crate::Tool::UvBoxTransform {
+        if self.session.live.as_ref()?.tool != crate::Tool::UvBoxTransform {
             return None;
         }
         let proxy = self.uv_tool_proxy()?;

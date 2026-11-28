@@ -109,7 +109,7 @@ fn path_points_drive_a_move() {
     ]))
     .unwrap();
     e.dispatch(Command::Activate(Tool::Move)).unwrap();
-    let p = e.live.as_ref().unwrap().params.clone();
+    let p = e.session.live.as_ref().unwrap().params.clone();
     e.dispatch(Command::Preview(Parameters {
         delta: DVec3::Y,
         ..p

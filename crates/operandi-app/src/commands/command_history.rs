@@ -364,7 +364,7 @@ impl Operandi {
         self.command_active()
             .map(|i| command::IDS[i].0.to_owned())
             .or_else(|| {
-                let live = self.editor.live.as_ref()?;
+                let live = self.editor.session.live.as_ref()?;
                 Some(tool_info::info(live.tool).command_id.to_owned())
             })
     }

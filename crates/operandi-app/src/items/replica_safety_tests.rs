@@ -13,7 +13,7 @@ fn replica_app() -> Operandi {
     let mut a = super::tests::box_app();
     a.run(Command::Mode(operandi_core::Mode::Item));
     a.activate(operandi_core::Tool::Array);
-    let mut p = a.editor.live.as_ref().unwrap().params.clone();
+    let mut p = a.editor.session.live.as_ref().unwrap().params.clone();
     p.duplicate.copier = Some(operandi_core::duplicate_copier::Copier::Replica);
     p.duplicate.array.count = [3, 1, 1];
     p.duplicate.placed = true;

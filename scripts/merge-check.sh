@@ -161,6 +161,11 @@ with_python() {
 
 step "fmt"
 "$CARGO_BIN" fmt --check
+# No new area link against the flow (docs/AREA_DEPENDENCIES.md); the same
+# strict check CI runs.
+step "area dependencies"
+python3 scripts/area-deps.py --self-test
+python3 scripts/area-deps.py --check --strict --no-report
 # The plain build (no extras), with clippy's warnings as errors.
 step "clippy"
 "$CARGO_BIN" clippy --locked --workspace --all-targets -- -D warnings

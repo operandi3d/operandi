@@ -67,7 +67,7 @@ impl Operandi {
         } else {
             0
         };
-        let Some(live) = self.editor.live.as_ref().filter(|l| l.tool == tool) else {
+        let Some(live) = self.editor.session.live.as_ref().filter(|l| l.tool == tool) else {
             return;
         };
         let Some(text) = readout_text(tool, family, &live.params) else {
@@ -97,7 +97,7 @@ impl Operandi {
         // A drag that ended without a release (the tool dropped under it)
         // shows nothing.
         if readout.view != self.drawing_view
-            || readout.released.is_none() && self.editor.live.is_none()
+            || readout.released.is_none() && self.editor.session.live.is_none()
         {
             return;
         }

@@ -120,7 +120,7 @@ fn bevel_through_the_editor_is_one_step_and_refuses_shared_points() {
     for tool in [Tool::EdgeBevel, Tool::EdgeChamfer] {
         let before = e.scene.clone();
         e.dispatch(Command::Activate(tool)).unwrap();
-        let mut p = e.live.as_ref().unwrap().params.clone();
+        let mut p = e.session.live.as_ref().unwrap().params.clone();
         p.chamfer.offset = 0.1;
         p.chamfer.segments = 2;
         e.dispatch(Command::Preview(p)).unwrap();

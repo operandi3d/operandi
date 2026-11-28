@@ -1205,6 +1205,7 @@ fn layer_items(app: &Operandi, i: usize, f: Falloff) -> Vec<tf::Item<FalloffP>> 
     if i == 0
         && app
             .editor
+            .session
             .preset
             .as_ref()
             .and_then(|p| p.row().falloff_kind())
@@ -1215,7 +1216,7 @@ fn layer_items(app: &Operandi, i: usize, f: Falloff) -> Vec<tf::Item<FalloffP>> 
     {
         items.push(tf::Item::Wide(
             tf::Button::run("Fit to Selection", |app: &mut Operandi| {
-                let Some(row) = app.editor.preset.as_ref().map(|p| p.row()) else {
+                let Some(row) = app.editor.session.preset.as_ref().map(|p| p.row()) else {
                     return;
                 };
                 match row.fitted_falloff(&app.editor.scene) {
@@ -1339,7 +1340,7 @@ pub(super) fn set_selection_steps(app: &mut Operandi, i: usize, steps: u32) {
 /// bounding box (Linear and Radial keep their last settings, FAL-M-03).
 pub(super) fn fitted_on_choose(editor: &operandi_core::Editor, f: Falloff) -> Falloff {
     match f {
-        Falloff::Cylinder(c) if editor.live.is_some() => {
+        Falloff::Cylinder(c) if editor.session.live.is_some() => {
             c.auto_size(&editor.scene).map_or(f, Falloff::Cylinder)
         }
         _ => f,
@@ -1354,6 +1355,7 @@ impl Operandi {
         self.menu_owned_input = true;
         let enabled = self
             .editor
+            .session
             .live
             .as_ref()
             .is_none_or(|l| l.tool.card().layers.falloff);
@@ -1541,9 +1543,10 @@ impl Operandi {
     /// (FO-02), as it does Constrain to Background.
     pub(super) fn escape_clears_falloff(&self) -> bool {
         self.editor.spatial_falloff.is_some()
-            && !self.editor.live.as_ref().is_some_and(|l| l.applied)
+            && !self.editor.session.live.as_ref().is_some_and(|l| l.applied)
             && self
                 .editor
+                .session
                 .pen_draft
                 .as_ref()
                 .is_none_or(|d| d.points().is_empty())

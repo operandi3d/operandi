@@ -43,11 +43,11 @@ fn click(a: &mut Operandi, ctx: &Context, size: Vec2, at: Pos2) {
 }
 
 fn live_params(a: &Operandi) -> Parameters {
-    a.editor.live.as_ref().unwrap().params.clone()
+    a.editor.session.live.as_ref().unwrap().params.clone()
 }
 
 fn live_tool(a: &Operandi) -> Option<Tool> {
-    a.editor.live.as_ref().map(|l| l.tool)
+    a.editor.session.live.as_ref().map(|l| l.tool)
 }
 
 #[test]

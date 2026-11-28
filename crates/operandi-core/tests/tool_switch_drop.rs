@@ -105,7 +105,7 @@ fn draw(e: &mut Editor, t: T) {
     let x = 3.;
     match t {
         T::Box | T::Sphere | T::Cylinder | T::Move | T::Bevel => {
-            let mut p = e.live.as_ref().unwrap().params.clone();
+            let mut p = e.session.live.as_ref().unwrap().params.clone();
             match t {
                 T::Move => p.delta = DVec3::Y * 0.5,
                 T::Bevel => p.inset = 0.1,
@@ -117,7 +117,7 @@ fn draw(e: &mut Editor, t: T) {
                     }
                 }
             }
-            e.tweak_held = true;
+            e.session.tweak_held = true;
             e.dispatch(Command::Preview(p)).unwrap();
             e.end_tweak();
         }
@@ -133,7 +133,7 @@ fn draw(e: &mut Editor, t: T) {
         T::Ellipsoid => {
             let p = EllipsoidParameters {
                 radius: DVec3::splat(0.5),
-                ..e.ellipsoid.as_ref().unwrap().requested.clone()
+                ..e.session.ellipsoid.as_ref().unwrap().requested.clone()
             };
             e.dispatch(Command::ConfigureEllipsoid(p)).unwrap();
         }
@@ -141,7 +141,7 @@ fn draw(e: &mut Editor, t: T) {
         // place the remembered shape the way a viewport drag or panel edit
         // would.
         T::Torus | T::Capsule | T::Arc => {
-            let p = e.shape.as_ref().unwrap().requested.clone();
+            let p = e.session.shape.as_ref().unwrap().requested.clone();
             e.dispatch(Command::ConfigureShape(p)).unwrap();
         }
         T::Tube => e
@@ -176,7 +176,7 @@ fn cone_drop_keeps_the_drawn_cone_and_one_undo_removes_it() {
     let steps = e.history.undo.len();
     e.dispatch(Command::ArmCone).unwrap();
     // The viewport draw sends ConfigureCone frames during a held drag.
-    e.tweak_held = true;
+    e.session.tweak_held = true;
     for r in [0.2, 0.4, 0.6] {
         e.dispatch(Command::ConfigureCone(ConeParameters {
             size: DVec3::new(r, 1., r),
@@ -187,7 +187,7 @@ fn cone_drop_keeps_the_drawn_cone_and_one_undo_removes_it() {
     e.end_tweak();
     let shown = e.cone_preview_scene().unwrap().unwrap();
     e.dispatch(Command::Drop).unwrap();
-    assert!(e.cone.is_none());
+    assert!(e.session.cone.is_none());
     assert_eq!(e.scene, shown);
     assert!(faces(&e) > faces_of(&base));
     assert_eq!(e.history.undo.len(), steps + 1);
@@ -200,10 +200,13 @@ fn cone_drop_keeps_the_drawn_cone_and_one_undo_removes_it() {
 
     e.dispatch(Command::Undo).unwrap();
     assert_eq!(e.scene, base);
-    assert!(e.cone.is_none(), "Undo after Drop keeps the tool closed");
+    assert!(
+        e.session.cone.is_none(),
+        "Undo after Drop keeps the tool closed"
+    );
     e.dispatch(Command::Redo).unwrap();
     assert_eq!(e.scene, shown);
-    assert!(e.cone.is_none());
+    assert!(e.session.cone.is_none());
 }
 
 #[test]
@@ -212,7 +215,7 @@ fn armed_cone_drop_with_no_preview_is_neutral() {
     let before = (e.scene.clone(), e.history.undo.len());
     e.dispatch(Command::ArmCone).unwrap();
     e.dispatch(Command::Drop).unwrap();
-    assert!(e.cone.is_none());
+    assert!(e.session.cone.is_none());
     assert_eq!((e.scene.clone(), e.history.undo.len()), before);
 }
 
@@ -223,7 +226,7 @@ fn cone_drop_with_a_field_error_refuses_and_keeps_the_session() {
     draw(&mut e, T::Cone);
     let invalid = ConeParameters {
         gaps: 50.,
-        ..e.cone.as_ref().unwrap().requested.clone()
+        ..e.session.cone.as_ref().unwrap().requested.clone()
     };
     assert!(e.dispatch(Command::ConfigureCone(invalid)).is_err());
     let before = e.clone();
@@ -240,12 +243,12 @@ fn every_primitive_drop_keeps_its_preview_as_one_step() {
         e.dispatch(start(t)).unwrap();
         draw(&mut e, t);
         e.dispatch(Command::Drop).unwrap();
-        assert_eq!(e.active_task(), None, "{t:?}");
+        assert_eq!(e.session.active_task(), None, "{t:?}");
         assert!(faces(&e) > faces_of(&base), "{t:?} kept nothing");
         assert_eq!(e.history.undo.len(), steps + 1, "{t:?}");
         e.dispatch(Command::Undo).unwrap();
         assert_eq!(e.scene, base, "{t:?}");
-        assert_eq!(e.active_task(), None, "{t:?} reopened on Undo");
+        assert_eq!(e.session.active_task(), None, "{t:?} reopened on Undo");
     }
 }
 fn faces_of(scene: &Scene) -> usize {
@@ -263,7 +266,7 @@ fn check_switch(a: T, b: T) {
     let draws = !matches!(a, T::Spike | T::Reduction);
     e.dispatch(start(b))
         .unwrap_or_else(|err| panic!("{a:?} -> {b:?}: {err}"));
-    assert_eq!(e.active_task(), Some(task(b)), "{a:?} -> {b:?}");
+    assert_eq!(e.session.active_task(), Some(task(b)), "{a:?} -> {b:?}");
     if draws {
         assert_eq!(e.history.undo.len(), steps + 1, "{a:?} -> {b:?}");
         let step = e.history.undo.last().unwrap();
@@ -276,11 +279,11 @@ fn check_switch(a: T, b: T) {
         // Undo closes b (a shape armed with its preview shown discards
         // that preview first), then removes a's work in one go.
         for _ in 0..2 {
-            if e.active_task().is_some() {
+            if e.session.active_task().is_some() {
                 e.dispatch(Command::Undo).unwrap();
             }
         }
-        assert_eq!(e.active_task(), None, "{a:?} -> {b:?}");
+        assert_eq!(e.session.active_task(), None, "{a:?} -> {b:?}");
         assert_eq!(e.history.undo.len(), steps + 1, "{a:?} -> {b:?}");
         e.dispatch(Command::Undo).unwrap();
         assert_eq!(e.scene, base, "{a:?} -> {b:?}");
@@ -325,7 +328,7 @@ fn the_open_tools_own_button_drops_it() {
         e.dispatch(start(t)).unwrap();
         draw(&mut e, t);
         e.dispatch(start(t)).unwrap();
-        assert_eq!(e.active_task(), None, "{t:?}");
+        assert_eq!(e.session.active_task(), None, "{t:?}");
         let expected = steps + usize::from(t != T::Spike);
         assert_eq!(e.history.undo.len(), expected, "{t:?}");
     }
@@ -333,10 +336,18 @@ fn the_open_tools_own_button_drops_it() {
     let mut e = editor();
     e.dispatch(Command::PenStart).unwrap();
     draw(&mut e, T::Pen);
-    let before = (e.pen_draft.clone(), e.scene.clone(), e.history.undo.len());
+    let before = (
+        e.session.pen_draft.clone(),
+        e.scene.clone(),
+        e.history.undo.len(),
+    );
     e.dispatch(Command::PenStart).unwrap();
     assert_eq!(
-        (e.pen_draft.clone(), e.scene.clone(), e.history.undo.len()),
+        (
+            e.session.pen_draft.clone(),
+            e.scene.clone(),
+            e.history.undo.len()
+        ),
         before
     );
 }
@@ -349,7 +360,7 @@ fn switching_from_a_tool_with_a_field_error_changes_nothing() {
     draw(&mut e, T::Cone);
     let invalid = ConeParameters {
         gaps: 50.,
-        ..e.cone.as_ref().unwrap().requested.clone()
+        ..e.session.cone.as_ref().unwrap().requested.clone()
     };
     assert!(e.dispatch(Command::ConfigureCone(invalid)).is_err());
     for b in [T::Box, T::Ellipsoid, T::Torus, T::Move, T::Pen, T::Spike] {
@@ -383,7 +394,7 @@ fn a_new_tool_that_cannot_start_leaves_the_open_one() {
     draw(&mut e, T::Cone);
     e.action_context.center = CenterMode::Origin;
     e.dispatch(Command::ConfigureCone(
-        e.cone.as_ref().unwrap().requested.clone(),
+        e.session.cone.as_ref().unwrap().requested.clone(),
     ))
     .unwrap();
     let before = e.clone();
@@ -411,7 +422,11 @@ fn unit_insertion_drops_the_open_tool_first() {
                 let cmd = unit(destination);
                 e.dispatch(cmd.clone())
                     .unwrap_or_else(|err| panic!("{a:?} unit {u} {destination:?}: {err}"));
-                assert_eq!(e.active_task(), None, "{a:?} unit {u} {destination:?}");
+                assert_eq!(
+                    e.session.active_task(),
+                    None,
+                    "{a:?} unit {u} {destination:?}"
+                );
                 // The tool's work, then the unit: two steps.
                 assert_eq!(
                     e.history.undo.len(),
@@ -442,7 +457,7 @@ fn unit_insertion_refuses_when_the_open_tool_cannot_drop_or_selection_is_open() 
     draw(&mut e, T::Cone);
     let invalid = ConeParameters {
         gaps: 50.,
-        ..e.cone.as_ref().unwrap().requested.clone()
+        ..e.session.cone.as_ref().unwrap().requested.clone()
     };
     assert!(e.dispatch(Command::ConfigureCone(invalid)).is_err());
     for destination in [UnitDestination::ExistingMesh, UnitDestination::NewMesh] {
@@ -484,21 +499,21 @@ fn cone_apply_is_a_plain_step_and_undo_never_reopens_cone() {
     e.dispatch(Command::Drop).unwrap();
     e.dispatch(Command::Undo).unwrap();
     assert_eq!(e.scene, base);
-    assert!(e.cone.is_none());
+    assert!(e.session.cone.is_none());
     e.dispatch(Command::Redo).unwrap();
     assert_eq!(e.scene, applied);
-    assert!(e.cone.is_none());
+    assert!(e.session.cone.is_none());
 
     // With Cone still open, Undo of an Apply keeps it open with its
     // current values, like Ellipsoid.
     let mut e = editor();
     e.dispatch(Command::ArmCone).unwrap();
     draw(&mut e, T::Cone);
-    let values = e.cone.as_ref().unwrap().requested.clone();
+    let values = e.session.cone.as_ref().unwrap().requested.clone();
     e.dispatch(Command::Apply).unwrap();
     e.dispatch(Command::Undo).unwrap();
     assert_eq!(e.scene, base);
-    assert_eq!(e.cone.as_ref().unwrap().requested, values);
+    assert_eq!(e.session.cone.as_ref().unwrap().requested, values);
 }
 
 /// Changing selection mode (1/2/3/4) with a tool open drops the tool first,
@@ -516,7 +531,7 @@ fn changing_mode_drops_the_open_tool_first() {
             draw(&mut e, t);
             e.dispatch(Command::Mode(mode))
                 .unwrap_or_else(|err| panic!("{t:?} -> {mode:?}: {err}"));
-            assert_eq!(e.active_task(), None, "{t:?} -> {mode:?}");
+            assert_eq!(e.session.active_task(), None, "{t:?} -> {mode:?}");
             assert!(!e.i2_active(), "{t:?} -> {mode:?}");
             assert_eq!(e.scene.selection.mode, mode, "{t:?} -> {mode:?}");
             if matches!(t, T::Spike | T::Reduction) {
@@ -542,7 +557,7 @@ fn changing_mode_drops_rotate_and_scale_too() {
             ModeRouteEligibility::DropsToolFirst
         );
         e.dispatch(Command::Mode(Mode::Edge)).unwrap();
-        assert!(e.live.is_none(), "{tool:?}");
+        assert!(e.session.live.is_none(), "{tool:?}");
         assert_eq!(e.scene.selection.mode, Mode::Edge, "{tool:?}");
         assert_eq!(e.mode_route_eligibility(), ModeRouteEligibility::Direct);
     }
@@ -556,7 +571,7 @@ fn changing_mode_from_a_tool_that_cannot_drop_changes_nothing() {
     draw(&mut e, T::Cone);
     let invalid = ConeParameters {
         gaps: 50.,
-        ..e.cone.as_ref().unwrap().requested.clone()
+        ..e.session.cone.as_ref().unwrap().requested.clone()
     };
     assert!(e.dispatch(Command::ConfigureCone(invalid)).is_err());
     let before = e.clone();

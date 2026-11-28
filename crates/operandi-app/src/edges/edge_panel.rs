@@ -267,7 +267,7 @@ impl Operandi {
         } else {
             Tool::EdgeChamfer
         };
-        let Some(live) = self.editor.live.as_ref().filter(|l| l.tool == tool) else {
+        let Some(live) = self.editor.session.live.as_ref().filter(|l| l.tool == tool) else {
             self.status = format!("Activate {} first", tool.label());
             return;
         };
@@ -426,7 +426,7 @@ impl Operandi {
             self.status = format!("{} off", tool.label());
             return;
         }
-        if self.editor.has_active_task() {
+        if self.editor.session.has_active_task() {
             self.status = format!("Drop or Cancel the active tool before {}", tool.label());
             return;
         }

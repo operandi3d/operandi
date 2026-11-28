@@ -7,11 +7,11 @@ use super::*;
 impl Operandi {
     /// Start (or, on the same tool, drop) one of the four primitives.
     pub(super) fn arm_shape(&mut self, kind: ShapeKind) {
-        let before = self.editor.shape.as_ref().map(|s| s.kind());
+        let before = self.editor.session.shape.as_ref().map(|s| s.kind());
         self.run(Command::ArmShape(kind));
         // A new Tube path has no current point yet (DPM-08).
         self.point_modes.tube_current = None;
-        if self.editor.shape.as_ref().map(|s| s.kind()) != before {
+        if self.editor.session.shape.as_ref().map(|s| s.kind()) != before {
             self.clear_fields();
         }
     }
@@ -423,24 +423,31 @@ fn text(f: &mut ToolForm<P>) {
     .field(make_uvs("txt-uvs"));
 }
 
-fn tube(f: &mut ToolForm<P>, t: &TubeParameters) {
+fn tube(f: &mut ToolForm<P>, t: &TubeParameters, current: Option<usize>) {
     // DPM-01/08/11: Mode first, as on the curve tools.
     f.push(crate::draw_tools::app_mode_row(
         |m| m.tube,
         |m, mode| m.tube = mode,
     ));
-    f.heading(format!("Control points ({})", t.points.len()));
-    for i in 0..t.points.len() {
+    // #44 (Steve Hill): as on the curve tools, the current point's
+    // position only (the one last clicked in the view, else the last).
+    let count = t.points.len();
+    f.note(format!("Number of Points {count}"));
+    if let Some(c) = current.filter(|&c| c < count).or(count.checked_sub(1)) {
+        f.note(format!(
+            "Current Point {} · click a point in the view to edit another",
+            c + 1
+        ));
         f.fields_from(plain_vector(
-            &format!("tub_point{i}_"),
-            &format!("Point {}", i + 1),
+            "tub_current",
+            "Position",
             move |p: &P| match p {
-                ShapeParameters::Tube(t) => t.points.get(i).copied().unwrap_or_default(),
+                ShapeParameters::Tube(t) => t.points.get(c).copied().unwrap_or_default(),
                 _ => DVec3::ZERO,
             },
             move |p, a, v| {
                 if let ShapeParameters::Tube(t) = p
-                    && let Some(point) = t.points.get_mut(i)
+                    && let Some(point) = t.points.get_mut(c)
                 {
                     point[a] = v;
                 }
@@ -529,7 +536,11 @@ pub(super) struct ShapeFields;
 impl ToolFields for ShapeFields {
     type P = ShapeParameters;
     fn params(app: &Operandi) -> Option<P> {
-        app.editor.shape.as_ref().map(|s| s.requested.clone())
+        app.editor
+            .session
+            .shape
+            .as_ref()
+            .map(|s| s.requested.clone())
     }
     fn form(app: &Operandi, p: &P) -> ToolForm<P> {
         let mut f = ToolForm::new();
@@ -539,7 +550,7 @@ impl ToolFields for ShapeFields {
             ShapeParameters::Torus(_) => torus(&mut f),
             ShapeParameters::Capsule(_) => capsule(&mut f),
             ShapeParameters::Arc(_) => arc(&mut f),
-            ShapeParameters::Tube(t) => tube(&mut f, t),
+            ShapeParameters::Tube(t) => tube(&mut f, t, app.point_modes.tube_current),
             ShapeParameters::Text(_) => text(&mut f),
             ShapeParameters::Teapot(_) => teapot(&mut f),
         }
@@ -563,7 +574,7 @@ impl ToolFields for ShapeFields {
                 None,
             );
         }
-        let session = app.editor.shape.as_ref();
+        let session = app.editor.session.shape.as_ref();
         let ready = app.field_errors.is_empty()
             && session.is_some_and(|s| s.error.is_none() && s.preview.is_some());
         f.separator()
@@ -611,7 +622,7 @@ impl ToolFields for ShapeFields {
         app.editor.dispatch(Command::ConfigureShape(p))
     }
     fn published(app: &mut Operandi) {
-        if let Some(s) = &app.editor.shape {
+        if let Some(s) = &app.editor.session.shape {
             app.status = format!(
                 "{} preview · Apply adds it and keeps the tool; Drop adds it and closes; Cancel discards it",
                 s.kind().label()
@@ -619,26 +630,32 @@ impl ToolFields for ShapeFields {
         }
     }
     fn settled(app: &mut Operandi) -> bool {
-        app.editor.shape.as_ref().is_none_or(|s| s.error.is_none())
+        app.editor
+            .session
+            .shape
+            .as_ref()
+            .is_none_or(|s| s.error.is_none())
     }
     fn option_error_key(app: &Operandi, _: &str) -> Option<String> {
         app.editor
+            .session
             .shape
             .as_ref()
             .map(|s| format!("{}error", prefix(s.kind())))
     }
     fn after_option(app: &mut Operandi) {
-        let Some(ShapeParameters::Tube(t)) = app.editor.shape.as_ref().map(|s| s.requested.clone())
+        let Some(ShapeParameters::Tube(t)) = app
+            .editor
+            .session
+            .shape
+            .as_ref()
+            .map(|s| s.requested.clone())
         else {
             return;
         };
-        // A removed point's fields go with it.
-        let gone = |key: &String| {
-            key.strip_prefix("tub_point")
-                .and_then(|rest| rest.split_once('_'))
-                .and_then(|(i, _)| i.parse::<usize>().ok())
-                .is_some_and(|i| i >= t.points.len())
-        };
+        // Adding or removing a point can change which point the Position
+        // rows show (#44): they read it again.
+        let gone = |key: &String| key.starts_with("tub_current");
         app.fields.retain(|k, _| !gone(k));
         app.confirmed_fields.retain(|k, _| !gone(k));
         app.field_errors.retain(|k, _| !gone(k));
@@ -646,7 +663,7 @@ impl ToolFields for ShapeFields {
         // instead of showing a field error.
         if t.points.len() < 2 {
             app.field_errors.retain(|k, _| !k.starts_with("tub_"));
-            if let Some(s) = app.editor.shape.as_mut() {
+            if let Some(s) = app.editor.session.shape.as_mut() {
                 s.error = None;
             }
             app.status = "Tube: add at least 2 control points".into();
@@ -670,7 +687,7 @@ mod tests {
     }
     /// Arming draws nothing; place the remembered shape like a drag would.
     fn place(a: &mut Operandi) {
-        let p = a.editor.shape.as_ref().unwrap().requested.clone();
+        let p = a.editor.session.shape.as_ref().unwrap().requested.clone();
         a.run(Command::ConfigureShape(p));
     }
     fn counts(a: &Operandi) -> (usize, usize) {
@@ -681,7 +698,7 @@ mod tests {
     #[test]
     fn torus_fields_update_linked_sizes_and_drop_adds_it() {
         let mut a = app("Torus");
-        assert!(a.editor.shape.is_some());
+        assert!(a.editor.session.shape.is_some());
         // Draw once so the fields exist, as the panel does.
         a.sync_form::<ShapeFields>(true);
         enter(&mut a, "tor_sides", "8");
@@ -694,7 +711,7 @@ mod tests {
         assert_eq!(a.fields["tor_ring"], workspace::number_text(1., " m"));
         a.run(Command::Drop);
         assert_eq!(counts(&a), (32, 32));
-        assert!(a.editor.shape.is_none());
+        assert!(a.editor.session.shape.is_none());
     }
 
     #[test]
@@ -718,7 +735,7 @@ mod tests {
         enter(&mut a, "arc_segments", "6");
         a.run(Command::Apply);
         assert_eq!(counts(&a), (8, 1));
-        assert!(a.editor.shape.is_some());
+        assert!(a.editor.session.shape.is_some());
     }
 
     #[test]
@@ -736,13 +753,64 @@ mod tests {
     }
 
     #[test]
+    fn tube_panel_shows_the_current_point_only() {
+        // #44 (Steve Hill): like the curve tools, Tool Properties shows the
+        // current point's position, not a row per point; with none picked,
+        // the last one.
+        use crate::tool_form::Item;
+        let mut a = app("Tube");
+        a.form_change::<ShapeFields>(|p| {
+            if let ShapeParameters::Tube(t) = p {
+                t.points = vec![DVec3::ZERO, DVec3::Y, DVec3::new(1., 2., 0.)];
+            }
+        });
+        let labels = |a: &Operandi| -> Vec<String> {
+            let p = ShapeFields::params(a).unwrap();
+            ShapeFields::form(a, &p)
+                .items
+                .iter()
+                .filter_map(|i| match i {
+                    Item::Field(f) => Some(f.row.label.clone()),
+                    _ => None,
+                })
+                .collect()
+        };
+        let shown = labels(&a);
+        assert!(!shown.iter().any(|l| l.starts_with("Point ")), "{shown:?}");
+        assert!(shown.contains(&"Position X".to_owned()), "{shown:?}");
+        let position = |a: &Operandi| {
+            let p = ShapeFields::params(a).unwrap();
+            let form = ShapeFields::form(a, &p);
+            form.items
+                .iter()
+                .find_map(|i| match i {
+                    Item::Field(f) if f.row.label == "Position X" => Some(f.row.key.clone()),
+                    _ => None,
+                })
+                .unwrap()
+        };
+        // None picked: the last point. Picking point 2 shows it, and the
+        // fields edit it.
+        assert_eq!(position(&a), "tub_current0");
+        a.point_modes.tube_current = Some(1);
+        a.sync_form::<ShapeFields>(true);
+        assert_eq!(a.fields["tub_current1"], workspace::number_text(1., " m"));
+        enter(&mut a, "tub_current0", "0.5 m");
+        let ShapeParameters::Tube(t) = &a.editor.session.shape.as_ref().unwrap().requested else {
+            panic!("tube")
+        };
+        assert_eq!(t.points[1], DVec3::new(0.5, 1., 0.), "{}", a.status);
+        assert_eq!(t.points[2], DVec3::new(1., 2., 0.));
+    }
+
+    #[test]
     fn command_line_and_menu_names() {
         let mut a = app("Torus");
         assert_eq!(a.command_active(), command::id("prim.toroid"));
         place(&mut a);
         a.execute("tool.set prim.capsule on");
         assert!(matches!(
-            a.editor.shape.as_ref().map(|s| s.kind()),
+            a.editor.session.shape.as_ref().map(|s| s.kind()),
             Some(ShapeKind::Capsule)
         ));
         // Switching tools dropped the Torus into the mesh.
@@ -750,31 +818,39 @@ mod tests {
         a.execute("tool.reset");
         place(&mut a);
         a.execute("Capsule");
-        assert!(a.editor.shape.is_none());
+        assert!(a.editor.session.shape.is_none());
         assert_eq!(counts(&a), (288 + 242, 288 + 264));
     }
 
     #[test]
     fn text_typed_in_the_panel_drops_as_polygons() {
         let mut a = app("Text");
-        assert!(a.editor.shape.is_some(), "{}", a.status);
+        assert!(a.editor.session.shape.is_some(), "{}", a.status);
         // Nothing to show until there are letters.
-        assert!(a.editor.shape.as_ref().unwrap().preview.is_none());
+        assert!(a.editor.session.shape.as_ref().unwrap().preview.is_none());
         a.sync_form::<ShapeFields>(true);
         enter(&mut a, "txt_text", "Hi");
         enter(&mut a, "txt_size", "2 m");
-        let preview = a.editor.shape.as_ref().unwrap().preview.clone().unwrap();
+        let preview = a
+            .editor
+            .session
+            .shape
+            .as_ref()
+            .unwrap()
+            .preview
+            .clone()
+            .unwrap();
         assert!(!preview.faces.is_empty());
         let undo = a.editor.history.undo.len();
         a.run(Command::Drop);
-        assert!(a.editor.shape.is_none());
+        assert!(a.editor.session.shape.is_none());
         assert_eq!(counts(&a), (preview.vertices.len(), preview.faces.len()));
         a.run(Command::Undo);
         assert_eq!(counts(&a), (0, 0));
         assert!(a.editor.history.undo.len() <= undo + 1);
         // The next Text starts from the last settings.
         a.execute("Text");
-        let ShapeParameters::Text(t) = &a.editor.shape.as_ref().unwrap().requested else {
+        let ShapeParameters::Text(t) = &a.editor.session.shape.as_ref().unwrap().requested else {
             panic!("text")
         };
         assert_eq!((t.text.as_str(), t.size), ("Hi", 2.));
@@ -784,7 +860,7 @@ mod tests {
     fn dropping_empty_text_adds_nothing() {
         let mut a = app("Text");
         a.run(Command::Drop);
-        assert!(a.editor.shape.is_none(), "{}", a.status);
+        assert!(a.editor.session.shape.is_none(), "{}", a.status);
         assert_eq!(counts(&a), (0, 0));
     }
 }

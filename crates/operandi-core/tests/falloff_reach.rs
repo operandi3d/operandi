@@ -57,7 +57,7 @@ fn points(e: &Editor) -> Vec<DVec3> {
     e.scene.active().unwrap().mesh.vertices.clone()
 }
 fn live(e: &Editor) -> Parameters {
-    e.live.as_ref().unwrap().params.clone()
+    e.session.live.as_ref().unwrap().params.clone()
 }
 fn weights(e: &Editor, f: Falloff) -> Vec<f64> {
     let id = e.scene.active().unwrap().id;

@@ -10,7 +10,7 @@ fn polygon_pen_command_click_capture_refine_and_drop() {
     app.editor.scene.selection.mode = Mode::Polygon;
     app.category = toolbox::Category::Polygon;
     app.execute("tool.set prim.pen on");
-    assert!(app.editor.pen_draft.is_some());
+    assert!(app.editor.session.pen_draft.is_some());
     let before = app.editor.scene.clone();
     let ctx = Context::default();
     theme::install(&ctx);
@@ -33,7 +33,16 @@ fn polygon_pen_command_click_capture_refine_and_drop() {
             ],
         );
     }
-    assert_eq!(app.editor.pen_draft.as_ref().unwrap().points().len(), 4);
+    assert_eq!(
+        app.editor
+            .session
+            .pen_draft
+            .as_ref()
+            .unwrap()
+            .points()
+            .len(),
+        4
+    );
     assert_eq!(app.editor.scene, before);
     app.editor.dispatch(Command::PenSelect(0)).unwrap();
     app.clear_fields();
@@ -42,11 +51,11 @@ fn polygon_pen_command_click_capture_refine_and_drop() {
     app.fields.insert("pen_y".into(), "-1 m".into());
     assert!(app.confirm_fields());
     assert_eq!(
-        app.editor.pen_draft.as_ref().unwrap().points()[0],
+        app.editor.session.pen_draft.as_ref().unwrap().points()[0],
         DVec3::new(-1., -1., 0.)
     );
     app.execute("tool.drop");
-    assert!(app.editor.pen_draft.is_none());
+    assert!(app.editor.session.pen_draft.is_none());
     assert_eq!(app.editor.scene.active().unwrap().mesh.faces.len(), 1);
     app.execute("undo");
     assert_eq!(app.editor.scene, before);
@@ -72,7 +81,7 @@ fn panel_route_remap_and_text_focus_do_not_capture() {
             pointer(pos, false, Modifiers::NONE),
         ],
     );
-    assert!(app.editor.pen_draft.is_some());
+    assert!(app.editor.session.pen_draft.is_some());
     app.run(Command::Cancel);
     app.bindings.insert("Polygon Pen".into(), "C".into());
     ctx.memory_mut(|m| m.request_focus(Id::new("command-entry")));
@@ -82,7 +91,7 @@ fn panel_route_remap_and_text_focus_do_not_capture() {
         size,
         vec![key(Key::C), Event::Text("c".into())],
     );
-    assert!(app.editor.pen_draft.is_none());
+    assert!(app.editor.session.pen_draft.is_none());
     assert_eq!(app.command, "c");
     ctx.memory_mut(|m| m.surrender_focus(Id::new("command-entry")));
     draw(
@@ -104,7 +113,7 @@ fn panel_route_remap_and_text_focus_do_not_capture() {
         size,
         vec![Event::PointerMoved(viewport), key(Key::C)],
     );
-    assert!(app.editor.pen_draft.is_some());
+    assert!(app.editor.session.pen_draft.is_some());
 }
 
 #[test]
@@ -122,7 +131,7 @@ fn pen_press_adds_drag_moves_and_drop_faces_the_viewer() {
     let size = vec2(1440., 900.);
     draw(&mut app, &ctx, size, vec![]);
     let r = app.viewport_rect;
-    let count = |a: &Operandi| a.editor.pen_draft.as_ref().unwrap().points().len();
+    let count = |a: &Operandi| a.editor.session.pen_draft.as_ref().unwrap().points().len();
     // Clockwise on screen, each click with a 2-pixel wobble.
     let corners = [(-150., 120.), (150., 120.), (150., 260.), (-150., 260.)];
     let corners: Vec<Pos2> = corners
@@ -144,7 +153,7 @@ fn pen_press_adds_drag_moves_and_drop_faces_the_viewer() {
     }
     assert_eq!(count(&app), 4, "{}", app.status);
     // Press on an existing point and drag it: it moves, nothing is added.
-    let before = app.editor.pen_draft.as_ref().unwrap().points()[1];
+    let before = app.editor.session.pen_draft.as_ref().unwrap().points()[1];
     let p1 = app.camera.project(before, r).unwrap().0;
     draw(
         &mut app,
@@ -157,7 +166,7 @@ fn pen_press_adds_drag_moves_and_drop_faces_the_viewer() {
         ],
     );
     assert_eq!(count(&app), 4);
-    let moved = app.editor.pen_draft.as_ref().unwrap().points()[1];
+    let moved = app.editor.session.pen_draft.as_ref().unwrap().points()[1];
     assert!(moved.distance(before) > 1e-3);
     // Orbiting mid-draft keeps later points on the first point's plane.
     app.camera.pitch = -0.2;
@@ -171,7 +180,14 @@ fn pen_press_adds_drag_moves_and_drop_faces_the_viewer() {
             pointer(extra, false, Modifiers::NONE),
         ],
     );
-    let points = app.editor.pen_draft.as_ref().unwrap().points().to_vec();
+    let points = app
+        .editor
+        .session
+        .pen_draft
+        .as_ref()
+        .unwrap()
+        .points()
+        .to_vec();
     let plane = app.pen_plane.unwrap().0;
     let axis = match plane {
         1 => 0,
@@ -201,7 +217,7 @@ fn pen_press_adds_drag_moves_and_drop_faces_the_viewer() {
     ctx.memory_mut(|m| m.surrender_focus(Id::new("command-entry")));
     // Q drops; the polygon faces the camera.
     app.run(Command::Drop);
-    assert!(app.editor.pen_draft.is_none(), "{}", app.status);
+    assert!(app.editor.session.pen_draft.is_none(), "{}", app.status);
     let mesh = &app.editor.scene.active().unwrap().mesh;
     assert_eq!(mesh.faces.len(), 1);
     let (eye, _, _, _) = app.camera.basis();
@@ -249,22 +265,25 @@ fn actual_point_fields_refine_selected_point_and_cancel_invalid_text() {
     theme::install(&ctx);
     let size = vec2(1440., 900.);
     edit_pen_field(&mut app, &ctx, size, "pen_current", "0");
-    assert_eq!(app.editor.pen_draft.as_ref().unwrap().current(), Some(0));
+    assert_eq!(
+        app.editor.session.pen_draft.as_ref().unwrap().current(),
+        Some(0)
+    );
     edit_pen_field(&mut app, &ctx, size, "pen_x", "-1 m");
     assert_eq!(
-        app.editor.pen_draft.as_ref().unwrap().points(),
+        app.editor.session.pen_draft.as_ref().unwrap().points(),
         &[DVec3::new(-1., 0., 0.), DVec3::X, DVec3::Y]
     );
     edit_pen_field(&mut app, &ctx, size, "pen_y", "-2 m");
     edit_pen_field(&mut app, &ctx, size, "pen_z", "0.1 m");
     assert_eq!(
-        app.editor.pen_draft.as_ref().unwrap().points(),
+        app.editor.session.pen_draft.as_ref().unwrap().points(),
         &[DVec3::new(-1., -2., 0.1), DVec3::X, DVec3::Y]
     );
     edit_pen_field(&mut app, &ctx, size, "pen_y", "invalid");
     assert!(app.field_errors.contains_key("pen_y"));
     app.execute("cancel");
-    assert!(app.editor.pen_draft.is_none());
+    assert!(app.editor.session.pen_draft.is_none());
     assert_eq!(app.editor.scene, original_scene);
     assert!(app.editor.history.undo == original_undo && app.editor.history.redo == original_redo);
 }
@@ -288,7 +307,13 @@ fn pen_panel_polyline_keeps_click_order() {
             ..Default::default()
         }));
         assert_eq!(
-            app.editor.pen_draft.as_ref().unwrap().options().output,
+            app.editor
+                .session
+                .pen_draft
+                .as_ref()
+                .unwrap()
+                .options()
+                .output,
             output
         );
         draw(&mut app, &ctx, size, vec![]);
@@ -341,7 +366,7 @@ fn pen_walls_from_the_panel_right_drag_offset_and_drop() {
     let size = vec2(1440., 900.);
     draw(&mut app, &ctx, size, vec![]);
     // The panel turns walls on; Offset starts at 0.1 m.
-    let mut options = app.editor.pen_draft.as_ref().unwrap().options();
+    let mut options = app.editor.session.pen_draft.as_ref().unwrap().options();
     options.wall = WallMode::BothSides;
     options.offset = 0.1;
     app.run(Command::PenOptions(options));
@@ -360,6 +385,7 @@ fn pen_walls_from_the_panel_right_drag_offset_and_drop() {
     // The front view draws on XY, so the strip lies in XY.
     assert_eq!(
         app.editor
+            .session
             .pen_draft
             .as_ref()
             .unwrap()
@@ -382,7 +408,14 @@ fn pen_walls_from_the_panel_right_drag_offset_and_drop() {
         size,
         vec![right(at, true), Event::PointerMoved(end), right(end, false)],
     );
-    let offset = app.editor.pen_draft.as_ref().unwrap().options().offset;
+    let offset = app
+        .editor
+        .session
+        .pen_draft
+        .as_ref()
+        .unwrap()
+        .options()
+        .offset;
     assert!(offset > 0.1, "{offset}");
     app.execute("tool.drop");
     let m = &app.editor.scene.active().unwrap().mesh;
@@ -406,7 +439,7 @@ fn make_quads_clicks_ctrl_triangle_shift_new_strip_and_drop() {
     theme::install(&ctx);
     let size = vec2(1440., 900.);
     draw(&mut app, &ctx, size, vec![]);
-    let mut options = app.editor.pen_draft.as_ref().unwrap().options();
+    let mut options = app.editor.session.pen_draft.as_ref().unwrap().options();
     options.make_quads = true;
     app.run(Command::PenOptions(options));
     let click = |app: &mut Operandi, x: f64, y: f64, modifiers: Modifiers| {
@@ -432,7 +465,7 @@ fn make_quads_clicks_ctrl_triangle_shift_new_strip_and_drop() {
     click(&mut app, 0., 0., Modifiers::NONE);
     click(&mut app, 1., 1., Modifiers::NONE);
     click(&mut app, 0.5, 2., Modifiers::CTRL);
-    let draft = app.editor.pen_draft.as_ref().unwrap();
+    let draft = app.editor.session.pen_draft.as_ref().unwrap();
     assert_eq!(draft.points().len(), 5, "{}", app.status);
     assert!(draft.strip_ended());
     // Shift+click drops this strip and starts the next with Make Quads on.
@@ -442,6 +475,7 @@ fn make_quads_clicks_ctrl_triangle_shift_new_strip_and_drop() {
     assert!((0..2).all(|f| m.normal(f).z > 0.99), "faces the Front view");
     assert!(
         app.editor
+            .session
             .pen_draft
             .as_ref()
             .is_some_and(|d| d.options().strip() && d.points().is_empty())

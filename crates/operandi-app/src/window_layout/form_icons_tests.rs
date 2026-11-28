@@ -51,7 +51,10 @@ fn pick_fills_a_slot_from_the_next_button_clicked() {
     // A click on a toolbox button runs its line through `execute`.
     a.workbench.click_now = true;
     a.execute("Move");
-    assert!(a.editor.live.is_none(), "the picked button didn't run");
+    assert!(
+        a.editor.session.live.is_none(),
+        "the picked button didn't run"
+    );
     assert!(!a.form_picking(), "one pick, then off");
     let c = slot(&a, 2);
     assert_eq!(c.command.as_deref(), Some("Move"));

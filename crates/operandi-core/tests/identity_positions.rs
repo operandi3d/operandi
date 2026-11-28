@@ -28,7 +28,7 @@ fn moving_components_keeps_their_identities() {
     let mut e = cube();
     let before = ids(&mut e);
     e.dispatch(Command::Activate(Tool::Move)).unwrap();
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     p.delta = DVec3::new(0.3, -0.2, 0.1);
     e.dispatch(Command::Preview(p)).unwrap();
     assert_eq!(ids(&mut e), before, "preview keeps IDs");

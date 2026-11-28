@@ -199,6 +199,21 @@ pub struct OpContext<'a> {
     pub falloff: Option<&'a crate::ShapeWeights>,
 }
 impl OpContext<'_> {
+    /// The Falloff below's weight at each input point, for ops whose tool
+    /// kernels take per-point weights (#43: Polygon Bevel, Smooth Shift).
+    /// `None` without a Falloff step.
+    pub fn point_weights(&self) -> Option<Vec<f64>> {
+        let w = self.falloff?;
+        let weight = w.weigher(glam::DMat4::IDENTITY);
+        Some(
+            self.input
+                .vertices
+                .iter()
+                .map(|&p| weight(p).clamp(0., 1.))
+                .collect(),
+        )
+    }
+
     /// Adds a line to show with the op's row; the op still counts as run.
     pub fn note(&self, note: OpNote) {
         self.notes.borrow_mut().push(note);

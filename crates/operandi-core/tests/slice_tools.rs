@@ -64,14 +64,14 @@ fn mesh(e: &Editor) -> &Mesh {
     &e.scene.active().unwrap().mesh
 }
 fn params(e: &Editor) -> Parameters {
-    e.live.as_ref().unwrap().params.clone()
+    e.session.live.as_ref().unwrap().params.clone()
 }
 fn preview(e: &mut Editor, p: Parameters) {
     e.dispatch(Command::Preview(p)).unwrap();
 }
 /// One held gesture: every preview joins one tweak.
 fn gesture(e: &mut Editor, p: Parameters) {
-    e.tweak_held = true;
+    e.session.tweak_held = true;
     e.dispatch(Command::Preview(p)).unwrap();
     e.end_tweak();
 }
@@ -132,7 +132,10 @@ fn loop_slice_cuts_the_selected_edges_ring_and_drop_is_one_step() {
     // Mid-tool undo takes back the Count change and keeps the tool.
     e.dispatch(Command::Undo).unwrap();
     assert_eq!(mesh(&e).faces.len(), 12);
-    assert_eq!(e.live.as_ref().map(|l| l.tool), Some(Tool::LoopSlice));
+    assert_eq!(
+        e.session.live.as_ref().map(|l| l.tool),
+        Some(Tool::LoopSlice)
+    );
     e.dispatch(Command::Drop).unwrap();
     assert_eq!(e.history.undo.len(), steps + 1);
     assert_eq!(e.history.undo.last().unwrap().label, "Loop Slice");
@@ -178,7 +181,7 @@ fn loop_slice_without_a_ring_changes_nothing_and_cancel_restores() {
     preview(&mut e, p);
     assert_ne!(mesh(&e).faces.len(), 4);
     e.dispatch(Command::Cancel).unwrap();
-    assert!(e.live.is_none());
+    assert!(e.session.live.is_none());
     assert_eq!(
         e.scene.active().unwrap().mesh,
         before.active().unwrap().mesh

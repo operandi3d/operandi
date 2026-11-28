@@ -259,7 +259,7 @@ fn nothing_selected_tools_start_and_apply() {
         e.scene.active_mut().unwrap().mesh = grid.clone().into();
         e.dispatch(Command::Mode(mode)).unwrap();
         e.dispatch(Command::Activate(tool)).unwrap();
-        let mut p = e.live.as_ref().unwrap().params.clone();
+        let mut p = e.session.live.as_ref().unwrap().params.clone();
         assert!(p.inset > 0., "{tool:?} starts with a Width");
         p.shift = 0.1;
         p.inset = if tool == Tool::EdgeExtrude { 0.05 } else { 0.1 };

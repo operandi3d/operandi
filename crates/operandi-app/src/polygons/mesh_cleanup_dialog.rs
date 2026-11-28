@@ -566,7 +566,7 @@ mod callback_tests {
                     // UIC-307: the command line runs it; the owner settles and
                     // arms again.
                     a.execute(CLEAN_COMMAND);
-                    assert!(a.editor.has_active_task(), "{owner}: {}", a.status);
+                    assert!(a.editor.session.has_active_task(), "{owner}: {}", a.status);
                     continue;
                 }
                 assert!(a.editor == before, "{owner} {route}: {}", a.status);
@@ -590,7 +590,7 @@ mod callback_tests {
         a.run(Command::NewMesh);
         a.run(Command::Undo);
         a.editor.dispatch(Command::PenStart).unwrap();
-        assert!(a.editor.pen_draft.is_some());
+        assert!(a.editor.session.pen_draft.is_some());
         assert!(!a.editor.history.redo.is_empty());
         let before = a.editor.clone();
         let next = a.editor.identities.next_id().unwrap();
@@ -757,10 +757,15 @@ mod callback_tests {
                 offset: 0.2,
                 ..Default::default()
             }));
-            let params = a.editor.live.as_ref().unwrap().params.clone();
+            let params = a.editor.session.live.as_ref().unwrap().params.clone();
             a.run(Command::Preview(params));
             let stage = a.editor.scene.clone();
-            let live = a.editor.live.as_ref().expect("confirmed live stage");
+            let live = a
+                .editor
+                .session
+                .live
+                .as_ref()
+                .expect("confirmed live stage");
             assert!(live.applied);
             assert!(live.preview_error.is_none());
             assert_eq!(

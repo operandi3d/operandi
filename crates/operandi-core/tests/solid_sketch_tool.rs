@@ -39,7 +39,7 @@ fn faces(e: &Editor) -> usize {
     e.scene.active().map_or(0, |i| i.mesh.faces.len())
 }
 fn session(e: &Editor) -> &SketchSession {
-    e.solid_sketch.as_ref().unwrap()
+    e.session.solid_sketch.as_ref().unwrap()
 }
 
 #[test]
@@ -55,7 +55,7 @@ fn no_mesh_layer_refuses_with_the_message() {
         err,
         "Solid Sketch needs a mesh layer. Add or select a mesh first."
     );
-    assert!(e.solid_sketch.is_none());
+    assert!(e.session.solid_sketch.is_none());
 }
 
 #[test]
@@ -64,7 +64,7 @@ fn clicks_build_a_chain_live_and_drop_is_one_step() {
     let before = e.scene.clone();
     let steps = e.history.undo.len();
     start(&mut e);
-    assert_eq!(e.active_task(), Some(ActiveTask::SolidSketch));
+    assert_eq!(e.session.active_task(), Some(ActiveTask::SolidSketch));
     assert_eq!(session(&e).options().subdiv, SubdivMode::Level1);
     for x in [0., 1., 2.] {
         add(&mut e, x);
@@ -81,7 +81,7 @@ fn clicks_build_a_chain_live_and_drop_is_one_step() {
             .all(|r| *r == PolygonRepresentation::Subdivs)
     );
     e.dispatch(Command::Drop).unwrap();
-    assert!(e.solid_sketch.is_none());
+    assert!(e.session.solid_sketch.is_none());
     assert_eq!(e.history.undo.len(), steps + 1);
     assert_eq!(e.history.undo.last().unwrap().label, "Solid Sketch");
     assert_eq!(faces(&e), 22);
@@ -110,7 +110,7 @@ fn undo_inside_the_tool_steps_back_one_edit_and_a_drag_is_one_step() {
     }
     assert!((session(&e).sketch().nodes[1].center.z - 0.3).abs() < 1e-12);
     e.dispatch(Command::Undo).unwrap();
-    assert!(e.solid_sketch.is_some());
+    assert!(e.session.solid_sketch.is_some());
     assert_eq!(session(&e).sketch().nodes[1].center, DVec3::X);
     e.dispatch(Command::Redo).unwrap();
     assert!((session(&e).sketch().nodes[1].center.z - 0.3).abs() < 1e-12);
@@ -122,7 +122,7 @@ fn undo_inside_the_tool_steps_back_one_edit_and_a_drag_is_one_step() {
     assert_eq!(faces(&e), 0);
     // Nothing of its own left: Undo closes the tool, changing nothing.
     e.dispatch(Command::Undo).unwrap();
-    assert!(e.solid_sketch.is_none());
+    assert!(e.session.solid_sketch.is_none());
 }
 
 #[test]
@@ -132,7 +132,7 @@ fn cancel_restores_the_layer() {
     start(&mut e);
     add(&mut e, 0.);
     e.dispatch(Command::Cancel).unwrap();
-    assert!(e.solid_sketch.is_none());
+    assert!(e.session.solid_sketch.is_none());
     assert_eq!(e.scene, before);
 }
 
@@ -403,7 +403,7 @@ fn another_tool_drops_the_sketch_first() {
     add(&mut e, 0.);
     let steps = e.history.undo.len();
     e.dispatch(Command::Activate(Tool::Move)).unwrap();
-    assert!(e.solid_sketch.is_none());
+    assert!(e.session.solid_sketch.is_none());
     assert_eq!(e.history.undo.len(), steps + 1);
     assert_eq!(faces(&e), 6);
 }

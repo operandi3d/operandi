@@ -80,7 +80,10 @@ fn path_of(mesh: &Mesh, f: usize, op: &CurveSweepOp) -> PathTool {
     };
     t.curve.points = points_of(mesh, f);
     t.curve.closed = closed;
-    t.curve.bank = op.rotate.to_degrees();
+    // Rotation turns the profile itself (`profile`), so every ring, the
+    // first one too, rolls by it (#51: the bank left the first ring as
+    // it was).
+    t.curve.bank = 0.;
     t.steps.number = op.steps;
     t.steps.automatic = op.auto_steps;
     t.steps.smoothing_angle = op.walk_angle.to_degrees();
@@ -88,15 +91,19 @@ fn path_of(mesh: &Mesh, f: usize, op: &CurveSweepOp) -> PathTool {
     t.pen_align = op.align;
     t.steps.start_at_source = false;
     t.sweep.invert = op.flip;
-    t.sweep.cap_start = op.cap_mode & 1 == 1;
-    t.sweep.cap_end = op.cap_mode & 2 == 2;
+    // A closed curve makes a closed tube: no ends to cap (#51).
+    t.sweep.cap_start = !closed && op.cap_mode & 1 == 1;
+    t.sweep.cap_end = !closed && op.cap_mode & 2 == 2;
     t.sweep.size = 1.;
     t
 }
 
-/// A round profile polygon of diameter `size` at `at`, facing `along`.
-fn profile(at: DVec3, along: DVec3, size: f64) -> Mesh {
+/// A round profile polygon of diameter `size` at `at`, facing `along`,
+/// rolled by `rotate` radians about it.
+fn profile(at: DVec3, along: DVec3, size: f64, rotate: f64) -> Mesh {
     let (u, v) = along.any_orthonormal_pair();
+    let roll = glam::DQuat::from_axis_angle(along.normalize_or_zero(), rotate);
+    let (u, v) = (roll * u, roll * v);
     let r = size / 2.;
     let vertices = (0..PROFILE_SIDES)
         .map(|i| {
@@ -117,6 +124,61 @@ fn profile(at: DVec3, along: DVec3, size: f64) -> Mesh {
         .into(),
         ..Default::default()
     }
+}
+
+/// `mesh` with points that sit on one of the first ring's points (within
+/// a millionth of `size`) merged into it: a closed sweep's last ring onto
+/// its first.
+fn join_coincident(mut mesh: Mesh, size: f64) -> Mesh {
+    let tolerance = size.abs().max(1.) * 1e-6;
+    let n = mesh.vertices.len();
+    let mut map: Vec<u32> = (0..n as u32).collect();
+    // Only the first ring (the profile's own points) can be landed on, so
+    // each point is checked against those few.
+    let first = PROFILE_SIDES.min(n);
+    for (i, slot) in map.iter_mut().enumerate().skip(first) {
+        if let Some(j) =
+            (0..first).find(|&j| (mesh.vertices[i] - mesh.vertices[j]).length() <= tolerance)
+        {
+            *slot = j as u32;
+        }
+    }
+    if map.iter().enumerate().all(|(i, &m)| m as usize == i) {
+        return mesh;
+    }
+    let faces: Vec<Face> = mesh
+        .faces
+        .iter()
+        .map(|f| {
+            let mut f = f.clone();
+            for v in &mut f.vertices {
+                *v = map[*v as usize];
+            }
+            f
+        })
+        .collect();
+    // Drop the merged-away points (the profile carries no point maps, so
+    // only the polygons need renumbering).
+    let mut renumber = vec![u32::MAX; n];
+    let mut kept = Vec::with_capacity(n);
+    for (i, &m) in map.iter().enumerate() {
+        if m as usize == i {
+            renumber[i] = kept.len() as u32;
+            kept.push(mesh.vertices[i]);
+        }
+    }
+    mesh.vertices = kept;
+    mesh.faces = faces
+        .into_iter()
+        .map(|mut f| {
+            for v in &mut f.vertices {
+                *v = renumber[*v as usize];
+            }
+            f
+        })
+        .collect::<Vec<_>>()
+        .into();
+    mesh
 }
 
 impl TypedOp for CurveSweepOp {
@@ -151,9 +213,13 @@ impl TypedOp for CurveSweepOp {
             let Some(start) = path.first() else {
                 continue;
             };
-            let shape = profile(start.position, start.tangent, self.size);
-            let swept = sweep_geometry(&shape, &[0], &t)?;
-            crate::append_mesh(&mut out, swept.mesh)?;
+            let shape = profile(start.position, start.tangent, self.size, self.rotate);
+            let mut swept = sweep_geometry(&shape, &[0], &t)?.mesh;
+            if t.curve.closed {
+                // The last ring lands on the first: join them (#51).
+                swept = join_coincident(swept, self.size);
+            }
+            crate::append_mesh(&mut out, swept)?;
         }
         let n = out.faces.len() as u32;
         ctx.tag(&mut out, "sweep", first..n);

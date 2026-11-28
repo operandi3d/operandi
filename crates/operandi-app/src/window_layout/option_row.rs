@@ -144,7 +144,6 @@ pub(crate) fn value(ui: &mut Ui, label: &str, value: &str) -> Response {
 }
 
 /// A full-width button with no left label (UIC-116).
-#[allow(dead_code)]
 pub(crate) fn button(ui: &mut Ui, label: &str) -> Response {
     rows::button(ui, label)
 }

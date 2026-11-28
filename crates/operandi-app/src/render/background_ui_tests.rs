@@ -47,7 +47,10 @@ fn turning_it_on_keeps_the_open_tool() {
     a.run(Command::Mode(Mode::Vertex));
     a.activate(Tool::Move);
     a.execute("constrain to background");
-    assert_eq!(a.editor.live.as_ref().map(|l| l.tool), Some(Tool::Move));
+    assert_eq!(
+        a.editor.session.live.as_ref().map(|l| l.tool),
+        Some(Tool::Move)
+    );
     assert!(a.editor.background_constraint.is_some());
 }
 
@@ -428,7 +431,7 @@ fn mc08_a_snapped_point_ends_on_the_background() {
     // Dragged to just short of point 1: the handle snaps onto it...
     let params = operandi_core::Parameters {
         delta: DVec3::new(0.98, 0.49, 0.),
-        ..a.editor.live.as_ref().unwrap().params.clone()
+        ..a.editor.session.live.as_ref().unwrap().params.clone()
     };
     let snapped = a.snap_move(Tool::Move, params, None, r);
     assert!(

@@ -317,6 +317,10 @@ pub struct WorldDraw {
     /// Items drawn whole selected (Item mode) from geometry built
     /// unselected (`Selected`).
     pub whole_selected: std::collections::BTreeSet<u64>,
+    /// Items pre-highlighted whole (Item mode rollover), drawn as a whole
+    /// selected item is but in the rollover colours; a selected item
+    /// shows selected.
+    pub whole_rollover: std::collections::BTreeSet<u64>,
     /// Image layers drawn per pixel (gpu_scene.rs `GpuMaterials`).
     pub materials: Option<std::sync::Arc<crate::gpu_scene::GpuMaterials>>,
     /// HDRI stage 3: the picture whose blurred copy the Advanced style's
@@ -563,6 +567,10 @@ enum Shared {
     WholeFill,
     /// A whole selected item's wire as its outline (`Selected::wire`).
     WholeOutline,
+    /// A whole pre-highlighted item's fill (Item mode rollover).
+    RolloverFill,
+    /// A whole pre-highlighted item's wire as its outline.
+    RolloverOutline,
 }
 /// A matrix as a map key, bit for bit.
 fn matrix_key(m: glam::Mat4) -> [u32; 16] {
@@ -623,6 +631,24 @@ pub fn shadow_matrix(key: KeyLight, lo: [f32; 3], hi: [f32; 3]) -> (glam::Mat4, 
     (projection * view, toward)
 }
 /// An item's geometry on the graphics card.
+impl ResidentBuffers {
+    /// The shared placement a whole item's fill draws through.
+    fn fill_kind(&self) -> Shared {
+        if self.rollover {
+            Shared::RolloverFill
+        } else {
+            Shared::WholeFill
+        }
+    }
+    /// The shared placement a whole item's outline draws through.
+    fn outline_kind(&self) -> Shared {
+        if self.rollover {
+            Shared::RolloverOutline
+        } else {
+            Shared::WholeOutline
+        }
+    }
+}
 struct ResidentBuffers {
     generation: u64,
     /// The fill and wire, in the shared buffers for a small item
@@ -647,8 +673,11 @@ struct ResidentBuffers {
     /// Its own placement, made when first needed: a whole selected item's
     /// fill or one drawn by a material program reads more than the matrix.
     placement: Option<Placement>,
-    /// The item is drawn whole selected this frame.
+    /// The item is drawn whole selected (or whole pre-highlighted) this
+    /// frame.
     whole: bool,
+    /// Whole pre-highlighted rather than selected: the rollover colours.
+    rollover: bool,
     /// Where the cached geometry draws this frame (identity unless a drag
     /// moved the item since it was built). Items that need nothing else of
     /// their placement draw through a shared one for this matrix
@@ -1261,6 +1290,7 @@ struct VertexOut { @builtin(position) position: vec4<f32>, @location(0) color: v
                     bounds: bounds_of(&geometry.fill),
                     placement,
                     whole: false,
+                    rollover: false,
                     matrix: *matrix,
                     built: geometry.built,
                     patches,
@@ -1277,11 +1307,21 @@ struct VertexOut { @builtin(position) position: vec4<f32>, @location(0) color: v
             fill_colour,
             wire_colour,
         };
+        // Item mode's rollover: the same look in the rollover colours.
+        let rollover_as = |fill: bool, wire: bool| Selected {
+            fill,
+            wire,
+            mesh: true,
+            fill_colour: crate::theme::viewport::rollover_face(),
+            wire_colour: crate::theme::viewport::rollover(),
+        };
         for (id, ..) in &world.items {
             let Some(b) = self.resident.get_mut(id) else {
                 continue;
             };
-            b.whole = world.whole_selected.contains(id);
+            let selected = world.whole_selected.contains(id);
+            b.rollover = !selected && world.whole_rollover.contains(id);
+            b.whole = selected || b.rollover;
             // The item's own placement: only items whose material programs
             // read it (`Placement::local`).
             if b.programs {
@@ -1291,7 +1331,9 @@ struct VertexOut { @builtin(position) position: vec4<f32>, @location(0) color: v
                 p.set(queue, b.matrix, b.built);
                 p.select(
                     queue,
-                    if b.whole {
+                    if b.rollover {
+                        rollover_as(true, false)
+                    } else if b.whole {
                         selected_as(true, false)
                     } else {
                         Selected {
@@ -1311,8 +1353,8 @@ struct VertexOut { @builtin(position) position: vec4<f32>, @location(0) color: v
                 let m = matrix_key(b.matrix);
                 used.insert((m, Shared::Mesh));
                 if b.whole {
-                    used.insert((m, Shared::WholeFill));
-                    used.insert((m, Shared::WholeOutline));
+                    used.insert((m, b.fill_kind()));
+                    used.insert((m, b.outline_kind()));
                 }
             }
         }
@@ -1336,6 +1378,8 @@ struct VertexOut { @builtin(position) position: vec4<f32>, @location(0) color: v
                     },
                     Shared::WholeFill => selected_as(true, false),
                     Shared::WholeOutline => selected_as(true, true),
+                    Shared::RolloverFill => rollover_as(true, false),
+                    Shared::RolloverOutline => rollover_as(true, true),
                 },
             );
         }
@@ -1344,12 +1388,10 @@ struct VertexOut { @builtin(position) position: vec4<f32>, @location(0) color: v
             let Some(b) = self.resident.get_mut(id) else {
                 continue;
             };
+            let kinds = [Shared::Mesh, b.fill_kind(), b.outline_kind()];
             let Some(p) = &mut b.patches else { continue };
             let m = matrix_key(b.matrix);
-            for (slot, kind) in [Shared::Mesh, Shared::WholeFill, Shared::WholeOutline]
-                .into_iter()
-                .enumerate()
-            {
+            for (slot, kind) in kinds.into_iter().enumerate() {
                 if let Some(shared) = self.shared.get(&(m, kind)) {
                     p.bind_placement(
                         device,
@@ -1373,7 +1415,7 @@ struct VertexOut { @builtin(position) position: vec4<f32>, @location(0) color: v
     fn fill_placement<'a>(&'a self, b: &'a ResidentBuffers) -> &'a wgpu::BindGroup {
         match &b.placement {
             Some(own) if b.programs => &own.group,
-            _ if b.whole => self.shared_placement(b, Shared::WholeFill),
+            _ if b.whole => self.shared_placement(b, b.fill_kind()),
             _ => self.wire_placement(b),
         }
     }
@@ -1996,7 +2038,7 @@ struct VertexOut { @builtin(position) position: vec4<f32>, @location(0) color: v
                             &b.edges,
                             0..b.edge_count,
                             None,
-                            self.shared_placement(b, Shared::WholeOutline),
+                            self.shared_placement(b, b.outline_kind()),
                         );
                     }
                 }
@@ -2077,7 +2119,7 @@ struct VertexOut { @builtin(position) position: vec4<f32>, @location(0) color: v
                             &b.edges,
                             0..b.edge_count,
                             None,
-                            self.shared_placement(b, Shared::WholeOutline),
+                            self.shared_placement(b, b.outline_kind()),
                         );
                         runs.draw(&mut pass, 1, 3);
                     }

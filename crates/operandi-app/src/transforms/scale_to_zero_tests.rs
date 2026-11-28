@@ -8,7 +8,7 @@ fn rect() -> Rect {
 }
 
 fn delta(a: &Operandi) -> DVec3 {
-    a.editor.live.as_ref().unwrap().params.delta
+    a.editor.session.live.as_ref().unwrap().params.delta
 }
 
 #[test]
@@ -20,7 +20,7 @@ fn scale_handles_reach_zero_and_grow_back() {
     a.activate(Tool::Scale);
     let start = pos2(400., 300.);
     // The center handle: far left/down goes to exactly 0, not 0.1%.
-    let base = a.editor.live.as_ref().unwrap().params.clone();
+    let base = a.editor.session.live.as_ref().unwrap().params.clone();
     a.update_handle(
         viewport::SCALE_UNIFORM_HANDLE,
         base,
@@ -31,7 +31,7 @@ fn scale_handles_reach_zero_and_grow_back() {
     );
     assert_eq!(delta(&a), DVec3::ZERO, "{}", a.status);
     // From 0 a drag right grows all three axes together.
-    let base = a.editor.live.as_ref().unwrap().params.clone();
+    let base = a.editor.session.live.as_ref().unwrap().params.clone();
     a.update_handle(
         viewport::SCALE_UNIFORM_HANDLE,
         base,
@@ -52,7 +52,7 @@ fn scale_handles_reach_zero_and_grow_back() {
         .find(|h| h.0 < 3)
         .cloned()
         .expect("an axis handle");
-    let base = a.editor.live.as_ref().unwrap().params.clone();
+    let base = a.editor.session.live.as_ref().unwrap().params.clone();
     a.update_handle(
         axis,
         base,

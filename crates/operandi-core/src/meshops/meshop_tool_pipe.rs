@@ -16,8 +16,10 @@
 //!   its own copy of the falloff layers, taken from the active falloff
 //!   when it is added (Use Active Falloff / Clear Falloff change it).
 //!   The primitives above build their shape with it (their Falloff
-//!   Scale, Offset and Twist rows, #15). Other steps that add or remove
-//!   points aren't shaped and say so on their row.
+//!   Scale, Offset and Twist rows, #15), and Polygon Bevel and Smooth
+//!   Shift weigh their shift and inset by it, as their tools do (#43).
+//!   Other steps that add or remove points aren't shaped and say so on
+//!   their row.
 //!
 //! Provisional (MOQ-66): which steps follow each setting, the mirror's
 //! plane and tolerance, and the angle order are Operandi's reading; the
@@ -63,6 +65,10 @@ const PLACED: &[&str] = &[
 /// The primitives that build their shape with the falloff (Falloff
 /// Scale, Offset, Twist rows) instead of having their points weighed.
 const SHAPED: &[&str] = &[
+    // #43: their tools take a falloff, so the ops weigh their own moves
+    // (`OpContext::point_weights`).
+    "poly.bevel.item",
+    "poly.smshift.item",
     "prim.capsule.item",
     "prim.cone.item",
     "prim.cube.item",

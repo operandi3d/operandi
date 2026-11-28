@@ -25,7 +25,7 @@ fn history_queries_do_not_consume_identity_or_stage_marks() {
                 editor.dispatch(Command::BeginExtrude).unwrap();
             }
             2 => {
-                let mut p = editor.live.as_ref().unwrap().params.clone();
+                let mut p = editor.session.live.as_ref().unwrap().params.clone();
                 p.extent = glam::DVec3::Z * 0.5;
                 editor.dispatch(Command::Preview(p)).unwrap();
             }

@@ -101,7 +101,7 @@ impl Rig {
     fn activate(&mut self, tool: Tool) {
         self.a.activate(tool);
         assert_eq!(
-            self.a.editor.live.as_ref().map(|l| l.tool),
+            self.a.editor.session.live.as_ref().map(|l| l.tool),
             Some(tool),
             "{}",
             self.a.status
@@ -139,6 +139,7 @@ impl Rig {
     fn center(&self) -> DVec3 {
         self.a
             .editor
+            .session
             .live
             .as_ref()
             .unwrap()
@@ -149,6 +150,7 @@ impl Rig {
     fn axes(&self) -> glam::DMat3 {
         self.a
             .editor
+            .session
             .live
             .as_ref()
             .unwrap()
@@ -157,7 +159,7 @@ impl Rig {
             .basis
     }
     fn delta(&self) -> DVec3 {
-        self.a.editor.live.as_ref().unwrap().params.delta
+        self.a.editor.session.live.as_ref().unwrap().params.delta
     }
 }
 
@@ -417,14 +419,14 @@ fn other_centres_stay_put_under_a_press() {
         (CenterMode::Selection, AxisOrientation::Selection),
         (CenterMode::SelectionBorder, AxisOrientation::Selection),
         (CenterMode::SelectionAutoAxis, AxisOrientation::World),
-        (CenterMode::Local, AxisOrientation::World),
+        (CenterMode::Local, AxisOrientation::Local),
         (CenterMode::Pivot, AxisOrientation::Item),
         (CenterMode::Parent, AxisOrientation::Parent),
     ] {
         let mut rig = Rig::new(Mode::Polygon);
         rig.context(center, axis);
         rig.activate(Tool::Rotate);
-        let frame = rig.a.editor.live.as_ref().unwrap().action_frame;
+        let frame = rig.a.editor.session.live.as_ref().unwrap().action_frame;
         let before = rig.a.editor.scene.active().unwrap().mesh.vertices.clone();
         for (p, by) in [
             (DVec3::new(-5., 13., 0.), Vec2::ZERO),
@@ -434,7 +436,7 @@ fn other_centres_stay_put_under_a_press() {
         ] {
             rig.press(p, by);
             assert_eq!(
-                rig.a.editor.live.as_ref().unwrap().action_frame,
+                rig.a.editor.session.live.as_ref().unwrap().action_frame,
                 frame,
                 "{center:?} after a press at {p}"
             );

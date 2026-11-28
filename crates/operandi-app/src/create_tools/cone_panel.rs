@@ -11,7 +11,11 @@ pub(super) struct ConeFields;
 impl ToolFields for ConeFields {
     type P = ConeParameters;
     fn params(app: &Operandi) -> Option<ConeParameters> {
-        app.editor.cone.as_ref().map(|s| s.requested.clone())
+        app.editor
+            .session
+            .cone
+            .as_ref()
+            .map(|s| s.requested.clone())
     }
     fn form(app: &Operandi, p: &ConeParameters) -> ToolForm<ConeParameters> {
         type P = ConeParameters;
@@ -162,7 +166,7 @@ impl ToolFields for ConeFields {
             Vec::new(),
             None,
         );
-        let session = app.editor.cone.as_ref();
+        let session = app.editor.session.cone.as_ref();
         if let Some(error) = session.and_then(|s| s.error.as_ref()) {
             f.error(error);
         }
@@ -190,7 +194,11 @@ impl ToolFields for ConeFields {
         app.status = "Cone numeric preview ready · Apply creates one result".into();
     }
     fn settled(app: &mut Operandi) -> bool {
-        app.editor.cone.as_ref().is_none_or(|s| s.error.is_none())
+        app.editor
+            .session
+            .cone
+            .as_ref()
+            .is_none_or(|s| s.error.is_none())
     }
     fn option_error_key(_: &Operandi, error: &str) -> Option<String> {
         Some(if error.contains("Quad Grid") {
@@ -209,7 +217,7 @@ mod tests {
         let mut a = Operandi::empty();
         a.run(Command::NewMesh);
         a.execute("Cone");
-        assert!(a.editor.cone.is_some());
+        assert!(a.editor.session.cone.is_some());
         assert!(a.editor.scene.active().unwrap().mesh.vertices.is_empty());
         for (key, value) in [
             ("cone_position0", "1 m"),
@@ -222,13 +230,13 @@ mod tests {
             a.fields.insert(key.into(), value.into());
         }
         assert!(a.confirm_fields());
-        let preview = a.editor.cone.as_ref().unwrap().preview.clone();
+        let preview = a.editor.session.cone.as_ref().unwrap().preview.clone();
         a.fields.insert("cone_gaps".into(), "50".into());
         a.execute("Apply");
         assert!(a.editor.scene.active().unwrap().mesh.vertices.is_empty());
         assert_eq!(a.fields["cone_gaps"], "50");
         assert!(a.field_errors.contains_key("cone_gaps"));
-        assert_eq!(a.editor.cone.as_ref().unwrap().preview, preview);
+        assert_eq!(a.editor.session.cone.as_ref().unwrap().preview, preview);
         a.execute("cone apply");
         assert!(a.editor.scene.active().unwrap().mesh.vertices.is_empty());
         a.fields.insert("cone_gaps".into(), "7".into());
@@ -236,16 +244,16 @@ mod tests {
         assert_eq!(a.editor.scene.active().unwrap().mesh.vertices.len(), 25);
         a.fields.insert("cone_min0".into(), "-2 m".into());
         assert!(a.confirm_fields());
-        let p = &a.editor.cone.as_ref().unwrap().requested;
+        let p = &a.editor.session.cone.as_ref().unwrap().requested;
         assert_eq!(p.max().x, 1.5);
         assert_eq!(p.min().x, -2.);
         // The edited Min X shows a preview, so Drop keeps it as a Cone.
         a.execute("Drop");
-        assert!(a.editor.cone.is_none());
+        assert!(a.editor.session.cone.is_none());
         let dropped = a.editor.scene.clone();
         assert!(dropped.active().unwrap().mesh.vertices.len() > 25);
         a.execute("Undo");
-        assert!(a.editor.cone.is_none());
+        assert!(a.editor.session.cone.is_none());
         assert_eq!(a.editor.scene.active().unwrap().mesh.vertices.len(), 25);
         a.execute("Undo");
         assert!(a.editor.scene.active().unwrap().mesh.vertices.is_empty());
@@ -265,7 +273,7 @@ mod tests {
         assert!(a.field_errors.contains_key("cone_sides"));
         assert!(a.editor.scene.active().unwrap().mesh.vertices.is_empty());
         a.execute("Cancel");
-        assert!(a.editor.cone.is_none());
+        assert!(a.editor.session.cone.is_none());
         assert!(a.field_errors.is_empty());
         assert!(a.editor.scene.active().unwrap().mesh.vertices.is_empty());
     }
@@ -286,7 +294,7 @@ mod recovery_tests {
         a.fields.insert("cone_gaps".into(), "0".into());
         assert!(a.confirm_fields());
         assert!(a.field_errors.is_empty());
-        assert!(a.editor.cone.as_ref().unwrap().error.is_none());
+        assert!(a.editor.session.cone.as_ref().unwrap().error.is_none());
     }
 }
 
@@ -306,12 +314,12 @@ mod quad_grid_tests {
                 ..Default::default()
             }))
             .unwrap();
-        let preview = a.editor.cone.as_ref().unwrap().preview.clone();
+        let preview = a.editor.session.cone.as_ref().unwrap().preview.clone();
         // Odd sides are allowed since PRIM-K-02; a fraction is still refused.
         a.fields.insert("cone_sides".into(), "8.5".into());
         a.execute("Apply");
         assert!(a.field_errors.contains_key("cone_sides"));
-        assert_eq!(a.editor.cone.as_ref().unwrap().preview, preview);
+        assert_eq!(a.editor.session.cone.as_ref().unwrap().preview, preview);
         assert!(a.editor.scene.active().unwrap().mesh.vertices.is_empty());
         a.fields.insert("cone_sides".into(), "8".into());
         a.execute("Cone Apply");
@@ -328,7 +336,7 @@ mod quad_grid_tests {
         assert_eq!(ids.len(), 73);
         // Drop after Apply records nothing; Undo takes back the Apply.
         a.execute("Drop");
-        assert!(a.editor.cone.is_none());
+        assert!(a.editor.session.cone.is_none());
         a.execute("Undo");
         assert!(a.editor.scene.active().unwrap().mesh.vertices.is_empty());
     }

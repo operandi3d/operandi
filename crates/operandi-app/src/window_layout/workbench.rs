@@ -480,7 +480,7 @@ impl Operandi {
     pub(super) fn workbench_pipe(&self) -> std::result::Result<(Tool, Vec<String>), String> {
         let live = self
             .editor
-            .live
+            .session.live
             .as_ref()
             .ok_or("Open a tool first: the preset re-runs the open tool with its action centre, falloff and symmetry")?;
         let tool = live.tool;

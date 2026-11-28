@@ -13,7 +13,7 @@ fn editor() -> Editor {
 /// Draw one primitive with custom segment settings and Drop it.
 fn draw(e: &mut Editor, tool: Tool) {
     e.dispatch(Command::Activate(tool)).unwrap();
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     p.size = DVec3::splat(2.);
     p.segments = [3, 2, 4];
     if let Some(r) = p.radial.as_mut() {
@@ -25,7 +25,7 @@ fn draw(e: &mut Editor, tool: Tool) {
 }
 
 fn live(e: &Editor) -> &Parameters {
-    &e.live.as_ref().unwrap().params
+    &e.session.live.as_ref().unwrap().params
 }
 
 #[test]

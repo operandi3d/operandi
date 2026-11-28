@@ -71,7 +71,7 @@ fn a_paint_tool_hides_the_selection_highlight_until_another_tool() {
 
     // Another tool (Shear): the highlight is back.
     a.execute("tool.set xfrm.shear on");
-    assert!(a.editor.has_active_task(), "{}", a.status);
+    assert!(a.editor.session.has_active_task(), "{}", a.status);
     let back = picture(&mut a, &ctx);
     assert!(differing(&selected, &back) < 50, "the tint comes back");
     assert!(a.rollover_at(centre, r).is_some(), "hover comes back");

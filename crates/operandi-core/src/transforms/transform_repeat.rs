@@ -25,6 +25,7 @@ impl Editor {
     /// the latest change and no drag is in progress.
     fn current_transform_step(&self) -> Option<(&Live, &TransformStep)> {
         let live = self
+            .session
             .live
             .as_ref()
             .filter(|l| l.tool.is_transform() && l.tool != Tool::Tweak)?;
@@ -32,6 +33,7 @@ impl Editor {
             return None;
         }
         let step = self
+            .session
             .last_transform_step
             .as_deref()
             .filter(|s| s.tool == live.tool && s.after == self.scene)?;
@@ -51,7 +53,7 @@ impl Editor {
         next.identity_base = step.identity_base.clone();
         next.identity_preview = None;
         next.applied = step.applied;
-        self.live = Some(next);
+        self.session.live = Some(next);
         Ok(())
     }
 

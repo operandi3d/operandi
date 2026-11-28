@@ -20,7 +20,7 @@ fn moved() -> Editor {
     }))
     .unwrap();
     e.dispatch(Command::BeginExtrude).unwrap();
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     p.extent = DVec3::Z * 0.5;
     e.dispatch(Command::Preview(p)).unwrap();
     e
@@ -133,7 +133,7 @@ fn local_steps_resume_and_cancel_report_the_executed_route() {
         }
     );
     assert!(report.restored_local() && !report.foreground_closed);
-    assert!(e.live.is_some());
+    assert!(e.session.live.is_some());
     e.dispatch(Command::Drop).unwrap();
     e = moved();
     applied(&mut e, HistoryRequest::Undo);
@@ -197,7 +197,7 @@ fn refusal_is_typed_at_the_guard_and_final_publication_failure_is_not_success() 
     assert!(e == before);
 
     let mut e = moved();
-    e.live.as_mut().unwrap().preview_error = Some("retained invalid draft".into());
+    e.session.live.as_mut().unwrap().preview_error = Some("retained invalid draft".into());
     e.identities.publication = u64::MAX;
     let before = e.clone();
     let failure = e
@@ -216,7 +216,7 @@ fn refusal_is_typed_at_the_guard_and_final_publication_failure_is_not_success() 
     assert!(e.history.undo == before.history.undo);
     assert!(e.history.redo == before.history.redo);
     assert_eq!(e.revision, before.revision);
-    assert!(e.live.as_ref().unwrap().preview_error.is_none());
+    assert!(e.session.live.as_ref().unwrap().preview_error.is_none());
 }
 
 #[test]

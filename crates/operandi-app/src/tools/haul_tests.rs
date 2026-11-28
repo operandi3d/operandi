@@ -57,7 +57,14 @@ fn haul(
 }
 
 fn loop_slice(a: &Operandi) -> &operandi_core::LoopSlice {
-    &a.editor.live.as_ref().unwrap().params.slice.loop_slice
+    &a.editor
+        .session
+        .live
+        .as_ref()
+        .unwrap()
+        .params
+        .slice
+        .loop_slice
 }
 
 /// Loop Slice live on the ring of edge 0-4 (x = 0, z 0..1): it crosses all
@@ -116,7 +123,7 @@ fn left_drag_off_the_bar_moves_the_current_slice_one_bar_pixel_per_pixel() {
     a.run(Command::Undo);
     assert!((loop_slice(&a).positions[0] - 0.5).abs() < 1e-9);
     assert_eq!(
-        a.editor.live.as_ref().map(|l| l.tool),
+        a.editor.session.live.as_ref().map(|l| l.tool),
         Some(Tool::LoopSlice)
     );
 }
@@ -200,6 +207,7 @@ fn middle_drag_sideways_picks_current_and_up_sets_inset() {
     let ctx = Context::default();
     let mut a = loop_slice_app(&ctx);
     a.editor
+        .session
         .live
         .as_mut()
         .unwrap()
@@ -207,7 +215,7 @@ fn middle_drag_sideways_picks_current_and_up_sets_inset() {
         .slice
         .loop_slice
         .set_count(3);
-    let p = a.editor.live.as_ref().unwrap().params.clone();
+    let p = a.editor.session.live.as_ref().unwrap().params.clone();
     a.run(Command::Preview(p));
     let from = open_space(&a);
     let px = feel::WHOLE_STEP_PX;
@@ -291,7 +299,15 @@ fn bevel_right_drag_sets_segments_and_left_keeps_its_own_drag() {
     draw(&mut a, &ctx, SIZE, vec![]);
     a.activate(Tool::Bevel);
     draw(&mut a, &ctx, SIZE, vec![]);
-    let before = a.editor.live.as_ref().unwrap().params.bevel.segments;
+    let before = a
+        .editor
+        .session
+        .live
+        .as_ref()
+        .unwrap()
+        .params
+        .bevel
+        .segments;
     let from = open_space(&a);
     haul(
         &mut a,
@@ -301,7 +317,15 @@ fn bevel_right_drag_sets_segments_and_left_keeps_its_own_drag() {
         from + vec2(feel::WHOLE_STEP_PX * 2. + 1., 0.),
         Modifiers::NONE,
     );
-    let after = a.editor.live.as_ref().unwrap().params.bevel.segments;
+    let after = a
+        .editor
+        .session
+        .live
+        .as_ref()
+        .unwrap()
+        .params
+        .bevel
+        .segments;
     assert_eq!(after, before + 2, "{}", a.status);
     assert!(!haul::claims(Tool::Bevel, Button::Left), "DL-09");
 }
@@ -319,7 +343,16 @@ fn edge_bevel_right_drag_sets_segments() {
     draw(&mut a, &ctx, SIZE, vec![]);
     a.activate(Tool::EdgeBevel);
     draw(&mut a, &ctx, SIZE, vec![]);
-    let rows = |a: &Operandi| a.editor.live.as_ref().unwrap().params.chamfer.segments;
+    let rows = |a: &Operandi| {
+        a.editor
+            .session
+            .live
+            .as_ref()
+            .unwrap()
+            .params
+            .chamfer
+            .segments
+    };
     let before = rows(&a);
     let from = open_space(&a);
     let step = feel::WHOLE_STEP_PX;
@@ -375,7 +408,7 @@ fn every_table_value_is_a_number_field_on_its_tools_panel() {
         draw(&mut a, &ctx, SIZE, vec![]);
         a.activate(*tool);
         assert_eq!(
-            a.editor.live.as_ref().map(|l| l.tool),
+            a.editor.session.live.as_ref().map(|l| l.tool),
             Some(*tool),
             "{tool:?}: {}",
             a.status

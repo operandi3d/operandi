@@ -39,7 +39,7 @@ impl Editor {
     /// `operandi.solidSketch.strip`: removes the sketch data from the
     /// selected meshes, leaving plain polygons. One undo step.
     pub(crate) fn strip_solid_sketch(&mut self) -> Result<()> {
-        if self.has_active_task() {
+        if self.session.has_active_task() {
             return Err("Drop or Cancel the active tool before stripping sketch data".into());
         }
         let ids = self.scene.selected_items();

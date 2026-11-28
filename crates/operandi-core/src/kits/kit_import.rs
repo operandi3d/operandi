@@ -50,7 +50,28 @@ static IMPORTERS: RwLock<Vec<KitImporter>> = RwLock::new(Vec::new());
 
 /// Replace the table of kit importers.
 pub fn set_kit_importers(importers: Vec<KitImporter>) {
+    // Interchange asks the table through these hooks (it doesn't use kits).
+    crate::interchange::set_added_importers(crate::interchange::AddedImporters {
+        extensions: added_extensions,
+        import: import_added,
+    });
     *IMPORTERS.write().unwrap_or_else(|e| e.into_inner()) = importers;
+}
+
+/// Every extension in the table, each with its importer's label.
+fn added_extensions() -> Vec<(String, String)> {
+    let mut list = Vec::new();
+    for importer in kit_importers() {
+        for ext in &importer.extensions {
+            list.push((ext.clone(), importer.label.clone()));
+        }
+    }
+    list
+}
+
+/// Import `path` with the kit importer for `ext`, if there is one.
+fn import_added(ext: &str, path: &Path) -> Option<Result<Imported>> {
+    kit_importer_for(ext).map(|importer| run(&importer, path))
 }
 
 /// The kit importers now in the table.

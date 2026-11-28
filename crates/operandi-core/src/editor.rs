@@ -30,6 +30,9 @@ pub struct Live {
     /// service places it.
     pub placed_centre: Option<DVec3>,
     pub preview_error: Option<String>,
+    /// The pivot service's answer for this tool on `base`, kept so a drag
+    /// resolves it once (`Editor::live_pivots`). Derived; not compared.
+    pub pivots: crate::pivot_service::PivotCache,
 }
 #[derive(Clone, PartialEq)]
 pub struct Checkpoint {
@@ -67,6 +70,9 @@ pub struct Editor {
     pub history: crate::History,
     /// The tools' last-used values, one per tool (preset_store.rs).
     pub presets: crate::ToolPresets,
+    /// The running tool session: arming, tweaks, the tool Redo reopens and
+    /// the command and gesture running now (tool_session.rs).
+    pub session: crate::ToolSession,
     /// Meshes a tool or command has just run on as one of several active
     /// meshes (multi_tools.rs): their components were written by that
     /// tool for the new geometry, so they survive the topology check in
@@ -75,7 +81,6 @@ pub struct Editor {
     pub multi_fresh: std::collections::BTreeSet<u64>,
     /// Select > Polygon Tag Type: what tag selection modes select by.
     pub polygon_tag_kind: crate::PolygonTagKind,
-    pub pen_draft: Option<crate::PenDraft>,
     /// What the open tool's start inferred from another selection mode
     /// (selection_inference.rs), if anything.
     pub inference: Option<crate::selection_inference::Inference>,
@@ -88,14 +93,8 @@ pub struct Editor {
     pub symmetry_unpaired: Vec<u32>,
     /// The setting Toggle Symmetry turns back on (the last one before Off).
     pub symmetry_resume: Option<crate::Symmetry>,
-    /// Mirror partners added during the open selection gesture (lasso,
-    /// rectangle, paint), moved after the swept elements when it ends
-    /// (spec v3.1 section 11: swept elements first, then partners).
-    pub gesture_partners: Vec<(u64, crate::Component)>,
     /// Interactive Pen options, kept between Pen sessions.
     pub pen_options: crate::PenOptions,
-    /// The open Solid Sketch session (solid_sketch_editor.rs).
-    pub solid_sketch: Option<crate::SketchSession>,
     /// Solid Sketch options, kept between sessions (spec Q18).
     pub solid_sketch_options: crate::solid_sketch::SketchOptions,
     pub i2: crate::LiveExtrudeHistory,
@@ -137,10 +136,6 @@ pub struct Editor {
     /// it and the Vertex Map falloff reads it. Tool context, not scene
     /// data.
     pub selected_weight_map: Option<String>,
-    /// An open tool preset row (Soft Move, Twist, Flex, Flare ...): its
-    /// live tool is the row's tool, and the pipe slots it took go back on
-    /// drop (tool_preset.rs).
-    pub preset: Option<crate::PresetSession>,
     /// Last Linear and Radial settings, offered on reactivation (FAL-M-03).
     pub linear_falloff_preset: crate::LinearFalloff,
     pub radial_falloff_preset: crate::RadialFalloff,
@@ -148,16 +143,6 @@ pub struct Editor {
     /// tool flagged off only arms when picked. The app turns it on; off,
     /// every tool starts at once as before (scripts, staged one-shots).
     pub auto_activate_flags: bool,
-    /// CS-01: the live tool is armed: picked, values editable, nothing
-    /// drawn and the mesh as it was, until the first click or Apply.
-    pub armed: Option<Tool>,
-    /// N25: Edge Extend was started by a click, so its rows exist even at
-    /// zero offset (click_start.rs).
-    pub extend_from_click: bool,
-    /// How deep inside `dispatch` the editor is: arming and the armed
-    /// rules act only on top-level commands (click_start.rs).
-    #[doc(hidden)]
-    pub dispatch_depth: u32,
     /// 3D painting's saved-image record and last-made image and layer.
     #[cfg(feature = "painting")]
     pub paint: crate::paint::PaintSession,
@@ -167,37 +152,17 @@ pub struct Editor {
     >,
     pub surface_state: std::collections::BTreeMap<String, String>,
 
-    pub bridge: Option<crate::NumericBridge>,
-    pub spike: Option<crate::NumericSpike>,
     pub spike_strength: f64,
-    /// MP-T11 Polygon Reduction session; `None` when the tool is off.
-    pub reduction: Option<crate::NumericReduction>,
-    pub ellipsoid: Option<crate::NumericEllipsoid>,
-    /// Torus, Capsule, Arc or Tube numeric session (NPR), and each one's
-    /// last settings.
-    pub shape: Option<crate::NumericShape>,
-    pub cone: Option<crate::NumericCone>,
     pub scene: Scene,
     pub action_context: crate::ActionContext,
     /// Shared Symmetry setting (SYM-ST-01); tool context, not scene data.
     pub symmetry: crate::Symmetry,
-    pub live: Option<Live>,
     /// The document's key time, channel/key selections and playback
     /// (animation.rs; per scene tab).
     pub anim: crate::animation::AnimSession,
     /// RG-11/RG-30 Compensation: rig edits keep items where they are in
     /// world space (off by default; the app keeps it in its preferences).
     pub rig_compensation: bool,
-    /// The tool Undo just closed, which Redo opens again.
-    pub tool_reopen: Option<crate::ToolReopen>,
-    /// The active tool's own tweak history (`mid_tool_undo.rs`).
-    pub tweaks: crate::ToolTweaks,
-    /// The transform drag committed last, for Shift-continue (HM-02) and
-    /// middle-drag repeat (HM-04). Not document state.
-    pub last_transform_step: Option<Box<crate::transform_repeat::TransformStep>>,
-    /// Set by the app while a drag or scrub is held, so its changes are one
-    /// tweak; `end_tweak` clears it.
-    pub tweak_held: bool,
     pub revision: u64,
     pub next_item_id: u64,
     /// Boxed to keep `Editor` small: the app state is near the stack limit.

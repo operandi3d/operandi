@@ -114,7 +114,14 @@ fn drag_patches_match_a_full_rebuild_through_undo_and_redo() {
             let before = a.editor.scene.active().unwrap().mesh.shared().clone();
             assert_matches_full_build(&a, &when("before the drag"));
             a.activate(Tool::Move);
-            let base = a.editor.live.as_ref().expect("Move active").params.clone();
+            let base = a
+                .editor
+                .session
+                .live
+                .as_ref()
+                .expect("Move active")
+                .params
+                .clone();
             let builds = a.resident_cache.builds();
             let patches = a.resident_cache.patches();
             for k in 1..=5 {

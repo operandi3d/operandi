@@ -19,17 +19,17 @@ fn short_invalid_and_active_task_refusals_are_atomic() {
     e.dispatch(Command::PenStart).unwrap();
     e.dispatch(Command::PenCapture(DVec3::ZERO)).unwrap();
     e.dispatch(Command::PenCapture(DVec3::X)).unwrap();
-    let draft = e.pen_draft.clone();
+    let draft = e.session.pen_draft.clone();
     assert!(
         e.dispatch(Command::PenCapture(DVec3::splat(f64::NAN)))
             .is_err()
     );
     assert!(e.dispatch(Command::Activate(Tool::Extrude)).is_err());
-    assert!(e.pen_draft == draft && e.scene == scene);
+    assert!(e.session.pen_draft == draft && e.scene == scene);
     // Draw tools Pen (seen, 2026-11-05): dropping a two-point polygon
     // leaves its two points, one undo step.
     e.dispatch(Command::Drop).unwrap();
-    assert!(e.pen_draft.is_none());
+    assert!(e.session.pen_draft.is_none());
     let m = &e.scene.active().unwrap().mesh;
     let before = &scene.active().unwrap().mesh;
     assert_eq!(m.vertices.len(), before.vertices.len() + 2);
@@ -44,7 +44,7 @@ fn dropping_a_one_point_pen_draft_discards_it() {
     e.dispatch(Command::PenStart).unwrap();
     e.dispatch(Command::PenCapture(DVec3::ZERO)).unwrap();
     e.dispatch(Command::Drop).unwrap();
-    assert!(e.pen_draft.is_none() && e.scene == scene && e.history.undo.len() == undo);
+    assert!(e.session.pen_draft.is_none() && e.scene == scene && e.history.undo.len() == undo);
 }
 
 #[test]
@@ -60,9 +60,9 @@ fn self_intersecting_polygon_drop_retains_draft() {
     ] {
         e.dispatch(Command::PenCapture(p)).unwrap();
     }
-    let draft = e.pen_draft.clone();
+    let draft = e.session.pen_draft.clone();
     assert!(e.dispatch(Command::Drop).is_err());
-    assert!(e.scene == scene && e.pen_draft == draft);
+    assert!(e.scene == scene && e.session.pen_draft == draft);
 }
 
 #[test]

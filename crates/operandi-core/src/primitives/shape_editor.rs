@@ -37,7 +37,7 @@ impl Editor {
             .id;
         self.shape_target(target, kind)?;
         let requested = self.presets.get::<crate::ShapePreset>().get(kind);
-        self.shape = Some(NumericShape::armed(target, requested.clone()));
+        self.session.shape = Some(NumericShape::armed(target, requested.clone()));
         // Torus, Capsule, Arc and Tube are drawn in the viewport, like Cone
         // and Ellipsoid: nothing shows until a drag (or a panel edit) places
         // one (Jason, 2026-11-05). The instant shape is the Unit option
@@ -83,6 +83,7 @@ impl Editor {
     }
     pub(crate) fn configure_shape(&mut self, p: ShapeParameters) -> Result<()> {
         let session = self
+            .session
             .shape
             .as_ref()
             .ok_or("Choose Torus, Capsule, Arc or Tube first")?;
@@ -100,7 +101,11 @@ impl Editor {
         if matches!(&p, ShapeParameters::Tube(t) if t.points.len() < 2)
             || matches!(&p, ShapeParameters::Text(t) if t.text.trim().is_empty() && t.validate().is_ok())
         {
-            self.shape.as_mut().expect("checked above").publish_empty(p);
+            self.session
+                .shape
+                .as_mut()
+                .expect("checked above")
+                .publish_empty(p);
             return Ok(());
         }
         let result = self
@@ -110,7 +115,7 @@ impl Editor {
                 self.shape_scene(target, mesh.clone())?;
                 Ok(mesh)
             });
-        let session = self.shape.as_mut().expect("checked above");
+        let session = self.session.shape.as_mut().expect("checked above");
         session.publish(p, result, true)
     }
     fn shape_scene(&self, target: u64, mesh: Mesh) -> Result<Scene> {
@@ -122,7 +127,7 @@ impl Editor {
     }
     /// The scene with the preview appended, for drawing.
     pub fn shape_preview_scene(&self) -> Result<Option<Scene>> {
-        let Some(s) = &self.shape else {
+        let Some(s) = &self.session.shape else {
             return Ok(None);
         };
         s.preview
@@ -132,6 +137,7 @@ impl Editor {
     }
     pub(crate) fn reset_shape(&mut self) -> Result<()> {
         let kind = self
+            .session
             .shape
             .as_ref()
             .ok_or("Choose Torus, Capsule, Arc or Tube first")?
@@ -145,6 +151,7 @@ impl Editor {
         if matches!(&reset, ShapeParameters::Tube(_)) {
             // Reset Tube has no points: nothing to preview yet.
             staged
+                .session
                 .shape
                 .as_mut()
                 .expect("checked above")
@@ -159,6 +166,7 @@ impl Editor {
     /// Drop appends the shown preview and closes the tool.
     pub(crate) fn commit_shape(&mut self, drop: bool) -> Result<()> {
         let s = self
+            .session
             .shape
             .as_ref()
             .ok_or("Choose Torus, Capsule, Arc or Tube first")?;
@@ -178,8 +186,8 @@ impl Editor {
         }
         self.presets.get_mut::<crate::ShapePreset>().set(p);
         if drop {
-            self.shape = None;
-        } else if let Some(s) = &mut self.shape {
+            self.session.shape = None;
+        } else if let Some(s) = &mut self.session.shape {
             s.preview = None;
         }
         Ok(())

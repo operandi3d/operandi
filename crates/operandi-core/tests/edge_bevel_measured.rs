@@ -207,7 +207,7 @@ fn selection_after_and_undo() {
         e.scene.selection.edges = edges;
         let before = e.scene.clone();
         e.dispatch(Command::Activate(tool)).unwrap();
-        let mut p = e.live.as_ref().unwrap().params.clone();
+        let mut p = e.session.live.as_ref().unwrap().params.clone();
         p.chamfer.offset = 0.1;
         e.dispatch(Command::Preview(p)).unwrap();
         e.dispatch(Command::Drop).unwrap();

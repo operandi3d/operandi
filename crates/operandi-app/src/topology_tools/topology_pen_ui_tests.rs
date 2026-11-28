@@ -81,7 +81,7 @@ fn click(a: &mut Operandi, ctx: &Context, at: Pos2, m: Modifiers) {
 }
 
 fn set_mode(a: &mut Operandi, mode: PenMode) {
-    let mut p = a.editor.live.as_ref().unwrap().params.clone();
+    let mut p = a.editor.session.live.as_ref().unwrap().params.clone();
     p.topology_pen.mode = mode;
     a.run(Command::Preview(p));
 }
@@ -101,7 +101,7 @@ const CTRL: Modifiers = Modifiers {
 #[test]
 fn tp10_the_form_has_the_modes_and_the_values_stick() {
     let (mut a, ctx) = grid_app();
-    let p = a.editor.live.as_ref().unwrap().params.clone();
+    let p = a.editor.session.live.as_ref().unwrap().params.clone();
     let mut f = crate::tool_form::ToolForm::<Parameters>::default();
     crate::topology_pen_ui::pen_form(&p, &mut f);
     let keys: Vec<String> = f.fields().into_iter().map(|f| f.row.key.clone()).collect();

@@ -600,7 +600,7 @@ fn material_and_position_refuse_armed_reduction_without_changing_state() {
     let source = fixture();
     let mut a = app(&source);
     a.run(Command::ArmReduction);
-    assert!(a.editor.reduction.is_some(), "{}", a.status);
+    assert!(a.editor.session.reduction.is_some(), "{}", a.status);
     let before = a.editor.clone();
     a.execute("poly.setMaterial");
     assert!(a.set_material.is_none());
@@ -611,7 +611,7 @@ fn material_and_position_refuse_armed_reduction_without_changing_state() {
     // UIC-307: with its value given the command runs; Reduction settles
     // and arms again.
     a.execute("poly.setMaterial {Warm Clay}");
-    assert!(a.editor.reduction.is_some(), "{}", a.status);
+    assert!(a.editor.session.reduction.is_some(), "{}", a.status);
 }
 
 #[test]

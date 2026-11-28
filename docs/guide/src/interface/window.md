@@ -113,6 +113,10 @@ still don't select while a tool is on: select first, then pick the tool.
    in. (In a 3D view, use the **View dot** instead.)
 2. Drag the grip to a new place, or out of the window to float it.
 
+A floating window (a floated panel, a torn-off view, **Preview**, **Render**)
+stays in front of Operandi's main window, so clicking the main window never
+hides it. Switch to another app and that app can cover it.
+
 ### Dock a panel
 
 1. Drag the panel's grip over the edge of another frame. A line shows

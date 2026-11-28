@@ -95,7 +95,7 @@ impl Editor {
     /// before an Arm runs), an unfinished selection gesture, and a scene that
     /// doesn't validate.
     pub(crate) fn numeric_arm_guard(&self, name: &str) -> Result<()> {
-        if self.has_active_task() {
+        if self.session.has_active_task() {
             return Err(format!("Drop or Cancel the active tool before {name}"));
         }
         if self.selection_start.is_some() {

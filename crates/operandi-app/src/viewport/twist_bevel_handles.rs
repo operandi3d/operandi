@@ -113,6 +113,7 @@ impl Operandi {
     pub(crate) fn twist_bevel_spine(&self, params: &Parameters) -> Option<SpineView> {
         let l = self
             .editor
+            .session
             .live
             .as_ref()
             .filter(|l| l.tool == Tool::TwistBevel)?;
@@ -169,7 +170,7 @@ impl Operandi {
     /// its tangent) or the Bend Direction ring (around the base, in its
     /// plane).
     pub(super) fn spine_ring(&self, id: usize, r: Rect) -> Vec<Pos2> {
-        let Some(l) = &self.editor.live else {
+        let Some(l) = &self.editor.session.live else {
             return Vec::new();
         };
         let Some(view) = self.twist_bevel_spine(&l.params) else {
@@ -421,6 +422,7 @@ impl Operandi {
         // The readout: the property and its value (spec section 4).
         if self
             .editor
+            .session
             .live
             .as_ref()
             .is_some_and(|l| l.preview_error.is_none())

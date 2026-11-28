@@ -140,7 +140,10 @@ fn pick_to_add_takes_a_toolbox_button_instead_of_running_it() {
     draw(&mut a, &ctx, SIZE, vec![]);
     let steps = a.editor.history.undo.len();
     click_line(&mut a, &ctx, "Bevel", Modifiers::NONE);
-    assert!(a.editor.live.is_none(), "a picked button doesn't run");
+    assert!(
+        a.editor.session.live.is_none(),
+        "a picked button doesn't run"
+    );
     assert_eq!(a.editor.history.undo.len(), steps);
     assert_eq!(lines(&a), ["Bevel"]);
     assert_eq!(bench(&a).controls[0].width, Width::Full);
@@ -157,7 +160,10 @@ fn pick_to_add_takes_a_toolbox_button_instead_of_running_it() {
     a.category = toolbox::Category::Workbench;
     draw(&mut a, &ctx, SIZE, vec![]);
     click_line(&mut a, &ctx, "Bevel", Modifiers::NONE);
-    assert_eq!(a.editor.live.as_ref().map(|l| l.tool), Some(Tool::Bevel));
+    assert_eq!(
+        a.editor.session.live.as_ref().map(|l| l.tool),
+        Some(Tool::Bevel)
+    );
 }
 
 #[test]
@@ -198,7 +204,7 @@ fn pick_to_add_takes_a_tool_properties_row_and_shows_it_while_the_tool_is_open()
         .find(|(k, _)| k.starts_with("Bevel/"))
         .map(|(k, r)| (k.clone(), *r))
         .unwrap_or_else(|| panic!("no Bevel rows: {:?}", a.workbench.property_rects.keys()));
-    let before = a.editor.live.as_ref().unwrap().params.clone();
+    let before = a.editor.session.live.as_ref().unwrap().params.clone();
     a.execute("operandi.workbench.edit");
     a.execute("operandi.workbench.pick on");
     a.category = toolbox::Category::Polygon;
@@ -207,7 +213,7 @@ fn pick_to_add_takes_a_tool_properties_row_and_shows_it_while_the_tool_is_open()
     assert_eq!(lines(&a), std::slice::from_ref(&id), "{}", a.status);
     assert!(bench(&a).controls[0].property.is_some());
     assert!(
-        a.editor.live.as_ref().unwrap().params == before,
+        a.editor.session.live.as_ref().unwrap().params == before,
         "the field didn't change"
     );
     // In use, the Workbench tab draws that row while Bevel is open...
@@ -548,7 +554,10 @@ fn the_tool_pipe_preset_re_runs_the_same_pipe() {
     a.execute("Falloff linear");
     a.execute("Symmetry x");
     a.execute("Bevel");
-    assert_eq!(a.editor.live.as_ref().map(|l| l.tool), Some(Tool::Bevel));
+    assert_eq!(
+        a.editor.session.live.as_ref().map(|l| l.tool),
+        Some(Tool::Bevel)
+    );
     let pipe = (a.editor.action_context, a.editor.symmetry.axis);
     assert!(why(&a, "operandi.workbench.addChain").is_none());
     a.execute("operandi.workbench.addChain");
@@ -567,14 +576,14 @@ fn the_tool_pipe_preset_re_runs_the_same_pipe() {
     a.execute("action center automatic");
     a.execute("Falloff none");
     a.execute("Symmetry off");
-    assert!(a.editor.live.is_none() && a.editor.spatial_falloff.is_none());
+    assert!(a.editor.session.live.is_none() && a.editor.spatial_falloff.is_none());
     assert_ne!((a.editor.action_context, a.editor.symmetry.axis), pipe);
     // One click on the preset button puts the whole pipe back.
     a.category = toolbox::Category::Workbench;
     draw(&mut a, &ctx, SIZE, vec![]);
     click_line(&mut a, &ctx, &line, Modifiers::NONE);
     assert_eq!(
-        a.editor.live.as_ref().map(|l| l.tool),
+        a.editor.session.live.as_ref().map(|l| l.tool),
         Some(Tool::Bevel),
         "{}",
         a.status

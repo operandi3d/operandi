@@ -13,7 +13,7 @@ fn tool_switch_routes_confirm_fields_and_commit_once() {
         a.activate(Tool::Bevel);
         // Start an interactive stage; armed numeric configuration alone is deferred (BV-R23).
         a.run(Command::Preview(
-            a.editor.live.as_ref().unwrap().params.clone(),
+            a.editor.session.live.as_ref().unwrap().params.clone(),
         ));
         a.fields.insert("inset".into(), "0.1 m".into());
         let history = a.editor.history.undo.len();
@@ -31,23 +31,23 @@ fn tool_switch_routes_confirm_fields_and_commit_once() {
                 pointer(pos, false, Modifiers::NONE),
             ],
         );
-        assert_eq!(a.editor.live.as_ref().unwrap().tool, Tool::Move);
+        assert_eq!(a.editor.session.live.as_ref().unwrap().tool, Tool::Move);
         assert_eq!(a.editor.history.undo.len(), history + 1);
         assert_eq!(a.editor.history.undo.last().unwrap().label, "Bevel");
         assert_eq!(a.editor.scene.active().unwrap().mesh.faces.len(), 10);
         assert!(!a.fields.contains_key("inset"));
         a.fields.insert("delta0".into(), "0.25 m".into());
         a.menu_action(&ctx, app_menu::line_action(Tool::Rotate.label()));
-        assert_eq!(a.editor.live.as_ref().unwrap().tool, Tool::Rotate);
+        assert_eq!(a.editor.session.live.as_ref().unwrap().tool, Tool::Rotate);
         assert_eq!(a.editor.history.undo.len(), history + 2);
         assert!(!a.fields.contains_key("delta0"));
         // Keyboard switching drops a neutral tool without another checkpoint.
         ctx.memory_mut(|m| m.surrender_focus(m.focused().unwrap_or(Id::NULL)));
         let _ = draw(&mut a, &ctx, vec2(1440., 900.), vec![key(Key::R)]);
-        assert_eq!(a.editor.live.as_ref().unwrap().tool, Tool::Scale);
+        assert_eq!(a.editor.session.live.as_ref().unwrap().tool, Tool::Scale);
         assert_eq!(a.editor.history.undo.len(), history + 2);
         a.execute("extrude");
-        assert_eq!(a.editor.live.as_ref().unwrap().tool, Tool::Extrude);
+        assert_eq!(a.editor.session.live.as_ref().unwrap().tool, Tool::Extrude);
         assert_eq!(a.editor.history.undo.len(), history + 2);
     }
 }
@@ -59,7 +59,7 @@ fn invalid_text_blocks_switch_until_corrected() {
     a.activate(Tool::Bevel);
     // Start an interactive stage; armed numeric configuration alone is deferred (BV-R23).
     a.run(Command::Preview(
-        a.editor.live.as_ref().unwrap().params.clone(),
+        a.editor.session.live.as_ref().unwrap().params.clone(),
     ));
     a.fields.insert("inset".into(), "abc".into());
     let before = a.editor.clone();
@@ -69,7 +69,7 @@ fn invalid_text_blocks_switch_until_corrected() {
     assert!(a.field_errors.contains_key("inset"));
     a.fields.insert("inset".into(), "0.1 m".into());
     a.activate(Tool::Move);
-    assert_eq!(a.editor.live.as_ref().unwrap().tool, Tool::Move);
+    assert_eq!(a.editor.session.live.as_ref().unwrap().tool, Tool::Move);
     assert_eq!(a.editor.history.undo.len(), before.history.undo.len() + 1);
     assert!(a.field_errors.is_empty());
 }
@@ -87,8 +87,8 @@ fn t11_002_save_failure_keeps_task_history_buffers_and_association() {
     assert!(!a.save(std::env::temp_dir().join("operandi-no-such-directory-m11/scene.opscene")));
     assert_eq!(a.editor.scene, before.scene);
     assert_eq!(
-        a.editor.live.as_ref().unwrap().params,
-        before.live.as_ref().unwrap().params
+        a.editor.session.live.as_ref().unwrap().params,
+        before.session.live.as_ref().unwrap().params
     );
     assert_eq!(a.editor.history.undo.len(), before.history.undo.len());
     assert_eq!(a.path, path);
@@ -149,8 +149,8 @@ fn t11_005_captured_navigation_never_becomes_edit_even_coalesced() {
             assert_eq!(a.editor.scene, before.scene, "{tool:?}");
             assert_eq!(a.editor.history.undo.len(), before.history.undo.len());
             assert_eq!(
-                a.editor.live.as_ref().map(|l| &l.params),
-                before.live.as_ref().map(|l| &l.params)
+                a.editor.session.live.as_ref().map(|l| &l.params),
+                before.session.live.as_ref().map(|l| &l.params)
             );
             assert_ne!(a.camera.view, View::Perspective); // orbit preserves orthographic projection
             assert!(a.navigation.is_none());
@@ -178,7 +178,10 @@ fn t11_008_space_opens_mini_properties_alt_shift_space_cycles_and_text_priority(
         modifiers,
     };
     let _ = draw(&mut a, &ctx, vec2(1440., 900.), vec![key(Key::Space)]);
-    assert!(a.editor.live.is_some(), "Space no longer drops the tool");
+    assert!(
+        a.editor.session.live.is_some(),
+        "Space no longer drops the tool"
+    );
     assert!(a.mini_properties.is_some());
     let _ = draw(
         &mut a,
@@ -241,7 +244,7 @@ fn t11_006_013_editor_enter_tab_blur_escape_and_invalid_save() {
     );
     a.fields.insert("delta0".into(), "1 m/4".into());
     let _ = draw(&mut a, &ctx, vec2(1440., 900.), vec![key(Key::Tab)]);
-    assert_eq!(a.editor.live.as_ref().unwrap().params.delta.x, 0.25);
+    assert_eq!(a.editor.session.live.as_ref().unwrap().params.delta.x, 0.25);
     let _ = draw(
         &mut a,
         &ctx,
@@ -258,11 +261,11 @@ fn t11_006_013_editor_enter_tab_blur_escape_and_invalid_save() {
     assert!(a.field_errors.contains_key("delta0"));
     a.save_current();
     assert!(a.file_dialog.is_none());
-    assert!(a.editor.live.is_some());
+    assert!(a.editor.session.live.is_some());
     let _ = draw(&mut a, &ctx, vec2(1440., 900.), vec![key(Key::Escape)]);
     // A confirmed value shows in its unit (FORM-Q14).
     assert_eq!(a.fields["delta0"], "0.25 m");
-    assert!(a.editor.live.is_some());
+    assert!(a.editor.session.live.is_some());
     let _ = draw(
         &mut a,
         &ctx,
@@ -283,7 +286,7 @@ fn t11_006_013_editor_enter_tab_blur_escape_and_invalid_save() {
             pointer(y, false, Modifiers::NONE),
         ],
     );
-    assert_eq!(a.editor.live.as_ref().unwrap().params.delta.x, 1.25);
+    assert_eq!(a.editor.session.live.as_ref().unwrap().params.delta.x, 1.25);
 }
 #[test]
 fn t11_002_valid_unconfirmed_save_is_transactional_and_path_cancel_is_neutral() {
@@ -296,15 +299,15 @@ fn t11_002_valid_unconfirmed_save_is_transactional_and_path_cancel_is_neutral() 
     assert!(a.file_dialog.is_some());
     assert_eq!(a.editor.scene, before.scene);
     assert_eq!(
-        a.editor.live.as_ref().unwrap().params,
-        before.live.as_ref().unwrap().params
+        a.editor.session.live.as_ref().unwrap().params,
+        before.session.live.as_ref().unwrap().params
     );
     a.file_dialog = None;
     assert!(!a.save(std::env::temp_dir().join("operandi-no-such-directory-m11/scene.opscene")));
     assert_eq!(a.editor.scene, before.scene);
     assert_eq!(
-        a.editor.live.as_ref().unwrap().params,
-        before.live.as_ref().unwrap().params
+        a.editor.session.live.as_ref().unwrap().params,
+        before.session.live.as_ref().unwrap().params
     );
     assert_eq!(a.fields["delta0"], "0.25 m");
     assert_eq!(a.confirmed_fields["delta0"], "0 m");
@@ -370,7 +373,7 @@ fn t11_006_025_dismissing_one_modal_never_replays_keys_into_another_owner() {
     );
     assert_eq!(a.bindings_draft["Move"], "x");
     assert_eq!(a.editor.scene, scene);
-    assert!(a.editor.live.is_some());
+    assert!(a.editor.session.live.is_some());
     let _ = draw(&mut a, &ctx, vec2(1440., 900.), vec![]);
     let _ = draw(
         &mut a,
@@ -380,7 +383,7 @@ fn t11_006_025_dismissing_one_modal_never_replays_keys_into_another_owner() {
     );
     assert!(!a.show_bindings);
     assert!(
-        a.editor.live.is_some(),
+        a.editor.session.live.is_some(),
         "modal dismissal must not replay Space into Drop"
     );
     assert_eq!(a.editor.scene, scene);
@@ -433,7 +436,7 @@ fn t11_006_menu_owns_local_numeric_escape_even_if_popup_closed_this_frame() {
         },
     );
     assert_eq!(a.fields["delta0"], "unfinished");
-    assert!(a.editor.live.is_some());
+    assert!(a.editor.session.live.is_some());
 }
 #[test]
 fn m11_amendment_focused_disclosure_space_does_not_reach_global_drop() {
@@ -464,7 +467,7 @@ fn m11_amendment_focused_disclosure_space_does_not_reach_global_drop() {
         },
     );
     assert!(
-        a.editor.live.is_some(),
+        a.editor.session.live.is_some(),
         "focused disclosure owns Space; no global Drop"
     );
 }
@@ -490,12 +493,12 @@ fn m15_literal_chords_remap_and_component_context() {
             modifiers: Modifiers::SHIFT,
         }],
     );
-    assert_eq!(a.editor.live.as_ref().unwrap().tool, Tool::Move);
+    assert_eq!(a.editor.session.live.as_ref().unwrap().tool, Tool::Move);
     a.run(Command::Drop);
     a.bindings.insert("Move".into(), String::new());
     assert_eq!(a.shortcut("Move"), "");
     a.execute("Move");
-    assert_eq!(a.editor.live.as_ref().unwrap().tool, Tool::Move);
+    assert_eq!(a.editor.session.live.as_ref().unwrap().tool, Tool::Move);
 }
 #[test]
 fn m15_native_digit_provenance_prevents_keypad_mode_alias() {
@@ -562,14 +565,14 @@ fn mode_keys_drop_an_open_transform_tool_first() {
         a.editor.scene.selection.faces = vec![0];
         let ctx = Context::default();
         draw(&mut a, &ctx, vec2(1440., 900.), vec![key(tool_key)]);
-        assert_eq!(a.editor.live.as_ref().map(|l| l.tool), Some(tool));
+        assert_eq!(a.editor.session.live.as_ref().map(|l| l.tool), Some(tool));
         a.native_numbers = vec![native::NumberKey {
             digit: 2,
             keypad: false,
             pressed: true,
         }];
         draw(&mut a, &ctx, vec2(1440., 900.), vec![key(Key::Num2)]);
-        assert!(a.editor.live.is_none(), "{tool:?}: {}", a.status);
+        assert!(a.editor.session.live.is_none(), "{tool:?}: {}", a.status);
         assert_eq!(a.editor.scene.selection.mode, Mode::Edge, "{tool:?}");
     }
 }
@@ -639,7 +642,7 @@ fn modified_file_key_runs_the_layout_binding_except_in_focused_text() {
     };
     let cmd = super::tests::PLATFORM_CMD;
     press(&mut a, cmd | Modifiers::ALT);
-    assert_eq!(a.editor.live.as_ref().unwrap().tool, Tool::Scale);
+    assert_eq!(a.editor.session.live.as_ref().unwrap().tool, Tool::Scale);
     assert!(a.file_dialog.is_none());
     a.run(Command::Cancel);
 
@@ -648,7 +651,7 @@ fn modified_file_key_runs_the_layout_binding_except_in_focused_text() {
     ctx.memory_mut(|m| m.request_focus(field));
     assert!(a.text_editor_focused(&ctx));
     press(&mut a, cmd | Modifiers::ALT);
-    assert!(a.editor.live.is_none());
+    assert!(a.editor.session.live.is_none());
     assert!(a.file_dialog.is_none());
     press(&mut a, cmd);
     assert!(a.file_dialog.is_some());

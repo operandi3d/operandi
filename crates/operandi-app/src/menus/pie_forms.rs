@@ -271,8 +271,7 @@ impl Operandi {
                         Ok(self.status.clone())
                     }
                     None => {
-                        self.input_map_ui.recording =
-                            Some(crate::input_map_editor::Recording::Action(line));
+                        self.record_keys_for(line);
                         Ok(format!(
                             "Press the keys for {} (Esc cancels)",
                             self.action_label(&pie_menu::line(&id))

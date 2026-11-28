@@ -266,15 +266,15 @@ impl Operandi {
     }
     /// Row of the command table for the open tool or numeric session.
     pub(super) fn command_active(&self) -> Option<usize> {
-        let session = if self.editor.reduction.is_some() {
+        let session = if self.editor.session.reduction.is_some() {
             Some("poly.reduct")
-        } else if self.editor.bridge.is_some() {
+        } else if self.editor.session.bridge.is_some() {
             Some("edge.bridge")
-        } else if self.editor.spike.is_some() {
+        } else if self.editor.session.spike.is_some() {
             Some("poly.spikey")
-        } else if self.editor.ellipsoid.is_some() {
+        } else if self.editor.session.ellipsoid.is_some() {
             Some("prim.ellipsoid")
-        } else if let Some(s) = &self.editor.shape {
+        } else if let Some(s) = &self.editor.session.shape {
             Some(match s.kind() {
                 ShapeKind::Torus => "prim.toroid",
                 ShapeKind::Capsule => "prim.capsule",
@@ -283,13 +283,13 @@ impl Operandi {
                 ShapeKind::Text => "prim.text",
                 ShapeKind::Teapot => "Teapot",
             })
-        } else if self.editor.cone.is_some() {
+        } else if self.editor.session.cone.is_some() {
             Some("prim.cone")
         } else {
             None
         };
         let command_id = session.or_else(|| {
-            let live = self.editor.live.as_ref()?;
+            let live = self.editor.session.live.as_ref()?;
             Some(tool_info::info(live.tool).command_id)
         })?;
         id(command_id)
@@ -316,6 +316,7 @@ impl Operandi {
             && self.editor.scene.selection.mode == Mode::Item
             && self
                 .editor
+                .session
                 .live
                 .as_ref()
                 .is_some_and(|l| l.tool.transforms_items());
@@ -581,7 +582,7 @@ impl Operandi {
                 // MN-05.1: every tool resets through one command
                 // (`tool_reset.rs` keeps each tool's own reset where it
                 // had one).
-                if self.editor.has_active_task() {
+                if self.editor.session.has_active_task() {
                     self.run(Command::ResetToolAttributes);
                 } else {
                     fail(self, "No tool is active, so there is nothing to reset");
@@ -1038,7 +1039,7 @@ impl Operandi {
         // `SS Default` preset (Level 1), spec 2 and test 13.
         if preset.eq_ignore_ascii_case("solid.sketch") || preset.eq_ignore_ascii_case("SS Default")
         {
-            let on = self.editor.solid_sketch.is_some();
+            let on = self.editor.session.solid_sketch.is_some();
             match mode.to_ascii_lowercase().as_str() {
                 "on" | "1" if !on => {
                     self.start_solid_sketch(preset.eq_ignore_ascii_case("SS Default"))
@@ -1055,14 +1056,14 @@ impl Operandi {
             match mode.to_ascii_lowercase().as_str() {
                 "on" | "1" => self.start_interactive_pen(),
                 "?" => {
-                    self.status = if self.editor.pen_draft.is_some() {
+                    self.status = if self.editor.session.pen_draft.is_some() {
                         "1"
                     } else {
                         "0"
                     }
                     .into()
                 }
-                "off" | "0" if self.editor.pen_draft.is_some() => self.run(Command::Drop),
+                "off" | "0" if self.editor.session.pen_draft.is_some() => self.run(Command::Drop),
                 "off" | "0" => self.status = "Pen is not active".into(),
                 _ => fail(self, "Use tool.set prim.pen on, off or ?"),
             }
@@ -1097,7 +1098,7 @@ impl Operandi {
             if let Some(phrase) = operandi_core::command_registry::tool_phrase(preset) {
                 match mode.to_ascii_lowercase().as_str() {
                     "on" | "1" => self.execute(phrase),
-                    "off" | "0" if self.editor.has_active_task() => self.run(Command::Drop),
+                    "off" | "0" if self.editor.session.has_active_task() => self.run(Command::Drop),
                     "off" | "0" => self.status = "Ready".into(),
                     _ => fail(
                         self,
@@ -1150,6 +1151,7 @@ impl Operandi {
         // name its panel fields.
         let (attr, value) = if self
             .editor
+            .session
             .live
             .as_ref()
             .is_some_and(|l| l.tool == Tool::EdgeExtend)
@@ -1157,6 +1159,7 @@ impl Operandi {
             live_fields::edge_extend_attr(attr, value)
         } else if let Some(l) = self
             .editor
+            .session
             .live
             .as_ref()
             .filter(|l| l.tool == Tool::VertexBevel)
@@ -1304,7 +1307,7 @@ impl Operandi {
                 Err(e) => self.status = e,
             }
         } else if owner == "poly.spikey" && attr == "factor" {
-            let Some(spike) = self.editor.spike.as_ref() else {
+            let Some(spike) = self.editor.session.spike.as_ref() else {
                 fail(self, "Activate Spike first");
                 return;
             };
@@ -1343,7 +1346,14 @@ impl Operandi {
                 fail(self, "Activate Smooth Shift or Thicken first");
                 return;
             }
-            let mut p = self.editor.live.as_ref().unwrap().params.smooth_shift;
+            let mut p = self
+                .editor
+                .session
+                .live
+                .as_ref()
+                .unwrap()
+                .params
+                .smooth_shift;
             if value == "?" {
                 self.status = match attr.as_str() {
                     "shift" => format!("{} m", p.offset),
@@ -1390,7 +1400,14 @@ impl Operandi {
                     if let Err(e) = staged.dispatch(Command::ConfigureSmoothShift(p)) {
                         self.status = e;
                     } else if self.confirm_fields() {
-                        let mut current = self.editor.live.as_ref().unwrap().params.smooth_shift;
+                        let mut current = self
+                            .editor
+                            .session
+                            .live
+                            .as_ref()
+                            .unwrap()
+                            .params
+                            .smooth_shift;
                         match attr.as_str() {
                             "shift" => current.offset = p.offset,
                             "scale" => current.scale = p.scale,

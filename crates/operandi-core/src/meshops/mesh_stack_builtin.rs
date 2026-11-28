@@ -216,9 +216,18 @@ impl TypedOp for BevelOp {
         let whole = ctx.chosen()?.is_empty();
         let faces = ctx.chosen_or_all()?;
         let options = crate::BevelOptions::default();
+        // #43: the Falloff below weighs the shift and inset, as the tool's.
+        let weights = ctx.point_weights();
         let bevel = |group: bool| {
             crate::bevel_geometry_applied(
-                ctx.input, &faces, o.shift, o.inset, group, &options, None, None,
+                ctx.input,
+                &faces,
+                o.shift,
+                o.inset,
+                group,
+                &options,
+                weights.as_deref(),
+                None,
             )
         };
         let r = match bevel(o.group) {
@@ -230,10 +239,12 @@ impl TypedOp for BevelOp {
             // regions a grouped bevel can't take in one go (islands
             // touching at a corner, a whole closed part). Bevel each
             // region on its own instead of failing (MOQ-31, provisional).
-            Err(e) if o.group => match bevel_by_region(ctx.input, &faces, o, &options) {
-                Some(r) => r,
-                None => return Err(e),
-            },
+            Err(e) if o.group => {
+                match bevel_by_region(ctx.input, &faces, o, &options, weights.as_deref()) {
+                    Some(r) => r,
+                    None => return Err(e),
+                }
+            }
             Err(e) => return Err(e),
         };
         Ok(front_and_sides(ctx, r.mesh, &r.selected))
@@ -251,13 +262,30 @@ fn bevel_by_region(
     faces: &[u32],
     o: &BevelOp,
     options: &crate::BevelOptions,
+    weights: Option<&[f64]>,
 ) -> Option<crate::BevelResult> {
     let regions = edge_connected_regions(input, faces);
     let mut mesh = input.clone();
     let mut fronts = Vec::new();
     for region in regions {
+        // Bevel keeps the input's points first, so the weights still line
+        // up with them; points an earlier region added get full weight.
         let run = |m: &Mesh, group: bool| {
-            crate::bevel_geometry_applied(m, &region, o.shift, o.inset, group, options, None, None)
+            let w = weights.map(|w| {
+                let mut w = w.to_vec();
+                w.resize(m.vertices.len(), 1.);
+                w
+            });
+            crate::bevel_geometry_applied(
+                m,
+                &region,
+                o.shift,
+                o.inset,
+                group,
+                options,
+                w.as_deref(),
+                None,
+            )
         };
         let r = run(&mesh, true).or_else(|_| run(&mesh, false)).ok()?;
         let mut kept = r.selected.clone();
@@ -330,7 +358,9 @@ impl TypedOp for SmoothShiftOp {
             angle_weight: o.angle_weight,
             both_sides: o.both_sides,
         };
-        let r = crate::smooth_shift_geometry(ctx.input, &ctx.chosen()?, p, None)?;
+        // #43: the Falloff below weighs the shift, as the tool's.
+        let weights = ctx.point_weights();
+        let r = crate::smooth_shift_geometry(ctx.input, &ctx.chosen()?, p, weights.as_deref())?;
         Ok(front_and_sides(ctx, r.mesh, &r.selected))
     }
 }
@@ -667,6 +697,7 @@ pub(crate) fn builtin() -> Vec<Arc<dyn OpDef>> {
     table.extend(crate::meshop_push_influence::entries());
     table.extend(crate::meshop_morph_influence::entries());
     table.extend(crate::meshop_vortex::entries());
+    table.extend(crate::meshop_uv_transform::entries());
     table.extend(crate::meshop_wrap::entries());
     table.extend(crate::meshop_lattice::entries());
     table.extend(crate::meshop_spline_deformer::entries());
@@ -675,7 +706,9 @@ pub(crate) fn builtin() -> Vec<Arc<dyn OpDef>> {
     table.extend(crate::curve_ops::entries());
     table.extend(crate::meshop_curve_fill::entries());
     table.extend(crate::meshop_curve_rebuild::entries());
+    table.extend(crate::meshop_curve_rebuild_spans::entries());
     table.extend(crate::meshop_curve_sweep::entries());
+    table.extend(crate::meshop_lace::entries());
     table.extend(crate::meshop_edges_to_curves::entries());
     table.extend(crate::meshop_curve_boolean::entries());
     table.extend(crate::meshop_curve_convert::entries());

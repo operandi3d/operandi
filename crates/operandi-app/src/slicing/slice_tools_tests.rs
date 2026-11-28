@@ -51,7 +51,7 @@ fn drag(a: &mut Operandi, ctx: &Context, size: Vec2, from: Pos2, to: Pos2) {
 }
 
 fn live_tool(a: &Operandi) -> Option<Tool> {
-    a.editor.live.as_ref().map(|l| l.tool)
+    a.editor.session.live.as_ref().map(|l| l.tool)
 }
 
 #[test]
@@ -113,7 +113,15 @@ fn loop_slice_bar_drag_moves_the_slice_as_one_undo_step() {
     // The bar: 200 points long at (20, 50); the slice's triangle at 50 %.
     let triangle = r.left_top() + vec2(20. + 100., 50. + 4.);
     drag(&mut a, &ctx, size, triangle, triangle + vec2(50., 0.));
-    let o = &a.editor.live.as_ref().unwrap().params.slice.loop_slice;
+    let o = &a
+        .editor
+        .session
+        .live
+        .as_ref()
+        .unwrap()
+        .params
+        .slice
+        .loop_slice;
     assert!((o.positions[0] - 0.75).abs() < 1e-6, "{:?}", o.positions);
     let m = &a.editor.scene.active().unwrap().mesh;
     assert!(
@@ -123,7 +131,15 @@ fn loop_slice_bar_drag_moves_the_slice_as_one_undo_step() {
     );
     // One tweak for the whole drag: Undo goes back to 50 %, tool still on.
     a.run(Command::Undo);
-    let o = &a.editor.live.as_ref().unwrap().params.slice.loop_slice;
+    let o = &a
+        .editor
+        .session
+        .live
+        .as_ref()
+        .unwrap()
+        .params
+        .slice
+        .loop_slice;
     assert!((o.positions[0] - 0.5).abs() < 1e-9);
     assert_eq!(live_tool(&a), Some(Tool::LoopSlice));
     // A click on another edge picks its ring instead.
@@ -131,6 +147,7 @@ fn loop_slice_bar_drag_moves_the_slice_as_one_undo_step() {
     click(&mut a, &ctx, size, row, Modifiers::NONE);
     let rings = &a
         .editor
+        .session
         .live
         .as_ref()
         .unwrap()

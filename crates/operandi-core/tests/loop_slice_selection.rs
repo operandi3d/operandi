@@ -89,7 +89,8 @@ fn has_point(m: &Mesh, x: f64, z: f64) -> bool {
 }
 
 fn ring_of(e: &Editor) -> Vec<(u32, u32)> {
-    e.live
+    e.session
+        .live
         .as_ref()
         .unwrap()
         .params
@@ -192,7 +193,7 @@ fn pick_order_doesnt_matter() {
     assert_eq!(sides(mesh(&reversed)), sides(mesh(&picked)));
     // A ring clicked somewhere else changes nothing either.
     let mut clicked = editor(grid(5, 3), &l, true);
-    let mut p = clicked.live.as_ref().unwrap().params.clone();
+    let mut p = clicked.session.live.as_ref().unwrap().params.clone();
     p.slice.loop_slice.rings = vec![(16, 22)];
     clicked.dispatch(Command::Preview(p)).unwrap();
     assert_eq!(sides(mesh(&clicked)), sides(mesh(&picked)));

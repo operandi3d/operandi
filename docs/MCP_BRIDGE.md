@@ -660,6 +660,8 @@ used in the app; `primitive_add` always starts from the Reset values.
   - `duplicate` (boolean): Freeze into a new mesh item; default false.
   - `deformer` (string): The op, op:<item>:<op>; default the selected one.
   - `mesh` (integer): Accepted, not used yet.
+- **`deformer.rebind`** — Rebind a Wrap mesh operation, as its Rebind button does: stick each point of the step's input to its nearest spot on the Target as they are now, and save that binding with the step. Refuses when the op isn't a Wrap or has no Target.
+  - `deformer` (string): The Wrap op, op:<item>:<op>; default the selected one.
 - **`mesh.freeze`** — Freeze the selected mesh's whole Mesh Stack into a plain mesh. No arguments.
 - **`mirror.clone.create`** — Add a Mirror mesh operation (a Clone Effector with a pmodel.mirror generator) to the selected mesh, as meshop.create does. No arguments.
 - **`array.clone.create`** — Add an Array mesh operation (a Clone Effector with a pmodel.array generator) to the selected mesh, as meshop.create does. No arguments.

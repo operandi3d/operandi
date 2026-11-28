@@ -146,6 +146,8 @@ pub(crate) struct RenderState {
     /// The picture's and `outputs`' kinds and colour spaces, as
     /// `Slot::meta` (output k is entry k + 1).
     pub(crate) meta: Vec<image_viewer::OutputMeta>,
+    /// The shown picture with Bloom and Glare (post_effects_ui.rs).
+    pub(crate) post: crate::post_effects_ui::PostCache,
 }
 
 impl Default for RenderState {
@@ -176,6 +178,7 @@ impl Default for RenderState {
             outputs: Vec::new(),
             meta: Vec::new(),
             shown: None,
+            post: Default::default(),
         }
     }
 }
@@ -183,6 +186,11 @@ impl Default for RenderState {
 impl RenderState {
     pub fn busy(&self) -> bool {
         self.job.is_some()
+    }
+
+    /// The running render's slot and how many previews it has shown.
+    pub(crate) fn live_generation(&self) -> Option<(u64, u64)> {
+        self.job.as_ref().map(|j| (j.slot, j.seen))
     }
 
     #[cfg(test)]
@@ -565,6 +573,7 @@ impl Operandi {
             None => None,
         };
         let image_options = self.file_io_preferences.image();
+        let post = self.editor.scene.render.post.clone();
         let samples_total = settings.samples;
         self.render.rendering_to = Some(path.clone().unwrap_or_else(|| {
             Slot {
@@ -693,9 +702,24 @@ impl Operandi {
                             image_viewer::SaveFormat::Png8,
                             image_viewer::ViewTransform::Srgb,
                         );
+                        // Bloom and Glare go on the saved picture; the
+                        // cache and the slot keep it as rendered, so the
+                        // Render window can change them later.
+                        let saved_rgba = if post.is_active() {
+                            let mut px = image.rgba.clone();
+                            operandi_core::post_effects::apply(
+                                &post,
+                                &mut px,
+                                image.width,
+                                image.height,
+                            );
+                            std::borrow::Cow::Owned(px)
+                        } else {
+                            std::borrow::Cow::Borrowed(&image.rgba)
+                        };
                         crate::file_io_preferences::save_rgba(
                             &path,
-                            &rgba8(&image.rgba, picture_srgb),
+                            &rgba8(&saved_rgba, picture_srgb),
                             image.width,
                             image.height,
                             image_options,

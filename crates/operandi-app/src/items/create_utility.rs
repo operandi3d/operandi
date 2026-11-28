@@ -457,9 +457,9 @@ impl Operandi {
             return;
         }
         self.drop_draw();
-        if self.editor.has_active_task() {
+        if self.editor.session.has_active_task() {
             self.run(Command::Drop);
-            if self.editor.has_active_task() {
+            if self.editor.session.has_active_task() {
                 return;
             }
         }
@@ -589,7 +589,7 @@ impl Operandi {
 
     /// Called once a frame: a modeling tool that came on turns this off.
     pub(super) fn keep_utility_exclusive(&mut self) {
-        if self.utility.is_some() && self.editor.has_active_task() {
+        if self.utility.is_some() && self.editor.session.has_active_task() {
             self.utility = None;
         }
     }

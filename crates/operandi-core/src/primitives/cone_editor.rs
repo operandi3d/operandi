@@ -11,14 +11,14 @@ impl Editor {
             .filter(|i| i.visible)
             .ok_or("Select a visible mesh before numeric Cone")?
             .id;
-        self.cone = Some(NumericCone::armed(
+        self.session.cone = Some(NumericCone::armed(
             target,
             self.presets.get::<crate::ConePreset>().clone(),
         ));
         Ok(())
     }
     pub(crate) fn configure_cone(&mut self, p: ConeParameters) -> Result<()> {
-        let previous = self.cone.as_ref().ok_or("Arm numeric Cone first")?;
+        let previous = self.session.cone.as_ref().ok_or("Arm numeric Cone first")?;
         if p.polygon == PolygonRepresentation::Face
             && previous.requested.polygon == PolygonRepresentation::Face
             && p.edge_weight != previous.requested.edge_weight
@@ -31,7 +31,7 @@ impl Editor {
         let target = previous.target;
         let p = p.normalized();
         let result = self.cone_local_mesh(target, &p);
-        let session = self.cone.as_mut().ok_or("Arm numeric Cone first")?;
+        let session = self.session.cone.as_mut().ok_or("Arm numeric Cone first")?;
         session.publish(p, result, false)
     }
     fn cone_local_mesh(&self, target: u64, p: &ConeParameters) -> Result<Mesh> {
@@ -60,7 +60,7 @@ impl Editor {
         Ok(mesh)
     }
     pub(crate) fn apply_cone(&mut self) -> Result<()> {
-        let session = self.cone.as_ref().ok_or("Arm numeric Cone first")?;
+        let session = self.session.cone.as_ref().ok_or("Arm numeric Cone first")?;
         if let Some(error) = &session.error {
             return Err(format!("Correct Cone fields before Apply: {error}"));
         }
@@ -73,11 +73,11 @@ impl Editor {
         // geometry only; it never reopens or re-arms the tool.
         let before = std::mem::replace(&mut self.scene, candidate);
         self.record("Cone".into(), before);
-        self.cone = Some(NumericCone::armed(target, p));
+        self.session.cone = Some(NumericCone::armed(target, p));
         Ok(())
     }
     pub(crate) fn drop_cone(&mut self) -> Result<()> {
-        let session = self.cone.as_ref().ok_or("No numeric Cone")?;
+        let session = self.session.cone.as_ref().ok_or("No numeric Cone")?;
         if let Some(error) = &session.error {
             return Err(format!(
                 "Correct Cone fields or Cancel before Drop: {error}"
@@ -96,12 +96,12 @@ impl Editor {
             self.record("Cone".into(), before);
         }
         *self.presets.get_mut::<crate::ConePreset>() = p;
-        self.cone = None;
+        self.session.cone = None;
         Ok(())
     }
     /// Viewport consumption only. Committed scene/picking state is unchanged.
     pub fn cone_preview_scene(&self) -> Result<Option<Scene>> {
-        let Some(session) = &self.cone else {
+        let Some(session) = &self.session.cone else {
             return Ok(None);
         };
         let Some(mesh) = &session.preview else {

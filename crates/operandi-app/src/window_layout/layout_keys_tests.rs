@@ -342,7 +342,7 @@ fn switching_with_the_held_switcher_leaves_no_stuck_modifier() {
     assert_eq!(a.layouts.current, "UV");
     a.pointer_held = false;
     a.execute("Cube");
-    assert!(a.editor.live.is_some(), "{}", a.status);
+    assert!(a.editor.session.live.is_some(), "{}", a.status);
     a.execute("layout.restore Model");
     assert_eq!(a.layouts.current, "UV", "{}", a.status);
 }

@@ -61,7 +61,7 @@ impl Editor {
         if self.i2_active() {
             return Err("Finish or Cancel the Extrude stage before Set Position".into());
         }
-        if self.pen_draft.is_some() {
+        if self.session.pen_draft.is_some() {
             return Err("Drop or Cancel Pen before Set Position".into());
         }
         self.require_idle()?;

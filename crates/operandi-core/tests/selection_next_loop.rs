@@ -143,7 +143,7 @@ fn sphere() -> Editor {
     let mut e = Editor::default();
     e.dispatch(Command::NewMesh).unwrap();
     e.dispatch(Command::Activate(Tool::Sphere)).unwrap();
-    let p = e.live.as_ref().unwrap().params.clone();
+    let p = e.session.live.as_ref().unwrap().params.clone();
     e.dispatch(Command::Preview(p)).unwrap();
     e.dispatch(Command::Apply).unwrap();
     e.dispatch(Command::Drop).unwrap();

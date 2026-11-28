@@ -124,7 +124,7 @@ impl Editor {
     pub fn history_eligibility(&self, action: HistoryAction) -> HistoryEligibility<'_> {
         // Solid Sketch keeps its own edit steps (solid_sketch_editor.rs);
         // with none left Undo closes the tool.
-        if let Some(session) = &self.solid_sketch {
+        if let Some(session) = &self.session.solid_sketch {
             let available = match action {
                 HistoryAction::Undo => true,
                 HistoryAction::Redo => session.can_redo(),
@@ -139,7 +139,7 @@ impl Editor {
                 label: available.then_some("Solid Sketch"),
             };
         }
-        if let Some(draft) = &self.pen_draft {
+        if let Some(draft) = &self.session.pen_draft {
             return HistoryEligibility {
                 owner: HistoryOwner::Pen,
                 availability: match action {
@@ -153,7 +153,7 @@ impl Editor {
                     .then_some("Pen Point"),
             };
         }
-        if self.reduction.is_some() {
+        if self.session.reduction.is_some() {
             return HistoryEligibility {
                 owner: HistoryOwner::Reduction,
                 availability: HistoryAvailability::Refused(HistoryRefusal::Reduction(action)),
@@ -178,8 +178,8 @@ impl Editor {
         // Inside a tool: its own tweaks come first (Jason, 2026-11-04).
         if let Some(task) = self.tweak_session()
             && match action {
-                HistoryAction::Undo => self.tweaks.can_undo(),
-                HistoryAction::Redo => self.tweaks.can_redo(),
+                HistoryAction::Undo => self.session.tweaks.can_undo(),
+                HistoryAction::Redo => self.session.tweaks.can_redo(),
             }
         {
             return HistoryEligibility {
@@ -191,7 +191,8 @@ impl Editor {
                 },
                 availability: HistoryAvailability::Available,
                 label: Some(
-                    self.tweaks
+                    self.session
+                        .tweaks
                         .top_name(action == HistoryAction::Redo)
                         .unwrap_or(task_label(task)),
                 ),
@@ -220,7 +221,7 @@ impl Editor {
         // Document Redo would replace the tool's unrecorded tweaks.
         if action == HistoryAction::Redo
             && let Some(task) = self.tweak_session()
-            && self.tweaks.can_undo()
+            && self.session.tweaks.can_undo()
             && !self.history.redo.is_empty()
         {
             return HistoryEligibility {
@@ -344,19 +345,19 @@ impl Editor {
     /// (Ellipsoid, Cone, Torus/Capsule/Arc/Tube).
     pub(crate) fn primitive_session(&self) -> Option<PrimitiveSession> {
         let pending = |shown: bool, name: &'static str| shown.then_some(name);
-        if let Some(s) = &self.ellipsoid {
+        if let Some(s) = &self.session.ellipsoid {
             return Some(PrimitiveSession {
                 owner: HistoryOwner::Ellipsoid,
                 pending_preview: pending(s.preview.is_some(), "Ellipsoid"),
             });
         }
-        if let Some(s) = &self.shape {
+        if let Some(s) = &self.session.shape {
             return Some(PrimitiveSession {
                 owner: HistoryOwner::Shape,
                 pending_preview: pending(s.preview.is_some(), s.kind().label()),
             });
         }
-        if self.cone.is_some() {
+        if self.session.cone.is_some() {
             // Cone's value changes are undo steps of their own (MU-MID-01),
             // so its preview is never unrecorded.
             return Some(PrimitiveSession {
@@ -364,7 +365,11 @@ impl Editor {
                 pending_preview: None,
             });
         }
-        let live = self.live.as_ref().filter(|l| l.tool.is_primitive())?;
+        let live = self
+            .session
+            .live
+            .as_ref()
+            .filter(|l| l.tool.is_primitive())?;
         Some(PrimitiveSession {
             owner: HistoryOwner::LiveTool(live.tool),
             pending_preview: pending(live.base != self.scene, live.tool.label()),

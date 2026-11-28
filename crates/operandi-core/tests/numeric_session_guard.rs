@@ -34,12 +34,12 @@ fn every_numeric_arm_refuses_during_a_selection_gesture() {
         e.dispatch(Command::BeginSelection).unwrap();
         let err = e.dispatch(arm(i)).unwrap_err();
         assert!(err.starts_with("Finish selection before"), "{name}: {err}");
-        assert!(!e.has_active_task(), "{name} opened a task");
+        assert!(!e.session.has_active_task(), "{name} opened a task");
         // The same Arm works once the gesture is finished.
         e.dispatch(Command::EndSelection { cancel: true }).unwrap();
         e.dispatch(arm(i)).unwrap();
-        assert!(e.has_active_task(), "{name} did not arm");
-        assert_eq!(e.open_task_slots(), 1);
+        assert!(e.session.has_active_task(), "{name} did not arm");
+        assert_eq!(e.session.open_task_slots(), 1);
     }
 }
 
@@ -53,7 +53,7 @@ fn arming_another_numeric_tool_replaces_the_open_one() {
             let mut e = editor();
             e.dispatch(arm(first)).unwrap();
             e.dispatch(arm(second)).unwrap();
-            assert_eq!(e.open_task_slots(), 1, "{a} then {b}");
+            assert_eq!(e.session.open_task_slots(), 1, "{a} then {b}");
         }
     }
 }

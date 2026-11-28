@@ -71,7 +71,12 @@ fn ac_scene(center: CenterMode) -> Editor {
     e.scene.selection.faces = vec![0, 1, 2];
     e.dispatch(Command::ActionContext(ActionContext {
         center,
-        axis: AxisOrientation::World,
+        // Local by name is Local's centre with Local's axes.
+        axis: if center == CenterMode::Local {
+            AxisOrientation::Local
+        } else {
+            AxisOrientation::World
+        },
     }))
     .unwrap();
     e
@@ -95,7 +100,7 @@ fn world_points(e: &Editor) -> Vec<DVec3> {
 
 fn run(e: &mut Editor, tool: Tool, delta: DVec3) -> Vec<DVec3> {
     e.dispatch(Command::Activate(tool)).unwrap();
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     p.delta = delta;
     e.dispatch(Command::Preview(p)).unwrap();
     e.dispatch(Command::Drop).unwrap();
@@ -132,11 +137,12 @@ fn ac_rotate_selection() {
     }
 }
 
-/// Each island's frame (ACL-02/03): its item-space box middle; Y the
-/// direction of least spread of its points, pointed with its polygons'
-/// normals; X the direction of most spread (for the strip also the one
+/// Each island's frame (A-LOCAL): its item-space box middle; X the
+/// direction of most spread of its points (for the strip also the one
 /// nearest item X), or item X when the two in-plane spreads tie (the square
-/// quad, ACL-Q4); Z = X × Y. Spreads by power iteration on the covariance.
+/// quad, ACL-Q4); Z the direction of least spread, pointed with its
+/// polygons' normals; Y = Z × X. Spreads by power iteration on the
+/// covariance.
 fn island_frame(e: &Editor, points: &[usize], polygons: &[usize]) -> (DVec3, DMat3) {
     let w = world(e);
     let mesh = &e.scene.active().unwrap().mesh;
@@ -197,12 +203,11 @@ fn island_frame(e: &Editor, points: &[usize], polygons: &[usize]) -> (DVec3, DMa
     } else {
         major
     };
-    let y = (DMat3::from_mat4(w).inverse().transpose() * least).normalize();
-    let z = (DMat3::from_mat4(w) * x_item).cross(y).normalize();
-    let x = y.cross(z).normalize();
+    let z = (DMat3::from_mat4(w).inverse().transpose() * least).normalize();
+    let y = z.cross(DMat3::from_mat4(w) * x_item).normalize();
     (
         w.transform_point3((lo + hi) / 2.),
-        DMat3::from_cols(x, y, x.cross(y).normalize()),
+        DMat3::from_cols(y.cross(z), y, z),
     )
 }
 

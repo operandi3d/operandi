@@ -11,7 +11,9 @@
 2. Click **Solid Sketch** in the **Draw** section of the **Create** tool tab.
 3. Click in the **3D view** to add a node. Each click adds the next node,
    joined to the one before.
-4. Drag a node to move it, or drag its handles to size it.
+4. Drag a node to move it. Drag its red, green or blue square to size it
+   along X, Y or Z, or drag the dark green dot beyond the green square left
+   and right to twist it.
 5. Press **Q**, or click **Drop**, to keep it and close the tool.
 
 The **Solid Sketch** button starts the tool with **Subdiv Mode** set to

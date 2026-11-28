@@ -185,7 +185,7 @@ fn spin_mesh(source: &Mesh, selected: [usize; 2]) -> Result<Mesh> {
 }
 impl Editor {
     pub(crate) fn spin_quads(&mut self) -> Result<()> {
-        if self.i2_active() || self.pen_draft.is_some() {
+        if self.i2_active() || self.session.pen_draft.is_some() {
             return Err("Finish or Cancel the active tool before Spin Quad".into());
         }
         self.require_idle()?;

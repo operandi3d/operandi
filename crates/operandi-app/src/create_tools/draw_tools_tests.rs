@@ -450,12 +450,15 @@ fn pen_shift_click_ends_the_polygon_and_starts_the_next() {
     a.drop_draw();
     a.run(Command::Mode(Mode::Polygon));
     a.execute("polygon pen");
-    assert!(a.editor.pen_draft.is_some(), "{}", a.status);
+    assert!(a.editor.session.pen_draft.is_some(), "{}", a.status);
     for (x, y) in [(-100., 0.), (100., 0.), (0., -100.)] {
         let p = spot(&a, x, y);
         click(&mut a, &ctx, p);
     }
-    assert_eq!(a.editor.pen_draft.as_ref().unwrap().points().len(), 3);
+    assert_eq!(
+        a.editor.session.pen_draft.as_ref().unwrap().points().len(),
+        3
+    );
     let p = spot(&a, 200., 100.);
     click_with(&mut a, &ctx, p, PointerButton::Primary, Modifiers::SHIFT);
     assert_eq!(
@@ -466,6 +469,7 @@ fn pen_shift_click_ends_the_polygon_and_starts_the_next() {
     );
     let draft = a
         .editor
+        .session
         .pen_draft
         .as_ref()
         .expect("a new Pen polygon started");
@@ -504,13 +508,13 @@ fn torus_capsule_arc_draw_out_instead_of_appearing() {
         a.arm_shape(kind);
         frame(&mut a, &ctx, vec![]);
         assert!(
-            a.editor.shape.as_ref().unwrap().preview.is_none(),
+            a.editor.session.shape.as_ref().unwrap().preview.is_none(),
             "{name}: nothing until drawn"
         );
         let (from, to) = (spot(&a, 0., 0.), spot(&a, 120., 0.));
         drag(&mut a, &ctx, from, to);
         assert!(
-            a.editor.shape.as_ref().unwrap().preview.is_some(),
+            a.editor.session.shape.as_ref().unwrap().preview.is_some(),
             "{name}: {}",
             a.status
         );

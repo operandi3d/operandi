@@ -657,3 +657,24 @@ fn edge_slice_picks_and_shows_its_points_on_the_smooth_surface() {
     }
     assert!(tried > 0);
 }
+
+/// #57: Show Meshes off hides mesh items on the graphics-card path too
+/// (only the slower projected path read it, so on a real GPU it did
+/// nothing).
+#[test]
+fn show_meshes_off_hides_meshes_drawn_from_the_graphics_card() {
+    let ctx = Context::default();
+    theme::install(&ctx);
+    let size = vec2(1440., 900.);
+    let mut a = app();
+    a.force_resident = true;
+    draw(&mut a, &ctx, size, vec![]);
+    let id = a.editor.scene.active().unwrap().id;
+    assert!(a.resident_cache.cached(id).is_some(), "drawn from the card");
+    a.display.settings.drawing.meshes = false;
+    draw(&mut a, &ctx, size, vec![]);
+    assert!(a.resident_cache.cached(id).is_none(), "no longer drawn");
+    a.display.settings.drawing.meshes = true;
+    draw(&mut a, &ctx, size, vec![]);
+    assert!(a.resident_cache.cached(id).is_some(), "back again");
+}

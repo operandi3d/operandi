@@ -138,19 +138,25 @@ fn cone_and_ellipsoid_draw_by_dragging() {
         };
         a.solid_draw(cone, plane, anchor, edge, r, true);
         if cone {
-            let p = &a.editor.cone.as_ref().unwrap().requested;
+            let p = &a.editor.session.cone.as_ref().unwrap().requested;
             assert!((p.size.x - 1.).abs() < 1e-6, "{:?}", p.size);
             assert!(
-                a.editor.cone.as_ref().unwrap().preview.is_some(),
+                a.editor.session.cone.as_ref().unwrap().preview.is_some(),
                 "{}",
                 a.status
             );
         } else {
-            let p = &a.editor.ellipsoid.as_ref().unwrap().requested;
+            let p = &a.editor.session.ellipsoid.as_ref().unwrap().requested;
             assert!((p.radius.x - 1.).abs() < 1e-6, "{:?}", p.radius);
             assert!((p.position.x - 2.).abs() < 1e-6);
             assert!(
-                a.editor.ellipsoid.as_ref().unwrap().preview.is_some(),
+                a.editor
+                    .session
+                    .ellipsoid
+                    .as_ref()
+                    .unwrap()
+                    .preview
+                    .is_some(),
                 "{}",
                 a.status
             );

@@ -1,4 +1,4 @@
-//! Tool Properties of the Editor's live tools (everything `Editor::live`
+//! Tool Properties of the Editor's live tools (everything `ToolSession::live`
 //! runs except the primitives and Smooth Shift / Thicken, which have their
 //! own forms), declared as field lists for the shared form
 //! (`tool_form.rs`).
@@ -26,6 +26,7 @@ pub(super) struct LiveP {
 /// The live tool this panel serves.
 pub(super) fn live_tool(app: &Operandi) -> Option<&Live> {
     app.editor
+        .session
         .live
         .as_ref()
         .filter(|l| !l.tool.is_primitive() && !l.tool.is_smooth_shift())

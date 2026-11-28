@@ -115,7 +115,13 @@ fn a_radius_square_sizes_from_the_centre_or_the_far_side() {
             let far = |s: SessionShape| s.position.x - s.radius.unwrap().x;
             assert!((far(after) - far(before)).abs() < 1e-9, "shape {which}");
         }
-        assert!(a.editor.cone.as_ref().is_none_or(|s| s.preview.is_some()));
+        assert!(
+            a.editor
+                .session
+                .cone
+                .as_ref()
+                .is_none_or(|s| s.preview.is_some())
+        );
     }
 }
 
@@ -138,7 +144,7 @@ fn a_flat_base_keeps_only_its_height_handle() {
 #[test]
 fn the_torus_squares_set_its_radius_like_the_panel() {
     let mut a = drawn(2);
-    let torus = |a: &Operandi| match &a.editor.shape.as_ref().unwrap().requested {
+    let torus = |a: &Operandi| match &a.editor.session.shape.as_ref().unwrap().requested {
         ShapeParameters::Torus(t) => t.clone(),
         _ => unreachable!(),
     };
@@ -154,13 +160,14 @@ fn the_torus_squares_set_its_radius_like_the_panel() {
 fn text_gets_move_arrows_only() {
     let mut a = box_app();
     a.run(Command::ArmShape(ShapeKind::Text));
-    let Some(ShapeParameters::Text(mut t)) = a.editor.shape.as_ref().map(|s| s.requested.clone())
+    let Some(ShapeParameters::Text(mut t)) =
+        a.editor.session.shape.as_ref().map(|s| s.requested.clone())
     else {
         panic!("no text session");
     };
     t.text = "A".into();
     a.run(Command::ConfigureShape(ShapeParameters::Text(t)));
-    if a.editor.shape.as_ref().unwrap().preview.is_none() {
+    if a.editor.session.shape.as_ref().unwrap().preview.is_none() {
         // No font in this build: nothing drawn, so no handles either.
         assert!(a.handles(rect()).is_empty());
         return;
@@ -180,11 +187,11 @@ fn arc_and_teapot_get_move_arrows() {
     for kind in [ShapeKind::Arc, ShapeKind::Teapot] {
         let mut a = box_app();
         a.run(Command::ArmShape(kind));
-        let p = a.editor.shape.as_ref().unwrap().requested.clone();
+        let p = a.editor.session.shape.as_ref().unwrap().requested.clone();
         // Drawn: configured once, as a drag or a panel edit does.
         a.run(Command::ConfigureShape(p));
         assert!(
-            a.editor.shape.as_ref().unwrap().preview.is_some(),
+            a.editor.session.shape.as_ref().unwrap().preview.is_some(),
             "{kind:?} drawn: {}",
             a.status
         );

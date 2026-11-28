@@ -119,7 +119,7 @@ fn check(case: &Value) -> std::result::Result<(), String> {
         .collect();
     e.dispatch(Command::Activate(Tool::AxisSlice))
         .map_err(|err| format!("{id}: {err}"))?;
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     *p.slice.axis_slice = settings(id);
     e.dispatch(Command::Preview(p))
         .map_err(|err| format!("{id}: {err}"))?;

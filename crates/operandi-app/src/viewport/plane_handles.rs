@@ -110,6 +110,7 @@ impl Operandi {
     }
     fn extend_plane(&self) -> ExtendPlane {
         self.editor
+            .session
             .live
             .as_ref()
             .map_or(ExtendPlane::None, |l| l.params.edge_extend.plane)
@@ -205,7 +206,7 @@ impl Operandi {
     /// PH-11: the circle under `p`, asked only after the center handle and
     /// the arrows found nothing.
     pub(crate) fn plane_handle_hit(&self, p: Pos2, r: Rect) -> Option<usize> {
-        let tool = self.editor.live.as_ref()?.tool;
+        let tool = self.editor.session.live.as_ref()?.tool;
         if !self.shows_plane_handles(tool) {
             return None;
         }
@@ -312,7 +313,13 @@ impl Operandi {
             self.publish_handle_params(tool, params);
             return;
         }
-        let Some(frame) = self.editor.live.as_ref().and_then(|l| l.action_frame) else {
+        let Some(frame) = self
+            .editor
+            .session
+            .live
+            .as_ref()
+            .and_then(|l| l.action_frame)
+        else {
             return;
         };
         let center = self.transform_handle_center();

@@ -28,7 +28,7 @@ fn editor(center: DVec3, mode: Mode) -> Editor {
     e
 }
 fn params(e: &Editor) -> Parameters {
-    e.live.as_ref().unwrap().params.clone()
+    e.session.live.as_ref().unwrap().params.clone()
 }
 fn instance_on(d: &mut DuplicateParameters) {
     d.copier = Some(operandi_core::duplicate_copier::Copier::Instance);
@@ -39,7 +39,7 @@ fn run(e: &mut Editor, tool: Tool, set: impl FnOnce(&mut DuplicateParameters)) {
     instance_on(&mut p.duplicate);
     set(&mut p.duplicate);
     p.duplicate.placed = true;
-    e.tweak_held = true;
+    e.session.tweak_held = true;
     e.dispatch(Command::Preview(p)).unwrap();
     e.end_tweak();
     e.dispatch(Command::Drop).unwrap();

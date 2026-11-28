@@ -286,7 +286,7 @@ fn inactive_apply_uses_retained_cube_once_without_arming() {
     e.dispatch(Command::Drop).unwrap();
     let checkpoint = e.history.undo.len();
     e.dispatch(Command::Apply).unwrap();
-    assert!(e.live.is_none());
+    assert!(e.session.live.is_none());
     assert_eq!(e.history.undo.len(), checkpoint + 1);
     assert_eq!(e.scene.active().unwrap().mesh.faces.len(), 12);
     e.dispatch(Command::Undo).unwrap();

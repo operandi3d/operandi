@@ -13,15 +13,25 @@ Open the **Sculpt** toolbox tab (between Deform and Edit).
    (Lock Corners on by default). Hover a brush: name, command, shortcut
    ("Unassigned"), "Ctrl: … · Shift: smooth". [SC-100]
 2. Click Push: it lights in the accent colour; Tool Properties shows
-   **Sculpt: Push**, **Stroke**, **Tip: Smooth** sections. Offset
+   **Sculpt: Push** (one block: brush rows, a divider, Interpolation
+   Step / Continuous Stroke / Curve Constraint, greyed Set Color / Color /
+   Alpha, then Lock Borders and Lock Corners side by side) and **Smooth Brush**. Offset
    Distance is greyed while Offset Mode is Adaptive; switch to Absolute
-   and Offset Amount greys instead. [SC-101, SC-102]
-3. Click Inflate: Normal Mode is greyed (shows Vertex). Click Move:
-   Offset Mode, Offset Distance, Normal Mode, Density Mode, Interpolation
-   Step and Continuous Stroke are greyed. Smooth shows only Offset Amount
-   in its first section. [SC-102, SC-120, SC-123]
-4. With Push on, click Hard Tip: the tip section becomes **Tip: Hard**
-   with Soft Border instead of Shape. [SC-31]
+   and Offset Amount greys instead. [SC-101, SC-102, SI §2]
+3. Click Inflate: no Normal Mode row; Smooth Mode lists Shift Key, Low
+   Pressure, Uniform; Density Mode lists Additive, Attenuated, Maximum
+   Stroke and a greyed Maximum Map; Paint Mode, Set Color, Color and
+   Alpha are greyed with a note on hover. Tick Lock Borders in the panel:
+   the Sculpt tab's Lock Borders ticks too. Click Move: Sculpt Mode, Move
+   Mode, Move Back Faces, Offset Amount (100 %), Smooth Amount, greyed
+   Rigid UVs, then the locks. Smooth shows Sculpt Mode, Offset Amount
+   (25 %), a greyed Soft Filter and the locks. [SI-04, SI-15, SI-16,
+   SI-20..24, SPM-22..30]
+4. With Push on, click Hard Tip: the tip section becomes **Hard Brush**
+   with Soft Border instead of Shape Preset and Brush Settings. Back on
+   the Smooth tip, click **Brush Settings**: a popover with In/Out Weight
+   and In/Out Slope; changing one makes Shape Preset read Custom.
+   [SC-31, SI-33, SI-34]
 
 ## Cursor and size
 5. Over the mesh a ring follows the pointer, with a short line along the

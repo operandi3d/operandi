@@ -65,11 +65,12 @@ fn armed(kind: &str) -> Editor {
     e
 }
 fn preview(e: &Editor) -> Mesh {
-    e.cone
+    e.session
+        .cone
         .as_ref()
         .and_then(|s| s.preview.clone())
-        .or_else(|| e.ellipsoid.as_ref().and_then(|s| s.preview.clone()))
-        .or_else(|| e.shape.as_ref().and_then(|s| s.preview.clone()))
+        .or_else(|| e.session.ellipsoid.as_ref().and_then(|s| s.preview.clone()))
+        .or_else(|| e.session.shape.as_ref().and_then(|s| s.preview.clone()))
         .expect("the tool shows a preview")
 }
 /// The widest point's distance from the Y axis, among points above y.

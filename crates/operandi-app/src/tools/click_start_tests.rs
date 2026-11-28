@@ -69,7 +69,7 @@ fn bend_arms_then_the_first_press_starts_it_on_the_surface() {
     let at = screen(&a, DVec3::new(0.5, 0.2, 0.));
     drag(&mut a, &ctx, at, vec2(0., 0.));
     assert!(!a.editor.is_armed(), "{}", a.status);
-    let b = a.editor.live.as_ref().unwrap().params.bend;
+    let b = a.editor.session.live.as_ref().unwrap().params.bend;
     assert!(
         (b.base.z - eye.z.signum()).abs() < 1e-6,
         "on the face: {}",
@@ -133,7 +133,7 @@ fn edge_and_vertex_bevel_show_their_gizmo_at_once() {
         let before = points(&a);
         a.activate(tool);
         assert!(
-            a.editor.live.is_some() && !a.editor.is_armed(),
+            a.editor.session.live.is_some() && !a.editor.is_armed(),
             "{tool:?}: {}",
             a.status
         );
@@ -157,7 +157,7 @@ fn bevel_shows_its_handles_at_once_and_drags_the_bevel() {
     let before = points(&a);
     a.activate(Tool::Bevel);
     assert!(
-        a.editor.live.is_some() && !a.editor.is_armed(),
+        a.editor.session.live.is_some() && !a.editor.is_armed(),
         "{}",
         a.status
     );
@@ -177,7 +177,7 @@ fn bevel_shows_its_handles_at_once_and_drags_the_bevel() {
     a.editor.scene.selection.vertices = vec![0];
     a.activate(Tool::VertexExtrude);
     assert!(
-        a.editor.live.is_some() && !a.editor.is_armed(),
+        a.editor.session.live.is_some() && !a.editor.is_armed(),
         "{}",
         a.status
     );

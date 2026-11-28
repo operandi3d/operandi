@@ -82,7 +82,7 @@ impl Editor {
 
     /// Drops a live item transform tool, returning it to start again.
     pub(crate) fn settle_tool(&mut self) -> Option<Tool> {
-        let tool = self.live.as_ref().map(|l| l.tool)?;
+        let tool = self.session.live.as_ref().map(|l| l.tool)?;
         if !tool.is_transform() {
             return None;
         }
@@ -91,7 +91,7 @@ impl Editor {
     }
     pub(crate) fn resume_tool(&mut self, tool: Option<Tool>) {
         if let Some(tool) = tool
-            && self.live.is_none()
+            && self.session.live.is_none()
         {
             let _ = self.dispatch(Command::Activate(tool));
         }
@@ -156,7 +156,7 @@ impl Editor {
         }
         self.scene.time.current = t;
         animation::pose(&mut self.scene, t);
-        if let Some(live) = self.live.as_mut() {
+        if let Some(live) = self.session.live.as_mut() {
             live.base.time.current = t;
             animation::pose(&mut live.base, t);
         }
@@ -353,7 +353,7 @@ impl Editor {
             .cloned()
             .collect();
         if list.is_empty()
-            && let Some(tool) = self.live.as_ref().map(|l| l.tool)
+            && let Some(tool) = self.session.live.as_ref().map(|l| l.tool)
         {
             for id in self.scene.selected_items() {
                 for name in tool_channels(tool) {

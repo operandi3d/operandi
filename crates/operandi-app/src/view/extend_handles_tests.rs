@@ -62,10 +62,10 @@ impl Rig {
         draw(&mut self.a, &self.ctx, self.size, events);
     }
     fn tool(&self) -> Option<Tool> {
-        self.a.editor.live.as_ref().map(|l| l.tool)
+        self.a.editor.session.live.as_ref().map(|l| l.tool)
     }
     fn params(&self) -> Parameters {
-        self.a.editor.live.as_ref().unwrap().params.clone()
+        self.a.editor.session.live.as_ref().unwrap().params.clone()
     }
     fn set(&mut self, f: impl FnOnce(&mut Parameters)) {
         let mut p = self.params();

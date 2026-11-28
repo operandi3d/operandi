@@ -1488,6 +1488,11 @@ impl Operandi {
                 self.shading.collapsed.remove(&p);
                 at = self.editor.scene.shader_tree.get(p).and_then(|n| n.parent);
             }
+            // #56 (Jason, 2026-11-27): a new Image Map asks for its picture
+            // at once; cancelling keeps the empty layer.
+            if layer == NewLayer::ImageMap {
+                self.choose_shader_image(id);
+            }
         }
     }
 
@@ -3196,6 +3201,15 @@ impl Operandi {
                 .response
                 .on_hover_text("Double-click to show the image in the Image Viewer");
         });
+        // UIC-116: the field's button on the row under it (#56: the only
+        // way to a file panel was the last entry of the Image list).
+        if crate::option_row::button(ui, "Browse…")
+            .on_hover_text("Pick a picture file for this layer")
+            .clicked()
+        {
+            // UIC-164: the button runs its command.
+            self.run_command_line(&format!("operandi.texture.loadImage layer:{}", node.id));
+        }
         if view && let Some(path) = current_path {
             self.show_image_in_viewer(std::path::Path::new(&path));
         }
@@ -3239,26 +3253,70 @@ impl Operandi {
             }
         }
         if load {
-            let folder = self
-                .editor
-                .scene
-                .images
-                .last()
-                .and_then(|i| {
-                    std::path::Path::new(&i.path)
-                        .parent()
-                        .map(|p| p.to_path_buf())
-                })
-                .unwrap_or_default();
-            if !self.choose(
-                crate::file_chooser::Choose::Image { folder },
-                crate::file_chooser::Purpose::ShaderImage(node.id),
-            ) {
-                self.status = "No file panel is available to choose a picture".into();
-            }
+            self.choose_shader_image(node.id);
         }
         #[cfg(feature = "painting")]
         self.psd_layer_row(ui, node.id);
+    }
+
+    /// Opens the picture file panel for Image Map layer `node`, in the
+    /// folder of the scene's last image.
+    fn choose_shader_image(&mut self, node: NodeId) {
+        let folder = self
+            .editor
+            .scene
+            .images
+            .last()
+            .and_then(|i| {
+                std::path::Path::new(&i.path)
+                    .parent()
+                    .map(|p| p.to_path_buf())
+            })
+            .unwrap_or_default();
+        if !self.choose(
+            crate::file_chooser::Choose::Image { folder },
+            crate::file_chooser::Purpose::ShaderImage(node),
+        ) {
+            self.status = "No file panel is available to choose a picture".into();
+        }
+    }
+
+    /// `operandi.texture.loadImage layer:ID [filename:PATH]` (#56): the
+    /// Image Map's Browse… button runs it (UIC-164). `args` are the
+    /// line's words.
+    pub(super) fn texture_load_image_canonical(&mut self, args: &[String]) -> bool {
+        const NAME: &str = "operandi.texture.loadImage";
+        if !args.first().is_some_and(|a| a.eq_ignore_ascii_case(NAME)) {
+            return false;
+        }
+        let bound =
+            match operandi_core::command_args::bind(NAME, &args[1..], &["layer", "filename"]) {
+                Ok(b) => b,
+                Err(e) => {
+                    self.status = e;
+                    return true;
+                }
+            };
+        let layer = bound[0]
+            .and_then(|v| v.trim().parse::<NodeId>().ok())
+            .filter(|id| {
+                matches!(
+                    self.editor.scene.shader_tree.get(*id).map(|n| &n.kind),
+                    Some(NodeKind::Texture(t)) if matches!(
+                        t.source,
+                        operandi_core::shader_tree::TextureSource::ImageMap { .. }
+                    )
+                )
+            });
+        let Some(layer) = layer else {
+            self.status = format!("{NAME}: layer: takes an Image Map layer's id");
+            return true;
+        };
+        match bound[1] {
+            Some(path) => self.shader_image_chosen(layer, std::path::PathBuf::from(path)),
+            None => self.choose_shader_image(layer),
+        }
+        true
     }
 
     /// A picture file chosen for Image Map layer `node`.

@@ -642,8 +642,13 @@ impl Operandi {
         icon_only: bool,
         lit: Option<bool>,
     ) -> bool {
-        let active =
-            lit.unwrap_or_else(|| self.editor.live.as_ref().is_some_and(|l| l.tool == tool));
+        let active = lit.unwrap_or_else(|| {
+            self.editor
+                .session
+                .live
+                .as_ref()
+                .is_some_and(|l| l.tool == tool)
+        });
         let face = ToolFace {
             active,
             label: tool.label(),

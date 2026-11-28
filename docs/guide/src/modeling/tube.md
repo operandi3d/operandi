@@ -11,7 +11,8 @@
 2. Click **Tube** in the **Draw** section of the **Create** tool tab.
 3. Click in the **3D view** to add points on the **Work Plane**. The tube
    appears once there are two.
-4. Drag a point to move it. Middle-click a point to delete it
+4. Drag a point to move it, or click it and type its place in
+   **Tool Properties**. Middle-click a point to delete it
    (**Shift**+middle-click deletes it and every later one).
 5. Click **Drop** to keep the tube, or **Apply** to keep it and start
    another.
@@ -24,7 +25,7 @@
 
 | Name | What it does | Default |
 |---|---|---|
-| **Point 1**, **Point 2**, … | Each point's place (X, Y, Z). | none |
+| **Position** | The current point's place (X, Y, Z): the point you last clicked, else the last one. | the last point |
 | **Sides** | How many polygons go round the tube. | 12 |
 | **Segments** | How many rows of polygons go between two points. | 10 |
 | **Radius** | The tube's radius. | 0.2 m |

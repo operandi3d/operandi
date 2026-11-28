@@ -113,7 +113,7 @@ These keys help you find your model again:
 | Fit the selection in the view | **Shift+A** (**View > Frame Selection**) |
 | Zoom in or out a step | **.** (period) or **,** (comma) |
 | Top, Front or Right view | **Numpad 1**, **Numpad 2** or **Numpad 3** |
-| Back to the perspective view | **Numpad .** |
+| Back to the perspective view; again to look through the scene's camera, and again to come back | **Numpad .** |
 | Fill the window with this view, and back | **Numpad 0** or **Alt+0** |
 
 **View > Navigation Help** shows these gestures in the message line at the

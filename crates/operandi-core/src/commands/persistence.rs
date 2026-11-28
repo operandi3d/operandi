@@ -19,7 +19,14 @@ const MAX_LOAD_BYTES: u64 = 256 << 30;
 /// Newest native version this build reads and writes.
 // Version numbers: renumber here (and in the tests that name them) when
 // branches merge in another order.
-const CURRENT_VERSION: u32 = SCHEMATIC_PAGES_VERSION;
+const CURRENT_VERSION: u32 = POST_EFFECTS_VERSION;
+/// Version 68: Bloom and Glare (`RenderSettings::post`, post_effects.rs).
+/// A v67 build would refuse the unknown field; a scene with both off at
+/// their defaults keeps its older number.
+const POST_EFFECTS_VERSION: u32 = 68;
+fn has_v68_post_effects(scene: &Scene) -> bool {
+    !scene.render.post.is_default()
+}
 /// Version 67: Schematic workspaces and node places (`Rig::workspaces`,
 /// schematic_pages.rs, SC-91). A v66 build would refuse the unknown field.
 const SCHEMATIC_PAGES_VERSION: u32 = 67;
@@ -633,7 +640,9 @@ fn encode_document(scene: &Scene, preset: Option<&crate::preset::PresetHeader>) 
     let data = serde_json::to_vec_pretty(&Document {
         format: "Operandi".into(),
         preset: preset.cloned(),
-        version: if has_v67_workspaces(scene) {
+        version: if has_v68_post_effects(scene) {
+            POST_EFFECTS_VERSION
+        } else if has_v67_workspaces(scene) {
             SCHEMATIC_PAGES_VERSION
         } else if has_v66_channel_sets(scene) {
             CHANNEL_SETS_VERSION
@@ -807,6 +816,9 @@ fn decode_document(
     }
     if doc.version < RENDER_OUTPUTS_D_VERSION && has_v55_outputs(&doc.scene) {
         return Err("These Render Outputs require native version 55".into());
+    }
+    if doc.version < POST_EFFECTS_VERSION && has_v68_post_effects(&doc.scene) {
+        return Err("Bloom and Glare require native version 68".into());
     }
     if doc.version < SCHEMATIC_PAGES_VERSION && has_v67_workspaces(&doc.scene) {
         return Err("Schematic workspaces require native version 67".into());
@@ -1016,6 +1028,8 @@ fn decode_document(
         scene.xyz_items_to_x_first();
     }
     scene.settle_environment_transforms();
+    // The Final Color output's old Bloom rows become the scene's Bloom.
+    scene.move_old_output_bloom();
     if doc.version < ENVIRONMENT_VERSION && has_cameras_lights(&scene) {
         scene.ensure_environment()?;
     }

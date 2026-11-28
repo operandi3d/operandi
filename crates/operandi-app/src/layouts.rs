@@ -1407,7 +1407,7 @@ impl Operandi {
             self.status = format!("{target} layout");
             return Ok(());
         }
-        if self.editor.live.is_some() || self.pointer_held {
+        if self.editor.session.live.is_some() || self.pointer_held {
             return Err("Drop the tool before switching layouts".into());
         }
         // The layout being left keeps its file up to date, then its state.
@@ -1489,7 +1489,7 @@ impl Operandi {
             ));
         };
         if name == self.layouts.current {
-            if self.editor.live.is_some() || self.pointer_held {
+            if self.editor.session.live.is_some() || self.pointer_held {
                 return Err("Drop the tool before resetting the layout".into());
             }
             self.note_torn_windows();

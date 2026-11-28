@@ -9,7 +9,7 @@ pub(super) struct SpikeFields;
 impl ToolFields for SpikeFields {
     type P = f64;
     fn params(app: &Operandi) -> Option<f64> {
-        app.editor.spike.as_ref().map(|s| s.requested)
+        app.editor.session.spike.as_ref().map(|s| s.requested)
     }
     fn form(app: &Operandi, _: &f64) -> ToolForm<f64> {
         let mut f = ToolForm::new();
@@ -119,17 +119,17 @@ mod tests {
         a.execute("Undo");
         assert_eq!(a.editor.scene, reshaped);
         a.execute("Redo");
-        assert!(a.editor.spike.is_none());
+        assert!(a.editor.session.spike.is_none());
         assert_eq!(a.editor.scene.active().unwrap().mesh.faces.len(), 12);
         a.execute("Spike");
         a.fields.insert("spi_strength".into(), "invalid".into());
         a.execute("Move");
-        assert!(a.editor.spike.is_some());
-        assert!(a.editor.live.is_none());
+        assert!(a.editor.session.spike.is_some());
+        assert!(a.editor.session.live.is_none());
         a.fields.insert("spi_strength".into(), "0.25".into());
         a.execute("Move");
-        assert!(a.editor.spike.is_none());
-        assert!(a.editor.live.is_some());
+        assert!(a.editor.session.spike.is_none());
+        assert!(a.editor.session.live.is_some());
     }
     #[test]
     fn spi_panel_menu_art_input_route_and_compact_field_reachability() {
@@ -159,7 +159,7 @@ mod tests {
         }
         assert!(a.bindings.get("Spike").is_some_and(String::is_empty));
         a.execute("spike strength -0.25");
-        assert_eq!(a.editor.spike.as_ref().unwrap().requested, -0.25);
+        assert_eq!(a.editor.session.spike.as_ref().unwrap().requested, -0.25);
         a.execute("spike apply");
         assert_eq!(
             a.editor.scene.active().unwrap().mesh.vertices[4],
@@ -169,7 +169,7 @@ mod tests {
         assert!(!a.confirm_fields());
         a.run(Command::ResetSpike);
         assert!(a.field_errors.is_empty());
-        assert_eq!(a.editor.spike.as_ref().unwrap().requested, 0.);
+        assert_eq!(a.editor.session.spike.as_ref().unwrap().requested, 0.);
         // UIC-78: Cancel takes back the spike that is still live.
         a.run(Command::Cancel);
         assert_eq!(a.editor.scene.active().unwrap().mesh.faces.len(), 1);

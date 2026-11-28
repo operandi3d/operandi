@@ -90,7 +90,7 @@ fn live_with(tool: Tool, ctx: &Context, bindings: &[(&str, &str)]) -> Operandi {
     let source = a.editor.scene.clone();
     let at = empty_viewport(&a);
     click(&mut a, ctx, at);
-    assert!(a.editor.live.as_ref().unwrap().applied);
+    assert!(a.editor.session.live.as_ref().unwrap().applied);
     assert_ne!(a.editor.scene, source);
     a
 }
@@ -169,6 +169,7 @@ fn outcome(a: &Operandi) -> Outcome {
         a.editor.scene.clone(),
         history(a),
         a.editor
+            .session
             .live
             .as_ref()
             .map(|l| (l.tool, l.applied, l.params.smooth_shift)),
@@ -177,11 +178,11 @@ fn outcome(a: &Operandi) -> Outcome {
 
 fn assert_dropped_like_q(escape: &Operandi, q: &Operandi, tool: Tool, label: &str) {
     assert!(
-        q.editor.live.is_none(),
+        q.editor.session.live.is_none(),
         "{tool:?} {label}: Q oracle must drop"
     );
     assert!(
-        escape.editor.live.is_none(),
+        escape.editor.session.live.is_none(),
         "{tool:?} {label}: viewport Escape left the tool live"
     );
     assert_eq!(
@@ -202,7 +203,7 @@ fn live_after_field_escape(tool: Tool, ctx: &Context) -> (Operandi, Scene) {
     let source = a.editor.scene.clone();
     let at = empty_viewport(&a);
     click(&mut a, ctx, at);
-    assert!(a.editor.live.as_ref().unwrap().applied);
+    assert!(a.editor.session.live.as_ref().unwrap().applied);
     assert_ne!(a.editor.scene, source);
     let live = a.editor.clone();
     assert_eq!(a.confirmed_fields["sst_scale"], "100 %");
@@ -220,7 +221,13 @@ fn live_after_field_escape(tool: Tool, ctx: &Context) -> (Operandi, Scene) {
     // Clicking empty viewport space keeps the stage live (observed).
     let at = empty_viewport(&a);
     click(&mut a, ctx, at);
-    assert!(a.editor.live.as_ref().is_some_and(|l| l.tool == tool));
+    assert!(
+        a.editor
+            .session
+            .live
+            .as_ref()
+            .is_some_and(|l| l.tool == tool)
+    );
     (a, source)
 }
 
@@ -277,6 +284,7 @@ fn action_on_escape(tool: Tool) {
     assert!(
         oracle
             .editor
+            .session
             .live
             .as_ref()
             .is_some_and(|l| l.tool == Tool::Move)

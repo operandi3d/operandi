@@ -103,7 +103,7 @@ fn arm(a: &mut Operandi) {
 }
 
 fn params(a: &Operandi) -> SmoothShiftParameters {
-    let l = a.editor.live.as_ref().expect("Thicken live");
+    let l = a.editor.session.live.as_ref().expect("Thicken live");
     assert_eq!(l.tool, Tool::Thicken);
     l.params.smooth_shift
 }
@@ -116,9 +116,9 @@ fn editor_expected(source: &Scene, p: SmoothShiftParameters) -> Scene {
     };
     e.dispatch(Command::Activate(Tool::Thicken)).unwrap();
     e.dispatch(Command::ConfigureSmoothShift(p)).unwrap();
-    let staged = e.live.as_ref().unwrap().params.clone();
+    let staged = e.session.live.as_ref().unwrap().params.clone();
     e.dispatch(Command::Preview(staged)).unwrap();
-    assert_eq!(e.live.as_ref().unwrap().params.smooth_shift, p);
+    assert_eq!(e.session.live.as_ref().unwrap().params.smooth_shift, p);
     e.scene
 }
 
@@ -364,7 +364,7 @@ fn faces(s: &Scene) -> usize {
 /// from the source, with selected faces inside the current mesh.
 fn assert_stage(a: &Operandi, source: &Scene, p: SmoothShiftParameters, step: &str) -> Scene {
     assert_eq!(params(a), p, "{step}: parameters ({})", a.status);
-    let l = a.editor.live.as_ref().unwrap();
+    let l = a.editor.session.live.as_ref().unwrap();
     assert!(l.applied, "{step}: stage stays live");
     assert!(l.preview_error.is_none(), "{step}: {:?}", l.preview_error);
     let expected = editor_expected(source, p);
@@ -517,7 +517,11 @@ fn thicken_on_live_tool_state_save_recall_reset_then_cancel() {
         "Cancel adds no history"
     );
     assert!(a.editor.history.redo.is_empty());
-    assert!(a.editor.live.is_none(), "Cancel deactivates: {}", a.status);
+    assert!(
+        a.editor.session.live.is_none(),
+        "Cancel deactivates: {}",
+        a.status
+    );
     // Session-only recipe bookkeeping is separate from geometry and history:
     // Cancel keeps the saved state and its selection.
     assert_eq!(a.editor.surface_states["Thicken"][&name], state_a());
@@ -755,7 +759,7 @@ fn thicken_on_live_tool_state_rename_delete_then_default_reset_and_cancel() {
     assert_eq!(params(&a), p_b, "current values stay usable");
     assert_eq!(a.editor.scene, stage_b, "Delete leaves geometry unchanged");
     assert_eq!(a.editor.scene.selection, selection);
-    assert!(a.editor.live.as_ref().unwrap().applied);
+    assert!(a.editor.session.live.as_ref().unwrap().applied);
     assert_eq!(
         labels(&a.editor.history.undo),
         history,
@@ -778,7 +782,7 @@ fn thicken_on_live_tool_state_rename_delete_then_default_reset_and_cancel() {
     click_button(&mut a, &ctx, "Reset");
     assert_eq!(a.status, "Ready");
     let reset = assert_stage(&a, &source, defaults, "default Reset");
-    assert_eq!(a.editor.live.as_ref().unwrap().tool, Tool::Thicken);
+    assert_eq!(a.editor.session.live.as_ref().unwrap().tool, Tool::Thicken);
     assert!(params(&a).thicken, "Reset keeps Thicken on (TP-15)");
     assert_ne!(params(&a), p_c);
     assert_ne!(reset, stage_b);
@@ -803,7 +807,11 @@ fn thicken_on_live_tool_state_rename_delete_then_default_reset_and_cancel() {
         "Cancel adds no history"
     );
     assert!(a.editor.history.redo.is_empty());
-    assert!(a.editor.live.is_none(), "Cancel deactivates: {}", a.status);
+    assert!(
+        a.editor.session.live.is_none(),
+        "Cancel deactivates: {}",
+        a.status
+    );
     // Session-only recipe bookkeeping survives Cancel: sentinel kept, unselected.
     assert_eq!(states(&a).len(), 1);
     assert_eq!(states(&a)[&name_c], p_c);
@@ -820,7 +828,7 @@ fn thicken_on_live_tool_state_rename_delete_then_default_reset_and_cancel() {
 
 /// The armed (not yet applied) surface session for `tool`: its parameters.
 fn armed(a: &Operandi, tool: Tool, step: &str) -> SmoothShiftParameters {
-    let l = a.editor.live.as_ref().expect("surface tool armed");
+    let l = a.editor.session.live.as_ref().expect("surface tool armed");
     assert_eq!(l.tool, tool, "{step}: active identity ({})", a.status);
     assert!(!l.applied, "{step}: still armed, no live stage");
     assert!(l.preview_error.is_none(), "{step}: {:?}", l.preview_error);
@@ -919,7 +927,7 @@ fn armed_identity_switches_keep_separate_retained_values_and_tool_states() {
     frame(&mut a, &ctx, vec![]);
     let source = a.editor.scene.clone();
     let history = labels(&a.editor.history.undo);
-    assert!(a.editor.live.is_none());
+    assert!(a.editor.session.live.is_none());
     assert!(a.editor.surface_states.is_empty(), "isolated session store");
     assert!(a.editor.surface_state.is_empty());
 
@@ -1128,7 +1136,11 @@ fn armed_identity_switches_keep_separate_retained_values_and_tool_states() {
 
     // Cleanup: explicit Cancel of the armed tool keeps the scene unchanged.
     click_button(&mut a, &ctx, "Cancel");
-    assert!(a.editor.live.is_none(), "Cancel deactivates: {}", a.status);
+    assert!(
+        a.editor.session.live.is_none(),
+        "Cancel deactivates: {}",
+        a.status
+    );
     unchanged(&a, "Cancel");
     both(&a, Some(name_t.as_str()), "after Cancel");
 

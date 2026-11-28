@@ -224,7 +224,7 @@ struct MapHooks<'a> {
 
 impl TreeHooks<MapKey> for MapHooks<'_> {
     fn has_row_menu(&self, _key: MapKey) -> bool {
-        self.app.editor.live.is_none()
+        self.app.editor.session.live.is_none()
     }
     fn row_menu(&mut self, ui: &mut Ui, key: MapKey, rename: &mut dyn FnMut()) {
         self.app.menu_owned_input = true;
@@ -281,7 +281,7 @@ impl TreeHooks<MapKey> for MapHooks<'_> {
 impl Operandi {
     /// The E7 rows of the Edit tab's UV group.
     pub(super) fn uv_island_buttons(&mut self, ui: &mut Ui) {
-        let idle = self.editor.live.is_none();
+        let idle = self.editor.session.live.is_none();
         for row in ISLAND_ROWS {
             ui.horizontal(|ui| {
                 ui.spacing_mut().item_spacing.x = 2.;
@@ -401,7 +401,7 @@ impl Operandi {
     /// Delete; rename in place (UIC-39) or from the right-click menu, which
     /// also has Copy, Paste and Delete.
     pub(super) fn uv_maps_section(&mut self, ui: &mut Ui, _area: Rect) {
-        let idle = self.editor.live.is_none();
+        let idle = self.editor.session.live.is_none();
         let mut state = std::mem::take(&mut self.uv_maps_tree);
         let (names, current) = match self.editor.scene.active() {
             Some(i) => (

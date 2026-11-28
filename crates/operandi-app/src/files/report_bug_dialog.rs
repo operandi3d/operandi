@@ -310,7 +310,7 @@ impl Operandi {
     fn report_tool_state(&self) -> capture::ToolState {
         let scene = &self.editor.scene;
         let sel = &scene.selection;
-        let tool = match &self.editor.live {
+        let tool = match &self.editor.session.live {
             Some(live) => Some(live.tool.label().to_owned()),
             None => self.command_active().map(|i| command::IDS[i].0.to_owned()),
         };

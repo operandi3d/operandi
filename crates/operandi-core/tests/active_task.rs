@@ -36,13 +36,16 @@ fn starting_any_task_from_any_other_leaves_one_open() {
             // Refusals are fine (some tasks need a particular selection);
             // what matters is that no command leaves two tasks open.
             let _ = e.dispatch(first.clone());
-            assert!(e.open_task_slots() <= 1);
-            opened += usize::from(e.has_active_task());
+            assert!(e.session.open_task_slots() <= 1);
+            opened += usize::from(e.session.has_active_task());
             let _ = e.dispatch(second.clone());
-            assert!(e.open_task_slots() <= 1);
-            assert_eq!(e.has_active_task(), e.open_task_slots() == 1);
+            assert!(e.session.open_task_slots() <= 1);
+            assert_eq!(
+                e.session.has_active_task(),
+                e.session.open_task_slots() == 1
+            );
             let _ = e.dispatch(Command::Drop);
-            assert!(e.open_task_slots() <= 1);
+            assert!(e.session.open_task_slots() <= 1);
         }
     }
     // Most starts succeed on this fixture, so the transitions are exercised.
@@ -52,14 +55,14 @@ fn starting_any_task_from_any_other_leaves_one_open() {
 #[test]
 fn active_task_names_the_open_task() {
     let mut e = editor();
-    assert_eq!(e.active_task(), None);
+    assert_eq!(e.session.active_task(), None);
     e.dispatch(Command::Activate(Tool::Bevel)).unwrap();
-    assert_eq!(e.active_task(), Some(ActiveTask::Live(Tool::Bevel)));
+    assert_eq!(e.session.active_task(), Some(ActiveTask::Live(Tool::Bevel)));
     e.dispatch(Command::Drop).unwrap();
     e.dispatch(Command::ArmCone).unwrap();
-    assert_eq!(e.active_task(), Some(ActiveTask::Cone));
+    assert_eq!(e.session.active_task(), Some(ActiveTask::Cone));
     e.dispatch(Command::Cancel).unwrap();
-    assert_eq!(e.active_task(), None);
+    assert_eq!(e.session.active_task(), None);
 }
 
 #[test]
@@ -72,7 +75,7 @@ fn numeric_pen_refuses_and_ellipsoid_unit_drops_another_open_task() {
     let mut checked = 0;
     for arm in [Command::ArmBridge, Command::ArmSpike] {
         let mut e = editor();
-        if e.dispatch(arm).is_err() || !e.has_active_task() {
+        if e.dispatch(arm).is_err() || !e.session.has_active_task() {
             continue;
         }
         checked += 1;
@@ -82,7 +85,7 @@ fn numeric_pen_refuses_and_ellipsoid_unit_drops_another_open_task() {
         // Unit insertion drops the open task first (2026-11-05).
         e.dispatch(Command::InsertEllipsoidUnit(UnitDestination::NewMesh))
             .unwrap();
-        assert!(!e.has_active_task());
+        assert!(!e.session.has_active_task());
         assert_eq!(e.scene.items.len(), before.items.len() + 1);
     }
     assert!(checked > 0, "no task opened on the fixture");

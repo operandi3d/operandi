@@ -209,7 +209,7 @@ fn tc46_topology_pen_moves_never_conform_even_with_the_constraint_on() {
     e.scene.selection.mode = Mode::Vertex;
     e.dispatch(Command::ActivatePreset("mesh.topology".into()))
         .unwrap();
-    let p = e.live.as_ref().unwrap().params.clone();
+    let p = e.session.live.as_ref().unwrap().params.clone();
     e.dispatch(Command::Preview(Parameters {
         tweak: Some(TweakGrab {
             item: id,

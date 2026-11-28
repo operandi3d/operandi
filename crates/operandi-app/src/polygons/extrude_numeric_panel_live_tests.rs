@@ -100,7 +100,7 @@ fn editor_expected(fixture: &Editor, extents: &[DVec3]) -> Vec<Editor> {
     extents
         .iter()
         .map(|&d| {
-            let p = configured(e.live.as_ref().unwrap().params.clone(), d);
+            let p = configured(e.session.live.as_ref().unwrap().params.clone(), d);
             e.dispatch(Command::ConfigureExtrude(p)).unwrap();
             e.dispatch(Command::Apply).unwrap();
             e.clone()
@@ -313,7 +313,7 @@ fn assert_selected_cap_at(s: &Scene, source: &Scene, offset: DVec3, step: &str) 
 }
 
 fn armed(a: &Operandi, step: &str) -> Parameters {
-    let l = a.editor.live.as_ref().expect("Extrude armed");
+    let l = a.editor.session.live.as_ref().expect("Extrude armed");
     assert_eq!(l.tool, Tool::Extrude, "{step}: active tool ({})", a.status);
     assert!(!l.applied, "{step}: armed, no live stage");
     assert!(l.preview_error.is_none(), "{step}: {:?}", l.preview_error);
@@ -465,7 +465,7 @@ fn ex_t11_actual_panel_two_apply_stages_invalid_draft_drop_undo_redo() {
     frame(&mut a, &ctx, vec![]);
     assert!(!a.text_editor_focused(&ctx), "no text field focus before Q");
     frame(&mut a, &ctx, vec![key(Key::Q)]);
-    assert!(a.editor.live.is_none(), "Q drops: {}", a.status);
+    assert!(a.editor.session.live.is_none(), "Q drops: {}", a.status);
     assert_eq!(a.editor.scene, second, "Drop keeps the second stage");
     assert_eq!(
         labels(&a.editor.history.undo),
@@ -485,7 +485,7 @@ fn ex_t11_actual_panel_two_apply_stages_invalid_draft_drop_undo_redo() {
         assert_eq!(a.status, "Ready", "{step}");
         assert_eq!(&a.editor.scene, want, "{step}: whole scene");
         assert_eq!(a.editor.scene.selection, want.selection, "{step}");
-        assert!(a.editor.live.is_none(), "{step}: no tool restored");
+        assert!(a.editor.session.live.is_none(), "{step}: no tool restored");
         frame(&mut a, &ctx, vec![]);
     }
     assert_eq!(
@@ -523,7 +523,7 @@ fn configured_v_unselected(p: Parameters) -> Parameters {
 fn editor_expected_v_unselected(fixture: &Editor) -> Editor {
     let mut e = fixture.clone();
     e.dispatch(Command::Activate(Tool::Extrude)).unwrap();
-    let want = configured_v_unselected(e.live.as_ref().unwrap().params.clone());
+    let want = configured_v_unselected(e.session.live.as_ref().unwrap().params.clone());
     let mut selected = want.clone();
     selected.extrude_uv_selected = true;
     e.dispatch(Command::ConfigureExtrude(selected)).unwrap();
@@ -709,8 +709,8 @@ fn ex_002_actual_panel_uv_map_selector_retains_v_after_deselection() {
     assert_eq!(result, expected.scene, "whole scene vs Editor route");
     assert_eq!(result.selection, expected.scene.selection);
     assert_eq!(
-        a.editor.live.as_ref().unwrap().params,
-        expected.live.as_ref().unwrap().params
+        a.editor.session.live.as_ref().unwrap().params,
+        expected.session.live.as_ref().unwrap().params
     );
     assert_selected_cap_at(&result, &source, FIRST, "uv result");
     let m = &result.active().unwrap().mesh;
@@ -729,7 +729,7 @@ fn ex_002_actual_panel_uv_map_selector_retains_v_after_deselection() {
     }
     frame(&mut a, &ctx, vec![key(Key::Q)]);
     frame(&mut a, &ctx, vec![release]);
-    assert!(a.editor.live.is_none(), "Q drops: {}", a.status);
+    assert!(a.editor.session.live.is_none(), "Q drops: {}", a.status);
     assert_eq!(a.editor.scene, result, "Drop keeps the stage");
     assert_eq!(labels(&a.editor.history.undo), ["Extrude"]);
     for (action, want, step) in [
@@ -748,7 +748,7 @@ fn ex_002_actual_panel_uv_map_selector_retains_v_after_deselection() {
             std::ptr::eq(want, &result),
             "{step}: generated assignment presence"
         );
-        assert!(a.editor.live.is_none(), "{step}: no tool restored");
+        assert!(a.editor.session.live.is_none(), "{step}: no tool restored");
         frame(&mut a, &ctx, vec![]);
     }
     assert_eq!(labels(&a.editor.history.undo), ["Extrude"]);

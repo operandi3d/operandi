@@ -85,8 +85,6 @@ pub(crate) struct OsWindow {
     /// the system.
     pub position: Option<[f32; 2]>,
     pub min_size: [f32; 2],
-    /// Stays above the main window (palettes).
-    pub on_top: bool,
 }
 
 /// What a floating window did this frame.
@@ -146,7 +144,6 @@ impl Operandi {
                     .copied()
                     .or(place.position),
                 min_size: [200., 160.],
-                on_top: false,
             };
             let shown = self.os_window(ctx, spec, |app, ctx| {
                 CentralPanel::default()
@@ -233,10 +230,11 @@ impl Operandi {
         let mut builder = egui::ViewportBuilder::default()
             .with_title(spec.title)
             .with_inner_size(open_size)
-            .with_min_inner_size(spec.min_size);
-        if spec.on_top {
-            builder = builder.with_always_on_top();
-        }
+            .with_min_inner_size(spec.min_size)
+            // UIC-189: above the main window, not above other apps
+            // (floating_level.rs). Torn-off views too, so one can't get
+            // lost behind it on a single screen (VST-Q05).
+            .with_window_level(self.floating_window_level());
         if let Some(at) = open_at {
             builder = builder.with_position(at);
         }
@@ -275,7 +273,8 @@ impl Operandi {
 
     /// A small palette (Snaps, Absolute) in an OS window of its own, so it
     /// can sit outside the main window (Jason, 2026-11-10). It opens near
-    /// the main window's top left at `size`, stays above the main window,
+    /// the main window's top left at `size`, stays above the main window
+    /// (UIC-189),
     /// and returns `false` once its close button is pressed. Used by every
     /// floating palette (Jason, 2026-11-10: "most floating panels should be
     /// the same moving forward").
@@ -304,7 +303,6 @@ impl Operandi {
             size,
             position: near,
             min_size: [160., 120.],
-            on_top: true,
         };
         let mut out = None;
         let shown = self.os_window(ctx, spec, |app, ctx| {

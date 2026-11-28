@@ -49,7 +49,7 @@ fn drag(
     draw(a, ctx, size, vec![button(to, false, b, m)]);
 }
 fn session(a: &Operandi) -> &operandi_core::SketchSession {
-    a.editor.solid_sketch.as_ref().unwrap()
+    a.editor.session.solid_sketch.as_ref().unwrap()
 }
 fn faces(a: &Operandi) -> usize {
     a.editor.scene.active().unwrap().mesh.faces.len()
@@ -66,7 +66,7 @@ fn tool_set_bare_is_level_2_and_the_button_preset_level_1() {
     a.execute("tool.set solid.sketch ?");
     assert_eq!(a.status, "1");
     a.execute("tool.set solid.sketch off");
-    assert!(a.editor.solid_sketch.is_none());
+    assert!(a.editor.session.solid_sketch.is_none());
     a.execute("tool.set \"SS Default\" on");
     assert_eq!(
         session(&a).options().subdiv,
@@ -84,7 +84,7 @@ fn tool_set_bare_is_level_2_and_the_button_preset_level_1() {
 fn no_mesh_layer_refuses() {
     let mut a = Operandi::empty();
     a.execute("tool.set solid.sketch on");
-    assert!(a.editor.solid_sketch.is_none());
+    assert!(a.editor.session.solid_sketch.is_none());
     assert_eq!(
         a.status,
         "Solid Sketch needs a mesh layer. Add or select a mesh first."
@@ -339,7 +339,7 @@ fn reactivating_asks_and_strip_removes_the_data() {
     a.run(Command::Drop);
     a.execute("Solid Sketch");
     assert!(a.solid_sketch_ask.is_some());
-    assert!(a.editor.solid_sketch.is_none());
+    assert!(a.editor.session.solid_sketch.is_none());
     // Return answers Yes.
     draw(&mut a, &ctx, size, vec![]);
     draw(&mut a, &ctx, size, vec![super::tests::key(Key::Enter)]);
@@ -359,7 +359,7 @@ fn reactivating_asks_and_strip_removes_the_data() {
     );
     a.execute("Solid Sketch");
     assert!(a.solid_sketch_ask.is_none());
-    assert!(a.editor.solid_sketch.is_some());
+    assert!(a.editor.session.solid_sketch.is_some());
 }
 
 /// A background mesh with a point at (1, 0, 1), and an empty active mesh
@@ -422,7 +422,7 @@ fn nodes_snap_on_create_and_move_and_reactivating_is_safe() {
     // comes after a frame without it (a press on a window above a view
     // stays in that window, bug report #5).
     draw(&mut a, &ctx, size, vec![]);
-    assert!(a.editor.solid_sketch.is_some(), "{}", a.status);
+    assert!(a.editor.session.solid_sketch.is_some(), "{}", a.status);
     let at = screen(&a, DVec3::new(2., 0., 1.)) + vec2(6., -5.);
     click(&mut a, &ctx, size, at, Modifiers::NONE);
     let centres = session(&a).world_centres();
@@ -469,4 +469,80 @@ fn a_new_node_takes_the_nearer_of_seam_and_target() {
             assert!(c.distance(target) < 1e-9, "{c} vs {target} ({})", a.status);
         }
     }
+}
+
+/// #45 (Jason, 2026-11-27): red, green and blue all size the node (X, Y,
+/// Z); green stretches Size Y only.
+#[test]
+fn green_square_stretches_size_y_only() {
+    let (mut a, ctx, size) = app();
+    a.execute("Solid Sketch");
+    let at = screen(&a, DVec3::ZERO);
+    click(&mut a, &ctx, size, at, Modifiers::NONE);
+    // From the front the node's Y (world Y here) points up the screen.
+    a.camera.view = View::Front;
+    draw(&mut a, &ctx, size, vec![]);
+    let (_, c, axes, s) = a.sketch_current_frame().unwrap();
+    let green = screen(&a, c + axes[1] * s.y);
+    let to = screen(&a, c + axes[1] * 0.4);
+    drag(
+        &mut a,
+        &ctx,
+        size,
+        green,
+        to,
+        PointerButton::Primary,
+        Modifiers::NONE,
+    );
+    let node = &session(&a).sketch().nodes[0];
+    assert!((node.size.y - 0.4).abs() < 0.03, "{}", node.size);
+    assert!((node.size.x - 0.1).abs() < 1e-9 && (node.size.z - 0.1).abs() < 1e-9);
+    assert_eq!(node.twist, 0., "green no longer twists");
+}
+
+/// #45: Twist has its own dark green handle beyond the green square;
+/// dragging it right turns the node one way, left the other, and leaves
+/// the size alone.
+#[test]
+fn twist_handle_turns_with_left_right_drags() {
+    let (mut a, ctx, size) = app();
+    a.execute("Solid Sketch");
+    let at = screen(&a, DVec3::ZERO);
+    click(&mut a, &ctx, size, at, Modifiers::NONE);
+    a.camera.view = View::Front;
+    draw(&mut a, &ctx, size, vec![]);
+    let r = a.viewport_rect;
+    let handle = a.sketch_twist_handle(r).expect("a twist handle");
+    let (_, c, axes, s) = a.sketch_current_frame().unwrap();
+    let green = screen(&a, c + axes[1] * s.y);
+    assert!(handle.distance(green) > 8., "apart from the green square");
+    drag(
+        &mut a,
+        &ctx,
+        size,
+        handle,
+        handle + vec2(60., 0.),
+        PointerButton::Primary,
+        Modifiers::NONE,
+    );
+    let node = &session(&a).sketch().nodes[0];
+    let right = node.twist;
+    assert!(right.abs() > 0.1, "twisted: {right}");
+    assert!(
+        (node.size - DVec3::splat(0.1)).length() < 1e-9,
+        "{}",
+        node.size
+    );
+    let handle = a.sketch_twist_handle(r).unwrap();
+    drag(
+        &mut a,
+        &ctx,
+        size,
+        handle,
+        handle + vec2(-120., 0.),
+        PointerButton::Primary,
+        Modifiers::NONE,
+    );
+    let left = session(&a).sketch().nodes[0].twist;
+    assert!(left.signum() != right.signum(), "{right} then {left}");
 }

@@ -59,7 +59,7 @@ struct GroupHooks<'a> {
 
 impl TreeHooks<GroupKey> for GroupHooks<'_> {
     fn has_row_menu(&self, _key: GroupKey) -> bool {
-        self.app.editor.live.is_none()
+        self.app.editor.session.live.is_none()
     }
     fn row_menu(&mut self, ui: &mut Ui, key: GroupKey, rename: &mut dyn FnMut()) {
         self.app.menu_owned_input = true;

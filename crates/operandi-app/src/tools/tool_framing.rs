@@ -15,17 +15,22 @@ impl Operandi {
     /// to a point), a starting-size box at the tool's centre. `None` when
     /// no creation tool is open, so Frame All frames the scene as usual.
     pub(super) fn creation_tool_frame_points(&self) -> Option<Vec<DVec3>> {
-        let (before, after, centre) =
-            if let Some(live) = self.editor.live.as_ref().filter(|l| l.tool.is_primitive()) {
-                (
-                    &live.base,
-                    std::borrow::Cow::Borrowed(&self.editor.scene),
-                    Some(live.params.position),
-                )
-            } else {
-                let preview = self.editor.tool_preview_display()?;
-                (&self.editor.scene, std::borrow::Cow::Owned(preview), None)
-            };
+        let (before, after, centre) = if let Some(live) = self
+            .editor
+            .session
+            .live
+            .as_ref()
+            .filter(|l| l.tool.is_primitive())
+        {
+            (
+                &live.base,
+                std::borrow::Cow::Borrowed(&self.editor.scene),
+                Some(live.params.position),
+            )
+        } else {
+            let preview = self.editor.tool_preview_display()?;
+            (&self.editor.scene, std::borrow::Cow::Owned(preview), None)
+        };
         let mut points = Vec::new();
         for item in after.items.iter().filter(|i| after.shows(i)) {
             let old = before.item(item.id).map_or(0, |b| b.mesh.vertices.len());

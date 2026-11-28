@@ -346,7 +346,7 @@ fn a_modeling_tool_turns_the_brush_off_and_back() {
     frame(&mut a, &ctx, vec![]);
     assert_eq!(a.sculpt.brush, None);
     a.activate_sculpt(SculptBrush::Push);
-    assert!(a.editor.live.is_none(), "the brush dropped Move");
+    assert!(a.editor.session.live.is_none(), "the brush dropped Move");
     assert_eq!(a.sculpt.brush, Some(SculptBrush::Push));
     // Q drops it (SC-93 said Space; CV-03 gives Space to Mini Properties).
     frame(
@@ -742,7 +742,8 @@ fn low_pressure_greys_until_a_pen_is_seen_and_then_smooths_light_strokes() {
             .into_iter()
             .find(|f| f.row.label == "Smooth Mode")
             .expect("Smooth Mode row");
-        field.greyed_options.iter().any(|(i, _)| *i == 2)
+        // SI-15: Shift Key, Low Pressure, Uniform.
+        field.greyed_options.iter().any(|(i, _)| *i == 1)
     };
     let (mut a, ctx) = app();
     brush(&mut a, SculptBrush::Push, 60.);
@@ -823,7 +824,7 @@ fn toolbox_brush_forms_have_the_spec_rows() {
             .map(|f| f.row.label.clone())
             .collect()
     };
-    let tip = ["Size", "Auto Scale", "Shape", "Bias"];
+    let tip = ["Size", "Auto Scale", "Bias", "Shape Preset"];
     let rows = |brush: &[&str], stroke: &[&str]| -> Vec<String> {
         brush
             .iter()
@@ -925,9 +926,9 @@ fn toolbox_brush_forms_have_the_spec_rows() {
     assert!(!p.inverted_flatten);
     assert_eq!(p.offset_amount, 0.5);
     a.drop_sculpt();
-    // Move gains Move Mode first (SCT-49).
+    // Move gains Move Mode after Sculpt Mode (SCT-49).
     a.activate_sculpt(SculptBrush::Move);
-    assert_eq!(labels(&a)[0], "Move Mode");
+    assert_eq!(labels(&a)[..2], ["Sculpt Mode", "Move Mode"]);
 }
 
 /// SCT-45: on a plain mesh Attenuate is greyed with its reason and its command refuses.
@@ -1126,4 +1127,261 @@ fn a_dialog_mid_stroke_ends_it_as_its_own_step() {
     a.run(Command::Undo);
     a.run(Command::Undo);
     assert_eq!(mid(&a).z, 0., "back to the flat grid");
+}
+
+/// The brush form as (section title, its field labels), top to bottom.
+fn form_sections(a: &Operandi) -> Vec<(String, Vec<String>)> {
+    use crate::sculpt_ui::SculptFields;
+    use crate::tool_form::{Item, ToolFields};
+    let p = SculptFields::params(a).unwrap();
+    SculptFields::form(a, &p)
+        .items
+        .into_iter()
+        .filter_map(|item| match item {
+            Item::Section { name, items, .. } => Some((
+                name.to_string(),
+                items
+                    .iter()
+                    .filter_map(|i| match i {
+                        Item::Field(f) => Some(f.row.label.clone()),
+                        // The locks and Brush Settings draw themselves.
+                        Item::Custom(_) => Some("(own)".into()),
+                        Item::Separator => Some("—".into()),
+                        _ => None,
+                    })
+                    .collect(),
+            )),
+            _ => None,
+        })
+        .collect()
+}
+
+/// SI §2: Inflate's form, exact rows and order, in one block plus the
+/// "Smooth Brush" section; no Normal Mode row (SI-04), no Stroke section.
+#[test]
+fn inflate_form_has_the_spec_rows() {
+    let (mut a, _ctx) = app();
+    a.activate_sculpt(SculptBrush::Inflate);
+    let s = form_sections(&a);
+    let names: Vec<&str> = s.iter().map(|(n, _)| n.as_str()).collect();
+    assert_eq!(names, ["Sculpt: Inflate", "Smooth Brush"]);
+    assert_eq!(
+        s[0].1,
+        [
+            "Sculpt Mode",
+            "Offset Mode",
+            "Offset Distance",
+            "Offset Amount",
+            "Smooth Amount",
+            "Smooth Mode",
+            "Density Mode",
+            "—",
+            "Interpolation Step",
+            "Continuous Stroke",
+            "Curve Constraint",
+            "—",
+            "Paint Mode",
+            "—",
+            "Set Color",
+            "Color",
+            "Alpha",
+            "—",
+            "(own)",
+        ]
+    );
+    assert_eq!(
+        s[1].1,
+        ["Size", "Auto Scale", "Bias", "Shape Preset", "(own)"]
+    );
+    a.execute("brush.hard");
+    let s = form_sections(&a);
+    assert_eq!(s[1].0, "Hard Brush");
+    assert_eq!(s[1].1, ["Size", "Auto Scale", "Soft Border", "Bias"]);
+}
+
+/// SI-10, SI-15, SI-16, SI-20..23: choice lists, their order, and the
+/// image-only rows greyed with a note (Jason's "match", SI-Q3).
+#[test]
+fn inflate_choices_and_image_rows_are_greyed_with_a_note() {
+    use crate::form::{Kind, When};
+    use crate::sculpt_ui::SculptFields;
+    use crate::tool_form::ToolFields;
+    let (mut a, _ctx) = app();
+    a.activate_sculpt(SculptBrush::Inflate);
+    let p = SculptFields::params(&a).unwrap();
+    let form = SculptFields::form(&a, &p);
+    let field = |label: &str| {
+        *form
+            .fields()
+            .iter()
+            .find(|f| f.row.label == label)
+            .unwrap_or_else(|| panic!("{label} row"))
+    };
+    let names = |label: &str| match &field(label).row.kind {
+        Kind::Choice(n) => n.clone(),
+        k => panic!("{label} is {k:?}"),
+    };
+    assert_eq!(
+        names("Sculpt Mode"),
+        ["Automatic", "Mesh", "Image Map (Details)"]
+    );
+    assert_eq!(field("Sculpt Mode").greyed_options.len(), 1);
+    assert_eq!(
+        names("Smooth Mode"),
+        ["Shift Key", "Low Pressure", "Uniform"]
+    );
+    assert_eq!(
+        names("Density Mode"),
+        ["Additive", "Attenuated", "Maximum Stroke", "Maximum Map"]
+    );
+    assert!(
+        field("Density Mode")
+            .greyed_options
+            .iter()
+            .any(|(i, _)| *i == 3)
+    );
+    // SI-16 default: Attenuated.
+    assert_eq!(
+        p.density_mode,
+        operandi_core::sculpt::DensityMode::Attenuate
+    );
+    for label in ["Paint Mode", "Set Color", "Color", "Alpha"] {
+        let f = field(label);
+        assert_eq!(f.row.when, When::Never, "{label} greyed");
+        assert!(f.disabled_tip.is_some(), "{label} says why");
+    }
+    // The live rows stay live.
+    for label in ["Sculpt Mode", "Offset Mode", "Smooth Mode", "Density Mode"] {
+        assert_ne!(field(label).row.when, When::Never, "{label} live");
+    }
+}
+
+/// SI-24: the form's locks are the Sculpt tab's switches.
+#[test]
+fn the_form_locks_are_the_sculpt_tab_switches() {
+    use crate::sculpt_ui::SculptFields;
+    use crate::tool_form::ToolFields;
+    let (mut a, ctx) = app();
+    a.activate_sculpt(SculptBrush::Inflate);
+    assert!(!a.sculpt.settings.lock_borders && a.sculpt.settings.lock_corners);
+    // Every sculpt brush's form ends with them (SCT-01); the vertex map
+    // tools' don't.
+    for brush in [
+        SculptBrush::Push,
+        SculptBrush::Smooth,
+        SculptBrush::Move,
+        SculptBrush::Clay,
+    ] {
+        let (rows, _) = crate::sculpt_ui::toolbox_rows(brush);
+        assert_eq!(
+            rows.last(),
+            Some(&crate::sculpt_ui::Row::Locks),
+            "{brush:?}"
+        );
+    }
+    let (rows, _) = crate::sculpt_ui::toolbox_rows(SculptBrush::VmPaint);
+    assert!(!rows.contains(&crate::sculpt_ui::Row::Locks));
+    // Ticking Lock Borders in the panel ticks the tab's switch.
+    let p = SculptFields::params(&a).unwrap();
+    assert!(SculptFields::form(&a, &p).items.iter().any(|i| matches!(
+        i,
+        crate::tool_form::Item::Section { items, .. }
+            if items.iter().any(|i| matches!(i, crate::tool_form::Item::Custom(_)))
+    )));
+    a.execute("sculpt.borderLock on");
+    frame(&mut a, &ctx, vec![]);
+    assert!(a.sculpt.settings.lock_borders);
+}
+
+/// SPM-10..30: Push, Smooth and Move on the row-list form, with their
+/// starting values (Normal Mode Average on Push, Offset Amount 25 % on
+/// Smooth and 100 % on Move).
+#[test]
+fn push_smooth_and_move_use_the_row_list_form() {
+    use crate::tool_form::ToolFields;
+    let (mut a, _ctx) = app();
+    for (brush, want) in [
+        (
+            SculptBrush::Push,
+            &[
+                "Sculpt Mode",
+                "Offset Mode",
+                "Offset Distance",
+                "Offset Amount",
+                "Smooth Amount",
+                "Smooth Mode",
+                "Normal Mode",
+                "Density Mode",
+                "—",
+                "Interpolation Step",
+                "Continuous Stroke",
+                "Curve Constraint",
+                "—",
+                "Set Color",
+                "Color",
+                "Alpha",
+                "—",
+                "(own)",
+            ][..],
+        ),
+        (
+            SculptBrush::Smooth,
+            &["Sculpt Mode", "Offset Amount", "Soft Filter", "—", "(own)"],
+        ),
+        (
+            SculptBrush::Move,
+            &[
+                "Sculpt Mode",
+                "Move Mode",
+                "Move Back Faces",
+                "Offset Amount",
+                "Smooth Amount",
+                "Rigid UVs",
+                "—",
+                "(own)",
+            ],
+        ),
+    ] {
+        a.activate_sculpt(brush);
+        let p = crate::sculpt_ui::SculptFields::params(&a).unwrap();
+        match brush {
+            SculptBrush::Push => assert_eq!(p.normal_mode, NormalMode::Average),
+            SculptBrush::Smooth => assert_eq!(p.offset_amount, 0.25),
+            _ => assert_eq!(p.offset_amount, 1.),
+        }
+        let s = form_sections(&a);
+        assert_eq!(s.len(), 2, "{brush:?}: brush block and tip, no Stroke");
+        assert_eq!(s[0].1, want, "{brush:?}");
+        assert_eq!(s[1].0, "Smooth Brush");
+        a.drop_sculpt();
+    }
+}
+
+/// SI-34: Brush Settings' values drive the tip's Custom falloff, and the
+/// Shape Preset row then reads "Custom".
+#[test]
+fn custom_falloff_shows_as_custom_in_shape_preset() {
+    use crate::sculpt_ui::SculptFields;
+    use crate::tool_form::{Bind, ToolFields};
+    use operandi_core::sculpt::TipShape;
+    let (mut a, _ctx) = app();
+    a.activate_sculpt(SculptBrush::Inflate);
+    let tip = &mut a.sculpt.settings.inflate.tip;
+    tip.custom.in_weight = 0.8;
+    tip.shape = TipShape::Custom;
+    let p = SculptFields::params(&a).unwrap();
+    let form = SculptFields::form(&a, &p);
+    let shape = form
+        .fields()
+        .into_iter()
+        .find(|f| f.row.label == "Shape Preset")
+        .unwrap();
+    let Bind::Choice { get, .. } = &shape.bind else {
+        panic!("choice");
+    };
+    assert_eq!(get(&p), usize::MAX, "no preset matches");
+    assert_eq!(shape.otherwise.as_deref(), Some("Custom"));
+    // Picking a preset again leaves Custom.
+    a.form_change::<SculptFields>(|p| p.tip.shape = TipShape::Fat);
+    assert_eq!(a.sculpt.settings.inflate.tip.shape, TipShape::Fat);
 }

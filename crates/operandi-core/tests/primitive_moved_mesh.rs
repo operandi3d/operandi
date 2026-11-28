@@ -63,7 +63,7 @@ fn check(what: &str, op: impl Fn(&mut Editor)) {
 fn drawn(tool: Tool) -> impl Fn(&mut Editor) {
     move |e: &mut Editor| {
         e.dispatch(Command::Activate(tool)).unwrap();
-        let mut p = e.live.as_ref().unwrap().params.clone();
+        let mut p = e.session.live.as_ref().unwrap().params.clone();
         p.position = DVec3::new(0.4, 1.2, -0.7);
         p.size = DVec3::new(1., 2., 0.5);
         if let Some(r) = p.radial.as_mut() {
@@ -131,14 +131,14 @@ fn numeric_cone_ellipsoid_torus_land_where_drawn() {
 fn shape_preview_shows_where_drawn() {
     let mut e = editor(moved());
     e.dispatch(Command::ArmShape(ShapeKind::Capsule)).unwrap();
-    let p = e.shape.as_ref().unwrap().requested.clone();
+    let p = e.session.shape.as_ref().unwrap().requested.clone();
     e.dispatch(Command::ConfigureShape(p)).unwrap();
     let preview = e.shape_preview_scene().unwrap().unwrap();
     let mut plain = editor(Transform::default());
     plain
         .dispatch(Command::ArmShape(ShapeKind::Capsule))
         .unwrap();
-    let p = plain.shape.as_ref().unwrap().requested.clone();
+    let p = plain.session.shape.as_ref().unwrap().requested.clone();
     plain.dispatch(Command::ConfigureShape(p)).unwrap();
     let reference = plain.shape_preview_scene().unwrap().unwrap();
     let world = |s: &Scene| {
@@ -244,7 +244,7 @@ fn zero_scale_mesh_is_refused_and_left_alone() {
             "{err}"
         );
     }
-    assert!(!e.has_active_task());
+    assert!(!e.session.has_active_task());
     assert_eq!(e.scene, base);
     assert_eq!(e.history.undo.len(), history);
 }

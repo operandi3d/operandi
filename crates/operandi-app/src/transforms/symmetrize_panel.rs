@@ -72,6 +72,7 @@ impl Operandi {
         f.section("Symmetrize", false, rows.items);
         if let Some(error) = self
             .editor
+            .session
             .live
             .as_ref()
             .and_then(|l| l.preview_error.as_ref())

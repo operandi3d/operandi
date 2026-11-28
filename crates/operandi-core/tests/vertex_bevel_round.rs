@@ -309,7 +309,7 @@ fn the_tool_rounds_tags_every_cap_polygon_selects_the_cuts_and_undoes() {
     let mut e = editor(grid(), vec![5]);
     let before = e.scene.clone();
     e.dispatch(Command::Activate(Tool::VertexBevel)).unwrap();
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     // Starting values: Inset 0, Use Material off, empty name, Round Level 0.
     assert_eq!(
         (
@@ -369,7 +369,7 @@ fn cancel_leaves_the_mesh_as_it_was() {
     let before = e.scene.clone();
     let history = e.history.undo.len();
     e.dispatch(Command::Activate(Tool::VertexBevel)).unwrap();
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     p.inset = 0.3;
     p.vertex_round_level = 1;
     e.dispatch(Command::Preview(p)).unwrap();

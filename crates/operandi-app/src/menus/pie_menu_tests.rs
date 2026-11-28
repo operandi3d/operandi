@@ -351,7 +351,7 @@ fn disabled_entries_cannot_be_picked() {
     assert_eq!(a.pie.as_ref().unwrap().highlighted(), Some(1));
     frame(&mut a, &ctx, vec![key_event(Key::M, false, mods)]);
     assert!(a.pie.is_none());
-    assert!(a.editor.live.is_none());
+    assert!(a.editor.session.live.is_none());
     assert_eq!(a.editor.scene, scene);
     assert_eq!(a.editor.history.undo.len(), undo);
 }
@@ -381,7 +381,7 @@ fn pie_on_a_used_key_conflicts() {
     frame(&mut a, &ctx, vec![Event::PointerMoved(AT)]);
     frame(&mut a, &ctx, vec![key_event(Key::W, true, Modifiers::NONE)]);
     assert!(a.pie.is_none());
-    assert!(a.editor.live.is_none(), "Move doesn't run either");
+    assert!(a.editor.session.live.is_none(), "Move doesn't run either");
     assert!(a.status.contains("conflict"), "{}", a.status);
 }
 
@@ -481,7 +481,10 @@ fn built_in_entries_are_real_commands() {
     a.execute("Polygons");
     assert_eq!(a.editor.scene.selection.mode, Mode::Polygon);
     a.execute("Move");
-    assert_eq!(a.editor.live.as_ref().map(|l| l.tool), Some(Tool::Move));
+    assert_eq!(
+        a.editor.session.live.as_ref().map(|l| l.tool),
+        Some(Tool::Move)
+    );
 }
 
 /// A fast hold, point and release batched into the frame that opens the

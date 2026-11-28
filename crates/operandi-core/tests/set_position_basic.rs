@@ -24,12 +24,12 @@ fn parked_extrude() -> Editor {
     }))
     .unwrap();
     e.dispatch(Command::BeginExtrude).unwrap();
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     p.extent = glam::DVec3::Z * 0.5;
     e.dispatch(Command::ConfigureExtrude(p)).unwrap();
     e.dispatch(Command::Undo).unwrap();
     e.dispatch(Command::Undo).unwrap();
-    assert!(!e.i2_active() && e.live.is_none() && e.i2_can_redo());
+    assert!(!e.i2_active() && e.session.live.is_none() && e.i2_can_redo());
     e
 }
 #[test]

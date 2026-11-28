@@ -48,7 +48,7 @@ impl Editor {
         destination: UnitDestination,
     ) -> Result<()> {
         let name = shape.label();
-        if self.has_active_task() || self.selection_start.is_some() {
+        if self.session.has_active_task() || self.selection_start.is_some() {
             return Err(format!(
                 "Drop or Cancel the active tool and finish selection before Unit {name}"
             ));

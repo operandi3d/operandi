@@ -938,7 +938,7 @@ impl Operandi {
             // CP-A02: a locked item's transform fields are greyed.
             let not_editable = crate::unavailable::first([
                 crate::unavailable::unless(
-                    self.editor.live.is_none(),
+                    self.editor.session.live.is_none(),
                     crate::unavailable::TOOL_ACTIVE,
                 ),
                 crate::unavailable::unless(!item.is_locked(), crate::unavailable::LOCKED),
@@ -1005,7 +1005,7 @@ impl Operandi {
             let current = self.editor.scene.smoothing.clone();
             let mut next = current.clone();
             let mut continuing = false;
-            ui.gated_ui(crate::unavailable::unless(self.editor.live.is_none(), crate::unavailable::TOOL_ACTIVE), |ui| {
+            ui.gated_ui(crate::unavailable::unless(self.editor.session.live.is_none(), crate::unavailable::TOOL_ACTIVE), |ui| {
                     ui.weak("Default material: applies to every mesh");
                     ui.horizontal(|ui| {
                         crate::option_row::label(ui, "Smoothing");
@@ -1069,7 +1069,7 @@ impl Operandi {
             let mut next = current.clone();
             ui.gated_ui(
                 crate::unavailable::unless(
-                    self.editor.live.is_none(),
+                    self.editor.session.live.is_none(),
                     crate::unavailable::TOOL_ACTIVE,
                 ),
                 |ui| {
@@ -1240,7 +1240,7 @@ impl Operandi {
                 current.center.label(),
                 current.axis.label()
             ));
-            if self.editor.live.is_some() && self.editor.validate_action_context(current).is_err() {
+            if self.editor.session.live.is_some() && self.editor.validate_action_context(current).is_err() {
                 ui.weak("Drop or Cancel the current tool to change its center or axes.");
             }
             self.action_context_choice(
@@ -1328,14 +1328,11 @@ impl Operandi {
                 axis: AxisOrientation::World,
             };
             self.action_context_choice(ui, Button::selectable(current == origin, "Origin"), origin);
-            let local = ActionContext {
-                center: CenterMode::Local,
-                axis: AxisOrientation::World,
-            };
+            // C-LOCAL with A-LOCAL: each cluster's own centre and axes.
             self.action_context_choice(
                 ui,
-                Button::selectable(current.center == CenterMode::Local, "Local"),
-                local,
+                Button::selectable(current == ActionContext::LOCAL, "Local"),
+                ActionContext::LOCAL,
             )
             .on_hover_text("Each connected piece about its own centre, with axes from its own polygons");
             // The rulebook's item rows (ACS table, pivot_service.rs): one
@@ -1487,7 +1484,7 @@ impl Operandi {
     /// SEL-IT-01..03: Parent To and Unparent, each with or without keeping
     /// the item's world position.
     pub(super) fn parent_menu(&mut self, ui: &mut Ui, item: u64, parent: Option<u64>) {
-        let idle = self.editor.live.is_none();
+        let idle = self.editor.session.live.is_none();
         let others: Vec<(u64, String)> = self
             .editor
             .scene

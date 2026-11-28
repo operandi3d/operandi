@@ -16,7 +16,7 @@ fn editor() -> Editor {
 }
 
 fn precision(e: &Editor) -> f64 {
-    e.live.as_ref().unwrap().params.sketch_precision
+    e.session.live.as_ref().unwrap().params.sketch_precision
 }
 
 #[test]
@@ -26,7 +26,7 @@ fn defaults_carry_over_and_reset() {
     e.dispatch(Command::Activate(Tool::SketchExtrude)).unwrap();
     assert_eq!(e.scene.active().unwrap().mesh, source);
     assert_eq!(precision(&e), 30.);
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     p.sketch_precision = 50.;
     e.dispatch(Command::Preview(p)).unwrap();
     e.dispatch(Command::Drop).unwrap();

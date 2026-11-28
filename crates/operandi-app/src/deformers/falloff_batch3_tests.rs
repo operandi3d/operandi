@@ -156,3 +156,35 @@ fn press_and_drag_draws_the_falloff() {
     assert!(r.size.x > 0. && r.size.x == r.size.y && r.size.y == r.size.z);
     assert!(!a.falloff_draw_armed);
 }
+
+/// #65 (Leo): with snapping on, dragging a Linear falloff's End near a
+/// box corner puts it exactly on the corner; Start stays where it was.
+#[test]
+fn falloff_points_snap_while_dragged() {
+    let mut a = box_app();
+    let r = rect();
+    a.snapping.enabled = true;
+    let field = LinearFalloff {
+        start: DVec3::ZERO,
+        end: DVec3::new(0., 3., 0.),
+        ..Default::default()
+    };
+    a.run(Command::SpatialFalloff(Some(field.into())));
+    let (i, &(at, _)) = a
+        .falloff_handles(r)
+        .iter()
+        .enumerate()
+        .find(|(_, h)| h.1 == FalloffHandle::Point(1))
+        .unwrap();
+    let from = a.camera.project(at, r).unwrap().0;
+    // A box corner facing the eye.
+    let (eye, ..) = a.camera.basis();
+    let corner = DVec3::new(1., 1., eye.z.signum());
+    let near = a.camera.project(corner, r).unwrap().0 + vec2(-3., 2.);
+    a.drag_falloff(i, field.into(), from, near, r);
+    let Some(operandi_core::Falloff::Linear(f)) = a.editor.spatial_falloff else {
+        panic!("{}", a.status)
+    };
+    assert!((f.end - corner).length() < 1e-6, "{} ({})", f.end, a.status);
+    assert_eq!(f.start, DVec3::ZERO);
+}

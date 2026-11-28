@@ -658,7 +658,7 @@ pub fn add_loop_with(
 impl crate::Editor {
     /// Shared preflight: idle editor, a visible active mesh.
     pub(crate) fn edge_insert_target(&self, what: &str) -> Result<u64> {
-        if self.i2_active() || self.pen_draft.is_some() {
+        if self.i2_active() || self.session.pen_draft.is_some() {
             return Err(format!("Finish or Cancel the active tool before {what}"));
         }
         self.require_idle()?;

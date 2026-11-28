@@ -40,7 +40,7 @@ fn points(e: &Editor) -> Vec<DVec3> {
     e.scene.active().unwrap().mesh.vertices.clone()
 }
 fn live(e: &Editor) -> Parameters {
-    e.live.as_ref().unwrap().params.clone()
+    e.session.live.as_ref().unwrap().params.clone()
 }
 fn bend(e: &mut Editor, angle: f64) {
     let mut p = live(e);
@@ -73,7 +73,7 @@ fn activation_fits_the_spine_and_changes_nothing() {
     );
     assert_eq!(p.axis, 2);
     assert_eq!(p.angle, 0.);
-    let frame = e.live.as_ref().unwrap().action_frame.unwrap();
+    let frame = e.session.live.as_ref().unwrap().action_frame.unwrap();
     assert_eq!(frame.center, p.base, "the pivot is the action centre");
     assert_eq!(points(&e), before);
 }
@@ -299,7 +299,16 @@ fn centre_from_a_press_and_the_spine_vector() {
     let at = DVec3::new(0.05, 0.4, 0.);
     e.dispatch(Command::SetActionCenter(at)).unwrap();
     assert_eq!(live(&e).bend.base, at);
-    assert_eq!(e.live.as_ref().unwrap().action_frame.unwrap().center, at);
+    assert_eq!(
+        e.session
+            .live
+            .as_ref()
+            .unwrap()
+            .action_frame
+            .unwrap()
+            .center,
+        at
+    );
     assert_eq!(live(&e).bend.spine, spine);
     bend(&mut e, 60.);
     let from_low = points(&e);
@@ -339,7 +348,13 @@ fn centre_fields_move_the_frame() {
     p.bend.base = DVec3::new(0., 0.5, 0.);
     e.dispatch(Command::Preview(p)).unwrap();
     assert_eq!(
-        e.live.as_ref().unwrap().action_frame.unwrap().center,
+        e.session
+            .live
+            .as_ref()
+            .unwrap()
+            .action_frame
+            .unwrap()
+            .center,
         DVec3::new(0., 0.5, 0.)
     );
 }

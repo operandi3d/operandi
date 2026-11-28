@@ -44,7 +44,7 @@ fn move_arrow_tracks_the_pointer_in_perspective() {
         let start = handle_screen(&a).expect("handle on screen");
         let along = (tip - from).normalized();
         let to = start + along * 120.;
-        let base = a.editor.live.as_ref().unwrap().params.clone();
+        let base = a.editor.session.live.as_ref().unwrap().params.clone();
         a.update_handle(axis, base, start, to, Tool::Move, rect());
         let now = handle_screen(&a).expect("handle still on screen");
         assert!(
@@ -61,7 +61,7 @@ fn free_move_tracks_the_pointer_in_perspective() {
     let _ = a.handles(rect());
     let start = handle_screen(&a).expect("handle on screen");
     let to = start + vec2(90., -60.);
-    let base = a.editor.live.as_ref().unwrap().params.clone();
+    let base = a.editor.session.live.as_ref().unwrap().params.clone();
     a.update_handle(viewport::FREE_HANDLE, base, start, to, Tool::Move, rect());
     let now = handle_screen(&a).expect("handle still on screen");
     assert!(

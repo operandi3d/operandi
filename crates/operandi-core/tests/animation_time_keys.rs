@@ -22,7 +22,7 @@ fn add_cube(e: &mut Editor) -> u64 {
     e.dispatch(Command::Activate(Tool::Box)).unwrap();
     e.dispatch(Command::Preview(Parameters {
         size: DVec3::splat(2.),
-        ..e.live.as_ref().unwrap().params.clone()
+        ..e.session.live.as_ref().unwrap().params.clone()
     }))
     .unwrap();
     e.dispatch(Command::Drop).unwrap();
@@ -328,7 +328,7 @@ fn tk21_s_keys_selected_channels_or_the_live_tool() {
     e.dispatch(Command::Activate(Tool::Rotate)).unwrap();
     ok(&mut e, "operandi.key.set");
     assert!(e.scene.animation.is_animated(&ChannelKey::new(id, "rot.Z")));
-    assert!(e.live.is_some(), "the tool stays live");
+    assert!(e.session.live.is_some(), "the tool stays live");
 }
 
 #[test]

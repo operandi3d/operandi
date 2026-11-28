@@ -23,7 +23,7 @@ impl Editor {
         if axis > 2 {
             return Err("Flip It's axis is X, Y or Z".into());
         }
-        if self.has_active_task() || self.selection_start.is_some() {
+        if self.session.has_active_task() || self.selection_start.is_some() {
             return Err(format!(
                 "Drop or Cancel the active task before {}",
                 row.label

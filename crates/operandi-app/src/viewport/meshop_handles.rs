@@ -112,7 +112,7 @@ impl Operandi {
     /// The selected primitive op or Falloff step and its values, when no
     /// tool is on.
     pub(crate) fn selected_primitive_op(&self) -> Option<(OpRef, serde_json::Value)> {
-        if self.editor.live.is_some() || self.editor.has_active_task() {
+        if self.editor.session.live.is_some() || self.editor.session.has_active_task() {
             return None;
         }
         let row = self.editor.meshop_row?;

@@ -231,7 +231,7 @@ impl Operandi {
             return;
         };
         let id = item.id;
-        let idle = self.editor.live.is_none();
+        let idle = self.editor.session.live.is_none();
         let locked = item.is_locked();
         let mm = 1000.;
         let deg = 180. / std::f64::consts::PI;
@@ -615,7 +615,7 @@ impl Operandi {
         };
         let id = item.id;
         let deg = 180. / std::f64::consts::PI;
-        ui.gated_ui(crate::unavailable::unless(self.editor.live.is_none(), crate::unavailable::TOOL_ACTIVE), |ui| {
+        ui.gated_ui(crate::unavailable::unless(self.editor.session.live.is_none(), crate::unavailable::TOOL_ACTIVE), |ui| {
             ui.spacing_mut().item_spacing.y = 2.;
             Self::camera_section(ui, "Depth of Field", id, true, |ui| {
                 self.camera_check(ui, id, "Enable", |c| c.dof.enable, CameraEdit::DofEnable);
@@ -783,7 +783,10 @@ impl Operandi {
         };
         let id = item.id;
         ui.gated_ui(
-            crate::unavailable::unless(self.editor.live.is_none(), crate::unavailable::TOOL_ACTIVE),
+            crate::unavailable::unless(
+                self.editor.session.live.is_none(),
+                crate::unavailable::TOOL_ACTIVE,
+            ),
             |ui| {
                 ui.spacing_mut().item_spacing.y = 2.;
                 ui.separator();
@@ -855,7 +858,10 @@ impl Operandi {
         };
         let ov = |e: OverlayEdit| CameraEdit::Overlay(e);
         ui.gated_ui(
-            crate::unavailable::unless(self.editor.live.is_none(), crate::unavailable::TOOL_ACTIVE),
+            crate::unavailable::unless(
+                self.editor.session.live.is_none(),
+                crate::unavailable::TOOL_ACTIVE,
+            ),
             |ui| {
                 ui.spacing_mut().item_spacing.y = 2.;
                 ui.weak("Drawn when looking through this camera; never rendered");

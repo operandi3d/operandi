@@ -218,7 +218,7 @@ impl crate::Operandi {
         if let Some(g) = self.item_handle_hit(pos, r) {
             return Some(tip(TipKind::Camera(g)));
         }
-        let tool = self.editor.live.as_ref().map(|l| l.tool);
+        let tool = self.editor.session.live.as_ref().map(|l| l.tool);
         if self.editor.is_armed() {
             let name = tool.map(|t| t.label()).unwrap_or("The tool");
             return Some(format!("{name} — {}", tip(TipKind::ClickToStart)));

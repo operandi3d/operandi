@@ -120,7 +120,8 @@ and `scripts/merge-check.sh` refuses to run.
 Run the full tier once before calling a tool done, and again only if you
 change shared code after that. At merge time it runs on the branch with
 main merged in, and main moves only when it passes: `scripts/merge-check.sh`
-does that run, plus the Cycles, USD and Python extras (they only build
+does that run (and the strict area dependency check, as CI does; see
+CONTRIBUTING.md step 5), plus the Cycles, USD and Python extras (they only build
 with `--features cycles` / `usd` / `python`, so plain `cargo test` skips
 them): each is compiled on its own, then the tests run twice, with Cycles
 and USD on and then with Python on. 3D

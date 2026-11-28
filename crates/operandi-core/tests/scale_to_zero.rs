@@ -15,7 +15,7 @@ fn cube() -> Editor {
     e.dispatch(Command::Activate(Tool::Box)).unwrap();
     e.dispatch(Command::Preview(Parameters {
         size: DVec3::splat(2.),
-        ..e.live.as_ref().unwrap().params.clone()
+        ..e.session.live.as_ref().unwrap().params.clone()
     }))
     .unwrap();
     e.dispatch(Command::Drop).unwrap();
@@ -26,7 +26,7 @@ fn scale(e: &mut Editor, delta: DVec3) {
     e.dispatch(Command::Activate(Tool::Scale)).unwrap();
     e.dispatch(Command::Preview(Parameters {
         delta,
-        ..e.live.as_ref().unwrap().params.clone()
+        ..e.session.live.as_ref().unwrap().params.clone()
     }))
     .unwrap();
     e.dispatch(Command::Drop).unwrap();
@@ -83,7 +83,7 @@ fn an_item_scale_stays_above_zero() {
     e.dispatch(Command::Activate(Tool::Scale)).unwrap();
     let refused = e.dispatch(Command::Preview(Parameters {
         delta: DVec3::new(0., 1., 1.),
-        ..e.live.as_ref().unwrap().params.clone()
+        ..e.session.live.as_ref().unwrap().params.clone()
     }));
     assert!(refused.is_err());
     e.dispatch(Command::Cancel).unwrap();
@@ -102,7 +102,7 @@ fn components_reach_zero_but_not_below() {
     e.dispatch(Command::Activate(Tool::Scale)).unwrap();
     let below = e.dispatch(Command::Preview(Parameters {
         delta: DVec3::new(-0.5, 1., 1.),
-        ..e.live.as_ref().unwrap().params.clone()
+        ..e.session.live.as_ref().unwrap().params.clone()
     }));
     assert!(below.is_err());
     let bytes = persistence::encode(&e.scene).unwrap();

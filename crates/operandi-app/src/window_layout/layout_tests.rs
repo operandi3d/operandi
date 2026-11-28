@@ -237,8 +237,8 @@ fn m11_amendment_category_switch_preserves_task_grid_and_focus_at_both_scales() 
         assert!(a.toolbox_rects.contains_key("Bevel"));
         assert_eq!(a.editor.scene, before.scene);
         assert_eq!(
-            a.editor.live.as_ref().unwrap().params,
-            before.live.as_ref().unwrap().params
+            a.editor.session.live.as_ref().unwrap().params,
+            before.session.live.as_ref().unwrap().params
         );
         assert_eq!(a.editor.history.undo.len(), before.history.undo.len());
         // Tool drop does not choose a category for the user.
@@ -341,7 +341,7 @@ fn m16_panel_resize_scale_and_activation_routes() {
                     pointer(button, false, Modifiers::NONE),
                 ],
             );
-            assert_eq!(a.editor.live.as_ref().unwrap().tool, tool);
+            assert_eq!(a.editor.session.live.as_ref().unwrap().tool, tool);
             draw(&mut a, &ctx, size, vec![]);
             assert!(a.viewport_rect.width() > 100.);
             let keys = [
@@ -362,7 +362,7 @@ fn m16_panel_resize_scale_and_activation_routes() {
             }
             a.run(Command::Drop);
             a.execute(tool.label());
-            assert_eq!(a.editor.live.as_ref().unwrap().tool, tool);
+            assert_eq!(a.editor.session.live.as_ref().unwrap().tool, tool);
             assert_eq!(a.bindings[tool.label()], "");
         }
     }
@@ -468,8 +468,8 @@ fn par_t15_t16_category_strip_anchor_grid_hit_regions_and_live_state() {
             assert_eq!(a.category, toolbox::Category::Polygon);
             assert_eq!(a.editor.scene, editor.scene);
             assert_eq!(
-                a.editor.live.as_ref().unwrap().params,
-                editor.live.as_ref().unwrap().params
+                a.editor.session.live.as_ref().unwrap().params,
+                editor.session.live.as_ref().unwrap().params
             );
             assert_eq!(a.editor.history.undo.len(), editor.history.undo.len());
             assert_eq!(a.viewport_rect, viewport, "scale {scale} size {size:?}");
@@ -648,8 +648,8 @@ fn font_t05_unavailable_face_is_explicit_and_preserves_layout_and_task() {
             assert_eq!(a.editor.scene, before.scene);
             assert_eq!(a.editor.history.undo.len(), before.history.undo.len());
             assert_eq!(
-                a.editor.live.as_ref().unwrap().params,
-                before.live.as_ref().unwrap().params
+                a.editor.session.live.as_ref().unwrap().params,
+                before.session.live.as_ref().unwrap().params
             );
         }
     }

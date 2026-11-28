@@ -19,15 +19,16 @@ impl Editor {
             crate::AxisOrientation::Selection
                 | crate::AxisOrientation::Parent
                 | crate::AxisOrientation::Item
+                | crate::AxisOrientation::Local
         ) {
             context.axis.basis()?;
         }
-        if context.axis == crate::AxisOrientation::Selection && self.live.is_none() {
+        if context.axis == crate::AxisOrientation::Selection && self.session.live.is_none() {
             // The same world-space frame a tool gets on activation, so a
             // moved mesh doesn't grey the choice out.
             Self::extrude_frame(context, Tool::Move, &self.scene)?;
         }
-        if let Some(live) = &self.live {
+        if let Some(live) = &self.session.live {
             if live.action_frame.is_none() {
                 return Err(
                     "Drop or Cancel this tool before changing Action Center or axes".into(),
@@ -61,22 +62,22 @@ impl Editor {
         let previous = self.symmetry;
         let staged = (
             self.scene.clone(),
-            self.live.clone(),
-            self.cone.clone(),
-            self.ellipsoid.clone(),
-            self.shape.clone(),
-            self.solid_sketch.clone(),
+            self.session.live.clone(),
+            self.session.cone.clone(),
+            self.session.ellipsoid.clone(),
+            self.session.shape.clone(),
+            self.session.solid_sketch.clone(),
         );
         self.symmetry = symmetry;
         if let Err(error) = self.follow_symmetry(previous) {
             self.symmetry = previous;
             (
                 self.scene,
-                self.live,
-                self.cone,
-                self.ellipsoid,
-                self.shape,
-                self.solid_sketch,
+                self.session.live,
+                self.session.cone,
+                self.session.ellipsoid,
+                self.session.shape,
+                self.session.solid_sketch,
             ) = staged;
             return Err(error);
         }
@@ -100,7 +101,7 @@ impl Editor {
     pub(super) fn follow_symmetry(&mut self, previous: crate::Symmetry) -> Result<()> {
         let previous = previous.through(self.scene.workplane.center);
         let current = self.active_symmetry();
-        if let Some(live) = &self.live
+        if let Some(live) = &self.session.live
             && let Some(frame) = live.action_frame
             && live.tool != Tool::Bend
         {
@@ -119,11 +120,12 @@ impl Editor {
                 ..request(current)
             }
             .frame()?;
-            if let Some(live) = &mut self.live {
+            if let Some(live) = &mut self.session.live {
                 live.action_frame = Some(now);
             }
         }
         if let Some(parameters) = self
+            .session
             .live
             .as_ref()
             .filter(|live| live.applied)
@@ -131,17 +133,22 @@ impl Editor {
         {
             self.preview(parameters, false)?;
         }
-        if let Some(session) = self.cone.as_ref().filter(|s| s.preview.is_some()) {
+        if let Some(session) = self.session.cone.as_ref().filter(|s| s.preview.is_some()) {
             self.configure_cone(session.requested.clone())?;
         }
-        if let Some(session) = self.ellipsoid.as_ref().filter(|s| s.preview.is_some()) {
+        if let Some(session) = self
+            .session
+            .ellipsoid
+            .as_ref()
+            .filter(|s| s.preview.is_some())
+        {
             self.configure_ellipsoid(session.requested.clone())?;
         }
-        if let Some(session) = self.shape.as_ref().filter(|s| s.preview.is_some()) {
+        if let Some(session) = self.session.shape.as_ref().filter(|s| s.preview.is_some()) {
             self.configure_shape(session.requested.clone())?;
         }
         let mirror = crate::solid_sketch_symmetry::SketchMirror::of(current);
-        if let Some(session) = &mut self.solid_sketch {
+        if let Some(session) = &mut self.session.solid_sketch {
             session.follow_symmetry(mirror);
         }
         Ok(())
@@ -190,6 +197,7 @@ impl Editor {
     /// Use World Transforms.
     pub fn primitive_fit_falloff(&self) -> Result<crate::Falloff> {
         let live = self
+            .session
             .live
             .as_ref()
             .filter(|l| matches!(l.tool, Tool::Box | Tool::Sphere | Tool::Cylinder))
@@ -249,6 +257,7 @@ impl Editor {
             preview.is_some() || error.is_some()
         };
         if let Some(p) = self
+            .session
             .cone
             .as_ref()
             .filter(|s| shown(&s.preview, &s.error))
@@ -257,6 +266,7 @@ impl Editor {
             let _ = self.configure_cone(p);
         }
         if let Some(p) = self
+            .session
             .ellipsoid
             .as_ref()
             .filter(|s| shown(&s.preview, &s.error))
@@ -265,6 +275,7 @@ impl Editor {
             let _ = self.configure_ellipsoid(p);
         }
         if let Some(p) = self
+            .session
             .shape
             .as_ref()
             .filter(|s| shown(&s.preview, &s.error))
@@ -304,14 +315,19 @@ impl Editor {
     /// BN-45 (BH-Q12, provisional): the status bar text while Bend's axis
     /// runs along its spine, so the bend can't move anything.
     pub fn bend_notice(&self) -> Option<&'static str> {
-        let live = self.live.as_ref().filter(|l| l.tool == Tool::Bend)?;
+        let live = self
+            .session
+            .live
+            .as_ref()
+            .filter(|l| l.tool == Tool::Bend)?;
         live.params
             .bend
             .axis_along_spine(self.bend_axes(&self.scene))
             .then_some(crate::bend::AXIS_ALONG_SPINE)
     }
     pub fn bend_axes(&self, scene: &Scene) -> glam::DMat3 {
-        self.live
+        self.session
+            .live
             .as_ref()
             .and_then(|l| l.action_frame)
             .or_else(|| self.action_context.resolve(scene).ok())
@@ -419,7 +435,7 @@ impl Editor {
         if !point.is_finite() || point.abs().max_element() > 1e9 {
             return Err("The center must be a finite point".into());
         }
-        let live = self.live.as_ref().ok_or("No active tool")?;
+        let live = self.session.live.as_ref().ok_or("No active tool")?;
         let mut p = live.params.clone();
         if let Some(plane) = refit {
             // The target is the scene the tool started from, so the bend
@@ -434,7 +450,7 @@ impl Editor {
             p.bend.axis = fitted.axis;
         }
         p.bend.base = point;
-        let live = self.live.as_mut().ok_or("No active tool")?;
+        let live = self.session.live.as_mut().ok_or("No active tool")?;
         if live.applied {
             self.preview(p, false)
         } else {

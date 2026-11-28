@@ -32,7 +32,13 @@ impl Operandi {
         if self.editor.live_tool_label() != before {
             self.clear_fields();
         }
-        if self.editor.preset.as_ref().is_some_and(|p| p.id == row.id) {
+        if self
+            .editor
+            .session
+            .preset
+            .as_ref()
+            .is_some_and(|p| p.id == row.id)
+        {
             use tool_preset::FalloffKind as K;
             self.status = if row.falloff_kind() == Some(K::Selection) {
                 format!(

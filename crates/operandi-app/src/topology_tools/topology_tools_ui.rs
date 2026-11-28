@@ -223,6 +223,7 @@ impl Operandi {
     /// Whether the open tool preset is Topology Pen.
     pub(super) fn topology_pen_open(&self) -> bool {
         self.editor
+            .session
             .preset
             .as_ref()
             .is_some_and(|p| p.row().actor.topology_pen)

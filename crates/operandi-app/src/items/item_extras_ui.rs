@@ -721,7 +721,7 @@ impl Operandi {
         // Plain arrows only: Shift/Ctrl+arrows are the animation keys
         // (TK-63; egui's consume_key would also take them with Shift).
         if self.editor.scene.selection.mode != Mode::Item
-            || self.editor.live.is_some()
+            || self.editor.session.live.is_some()
             || ctx.input(|i| crate::anim_keys::owns_arrow(i.modifiers))
         {
             return false;

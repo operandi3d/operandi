@@ -420,9 +420,9 @@ fn redo_and_active_owner_are_not_consumed_by_refusal() {
     // UIC-307: an armed Reduction settles, Align runs, Reduction arms again.
     let mut e = pair();
     e.dispatch(Command::ArmReduction).unwrap();
-    assert!(e.reduction.is_some());
+    assert!(e.session.reduction.is_some());
     e.dispatch(Command::AlignPolygons).unwrap();
-    assert!(e.reduction.is_some());
+    assert!(e.session.reduction.is_some());
 }
 
 /// Peer-review P2: a valid exact-incidence mesh where an edge of either

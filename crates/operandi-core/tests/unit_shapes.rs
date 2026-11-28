@@ -76,7 +76,7 @@ fn unit_drops_a_live_tool_and_accepts_a_moved_mesh() {
         UnitDestination::ExistingMesh,
     ))
     .unwrap();
-    assert!(e.cone.is_none());
+    assert!(e.session.cone.is_none());
     assert!(!e.scene.active().unwrap().mesh.faces.is_empty());
     let mut e = Editor::default();
     e.dispatch(Command::NewMesh).unwrap();

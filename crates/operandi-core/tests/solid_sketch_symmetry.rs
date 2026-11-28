@@ -62,7 +62,7 @@ fn select(e: &mut Editor, i: usize) {
     edit(e, SketchEdit::Select(Some(i)));
 }
 fn session(e: &Editor) -> &SketchSession {
-    e.solid_sketch.as_ref().unwrap()
+    e.session.solid_sketch.as_ref().unwrap()
 }
 fn nodes(e: &Editor) -> Vec<solid_sketch::SketchNode> {
     session(e).sketch().nodes.clone()
@@ -371,7 +371,7 @@ fn symmetry_toggled_with_the_sketch_open_applies_to_new_nodes() {
     add(&mut e, dvec3(0., 0., 0.));
     add(&mut e, dvec3(0.5, 0., 0.));
     e.dispatch(Command::ToggleSymmetry).unwrap();
-    assert!(e.solid_sketch.is_some(), "still open");
+    assert!(e.session.solid_sketch.is_some(), "still open");
     assert!(session(&e).mirrors_new_nodes());
     add(&mut e, dvec3(1.0, 0., 0.));
     let n = nodes(&e);

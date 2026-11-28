@@ -27,7 +27,7 @@ fn ball() -> (Editor, u64) {
     e.dispatch(Command::Activate(Tool::Sphere)).unwrap();
     e.dispatch(Command::Preview(Parameters {
         size: DVec3::splat(1.),
-        ..e.live.as_ref().unwrap().params.clone()
+        ..e.session.live.as_ref().unwrap().params.clone()
     }))
     .unwrap();
     e.dispatch(Command::Drop).unwrap();

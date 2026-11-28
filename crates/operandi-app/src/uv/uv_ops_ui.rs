@@ -252,7 +252,7 @@ impl Operandi {
             self.status = "Close the open dialog first".into();
             return;
         }
-        if self.editor.live.is_some() {
+        if self.editor.session.live.is_some() {
             self.status = crate::unavailable::TOOL_ACTIVE.into();
             return;
         }

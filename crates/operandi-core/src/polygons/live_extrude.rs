@@ -170,7 +170,7 @@ impl Editor {
         self.scene = image.scene.clone();
         self.identities.current = image.identities.clone();
         self.identities.observe(&self.scene)?;
-        self.live = if cursor == 0 {
+        self.session.live = if cursor == 0 {
             None
         } else {
             let mut p = if cursor == 2 {
@@ -203,6 +203,7 @@ impl Editor {
                 action_frame: stage.frame,
                 placed_centre: None,
                 preview_error: None,
+                pivots: Default::default(),
             })
         };
         self.extrude_moved_caps = if cursor == 0 {
@@ -220,7 +221,7 @@ impl Editor {
         self.i2_validate_begin_source().is_ok()
     }
     fn i2_validate_begin_source(&self) -> Result<()> {
-        let l = self.live.as_ref().ok_or("Arm Extrude first")?;
+        let l = self.session.live.as_ref().ok_or("Arm Extrude first")?;
         if l.tool != Tool::Extrude || l.applied || self.i2_active() {
             return Err("Source requires an Armed Extrude".into());
         }
@@ -297,7 +298,12 @@ impl Editor {
         if self.history.undo.len() + self.history.redo.len() > 100 {
             return Err("Malformed completed history capacity".into());
         }
-        let l = self.live.as_ref().ok_or("Arm Extrude first")?.clone();
+        let l = self
+            .session
+            .live
+            .as_ref()
+            .ok_or("Arm Extrude first")?
+            .clone();
         if l.tool != Tool::Extrude || l.applied || l.preview_error.is_some() || self.i2_active() {
             return Err("Begin requires an Armed Extrude".into());
         }
@@ -337,7 +343,7 @@ impl Editor {
         if self.i2.fail_after_reservations == Some(32) {
             return Err("Injected failure after complete private candidate".into());
         }
-        let now = self.live.as_ref().ok_or("Missing begun session")?;
+        let now = self.session.live.as_ref().ok_or("Missing begun session")?;
         let plan = now
             .identity_preview
             .as_ref()
@@ -373,7 +379,7 @@ impl Editor {
         } else {
             stage.movement.as_ref().ok_or("Missing current movement")?
         };
-        let live = self.live.as_ref().ok_or("Missing active session")?;
+        let live = self.session.live.as_ref().ok_or("Missing active session")?;
         let item = stage
             .base
             .scene
@@ -404,6 +410,7 @@ impl Editor {
         let mut stage = self.i2.selected.clone().ok_or("No active stage")?;
         self.i2_check_active_source(&stage)?;
         let mut allowed = self
+            .session
             .live
             .as_ref()
             .ok_or("Missing active session")?
@@ -476,7 +483,7 @@ impl Editor {
     /// rechecked here. Any check that fails returns `Ok(false)`, and the full
     /// preview then produces the authoritative result or error.
     fn i2_fast_move(&mut self, stage: &ExtrudeStage, p: &Parameters) -> Result<bool> {
-        let Some(live) = self.live.as_ref() else {
+        let Some(live) = self.session.live.as_ref() else {
             return Ok(false);
         };
         let Some(item_id) = stage.base.scene.selection.item else {
@@ -562,7 +569,7 @@ impl Editor {
         scene.validate()?;
         self.identities.observe(&scene)?;
         self.scene = scene;
-        let l = self.live.as_mut().ok_or("No tool")?;
+        let l = self.session.live.as_mut().ok_or("No tool")?;
         l.params = p.clone();
         l.preview_error = None;
         l.applied = true;
@@ -570,7 +577,7 @@ impl Editor {
     }
     fn i2_finish(&mut self, continuing: bool) -> Result<()> {
         let stage = self.i2.selected.take().ok_or("Missing active stage")?;
-        let live = self.live.take().ok_or("Missing active session")?;
+        let live = self.session.live.take().ok_or("Missing active session")?;
         if let Some(error) = live.preview_error {
             return Err(format!("Correct stage before Finish: {error}"));
         }
@@ -586,7 +593,7 @@ impl Editor {
         if continuing {
             let mut p = live.params;
             p.extent = DVec3::ZERO;
-            self.live = Some(Live {
+            self.session.live = Some(Live {
                 tool: Tool::Extrude,
                 base: self.scene.clone(),
                 identity_base: Some(self.identities.current.clone()),
@@ -594,6 +601,7 @@ impl Editor {
                 params: p,
                 applied: false,
                 preview_error: None,
+                pivots: Default::default(),
                 action_frame: Some(self.pivot_request(&self.scene, Tool::Extrude).frame()?),
                 placed_centre: None,
             });
@@ -656,7 +664,7 @@ impl Editor {
                 Command::Cancel => {
                     let s = self.i2.selected.take().unwrap();
                     self.i2_restore(&s, 0)?;
-                    self.live = Some(Live {
+                    self.session.live = Some(Live {
                         tool: Tool::Extrude,
                         base: s.base.scene,
                         identity_base: Some(s.base.identities),
@@ -664,6 +672,7 @@ impl Editor {
                         params: s.armed_params,
                         applied: false,
                         preview_error: None,
+                        pivots: Default::default(),
                         action_frame: s.frame,
                         placed_centre: None,
                     });
@@ -709,7 +718,7 @@ impl Editor {
             match cmd {
                 // An active tool's own tweak Redo comes first.
                 Command::Redo
-                    if !(self.tweak_session().is_some() && self.tweaks.can_redo())
+                    if !(self.tweak_session().is_some() && self.session.tweaks.can_redo())
                         && self.i2_owns_history(HistoryAction::Redo) =>
                 {
                     self.i2_redo_eligibility().map_err(|reason| {
@@ -731,16 +740,16 @@ impl Editor {
                     return Ok(true);
                 }
                 Command::Cancel
-                    if self.live.as_ref().is_none_or(|l| {
+                    if self.session.live.as_ref().is_none_or(|l| {
                         l.tool == Tool::Extrude && !l.applied && l.preview_error.is_none()
-                    }) && self.cone.is_none()
-                        && self.ellipsoid.is_none()
-                        && self.shape.is_none()
-                        && self.spike.is_none()
-                        && self.bridge.is_none()
-                        && self.reduction.is_none() =>
+                    }) && self.session.cone.is_none()
+                        && self.session.ellipsoid.is_none()
+                        && self.session.shape.is_none()
+                        && self.session.spike.is_none()
+                        && self.session.bridge.is_none()
+                        && self.session.reduction.is_none() =>
                 {
-                    self.live = None;
+                    self.session.live = None;
                     self.i2_branch();
                     if let Some(report) = report.as_mut() {
                         report.effect = crate::HistoryEffect::ParkedDiscard;
@@ -822,7 +831,7 @@ mod tests {
             e.dispatch(Command::BeginExtrude).unwrap();
             for z in extents {
                 let stage = e.i2.selected.clone().unwrap();
-                let mut p = e.live.as_ref().unwrap().params.clone();
+                let mut p = e.session.live.as_ref().unwrap().params.clone();
                 p.extent = DVec3::new(0., 0., z);
                 let mut fast = e.clone();
                 let mut full = e.clone();
@@ -868,7 +877,7 @@ mod tests {
         e.dispatch(Command::BeginExtrude).unwrap();
         for z in [0., 5e-11, 1e-10, -5e-11, 1.1e-10, 0.5, -0.5] {
             let stage = e.i2.selected.as_ref().unwrap();
-            let mut p = e.live.as_ref().unwrap().params.clone();
+            let mut p = e.session.live.as_ref().unwrap().params.clone();
             p.extent = DVec3::new(0., 0., z);
             let mut fast = e.clone();
             let mut full = e.clone();
@@ -903,7 +912,7 @@ mod tests {
         }
         let mut e = armed();
         e.dispatch(Command::BeginExtrude).unwrap();
-        let mut p = e.live.as_ref().unwrap().params.clone();
+        let mut p = e.session.live.as_ref().unwrap().params.clone();
         p.extent = DVec3::Z * 0.5;
         e.dispatch(Command::Preview(p)).unwrap();
         e.dispatch(Command::Undo).unwrap();

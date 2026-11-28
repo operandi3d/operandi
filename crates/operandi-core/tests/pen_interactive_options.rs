@@ -71,7 +71,7 @@ fn polyline_open_and_closed_and_its_two_point_minimum() {
         let scene = e.scene.clone();
         e.dispatch(Command::Drop).unwrap();
         assert!(
-            e.pen_draft.is_none() && e.scene == scene,
+            e.session.pen_draft.is_none() && e.scene == scene,
             "one point is not a line"
         );
         draw(
@@ -139,7 +139,7 @@ fn select_new_off_keeps_the_selection() {
 fn invalid_combinations_refuse_and_options_carry_to_the_next_session() {
     let mut e = editor();
     e.dispatch(Command::PenStart).unwrap();
-    let draft = e.pen_draft.clone();
+    let draft = e.session.pen_draft.clone();
     // Flip and Close no longer depend on the type (pen-2026-11-05: Close
     // does nothing on a polygon); out-of-range values still refuse.
     for bad in [
@@ -158,7 +158,7 @@ fn invalid_combinations_refuse_and_options_carry_to_the_next_session() {
         },
     ] {
         assert!(e.dispatch(Command::PenOptions(bad)).is_err(), "{bad:?}");
-        assert_eq!(e.pen_draft, draft);
+        assert_eq!(e.session.pen_draft, draft);
     }
     // Options need a Pen session.
     e.dispatch(Command::Cancel).unwrap();
@@ -174,5 +174,5 @@ fn invalid_combinations_refuse_and_options_carry_to_the_next_session() {
     e.dispatch(Command::PenOptions(polyline)).unwrap();
     e.dispatch(Command::Cancel).unwrap();
     e.dispatch(Command::PenStart).unwrap();
-    assert_eq!(e.pen_draft.as_ref().unwrap().options(), polyline);
+    assert_eq!(e.session.pen_draft.as_ref().unwrap().options(), polyline);
 }

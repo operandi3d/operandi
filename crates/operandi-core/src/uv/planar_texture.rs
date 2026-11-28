@@ -116,7 +116,10 @@ pub(crate) fn route_item_transform(e: &crate::Editor, cmd: crate::Command) -> cr
     use crate::{Command, Mode};
     match cmd {
         Command::ItemTransform { item, transform }
-            if e.live.as_ref().is_some_and(|l| l.tool.transforms_items())
+            if e.session
+                .live
+                .as_ref()
+                .is_some_and(|l| l.tool.transforms_items())
                 && e.scene.selection.mode == Mode::Item
                 && e.scene.selected_items() == [item]
                 && e.scene.texture_locator(item).is_some() =>

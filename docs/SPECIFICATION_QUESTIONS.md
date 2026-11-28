@@ -4256,6 +4256,14 @@ picks the spec leaves open, all provisional:
   the back. Built: a Move setting **Move Back Faces** (off by default) that
   also grabs points facing away inside the tip. Open: does the reference
   Move grab back faces, and should the default be on? Needs a hands-on check.
+- **SCQ-12 Push, Smooth and Move forms** (2026-11-27). *Answered by spec
+  BEHAVIOR-SCULPT-PUSH-SMOOTH-MOVE (SPM-01..30), built as written:* Push =
+  Inflate's rows with Normal Mode (Average) and no Paint Mode; Smooth =
+  Sculpt Mode, Offset Amount, greyed Soft Filter; Move = Sculpt Mode, Move
+  Mode, Move Back Faces, Offset Amount, Smooth Amount, greyed Rigid UVs.
+  The four list Sculpt Mode's three choices and Curve Constraint as None,
+  Background 3D, Background 2D. Lock Borders / Lock Corners sit side by
+  side on one row (SPM-01), a UIC-115 departure Jason approved 2026-11-28.
 - **PH-Q37 Handles on Cone, Ellipsoid, Torus, Capsule, Text** (#37; Q-CN-06,
   NPR-Q01 leave them open). Built (provisional): once drawn, move arrows at
   the centre and a radius square at each end of each axis; Ellipsoid and
@@ -8934,8 +8942,8 @@ extrude, smooth-shift-thicken, split, quadruple and flip case).
   Curve / Bezier, Mode Continuous / Separate, Delete Geometry removes the
   polygons the edges belong to; Bezier Tangent Weight kept, not shown.
 - **MOQ-46 Curve Rebuild op, provisional.** Evenly spaced by length along
-  the drawn shape; result a Curve (lines stay lines). Rebuild Spans not
-  built.
+  the drawn shape; result a Curve (lines stay lines). Rebuild Spans
+  built 2026-11-27 (MOQ-69).
 - **MOQ-47 Radial Sweep op id, provisional.** `radial.sweep.item`, one op
   (reference: Sweep Effector + Helix). Unused Sweep Effector channels not
   kept. Mesh space.
@@ -8972,7 +8980,7 @@ extrude, smooth-shift-thicken, split, quadruple and flip case).
 - **MOQ-61 Set Seam blank map, provisional.** "UV Seam" (UVS-P02).
 - **MOQ-62 Set Vertex Normals channels, provisional.** Tolerance, Method,
   Angle, Power, Color Map Name kept, not built; Vertex Normal Options
-  defaults. UV Transform (`uvtransform`, help table only) not built.
+  defaults. UV Transform (`uvtransform`) built 2026-11-27 (MOQ-69).
 - **MOQ-63 Path slice ops' cutter, provisional.** Curve Slice, Pen Slice
   and Primitive Slice (Operandi ids `curve.slice.item`, `pen.slice.item`,
   `prim.slice.item`; the reference saves generator + `effector.cutter.item`
@@ -8980,8 +8988,8 @@ extrude, smooth-shift-thicken, split, quadruple and flip case).
   built cuts by position (Core, Tunnel, Stencil, Slice); Axis by position
   X, Y, Z, Custom, Action Axis; depth0/depth1/preview kept, not shown.
   Select Sliced Edges adds the new edges to the named edge set. Slice
-  Effector alone (needs a generator) and Lace Geometry (no channels in
-  TYPE-IDS) not built.
+  Effector alone (needs a generator) not built; Lace Geometry built
+  2026-11-27 (MOQ-69).
 - **MOQ-64 Curve/Pen Slice path, provisional.** Curve Index / Polyline
   Index count the mesh's own curve elements in order (no curve items
   yet); the curve isn't cut and stays; Action Axis = world Y; no curves =
@@ -9049,7 +9057,27 @@ extrude, smooth-shift-thicken, split, quadruple and flip case).
   triangle's frame), saved with the step (Jason 2026-11-26); Rebind is a
   Properties button that measures it again. A changed point count below
   or missing target polygons pass the mesh through and ask for Rebind.
-  Unclear: whether Rebind needs its own command for scripts.
+  Scripts rebind with `deformer.rebind deformer:op:<item>:<op>`
+  (Operandi's own name, 2026-11-27).
+- **MOQ-69 Tidy batch ops, provisional.** Spec: Operandi-specs
+  meshops-tidy-2026-11-27 (TB-xx). Built with the spec's suggested answers
+  (Jason to confirm): TB-Q1 an edge's falloff weight at its midpoint;
+  TB-Q2 one falloff per Select by Falloff (Operandi keeps a copy of the
+  active falloff, as the Falloff step, in mesh space, no falloff item);
+  TB-Q3 Distance spans = floor(L/D + 1e-6); TB-Q4 a closed curve's
+  closing span splits like any other; TB-Q5 UV Transform matches split
+  triangles by barycentric weights; TB-Q6 Lace Start/End trim properly,
+  Start ≥ End adds nothing. Also Operandi's readings: Conditional Loop's
+  "first point" is the lower point number, seeds of another kind convert
+  to edges, a walk from inside stops at a border point, edges on the
+  arriving edge's polygons are tried last; Rebuild Spans picks a span
+  when a chosen edge joins two of its stored points, an axis cast looks
+  the Flip way then the other, Broken Tangents on leaves a pushed knot's
+  handles, Span Reduction / Falloff By Distance saved with no effect,
+  choices stored by position, Alignment Mesh key `alignmentMesh`; UV
+  Transform with Use Source Transform off ignores the item's own
+  placement; Lace's Guide Mesh key `guide`, Custom Profile not built
+  (note, circle), closed whole guides make an uncapped closed tube.
 - **UVN-O-grow-quads-seam with corner UVs only, provisional.** Spec:
   new-point-uvs-2026-11-02 (UVN-T-06). Start: the seam grid, read as corner
   UVs only (how Operandi and imported meshes keep UVs); Grow Quads on edges
@@ -10111,6 +10139,18 @@ changed as noted.
   where rounded strips meet: Default (the default), Neutral, Uniform, Pinch.
   Patch and Radial are built but hidden until finished.
   `tool.attr edge.bevel miteringStyle` (`cornerPattern` still works).
+- **EBC-Q-RND1 (answered 2026-11-28; forum's oval corners).** Round
+  profiles between unequal sides, as on a 24-sided cap rim with Loop Slide
+  on, where EBC-B3-03's sum put the cap side only 0.26 Inset in while the
+  wall side moved the full Inset (a 3.9 : 1 oval). Answer: with Loop Slide
+  on, the cap-side point moves Inset × max(1, 2·cos(φ/2)) along the
+  corner's bisector, φ the cap polygon's corner angle (EBC-B3-03's sum at
+  120° and sharper, exactly the Inset above it); the wall side always moves
+  the full Inset. The profile is the quarter circle stretched to those two
+  distances about the old corner point (tangent to both sides), rows at
+  equal angle steps, so it only looks elliptical at sharp corners (3-5
+  sided caps). Checked on 7, 8, 12 and 24-sided rims, fan caps and
+  two-edge picks. Built; tests in edge_bevel_roundness.rs.
 
 ## MeshBlend B1 (2026-11-24, branch claude/project-thread-20fok5, provisional)
 
@@ -10225,3 +10265,21 @@ Built: what a press off the handle does under each Action Center (`ActionContext
 - ACR-Q19 Item mode is unchanged; its presses come with the Item-mode step.
 - ACR-Q20 In a UV view with a UV tool on, Element picks the UV point or edge under every click (UVT-133 was one click).
 
+## Solid Sketch handles (#45, 2026-11-27)
+
+- **SSH-Q1 (Jason, 2026-11-27, answered on #45).** Red, green and blue squares size the node along X, Y and Z; Twist has its own dark green handle, dragged left and right. Replaces spec 5.2's green = Twist. *Built.* Provisional: the Twist dot sits 18 points beyond the green square on screen (straight up when Y is seen end-on), and a drag turns half a degree per point, right one way and left the other.
+
+## Action Center rule sheet v6, step 3: one pivot service (2026-11-27, branch ac-rewrite-3, provisional)
+
+Built: the pivot service resolves a drag's base once into groups (`pivot_service::Resolved`: handle, and per mesh its groups with identity, frame, twin frame and targets carrying role and side); the transform tools' preview, handle and handle drag read only that. Local's axes are their own axis rule (`AxisOrientation::Local`), so the two mixing rules exist. Where the sheet left room:
+
+- ACR-Q21 Local axes with one centre under Symmetry: the frame is the last-selected element's cluster's; when that cluster is on the other side of the plane from the primary centre, its mirror image is used (the frame its twin has), so the primary side still takes the values as entered.
+- ACR-Q22 Local axes with one centre and nothing selected: no cluster holds a last-selected element, so the tool's own axes (World).
+- ACR-Q23 The primary frame is the service's when the tool starts, when the Action Center, Symmetry or a placed centre changes, and on Reset; between drags Move and Transform still carry it along with what they moved (the handle follows the selection even under Origin, as before). The groups are resolved about that carried frame.
+- ACR-Q24 S-09 is unchanged in this step: a Local cluster on the other side is edited in `LocalPiece::mirrored`, which keeps X pointing along +X; the review's inward-facing case (the twin's frame should be the exact mirror image) is still open.
+- ACR-Q25 Under Local the handle shows the last-selected cluster's own frame also when that cluster is on the non-primary side under Symmetry (as before); its values are then the mirror image of what the arrows suggest.
+- ACR-Q26 A falloff that reaches past the selection (Soft Selection, Coplanar, Element) adds its points to the groups, as before; in Vertex mode they can join Local clusters, and the handle now follows the same clusters the edit uses.
+- ACR-Q27 The Default Action Center preferences list no Local centre or Local axis yet (menu table, step 5); the bridge takes `axis: "local"`.
+- ACR-Q28 **Local handle on touching faces (Jason's hands-on check, 2026-11-27).** A wedge, its two sloped faces selected left then right, Local, Rotate. The faces share the ridge, so C-LOCAL makes them one cluster: the handle sits at the cluster's box middle with axes fitted to all its points (the longer left face dominates), and pick order plays no part. Jason expected the handle on the last-selected face with that face's own frame. The sheet says cluster centre and cluster frame; which to build is his call. Also open under the sheet's own wording: A-LOCAL's Z should be the cluster's normal vote itself, where the code takes the fitted direction nearest it (the review's A-LOCAL row). Steps 2 and 3 behave the same here. Tests: `ac_local_touching_faces.rs` (his expectation is the ignored one).
+- ACR-Q29 **Local's axes: the sheet's Z-normal against a typed Rotate case (2026-11-28, branch ac-rewrite-3b).** Jason's report: a cube's two opposite X walls, Local, Rotate, Symmetry off: the ring about the shared level direction leaned the walls opposite ways. Cause: AC-Q5 (the normal on the item axis nearest it) gave the wall facing −X the opposite Z. Built: A-LOCAL as AC-RULES v6 has it, Z on the normal at any tilt, X along the surface pointed to +X, Y = Z × X; AC-Q5 and ACS-12 ("Local Y is the island normal") are superseded. The recorded cases disagree with each other: ACS-H-local-x-pair-scale (Scale 2, 1.5, 1 typed, Symmetry X) was recorded with Z along the normal and now passes; ACS-HL-rotate-local-typedRY30 (Rotate Y 30 typed, Symmetry off) was recorded turning each island about its normal, which is Rotate Z under the sheet, and is now a known gap. Which is right for Rotate? Start: eight islands selected, Local, Rotate Y 30 typed. (Keeping Y on the normal at any tilt would also fix Jason's report and pass the Rotate case, but fail the Scale case and the sheet.)
+- ACR-Q30 **A-LOCAL details the sheet leaves open, provisional.** (a) Both in-surface directions as near X (a wall facing straight along X): the one nearer the item's Z, pointed to +Z, so the wall gets its level direction, as A-ELEM takes world Z there; still equal, the one of more spread (ACL-Q3). (b) Z on a cluster that isn't flat is the principal direction nearest the normal vote, not the vote itself: ACS-HL-scale-local-dragX and -rotate-local-dragRing were recorded that way on the bent strip (to 1e-3). (c) A vote that mostly cancels still falls back to the cluster's shape (FG-Q02). (d) "Nearest X" is the item's X (ACL-Q4), the sheet says world X; the two agree on an item that isn't turned.

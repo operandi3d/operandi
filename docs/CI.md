@@ -15,10 +15,11 @@ and by hand from the repo's Actions tab.
   machines. A push or pull request by anyone else runs on GitHub's machines
   (Mac at 10x minutes), so contributors' code never runs on Jason's.
 - Cycles isn't built; the `cycles` feature stays off.
-- The Linux job also runs `scripts/area-deps.py --check`, warn-only: it
-  annotates the run when a branch adds an area link against the flow inside
-  a dependency cycle (see [AREA_DEPENDENCIES.md](AREA_DEPENDENCIES.md)).
-  It never fails the run yet.
+- The Linux job also runs `scripts/area-deps.py --check --strict`, and
+  so does `scripts/merge-check.sh`: either fails when a branch adds an area
+  link against the flow inside a dependency cycle (see
+  [AREA_DEPENDENCIES.md](AREA_DEPENDENCIES.md); what to do is in
+  CONTRIBUTING.md, step 5).
 
 ## The Mac runner
 

@@ -532,7 +532,7 @@ fn live_vertex_tools_preview_cancel_and_drop() {
         }
         let before = e.scene.clone();
         e.dispatch(Command::Activate(tool)).unwrap();
-        let mut p = e.live.as_ref().unwrap().params.clone();
+        let mut p = e.session.live.as_ref().unwrap().params.clone();
         p.inset = 0.25;
         p.shift = 0.5;
         p.delta = DVec3::new(0.2, 0.2, 0.);
@@ -589,7 +589,7 @@ fn live_vertex_tools_preview_cancel_and_drop() {
 fn create_tool_adds_clicked_points_and_selects_them_in_order() {
     let mut e = editor(Mesh::default(), vec![]);
     e.dispatch(Command::Activate(Tool::VertexCreate)).unwrap();
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     p.sketch_path = vec![DVec3::ZERO, DVec3::X, DVec3::new(1., 1., 0.)];
     e.dispatch(Command::Preview(p)).unwrap();
     e.dispatch(Command::Drop).unwrap();
@@ -776,7 +776,13 @@ fn act(e: &mut Editor, act: &Act) -> Result<()> {
     match act {
         Act::Tool(tool, set) => {
             e.dispatch(Command::Activate(*tool))?;
-            let mut p = e.live.as_ref().ok_or("no live tool")?.params.clone();
+            let mut p = e
+                .session
+                .live
+                .as_ref()
+                .ok_or("no live tool")?
+                .params
+                .clone();
             set(&mut p);
             e.dispatch(Command::Preview(p))?;
             e.dispatch(Command::Drop)

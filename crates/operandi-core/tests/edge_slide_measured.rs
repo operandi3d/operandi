@@ -198,7 +198,7 @@ fn full_slide_merges_selects_and_undoes() {
     e.scene.selection.edges = vec![(1, 5), (5, 9), (9, 13)];
     let before = e.scene.clone();
     e.dispatch(Command::Activate(Tool::EdgeSlide)).unwrap();
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     p.shift = 1.;
     e.dispatch(Command::Preview(p.clone())).unwrap();
     e.dispatch(Command::Drop).unwrap();

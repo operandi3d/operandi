@@ -289,9 +289,10 @@ impl Operandi {
     /// settings kept, and nothing else happens (MC-04, MC-Q4; BG-Q10).
     pub(super) fn escape_clears_background_constraint(&self) -> bool {
         self.editor.background_constraint.is_some()
-            && !self.editor.live.as_ref().is_some_and(|l| l.applied)
+            && !self.editor.session.live.as_ref().is_some_and(|l| l.applied)
             && self
                 .editor
+                .session
                 .pen_draft
                 .as_ref()
                 .is_none_or(|d| d.points().is_empty())

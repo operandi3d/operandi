@@ -184,7 +184,7 @@ impl Operandi {
         if mode == crate::link_mode::LinkMode::Independent {
             return;
         }
-        let tool = self.editor.live.as_ref().map(|l| l.tool);
+        let tool = self.editor.session.live.as_ref().map(|l| l.tool);
         let kind = scrub::Kind::for_field(key, unit, tool);
         let parse = |t: &String| numeric::parse_quantity(t, kind.quantity()).ok();
         let Some(typed) = self.fields.get(key).and_then(parse) else {
@@ -224,7 +224,7 @@ impl Operandi {
         value: f64,
         unit: &str,
     ) -> bool {
-        let tool = self.editor.live.as_ref().map(|l| l.tool);
+        let tool = self.editor.session.live.as_ref().map(|l| l.tool);
         // UIC-53: a click on a whole-number field's arrows steps it by one,
         // as its own undo step.
         let kind = scrub::Kind::for_field(key, unit, tool);
@@ -256,7 +256,7 @@ impl Operandi {
             self.scrub = Some(scrub::Scrub::new(key, kind, value, start_text));
             // The whole scrub is one undo step, like a viewport drag
             // (`hold_pointer`); `drag_stopped` below ends it.
-            self.editor.tweak_held = true;
+            self.editor.session.tweak_held = true;
         }
         let Some(scrub) = self.scrub.as_mut().filter(|s| s.key == key) else {
             return false;
@@ -343,31 +343,31 @@ impl Operandi {
             return draw.kind.label();
         }
         let e = &self.editor;
-        if e.pen_draft.is_some() {
+        if e.session.pen_draft.is_some() {
             return "Pen";
         }
-        if e.solid_sketch.is_some() {
+        if e.session.solid_sketch.is_some() {
             return "Solid Sketch";
         }
-        if e.reduction.is_some() {
+        if e.session.reduction.is_some() {
             return "Polygon Reduction";
         }
-        if e.bridge.is_some() {
+        if e.session.bridge.is_some() {
             return "Bridge";
         }
-        if e.spike.is_some() {
+        if e.session.spike.is_some() {
             return "Spike";
         }
-        if e.ellipsoid.is_some() {
+        if e.session.ellipsoid.is_some() {
             return "Ellipsoid";
         }
-        if let Some(shape) = &e.shape {
+        if let Some(shape) = &e.session.shape {
             return shape.requested.kind().label();
         }
-        if e.cone.is_some() {
+        if e.session.cone.is_some() {
             return "Cone";
         }
-        if let Some(live) = &e.live {
+        if let Some(live) = &e.session.live {
             return live.tool.label();
         }
         if let Some(tool) = self.edge_click {
@@ -386,23 +386,23 @@ impl Operandi {
             ToolPanel::Sculpt
         } else if self.draw.is_some() {
             ToolPanel::Draw
-        } else if e.pen_draft.is_some() {
+        } else if e.session.pen_draft.is_some() {
             ToolPanel::Pen
-        } else if e.solid_sketch.is_some() {
+        } else if e.session.solid_sketch.is_some() {
             ToolPanel::SolidSketch
-        } else if e.reduction.is_some() {
+        } else if e.session.reduction.is_some() {
             ToolPanel::Reduction
-        } else if e.bridge.is_some() {
+        } else if e.session.bridge.is_some() {
             ToolPanel::Bridge
-        } else if e.spike.is_some() {
+        } else if e.session.spike.is_some() {
             ToolPanel::Spike
-        } else if e.ellipsoid.is_some() {
+        } else if e.session.ellipsoid.is_some() {
             ToolPanel::Ellipsoid
-        } else if e.shape.is_some() {
+        } else if e.session.shape.is_some() {
             ToolPanel::Shape
-        } else if e.cone.is_some() {
+        } else if e.session.cone.is_some() {
             ToolPanel::Cone
-        } else if let Some(live) = &e.live {
+        } else if let Some(live) = &e.session.live {
             if live.tool.is_smooth_shift() {
                 ToolPanel::Surface
             } else if live.tool.is_primitive() {
@@ -1390,7 +1390,7 @@ mod history_widget_tests {
         assert!(!widget(&a, &ctx, false, 0.3, vec![]).0.enabled());
 
         let mut a = local();
-        let mut p = a.editor.live.as_ref().unwrap().params.clone();
+        let mut p = a.editor.session.live.as_ref().unwrap().params.clone();
         p.extent = DVec3::Z * 0.5;
         a.editor.dispatch(Command::Preview(p)).unwrap();
         let (_, text) = widget(&a, &context(), false, 0., vec![]);
@@ -1508,7 +1508,7 @@ mod mode_availability_tests {
             );
             // Every open tool is dropped first (Jason, 2026-11-05).
             assert_eq!(a.editor.scene.selection.mode, Mode::Edge, "{tool}");
-            assert!(!a.editor.has_active_task(), "{tool}");
+            assert!(!a.editor.session.has_active_task(), "{tool}");
             assert_eq!(a.status, "Ready", "{tool}");
         }
     }

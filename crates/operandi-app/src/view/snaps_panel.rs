@@ -112,6 +112,7 @@ impl Operandi {
         };
         let running = self
             .editor
+            .session
             .live
             .as_ref()
             .is_some_and(|l| l.tool == preset.tool());
@@ -135,6 +136,7 @@ impl Operandi {
         if self.snap_preset.is_some_and(|(p, _)| p == preset)
             && self
                 .editor
+                .session
                 .live
                 .as_ref()
                 .is_some_and(|l| l.tool == preset.tool())
@@ -146,16 +148,16 @@ impl Operandi {
         }
         // A different preset: the first one's tool goes, its centre returns.
         if self.snap_preset.is_some() {
-            if self.editor.live.is_some() {
+            if self.editor.session.live.is_some() {
                 self.run(Command::Drop);
             }
             self.leave_snap_preset();
         }
         let before = self.editor.action_context;
-        if self.editor.live.as_ref().map(|l| l.tool) != Some(preset.tool()) {
+        if self.editor.session.live.as_ref().map(|l| l.tool) != Some(preset.tool()) {
             self.activate(preset.tool());
         }
-        if self.editor.live.as_ref().map(|l| l.tool) != Some(preset.tool()) {
+        if self.editor.session.live.as_ref().map(|l| l.tool) != Some(preset.tool()) {
             // Activation refused; its status line says why.
             return;
         }
@@ -168,7 +170,7 @@ impl Operandi {
             SnapPreset::DragSnap | SnapPreset::DragSnapRigid => {
                 // §4.1/4.2: Element Move, Auto (Q3), Range 0, Use
                 // Connectivity or Rigid Connections.
-                let mut p = self.editor.live.as_ref().unwrap().params.clone();
+                let mut p = self.editor.session.live.as_ref().unwrap().params.clone();
                 p.tweak_options.mode = TweakMode::Auto;
                 p.tweak_options.range = 0.;
                 p.tweak_options.connect = if preset == SnapPreset::DragSnap {
@@ -198,7 +200,7 @@ impl Operandi {
             _ => None,
         };
         if let Some(handles) = handles
-            && let Some(live) = self.editor.live.as_ref()
+            && let Some(live) = self.editor.session.live.as_ref()
         {
             let mut p = live.params.clone();
             p.absolute_handles = Some(handles);

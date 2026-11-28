@@ -647,6 +647,7 @@ impl Operandi {
     pub(crate) fn uv_view_project_click(&mut self, r: Rect) -> bool {
         let Some(live) = self
             .editor
+            .session
             .live
             .as_ref()
             .filter(|l| l.tool == Tool::UvViewProject)

@@ -57,14 +57,15 @@ impl Operandi {
             || (self.editor.i2.selected.is_some()
                 && self
                     .editor
+                    .session
                     .live
                     .as_ref()
                     .is_none_or(|l| !l.applied && l.tool == Tool::Extrude)
-                && self.editor.cone.is_none()
-                && self.editor.bridge.is_none()
-                && self.editor.spike.is_none()
-                && self.editor.ellipsoid.is_none()
-                && self.editor.shape.is_none())
+                && self.editor.session.cone.is_none()
+                && self.editor.session.bridge.is_none()
+                && self.editor.session.spike.is_none()
+                && self.editor.session.ellipsoid.is_none()
+                && self.editor.session.shape.is_none())
     }
 
     /// How the active tool can be left now, by the same rules as
@@ -74,7 +75,7 @@ impl Operandi {
         let armed = task || self.edge_click.is_some() || self.vertex_weld;
         let side_tool =
             self.utility.is_some() || self.sculpt.brush.is_some() || self.draw.is_some();
-        let live_tool = self.editor.live.as_ref().map(|l| l.tool);
+        let live_tool = self.editor.session.live.as_ref().map(|l| l.tool);
         let smooth_shift = live_tool.is_some_and(|t| t.is_smooth_shift());
         let bound = |action: &str| {
             self.bindings
@@ -171,7 +172,7 @@ mod tests {
     fn the_hint_follows_a_rebound_drop_key() {
         let mut a = cube_app();
         a.run(Command::Activate(Tool::Move));
-        assert!(a.editor.live.is_some());
+        assert!(a.editor.session.live.is_some());
         let shown = a.tool_exit_hint().unwrap();
         assert!(shown.starts_with("Q / Escape: drop tool"), "{shown}");
         assert!(shown.ends_with("Cancel: Tool Properties"), "{shown}");

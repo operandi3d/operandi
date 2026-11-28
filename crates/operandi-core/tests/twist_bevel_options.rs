@@ -226,7 +226,7 @@ fn subd_walls_and_exact_undo_redo_on_a_uv_mapped_subd_mesh() {
     let mut e = subd_editor();
     let before = mesh(&e);
     e.dispatch(Command::Activate(Tool::TwistBevel)).unwrap();
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     p.twist_bevel = TwistBevelOptions {
         shift: 0.6,
         inset: 0.2,
@@ -264,7 +264,7 @@ fn bend_direction_zero_is_world_x_on_a_rotated_item() {
     let world = e.scene.world_matrix(id).unwrap();
     let base = world.transform_point3(e.scene.active().unwrap().mesh.center(4));
     e.dispatch(Command::Activate(Tool::TwistBevel)).unwrap();
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     p.twist_bevel = TwistBevelOptions {
         shift: 1.,
         bend: 90.,

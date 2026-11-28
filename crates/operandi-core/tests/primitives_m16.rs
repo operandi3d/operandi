@@ -29,7 +29,7 @@ fn m16_replacement_history_attributes_cancel_and_committed_save_reopen() {
         let base = e.scene.clone();
         e.dispatch(Command::Activate(tool)).unwrap();
         assert_eq!(e.scene, base, "activation creates no geometry");
-        let mut p = e.live.as_ref().unwrap().params.clone();
+        let mut p = e.session.live.as_ref().unwrap().params.clone();
         p.position = DVec3::new(1., 2., -3.);
         p.radial = Some(RadialParameters {
             radius: DVec3::new(1., 1.5, 2.),
@@ -87,7 +87,7 @@ fn m16_replacement_history_attributes_cancel_and_committed_save_reopen() {
             std::process::id()
         ));
         e.save_committed(&path).unwrap();
-        assert!(e.live.is_none());
+        assert!(e.session.live.is_none());
         assert_eq!(e.history.undo.last().unwrap().label, tool.label());
         assert_eq!(persistence::load(&path).unwrap(), preview);
         std::fs::remove_file(path).unwrap();
@@ -106,18 +106,18 @@ fn m16_flat_base_is_kept_and_target_refusals_are_atomic() {
         e = fixture();
         e.scene.active_mut().unwrap().visible = false;
         assert!(e.dispatch(Command::Activate(tool)).is_err());
-        assert!(e.live.is_none());
+        assert!(e.session.live.is_none());
         e.scene.active_mut().unwrap().visible = true;
         // A moved mesh takes primitives now (primitive_moved_mesh.rs).
         e.scene.active_mut().unwrap().transform.translation.x = 1.;
         e.dispatch(Command::Activate(tool)).unwrap();
         e.dispatch(Command::Cancel).unwrap();
-        assert!(e.live.is_none());
+        assert!(e.session.live.is_none());
         e.scene.active_mut().unwrap().transform = Default::default();
         let base = e.scene.clone();
         for normal in 0..3 {
             e.dispatch(Command::Activate(tool)).unwrap();
-            let mut p = e.live.as_ref().unwrap().params.clone();
+            let mut p = e.session.live.as_ref().unwrap().params.clone();
             p.radial.as_mut().unwrap().radius[normal] = 0.;
             e.dispatch(Command::Preview(p.clone())).unwrap();
             // drag-creation-2026-11-06: the flat base is a real disc.
@@ -126,7 +126,7 @@ fn m16_flat_base_is_kept_and_target_refusals_are_atomic() {
             let mut bad = p.clone();
             bad.radial.as_mut().unwrap().radius[(normal + 1) % 3] = f64::NAN;
             assert!(e.dispatch(Command::Preview(bad)).is_err());
-            assert_eq!(e.live.as_ref().unwrap().params, p);
+            assert_eq!(e.session.live.as_ref().unwrap().params, p);
             e.dispatch(Command::Drop).unwrap();
             // Drop keeps it (rule 4); undo takes it back.
             assert_eq!(e.scene.active().unwrap().mesh.faces.len(), faces + 1);

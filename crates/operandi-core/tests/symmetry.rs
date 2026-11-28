@@ -427,7 +427,7 @@ fn sym_o07_cube_is_doubled() {
         position: DVec3::new(1., 0., 0.),
         size: DVec3::ONE,
         make_uvs: true,
-        ..e.live.as_ref().unwrap().params.clone()
+        ..e.session.live.as_ref().unwrap().params.clone()
     }))
     .unwrap();
     e.dispatch(Command::Drop).unwrap();
@@ -635,7 +635,7 @@ fn sym_b2_05_cube_on_the_plane_is_not_doubled() {
             position: DVec3::new(x, 0., 0.),
             // Not the starting size, so the preview builds.
             size: DVec3::splat(2.),
-            ..e.live.as_ref().unwrap().params.clone()
+            ..e.session.live.as_ref().unwrap().params.clone()
         }))
         .unwrap();
         e.dispatch(Command::Drop).unwrap();
@@ -714,7 +714,13 @@ fn handle_sits_on_the_pick_and_drags_as_dragged() {
     assert_eq!(e.scene.selection.vertices, vec![9, 5]);
     e.dispatch(Command::Activate(Tool::Move)).unwrap();
     close(
-        e.live.as_ref().unwrap().action_frame.unwrap().center,
+        e.session
+            .live
+            .as_ref()
+            .unwrap()
+            .action_frame
+            .unwrap()
+            .center,
         DVec3::new(2., 1., 0.),
     );
     e.dispatch(Command::Preview(Parameters {

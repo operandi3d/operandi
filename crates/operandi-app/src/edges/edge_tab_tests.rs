@@ -100,7 +100,7 @@ fn edge_tab_add_loop_click_and_commands() {
     a.toggle_edge_click(edge_panel::EdgeClick::AddLoop);
     a.run(Command::Activate(Tool::Move));
     assert_eq!(a.edge_click, None);
-    assert!(a.editor.live.is_some());
+    assert!(a.editor.session.live.is_some());
     // Command routes.
     let mut b = cube();
     b.execute("tool.set edge.addPoint on");
@@ -171,7 +171,7 @@ fn edge_extend_handle_drag_and_edge_extrude_fields() {
         vec![pointer(row, false, Modifiers::NONE)],
     );
     assert_eq!(
-        a.editor.live.as_ref().map(|l| l.tool),
+        a.editor.session.live.as_ref().map(|l| l.tool),
         Some(Tool::EdgeExtend),
         "{}",
         a.status
@@ -199,7 +199,7 @@ fn edge_extend_handle_drag_and_edge_extrude_fields() {
         vec![pointer(up, false, Modifiers::NONE)],
     );
     assert!(
-        a.editor.live.as_ref().unwrap().params.delta.y > 0.,
+        a.editor.session.live.as_ref().unwrap().params.delta.y > 0.,
         "{}",
         a.status
     );
@@ -225,7 +225,7 @@ fn edge_extend_handle_drag_and_edge_extrude_fields() {
     b.editor.scene.selection.edges = vec![(0, 1)];
     b.execute("tool.set edge.extrude on");
     assert_eq!(
-        b.editor.live.as_ref().map(|l| l.tool),
+        b.editor.session.live.as_ref().map(|l| l.tool),
         Some(Tool::EdgeExtrude),
         "{}",
         b.status
@@ -270,7 +270,7 @@ fn shift_x_is_edge_extrude_in_edge_mode_and_extrude_elsewhere() {
     draw(&mut edge, &ctx, size, vec![]);
     draw(&mut edge, &ctx, size, vec![shift_x.clone()]);
     assert_eq!(
-        edge.editor.live.as_ref().map(|l| l.tool),
+        edge.editor.session.live.as_ref().map(|l| l.tool),
         Some(Tool::EdgeExtrude),
         "{}",
         edge.status
@@ -282,7 +282,7 @@ fn shift_x_is_edge_extrude_in_edge_mode_and_extrude_elsewhere() {
     draw(&mut poly, &ctx, size, vec![]);
     draw(&mut poly, &ctx, size, vec![shift_x]);
     assert_eq!(
-        poly.editor.live.as_ref().map(|l| l.tool),
+        poly.editor.session.live.as_ref().map(|l| l.tool),
         Some(Tool::Extrude),
         "{}",
         poly.status
@@ -323,7 +323,7 @@ fn slide_shortcut_and_handle_drag() {
         }],
     );
     assert_eq!(
-        a.editor.live.as_ref().map(|l| l.tool),
+        a.editor.session.live.as_ref().map(|l| l.tool),
         Some(Tool::EdgeSlide),
         "{}",
         a.status
@@ -347,7 +347,7 @@ fn slide_shortcut_and_handle_drag() {
         size,
         vec![pointer(end + along, false, Modifiers::NONE)],
     );
-    let shift = a.editor.live.as_ref().unwrap().params.shift;
+    let shift = a.editor.session.live.as_ref().unwrap().params.shift;
     assert!(shift > 0. && shift <= 1., "{shift} {}", a.status);
     a.run(Command::Drop);
     assert_eq!(a.editor.history.undo.last().unwrap().label, "Slide");
@@ -364,7 +364,7 @@ fn edge_weight_tool_starts_at_current_weight_and_records_once() {
     a.editor.scene.selection.edges = vec![(0, 1)];
     a.execute("tool.set edge.crease on");
     assert_eq!(
-        a.editor.live.as_ref().map(|l| l.tool),
+        a.editor.session.live.as_ref().map(|l| l.tool),
         Some(Tool::EdgeCrease),
         "{}",
         a.status
@@ -379,7 +379,7 @@ fn edge_weight_tool_starts_at_current_weight_and_records_once() {
     assert_eq!(a.editor.history.undo.last().unwrap().label, "Edge Weight");
     // Re-activating starts at the stored weight, so no accidental reset.
     a.execute("tool.set edge.crease on");
-    assert!((a.editor.live.as_ref().unwrap().params.shift - 0.6).abs() < 1e-12);
+    assert!((a.editor.session.live.as_ref().unwrap().params.shift - 0.6).abs() < 1e-12);
     a.run(Command::Cancel);
     assert_eq!(
         a.editor
@@ -528,7 +528,7 @@ fn edge_bevel_chamfer_relax_rows_shortcut_handle_and_bridge() {
         vec![Event::PointerMoved(viewport), key(Key::B)],
     );
     assert_eq!(
-        a.editor.live.as_ref().map(|l| l.tool),
+        a.editor.session.live.as_ref().map(|l| l.tool),
         Some(Tool::EdgeBevel),
         "{}",
         a.status
@@ -538,7 +538,7 @@ fn edge_bevel_chamfer_relax_rows_shortcut_handle_and_bridge() {
     a.execute("tool.set edge.bevel on");
     let r = a.viewport_rect;
     let handle = a.handles(r).into_iter().next().expect("inset handle");
-    let params = a.editor.live.as_ref().unwrap().params.clone();
+    let params = a.editor.session.live.as_ref().unwrap().params.clone();
     a.update_handle(
         handle.0,
         params,
@@ -548,7 +548,15 @@ fn edge_bevel_chamfer_relax_rows_shortcut_handle_and_bridge() {
         r,
     );
     assert!(
-        a.editor.live.as_ref().unwrap().params.chamfer.offset > 0.,
+        a.editor
+            .session
+            .live
+            .as_ref()
+            .unwrap()
+            .params
+            .chamfer
+            .offset
+            > 0.,
         "{}",
         a.status
     );
@@ -563,7 +571,7 @@ fn edge_bevel_chamfer_relax_rows_shortcut_handle_and_bridge() {
     let mut b = cube();
     b.execute("tool.set edge.chamfer on");
     assert_eq!(
-        b.editor.live.as_ref().map(|l| l.tool),
+        b.editor.session.live.as_ref().map(|l| l.tool),
         Some(Tool::EdgeChamfer)
     );
     b.fields.insert("chamfer_offset".into(), "0.1 m".into());
@@ -732,7 +740,7 @@ fn edge_bevel_chamfer_options_by_command_and_fields() {
     // Chamfer's options come back; its width starts at zero.
     a.run(Command::Undo);
     a.execute("tool.set edge.chamfer on");
-    let p = &a.editor.live.as_ref().unwrap().params;
+    let p = &a.editor.session.live.as_ref().unwrap().params;
     assert_eq!(p.edge_bevel.shape, operandi_core::EdgeBevelShape::Square);
     assert_eq!((p.chamfer.segments, p.chamfer.offset), (3, 0.));
 }
@@ -752,7 +760,7 @@ fn edge_extrude_handle_drag_from_fresh_tool_extrudes() {
     draw(&mut a, &ctx, size, vec![]);
     a.execute("tool.set edge.extrude on");
     assert_eq!(
-        a.editor.live.as_ref().map(|l| l.tool),
+        a.editor.session.live.as_ref().map(|l| l.tool),
         Some(Tool::EdgeExtrude),
         "{}",
         a.status
@@ -761,7 +769,7 @@ fn edge_extrude_handle_drag_from_fresh_tool_extrudes() {
     let r = a.viewport_rect;
     // A fresh tool already has a Width, so the Extrude arrow alone extrudes
     // (Width 0 refused every Extrude; Jason, 2026-11-04).
-    assert!(a.editor.live.as_ref().unwrap().params.inset > 0.);
+    assert!(a.editor.session.live.as_ref().unwrap().params.inset > 0.);
     let (_, start, end, label) = a.handles(r).into_iter().next().expect("Extrude handle");
     assert_eq!(label, "Extrude");
     let along = (end - start).normalized() * 40.;
@@ -780,7 +788,7 @@ fn edge_extrude_handle_drag_from_fresh_tool_extrudes() {
         vec![pointer(end + along, false, Modifiers::NONE)],
     );
     assert!(
-        a.editor.live.as_ref().unwrap().params.shift > 0.,
+        a.editor.session.live.as_ref().unwrap().params.shift > 0.,
         "{}",
         a.status
     );
@@ -807,7 +815,7 @@ fn vertex_extrude_starts_with_a_width() {
     a.run(Command::Mode(Mode::Vertex));
     a.editor.scene.selection.vertices = vec![0];
     a.execute("tool.set vert.extrude on");
-    let l = a.editor.live.as_ref().expect("Vertex Extrude live");
+    let l = a.editor.session.live.as_ref().expect("Vertex Extrude live");
     assert_eq!(l.tool, Tool::VertexExtrude, "{}", a.status);
     assert!((l.params.inset - 0.2).abs() < 1e-12, "{}", l.params.inset);
     // Extrude alone now works without touching Width.
@@ -834,10 +842,10 @@ fn edge_weight_accepts_any_percent() {
     a.execute("tool.set edge.crease on");
     a.fields.insert("edge_weight".into(), "-50%".into());
     assert!(a.confirm_fields(), "{}", a.status);
-    assert!((a.editor.live.as_ref().unwrap().params.shift + 0.5).abs() < 1e-12);
+    assert!((a.editor.session.live.as_ref().unwrap().params.shift + 0.5).abs() < 1e-12);
     a.fields.insert("edge_weight".into(), "250%".into());
     assert!(a.confirm_fields(), "{}", a.status);
-    assert_eq!(a.editor.live.as_ref().unwrap().params.shift, 2.5);
+    assert_eq!(a.editor.session.live.as_ref().unwrap().params.shift, 2.5);
     a.fields.insert("edge_weight".into(), "-40%".into());
     assert!(a.confirm_fields(), "{}", a.status);
     a.run(Command::Drop);

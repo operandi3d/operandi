@@ -340,7 +340,7 @@ impl MeshIdentity {
 impl Editor {
     /// Read-only resolution shared by the command and any UI affordance.
     pub fn make_target(&self) -> Result<MakePlan> {
-        if self.i2_active() || self.pen_draft.is_some() {
+        if self.i2_active() || self.session.pen_draft.is_some() {
             return Err("Finish or Cancel the active tool before Make".into());
         }
         self.require_idle()?;
@@ -366,7 +366,10 @@ impl Editor {
     /// One atomic "Make" edit. Selection (mode, ordered and remembered
     /// components, item) is unchanged; the new face is not selected.
     pub(crate) fn make_polygon(&mut self, kind: crate::MakeType, close: bool) -> Result<()> {
-        if self.has_active_task() || self.selection_start.is_some() || self.pen_draft.is_some() {
+        if self.session.has_active_task()
+            || self.selection_start.is_some()
+            || self.session.pen_draft.is_some()
+        {
             return Err("Drop or Cancel the active tool before Make Polygon".into());
         }
         // make-split-2026-11-05: in Vertex mode, Make builds one polygon from

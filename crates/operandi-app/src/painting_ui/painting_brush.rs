@@ -1020,9 +1020,9 @@ impl Operandi {
         self.drop_sculpt();
         self.drop_draw();
         self.utility = None;
-        if self.editor.has_active_task() {
+        if self.editor.session.has_active_task() {
             self.run(Command::Drop);
-            if self.editor.has_active_task() {
+            if self.editor.session.has_active_task() {
                 return;
             }
         }

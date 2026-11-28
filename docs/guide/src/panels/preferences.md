@@ -3,7 +3,8 @@
 
 **Preferences** (**Edit > Preferences…**, **Ctrl+,**) holds the settings
 that are yours rather than the scene's: they apply to every scene and are
-kept between sessions.
+kept between sessions. On a Mac it is also in the application menu,
+**Operandi > Preferences…**.
 
 ![The Preferences window on its Input page](../images/panel-preferences.png)
 
@@ -33,6 +34,15 @@ applies to every view.
   opposite edge when it reaches one, so the drag never runs out of room.
   It works for orbit, pan, zoom, tool handles and the drags that change a
   value; selecting, drawing and brush strokes stay under the pointer.
+
+## Trackball Rotation
+
+**Trackball Rotation** on the **Remapping** page, off at first, makes
+orbiting turn the view freely about its own axes instead of around the
+world's up direction. The first time you orbit a 3D view, a small note at
+the bottom of the view asks **Try Trackball Rotation?**: **Turn On** turns
+it on, **No Thanks** keeps the usual orbit. The note goes by itself after
+17 seconds and never comes back.
 
 ## Common tasks
 

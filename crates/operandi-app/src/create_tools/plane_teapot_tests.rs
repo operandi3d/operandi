@@ -18,7 +18,10 @@ fn shift_click_on_text_adds_a_plane_item() {
     assert_eq!(item.name, "Plane", "{}", a.status);
     assert_ne!(item.id, first);
     assert_eq!(item.mesh.faces.len(), 1);
-    assert!(a.editor.shape.is_none(), "no tool, no drag (MT5-01)");
+    assert!(
+        a.editor.session.shape.is_none(),
+        "no tool, no drag (MT5-01)"
+    );
 }
 
 #[test]
@@ -27,13 +30,13 @@ fn teapot_tool_and_items_run_from_their_command_lines() {
     a.run(Command::NewMesh);
     a.execute("Teapot");
     assert_eq!(
-        a.editor.shape.as_ref().map(|s| s.kind()),
+        a.editor.session.shape.as_ref().map(|s| s.kind()),
         Some(ShapeKind::Teapot),
         "{}",
         a.status
     );
     a.execute("Teapot");
-    assert!(a.editor.shape.is_none(), "a second Teapot drops it");
+    assert!(a.editor.session.shape.is_none(), "a second Teapot drops it");
     a.execute("Teapot Item");
     assert_eq!(a.editor.scene.active().unwrap().name, "Teapot");
     a.execute("Plane Item");

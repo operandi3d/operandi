@@ -80,7 +80,7 @@ fn arm(a: &mut Operandi) {
 }
 
 fn params(a: &Operandi) -> SmoothShiftParameters {
-    let l = a.editor.live.as_ref().expect("Thicken live");
+    let l = a.editor.session.live.as_ref().expect("Thicken live");
     assert_eq!(l.tool, Tool::Thicken);
     l.params.smooth_shift
 }
@@ -93,9 +93,9 @@ fn editor_expected(source: &Scene, p: SmoothShiftParameters) -> Scene {
     };
     e.dispatch(Command::Activate(Tool::Thicken)).unwrap();
     e.dispatch(Command::ConfigureSmoothShift(p)).unwrap();
-    let staged = e.live.as_ref().unwrap().params.clone();
+    let staged = e.session.live.as_ref().unwrap().params.clone();
     e.dispatch(Command::Preview(staged)).unwrap();
-    assert_eq!(e.live.as_ref().unwrap().params.smooth_shift, p);
+    assert_eq!(e.session.live.as_ref().unwrap().params.smooth_shift, p);
     e.scene
 }
 
@@ -200,7 +200,11 @@ fn live(ctx: &Context) -> (Operandi, Scene, Vec<String>) {
     assert_eq!(displayed(&mut a, ctx), shown(explicit(true, false)));
     let at = a.viewport_rect.left_top() + vec2(20., 60.);
     click_at(&mut a, ctx, at);
-    assert!(a.editor.live.as_ref().unwrap().applied, "{}", a.status);
+    assert!(
+        a.editor.session.live.as_ref().unwrap().applied,
+        "{}",
+        a.status
+    );
     assert_eq!(params(&a), explicit(true, false));
     assert_eq!(
         a.editor.scene,
@@ -228,8 +232,16 @@ fn toggle_sequence(a: &mut Operandi, ctx: &Context, source: &Scene) -> Vec<Scene
             a.status
         );
         assert_eq!(displayed(a, ctx), shown(p), "{label}: displayed state");
-        assert!(a.editor.live.as_ref().unwrap().applied);
-        assert!(a.editor.live.as_ref().unwrap().preview_error.is_none());
+        assert!(a.editor.session.live.as_ref().unwrap().applied);
+        assert!(
+            a.editor
+                .session
+                .live
+                .as_ref()
+                .unwrap()
+                .preview_error
+                .is_none()
+        );
         let expected = editor_expected(source, p);
         assert_eq!(a.editor.scene, expected, "{label} → {thicken}/{both_sides}");
         let sel = &a.editor.scene.selection;
@@ -275,7 +287,11 @@ fn thicken_on_live_checkboxes_replace_from_source_then_cancel_restores() {
         "Cancel adds no history"
     );
     // Existing contract: explicit Cancel resolves the stage and deactivates.
-    assert!(a.editor.live.is_none(), "Cancel deactivates: {}", a.status);
+    assert!(
+        a.editor.session.live.is_none(),
+        "Cancel deactivates: {}",
+        a.status
+    );
     assert!(
         a.editor.history.redo.is_empty(),
         "Cancel leaves nothing to redo"
@@ -290,7 +306,11 @@ fn thicken_on_live_checkboxes_drop_undo_redo_and_save_load() {
     let final_params = params(&a);
     assert_eq!(final_params, explicit(true, false));
     click_button(&mut a, &ctx, "Drop");
-    assert!(a.editor.live.is_none(), "Drop deactivates: {}", a.status);
+    assert!(
+        a.editor.session.live.is_none(),
+        "Drop deactivates: {}",
+        a.status
+    );
     let committed = a.editor.scene.clone();
     assert_eq!(committed, editor_expected(&source, final_params));
     assert_eq!(&committed, stages.last().unwrap());
@@ -299,7 +319,7 @@ fn thicken_on_live_checkboxes_drop_undo_redo_and_save_load() {
     assert_eq!(after_drop.last().unwrap(), "Thicken");
 
     a.run(Command::Undo);
-    assert!(a.editor.live.is_none());
+    assert!(a.editor.session.live.is_none());
     assert_eq!(labels(&a.editor.history.redo), ["Thicken"]);
     assert_eq!(a.editor.scene, source, "Undo restores source: {}", a.status);
     assert_eq!(labels(&a.editor.history.undo), history);
@@ -311,7 +331,7 @@ fn thicken_on_live_checkboxes_drop_undo_redo_and_save_load() {
     );
     assert_eq!(labels(&a.editor.history.undo), after_drop);
     assert!(
-        a.editor.live.is_none(),
+        a.editor.session.live.is_none(),
         "Redo restores the dropped shell only"
     );
     assert!(a.editor.history.redo.is_empty());

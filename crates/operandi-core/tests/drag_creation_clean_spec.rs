@@ -21,7 +21,7 @@ fn cube_base_is_one_rectangle_and_drop_keeps_it() {
     // D1/D2: centre (0.409, −0.09, 0), size 0.822 × 0.168 × 0.
     let mut e = editor();
     e.dispatch(Command::Activate(Tool::Box)).unwrap();
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     p.position = DVec3::new(0.409, -0.09, 0.);
     p.size = DVec3::new(0.822, 0.168, 0.);
     p.segments = [1, 1, 1];
@@ -38,7 +38,7 @@ fn sphere_and_cylinder_bases_are_24_sided_discs() {
     ] {
         let mut e = editor();
         e.dispatch(Command::Activate(tool)).unwrap();
-        let mut p = e.live.as_ref().unwrap().params.clone();
+        let mut p = e.session.live.as_ref().unwrap().params.clone();
         p.position = DVec3::ZERO;
         let radial = p.radial.as_mut().unwrap();
         radial.radius = radius;

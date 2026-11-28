@@ -108,6 +108,6 @@ fn a_live_tool_keeps_its_own_row() {
     let ctx = Context::default();
     let mut a = app(&ctx, Session::Cone);
     a.run(Command::Cancel);
-    assert!(a.editor.cone.is_none());
+    assert!(a.editor.session.cone.is_none());
     assert_eq!(a.haul_session_value("cone_sides"), None);
 }

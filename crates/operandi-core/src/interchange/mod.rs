@@ -298,6 +298,31 @@ pub fn set_usd_importer(importer: UsdImporter) {
     let _ = USD_IMPORTER.set(importer);
 }
 
+/// File types added from outside interchange: those of kits that are on
+/// (KIT-1). `kit_import` registers these hooks when it fills its table,
+/// so interchange never uses kits (kits use interchange;
+/// docs/AREA_DEPENDENCIES.md).
+#[derive(Clone, Copy)]
+pub struct AddedImporters {
+    /// Each added lower-case extension, with the Import dialog's label.
+    pub extensions: fn() -> Vec<(String, String)>,
+    /// Read `path` when an added type has its lower-case extension `ext`.
+    pub import: fn(&str, &Path) -> Option<Result<Imported>>,
+}
+static ADDED_IMPORTERS: std::sync::OnceLock<AddedImporters> = std::sync::OnceLock::new();
+/// Register the added-type hooks (once; later calls are ignored).
+pub fn set_added_importers(added: AddedImporters) {
+    let _ = ADDED_IMPORTERS.set(added);
+}
+
+/// The added types now (see [`AddedImporters`]).
+fn added_extensions() -> Vec<(String, String)> {
+    ADDED_IMPORTERS
+        .get()
+        .map(|added| (added.extensions)())
+        .unwrap_or_default()
+}
+
 /// True when `path` has an extension `import` reads: a built-in one or
 /// one a kit that's on adds (`kit_import`, KIT-1).
 pub fn is_importable(path: &Path) -> bool {
@@ -306,7 +331,7 @@ pub fn is_importable(path: &Path) -> bool {
         .map(str::to_ascii_lowercase)
         .is_some_and(|e| {
             IMPORT_EXTENSIONS.contains(&e.as_str())
-                || crate::kit_import::kit_importer_for(&e).is_some()
+                || added_extensions().iter().any(|(added, _)| *added == e)
         })
 }
 
@@ -317,11 +342,7 @@ pub fn import_extensions() -> Vec<(String, String)> {
         .iter()
         .map(|e| (e.to_string(), e.to_ascii_uppercase()))
         .collect();
-    for importer in crate::kit_import::kit_importers() {
-        for ext in &importer.extensions {
-            list.push((ext.clone(), importer.label.clone()));
-        }
-    }
+    list.extend(added_extensions());
     list
 }
 
@@ -354,9 +375,11 @@ pub fn import_with(path: &Path, usd: &UsdImportOptions) -> Result<Imported> {
     // A file type a kit adds goes to the kit's helper program. Kits can't
     // take over a built-in type (kit_manifest), so this never shadows one.
     if !IMPORT_EXTENSIONS.contains(&ext.as_str())
-        && let Some(importer) = crate::kit_import::kit_importer_for(&ext)
+        && let Some(imported) = ADDED_IMPORTERS
+            .get()
+            .and_then(|added| (added.import)(&ext, path))
     {
-        return crate::kit_import::run(&importer, path);
+        return imported;
     }
     let bytes = operandi_files::read_whole(path, MAX_IMPORT_BYTES)?;
     let stem = path

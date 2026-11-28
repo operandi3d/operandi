@@ -392,7 +392,7 @@ impl Operandi {
             self.status = "Weld off".into();
             return;
         }
-        if self.editor.has_active_task() {
+        if self.editor.session.has_active_task() {
             self.status = "Drop or Cancel the active tool before Weld".into();
             return;
         }
@@ -433,6 +433,7 @@ impl Operandi {
     pub(super) fn vertex_click_at(&mut self, p: Pos2, r: Rect) -> bool {
         let creating = self
             .editor
+            .session
             .live
             .as_ref()
             .is_some_and(|l| l.tool == Tool::VertexCreate);
@@ -444,7 +445,7 @@ impl Operandi {
             self.status = "Create: click where the pointer meets the work plane".into();
             return true;
         };
-        let mut params = self.editor.live.as_ref().unwrap().params.clone();
+        let mut params = self.editor.session.live.as_ref().unwrap().params.clone();
         // VX-CR02: a placed point snaps (after Coordinate Rounding); the
         // points placed so far are targets too.
         self.snap_session = Default::default();
@@ -899,7 +900,15 @@ mod vertex_bevel_level_script_tests {
         a.editor.scene.selection.vertices = vec![0];
         a.execute("tool.set vert.bevel on");
         a.execute("tool.attr vert.bevel level 2");
-        let level = |a: &Operandi| a.editor.live.as_ref().unwrap().params.vertex_round_level;
+        let level = |a: &Operandi| {
+            a.editor
+                .session
+                .live
+                .as_ref()
+                .unwrap()
+                .params
+                .vertex_round_level
+        };
         assert_eq!(level(&a), 2, "{}", a.status);
         a.execute("tool.attr vert.bevel segments 6");
         assert_eq!(level(&a), 3, "{}", a.status);

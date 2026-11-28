@@ -457,7 +457,7 @@ fn options_are_kept_between_uses_and_drop_undo_cancel_and_save_agree() {
     e.scene.selection.edges = vec![(6, 7)];
     let before = e.scene.clone();
     e.dispatch(Command::Activate(Tool::EdgeChamfer)).unwrap();
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     assert_eq!(p.edge_bevel, EdgeBevelOptions::default());
     p.chamfer.offset = 0.1;
     p.chamfer.segments = 3;
@@ -482,7 +482,7 @@ fn options_are_kept_between_uses_and_drop_undo_cancel_and_save_agree() {
     // Next use: options and Segments kept, width back to zero.
     e.dispatch(Command::Undo).unwrap();
     e.dispatch(Command::Activate(Tool::EdgeChamfer)).unwrap();
-    let again = e.live.as_ref().unwrap().params.clone();
+    let again = e.session.live.as_ref().unwrap().params.clone();
     assert_eq!(again.edge_bevel, p.edge_bevel);
     assert_eq!(again.chamfer.segments, 3);
     assert_eq!(again.chamfer.offset, 0.);
@@ -495,7 +495,7 @@ fn options_are_kept_between_uses_and_drop_undo_cancel_and_save_agree() {
     // Edge Bevel keeps its own options.
     e.dispatch(Command::Activate(Tool::EdgeBevel)).unwrap();
     assert_eq!(
-        e.live.as_ref().unwrap().params.edge_bevel,
+        e.session.live.as_ref().unwrap().params.edge_bevel,
         EdgeBevelOptions::default()
     );
 }

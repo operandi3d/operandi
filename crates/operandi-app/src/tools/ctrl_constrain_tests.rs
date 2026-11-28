@@ -69,7 +69,7 @@ impl Rig {
     fn activate(&mut self, tool: Tool) {
         self.a.activate(tool);
         assert_eq!(
-            self.a.editor.live.as_ref().map(|l| l.tool),
+            self.a.editor.session.live.as_ref().map(|l| l.tool),
             Some(tool),
             "{}",
             self.a.status
@@ -85,7 +85,13 @@ impl Rig {
         for &by in path {
             self.frame(vec![Event::PointerMoved(from + by)]);
         }
-        self.held = self.a.editor.live.as_ref().map(|l| l.params.clone());
+        self.held = self
+            .a
+            .editor
+            .session
+            .live
+            .as_ref()
+            .map(|l| l.params.clone());
         let end = from + *path.last().unwrap();
         self.frame(vec![pointer(end, false, modifiers)]);
     }
@@ -94,7 +100,7 @@ impl Rig {
         self.drag_path(from, &path, modifiers);
     }
     fn params(&self) -> Parameters {
-        self.a.editor.live.as_ref().unwrap().params.clone()
+        self.a.editor.session.live.as_ref().unwrap().params.clone()
     }
     /// The values the last drag reached before its release.
     fn held(&self) -> Parameters {
@@ -454,7 +460,7 @@ fn hm04_middle_click_repeats_the_previous_drag_once() {
         "{} step {step} ({}) tweaks {}",
         point5(&rig),
         rig.a.status,
-        rig.a.editor.tweaks.undo_steps()
+        rig.a.editor.session.tweaks.undo_steps()
     );
 }
 
@@ -543,7 +549,7 @@ fn rpt_t01_typed_angle_then_middle_click_doubles_it_in_two_steps() {
     assert!(same_points(&rig.points(), &once, 1e-9), "{}", rig.a.status);
     rig.a.run(Command::Undo);
     assert!(same_points(&rig.points(), &start, 1e-9), "{}", rig.a.status);
-    assert!(rig.a.editor.live.is_some(), "the tool stays on");
+    assert!(rig.a.editor.session.live.is_some(), "the tool stays on");
 }
 
 #[test]

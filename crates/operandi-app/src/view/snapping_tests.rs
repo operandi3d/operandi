@@ -106,6 +106,7 @@ fn screen(app: &Operandi, p: DVec3, rect: Rect) -> Pos2 {
 fn drag_to(app: &mut Operandi, to: Pos2, rect: Rect) {
     let center = app
         .editor
+        .session
         .live
         .as_ref()
         .unwrap()
@@ -113,7 +114,7 @@ fn drag_to(app: &mut Operandi, to: Pos2, rect: Rect) {
         .unwrap()
         .center;
     let start = screen(app, center, rect);
-    let base = app.editor.live.as_ref().unwrap().params.clone();
+    let base = app.editor.session.live.as_ref().unwrap().params.clone();
     app.update_handle(viewport::FREE_HANDLE, base, start, to, Tool::Move, rect);
 }
 
@@ -302,7 +303,7 @@ fn tweak_grab_point_snaps_to_a_vertex() {
         },
         at: DVec3::new(1., 1., 0.),
     };
-    let base = app.editor.live.as_ref().unwrap().params.clone();
+    let base = app.editor.session.live.as_ref().unwrap().params.clone();
     let target = screen(&app, DVec3::new(3., 1., 0.), rect);
     let press = screen(&app, DVec3::new(1., 1., 0.), rect);
     app.tweak_drag(pick, &base, press, target - vec2(10., 4.), rect);
@@ -391,6 +392,7 @@ fn an_axis_arrow_drag_takes_the_targets_position_along_its_axis() {
     let (mut app, rect) = two_quads(2, VERTEX);
     let center = app
         .editor
+        .session
         .live
         .as_ref()
         .unwrap()
@@ -398,7 +400,7 @@ fn an_axis_arrow_drag_takes_the_targets_position_along_its_axis() {
         .unwrap()
         .center;
     let start = screen(&app, center, rect);
-    let base = app.editor.live.as_ref().unwrap().params.clone();
+    let base = app.editor.session.live.as_ref().unwrap().params.clone();
     let target = screen(&app, DVec3::new(4., 0., 0.), rect);
     app.update_handle(0, base, start, target + vec2(2., 0.), Tool::Move, rect);
     let p = points(&app)[2];
@@ -489,10 +491,7 @@ fn slanted_edge(targets: Targets) -> (Operandi, Rect) {
     app.camera.distance = rect.height() as f64 * app.camera.lens / 288.3;
     app.run(Command::Mode(Mode::Edge));
     app.editor.scene.selection.edges = vec![(0, 1)];
-    app.run(Command::ActionContext(ActionContext {
-        center: CenterMode::Local,
-        ..app.editor.action_context
-    }));
+    app.run(Command::ActionContext(ActionContext::LOCAL));
     app.snapping = SnappingPreferences {
         enabled: true,
         global: Targets::default(),
@@ -507,7 +506,7 @@ fn slanted_edge(targets: Targets) -> (Operandi, Rect) {
 /// action center) with the pointer on `to`; the handle's new position.
 fn drag_tilted_arrow(app: &mut Operandi, to: DVec3, rect: Rect) -> DVec3 {
     let start = screen(app, app.transform_handle_center(), rect);
-    let base = app.editor.live.as_ref().unwrap().params.clone();
+    let base = app.editor.session.live.as_ref().unwrap().params.clone();
     let target = screen(app, to, rect);
     app.update_handle(0, base, start, target, Tool::Move, rect);
     app.transform_handle_center()

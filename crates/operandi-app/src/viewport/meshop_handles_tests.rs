@@ -56,7 +56,7 @@ fn a_selected_primitive_op_shows_its_handles() {
 fn no_handles_while_a_tool_is_on_or_for_other_ops() {
     let mut a = cylinder_op();
     a.activate(Tool::Box);
-    assert!(a.editor.live.is_some(), "{}", a.status);
+    assert!(a.editor.session.live.is_some(), "{}", a.status);
     assert!(a.meshop_handles(rect()).is_empty());
     let mut b = Operandi::empty();
     b.run(Command::NewMesh);

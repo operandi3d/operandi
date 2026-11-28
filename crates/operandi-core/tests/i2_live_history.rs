@@ -86,7 +86,7 @@ fn exact_local_states_signed_zero_and_resume() {
         arm(&mut e, 0.5);
         begin(&mut e);
         check(&e, zero, ii, 1);
-        assert_eq!(e.live.as_ref().unwrap().params.extent, DVec3::ZERO);
+        assert_eq!(e.session.live.as_ref().unwrap().params.extent, DVec3::ZERO);
         assert!(e.history.undo.is_empty());
         mov(&mut e, 0.5);
         check(&e, moved, ii, 2);
@@ -199,7 +199,7 @@ fn completed_history_anchor_and_capacity() {
         assert_eq!(e.scene, scene("G0"));
         e.dispatch(Command::Redo).unwrap();
         assert_eq!(e.scene, scene("G2"));
-        assert!(e.live.is_none());
+        assert!(e.session.live.is_none());
     }
 }
 #[test]
@@ -234,7 +234,7 @@ fn two_completed_stages_and_numeric_apply_unchanged() {
         mov(&mut e, z);
         e.dispatch(Command::Continue).unwrap();
         assert_eq!(e.history.undo.len(), 1);
-        assert!(!e.live.as_ref().unwrap().applied);
+        assert!(!e.session.live.as_ref().unwrap().applied);
         begin(&mut e);
         assert_eq!(e.scene, scene(b1));
         mov(&mut e, 0.5);
@@ -246,7 +246,7 @@ fn two_completed_stages_and_numeric_apply_unchanged() {
         assert_eq!(e.scene, scene(if z == 0. { "G1" } else { "G2" }));
         e.dispatch(Command::Redo).unwrap();
         assert_eq!(e.scene, scene(b2));
-        assert!(e.live.is_none());
+        assert!(e.session.live.is_none());
     }
     let mut e = make_editor("G0");
     arm(&mut e, 0.5);
@@ -364,10 +364,10 @@ fn routing_changed_noop_refusal_cone_metadata_and_other_owner() {
             assert!(e == before);
         }
         drop(before); // Release the explicit assertion snapshot before inventory.
-        let actual_owner = if e.cone.is_some() {
+        let actual_owner = if e.session.cone.is_some() {
             Some("ConeArmed")
         } else {
-            e.live.as_ref().map(|l| {
+            e.session.live.as_ref().map(|l| {
                 assert_eq!(l.tool, Tool::Move);
                 assert!(!l.applied);
                 "MoveArmed"
@@ -384,7 +384,7 @@ fn routing_changed_noop_refusal_cone_metadata_and_other_owner() {
                 .selected
                 .as_ref()
                 .map_or(0, |s| 2 + usize::from(s.movement.is_some()))
-            + usize::from(e.live.is_some());
+            + usize::from(e.session.live.is_some());
         assert_eq!(roots as u64, row["root_pairs"]["total"].as_u64().unwrap());
         assert_eq!(e.identities.next_id().unwrap(), 83);
         assert_eq!(e.i2.serial.next().unwrap(), 2);
@@ -912,14 +912,14 @@ mod frozen_traces {
                 &s["prior_anchor"],
             );
         }
-        let owner = e.live.as_ref().map(|l| match (l.tool, l.applied) {
+        let owner = e.session.live.as_ref().map(|l| match (l.tool, l.applied) {
             (Tool::Extrude, true) => "ExtrudeBegun",
             (Tool::Extrude, false) => "ExtrudeArmed",
             (Tool::Move, false) => "MoveArmed",
             _ => "unsupported",
         });
         assert_eq!(owner, s["tool_owner"].as_str(), "{name} owner");
-        if let Some(l) = &e.live {
+        if let Some(l) = &e.session.live {
             assert!(l.preview_error.is_none());
             if let Some(st) = &e.i2.selected
                 && st.cursor > 0
@@ -957,7 +957,7 @@ mod frozen_traces {
         let document = 2 * (e.history.undo.len() + e.history.redo.len());
         let selected = roots(&e.i2.selected);
         let prior = roots(&e.i2.prior);
-        let live = usize::from(e.live.is_some());
+        let live = usize::from(e.session.live.is_some());
         let inventory = json!({"completed_entries":e.history.undo.len()+e.history.redo.len(),"completed_applied":e.history.undo.len(),"completed_redo":e.history.redo.len(),"selected_stage_objects":usize::from(e.i2.selected.is_some()),"saved_prior_stage_objects":usize::from(e.i2.prior.is_some()),"external_reader_stage_objects":readers.iter().filter(|r|r.selected.is_some()).count(),"retained_stage_objects_total":usize::from(e.i2.selected.is_some())+usize::from(e.i2.prior.is_some())+readers.iter().filter(|r|r.selected.is_some()).count(),"selected_local_entries":entries(&e.i2.selected),"selected_local_cursor":e.i2.selected.as_ref().map(|s|s.cursor),"prior_local_entries":entries(&e.i2.prior),"document_snapshot_pairs":document,"current_visible_snapshot_pairs":1,"selected_stage_snapshot_pairs":selected,"prior_stage_snapshot_pairs":prior,"legacy_live_base_pairs":live,"external_reader_snapshot_pairs":external,"full_snapshot_control_pairs_total":document+1+selected+prior+live+external});
         assert_eq!(&inventory, count, "{name} complete logical root inventory");
         let definitions = data("docs/i2-simple/expectations/READERS.json");
@@ -1184,7 +1184,7 @@ fn wrong_stage_and_changed_source_layout_refuse_fresh_capture() {
     );
     assert!(e == before);
     let t = e.extrude_stage_ticket().unwrap();
-    e.live.as_mut().unwrap().base.items[0].mesh.faces[1]
+    e.session.live.as_mut().unwrap().base.items[0].mesh.faces[1]
         .vertices
         .rotate_left(1);
     let before = e.clone();
@@ -1234,7 +1234,7 @@ fn frozen_malformed_and_unsupported_sources_refuse_before_begin_without_reservat
             let mut e = make_editor("G0");
             arm(&mut e, 0.);
             e.scene = input.clone();
-            e.live.as_mut().unwrap().base = input;
+            e.session.live.as_mut().unwrap().base = input;
             e
         } else {
             let mut e = make_editor(name);
@@ -1286,8 +1286,8 @@ fn continue_at_local_undo_s1_discards_movement_redo_and_arms_without_new_topolog
     assert_eq!(e.history.undo.len(), 1);
     assert!(e.history.redo.is_empty());
     assert!(e.i2.selected.is_none());
-    assert!(!e.live.as_ref().unwrap().applied);
-    assert_eq!(e.live.as_ref().unwrap().params.extent, DVec3::ZERO);
+    assert!(!e.session.live.as_ref().unwrap().applied);
+    assert_eq!(e.session.live.as_ref().unwrap().params.extent, DVec3::ZERO);
     assert_eq!(e.identities.next_id().unwrap(), 83);
     assert_eq!(e.i2.serial.next().unwrap(), 2);
     begin(&mut e);

@@ -60,6 +60,7 @@ impl Operandi {
     fn click_apply_reduction(&mut self) {
         let changed = self
             .editor
+            .session
             .reduction
             .as_ref()
             .and_then(|r| r.source.as_ref())

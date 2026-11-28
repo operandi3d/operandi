@@ -8,7 +8,7 @@ fn rect() -> Rect {
 }
 
 fn live_tool(a: &Operandi) -> Option<Tool> {
-    a.editor.live.as_ref().map(|l| l.tool)
+    a.editor.session.live.as_ref().map(|l| l.tool)
 }
 
 #[test]
@@ -56,9 +56,9 @@ fn the_handle_drags_the_distance() {
         let (axis, origin, end, name) = handles.first().cloned().expect("one handle");
         assert_eq!(name, label);
         assert_eq!(handles.len(), 1);
-        let base = a.editor.live.as_ref().unwrap().params.clone();
+        let base = a.editor.session.live.as_ref().unwrap().params.clone();
         a.update_handle(axis, base, origin, end, tool, rect());
-        let p = &a.editor.live.as_ref().unwrap().params;
+        let p = &a.editor.session.live.as_ref().unwrap().params;
         let amount = if tool == Tool::Inset {
             p.inset
         } else {
@@ -78,7 +78,7 @@ fn a_drag_away_from_the_handle_changes_the_distance() {
         a.run(Command::Mode(Mode::Polygon));
         a.editor.scene.selection.faces = vec![0];
         a.activate(tool);
-        let base = a.editor.live.as_ref().unwrap().params.clone();
+        let base = a.editor.session.live.as_ref().unwrap().params.clone();
         let start = pos2(400., 300.);
         a.update_handle(
             viewport::OFF_HANDLE,
@@ -88,7 +88,7 @@ fn a_drag_away_from_the_handle_changes_the_distance() {
             tool,
             rect(),
         );
-        let p = &a.editor.live.as_ref().unwrap().params;
+        let p = &a.editor.session.live.as_ref().unwrap().params;
         let amount = if tool == Tool::Inset {
             p.inset
         } else {

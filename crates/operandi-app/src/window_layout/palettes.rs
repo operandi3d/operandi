@@ -70,7 +70,6 @@ pub(super) struct Palette {
     pub name: String,
     pub order: i32,
     pub size: [f32; 2],
-    pub on_top: bool,
     pub content: Content,
 }
 
@@ -173,7 +172,6 @@ pub(super) fn palette_from(doc: &WindowLayout) -> Option<Palette> {
         name: doc.name.clone(),
         order: doc.order,
         size,
-        on_top: info.on_top,
         content,
     })
 }
@@ -629,7 +627,6 @@ impl Operandi {
                 size: place.size,
                 position: place.position,
                 min_size: [200., 160.],
-                on_top: p.on_top,
             };
             let shown = self.os_window(ctx, spec, |app, ctx| {
                 CentralPanel::default()

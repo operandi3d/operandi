@@ -650,7 +650,7 @@ fn move_drag_subdivided() {
         a.navigation
             .as_ref()
             .map(|n| matches!(n.kind, input::GestureKind::Handle(..))),
-        a.editor.live.as_ref().map(|l| l.params.delta),
+        a.editor.session.live.as_ref().map(|l| l.params.delta),
         a.status
     );
     println!(
@@ -812,7 +812,7 @@ fn item_move_drag_gpu() {
     for k in 0..history {
         a.editor.scene.selection.vertices = vec![(k * 37 % 18000) as u32];
         a.activate(Tool::Move);
-        let mut p = a.editor.live.as_ref().unwrap().params.clone();
+        let mut p = a.editor.session.live.as_ref().unwrap().params.clone();
         p.delta.z = 0.001;
         a.run(Command::Preview(p));
         a.run(Command::Drop);
@@ -1057,7 +1057,7 @@ fn item_move_drag_scene_file() {
     }
     println!(
         "Move: live {:?}, mode {:?}, modal {}, status {:?}",
-        a.editor.live.as_ref().map(|l| l.tool),
+        a.editor.session.live.as_ref().map(|l| l.tool),
         a.editor.scene.selection.mode,
         a.has_modal(),
         a.status
@@ -1095,7 +1095,7 @@ fn item_move_drag_scene_file() {
         println!("no Move handle found on screen");
     }
     // The tool's value changed directly every frame (no pointer).
-    if let Some(base) = a.editor.live.as_ref().map(|l| l.params.clone()) {
+    if let Some(base) = a.editor.session.live.as_ref().map(|l| l.params.clone()) {
         let before = counts(&a);
         let mut k = 0.;
         measure("scene/item_move_preview", || {
@@ -1215,7 +1215,7 @@ fn tweak_drag_subdivided() {
         size,
         vec![super::tests::pointer(end, false, Modifiers::NONE)],
     );
-    let mut p = a.editor.live.as_ref().unwrap().params.clone();
+    let mut p = a.editor.session.live.as_ref().unwrap().params.clone();
     p.tweak_options.range = 0.05;
     p.tweak_options.connect = operandi_core::TweakConnect::Connectivity;
     a.run(Command::Preview(p));
@@ -1245,6 +1245,7 @@ fn tweak_drag_subdivided() {
     println!(
         "PERF tweak range drag: moved {} points, subdivision full builds {} status {}",
         a.editor
+            .session
             .live
             .as_ref()
             .and_then(|l| l.params.tweak_plan.as_ref())
@@ -1446,7 +1447,7 @@ fn tool_frames_subdivided() {
         }
         super::tests::draw(&mut a, &ctx, size, vec![]);
         a.activate(tool);
-        let Some(mut base) = a.editor.live.as_ref().map(|l| l.params.clone()) else {
+        let Some(mut base) = a.editor.session.live.as_ref().map(|l| l.params.clone()) else {
             println!("PERF tool/{tool:?} not active: {}", a.status);
             continue;
         };
@@ -1678,7 +1679,7 @@ fn uv_tool_frames_subdivided() {
         super::tests::draw(&mut a, &ctx, size, vec![]);
         a.activate(tool);
         a.run(Command::UvToolSpace(Some(None)));
-        let Some(base) = a.editor.live.as_ref().map(|l| l.params.clone()) else {
+        let Some(base) = a.editor.session.live.as_ref().map(|l| l.params.clone()) else {
             println!("PERF {tag}/{tool:?} not active: {}", a.status);
             continue;
         };
@@ -1687,7 +1688,7 @@ fn uv_tool_frames_subdivided() {
         let mut k = 0.;
         measure(&format!("{tag}/{tool:?}_16k_quads_subdivided"), || {
             k += 1.;
-            let mut p = a.editor.live.as_ref().unwrap().params.clone();
+            let mut p = a.editor.session.live.as_ref().unwrap().params.clone();
             let space = p.uv.clone();
             p = base.clone();
             p.uv = space;

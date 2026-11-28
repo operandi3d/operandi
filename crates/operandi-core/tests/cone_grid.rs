@@ -448,13 +448,13 @@ fn ca_gt05_gt06_sparse_identity_preservation_apply_history_and_disk_roundtrip() 
         ..parameters(14)
     };
     e.dispatch(Command::ConfigureCone(p.clone())).unwrap();
-    let valid = e.cone.as_ref().unwrap().preview.clone();
+    let valid = e.session.cone.as_ref().unwrap().preview.clone();
     e.dispatch(Command::ConfigureCone(ConeParameters {
         gaps: 50.,
         ..p.clone()
     }))
     .unwrap_err();
-    assert_eq!(e.cone.as_ref().unwrap().preview, valid);
+    assert_eq!(e.session.cone.as_ref().unwrap().preview, valid);
     assert!(e.dispatch(Command::Apply).is_err());
     assert_eq!(e.scene, before);
     e.dispatch(Command::ConfigureCone(p)).unwrap();
@@ -492,7 +492,7 @@ fn ca_gt05_gt06_sparse_identity_preservation_apply_history_and_disk_roundtrip() 
     assert_eq!(committed.items[1], unrelated);
     // Drop after Apply shows no preview, so it records nothing.
     e.dispatch(Command::Drop).unwrap();
-    assert!(e.cone.is_none());
+    assert!(e.session.cone.is_none());
     assert_eq!(e.scene, committed);
     e.dispatch(Command::Undo).unwrap();
     assert_eq!(e.scene, before);
@@ -587,7 +587,7 @@ fn ca_gt04_unsupported_domains_and_nonfinite_endpoint_preserve_last_preview() {
         ..parameters(8)
     };
     e.dispatch(Command::ConfigureCone(p.clone())).unwrap();
-    let valid = e.cone.as_ref().unwrap().preview.clone();
+    let valid = e.session.cone.as_ref().unwrap().preview.clone();
     // Odd sides are a supported cap since PRIM-K-02.
     for request in [
         ConeParameters {
@@ -612,7 +612,7 @@ fn ca_gt04_unsupported_domains_and_nonfinite_endpoint_preserve_last_preview() {
         },
     ] {
         assert!(e.dispatch(Command::ConfigureCone(request)).is_err());
-        assert_eq!(e.cone.as_ref().unwrap().preview, valid);
+        assert_eq!(e.session.cone.as_ref().unwrap().preview, valid);
         assert!(e.dispatch(Command::Apply).is_err());
         assert!(e.scene.active().unwrap().mesh.vertices.is_empty());
     }

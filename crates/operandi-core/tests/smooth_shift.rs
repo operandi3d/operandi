@@ -43,14 +43,14 @@ fn sst_both_identities_live_replacement_cancel_apply_continuation_and_history() 
     for tool in [Tool::SmoothShift, Tool::Thicken] {
         let mut e = editor(tool);
         let source = e.scene.clone();
-        let mut p = e.live.as_ref().unwrap().params.smooth_shift;
+        let mut p = e.session.live.as_ref().unwrap().params.smooth_shift;
         assert_eq!(p.thicken, tool == Tool::Thicken);
         assert_eq!(e.scene, source);
         p.offset = 0.2;
         e.dispatch(Command::ConfigureSmoothShift(p)).unwrap();
         assert_eq!(e.scene, source);
         e.dispatch(Command::Apply).unwrap();
-        assert!(!e.live.as_ref().unwrap().applied);
+        assert!(!e.session.live.as_ref().unwrap().applied);
         assert_eq!(e.history.undo.len(), 1);
         assert_eq!(e.history.undo[0].label, tool.label());
         let first = e.scene.clone();
@@ -61,15 +61,15 @@ fn sst_both_identities_live_replacement_cancel_apply_continuation_and_history() 
         assert_ne!(first, second);
         e.dispatch(Command::Undo).unwrap();
         assert_eq!(e.scene, first);
-        assert!(e.live.is_none());
+        assert!(e.session.live.is_none());
         e.dispatch(Command::Redo).unwrap();
         assert_eq!(e.scene, second);
         e = editor(tool);
-        p = e.live.as_ref().unwrap().params.smooth_shift;
+        p = e.session.live.as_ref().unwrap().params.smooth_shift;
         p.offset = 0.1;
         e.dispatch(Command::ConfigureSmoothShift(p)).unwrap();
         let second = e.scene.clone();
-        let l = e.live.as_ref().unwrap().params.clone();
+        let l = e.session.live.as_ref().unwrap().params.clone();
         e.dispatch(Command::Preview(l)).unwrap();
         let live = e.scene.clone();
         p.offset = 0.3;
@@ -81,13 +81,19 @@ fn sst_both_identities_live_replacement_cancel_apply_continuation_and_history() 
         e.dispatch(Command::Cancel).unwrap();
         assert_eq!(e.scene, second);
         e.dispatch(Command::Activate(tool)).unwrap();
-        let l = e.live.as_ref().unwrap().params.clone();
+        let l = e.session.live.as_ref().unwrap().params.clone();
         e.dispatch(Command::Preview(l)).unwrap();
         let stage = e.scene.clone();
         e.dispatch(Command::Continue).unwrap();
         assert_eq!(e.scene, stage);
-        assert_eq!(e.live.as_ref().unwrap().params.smooth_shift.offset, 0.);
-        assert_eq!(e.live.as_ref().unwrap().params.smooth_shift.scale, 1.);
+        assert_eq!(
+            e.session.live.as_ref().unwrap().params.smooth_shift.offset,
+            0.
+        );
+        assert_eq!(
+            e.session.live.as_ref().unwrap().params.smooth_shift.scale,
+            1.
+        );
         e.dispatch(Command::Cancel).unwrap();
         assert_eq!(e.scene, stage);
         e.dispatch(Command::Undo).unwrap();
@@ -121,12 +127,12 @@ fn sst_states_namespaces_reset_retention_and_invalid_recovery() {
     // Under Thicken, Reset with no state gives Thicken's own values (tool
     // presets TP-15, 2026-11-15; before, Smooth Shift's).
     assert_eq!(
-        e.live.as_ref().unwrap().params.smooth_shift,
+        e.session.live.as_ref().unwrap().params.smooth_shift,
         tool_preset::thicken_values()
     );
     e.dispatch(Command::SurfaceStateRecall(Some("A".into())))
         .unwrap();
-    assert_eq!(e.live.as_ref().unwrap().params.smooth_shift, p);
+    assert_eq!(e.session.live.as_ref().unwrap().params.smooth_shift, p);
     e.dispatch(Command::SurfaceStateRename("B".into())).unwrap();
     e.dispatch(Command::SurfaceStateDelete).unwrap();
     assert!(e.surface_state.is_empty());
@@ -139,7 +145,7 @@ fn sst_states_namespaces_reset_retention_and_invalid_recovery() {
     e.dispatch(Command::Drop).unwrap();
     e.dispatch(Command::Activate(Tool::SmoothShift)).unwrap();
     assert_eq!(
-        e.live.as_ref().unwrap().params.smooth_shift,
+        e.session.live.as_ref().unwrap().params.smooth_shift,
         SmoothShiftParameters::default()
     );
     assert!(!e.surface_states.contains_key("Smooth Shift"));
@@ -148,7 +154,7 @@ fn sst_states_namespaces_reset_retention_and_invalid_recovery() {
     // Thicken starts from where its last Reset left it: its own values
     // (TP-15).
     assert_eq!(
-        e.live.as_ref().unwrap().params.smooth_shift,
+        e.session.live.as_ref().unwrap().params.smooth_shift,
         tool_preset::thicken_values()
     );
 }
@@ -178,7 +184,7 @@ fn sst_typed_storage_limits_append_native_version_and_unrelated_preservation() {
         .polygon_sets
         .insert("P".into(), [0].into());
     // Activate captured the old scene; recapture after adding original attributes.
-    e.live = None;
+    e.session.live = None;
     e.dispatch(Command::Activate(Tool::SmoothShift)).unwrap();
     let source = e.scene.clone();
     let mut extra = source.items[0].clone();
@@ -186,7 +192,7 @@ fn sst_typed_storage_limits_append_native_version_and_unrelated_preservation() {
     extra.name = "Unrelated".into();
     e.scene.items.push(extra.clone());
     e.scene.next_id = 3;
-    e.live.as_mut().unwrap().base = e.scene.clone();
+    e.session.live.as_mut().unwrap().base = e.scene.clone();
     e.dispatch(Command::ConfigureSmoothShift(SmoothShiftParameters {
         offset: 0.2,
         ..Default::default()
@@ -271,7 +277,7 @@ fn sst_local_context_falloff_only_offsets_and_source_integrity() {
 fn sst_legacy_sparse_uv_identity_and_crease_descendants_survive() {
     use glam::DVec2;
     let mut e = editor(Tool::Thicken);
-    e.live = None;
+    e.session.live = None;
     let m = &mut e.scene.active_mut().unwrap().mesh;
     m.uv_maps.insert(
         "UV".into(),
@@ -399,7 +405,7 @@ fn sst_default_action_center_scales_about_the_selection() {
             e.dispatch(Command::ConfigureSmoothShift(SmoothShiftParameters {
                 offset,
                 scale,
-                ..e.live.as_ref().unwrap().params.smooth_shift
+                ..e.session.live.as_ref().unwrap().params.smooth_shift
             }))
             .unwrap();
             e.dispatch(Command::Apply).unwrap();
@@ -447,7 +453,7 @@ fn two_quads(tool: Tool, center: CenterMode, symmetry: Symmetry) -> Editor {
     let p = SmoothShiftParameters {
         offset: 0.,
         scale: 0.5,
-        ..e.live.as_ref().unwrap().params.smooth_shift
+        ..e.session.live.as_ref().unwrap().params.smooth_shift
     };
     e.dispatch(Command::ConfigureSmoothShift(p)).unwrap();
     e.dispatch(Command::Apply).unwrap();
@@ -504,7 +510,7 @@ fn sst_origin_action_center_scales_about_the_origin() {
         e.dispatch(Command::ConfigureSmoothShift(SmoothShiftParameters {
             offset: 0.4,
             scale: 0.5,
-            ..e.live.as_ref().unwrap().params.smooth_shift
+            ..e.session.live.as_ref().unwrap().params.smooth_shift
         }))
         .unwrap();
         e.dispatch(Command::Apply).unwrap();

@@ -410,10 +410,10 @@ impl Operandi {
                 }
                 self.run(Command::SelectItem(Some(id)));
                 self.run(Command::Mode(Mode::Item));
-                if self.editor.live.as_ref().map(|l| l.tool) != Some(Tool::Move) {
+                if self.editor.session.live.as_ref().map(|l| l.tool) != Some(Tool::Move) {
                     self.activate(Tool::Move);
                 }
-                if self.editor.live.as_ref().map(|l| l.tool) != Some(Tool::Move) {
+                if self.editor.session.live.as_ref().map(|l| l.tool) != Some(Tool::Move) {
                     let why = format!("Move didn't start ({})", self.status);
                     abort(self, &why);
                 }
@@ -693,7 +693,7 @@ mod tests {
         assert!(label.contains("patched 6 polygons"), "{label}");
         a.run(Command::Mode(Mode::Item));
         a.activate(Tool::Move);
-        let base = a.editor.live.as_ref().unwrap().params.clone();
+        let base = a.editor.session.live.as_ref().unwrap().params.clone();
         for k in 1..3 {
             let mut p = base.clone();
             p.delta.x = 0.1 * k as f64;

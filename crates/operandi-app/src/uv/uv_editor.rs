@@ -73,7 +73,7 @@ impl Operandi {
             ),
             None => (Vec::new(), None),
         };
-        let idle = self.editor.live.is_none();
+        let idle = self.editor.session.live.is_none();
         let mut pick = None;
         ui.horizontal(|ui| {
             ui.label("Map");

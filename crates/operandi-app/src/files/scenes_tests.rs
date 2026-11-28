@@ -63,13 +63,13 @@ fn each_scene_keeps_its_own_history_selection_path_and_dirty_state() {
 fn a_live_tool_stays_with_its_scene() {
     let mut a = app();
     a.execute("Cone");
-    assert!(a.editor.cone.is_some(), "{}", a.status);
+    assert!(a.editor.session.cone.is_some(), "{}", a.status);
     a.fields.insert("cone_sides".into(), "7".into());
     a.request_file(FileAction::New);
-    assert!(a.editor.cone.is_none(), "the new scene has no tool");
+    assert!(a.editor.session.cone.is_none(), "the new scene has no tool");
     assert!(a.fields.is_empty(), "nor the old scene's field drafts");
     assert!(a.switch_scene(0));
-    assert!(a.editor.cone.is_some(), "Cone is still armed");
+    assert!(a.editor.session.cone.is_some(), "Cone is still armed");
     assert_eq!(a.fields.get("cone_sides").map(String::as_str), Some("7"));
 }
 
@@ -80,8 +80,8 @@ fn a_live_tool_stays_with_its_scene() {
 fn a_live_tools_tweak_history_stays_with_its_scene() {
     use operandi_core::{HistoryRequest, Parameters};
     fn drag(a: &mut Operandi, delta: DVec3) {
-        let base = a.editor.live.as_ref().unwrap().params.clone();
-        a.editor.tweak_held = true;
+        let base = a.editor.session.live.as_ref().unwrap().params.clone();
+        a.editor.session.tweak_held = true;
         for t in [0.5, 1.] {
             a.editor
                 .dispatch(Command::Preview(Parameters {
@@ -131,7 +131,13 @@ fn a_live_tools_tweak_history_stays_with_its_scene() {
     };
     undo(&mut a);
     assert_eq!(a.editor.scene, first);
-    assert!(a.editor.live.as_ref().is_some_and(|l| l.tool == Tool::Move));
+    assert!(
+        a.editor
+            .session
+            .live
+            .as_ref()
+            .is_some_and(|l| l.tool == Tool::Move)
+    );
     undo(&mut a);
     assert_eq!(a.editor.scene, original);
     a.editor
@@ -681,7 +687,15 @@ fn a_parked_numeric_preview_counts_as_unsaved() {
         panic!("no draw gesture: {}", a.status);
     };
     a.solid_draw(false, plane, anchor, edge, r, true);
-    assert!(a.editor.ellipsoid.as_ref().unwrap().preview.is_some());
+    assert!(
+        a.editor
+            .session
+            .ellipsoid
+            .as_ref()
+            .unwrap()
+            .preview
+            .is_some()
+    );
     assert!(a.dirty(), "the open scene counts its preview");
     a.request_file(FileAction::New);
     assert!(a.tab_dirty(0), "and so does the same scene parked");

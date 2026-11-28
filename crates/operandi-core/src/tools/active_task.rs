@@ -1,5 +1,5 @@
-//! Which modeling task is open. The editor keeps each kind of task in its own
-//! slot (`live`, `cone`, `ellipsoid`, `spike`, `bridge`, `reduction`,
+//! Which modeling task is open. The tool session keeps each kind of task in
+//! its own slot (`live`, `cone`, `ellipsoid`, `spike`, `bridge`, `reduction`,
 //! `pen_draft`); at most one is open at a time. Ask here instead of checking
 //! the slots one by one, so every caller agrees on what "a tool is active"
 //! means.
@@ -21,7 +21,7 @@ pub enum ActiveTask {
     SolidSketch,
 }
 
-impl Editor {
+impl crate::ToolSession {
     /// The open task, if any.
     pub fn active_task(&self) -> Option<ActiveTask> {
         if let Some(live) = &self.live {
@@ -104,14 +104,18 @@ impl Editor {
             return None;
         }
         let open = self
+            .session
             .active_task()
             .or_else(|| self.i2_active().then_some(ActiveTask::Live(Tool::Extrude)))?;
         let same = match (cmd, open) {
-            (Command::Activate(t), ActiveTask::Live(open)) => *t == open && self.preset.is_none(),
+            (Command::Activate(t), ActiveTask::Live(open)) => {
+                *t == open && self.session.preset.is_none()
+            }
             (Command::ActivateDeform(p), ActiveTask::Live(_)) => {
-                self.preset.as_ref().is_some_and(|s| s.id == p.id())
+                self.session.preset.as_ref().is_some_and(|s| s.id == p.id())
             }
             (Command::ActivatePreset(name), ActiveTask::Live(_)) => self
+                .session
                 .preset
                 .as_ref()
                 .is_some_and(|s| crate::tool_preset::row(name).is_some_and(|r| r.id == s.id)),

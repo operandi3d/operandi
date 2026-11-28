@@ -115,6 +115,7 @@ impl Editor {
                 field.validate()?;
             }
             if self
+                .session
                 .live
                 .as_ref()
                 .is_some_and(|l| !l.tool.card().layers.falloff)
@@ -141,7 +142,7 @@ impl Editor {
                 Some(crate::Falloff::Radial(f)) => next.radial_falloff_preset = f,
                 _ => {}
             }
-            if let Some(l) = next.live.as_ref().filter(|l| l.applied) {
+            if let Some(l) = next.session.live.as_ref().filter(|l| l.applied) {
                 next.dispatch(Command::Preview(l.params.clone()))?;
             }
             next.refresh_falloff_primitives();
@@ -154,7 +155,7 @@ impl Editor {
             }
             let mut next = self.clone();
             next.falloff_path = points;
-            if let Some(l) = next.live.as_ref().filter(|l| l.applied) {
+            if let Some(l) = next.session.live.as_ref().filter(|l| l.applied) {
                 next.dispatch(Command::Preview(l.params.clone()))?;
             }
             next.refresh_falloff_primitives();
@@ -173,7 +174,7 @@ impl Editor {
                 .into_iter()
                 .map(|(k, w)| (k, std::sync::Arc::new(w)))
                 .collect();
-            if let Some(l) = next.live.as_ref().filter(|l| l.applied) {
+            if let Some(l) = next.session.live.as_ref().filter(|l| l.applied) {
                 next.dispatch(Command::Preview(l.params.clone()))?;
             }
             next.refresh_falloff_primitives();
@@ -193,7 +194,7 @@ impl Editor {
             }
             let mut next = self.clone();
             next.falloff_element = pick;
-            if let Some(l) = next.live.as_ref().filter(|l| l.applied) {
+            if let Some(l) = next.session.live.as_ref().filter(|l| l.applied) {
                 next.dispatch(Command::Preview(l.params.clone()))?;
             }
             next.refresh_falloff_primitives();
@@ -218,7 +219,7 @@ impl Editor {
             let mut next = self.clone();
             next.remap_falloff_stamps(&added);
             next.added_falloffs = added;
-            if let Some(l) = next.live.as_ref().filter(|l| l.applied) {
+            if let Some(l) = next.session.live.as_ref().filter(|l| l.applied) {
                 next.dispatch(Command::Preview(l.params.clone()))?;
             }
             next.refresh_falloff_primitives();
@@ -226,6 +227,7 @@ impl Editor {
             return Ok(());
         }
         let l = self
+            .session
             .live
             .as_ref()
             .filter(|l| l.tool == Tool::Bevel)
@@ -244,7 +246,7 @@ impl Editor {
                 if l.applied || p != l.params {
                     self.dispatch(Command::Preview(p))?;
                 } else {
-                    let l = self.live.as_mut().unwrap();
+                    let l = self.session.live.as_mut().unwrap();
                     l.params = p;
                     l.preview_error = None;
                 }
@@ -259,7 +261,7 @@ impl Editor {
                 if l.applied {
                     self.dispatch(Command::Preview(p))?;
                 } else {
-                    let l = self.live.as_mut().unwrap();
+                    let l = self.session.live.as_mut().unwrap();
                     l.params = p;
                     l.preview_error = None;
                 }
@@ -288,7 +290,7 @@ impl Editor {
                 if l.applied {
                     self.dispatch(Command::Preview(p))?;
                 } else {
-                    let l = self.live.as_mut().unwrap();
+                    let l = self.session.live.as_mut().unwrap();
                     l.params = p;
                     l.preview_error = None;
                 }

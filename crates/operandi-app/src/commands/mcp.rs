@@ -562,7 +562,9 @@ impl Operandi {
         // tools on and drag them, so an active tool doesn't stop them.
         let acts_as_person = matches!(tool, "app_command" | "pointer_stroke");
         if !acts_as_person
-            && (self.editor.has_active_task() || self.edge_click.is_some() || self.vertex_weld)
+            && (self.editor.session.has_active_task()
+                || self.edge_click.is_some()
+                || self.vertex_weld)
         {
             return Some("A tool is active in Operandi; drop or cancel it in the app first".into());
         }
@@ -1300,7 +1302,7 @@ mod tests {
         let mut a = app();
         call(&mut a, "tool_run", json!({"tool": "prim.cube"})).unwrap();
         a.activate(Tool::Move);
-        assert!(a.editor.has_active_task(), "{}", a.status);
+        assert!(a.editor.session.has_active_task(), "{}", a.status);
         let refused = call(&mut a, "tool_run", json!({"tool": "prim.sphere"})).unwrap_err();
         assert!(refused.contains("tool is active"), "{refused}");
         // Reading is still fine.

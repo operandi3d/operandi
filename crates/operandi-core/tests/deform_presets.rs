@@ -19,7 +19,7 @@ fn points(e: &Editor) -> Vec<DVec3> {
     e.scene.active().unwrap().mesh.vertices.clone()
 }
 fn live(e: &Editor) -> Parameters {
-    e.live.as_ref().unwrap().params.clone()
+    e.session.live.as_ref().unwrap().params.clone()
 }
 /// One drag of the preset's transform: a preview, then the release.
 fn drag(e: &mut Editor, delta: DVec3) {
@@ -34,7 +34,7 @@ fn twist_turns_each_point_by_weight_times_angle() {
     let before = points(&e);
     e.dispatch(Command::ActivateDeform(DeformPreset::Twist))
         .unwrap();
-    assert_eq!(e.live.as_ref().unwrap().tool, Tool::Rotate);
+    assert_eq!(e.session.live.as_ref().unwrap().tool, Tool::Rotate);
     assert_eq!(e.live_tool_label(), Some("Twist"));
     // Fitted: Start (full effect) at the top, End at the bottom.
     let Some(Falloff::Linear(f)) = e.spatial_falloff else {
@@ -78,7 +78,7 @@ fn drop_names_the_step_after_the_preset_and_gives_back_the_users_falloff() {
     let linear_before = e.linear_falloff_preset;
     e.dispatch(Command::ActivateDeform(DeformPreset::Taper))
         .unwrap();
-    assert_eq!(e.live.as_ref().unwrap().tool, Tool::Scale);
+    assert_eq!(e.session.live.as_ref().unwrap().tool, Tool::Scale);
     assert!(matches!(e.spatial_falloff, Some(Falloff::Linear(_))));
     drag(&mut e, DVec3::new(0.5, 1., 0.5));
     drag(&mut e, DVec3::new(0.5, 1., 0.5));
@@ -91,12 +91,12 @@ fn drop_names_the_step_after_the_preset_and_gives_back_the_users_falloff() {
     e.dispatch(Command::Redo).unwrap();
     assert_eq!(points(&e), after_two);
     e.dispatch(Command::Drop).unwrap();
-    assert!(e.live.is_none());
+    assert!(e.session.live.is_none());
     assert_eq!(e.history.undo.len(), 1);
     assert_eq!(e.history.undo.last().unwrap().label, "Taper");
     assert_eq!(e.spatial_falloff, Some(mine.into()));
     assert_eq!(e.linear_falloff_preset, linear_before);
-    assert!(e.preset.is_none());
+    assert!(e.session.preset.is_none());
     // One undo removes the whole action.
     let start = column();
     e.dispatch(Command::Undo).unwrap();
@@ -147,7 +147,7 @@ fn shear_soft_move_swirl_and_bulge_use_their_falloffs() {
     ] {
         let mut e = column();
         e.dispatch(Command::ActivateDeform(preset)).unwrap();
-        assert_eq!(e.live.as_ref().unwrap().tool, tool, "{preset:?}");
+        assert_eq!(e.session.live.as_ref().unwrap().tool, tool, "{preset:?}");
         match e.spatial_falloff.unwrap() {
             Falloff::Linear(f) => {
                 assert!(linear, "{preset:?}");
@@ -185,7 +185,7 @@ fn presets_refuse_item_mode_and_toggle_off_from_their_own_button() {
         e.dispatch(Command::ActivateDeform(DeformPreset::Twist))
             .is_err()
     );
-    assert!(e.live.is_none() && e.preset.is_none());
+    assert!(e.session.live.is_none() && e.session.preset.is_none());
     assert_eq!(e.scene, before.scene);
     let mut e = column();
     e.dispatch(Command::ActivateDeform(DeformPreset::Twist))
@@ -198,10 +198,10 @@ fn presets_refuse_item_mode_and_toggle_off_from_their_own_button() {
     // Its own button again drops it; the falloff goes with it.
     e.dispatch(Command::ActivateDeform(DeformPreset::Swirl))
         .unwrap();
-    assert!(e.live.is_none() && e.spatial_falloff.is_none());
+    assert!(e.session.live.is_none() && e.spatial_falloff.is_none());
     // Plain Rotate after a preset has no falloff.
     e.dispatch(Command::Activate(Tool::Rotate)).unwrap();
-    assert!(e.spatial_falloff.is_none() && e.preset.is_none());
+    assert!(e.spatial_falloff.is_none() && e.session.preset.is_none());
     // Switching from a preset to plain Rotate drops the preset first.
     e.dispatch(Command::Drop).unwrap();
     e.dispatch(Command::ActivateDeform(DeformPreset::Twist))
@@ -217,8 +217,8 @@ fn undo_past_the_presets_start_closes_it_and_clears_its_falloff() {
     e.dispatch(Command::ActivateDeform(DeformPreset::Bulge))
         .unwrap();
     e.dispatch(Command::Undo).unwrap();
-    assert!(e.live.is_none());
-    assert!(e.spatial_falloff.is_none() && e.preset.is_none());
+    assert!(e.session.live.is_none());
+    assert!(e.spatial_falloff.is_none() && e.session.preset.is_none());
 }
 
 #[test]
@@ -320,7 +320,7 @@ fn smooth_works_on_activation_and_its_fields_rework_one_result() {
     assert_eq!(points(&e), once);
     // Mid-tool undo: the field edit comes back off, the tool stays.
     e.dispatch(Command::Undo).unwrap();
-    assert_eq!(e.live.as_ref().unwrap().tool, Tool::Smooth);
+    assert_eq!(e.session.live.as_ref().unwrap().tool, Tool::Smooth);
     assert_eq!(points(&e), before);
     e.dispatch(Command::Redo).unwrap();
     e.dispatch(Command::Drop).unwrap();
@@ -338,7 +338,7 @@ fn push_and_smooth_refuse_item_mode() {
     e.scene.selection.mode = Mode::Item;
     for tool in [Tool::Push, Tool::Smooth] {
         assert!(e.dispatch(Command::Activate(tool)).is_err());
-        assert!(e.live.is_none());
+        assert!(e.session.live.is_none());
     }
 }
 

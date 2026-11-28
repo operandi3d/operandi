@@ -8,7 +8,7 @@ impl Editor {
     /// if in its own mode, and the mode you're in stays.
     pub(crate) fn handle_activate(&mut self, t: Tool) -> Result<AfterCommand> {
         // An open tool keeps its own inference; the native start refuses.
-        if self.has_active_task() {
+        if self.session.has_active_task() {
             return self.handle_activate_native(t);
         }
         let saved = self.scene.selection.clone();
@@ -23,7 +23,7 @@ impl Editor {
         match self.handle_activate_native(t) {
             Ok(after) => {
                 self.scene.selection.mode = saved.mode;
-                if let Some(live) = self.live.as_mut() {
+                if let Some(live) = self.session.live.as_mut() {
                     live.base.selection.mode = saved.mode;
                 }
                 Ok(after)
@@ -37,12 +37,12 @@ impl Editor {
     }
     pub(super) fn handle_activate_native(&mut self, t: Tool) -> Result<AfterCommand> {
         // RPT-08: a new tool session starts with nothing to repeat.
-        self.last_transform_step = None;
+        self.session.last_transform_step = None;
         if self.spatial_falloff.is_some() && !t.card().layers.falloff {
             return Err(crate::tool_card::falloff_refusal());
         }
         // Another open tool was dropped first by `tool_switch`.
-        if self.has_active_task() {
+        if self.session.has_active_task() {
             return Err("Drop or Cancel the active tool first".into());
         }
         self.multi_extrude = None;
@@ -481,6 +481,7 @@ impl Editor {
             // A copier comes only from the open preset row (DX-20/30), so a
             // plain button never inherits the last row's.
             duplicate.copier = self
+                .session
                 .preset
                 .as_ref()
                 .filter(|p| p.tool == t)
@@ -554,7 +555,7 @@ impl Editor {
             }
             _ => params,
         };
-        self.live = Some(Live {
+        self.session.live = Some(Live {
             identity_base: Some(self.identities.current.clone()),
             identity_preview: None,
             tool: t,
@@ -562,6 +563,7 @@ impl Editor {
             params,
             applied: false,
             preview_error: None,
+            pivots: Default::default(),
             // The action-centre layer: tools that work about a frame
             // capture it now.
             placed_centre: None,
@@ -577,17 +579,23 @@ impl Editor {
         // fields then adjust that one result (deform.rs). So do the Deform
         // finish tools (deform_finish.rs).
         if t.shows_result_at_once() {
-            let p = self.live.as_ref().ok_or("No active tool")?.params.clone();
+            let p = self
+                .session
+                .live
+                .as_ref()
+                .ok_or("No active tool")?
+                .params
+                .clone();
             self.preview(p, false)?;
         }
         // Loop Slice with a ring from the selection shows its slice at once
         // (part of the activation step). A ring it can't cut is dropped, and
         // the tool waits for a click on an edge.
         if t == Tool::LoopSlice
-            && let Some(p) = self.live.as_ref().map(|l| l.params.clone())
+            && let Some(p) = self.session.live.as_ref().map(|l| l.params.clone())
             && !p.slice.loop_slice.rings.is_empty()
             && self.preview(p, false).is_err()
-            && let Some(live) = self.live.as_mut()
+            && let Some(live) = self.session.live.as_mut()
         {
             live.params.slice.loop_slice.rings.clear();
         }
@@ -597,6 +605,7 @@ impl Editor {
     /// Continue the live tool on a new stage (e.g. Shift-click on caps).
     pub(super) fn handle_continue(&mut self) -> Result<()> {
         let live = self
+            .session
             .live
             .as_ref()
             .ok_or("Activate Bevel or Extrude first")?;
@@ -662,7 +671,7 @@ impl Editor {
         next.identity_base = Some(self.identities.current.clone());
         next.identity_preview = None;
         self.scene.selection = next.base.selection.clone();
-        self.live = Some(next);
+        self.session.live = Some(next);
         Ok(())
     }
 
@@ -672,7 +681,11 @@ impl Editor {
     /// extend it back twice"). The action frame is resolved again on the
     /// new edges, so the centre follows them.
     pub(super) fn continue_edge_extend(&mut self) -> Result<()> {
-        let live = self.live.as_ref().ok_or("Activate Edge Extend first")?;
+        let live = self
+            .session
+            .live
+            .as_ref()
+            .ok_or("Activate Edge Extend first")?;
         if !live.applied || live.base == self.scene {
             return Err("Extend the edges first; Shift+click then extends again".into());
         }
@@ -689,7 +702,7 @@ impl Editor {
         next.identity_base = Some(self.identities.current.clone());
         next.identity_preview = None;
         let params = next.params.clone();
-        self.live = Some(next);
+        self.session.live = Some(next);
         self.preview(params, false)
     }
 }

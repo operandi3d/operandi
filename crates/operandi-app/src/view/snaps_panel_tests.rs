@@ -99,7 +99,7 @@ impl Rig {
         self.screen(at)
     }
     fn params(&self) -> Parameters {
-        self.a.editor.live.as_ref().unwrap().params.clone()
+        self.a.editor.session.live.as_ref().unwrap().params.clone()
     }
     /// Press a preset and click point `i` for its Element centre.
     fn start(&mut self, preset: &str, i: u32) {
@@ -139,7 +139,10 @@ fn drag_snap_presets_start_element_move_with_snapping() {
     rig.a.execute("Drag Snap");
     assert!(rig.a.snapping.enabled, "a preset turns snapping on (Q2)");
     let o = rig.params().tweak_options;
-    assert_eq!(rig.a.editor.live.as_ref().unwrap().tool, Tool::Tweak);
+    assert_eq!(
+        rig.a.editor.session.live.as_ref().unwrap().tool,
+        Tool::Tweak
+    );
     assert_eq!(
         (o.mode, o.range, o.connect),
         (TweakMode::Auto, 0., TweakConnect::Connectivity)
@@ -148,13 +151,13 @@ fn drag_snap_presets_start_element_move_with_snapping() {
     assert_eq!(rig.params().tweak_options.connect, TweakConnect::Rigid);
     // Pressing the running preset again drops it; snapping stays on.
     rig.a.execute("Drag Snap Rigid");
-    assert!(rig.a.editor.live.is_none());
+    assert!(rig.a.editor.session.live.is_none());
     assert!(rig.a.snap_preset.is_none());
     assert!(rig.a.snapping.enabled);
     // The script name works too, `snap:true` and all.
     rig.a.execute("tool.set SnapDrag 1 snap:true");
     assert_eq!(
-        rig.a.editor.live.as_ref().unwrap().tool,
+        rig.a.editor.session.live.as_ref().unwrap().tool,
         Tool::Tweak,
         "{}",
         rig.a.status

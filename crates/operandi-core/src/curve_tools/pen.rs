@@ -146,7 +146,7 @@ pub struct PenResult {
 }
 impl Editor {
     pub(crate) fn create_pen(&mut self, input: &PenInput) -> Result<()> {
-        if self.has_active_task() || self.selection_start.is_some() {
+        if self.session.has_active_task() || self.selection_start.is_some() {
             return Err("Drop or Cancel the active tool or selection before using Pen".into());
         }
         self.scene.validate()?;

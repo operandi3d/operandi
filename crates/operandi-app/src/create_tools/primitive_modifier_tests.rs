@@ -67,7 +67,7 @@ fn fixture() -> Operandi {
 }
 fn assert_unchanged(a: &Operandi, before: &Editor) {
     assert_eq!(a.editor.scene, before.scene);
-    assert!(a.editor.live == before.live);
+    assert!(a.editor.session.live == before.session.live);
     assert_eq!(a.editor.history.undo.len(), before.history.undo.len());
     assert_eq!(a.editor.history.redo.len(), before.history.redo.len());
     assert_eq!(
@@ -185,7 +185,7 @@ fn pm_t05_t06_t08_t10_unit_clicks_route_by_event_and_preserve_live_task_guards()
                     // MB-13: an unmatched pair runs the base (draw / drop).
                     // Clicking the open tool's button drops it.
                     assert_eq!(
-                        a.editor.live.as_ref().map(|l| l.tool),
+                        a.editor.session.live.as_ref().map(|l| l.tool),
                         (!live).then_some(tool),
                         "{}",
                         a.status
@@ -193,7 +193,7 @@ fn pm_t05_t06_t08_t10_unit_clicks_route_by_event_and_preserve_live_task_guards()
                     assert_eq!(a.editor.scene.items.len(), before.scene.items.len());
                 } else {
                     // A live tool (nothing drawn yet) is dropped first.
-                    assert!(a.editor.live.is_none());
+                    assert!(a.editor.session.live.is_none());
                     assert_eq!(a.editor.history.undo.len(), before.history.undo.len() + 1);
                     assert_eq!(
                         a.editor.scene.items.len(),
@@ -221,7 +221,7 @@ fn pm_t05_t06_t08_t10_unit_clicks_route_by_event_and_preserve_live_task_guards()
     // Release before click routes ordinary activation, never a stale unit action.
     frame(&mut a, &ctx, Modifiers::CTRL, true, vec![]);
     drag(&mut a, &ctx, p, p, Modifiers::NONE);
-    assert_eq!(a.editor.live.as_ref().unwrap().tool, Tool::Sphere);
+    assert_eq!(a.editor.session.live.as_ref().unwrap().tool, Tool::Sphere);
     assert!(a.editor.scene.active().unwrap().mesh.vertices.is_empty());
 }
 
@@ -285,7 +285,7 @@ fn pm_t08_t09_field_menu_modal_and_navigation_own_modifiers() {
                 ],
             );
             if owner == "text" {
-                assert!(a.editor.live.is_none(), "{}", a.status);
+                assert!(a.editor.session.live.is_none(), "{}", a.status);
                 assert_eq!(a.editor.history.undo.len(), before.history.undo.len() + 1);
                 assert_ne!(a.editor.scene, before.scene);
             } else {
@@ -321,9 +321,13 @@ fn pm_t01_t11_uniform_sphere_geometry_seams_history_and_persistence() {
         let p0 = a.camera.plane_point(start, r, plane, DVec3::ZERO).unwrap();
         let p1 = a.camera.plane_point(end, r, plane, DVec3::ZERO).unwrap();
         drag(&mut a, &ctx, start, end, Modifiers::CTRL);
-        let params = a.editor.live.as_ref().unwrap().params.clone();
+        let params = a.editor.session.live.as_ref().unwrap().params.clone();
         let radius = params.radial.unwrap().radius;
-        assert!(a.editor.live.as_ref().unwrap().applied, "{}", a.status);
+        assert!(
+            a.editor.session.live.as_ref().unwrap().applied,
+            "{}",
+            a.status
+        );
         assert_eq!(radius.x, radius.y);
         assert_eq!(radius.y, radius.z);
         assert!((radius.x - (p1 - p0).abs().max_element()).abs() < 1e-8);
@@ -348,7 +352,7 @@ fn pm_t01_t11_uniform_sphere_geometry_seams_history_and_persistence() {
         assert_eq!(a.editor.scene, before);
         a.run(Command::Redo);
         assert_eq!(a.editor.scene, result);
-        assert!(a.editor.live.is_none());
+        assert!(a.editor.session.live.is_none());
         let path = std::env::temp_dir().join(format!(
             "operandi-pm-sphere-{}-{plane}.opscene",
             std::process::id()
@@ -369,7 +373,7 @@ fn pm_t04_ctrl_side_moves_preserve_all_dimensions_modes_and_unrelated_geometry()
                     a.camera.view = View::Perspective;
                     a.camera.distance = 12.;
                     a.activate(tool);
-                    let mut params = a.editor.live.as_ref().unwrap().params.clone();
+                    let mut params = a.editor.session.live.as_ref().unwrap().params.clone();
                     params.position = DVec3::new(1., 1., 1.);
                     params.size = DVec3::new(2., 3., 4.);
                     params.box_handle_mode = mode;
@@ -393,7 +397,7 @@ fn pm_t04_ctrl_side_moves_preserve_all_dimensions_modes_and_unrelated_geometry()
                     let unit = a.camera.project(params.position + direction, r).unwrap().0
                         - a.camera.project(params.position, r).unwrap().0;
                     drag(&mut a, &ctx, start, start + unit * 0.4, Modifiers::CTRL);
-                    let actual = &a.editor.live.as_ref().unwrap().params;
+                    let actual = &a.editor.session.live.as_ref().unwrap().params;
                     assert_eq!(actual.size, params.size);
                     assert_eq!(actual.radial, params.radial);
                     assert_eq!(actual.box_handle_mode, mode);
@@ -405,6 +409,7 @@ fn pm_t04_ctrl_side_moves_preserve_all_dimensions_modes_and_unrelated_geometry()
                     );
                     let base_count = a
                         .editor
+                        .session
                         .live
                         .as_ref()
                         .unwrap()
@@ -437,7 +442,7 @@ fn pm_t04_ctrl_side_moves_preserve_all_dimensions_modes_and_unrelated_geometry()
                         start + unit * (0.2 * sign),
                         Modifiers::NONE,
                     );
-                    let resized = &a.editor.live.as_ref().unwrap().params;
+                    let resized = &a.editor.session.live.as_ref().unwrap().params;
                     if tool == Tool::Box {
                         assert_ne!(resized.size, moved.size);
                     } else {
@@ -508,8 +513,8 @@ fn pm_t03_modifier_change_mid_drag_is_ignored_and_focus_loss_releases_capture() 
         // Compare everything but identity_base, whose epoch is a process-wide
         // counter and so always differs between two separate apps.
         let (x, y) = (
-            a.editor.live.as_ref().expect("live"),
-            steady.editor.live.as_ref().expect("live"),
+            a.editor.session.live.as_ref().expect("live"),
+            steady.editor.session.live.as_ref().expect("live"),
         );
         assert!(
             x.base == y.base && x.params == y.params,
@@ -568,7 +573,7 @@ fn pm_drag_ctrl_mouseup_precedes_the_frames_final_modifier_release() {
             let middle = start + vec2(60., 25.);
             let end = start + vec2(150., 40.);
             let overall = |a: &Operandi| {
-                let p = &a.editor.live.as_ref().unwrap().params;
+                let p = &a.editor.session.live.as_ref().unwrap().params;
                 p.radial.map_or(p.size, |r| r.radius * 2.)
             };
             frame(
@@ -653,7 +658,7 @@ fn pm_drag_uniform_primitives_geometry_history_and_roundtrip() {
             let p0 = a.camera.plane_point(start, r, plane, center).unwrap();
             let p1 = a.camera.plane_point(end, r, plane, center).unwrap();
             drag(&mut a, &ctx, start, end, Modifiers::CTRL);
-            let live = a.editor.live.as_ref().unwrap();
+            let live = a.editor.session.live.as_ref().unwrap();
             assert!(live.applied, "{tool:?}/{view:?}: {}", a.status);
             let position = p0;
             let size = 2. * (p1 - p0).abs().max_element();
@@ -698,7 +703,7 @@ fn pm_drag_uniform_primitives_geometry_history_and_roundtrip() {
             assert_eq!(a.editor.scene, before);
             a.run(Command::Redo);
             assert_eq!(a.editor.scene, result);
-            assert!(a.editor.live.is_none());
+            assert!(a.editor.session.live.is_none());
             let path = std::env::temp_dir().join(format!(
                 "operandi-ctrl-drag-{}-{tool:?}-{plane}.opscene",
                 std::process::id()
@@ -726,8 +731,8 @@ fn pm_t02_alt_and_command_are_not_unit_aliases() {
         frame(&mut a, &ctx, Modifiers::NONE, true, vec![]);
         let p = a.toolbox_rects["Sphere"].center();
         drag(&mut a, &ctx, p, p, mods);
-        assert_eq!(a.editor.live.as_ref().unwrap().tool, Tool::Sphere);
-        assert!(!a.editor.live.as_ref().unwrap().applied);
+        assert_eq!(a.editor.session.live.as_ref().unwrap().tool, Tool::Sphere);
+        assert!(!a.editor.session.live.as_ref().unwrap().applied);
     }
 }
 
@@ -762,7 +767,7 @@ fn pm_drag_click_without_motion_cancel_and_combinations_preserve_base() {
         }
         drag(&mut a, &ctx, start, start + vec2(100., 0.), Modifiers::CTRL);
         assert!(
-            a.editor.live.as_ref().unwrap().applied,
+            a.editor.session.live.as_ref().unwrap().applied,
             "{tool:?}: {}",
             a.status
         );
@@ -788,7 +793,7 @@ fn pm_t13_t16_unit_click_size_ignores_view_grid_plane_and_refusal_keeps_pending_
             let p = a.toolbox_rects[tool.label()].center();
             drag(&mut a, &ctx, p, p, Modifiers::SHIFT);
             let mesh = &a.editor.scene.active().unwrap().mesh;
-            assert!(a.editor.live.is_none());
+            assert!(a.editor.session.live.is_none());
             // The unit Cylinder is 1.5 m tall (unit-primitive-2026-11-05).
             let half_height = if tool == Tool::Cylinder { 0.75 } else { 0.5 };
             assert!(mesh.vertices.iter().all(
@@ -817,7 +822,7 @@ fn pm_t13_t16_unit_click_size_ignores_view_grid_plane_and_refusal_keeps_pending_
             Tool::Sphere => "Sphere New Unit",
             _ => "Cylinder New Unit",
         });
-        assert!(a.editor.live.is_none(), "{}", a.status);
+        assert!(a.editor.session.live.is_none(), "{}", a.status);
         assert_eq!(a.editor.scene.items.len(), before.scene.items.len() + 1);
         assert!(a.editor.history.undo.len() > before.history.undo.len());
     }
@@ -873,7 +878,7 @@ fn ic_t07_08_09_centered_oracles_quadrants_crossing_and_captured_anchor() {
                 let check = |a: &Operandi, end: Pos2| {
                     let q = a.camera.plane_point(end, rect, plane, center).unwrap();
                     let half = (q - anchor).abs().max_element();
-                    let p = &a.editor.live.as_ref().unwrap().params;
+                    let p = &a.editor.session.live.as_ref().unwrap().params;
                     assert!(
                         p.position.abs_diff_eq(anchor, 1e-9),
                         "{tool:?}/{view:?}: {:?} != {anchor:?}",
@@ -961,7 +966,7 @@ fn shift_drag_off_handles_keeps_the_primitive_and_draws_the_next() {
         };
         drag(&mut a, &ctx, c, c + vec2(60., 40.), first_mods);
         // Change a setting so "same settings" is visible on the next one.
-        let mut p = a.editor.live.as_ref().unwrap().params.clone();
+        let mut p = a.editor.session.live.as_ref().unwrap().params.clone();
         p.segments = [2, 2, 2];
         if let Some(r) = p.radial.as_mut() {
             r.sides = 9;
@@ -977,7 +982,12 @@ fn shift_drag_off_handles_keeps_the_primitive_and_draws_the_next() {
             start + vec2(60., 40.),
             first_mods | Modifiers::SHIFT,
         );
-        let live = a.editor.live.as_ref().expect("next primitive is live");
+        let live = a
+            .editor
+            .session
+            .live
+            .as_ref()
+            .expect("next primitive is live");
         assert_eq!(live.tool, tool);
         assert_eq!(
             a.editor.history.undo.len(),
@@ -1034,7 +1044,7 @@ fn ellipsoid_cone_torus_capsule_cells_make_units() {
                 true,
                 vec![pointer(p, true, mods), pointer(p, false, mods)],
             );
-            assert!(!a.editor.has_active_task(), "{label}: {}", a.status);
+            assert!(!a.editor.session.has_active_task(), "{label}: {}", a.status);
             assert_eq!(
                 a.editor.history.undo.len(),
                 before.history.undo.len() + 1,

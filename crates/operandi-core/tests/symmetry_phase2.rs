@@ -46,7 +46,7 @@ fn symmetric(m: &Mesh) {
 }
 fn live(e: &mut Editor, tool: Tool, edit: impl FnOnce(&mut Parameters)) {
     e.dispatch(Command::Activate(tool)).unwrap();
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     edit(&mut p);
     e.dispatch(Command::Preview(p)).unwrap();
     e.dispatch(Command::Drop).unwrap();
@@ -270,10 +270,10 @@ fn two_boxes() -> Mesh {
 }
 fn run_duplicate(e: &mut Editor, tool: Tool, set: impl FnOnce(&mut DuplicateParameters)) {
     e.dispatch(Command::Activate(tool)).unwrap();
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     set(&mut p.duplicate);
     p.duplicate.placed = true;
-    e.tweak_held = true;
+    e.session.tweak_held = true;
     e.dispatch(Command::Preview(p)).unwrap();
     e.end_tweak();
     e.dispatch(Command::Drop).unwrap();
@@ -382,7 +382,7 @@ fn symmetry_tool_snaps_pairs_within_threshold() {
     let before = e.scene.clone();
     // Default Threshold 1 mm: the near point snaps, the far one stays.
     e.dispatch(Command::Activate(Tool::SymmetryTool)).unwrap();
-    let p = e.live.as_ref().unwrap().params.clone();
+    let p = e.session.live.as_ref().unwrap().params.clone();
     assert_eq!(p.symmetry_fix, symmetry_fix::SymmetryFix::default());
     e.dispatch(Command::Preview(p.clone())).unwrap();
     let out = mesh(&e);

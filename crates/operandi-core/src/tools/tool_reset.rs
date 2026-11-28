@@ -19,13 +19,15 @@ use crate::{ActiveTask, Command, Editor, Result, Tool};
 impl Editor {
     /// The undo-step name a reset of the active tool gets (MN-05.4).
     pub(crate) fn reset_step_label(&self) -> Option<String> {
-        self.active_task()
+        self.session
+            .active_task()
             .map(|task| format!("Reset {}", crate::history_policy::task_label(task)))
     }
 
     /// MN-05.1: the active tool's values back to the factory.
     pub(crate) fn reset_tool_attributes(&mut self) -> Result<()> {
         let task = self
+            .session
             .active_task()
             .ok_or("No tool is active, so there is nothing to reset")?;
         let own = match task {
@@ -65,18 +67,19 @@ impl Editor {
     /// Every other live tool: the values it starts with when nothing is
     /// remembered from an earlier use.
     fn reset_live_to_factory(&mut self) -> Result<()> {
-        let live = self.live.as_ref().ok_or("No active tool")?;
+        let live = self.session.live.as_ref().ok_or("No active tool")?;
         let tool = live.tool;
         let mut probe = self.clone();
         probe.forget_tool_memory();
         // Start it outright (no Click to Start arming) from the scene the
         // tool works on, as a fresh pick would.
         probe.auto_activate_flags = false;
-        probe.armed = None;
+        probe.session.armed = None;
         probe.scene = live.base.clone();
-        probe.live = None;
+        probe.session.live = None;
         probe.dispatch_inner(Command::Activate(tool), &mut None)?;
         let factory = probe
+            .session
             .live
             .as_ref()
             .filter(|l| l.tool == tool)
@@ -89,7 +92,7 @@ impl Editor {
         if live.applied {
             self.dispatch(Command::Preview(factory))
         } else {
-            let l = self.live.as_mut().unwrap();
+            let l = self.session.live.as_mut().unwrap();
             l.params = factory;
             l.preview_error = None;
             Ok(())

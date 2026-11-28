@@ -91,7 +91,7 @@ impl Operandi {
     /// and drags it in the plane facing the view; its moves become one
     /// step on release.
     pub(super) fn rig_guide_press(&mut self, pos: Pos2, r: Rect) -> Option<input::GestureKind> {
-        if self.editor.live.is_some() {
+        if self.editor.session.live.is_some() {
             return None;
         }
         let g = self.pick_guide(pos, r)?;

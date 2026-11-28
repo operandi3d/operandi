@@ -21,7 +21,7 @@ fn editor() -> Editor {
 }
 
 fn drag(e: &mut Editor, shift: f64) {
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     p.shift = shift;
     e.dispatch(Command::Preview(p)).unwrap();
 }
@@ -56,7 +56,7 @@ fn editing_inset_after_a_drag_updates_that_bevel_live() {
     drag(&mut e, 0.042);
     let before = e.scene.active().unwrap().mesh.vertices.clone();
     // A panel edit right after the drag: the same (last) bevel, re-applied.
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     p.inset = 0.06;
     e.dispatch(Command::Preview(p)).unwrap();
     assert_eq!(counts(&e), (12, 10), "still one ring");

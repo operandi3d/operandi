@@ -103,6 +103,10 @@ pub fn install(ctx: &Context) {
     style.spacing.button_padding = vec2(6., 2.);
     style.spacing.interact_size = vec2(20., 22.);
     style.spacing.indent = 14.;
+    // #68: dropdowns open to their full length (egui's 200 px default
+    // scrolled a 10-entry list like the viewport's view menu); only genuinely
+    // long lists (fonts, images) still scroll.
+    style.spacing.combo_height = 480.;
     apply_visuals(&mut style.visuals);
     // Keep numeric/command monospace, small overlays and headings at their
     // established sizes. FONT-001 calibrates standard proportional chrome only.
@@ -569,6 +573,10 @@ pub mod viewport {
     }
     pub fn rollover() -> Color32 {
         color(ColorId::Rollover)
+    }
+    /// A whole item's rollover fill in Item mode (the Face rollover).
+    pub fn rollover_face() -> Color32 {
+        color(ColorId::RolloverFace)
     }
     /// The rollover of polygon `face`, by its kind: Face, Subdivision or
     /// Catmull-Clark (points and edges use the Generic rollover).
@@ -1099,4 +1107,23 @@ pub fn set_overrides(all: &std::collections::BTreeMap<ColorId, Color32>) {
 /// Changes whenever any colour changes; caches of drawn colours key on it.
 pub fn generation() -> u64 {
     GENERATION.with(|g| g.get())
+}
+
+#[cfg(test)]
+mod tests {
+    /// #68: a ten-entry dropdown (the viewport's view menu) opens without a
+    /// scrollbar.
+    #[test]
+    fn theme_lets_a_ten_entry_dropdown_open_without_scrolling() {
+        let ctx = eframe::egui::Context::default();
+        super::install(&ctx);
+        let spacing = ctx.style().spacing.clone();
+        let row = spacing.interact_size.y + spacing.item_spacing.y;
+        let needed = 10. * row + spacing.menu_margin.sum().y;
+        assert!(
+            spacing.combo_height >= needed,
+            "combo_height {} < {needed}",
+            spacing.combo_height
+        );
+    }
 }

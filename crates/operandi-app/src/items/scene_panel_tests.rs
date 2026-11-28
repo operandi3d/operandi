@@ -278,7 +278,7 @@ fn par_t05_property_text_focus_expressions_invalid_escape_and_history() {
     draw(&mut a, &ctx, vec2(1440., 900.), vec![key(Key::Enter)]);
     assert_eq!(a.editor.scene, before);
     draw(&mut a, &ctx, vec2(1440., 900.), vec![key(Key::Q)]);
-    assert!(a.editor.live.is_none());
+    assert!(a.editor.session.live.is_none());
     draw(&mut a, &ctx, vec2(1440., 900.), vec![key(Key::Escape)]);
     assert_eq!(a.editor.scene, before);
 }
@@ -465,11 +465,11 @@ fn free_center_handle_and_click_away_center() {
     let away = r.left_top() + vec2(60., r.height() / 2.);
     assert!(a.pick_component(away, r).is_none());
     drag(&mut a, &ctx, away, away + vec2(40., 0.));
-    let live = a.editor.live.as_ref().unwrap();
+    let live = a.editor.session.live.as_ref().unwrap();
     let center = live.action_frame.unwrap().center;
     let (projected, _) = a.camera.project(center, r).unwrap();
     assert!(projected.distance(away) < 1., "{projected:?} vs {away:?}");
-    assert!(a.editor.tweaks.can_undo(), "{}", a.status);
+    assert!(a.editor.session.tweaks.can_undo(), "{}", a.status);
     assert_ne!(a.editor.history.undo.last().unwrap().before, a.editor.scene);
 }
 

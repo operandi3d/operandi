@@ -29,7 +29,7 @@ fn assert_baseline(app: &Operandi) {
     assert_eq!(scene, &app.saved);
     assert!(!app.dirty());
     assert!(app.path.is_none());
-    assert!(app.editor.live.is_none());
+    assert!(app.editor.session.live.is_none());
     assert!(app.editor.history.undo.is_empty());
     assert!(app.editor.history.redo.is_empty());
 }

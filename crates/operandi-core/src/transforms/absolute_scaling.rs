@@ -219,7 +219,7 @@ impl Editor {
         if self.i2_active() {
             return Err("Finish or Cancel the Extrude stage before Absolute Scaling".into());
         }
-        if self.pen_draft.is_some() {
+        if self.session.pen_draft.is_some() {
             return Err("Drop or Cancel Pen before Absolute Scaling".into());
         }
         self.require_idle()?;

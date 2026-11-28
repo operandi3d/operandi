@@ -187,15 +187,15 @@ impl Operandi {
     /// True while a tool, Pen draft or selection gesture holds the scene.
     pub(super) fn scene_busy(&self) -> bool {
         let e = &self.editor;
-        e.live.is_some()
-            || e.pen_draft.is_some()
-            || e.solid_sketch.is_some()
-            || e.bridge.is_some()
-            || e.spike.is_some()
-            || e.reduction.is_some()
-            || e.ellipsoid.is_some()
-            || e.shape.is_some()
-            || e.cone.is_some()
+        e.session.live.is_some()
+            || e.session.pen_draft.is_some()
+            || e.session.solid_sketch.is_some()
+            || e.session.bridge.is_some()
+            || e.session.spike.is_some()
+            || e.session.reduction.is_some()
+            || e.session.ellipsoid.is_some()
+            || e.session.shape.is_some()
+            || e.session.cone.is_some()
             || e.selection_start.is_some()
     }
 
@@ -265,12 +265,12 @@ impl Operandi {
     pub(super) fn new_scene_tab(&mut self) {
         // CA-CON-003/015: the new scene takes Cone's settings from an
         // active Cone session, which itself stays with its scene.
-        let cone = self.editor.cone.clone();
+        let cone = self.editor.session.cone.clone();
         let at = self.scenes.active + 1;
         let untitled = self.next_untitled();
         self.scenes.add(at, untitled);
         self.switch_scene_now(at);
-        self.editor.cone = cone;
+        self.editor.session.cone = cone;
         self.initialize_new_document();
     }
 

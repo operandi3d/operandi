@@ -210,7 +210,7 @@ mod tests {
         a.viewport_gpu = Some(gpu::ViewportGpu::new(state));
         a.run(Command::NewMesh);
         a.activate(Tool::Sphere);
-        let p = a.editor.live.as_ref().unwrap().params.clone();
+        let p = a.editor.session.live.as_ref().unwrap().params.clone();
         a.run(Command::Preview(p));
         a.run(Command::Drop);
         a.camera.view = crate::camera::View::Perspective;

@@ -22,13 +22,13 @@ fn point(e: &Editor) -> DVec3 {
 fn drag(e: &mut Editor, delta: DVec3) {
     let p = Parameters {
         delta,
-        ..e.live.as_ref().unwrap().params.clone()
+        ..e.session.live.as_ref().unwrap().params.clone()
     };
     e.dispatch(Command::Preview(p)).unwrap();
     e.dispatch(Command::CommitTransformStep).unwrap();
 }
 fn tool(e: &Editor) -> Option<Tool> {
-    e.live.as_ref().map(|l| l.tool)
+    e.session.live.as_ref().map(|l| l.tool)
 }
 
 #[test]
@@ -36,16 +36,23 @@ fn each_drag_is_one_step_and_undo_keeps_the_tool() {
     let mut e = fixture();
     let start = point(&e);
     e.dispatch(Command::Activate(Tool::Move)).unwrap();
-    let center = e.live.as_ref().unwrap().action_frame.unwrap().center;
+    let center = e
+        .session
+        .live
+        .as_ref()
+        .unwrap()
+        .action_frame
+        .unwrap()
+        .center;
     drag(&mut e, DVec3::X);
     drag(&mut e, DVec3::Y);
     assert_eq!(point(&e), start + DVec3::new(1., 1., 0.));
     // Each drag is a tweak of the Move session, not a document step yet
     // (Jason, 2026-11-04); Drop records the session as one step.
     assert!(e.history.undo.is_empty());
-    assert!(e.tweaks.can_undo());
+    assert!(e.session.tweaks.can_undo());
     // The next drag starts from zero, with the handle on the moved point.
-    let live = e.live.as_ref().unwrap();
+    let live = e.session.live.as_ref().unwrap();
     assert_eq!(live.params.delta, DVec3::ZERO);
     assert_eq!(
         live.action_frame.unwrap().center,
@@ -57,7 +64,13 @@ fn each_drag_is_one_step_and_undo_keeps_the_tool() {
     assert_eq!(tool(&e), Some(Tool::Move));
     assert_eq!(point(&e), start + DVec3::X);
     assert_eq!(
-        e.live.as_ref().unwrap().action_frame.unwrap().center,
+        e.session
+            .live
+            .as_ref()
+            .unwrap()
+            .action_frame
+            .unwrap()
+            .center,
         center + DVec3::X
     );
     e.dispatch(Command::Undo).unwrap();
@@ -96,7 +109,7 @@ fn pending_field_edit_is_undone_and_redone_as_a_step() {
     // A typed offset, not yet released by a drag.
     let p = Parameters {
         delta: DVec3::X * 2.,
-        ..e.live.as_ref().unwrap().params.clone()
+        ..e.session.live.as_ref().unwrap().params.clone()
     };
     e.dispatch(Command::Preview(p)).unwrap();
     let typed = point(&e);
@@ -118,11 +131,11 @@ fn drop_after_drags_adds_no_extra_step() {
     e.dispatch(Command::Activate(Tool::Move)).unwrap();
     drag(&mut e, DVec3::X);
     e.dispatch(Command::Drop).unwrap();
-    assert!(e.live.is_none());
+    assert!(e.session.live.is_none());
     assert_eq!(e.history.undo.len(), 1);
     // Ordinary Undo after Drop still works and leaves no tool behind.
     e.dispatch(Command::Undo).unwrap();
-    assert!(e.live.is_none());
+    assert!(e.session.live.is_none());
 }
 
 #[test]
@@ -133,7 +146,7 @@ fn cancel_discards_the_whole_session() {
     drag(&mut e, DVec3::X);
     let p = Parameters {
         delta: DVec3::Y,
-        ..e.live.as_ref().unwrap().params.clone()
+        ..e.session.live.as_ref().unwrap().params.clone()
     };
     e.dispatch(Command::Preview(p)).unwrap();
     e.dispatch(Command::Cancel).unwrap();
@@ -172,7 +185,11 @@ fn rotate_and_scale_steps_reset_to_neutral() {
         drag(&mut e, delta);
         let after = e.scene.clone();
         assert_ne!(after, start);
-        assert_eq!(e.live.as_ref().unwrap().params.delta, neutral, "{t:?}");
+        assert_eq!(
+            e.session.live.as_ref().unwrap().params.delta,
+            neutral,
+            "{t:?}"
+        );
         e.dispatch(Command::Undo).unwrap();
         assert_eq!(tool(&e), Some(t));
         assert_eq!(e.scene, start);

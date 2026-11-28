@@ -87,3 +87,21 @@ Properties, the eye turns it off, Undo removes it.
 6. An op's Properties › Selection › Add Selection…: the same widget as a
    plain list. Items list › Add Item (label): the Add Item browser; the ▾
    arrow still opens the menu.
+
+## Tidy batch (2026-11-27)
+
+1. Turn on a Linear falloff, add a Material Tag step, Add Selection…
+   Select by Falloff: the row shows the falloff; drag Threshold and watch
+   the tagged polygons change. Clear Falloff: nothing is tagged.
+2. On a grid, an Edge step (e.g. Edge Bevel) with Select by Index (one
+   edge) then Select Conditional Loop: the bevel runs border to border;
+   turn Loop Both Directions off and flip Start Direction.
+3. A UV-mapped plane as Target of a UV Transform step on a small mesh
+   (Deformers folder), Target UV Map "Texture": the mesh lies on the
+   plane; move the plane: it follows.
+4. A curve with Curve Rebuild Spans: knots appear (Bezier); set Offset
+   Mode Vector and Offset Amount: the new knots lift.
+5. Lace Geometry (Duplicate folder) with a curve mesh as Guide Mesh,
+   Radius 0.05: a tube along the curve; drag Start/End.
+6. Wrap: run `deformer.rebind` from the command line with the step
+   selected: same as pressing Rebind.

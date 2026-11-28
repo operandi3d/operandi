@@ -162,11 +162,11 @@ fn ar3_axis_rotate_is_a_rotate_preset_with_one_ring() {
     let mut e = editor(grid4());
     e.dispatch(Command::ActivatePreset("AxisRotate".into()))
         .unwrap();
-    assert_eq!(e.live.as_ref().unwrap().tool, Tool::Rotate);
+    assert_eq!(e.session.live.as_ref().unwrap().tool, Tool::Rotate);
     assert_eq!(e.live_tool_label(), Some("Axis Rotate"));
-    assert!(e.preset.as_ref().unwrap().row().actor.single_ring);
+    assert!(e.session.preset.as_ref().unwrap().row().actor.single_ring);
     e.dispatch(Command::Drop).unwrap();
-    assert!(e.preset.is_none());
+    assert!(e.session.preset.is_none());
     // Item mode works too (it's a transform).
     e.scene.selection.mode = Mode::Item;
     e.dispatch(Command::ActivatePreset("AxisRotate".into()))

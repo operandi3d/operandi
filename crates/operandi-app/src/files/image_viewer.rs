@@ -902,7 +902,7 @@ impl ViewerPreferences {
     }
 }
 
-/// The side panel's tabs (IV-35b; Image Processing and Compare come later).
+/// The side panel's tabs (IV-35b; Compare comes later).
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
 pub enum Tab {
     ImageProcessing,

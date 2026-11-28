@@ -505,6 +505,54 @@ pub const RENDER_FIELDS: &[(&str, &str)] = &[
         "resolution",
         "[width, height] px of the render camera's picture (sets its Resolution Override); false turns the override off",
     ),
+    (
+        "bloom",
+        "bool: Bloom, a soft glow around bright parts of the finished picture (Render window > Image Processing; default false). Changes the picture, not the render",
+    ),
+    (
+        "bloom_threshold",
+        "Bloom Threshold: linear brightness where the glow starts, 0-1000 (default 1 = white)",
+    ),
+    (
+        "bloom_intensity",
+        "Bloom Intensity as a 0-10 factor (0.5 = 50 %, the default): share of the light over the threshold spread into the glow",
+    ),
+    (
+        "bloom_radius",
+        "Bloom Radius as a 0.001-1 fraction of the picture's width (default 0.05)",
+    ),
+    (
+        "bloom_tint",
+        "Bloom Tint [r, g, b] linear, 0-1 (default [1, 1, 1])",
+    ),
+    (
+        "glare",
+        "bool: Glare, straight streaks out of bright points (a star filter; default false)",
+    ),
+    (
+        "glare_threshold",
+        "Glare Threshold: linear brightness where streaks start, 0-1000 (default 2)",
+    ),
+    (
+        "glare_intensity",
+        "Glare Intensity as a 0-10 factor (default 0.3 = 30 %)",
+    ),
+    (
+        "glare_streaks",
+        "Glare Streaks: rays per bright point, 2, 4, 6 or 8 (default 4)",
+    ),
+    (
+        "glare_angle",
+        "Glare Angle in radians, the first ray counter-clockwise from the right (default pi/4)",
+    ),
+    (
+        "glare_length",
+        "Glare Length as a 0.005-2 fraction of the picture's width (default 0.2)",
+    ),
+    (
+        "glare_tint",
+        "Glare Tint [r, g, b] linear, 0-1 (default [1, 1, 1])",
+    ),
 ];
 
 /// `render_settings_get`: the scene's render settings and picture size.
@@ -533,6 +581,18 @@ pub fn render_settings_get(e: &Editor, args: &Map<String, Value>) -> Result<Valu
         "total_photons": r.direct_caustics.total_photons,
         "local_photons": r.direct_caustics.local_photons,
         "walkthrough": r.direct_caustics.walkthrough,
+        "bloom": r.post.bloom.enabled,
+        "bloom_threshold": r.post.bloom.threshold,
+        "bloom_intensity": r.post.bloom.intensity,
+        "bloom_radius": r.post.bloom.radius,
+        "bloom_tint": r.post.bloom.tint,
+        "glare": r.post.glare.enabled,
+        "glare_threshold": r.post.glare.threshold,
+        "glare_intensity": r.post.glare.intensity,
+        "glare_streaks": r.post.glare.streaks,
+        "glare_angle": r.post.glare.angle.to_radians(),
+        "glare_length": r.post.glare.length,
+        "glare_tint": r.post.glare.tint,
         "exposure": fc.as_ref().map(|o| o.settings.exposure.label()),
         "white_level": fc.as_ref().map(|o| o.settings.white_level),
         "iso": fc.as_ref().map(|o| o.settings.iso),
@@ -595,6 +655,44 @@ pub fn render_settings_set(e: &mut Editor, args: &Map<String, Value>) -> Result<
     }
     if let Some(v) = get("walkthrough") {
         s.direct_caustics.walkthrough = flag("walkthrough", v)?;
+    }
+    let (b, g) = (&mut s.post.bloom, &mut s.post.glare);
+    if let Some(v) = get("bloom") {
+        b.enabled = flag("bloom", v)?;
+    }
+    if let Some(v) = get("bloom_threshold") {
+        b.threshold = number("bloom_threshold", v)?;
+    }
+    if let Some(v) = get("bloom_intensity") {
+        b.intensity = number("bloom_intensity", v)?;
+    }
+    if let Some(v) = get("bloom_radius") {
+        b.radius = number("bloom_radius", v)?;
+    }
+    if let Some(v) = get("bloom_tint") {
+        b.tint = rgb("bloom_tint", v)?;
+    }
+    if let Some(v) = get("glare") {
+        g.enabled = flag("glare", v)?;
+    }
+    if let Some(v) = get("glare_threshold") {
+        g.threshold = number("glare_threshold", v)?;
+    }
+    if let Some(v) = get("glare_intensity") {
+        g.intensity = number("glare_intensity", v)?;
+    }
+    if let Some(v) = get("glare_streaks") {
+        g.streaks = whole("glare_streaks", v)?;
+    }
+    if let Some(v) = get("glare_angle") {
+        // The bridge's angles are radians; the panel shows degrees.
+        g.angle = number("glare_angle", v)?.to_degrees();
+    }
+    if let Some(v) = get("glare_length") {
+        g.length = number("glare_length", v)?;
+    }
+    if let Some(v) = get("glare_tint") {
+        g.tint = rgb("glare_tint", v)?;
     }
     e.dispatch(Command::SetRenderSettings(s))?;
     // Exposure and gamma: the Final Color Render Output's settings.

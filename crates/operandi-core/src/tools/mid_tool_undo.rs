@@ -23,7 +23,7 @@
 //! tweak and keeps the tool, Redo puts it back. Once the tool is dropped the
 //! whole session is one undo step. Applies to Move/Rotate/Scale/Transform,
 //! the drawn primitives and the numeric primitive sessions; Tweak keeps one
-//! document step per drag (TWK-24). `Editor::tweaks`.
+//! document step per drag (TWK-24). `ToolSession::tweaks`.
 use crate::{ActiveTask, Command, Editor, IdentityScene, Live, NumericCone, NumericEllipsoid};
 use crate::{NumericBridge, NumericShape, NumericSpike, Result, Scene, Tool};
 
@@ -126,7 +126,7 @@ impl Editor {
     pub(crate) fn mid_undo_task(&self) -> Option<ActiveTask> {
         // Every tool except Pen (its own point undo) and Polygon Reduction
         // (refused on purpose, RED-004/D1).
-        self.active_task().filter(|task| {
+        self.session.active_task().filter(|task| {
             !matches!(
                 task,
                 ActiveTask::Pen | ActiveTask::Reduction | ActiveTask::SolidSketch
@@ -142,8 +142,8 @@ impl Editor {
 
     /// Redo would open again the tool that Undo just closed.
     pub(crate) fn redo_reopens_tool(&self) -> Option<&'static str> {
-        let r = self.tool_reopen.as_ref()?;
-        (self.active_task().is_none()
+        let r = self.session.tool_reopen.as_ref()?;
+        (self.session.active_task().is_none()
             && self.history.redo.len() == r.redo_len
             && self.scene == r.closed)
             .then(|| r.session.label())
@@ -159,7 +159,7 @@ impl Editor {
         if history {
             return;
         }
-        self.tool_reopen = None;
+        self.session.tool_reopen = None;
         if after != before {
             if before.is_some() {
                 // Leaving drops the steps undone while the tool was active
@@ -184,30 +184,30 @@ impl Editor {
         }
         let shown = self.scene.clone();
         let shown_identities = self.identities.current.clone();
-        let session = if let Some(l) = self.live.take() {
+        let session = if let Some(l) = self.session.live.take() {
             self.scene = l.base.clone();
             if let Some(ids) = &l.identity_base {
                 self.identities.current = ids.clone();
                 self.identities.observe(&self.scene)?;
             }
             ReopenSession::Live(Box::new(l))
-        } else if let Some(s) = self.cone.take() {
+        } else if let Some(s) = self.session.cone.take() {
             ReopenSession::Cone(s)
-        } else if let Some(s) = self.ellipsoid.take() {
+        } else if let Some(s) = self.session.ellipsoid.take() {
             ReopenSession::Ellipsoid(s)
-        } else if let Some(s) = self.shape.take() {
+        } else if let Some(s) = self.session.shape.take() {
             ReopenSession::Shape(s)
-        } else if let Some(s) = self.spike.take() {
+        } else if let Some(s) = self.session.spike.take() {
             ReopenSession::Spike(s)
-        } else if let Some(s) = self.bridge.take() {
+        } else if let Some(s) = self.session.bridge.take() {
             ReopenSession::Bridge(s)
         } else {
             return Ok(None);
         };
         let label = session.label();
         self.history.tool_steps = None;
-        let tweaks = std::mem::take(&mut self.tweaks);
-        self.tool_reopen = Some(ToolReopen {
+        let tweaks = std::mem::take(&mut self.session.tweaks);
+        self.session.tool_reopen = Some(ToolReopen {
             session,
             shown,
             shown_identities,
@@ -223,7 +223,7 @@ impl Editor {
         if self.redo_reopens_tool().is_none() {
             return Ok(None);
         }
-        let Some(r) = self.tool_reopen.take() else {
+        let Some(r) = self.session.tool_reopen.take() else {
             return Ok(None);
         };
         let label = r.session.label();
@@ -232,17 +232,17 @@ impl Editor {
                 self.scene = r.shown;
                 self.identities.current = r.shown_identities;
                 self.identities.observe(&self.scene)?;
-                self.live = Some(*l);
+                self.session.live = Some(*l);
             }
-            ReopenSession::Cone(s) => self.cone = Some(s),
-            ReopenSession::Ellipsoid(s) => self.ellipsoid = Some(s),
-            ReopenSession::Shape(s) => self.shape = Some(s),
-            ReopenSession::Spike(s) => self.spike = Some(s),
-            ReopenSession::Bridge(s) => self.bridge = Some(s),
+            ReopenSession::Cone(s) => self.session.cone = Some(s),
+            ReopenSession::Ellipsoid(s) => self.session.ellipsoid = Some(s),
+            ReopenSession::Shape(s) => self.session.shape = Some(s),
+            ReopenSession::Spike(s) => self.session.spike = Some(s),
+            ReopenSession::Bridge(s) => self.session.bridge = Some(s),
         }
         self.history.tool_steps = Some(0);
         self.history.tool_redo_floor = Some(self.history.redo.len());
-        self.tweaks = r.tweaks;
+        self.session.tweaks = r.tweaks;
         Ok(Some(label))
     }
 }
@@ -253,7 +253,11 @@ impl Editor {
         // An Extrude stage keeps its own Begin/Move Extrude history.
         if self.i2_active()
             || (self.i2.selected.is_some()
-                && self.live.as_ref().is_some_and(|l| l.tool == Tool::Extrude))
+                && self
+                    .session
+                    .live
+                    .as_ref()
+                    .is_some_and(|l| l.tool == Tool::Extrude))
         {
             return None;
         }
@@ -264,27 +268,40 @@ impl Editor {
     fn session_snapshot(&self) -> Option<TweakState> {
         self.tweak_session()?;
         let invalid = self
+            .session
             .live
             .as_ref()
             .is_some_and(|l| l.preview_error.is_some())
-            || self.cone.as_ref().is_some_and(|s| s.error.is_some())
-            || self.ellipsoid.as_ref().is_some_and(|s| s.error.is_some())
-            || self.shape.as_ref().is_some_and(|s| s.error.is_some());
+            || self
+                .session
+                .cone
+                .as_ref()
+                .is_some_and(|s| s.error.is_some())
+            || self
+                .session
+                .ellipsoid
+                .as_ref()
+                .is_some_and(|s| s.error.is_some())
+            || self
+                .session
+                .shape
+                .as_ref()
+                .is_some_and(|s| s.error.is_some());
         if invalid {
             return None;
         }
-        let session = if let Some(l) = &self.live {
+        let session = if let Some(l) = &self.session.live {
             ReopenSession::Live(Box::new(l.clone()))
-        } else if let Some(s) = &self.cone {
+        } else if let Some(s) = &self.session.cone {
             ReopenSession::Cone(s.clone())
-        } else if let Some(s) = &self.ellipsoid {
+        } else if let Some(s) = &self.session.ellipsoid {
             ReopenSession::Ellipsoid(s.clone())
-        } else if let Some(s) = &self.shape {
+        } else if let Some(s) = &self.session.shape {
             ReopenSession::Shape(s.clone())
-        } else if let Some(s) = &self.spike {
+        } else if let Some(s) = &self.session.spike {
             ReopenSession::Spike(s.clone())
         } else {
-            ReopenSession::Bridge(self.bridge.clone()?)
+            ReopenSession::Bridge(self.session.bridge.clone()?)
         };
         Some(TweakState {
             bevel_start: false,
@@ -301,12 +318,12 @@ impl Editor {
         self.identities.current = state.identities;
         self.identities.observe(&self.scene)?;
         match state.session {
-            ReopenSession::Live(l) => self.live = Some(*l),
-            ReopenSession::Cone(s) => self.cone = Some(s),
-            ReopenSession::Ellipsoid(s) => self.ellipsoid = Some(s),
-            ReopenSession::Shape(s) => self.shape = Some(s),
-            ReopenSession::Spike(s) => self.spike = Some(s),
-            ReopenSession::Bridge(s) => self.bridge = Some(s),
+            ReopenSession::Live(l) => self.session.live = Some(*l),
+            ReopenSession::Cone(s) => self.session.cone = Some(s),
+            ReopenSession::Ellipsoid(s) => self.session.ellipsoid = Some(s),
+            ReopenSession::Shape(s) => self.session.shape = Some(s),
+            ReopenSession::Spike(s) => self.session.spike = Some(s),
+            ReopenSession::Bridge(s) => self.session.bridge = Some(s),
         }
         Ok(())
     }
@@ -318,14 +335,14 @@ impl Editor {
     pub(crate) fn is_tweak(&self, cmd: &Command) -> bool {
         is_tweak_command(cmd)
             || (matches!(cmd, Command::Continue)
-                && self.live.as_ref().is_some_and(|l| {
+                && self.session.live.as_ref().is_some_and(|l| {
                     matches!(l.tool, Tool::Bevel | Tool::TwistBevel | Tool::EdgeExtend)
                 }))
     }
 
     /// Before a command: the state to keep if it starts a new tweak.
     pub(crate) fn tweak_before(&self, cmd: &Command) -> Option<Box<TweakStart>> {
-        if !self.is_tweak(cmd) || self.tweaks.open {
+        if !self.is_tweak(cmd) || self.session.tweaks.open {
             return None;
         }
         let mut state = self.session_snapshot()?;
@@ -353,7 +370,7 @@ impl Editor {
         if task.is_none() || task != before_task || self.history.history_serial != serial_before {
             // Closed, switched, or recorded a step (Apply): the tweaks are
             // in that step now.
-            self.tweaks = ToolTweaks::default();
+            self.session.tweaks = ToolTweaks::default();
             return;
         }
         if let Some(start) = start {
@@ -367,7 +384,7 @@ impl Editor {
             // A named step whose inner commands kept the same start under
             // the tool's name (a reset re-dispatching Preview) takes the
             // name instead of becoming a second step.
-            if let Some(last) = self.tweaks.undo.last_mut()
+            if let Some(last) = self.session.tweaks.undo.last_mut()
                 && start.state.named.is_some()
                 && last.named.is_none()
                 && (TweakState {
@@ -376,21 +393,21 @@ impl Editor {
                 }) == *last
             {
                 last.named = start.state.named.clone();
-            } else if changed && self.tweaks.undo.last() != Some(&start.state) {
-                self.tweaks.undo.push(start.state);
-                self.tweaks.redo.clear();
-                self.tweaks.open = true;
+            } else if changed && self.session.tweaks.undo.last() != Some(&start.state) {
+                self.session.tweaks.undo.push(start.state);
+                self.session.tweaks.redo.clear();
+                self.session.tweaks.open = true;
             }
         }
-        if !cmd_was_tweak || !self.tweak_held {
-            self.tweaks.open = false;
+        if !cmd_was_tweak || !self.session.tweak_held {
+            self.session.tweaks.open = false;
         }
     }
 
     /// A gesture ended: the next change starts a new tweak.
     pub fn end_tweak(&mut self) {
-        self.tweak_held = false;
-        self.tweaks.open = false;
+        self.session.tweak_held = false;
+        self.session.tweaks.open = false;
     }
 
     /// Undo the active tool's last tweak; the tool stays.
@@ -398,7 +415,7 @@ impl Editor {
         if self.tweak_session().is_none() {
             return Ok(None);
         }
-        let Some(state) = self.tweaks.undo.pop() else {
+        let Some(state) = self.session.tweaks.undo.pop() else {
             return Ok(None);
         };
         let mut now = self.session_snapshot().ok_or("No active tool")?;
@@ -407,8 +424,8 @@ impl Editor {
         now.named = state.named.clone();
         let label = now.session.label();
         self.restore_snapshot(state)?;
-        self.tweaks.redo.push(now);
-        self.tweaks.open = false;
+        self.session.tweaks.redo.push(now);
+        self.session.tweaks.open = false;
         Ok(Some(label))
     }
 
@@ -417,7 +434,7 @@ impl Editor {
         if self.tweak_session().is_none() {
             return Ok(None);
         }
-        let Some(state) = self.tweaks.redo.pop() else {
+        let Some(state) = self.session.tweaks.redo.pop() else {
             return Ok(None);
         };
         let mut now = self.session_snapshot().ok_or("No active tool")?;
@@ -425,8 +442,8 @@ impl Editor {
         now.named = state.named.clone();
         let label = now.session.label();
         self.restore_snapshot(state)?;
-        self.tweaks.undo.push(now);
-        self.tweaks.open = false;
+        self.session.tweaks.undo.push(now);
+        self.session.tweaks.open = false;
         Ok(Some(label))
     }
 
@@ -436,13 +453,14 @@ impl Editor {
         // Only the transform tools move their base along with each drag, and
         // Bevel and Edge Extend with each fresh one they stack; a primitive's base is the
         // session's start already.
-        if !self.live.as_ref().is_some_and(|l| {
+        if !self.session.live.as_ref().is_some_and(|l| {
             l.tool.is_transform()
                 || matches!(l.tool, Tool::Bevel | Tool::TwistBevel | Tool::EdgeExtend)
         }) {
             return None;
         }
-        self.tweaks
+        self.session
+            .tweaks
             .undo
             .first()
             .map(|s| (s.scene.clone(), s.identities.clone()))
@@ -462,7 +480,7 @@ impl Editor {
         base_ids: Option<IdentityScene>,
     ) {
         let mut starts = vec![(base, base_ids)];
-        for s in self.tweaks.undo.iter().filter(|s| s.bevel_start) {
+        for s in self.session.tweaks.undo.iter().filter(|s| s.bevel_start) {
             if starts.last().is_some_and(|(scene, _)| *scene != s.scene) {
                 starts.push((s.scene.clone(), Some(s.identities.clone())));
             }

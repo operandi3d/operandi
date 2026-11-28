@@ -224,7 +224,7 @@ impl Operandi {
 
     /// The live tool, when the layer claims `button` for it.
     pub(crate) fn haul_tool(&self, button: Button) -> Option<Tool> {
-        let tool = self.editor.live.as_ref()?.tool;
+        let tool = self.editor.session.live.as_ref()?.tool;
         haul::claims(tool, button).then_some(tool)
     }
 
@@ -232,15 +232,15 @@ impl Operandi {
     /// is live (GitHub #13).
     fn haul_session(&self, button: Button) -> Option<haul::Session> {
         use haul::Session;
-        if self.editor.live.is_some() {
+        if self.editor.session.live.is_some() {
             return None;
         }
-        let session = if self.editor.cone.is_some() {
+        let session = if self.editor.session.cone.is_some() {
             Session::Cone
-        } else if self.editor.ellipsoid.is_some() {
+        } else if self.editor.session.ellipsoid.is_some() {
             Session::Ellipsoid
         } else {
-            match self.editor.shape.as_ref()?.kind() {
+            match self.editor.session.shape.as_ref()?.kind() {
                 ShapeKind::Torus => Session::Torus,
                 ShapeKind::Capsule => Session::Capsule,
                 ShapeKind::Arc => Session::Arc,
@@ -357,7 +357,7 @@ impl Operandi {
 
     /// What a press with `button` that never moves does.
     pub(crate) fn haul_click(&self, button: Button, _mods: Modifiers) -> HaulClick {
-        let tool = self.editor.live.as_ref().map(|l| l.tool);
+        let tool = self.editor.session.live.as_ref().map(|l| l.tool);
         match (tool, button) {
             (Some(t), Button::Middle) if t.is_smooth_shift() => HaulClick::CloneSmoothShift,
             _ => HaulClick::Nothing,
@@ -367,7 +367,7 @@ impl Operandi {
     /// Whether `pos` is on the live tool's own on-screen control, which
     /// takes the press before the drag layer (DL-01).
     pub(crate) fn haul_on_tool_control(&self, pos: Pos2, r: Rect) -> bool {
-        match self.editor.live.as_ref() {
+        match self.editor.session.live.as_ref() {
             Some(l) if l.tool == Tool::LoopSlice => self.loop_slice_bar_hit(&l.params, pos, r),
             _ => false,
         }
@@ -379,6 +379,7 @@ impl Operandi {
             // LS-Q02: one bar pixel per screen pixel; the field is percent.
             let length = self
                 .editor
+                .session
                 .live
                 .as_ref()
                 .map_or(200., |l| l.params.slice.loop_slice.length.max(1.));

@@ -337,7 +337,7 @@ impl Bridge {
             ),
             def(
                 "render_settings_get",
-                "The scene's final-render settings: samples, denoise, adaptive_threshold, exposure (stops), the render camera and its picture size. Each field's unit is in units.",
+                "The scene's final-render settings: samples, denoise, adaptive_threshold, exposure (stops), Bloom and Glare (applied to the finished picture), the render camera and its picture size. Each field's unit is in units.",
                 json!({"type": "object", "properties": {}, "additionalProperties": false}),
             ),
             def(
@@ -762,7 +762,7 @@ impl Bridge {
             "revision": e.revision,
             "items": items,
             "selection": selection_json(e),
-            "live_tool": e.live.as_ref().map(|l| l.tool.label()),
+            "live_tool": e.session.live.as_ref().map(|l| l.tool.label()),
             "symmetry": {"axis": e.symmetry.axis, "offset": e.symmetry.offset},
             "undo": e.history.undo.iter().map(|c| c.label.as_str()).collect::<Vec<_>>(),
             "redo": e.history.redo.iter().rev().map(|c| c.label.as_str()).collect::<Vec<_>>(),
@@ -1408,11 +1408,14 @@ fn action_center(v: Option<&Value>) -> Result<Option<operandi_core::ActionContex
             CenterMode::Parent => AxisOrientation::Parent,
             CenterMode::Pivot if mode == "pivot_center_parent_axis" => AxisOrientation::Parent,
             CenterMode::Pivot => AxisOrientation::Item,
+            // Local is each cluster's own centre and its own axes.
+            CenterMode::Local => AxisOrientation::Local,
             _ => AxisOrientation::World,
         },
         Some("world") => AxisOrientation::World,
         Some("parent") => AxisOrientation::Parent,
         Some("item") => AxisOrientation::Item,
+        Some("local") => AxisOrientation::Local,
         Some("selection") => AxisOrientation::Selection,
         Some("workplane_xz") | Some("xz") => AxisOrientation::Workplane(0),
         Some("workplane_yz") | Some("yz") => AxisOrientation::Workplane(1),
@@ -1427,7 +1430,7 @@ fn action_center(v: Option<&Value>) -> Result<Option<operandi_core::ActionContex
         ),
         Some(other) => {
             return Err(format!(
-                "Unknown action axis {other}; use world, selection, xz, yz, xy, element, parent or item"
+                "Unknown action axis {other}; use world, selection, xz, yz, xy, element, parent, item or local"
             ));
         }
     };
@@ -1603,6 +1606,7 @@ fn curve_extrude_run(e: &mut Editor, params: Option<&Value>) -> Result<()> {
     };
     e.dispatch(Command::ActivatePreset("CurveExtrude".into()))?;
     let mut p = e
+        .session
         .live
         .as_ref()
         .map(|l| l.params.clone())
@@ -1911,6 +1915,7 @@ fn tool_run_with(
         e.dispatch(Command::AddedFalloffs(falloffs[1..].to_vec()))?;
     }
     let mut p = e
+        .session
         .live
         .as_ref()
         .map(|l| l.params.clone())
@@ -2067,7 +2072,8 @@ fn tool_run_with(
         _ => false,
     };
     if zero_apply {
-        e.live
+        e.session
+            .live
             .as_mut()
             .ok_or("The tool did not start a live session")?
             .params = p;

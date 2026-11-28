@@ -80,7 +80,12 @@ fn sketch_leg(a: &mut Operandi, ctx: &Context, heel: DVec3) {
     frame(a, ctx, vec![]);
 }
 fn centres(a: &Operandi) -> Vec<DVec3> {
-    a.editor.solid_sketch.as_ref().unwrap().world_centres()
+    a.editor
+        .session
+        .solid_sketch
+        .as_ref()
+        .unwrap()
+        .world_centres()
 }
 fn near(a: DVec3, b: DVec3) -> bool {
     a.abs_diff_eq(b, 1e-6)
@@ -99,7 +104,7 @@ fn sketch_node_clicked_in_left_view_keeps_the_heel_x() {
     let c = centres(&a);
     assert_eq!(c.len(), 3, "{}", a.status);
     assert!(near(c[2], toe), "toe at {:?}, wanted {toe:?}", c[2]);
-    let s = a.editor.solid_sketch.as_ref().unwrap();
+    let s = a.editor.session.solid_sketch.as_ref().unwrap();
     assert_eq!(
         s.sketch().nodes[2].parent,
         Some(1),

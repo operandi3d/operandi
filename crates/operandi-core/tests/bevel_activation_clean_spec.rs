@@ -42,7 +42,7 @@ fn zero_apply_builds_the_ring() {
 fn each_apply_bevels_again() {
     let mut e = cube_top_selected();
     e.dispatch(Command::Activate(Tool::Bevel)).unwrap();
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     p.inset = 0.1;
     e.dispatch(Command::ConfigureBevel(p)).unwrap();
     e.dispatch(Command::Apply).unwrap();

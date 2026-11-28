@@ -224,7 +224,7 @@ impl Operandi {
             ui.weak("Select an environment");
             return;
         };
-        let idle = self.editor.live.is_none();
+        let idle = self.editor.session.live.is_none();
         crate::form::rows::section(ui, ENVIRONMENT_TAB, false, |ui| {
             ui.gated_ui(
                 crate::unavailable::unless(idle, crate::unavailable::TOOL_ACTIVE),
@@ -321,7 +321,7 @@ impl Operandi {
         };
         let m = (*env.material.settings).clone();
         let d = EnvironmentMaterial::default();
-        let idle = self.editor.live.is_none();
+        let idle = self.editor.session.live.is_none();
         ui.strong(ENVIRONMENT_MATERIAL_TAB);
         self.env_material_name_row(ui, id, &env.material.name);
         crate::form::rows::section(ui, "Layer", false, |ui| {
@@ -951,7 +951,7 @@ impl Operandi {
         let Some(item) = self.editor.scene.item(id).cloned() else {
             return;
         };
-        let idle = self.editor.live.is_none();
+        let idle = self.editor.session.live.is_none();
         let busy = crate::unavailable::unless(idle, crate::unavailable::TOOL_ACTIVE);
         if ui.gated(busy, egui::Button::new("Rename…")).clicked() {
             rename();
@@ -1116,7 +1116,7 @@ impl Operandi {
             });
             if self.shading.layer_tab == LayerTab::TextureLocator {
                 let locator = t.locator;
-                let idle = self.editor.live.is_none();
+                let idle = self.editor.session.live.is_none();
                 ui.gated_ui(
                     crate::unavailable::unless(idle, crate::unavailable::TOOL_ACTIVE),
                     |ui| {
@@ -1129,7 +1129,7 @@ impl Operandi {
         let mut edited = node.clone();
         let mut continuing = false;
         let mut load_image_here = false;
-        let idle = self.editor.live.is_none();
+        let idle = self.editor.session.live.is_none();
         ui.gated_ui(crate::unavailable::unless(idle, crate::unavailable::TOOL_ACTIVE), |ui| {
             ui.spacing_mut().item_spacing.y = 2.;
             let key = Id::new(("env-layer-name", item, layer));

@@ -801,7 +801,9 @@ impl Operandi {
         let mut builder = egui::ViewportBuilder::default()
             .with_title("Preview")
             .with_inner_size(size)
-            .with_min_inner_size([320., 240.]);
+            .with_min_inner_size([320., 240.])
+            // UIC-189: above the main window, not above other apps.
+            .with_window_level(self.floating_window_level());
         if let Some(p) = position {
             builder = builder.with_position(p);
         }

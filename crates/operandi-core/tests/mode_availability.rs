@@ -80,7 +80,7 @@ fn mv03_surface_drop_then_mode_matches_existing_nested_boundary() {
             let mut e = fixture();
             e.dispatch(Command::Activate(tool)).unwrap();
             if substantive {
-                let mut p = e.live.as_ref().unwrap().params.clone();
+                let mut p = e.session.live.as_ref().unwrap().params.clone();
                 p.smooth_shift.offset = 0.1;
                 e.dispatch(Command::Preview(p)).unwrap();
             }
@@ -100,7 +100,7 @@ fn mv03_surface_drop_then_mode_matches_existing_nested_boundary() {
                 *e.presets.get::<operandi_core::ThickenPreset>(),
                 *manual.presets.get::<operandi_core::ThickenPreset>()
             );
-            assert!(e.live.is_none());
+            assert!(e.session.live.is_none());
             assert_eq!(e.revision, manual.revision);
             assert_eq!(e.identities.publication, manual.identities.publication + 1);
             assert_eq!(e.identities.request, manual.identities.request + 1);
@@ -119,13 +119,13 @@ fn mv03_surface_errors_and_cone_overlap_keep_authoritative_drop_order() {
     for tool in [Tool::SmoothShift, Tool::Thicken] {
         let mut e = fixture();
         e.dispatch(Command::Activate(tool)).unwrap();
-        e.live.as_mut().unwrap().preview_error = Some("surface invalid".into());
+        e.session.live.as_mut().unwrap().preview_error = Some("surface invalid".into());
         refusal(
             &mut e,
             "Correct the current stage or Cancel before Drop: surface invalid",
         );
         let target = e.scene.selection.item.unwrap();
-        e.cone = Some(NumericCone {
+        e.session.cone = Some(NumericCone {
             target,
             requested: Default::default(),
             preview: None,
@@ -138,7 +138,7 @@ fn mv03_surface_errors_and_cone_overlap_keep_authoritative_drop_order() {
         );
         // A raw overlap: Drop closes Cone, but the surface tool stays open,
         // so the mode change refuses and nothing changes.
-        e.cone.as_mut().unwrap().error = None;
+        e.session.cone.as_mut().unwrap().error = None;
         refusal(&mut e, "Finish the current tool before changing mode");
     }
 }
@@ -147,7 +147,7 @@ fn mv04_late_publication_failure_does_not_publish_mode_or_surface_drop() {
     let mut same = fixture();
     same.dispatch(Command::Activate(Tool::SmoothShift)).unwrap();
     same.dispatch(Command::Mode(Mode::Polygon)).unwrap();
-    assert!(same.live.is_none());
+    assert!(same.session.live.is_none());
     let mut e = fixture();
     e.identities.publication = u64::MAX;
     let before = e.clone();
@@ -195,7 +195,7 @@ fn mv04_route_queries_are_pure_and_never_a_cached_permit() {
         marks,
         (e.identities.next_id().unwrap(), e.i2.serial.next().unwrap())
     );
-    e.live.as_mut().unwrap().preview_error = Some("changed after presentation".into());
+    e.session.live.as_mut().unwrap().preview_error = Some("changed after presentation".into());
     assert_eq!(
         e.mode_route_eligibility(),
         ModeRouteEligibility::DropsToolFirst
@@ -205,7 +205,7 @@ fn mv04_route_queries_are_pure_and_never_a_cached_permit() {
         "Correct the current stage or Cancel before Drop: changed after presentation",
     );
     let target = e.scene.selection.item.unwrap();
-    e.cone = Some(NumericCone {
+    e.session.cone = Some(NumericCone {
         target,
         requested: Default::default(),
         preview: None,

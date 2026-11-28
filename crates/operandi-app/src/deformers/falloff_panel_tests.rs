@@ -26,7 +26,7 @@ fn app_with(tool: Tool) -> Operandi {
     a.editor.scene.selection.vertices = (0..n).collect();
     a.activate(tool);
     assert_eq!(
-        a.editor.live.as_ref().map(|l| l.tool),
+        a.editor.session.live.as_ref().map(|l| l.tool),
         Some(tool),
         "{}",
         a.status
@@ -150,7 +150,10 @@ fn linear_rows_and_custom_in_out() {
         a.editor.spatial_falloff,
         Some(Falloff::Linear(l)) if l.end == DVec3::new(0., 3., 0.)
     ));
-    assert_eq!(a.editor.live.as_ref().map(|l| l.tool), Some(Tool::Move));
+    assert_eq!(
+        a.editor.session.live.as_ref().map(|l| l.tool),
+        Some(Tool::Move)
+    );
 }
 
 /// FO-10/11/32: every layer gets its own section with Mix Mode; the first
@@ -220,7 +223,7 @@ fn falloff_sections_show_with_no_tool() {
     a.run(Command::SpatialFalloff(Some(Falloff::Selection(
         SelectionFalloff::default(),
     ))));
-    assert!(a.editor.live.is_none());
+    assert!(a.editor.session.live.is_none());
     assert_eq!(sections(&form(&a))[0].0, "Selection Falloff");
     // Nothing to show with no falloff.
     a.run(Command::SpatialFalloff(None));
@@ -250,7 +253,10 @@ fn escape_in_the_view_clears_the_falloff() {
     );
     assert_eq!(a.editor.spatial_falloff, None, "{}", a.status);
     assert!(a.editor.added_falloffs.is_empty());
-    assert_eq!(a.editor.live.as_ref().map(|l| l.tool), Some(Tool::Move));
+    assert_eq!(
+        a.editor.session.live.as_ref().map(|l| l.tool),
+        Some(Tool::Move)
+    );
 }
 
 fn right_press(a: &mut Operandi, ctx: &Context, from: Pos2, by: Vec2) {
@@ -299,7 +305,10 @@ fn right_click_adds_a_step_and_drags_change_steps() {
     assert_eq!(steps(&a), 3, "{}", a.status);
     right_press(&mut a, &ctx, from, vec2(45., 0.));
     assert_eq!(steps(&a), 5, "{}", a.status);
-    assert_eq!(a.editor.live.as_ref().map(|l| l.tool), Some(Tool::Move));
+    assert_eq!(
+        a.editor.session.live.as_ref().map(|l| l.tool),
+        Some(Tool::Move)
+    );
 }
 
 /// FO-20/21 (batch 1, built types): Add lists Invert, Linear, Radial,

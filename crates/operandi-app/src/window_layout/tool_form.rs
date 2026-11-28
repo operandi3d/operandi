@@ -1810,7 +1810,7 @@ mod tests {
                 sel.faces = vec![0];
             }
             a.activate(tool);
-            if a.editor.live.is_none() {
+            if a.editor.session.live.is_none() {
                 // Some need particular geometry to start (a bevelled strip,
                 // a point with three polygons); their rows are checked on
                 // a Move session standing in for them.
@@ -1832,16 +1832,20 @@ mod tests {
                     a.status
                 );
                 a.activate(Tool::Move);
-                a.editor.live.as_mut().unwrap().tool = tool;
+                a.editor.session.live.as_mut().unwrap().tool = tool;
             }
             assert!(
-                a.editor.live.as_ref().is_some_and(|l| l.tool == tool),
+                a.editor
+                    .session
+                    .live
+                    .as_ref()
+                    .is_some_and(|l| l.tool == tool),
                 "{tool:?} didn't start: {}",
                 a.status
             );
             if tool == Tool::VertexCreate {
                 // Its Position rows edit the last clicked point.
-                a.editor.live.as_mut().unwrap().params.sketch_path = vec![DVec3::ZERO];
+                a.editor.session.live.as_mut().unwrap().params.sketch_path = vec![DVec3::ZERO];
             }
             let kind = a.tool_panel_kind();
             assert_eq!(kind, live_panel(tool), "{tool:?}");
@@ -2026,12 +2030,12 @@ mod tests {
         let mut a = app_with("Push");
         a.fields.insert("push_distance".into(), "0.2".into());
         assert!(a.confirm_form::<LiveFields>());
-        assert_eq!(a.editor.live.as_ref().unwrap().params.shift, 0.2);
+        assert_eq!(a.editor.session.live.as_ref().unwrap().params.shift, 0.2);
         let mut a = app_with("Smooth");
         a.fields.insert("smooth_iterations".into(), "7".into());
         a.fields.insert("smooth_strength".into(), "0.5".into());
         assert!(a.confirm_form::<LiveFields>());
-        let s = &a.editor.live.as_ref().unwrap().params.smooth;
+        let s = &a.editor.session.live.as_ref().unwrap().params.smooth;
         assert_eq!((s.iterations, s.strength), (7, 0.5));
         a.fields.insert("smooth_iterations".into(), "2.5".into());
         assert!(!a.confirm_form::<LiveFields>());

@@ -45,7 +45,7 @@ fn near(a: DVec2, b: DVec2) -> bool {
 /// Start `tool`, change its parameters with `edit`, preview, drop.
 fn run(e: &mut Editor, tool: Tool, edit: impl FnOnce(&mut Parameters)) {
     e.dispatch(Command::Activate(tool)).unwrap();
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     edit(&mut p);
     e.dispatch(Command::Preview(p)).unwrap();
     e.dispatch(Command::Drop).unwrap();
@@ -229,7 +229,7 @@ fn uvt19_project_from_view_waits_for_a_click_then_writes_screen_positions() {
     let mut e = editor_with(grid(1, 1, 1., 1.), Mode::Polygon);
     e.dispatch(Command::Activate(Tool::UvViewProject)).unwrap();
     assert!(mesh(&e).uv_maps.is_empty(), "nothing before the click");
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     // Looking straight down -Y from above (orthographic): screen x = world
     // x, screen y = world -z.
     let rows = [
@@ -383,7 +383,7 @@ fn unwrap_tool_unwraps_live_and_is_one_undo_step() {
     e.dispatch(Command::Activate(Tool::UvUnwrap)).unwrap();
     // UVS-1 §1 Interaction: the result shows as soon as the tool is live.
     assert!(mesh(&e).uv_maps.contains_key("Texture"));
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     p.uv_unwrap.offset_angle = 90.;
     e.dispatch(Command::Preview(p)).unwrap();
     e.dispatch(Command::Drop).unwrap();

@@ -185,7 +185,7 @@ fn cylinder_caps_and_axis_through_the_editor() {
     let mut e = Editor::default();
     e.dispatch(Command::NewMesh).unwrap();
     e.dispatch(Command::Activate(Tool::Cylinder)).unwrap();
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     p.radial = Some(RadialParameters {
         radius: DVec3::new(0.5, 0.75, 0.5),
         sides: 8,
@@ -210,11 +210,11 @@ fn cylinder_caps_and_axis_through_the_editor() {
     e.dispatch(Command::Undo).unwrap();
     assert!(e.scene.active().unwrap().mesh.vertices.is_empty());
     e.dispatch(Command::Activate(Tool::Cylinder)).unwrap();
-    let p = &e.live.as_ref().unwrap().params;
+    let p = &e.session.live.as_ref().unwrap().params;
     assert_eq!(p.cylinder_caps, [CylinderCap::Quads, CylinderCap::Radial]);
     assert_eq!(p.radial_axis, 0);
     e.dispatch(Command::ResetPrimitive).unwrap();
-    let p = &e.live.as_ref().unwrap().params;
+    let p = &e.session.live.as_ref().unwrap().params;
     assert_eq!(p.cylinder_caps, [CylinderCap::Single; 2]);
     assert_eq!(p.radial_axis, 1);
 }
@@ -226,7 +226,7 @@ fn tessellated_sphere_through_the_editor() {
     let mut e = Editor::default();
     e.dispatch(Command::NewMesh).unwrap();
     e.dispatch(Command::Activate(Tool::Sphere)).unwrap();
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     p.radial = Some(RadialParameters {
         radius: DVec3::new(0.5, 0.5, 1.),
         sides: 8,
@@ -246,6 +246,6 @@ fn tessellated_sphere_through_the_editor() {
     );
     e.dispatch(Command::Drop).unwrap();
     e.dispatch(Command::Activate(Tool::Sphere)).unwrap();
-    let p = &e.live.as_ref().unwrap().params;
+    let p = &e.session.live.as_ref().unwrap().params;
     assert_eq!((p.sphere_level, p.radial_axis), (Some(1), 2));
 }

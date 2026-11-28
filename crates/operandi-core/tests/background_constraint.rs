@@ -106,7 +106,7 @@ fn move_by(e: &mut Editor, delta: DVec3) {
     e.dispatch(Command::Activate(Tool::Move)).unwrap();
     e.dispatch(Command::Preview(Parameters {
         delta,
-        ..e.live.as_ref().unwrap().params.clone()
+        ..e.session.live.as_ref().unwrap().params.clone()
     }))
     .unwrap();
 }
@@ -186,11 +186,11 @@ fn turning_it_on_keeps_the_tool_and_reapplies() {
     move_by(&mut e, DVec3::new(0.1, 0., 0.));
     close(point(&e, fg, 0), DVec3::new(0.4, 0.2, 5.));
     on(&mut e, BackgroundConstraint::default());
-    assert_eq!(e.live.as_ref().map(|l| l.tool), Some(Tool::Move));
+    assert_eq!(e.session.live.as_ref().map(|l| l.tool), Some(Tool::Move));
     close(point(&e, fg, 0), DVec3::new(0.4, 0.2, 0.));
     // Off again: the live tool moves the point freely.
     e.dispatch(Command::BackgroundConstraint(None)).unwrap();
-    assert_eq!(e.live.as_ref().map(|l| l.tool), Some(Tool::Move));
+    assert_eq!(e.session.live.as_ref().map(|l| l.tool), Some(Tool::Move));
     close(point(&e, fg, 0), DVec3::new(0.4, 0.2, 5.));
     // The options come back next time.
     assert_eq!(
@@ -238,7 +238,7 @@ fn element_move_slides_over_the_background() {
     });
     e.dispatch(Command::Activate(Tool::Tweak)).unwrap();
     for step in 1..=5 {
-        let mut p = e.live.as_ref().unwrap().params.clone();
+        let mut p = e.session.live.as_ref().unwrap().params.clone();
         p.tweak = Some(TweakGrab {
             item: fg,
             element: TweakElement::Vertex(0),
@@ -270,7 +270,8 @@ fn pen_points_land_on_the_background() {
         e.dispatch(Command::PenCapture(p)).unwrap();
     }
     assert!(
-        e.pen_draft
+        e.session
+            .pen_draft
             .as_ref()
             .unwrap()
             .points()
@@ -281,7 +282,7 @@ fn pen_points_land_on_the_background() {
     e.dispatch(Command::PenRefine(DVec3::new(0.6, 0.6, 3.)))
         .unwrap();
     close(
-        e.pen_draft.as_ref().unwrap().points()[2],
+        e.session.pen_draft.as_ref().unwrap().points()[2],
         DVec3::new(0.6, 0.6, 0.),
     );
     e.dispatch(Command::Drop).unwrap();
@@ -424,7 +425,7 @@ fn frame_cost(subd_level: Option<u8>) {
         let t = std::time::Instant::now();
         e.dispatch(Command::Preview(Parameters {
             delta: DVec3::new(0.001 * k as f64, 0., 0.),
-            ..e.live.as_ref().unwrap().params.clone()
+            ..e.session.live.as_ref().unwrap().params.clone()
         }))
         .unwrap();
         frames.push(t.elapsed().as_secs_f64() * 1e3);
@@ -470,7 +471,7 @@ fn make_quads_partners_land_on_the_background() {
     on(&mut e, BackgroundConstraint::default());
     e.set_constraint_view(ConstraintView::default());
     e.dispatch(Command::PenStart).unwrap();
-    let mut o = e.pen_draft.as_ref().unwrap().options();
+    let mut o = e.session.pen_draft.as_ref().unwrap().options();
     o.make_quads = true;
     e.dispatch(Command::PenOptions(o)).unwrap();
     // Starting edge drawn at two heights; the next click's partner is
@@ -483,7 +484,7 @@ fn make_quads_partners_land_on_the_background() {
         .unwrap();
     e.dispatch(Command::PenCaptureEnd(DVec3::new(0.6, 0.1, 4.)))
         .unwrap();
-    let pts = e.pen_draft.as_ref().unwrap().points().to_vec();
+    let pts = e.session.pen_draft.as_ref().unwrap().points().to_vec();
     assert_eq!(pts.len(), 5);
     assert!(pts.iter().all(|p| p.z.abs() < 1e-12), "{pts:?}");
     close(pts[3], DVec3::new(0.3, 0.3, 0.));
@@ -511,7 +512,7 @@ fn round_an_eye(eye: Mesh) {
     on(&mut e, BackgroundConstraint::default());
     e.set_constraint_view(ConstraintView::default());
     e.dispatch(Command::PenStart).unwrap();
-    let mut o = e.pen_draft.as_ref().unwrap().options();
+    let mut o = e.session.pen_draft.as_ref().unwrap().options();
     o.make_quads = true;
     e.dispatch(Command::PenOptions(o)).unwrap();
     let at = |r: f64, degrees: f64| {
@@ -524,7 +525,7 @@ fn round_an_eye(eye: Mesh) {
         e.dispatch(Command::PenCapture(at(0.4, 20. * k as f64)))
             .unwrap();
     }
-    let pts = e.pen_draft.as_ref().unwrap().points().to_vec();
+    let pts = e.session.pen_draft.as_ref().unwrap().points().to_vec();
     let sphere_radius = |p: DVec3| p.length();
     for k in 1..pts.len() / 2 {
         let (l, r) = (pts[2 * k], pts[2 * k + 1]);

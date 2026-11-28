@@ -17,7 +17,7 @@ fn live(mode: Mode, tool: Tool, select: impl FnOnce(&mut Operandi)) -> Operandi 
     select(&mut a);
     a.activate(tool);
     draw(&mut a, &ctx, SIZE, vec![]);
-    assert!(a.editor.live.is_some(), "{tool:?}: {}", a.status);
+    assert!(a.editor.session.live.is_some(), "{tool:?}: {}", a.status);
     a
 }
 
@@ -148,11 +148,11 @@ fn edge_bevel_has_a_support_edges_handle() {
     }
     assert!(a.handle_axis(1).dot(a.handle_axis(0)).abs() < 1e-6);
     let mut faces = |support: f64| {
-        let mut p = a.editor.live.as_ref().unwrap().params.clone();
+        let mut p = a.editor.session.live.as_ref().unwrap().params.clone();
         p.chamfer.offset = 0.2;
         p.edge_bevel.support = support;
         a.run(Command::Preview(p));
-        assert!(a.editor.live.is_some(), "{}", a.status);
+        assert!(a.editor.session.live.is_some(), "{}", a.status);
         a.editor.scene.active().unwrap().mesh.faces.len()
     };
     let plain = faces(0.);
@@ -174,12 +174,19 @@ fn edge_bevel_mitering_field_and_script_attribute() {
     let plain = mesh(&a).faces.len();
     a.fields.insert("ebc_mitering".into(), "0.1 m".into());
     assert!(a.confirm_fields(), "{}", a.status);
-    let live = a.editor.live.as_ref().unwrap();
+    let live = a.editor.session.live.as_ref().unwrap();
     assert_eq!(live.params.edge_bevel.support, 0.1);
     assert!(mesh(&a).faces.len() > plain, "Mitering adds polygons");
     a.execute("tool.attr edge.bevel mitering 0.05");
     assert_eq!(
-        a.editor.live.as_ref().unwrap().params.edge_bevel.support,
+        a.editor
+            .session
+            .live
+            .as_ref()
+            .unwrap()
+            .params
+            .edge_bevel
+            .support,
         0.05
     );
     assert_eq!(
@@ -189,7 +196,14 @@ fn edge_bevel_mitering_field_and_script_attribute() {
     a.execute("tool.attr edge.bevel mitering -1");
     assert!(a.status.contains("Mitering"), "{}", a.status);
     assert_eq!(
-        a.editor.live.as_ref().unwrap().params.edge_bevel.support,
+        a.editor
+            .session
+            .live
+            .as_ref()
+            .unwrap()
+            .params
+            .edge_bevel
+            .support,
         0.05
     );
 }
@@ -204,7 +218,16 @@ fn edge_bevel_loop_slide_checkbox_and_script_attribute() {
     let mut a = live(Mode::Edge, Tool::EdgeBevel, |a| {
         a.editor.scene.selection.edges = vec![e1, e2];
     });
-    let on = |a: &Operandi| a.editor.live.as_ref().unwrap().params.edge_bevel.loop_slide;
+    let on = |a: &Operandi| {
+        a.editor
+            .session
+            .live
+            .as_ref()
+            .unwrap()
+            .params
+            .edge_bevel
+            .loop_slide
+    };
     assert!(on(&a), "on by default");
     a.execute("tool.attr edge.bevel loopSlide ?");
     assert_eq!(a.status, "1");
@@ -245,7 +268,16 @@ fn edge_bevel_corner_pattern_field_and_script_attribute() {
     let mut a = live(Mode::Edge, Tool::EdgeBevel, |a| {
         a.editor.scene.selection.edges = vec![e1, e2, third];
     });
-    let corner = |a: &Operandi| a.editor.live.as_ref().unwrap().params.edge_bevel.corner;
+    let corner = |a: &Operandi| {
+        a.editor
+            .session
+            .live
+            .as_ref()
+            .unwrap()
+            .params
+            .edge_bevel
+            .corner
+    };
     assert_eq!(corner(&a), operandi_core::CornerPattern::Balanced);
     a.fields.insert("chamfer_offset".into(), "0.2 m".into());
     a.fields.insert("chamfer_segments".into(), "3".into());
@@ -315,11 +347,11 @@ fn edge_bevel_bevel_and_mitering_combine_and_the_handles_follow() {
         let start = a.handles(r)[0].1;
         for &axis in &order {
             let h = a.handles(r).into_iter().find(|h| h.0 == axis).unwrap();
-            let params = a.editor.live.as_ref().unwrap().params.clone();
+            let params = a.editor.session.live.as_ref().unwrap().params.clone();
             let to = h.2 + (h.2 - h.1).normalized() * 30.;
             a.update_handle(h.0, params, h.2, to, Tool::EdgeBevel, r);
         }
-        let p = &a.editor.live.as_ref().unwrap().params;
+        let p = &a.editor.session.live.as_ref().unwrap().params;
         assert!(
             p.chamfer.offset > 0. && p.edge_bevel.support > 0.,
             "{order:?}: {}",
@@ -417,7 +449,7 @@ mod panel_bevel_and_mitering {
         frame(&mut a, ctx, vec![Event::PointerMoved(c), key(Key::B)]);
         frame(&mut a, ctx, vec![]);
         assert_eq!(
-            a.editor.live.as_ref().map(|l| l.tool),
+            a.editor.session.live.as_ref().map(|l| l.tool),
             Some(Tool::EdgeBevel)
         );
         a
@@ -429,7 +461,7 @@ mod panel_bevel_and_mitering {
             a.field_errors,
             a.status
         );
-        let p = &a.editor.live.as_ref().expect("still live").params;
+        let p = &a.editor.session.live.as_ref().expect("still live").params;
         (p.chamfer.offset, p.edge_bevel.support)
     }
     fn faces(a: &Operandi) -> usize {

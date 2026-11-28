@@ -49,7 +49,7 @@ fn scale_changes_the_noise_under_a_live_scale() {
         NoiseFalloff::default(),
     ))));
     a.activate(Tool::Scale);
-    let mut p = a.editor.live.as_ref().unwrap().params.clone();
+    let mut p = a.editor.session.live.as_ref().unwrap().params.clone();
     p.scale_delta = DVec3::splat(1.);
     a.run(Command::Preview(p));
     let one = points(&a);
@@ -82,7 +82,7 @@ fn typing_a_falloff_value_under_a_live_tool_confirms_it() {
     assert_eq!(noise(&a), 0.37);
     // The same with no tool open: the falloff rows are the whole panel.
     a.run(Command::Drop);
-    assert!(a.editor.live.is_none());
+    assert!(a.editor.session.live.is_none());
     a.fields.insert(scale_key().into(), "2 m".into());
     assert!(a.confirm_fields(), "{}", a.status);
     assert_eq!(noise(&a), 2.);

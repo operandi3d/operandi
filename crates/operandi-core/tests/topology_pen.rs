@@ -102,14 +102,14 @@ fn tp10_options_stick_within_the_session() {
     let (mut e, _) = scene_with(grid(1, 1, 0.1));
     e.dispatch(Command::ActivatePreset("mesh.topology".into()))
         .unwrap();
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     p.topology_pen.mode = PenMode::Fill;
     p.tweak_options.range = 0.5; // the falloff is edited in Tweak's options
     e.dispatch(Command::Preview(p)).unwrap();
     e.dispatch(Command::Drop).unwrap();
     e.dispatch(Command::ActivatePreset("mesh.topology".into()))
         .unwrap();
-    let p = &e.live.as_ref().unwrap().params;
+    let p = &e.session.live.as_ref().unwrap().params;
     assert_eq!(p.topology_pen.mode, PenMode::Fill);
     assert_eq!(p.tweak_options.range, 0.5, "the falloff drives Move");
 }

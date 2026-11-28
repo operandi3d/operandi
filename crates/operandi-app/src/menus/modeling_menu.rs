@@ -373,7 +373,7 @@ mod tests {
             );
             assert_eq!(a.editor.scene, scene, "no selection change");
             assert_eq!(a.editor.history.undo.len(), history);
-            assert!(a.editor.live.is_none());
+            assert!(a.editor.session.live.is_none());
         }
     }
 

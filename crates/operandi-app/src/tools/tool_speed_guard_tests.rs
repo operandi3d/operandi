@@ -288,7 +288,7 @@ fn every_tool_drag_stays_on_the_fast_path() {
         }
         super::tests::draw(&mut a, &ctx, size, vec![]);
         a.activate(tool);
-        let Some(mut base) = a.editor.live.as_ref().map(|l| l.params.clone()) else {
+        let Some(mut base) = a.editor.session.live.as_ref().map(|l| l.params.clone()) else {
             failures.push(format!("{tool:?}: didn't activate ({})", a.status));
             continue;
         };
@@ -378,7 +378,14 @@ fn flex_drag_stays_on_the_fast_path() {
         .collect();
     super::tests::draw(&mut a, &ctx, size, vec![]);
     a.activate_deform(operandi_core::DeformPreset::Flex);
-    let base = a.editor.live.as_ref().expect("Flex is live").params.clone();
+    let base = a
+        .editor
+        .session
+        .live
+        .as_ref()
+        .expect("Flex is live")
+        .params
+        .clone();
     let frame = |a: &mut Operandi, k: f64| {
         let mut p = base.clone();
         p.rotation_delta.x = 2. * k;
@@ -427,6 +434,7 @@ fn flare_drag_stays_on_the_fast_path() {
     a.activate_preset("Flare");
     let base = a
         .editor
+        .session
         .live
         .as_ref()
         .expect("Flare is live")
@@ -704,7 +712,7 @@ fn item_transform_drags_stay_on_the_fast_path() {
         a.run(Command::Mode(Mode::Item));
         super::tests::draw(&mut a, &ctx, size, vec![]);
         a.activate(tool);
-        let Some(base) = a.editor.live.as_ref().map(|l| l.params.clone()) else {
+        let Some(base) = a.editor.session.live.as_ref().map(|l| l.params.clone()) else {
             failures.push(format!("{tool:?}: didn't activate ({})", a.status));
             continue;
         };
@@ -785,7 +793,7 @@ fn scene_changes_under_a_resting_pointer_keep_the_picking_surface() {
     let over = a.viewport_rect.center();
     super::tests::draw(&mut a, &ctx, size, vec![Event::PointerMoved(over)]);
     a.activate(Tool::Move);
-    let base = a.editor.live.as_ref().unwrap().params.clone();
+    let base = a.editor.session.live.as_ref().unwrap().params.clone();
     let frame = |a: &mut Operandi, k: f64| {
         let mut p = base.clone();
         p.delta.x = 0.01 * k;
@@ -995,7 +1003,7 @@ fn whole_mesh_component_drags_draw_the_cached_mesh() {
         a.editor.scene.selection.faces.clear();
         super::tests::draw(&mut a, &ctx, size, vec![]);
         a.activate(tool);
-        let Some(base) = a.editor.live.as_ref().map(|l| l.params.clone()) else {
+        let Some(base) = a.editor.session.live.as_ref().map(|l| l.params.clone()) else {
             failures.push(format!("{tool:?}: didn't activate ({})", a.status));
             continue;
         };
@@ -1101,6 +1109,7 @@ fn loop_slice_drag_work_stays_near_the_ring() {
     a.activate(Tool::LoopSlice);
     let base = a
         .editor
+        .session
         .live
         .as_ref()
         .expect("Loop Slice active")
@@ -1246,7 +1255,7 @@ fn image_layer_drags_compile_and_upload_nothing() {
         }
         super::tests::draw(&mut a, &ctx, size, vec![]);
         a.activate(tool);
-        let Some(base) = a.editor.live.as_ref().map(|l| l.params.clone()) else {
+        let Some(base) = a.editor.session.live.as_ref().map(|l| l.params.clone()) else {
             failures.push(format!("{tool:?} {mode:?}: didn't activate"));
             continue;
         };
@@ -1353,7 +1362,7 @@ fn live_patch_redraw_stays_on_the_fast_path() {
     a.editor.scene.selection.vertices = vec![4];
     super::tests::draw(&mut a, &ctx, size, vec![]);
     a.activate(Tool::Move);
-    let base = a.editor.live.as_ref().unwrap().params.clone();
+    let base = a.editor.session.live.as_ref().unwrap().params.clone();
     let frame = |a: &mut Operandi, k: f64| {
         let mut p = base.clone();
         p.delta.y = 0.01 * k;

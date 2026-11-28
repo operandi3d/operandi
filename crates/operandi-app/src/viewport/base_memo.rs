@@ -1,41 +1,8 @@
 //! Values computed once per drag from the live tool's base scene (handle
-//! frames, rails), and the Local handle frame that uses one.
+//! frames, rails). The transform tools' own handle frame comes from the
+//! pivot service (`Editor::handle_frame`), which keeps its answer per drag
+//! base itself.
 use super::*;
-
-impl Operandi {
-    /// AC-75: the Local handle's frame (on the last selected element's
-    /// cluster) for the live Move, Rotate, Scale or Transform tool: the
-    /// pivot service's answer, once per drag base.
-    pub(crate) fn local_handle_frame(&self) -> Option<operandi_core::ActionFrame> {
-        let l = self.editor.live.as_ref()?;
-        let context = self.editor.action_context;
-        if context.center != CenterMode::Local
-            || !matches!(
-                l.tool,
-                Tool::Move | Tool::Rotate | Tool::Scale | Tool::Transform
-            )
-        {
-            return None;
-        }
-        let memo = &self.local_handle_memo;
-        let stale = matches!(&*memo.0.borrow(), Some((_, (at, _))) if *at != context);
-        if stale {
-            *memo.0.borrow_mut() = None;
-        }
-        memo.get(&l.base, || {
-            (
-                context,
-                self.editor
-                    .pivot_request(&l.base, l.tool)
-                    .local_handle_frame(),
-            )
-        })
-        .1
-    }
-    pub(crate) fn local_handle_basis(&self) -> Option<glam::DMat3> {
-        self.local_handle_frame().map(|f| f.basis)
-    }
-}
 
 /// A value derived only from a live tool's base scene (the scene before the
 /// drag), such as a handle frame. The base stays the same for the whole drag,

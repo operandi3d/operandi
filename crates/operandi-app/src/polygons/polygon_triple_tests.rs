@@ -283,7 +283,7 @@ fn tri_004_routes_preserve_another_tools_field_draft_on_refusal() {
     let ctx = context();
     let mut a = app(&source);
     a.execute("spike");
-    assert!(a.editor.spike.is_some(), "{}", a.status);
+    assert!(a.editor.session.spike.is_some(), "{}", a.status);
     a.fields
         .insert("spi_strength".into(), "not a number".into());
     let editor = a.editor.clone();

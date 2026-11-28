@@ -203,7 +203,7 @@ pub(crate) fn align_mesh(source: &Mesh, faces: &BTreeSet<usize>) -> Result<Mesh>
 impl Editor {
     /// Resolve the active mesh id and the face to reverse without mutation.
     fn align_target(&self) -> Result<(u64, BTreeSet<usize>)> {
-        if self.i2_active() || self.pen_draft.is_some() {
+        if self.i2_active() || self.session.pen_draft.is_some() {
             return Err("Finish or Cancel the active tool before Align".into());
         }
         self.require_idle()?;

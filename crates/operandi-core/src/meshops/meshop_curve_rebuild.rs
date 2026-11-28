@@ -5,8 +5,8 @@
 //! Provisional (MOQ-46): the rebuilt curve is a Curve through the new
 //! points (a line stays a line); an open curve keeps both its end points,
 //! a closed one starts where it started. Points are spaced by length along
-//! the drawn shape. Curve Rebuild Spans (`curve.rebuildSpan`), with its
-//! offsets and falloffs, isn't built.
+//! the drawn shape. Curve Rebuild Spans (`curve.rebuildSpan`) is its own
+//! op (meshop_curve_rebuild_spans.rs).
 use crate::curves::{self, CurveKind};
 use crate::mesh_stack_builtin::{choice, count, distance};
 use crate::meshop_curve_common::{chosen_curves, drop_faces, kind_of, points_of, push_curve};

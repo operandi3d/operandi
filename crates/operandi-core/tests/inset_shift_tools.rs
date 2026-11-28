@@ -21,7 +21,7 @@ fn mesh(e: &Editor) -> Mesh {
 
 fn run(e: &mut Editor, tool: Tool, amount: f64) {
     e.dispatch(Command::Activate(tool)).unwrap();
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     if tool == Tool::Inset {
         p.inset = amount;
     } else {
@@ -123,7 +123,7 @@ fn cancel_and_refusals_leave_the_scene_unchanged() {
         run(&mut e, tool, 0.3);
         e.dispatch(Command::Cancel).unwrap();
         assert!(mesh(&e) == before);
-        assert!(e.live.is_none());
+        assert!(e.session.live.is_none());
         // Polygon mode only.
         e.scene.selection.mode = Mode::Edge;
         assert!(e.dispatch(Command::Activate(tool)).is_err());
@@ -131,7 +131,7 @@ fn cancel_and_refusals_leave_the_scene_unchanged() {
         e.scene.selection.mode = Mode::Polygon;
         run(&mut e, tool, 0.2);
         let shown = mesh(&e);
-        let mut p = e.live.as_ref().unwrap().params.clone();
+        let mut p = e.session.live.as_ref().unwrap().params.clone();
         p.inset = f64::NAN;
         p.shift = f64::NAN;
         assert!(e.dispatch(Command::Preview(p)).is_err());
@@ -155,11 +155,16 @@ fn each_tweak_is_its_own_undo_step_inside_the_tool() {
     e.scene.selection.faces = vec![0];
     run(&mut e, Tool::Inset, 0.1);
     let first = mesh(&e);
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     p.inset = 0.3;
     e.dispatch(Command::Preview(p)).unwrap();
     e.dispatch(Command::Undo).unwrap();
-    assert!(e.live.as_ref().is_some_and(|l| l.tool == Tool::Inset));
+    assert!(
+        e.session
+            .live
+            .as_ref()
+            .is_some_and(|l| l.tool == Tool::Inset)
+    );
     assert!(mesh(&e) == first);
-    assert_eq!(e.live.as_ref().unwrap().params.inset, 0.1);
+    assert_eq!(e.session.live.as_ref().unwrap().params.inset, 0.1);
 }

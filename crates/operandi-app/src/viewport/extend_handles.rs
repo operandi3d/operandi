@@ -77,7 +77,7 @@ impl Operandi {
     /// first neighbouring polygon in the extension's base: Inset outward
     /// in its plane, Shift along its normal (as the geometry uses them).
     pub(crate) fn extend_local_axes(&self) -> Option<(DVec3, DVec3)> {
-        let l = self.editor.live.as_ref()?;
+        let l = self.editor.session.live.as_ref()?;
         let item = l.base.active()?;
         let world = l.base.world_matrix(item.id).ok()?;
         let &(a, b) = l.base.selection.edges.first()?;

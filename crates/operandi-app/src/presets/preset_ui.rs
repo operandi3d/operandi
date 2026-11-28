@@ -245,6 +245,10 @@ impl Operandi {
         if self.environment_canonical(&args) {
             return true;
         }
+        // Browse… on an Image Map layer (shading_panel.rs).
+        if self.texture_load_image_canonical(&args) {
+            return true;
+        }
         if first == "help" && args.len() == 2 {
             let topic = args[1].to_ascii_lowercase();
             if let Some((_, help)) = COMMANDS.iter().find(|(c, _)| *c == topic) {

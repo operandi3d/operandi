@@ -47,6 +47,7 @@ pub(crate) struct BendDrag {
 impl Operandi {
     fn bend_params(&self) -> Option<Parameters> {
         self.editor
+            .session
             .live
             .as_ref()
             .filter(|l| l.tool == Tool::Bend && !self.editor.is_armed())

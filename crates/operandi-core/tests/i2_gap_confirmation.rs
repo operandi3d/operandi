@@ -158,9 +158,9 @@ fn check(e: &Editor, name: &str) {
         roles(&a.plan, &b["correspondence"]);
     }
     if v["live"].is_null() {
-        assert!(e.live.is_none())
+        assert!(e.session.live.is_none())
     } else {
-        let a = e.live.as_ref().unwrap();
+        let a = e.session.live.as_ref().unwrap();
         let b = &v["live"];
         assert_eq!(a.tool.label(), b["tool"].as_str().unwrap());
         assert_eq!(a.applied, b["applied"].as_bool().unwrap());
@@ -210,9 +210,9 @@ fn check(e: &Editor, name: &str) {
         v["stage_bank_next"].as_u64().unwrap()
     );
     assert!(
-        e.cone.is_none()
-            && e.spike.is_none()
-            && e.ellipsoid.is_none()
+        e.session.cone.is_none()
+            && e.session.spike.is_none()
+            && e.session.ellipsoid.is_none()
             && e.selection_start.is_none()
     );
     let selected = e
@@ -225,7 +225,7 @@ fn check(e: &Editor, name: &str) {
     exact(&json!(selected), &v["ordered_selected_face_ids"]);
     let roots = 1
         + 2 * (e.history.undo.len() + e.history.redo.len())
-        + usize::from(e.live.is_some())
+        + usize::from(e.session.live.is_some())
         + e.i2
             .selected
             .as_ref()
@@ -400,14 +400,14 @@ fn fixed_other_tool_applied_move_redo_guard_and_legacy_ids() {
             1,
             1,
         );
-        let mut bad = e.live.as_ref().unwrap().params.clone();
+        let mut bad = e.session.live.as_ref().unwrap().params.clone();
         bad.delta.x = f64::NAN;
         let before = e.clone();
         assert!(e.dispatch(Command::Preview(bad)).is_err());
         assert!(e == before);
         drop(before);
         check(&e, "otherMoveArmed");
-        let mut p = e.live.as_ref().unwrap().params.clone();
+        let mut p = e.session.live.as_ref().unwrap().params.clone();
         p.delta = DVec3::X * 0.25;
         dispatch(&mut e, Command::Preview(p), "otherMoveApplied", 2, 2);
         // Undo is available with Move live (Jason, 2026-11-03); Redo over
@@ -447,7 +447,7 @@ fn fixed_other_tool_applied_move_redo_guard_and_legacy_ids() {
                         (e.identities.publication - a, e.identities.request - b),
                         (1, 1)
                     );
-                    assert_eq!(e.live.as_ref().map(|l| l.tool), Some(Tool::Move));
+                    assert_eq!(e.session.live.as_ref().map(|l| l.tool), Some(Tool::Move));
                     check(&e, state);
                 }
             }

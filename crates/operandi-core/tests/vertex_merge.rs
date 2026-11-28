@@ -280,7 +280,7 @@ fn the_merge_tool_starts_at_its_values_merges_at_the_average_and_undoes() {
     let mut e = editor(three_near(), vec![0, 3, 6]);
     let before = e.scene.clone();
     e.dispatch(Command::Activate(Tool::VertexMerge)).unwrap();
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     // G13: Distance 0.001, both options off.
     assert_eq!(
         (
@@ -318,7 +318,7 @@ fn the_merge_tool_keeps_squashed_polygons_when_asked() {
     );
     let mut e = editor(tri, vec![0, 1]);
     e.dispatch(Command::Activate(Tool::VertexMerge)).unwrap();
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     p.shift = 0.1;
     p.vertex_merge_keep_small = true;
     e.dispatch(Command::Preview(p)).unwrap();

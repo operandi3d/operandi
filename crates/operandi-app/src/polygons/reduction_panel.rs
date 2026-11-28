@@ -34,6 +34,7 @@ impl Operandi {
     ) -> Result<()> {
         let mut p = self
             .editor
+            .session
             .reduction
             .as_ref()
             .ok_or("Activate Polygon Reduction first")?
@@ -45,7 +46,7 @@ impl Operandi {
     }
     /// Target, current and actual counts are reported separately (RED-002).
     pub(super) fn reduction_status(&self) -> String {
-        let Some(s) = &self.editor.reduction else {
+        let Some(s) = &self.editor.session.reduction else {
             return "Ready".into();
         };
         let requested = s.parameters.number;
@@ -67,7 +68,7 @@ impl Operandi {
     }
     /// `tool.attr poly.reduct <attribute> <value|?>`.
     pub(super) fn reduction_property(&mut self, attr: &str, value: &str) {
-        let Some(s) = self.editor.reduction.as_ref() else {
+        let Some(s) = self.editor.session.reduction.as_ref() else {
             self.status = "Activate Polygon Reduction first".into();
             return;
         };
@@ -115,10 +116,10 @@ pub(super) struct ReductionFields;
 impl ToolFields for ReductionFields {
     type P = ReductionParameters;
     fn params(app: &Operandi) -> Option<ReductionParameters> {
-        app.editor.reduction.as_ref().map(|s| s.parameters)
+        app.editor.session.reduction.as_ref().map(|s| s.parameters)
     }
     fn form(app: &Operandi, _: &ReductionParameters) -> ToolForm<ReductionParameters> {
-        let Some(s) = &app.editor.reduction else {
+        let Some(s) = &app.editor.session.reduction else {
             return ToolForm::new();
         };
         let mut f = ToolForm::new();

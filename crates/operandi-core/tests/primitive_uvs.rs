@@ -102,7 +102,7 @@ fn cube_faces_fill_their_own_tiles() {
 fn draw(e: &mut Editor, tool: Tool, uvs: bool) {
     e.dispatch(Command::Activate(tool)).unwrap();
     e.dispatch(Command::PrimitiveUvs(uvs)).unwrap();
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     p.size = DVec3::splat(2.);
     e.dispatch(Command::Preview(p)).unwrap();
     e.dispatch(Command::Drop).unwrap();
@@ -136,19 +136,19 @@ fn make_uvs_is_kept_between_uses_and_reset_turns_it_back_on() {
         let mut e = editor();
         assert!(e.dispatch(Command::Activate(tool)).is_ok());
         assert!(
-            e.live.as_ref().unwrap().params.make_uvs,
+            e.session.live.as_ref().unwrap().params.make_uvs,
             "{tool:?} default on"
         );
         e.dispatch(Command::Cancel).unwrap();
         draw(&mut e, tool, false);
         e.dispatch(Command::Activate(tool)).unwrap();
         assert!(
-            !e.live.as_ref().unwrap().params.make_uvs,
+            !e.session.live.as_ref().unwrap().params.make_uvs,
             "{tool:?} kept off"
         );
         e.dispatch(Command::ResetPrimitive).unwrap();
         assert!(
-            e.live.as_ref().unwrap().params.make_uvs,
+            e.session.live.as_ref().unwrap().params.make_uvs,
             "{tool:?} reset on"
         );
         e.dispatch(Command::Cancel).unwrap();

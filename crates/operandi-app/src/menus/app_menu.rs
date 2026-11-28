@@ -51,6 +51,10 @@ pub(crate) fn action_line(index: u32) -> Option<String> {
     let lines = LINES.lock().unwrap_or_else(|e| e.into_inner());
     lines.list.get(index as usize).cloned()
 }
+/// The line the macOS app menu's Preferences… entry runs (#67): the same
+/// as Edit > Preferences… and the input map's Preferences action.
+#[cfg_attr(not(target_os = "macos"), allow(dead_code))]
+pub(crate) const PREFERENCES_LINE: &str = "Preferences";
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Item {
     pub action: Action,
@@ -276,6 +280,34 @@ mod tests {
             .unwrap()
             .clone()
     }
+    /// #67: the app menu's Preferences… runs the Edit menu's line, which
+    /// opens Preferences, and takes ⌘, natively only while the input map
+    /// binds Preferences to Cmd+, (so a key press never runs it twice or
+    /// shadows a remapped chord).
+    #[cfg(target_os = "macos")]
+    #[test]
+    fn app_menu_preferences_opens_preferences_and_follows_its_binding() {
+        let mut a = Operandi::empty();
+        let ctx = Context::default();
+        let action = line_action(PREFERENCES_LINE);
+        assert!(find(&a, &ctx, action).enabled);
+        a.menu_action(&ctx, action);
+        assert!(a.show_preferences);
+        let default = crate::input::default_bindings();
+        assert_eq!(
+            crate::input::preferences_key_equivalent(
+                default.get(PREFERENCES_LINE).map(String::as_str)
+            ),
+            ","
+        );
+        assert_eq!(crate::input::preferences_key_equivalent(Some("Cmd+P")), "");
+        assert_eq!(
+            crate::input::preferences_key_equivalent(Some("Shift+Cmd+,")),
+            ""
+        );
+        assert_eq!(crate::input::preferences_key_equivalent(Some("")), "");
+        assert_eq!(crate::input::preferences_key_equivalent(None), "");
+    }
     #[test]
     fn native_model_keeps_full_menu_inventory_and_focus_aware_shortcuts() {
         let mut a = Operandi::empty();
@@ -349,11 +381,17 @@ mod tests {
         let shown = a.editor.scene.clone();
         a.menu_action(&ctx, line_action("app.undo"));
         assert_eq!(a.editor.scene, base);
-        assert_eq!(a.editor.live.as_ref().map(|l| l.tool), Some(Tool::Box));
+        assert_eq!(
+            a.editor.session.live.as_ref().map(|l| l.tool),
+            Some(Tool::Box)
+        );
         assert_eq!(a.status, "Undo · Cube is still active");
         assert!(find(&a, &ctx, line_action("app.redo")).enabled);
         a.menu_action(&ctx, line_action("app.redo"));
-        assert_eq!(a.editor.live.as_ref().map(|l| l.tool), Some(Tool::Box));
+        assert_eq!(
+            a.editor.session.live.as_ref().map(|l| l.tool),
+            Some(Tool::Box)
+        );
         assert_eq!(a.editor.scene, shown);
         a.run(Command::Preview(Parameters {
             size: DVec3::splat(2.),
@@ -367,7 +405,7 @@ mod tests {
                 .contains("Cube"),
             "{}; live={:?}; undo={:?}",
             a.status,
-            a.editor.live.as_ref().map(|l| l.tool),
+            a.editor.session.live.as_ref().map(|l| l.tool),
             a.editor
                 .history
                 .undo
@@ -478,7 +516,7 @@ mod tests {
             assert!(!find(&app, &ctx, line_action("app.redo")).enabled);
             // Undo closes the armed tool; the next one undoes the rename.
             app.menu_action(&ctx, line_action("app.undo"));
-            assert!(app.editor.live.is_none());
+            assert!(app.editor.session.live.is_none());
             assert_eq!(app.editor.scene.active().unwrap().name, "renamed");
             app.menu_action(&ctx, line_action("app.undo"));
             assert_eq!(app.editor.scene, history_app().editor.scene);
@@ -533,7 +571,7 @@ mod tests {
                 .title
                 .contains("Undo Begin Extrude")
         );
-        let mut p = app.editor.live.as_ref().unwrap().params.clone();
+        let mut p = app.editor.session.live.as_ref().unwrap().params.clone();
         p.extent = DVec3::Z * 0.5;
         app.editor.dispatch(Command::Preview(p)).unwrap();
         agrees(&app, &ctx);
@@ -564,7 +602,10 @@ mod tests {
         app.editor.dispatch(Command::Activate(Tool::Move)).unwrap();
         agrees(&app, &ctx);
         app.menu_action(&ctx, line_action("app.redo"));
-        assert_eq!(app.editor.live.as_ref().unwrap().tool, Tool::Extrude);
+        assert_eq!(
+            app.editor.session.live.as_ref().unwrap().tool,
+            Tool::Extrude
+        );
         assert_eq!(app.editor.i2.selected.as_ref().unwrap().cursor, 1);
     }
     #[test]
@@ -600,7 +641,7 @@ mod tests {
         a.run(Command::Mode(Mode::Edge));
         assert_ne!(a.editor.scene, before.scene);
         // The confirmed Move is dropped as its own step, then Edge mode.
-        assert!(a.editor.live.is_none());
+        assert!(a.editor.session.live.is_none());
         assert_eq!(a.editor.scene.selection.mode, Mode::Edge);
         assert_eq!(a.editor.history.undo.len(), before.history.undo.len() + 1);
     }

@@ -52,7 +52,7 @@ fn middle_drag_copies_the_drawn_cube_and_adjusts_the_copy() {
         position: DVec3::new(3., 0., 0.),
         size: DVec3::new(1., 0.5, 2.),
         segments: [2, 3, 1],
-        ..a.editor.live.as_ref().unwrap().params.clone()
+        ..a.editor.session.live.as_ref().unwrap().params.clone()
     };
     a.run(Command::Preview(first.clone()));
     draw(&mut a, &ctx, SIZE, vec![]);
@@ -61,7 +61,7 @@ fn middle_drag_copies_the_drawn_cube_and_adjusts_the_copy() {
     let at = a.viewport_rect.center() + vec2(-150., 60.);
     // A middle click that doesn't move: a copy at the pointer.
     drag(&mut a, &ctx, at, at, PointerButton::Middle, Modifiers::NONE);
-    let live = a.editor.live.as_ref().expect("the copy is live");
+    let live = a.editor.session.live.as_ref().expect("the copy is live");
     assert_eq!(live.tool, Tool::Box);
     assert!(live.applied, "{}", a.status);
     assert_eq!(live.params.size, first.size, "same size");
@@ -77,7 +77,7 @@ fn middle_drag_copies_the_drawn_cube_and_adjusts_the_copy() {
     );
     assert!(a.editor.scene.active().unwrap().mesh.vertices.len() > vertices);
     // A middle drag adjusts the copy it makes.
-    let before = a.editor.live.as_ref().unwrap().params.clone();
+    let before = a.editor.session.live.as_ref().unwrap().params.clone();
     let at = a.viewport_rect.center() + vec2(150., -60.);
     drag(
         &mut a,
@@ -87,7 +87,7 @@ fn middle_drag_copies_the_drawn_cube_and_adjusts_the_copy() {
         PointerButton::Middle,
         Modifiers::NONE,
     );
-    let after = &a.editor.live.as_ref().unwrap().params;
+    let after = &a.editor.session.live.as_ref().unwrap().params;
     assert_ne!(after.position, before.position);
     assert_ne!(
         (after.size, after.position),
@@ -101,14 +101,14 @@ fn middle_drag_copies_the_drawn_cube_and_adjusts_the_copy() {
 fn middle_drag_copies_a_sphere_with_its_radius() {
     let (mut a, ctx) = setup();
     a.activate(Tool::Sphere);
-    let mut first = a.editor.live.as_ref().unwrap().params.clone();
+    let mut first = a.editor.session.live.as_ref().unwrap().params.clone();
     first.position = DVec3::new(-3., 0., 0.);
     first.radial.as_mut().unwrap().radius = DVec3::splat(0.75);
     a.run(Command::Preview(first.clone()));
     draw(&mut a, &ctx, SIZE, vec![]);
     let at = a.viewport_rect.center() + vec2(100., 100.);
     drag(&mut a, &ctx, at, at, PointerButton::Middle, Modifiers::NONE);
-    let live = a.editor.live.as_ref().unwrap();
+    let live = a.editor.session.live.as_ref().unwrap();
     assert_eq!(live.tool, Tool::Sphere, "{}", a.status);
     assert_eq!(live.params.radial.unwrap().radius, DVec3::splat(0.75));
     assert_ne!(live.params.position, first.position);
@@ -153,7 +153,10 @@ fn transform_right_drag_sets_up_a_linear_falloff() {
     };
     assert_ne!((f.start, f.end), (base.start, base.end), "{}", a.status);
     assert!(f.start.distance(f.end) > 0.1);
-    assert_eq!(a.editor.live.as_ref().map(|l| l.tool), Some(Tool::Move));
+    assert_eq!(
+        a.editor.session.live.as_ref().map(|l| l.tool),
+        Some(Tool::Move)
+    );
 }
 
 #[test]

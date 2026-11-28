@@ -46,14 +46,14 @@ fn points(e: &Editor) -> Vec<DVec3> {
     e.scene.active().unwrap().mesh.vertices.clone()
 }
 fn live(e: &Editor) -> BendOptions {
-    e.live.as_ref().unwrap().params.bend
+    e.session.live.as_ref().unwrap().params.bend
 }
 /// Start Bend with the centre at `centre`, spine (0, 2, 0) and `axis`, then
 /// set Angle.
 fn bend(e: &mut Editor, centre: DVec3, axis: usize, angle: f64, both: bool) {
     e.dispatch(Command::Activate(Tool::Bend)).unwrap();
     e.dispatch(Command::SetActionCenter(centre)).unwrap();
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     p.bend.spine = DVec3::new(0., 2., 0.);
     p.bend.axis = axis;
     p.bend.both_sides = both;
@@ -245,7 +245,7 @@ fn bn45_axis_along_the_spine_moves_nothing() {
         e.bend_notice(),
         Some("The bend axis runs along the spine; pick another axis")
     );
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     p.bend.axis = 2;
     e.dispatch(Command::Preview(p)).unwrap();
     assert_ne!(points(&e), before);

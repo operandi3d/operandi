@@ -24,15 +24,21 @@ fn fixture() -> (Editor, u32) {
     (e, top)
 }
 fn tool(e: &Editor) -> Option<Tool> {
-    e.live.as_ref().map(|l| l.tool)
+    e.session.live.as_ref().map(|l| l.tool)
 }
 fn preview(e: &mut Editor, f: impl FnOnce(&mut Parameters)) {
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     f(&mut p);
     e.dispatch(Command::Preview(p)).unwrap();
 }
 fn center(e: &Editor) -> DVec3 {
-    e.live.as_ref().unwrap().action_frame.unwrap().center
+    e.session
+        .live
+        .as_ref()
+        .unwrap()
+        .action_frame
+        .unwrap()
+        .center
 }
 fn points(e: &Editor) -> Vec<DVec3> {
     e.scene.active().unwrap().mesh.vertices.clone()
@@ -53,7 +59,7 @@ fn grow_keeps_move_and_transform_live() {
         assert_eq!(tool(&e), Some(t), "{t:?}");
         assert_eq!(e.scene.selection.faces.len(), 5, "{t:?}");
         assert!(e.scene.selection.faces.contains(&top));
-        assert_eq!(e.live.as_ref().unwrap().params.delta, DVec3::ZERO);
+        assert_eq!(e.session.live.as_ref().unwrap().params.delta, DVec3::ZERO);
         // The drag so far is one step and the selection change the next.
         assert_eq!(e.history.undo.len(), 2, "{t:?}");
         assert_eq!(points(&e), dragged, "{t:?}");
@@ -104,7 +110,7 @@ fn shrink_keeps_rotate_and_scale_live() {
         } else {
             DVec3::ZERO
         };
-        assert_eq!(e.live.as_ref().unwrap().params.delta, zero, "{t:?}");
+        assert_eq!(e.session.live.as_ref().unwrap().params.delta, zero, "{t:?}");
         assert_eq!(e.history.undo.len(), 2, "{t:?}");
         assert_ne!(center(&e), start, "{t:?}");
     }

@@ -14,7 +14,7 @@ impl Editor {
     /// Pure observation, freshly repeated by execution. The target mode does
     /// not alter the route, even when it equals the current mode.
     pub fn mode_route_eligibility(&self) -> ModeRouteEligibility {
-        if self.has_active_task() || self.i2_active() {
+        if self.session.has_active_task() || self.i2_active() {
             ModeRouteEligibility::DropsToolFirst
         } else {
             ModeRouteEligibility::Direct
@@ -30,7 +30,7 @@ impl Editor {
                 // they were and reports why.
                 let mut staged = self.clone();
                 staged.dispatch(Command::Drop)?;
-                if staged.has_active_task() || staged.i2_active() {
+                if staged.session.has_active_task() || staged.i2_active() {
                     return Err("Finish the current tool before changing mode".into());
                 }
                 staged.dispatch(Command::Mode(mode))?;

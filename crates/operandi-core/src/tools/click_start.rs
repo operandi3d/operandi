@@ -45,8 +45,9 @@ pub(crate) fn may_arm(cmd: &Command) -> bool {
 impl Editor {
     /// The armed tool, if the live tool is armed (CS-01).
     pub fn armed_tool(&self) -> Option<Tool> {
-        let tool = self.armed?;
-        self.live
+        let tool = self.session.armed?;
+        self.session
+            .live
             .as_ref()
             .filter(|l| l.tool == tool)
             .map(|l| l.tool)
@@ -65,16 +66,17 @@ impl Editor {
     /// scene goes back to the tool's start, so nothing the start showed
     /// (a remembered Angle, a fitted preview) stays on the mesh.
     pub(crate) fn arm_if_flagged(&mut self) {
-        self.armed = None;
-        self.extend_from_click = false;
+        self.session.armed = None;
+        self.session.extend_from_click = false;
         if !self.auto_activate_flags {
             return;
         }
-        let Some(live) = self.live.as_mut() else {
+        let Some(live) = self.session.live.as_mut() else {
             return;
         };
         let tool = live.tool;
         let preset = self
+            .session
             .preset
             .as_ref()
             .filter(|p| p.tool == tool)
@@ -86,21 +88,21 @@ impl Editor {
         live.applied = false;
         live.identity_preview = None;
         live.preview_error = None;
-        self.armed = Some(tool);
+        self.session.armed = Some(tool);
     }
 
     /// The commands an armed tool answers itself; `None` lets the command
     /// run as usual (and a tool that is no longer live forgets it was
     /// armed).
     pub(crate) fn armed_command(&mut self, cmd: &Command) -> Option<Result<()>> {
-        if self.armed.is_some() && !self.is_armed() {
-            self.armed = None;
+        if self.session.armed.is_some() && !self.is_armed() {
+            self.session.armed = None;
         }
-        self.armed?;
+        self.session.armed?;
         match cmd {
             // CS-01: panel edits change the values, not the mesh.
             Command::Preview(p) => {
-                let live = self.live.as_mut()?;
+                let live = self.session.live.as_mut()?;
                 live.params = p.clone();
                 Some(Ok(()))
             }
@@ -109,7 +111,7 @@ impl Editor {
             // CS-22: nothing was shown, so Drop and Cancel change nothing;
             // the tool's own drop still keeps its values for next time.
             Command::Drop | Command::Cancel => {
-                self.armed = None;
+                self.session.armed = None;
                 None
             }
             _ => None,
@@ -119,17 +121,18 @@ impl Editor {
     /// CS-21: Apply on an armed tool runs it once with the panel's values
     /// as one undo step and leaves it armed on the result, values kept.
     fn apply_armed(&mut self) -> Result<()> {
-        let live = self.live.as_ref().ok_or("No active tool")?;
+        let live = self.session.live.as_ref().ok_or("No active tool")?;
         let (tool, params) = (live.tool, live.params.clone());
         let mut staged = self.clone();
-        staged.armed = None;
-        staged.dispatch_depth += 1;
+        staged.session.armed = None;
+        staged.session.dispatch_depth += 1;
         let before = staged.scene.clone();
         staged.preview(params.clone(), false)?;
-        let live = staged.live.as_ref().ok_or("No active tool")?;
+        let live = staged.session.live.as_ref().ok_or("No active tool")?;
         if staged.scene != before {
             staged.identities.record_before = live.identity_base.clone();
             let label = staged
+                .session
                 .preset
                 .as_ref()
                 .filter(|p| p.tool == tool)
@@ -139,14 +142,14 @@ impl Editor {
         }
         let base = staged.scene.clone();
         let current = staged.identities.current.clone();
-        let live = staged.live.as_mut().ok_or("No active tool")?;
+        let live = staged.session.live.as_mut().ok_or("No active tool")?;
         live.base = base;
         live.identity_base = Some(current);
         live.identity_preview = None;
         live.applied = false;
         live.params = params;
-        staged.armed = Some(tool);
-        staged.dispatch_depth -= 1;
+        staged.session.armed = Some(tool);
+        staged.session.dispatch_depth -= 1;
         *self = staged;
         Ok(())
     }
@@ -161,9 +164,9 @@ impl Editor {
             return Err("The work plane must be 0, 1 or 2".into());
         }
         let mut staged = self.clone();
-        staged.armed = None;
-        staged.dispatch_depth += 1;
-        let tool = staged.live.as_ref().ok_or("No active tool")?.tool;
+        staged.session.armed = None;
+        staged.session.dispatch_depth += 1;
+        let tool = staged.session.live.as_ref().ok_or("No active tool")?.tool;
         if tool == Tool::Bend {
             // CS-10/11/14 for Bend: the centre (its own copy of the action
             // centre), Axis on the plane's normal, the spine fit.
@@ -171,7 +174,11 @@ impl Editor {
         } else if matches!(
             staged.action_context.center,
             CenterMode::Automatic | CenterMode::None
-        ) && let Some(frame) = staged.live.as_mut().and_then(|l| l.action_frame.as_mut())
+        ) && let Some(frame) = staged
+            .session
+            .live
+            .as_mut()
+            .and_then(|l| l.action_frame.as_mut())
         {
             // CS-10: Automatic puts the centre at the click, and so does
             // None, which is Automatic without an axis choice (AC-12,
@@ -182,7 +189,7 @@ impl Editor {
         // the extension, rows on the source edges until dragged, so the
         // next tool can scale them in at once.
         if tool == Tool::EdgeExtend {
-            staged.extend_from_click = true;
+            staged.session.extend_from_click = true;
         }
         // CS-13: Linear and Radial falloffs were fitted to the target when
         // the tool was picked (TP-17); the target hasn't changed since.
@@ -190,9 +197,15 @@ impl Editor {
         // the falloff's centre where the click put the tool's centre.
         staged.place_row_falloff_at_tool();
         // Then the tool shows its result for the panel's values.
-        let params = staged.live.as_ref().ok_or("No active tool")?.params.clone();
+        let params = staged
+            .session
+            .live
+            .as_ref()
+            .ok_or("No active tool")?
+            .params
+            .clone();
         staged.preview(params, false)?;
-        staged.dispatch_depth -= 1;
+        staged.session.dispatch_depth -= 1;
         *self = staged;
         Ok(())
     }

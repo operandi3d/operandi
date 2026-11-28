@@ -72,11 +72,14 @@ impl Rig {
     }
     fn activate(&mut self, tool: Tool) {
         self.a.activate(tool);
-        assert_eq!(self.a.editor.live.as_ref().map(|l| l.tool), Some(tool));
+        assert_eq!(
+            self.a.editor.session.live.as_ref().map(|l| l.tool),
+            Some(tool)
+        );
         self.frame(vec![]);
     }
     fn circles(&self) -> Vec<(usize, Pos2)> {
-        let tool = self.a.editor.live.as_ref().unwrap().tool;
+        let tool = self.a.editor.session.live.as_ref().unwrap().tool;
         self.a
             .plane_handles(tool, self.a.viewport_rect)
             .into_iter()
@@ -96,7 +99,13 @@ impl Rig {
         for step in 1..=4 {
             self.frame(vec![Event::PointerMoved(from + by * (step as f32 / 4.))]);
         }
-        self.held = self.a.editor.live.as_ref().map(|l| l.params.clone());
+        self.held = self
+            .a
+            .editor
+            .session
+            .live
+            .as_ref()
+            .map(|l| l.params.clone());
         self.frame(vec![pointer(from + by, false, modifiers)]);
     }
     fn held(&self) -> Parameters {

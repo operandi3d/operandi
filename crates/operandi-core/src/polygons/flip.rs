@@ -8,13 +8,13 @@ use std::collections::{BTreeMap, BTreeSet};
 
 impl Editor {
     pub(crate) fn flip_selected_polygons(&mut self) -> Result<()> {
-        if self.live.is_some()
-            || self.bridge.is_some()
-            || self.spike.is_some()
-            || self.cone.is_some()
-            || self.ellipsoid.is_some()
-            || self.shape.is_some()
-            || self.reduction.is_some()
+        if self.session.live.is_some()
+            || self.session.bridge.is_some()
+            || self.session.spike.is_some()
+            || self.session.cone.is_some()
+            || self.session.ellipsoid.is_some()
+            || self.session.shape.is_some()
+            || self.session.reduction.is_some()
             || self.selection_start.is_some()
         {
             return Err("Drop or Cancel the active task before Flip".into());

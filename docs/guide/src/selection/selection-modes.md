@@ -17,6 +17,9 @@ Most tools work on what is selected. The selection mode says what a click picks:
 
 The buttons are at the left of the **Mode bar**. **Alt+Shift+Space** steps to the next mode.
 
+Before you click, what a click would pick lights up under the pointer. In
+**Items** mode the whole item lights up.
+
 ## Selecting with the mouse
 
 | Do this | To |

@@ -22,7 +22,7 @@ fn points(e: &Editor) -> Vec<DVec3> {
     e.scene.active().unwrap().mesh.vertices.clone()
 }
 fn params(e: &Editor) -> Parameters {
-    e.live.as_ref().unwrap().params.clone()
+    e.session.live.as_ref().unwrap().params.clone()
 }
 fn bent(e: &mut Editor) {
     let mut p = params(e);
@@ -109,7 +109,7 @@ fn cs22_armed_changes_nothing_and_drop_is_a_no_op() {
     assert_eq!(params(&e).bend.angle, 90., "the panel's value is kept");
     assert_eq!(points(&e), before, "but nothing changes");
     e.dispatch(Command::Drop).unwrap();
-    assert!(e.live.is_none() && !e.is_armed());
+    assert!(e.session.live.is_none() && !e.is_armed());
     assert_eq!(points(&e), before);
     assert!(e.history.undo.is_empty(), "no undo step");
     e.dispatch(Command::Activate(Tool::Bend)).unwrap();
@@ -138,7 +138,7 @@ fn cs21_apply_runs_once_and_stays_armed() {
     assert!(e.is_armed(), "Apply leaves it armed");
     assert_eq!(params(&e).bend.angle, 90.);
     assert_eq!(
-        e.live.as_ref().unwrap().base,
+        e.session.live.as_ref().unwrap().base,
         e.scene,
         "armed on the result"
     );
@@ -175,7 +175,16 @@ fn cs02_first_click_centre_axis_then_the_tools_setup() {
         "CS-14 {}",
         b.spine
     );
-    assert_eq!(e.live.as_ref().unwrap().action_frame.unwrap().center, at);
+    assert_eq!(
+        e.session
+            .live
+            .as_ref()
+            .unwrap()
+            .action_frame
+            .unwrap()
+            .center,
+        at
+    );
     assert_ne!(points(&e), before, "the panel's Angle now shows");
     // Bad clicks leave an armed tool armed.
     e.dispatch(Command::Cancel).unwrap();
@@ -208,7 +217,16 @@ fn cs12_cs13_other_centres_stay_and_the_falloff_keeps_its_fit() {
             plane: 2,
         })
         .unwrap();
-        assert_eq!(e.live.as_ref().unwrap().action_frame.unwrap().center, at);
+        assert_eq!(
+            e.session
+                .live
+                .as_ref()
+                .unwrap()
+                .action_frame
+                .unwrap()
+                .center,
+            at
+        );
     }
     assert_eq!(e.spatial_falloff, falloff, "CS-13");
     e.dispatch(Command::Drop).unwrap();
@@ -221,7 +239,13 @@ fn cs12_cs13_other_centres_stay_and_the_falloff_keeps_its_fit() {
     .unwrap();
     e.dispatch(Command::Activate(Tool::Push)).unwrap();
     assert!(e.is_armed());
-    let centre = e.live.as_ref().unwrap().action_frame.map(|f| f.center);
+    let centre = e
+        .session
+        .live
+        .as_ref()
+        .unwrap()
+        .action_frame
+        .map(|f| f.center);
     e.dispatch(Command::ToolClick {
         point: at,
         plane: 2,
@@ -229,7 +253,12 @@ fn cs12_cs13_other_centres_stay_and_the_falloff_keeps_its_fit() {
     .unwrap();
     assert!(!e.is_armed());
     assert_eq!(
-        e.live.as_ref().unwrap().action_frame.map(|f| f.center),
+        e.session
+            .live
+            .as_ref()
+            .unwrap()
+            .action_frame
+            .map(|f| f.center),
         centre
     );
 }
@@ -273,7 +302,16 @@ fn tp19_soft_move_falloff_starts_at_the_click() {
         plane: 2,
     })
     .unwrap();
-    assert_eq!(e.live.as_ref().unwrap().action_frame.unwrap().center, at);
+    assert_eq!(
+        e.session
+            .live
+            .as_ref()
+            .unwrap()
+            .action_frame
+            .unwrap()
+            .center,
+        at
+    );
     let Some(Falloff::Radial(placed)) = e.spatial_falloff else {
         panic!("still Radial");
     };

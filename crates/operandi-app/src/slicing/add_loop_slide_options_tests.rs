@@ -141,7 +141,7 @@ fn slide_stop_negative_and_loop_slide_reach_the_tool() {
     a.run(Command::Mode(Mode::Vertex));
     a.editor.scene.selection.vertices = vec![0];
     a.activate(Tool::VertexSlide);
-    let mut p = a.editor.live.as_ref().unwrap().params.clone();
+    let mut p = a.editor.session.live.as_ref().unwrap().params.clone();
     p.slide_extras.loop_slide = false;
     p.shift = 1.5;
     assert!(a.run_ok(Command::Preview(p.clone())), "{}", a.status);

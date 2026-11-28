@@ -25,7 +25,7 @@ fn fixture() -> Editor {
     e
 }
 fn tool(e: &Editor) -> Option<Tool> {
-    e.live.as_ref().map(|l| l.tool)
+    e.session.live.as_ref().map(|l| l.tool)
 }
 fn points(e: &Editor) -> Vec<DVec3> {
     e.scene.active().unwrap().mesh.vertices.clone()
@@ -62,13 +62,13 @@ fn new_mesh_after_a_drag_settles_the_drag_first() {
     let first = e.scene.active().unwrap().id;
     e.dispatch(Command::Activate(Tool::Move)).unwrap();
     let start = e.history.undo.len();
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     p.delta = DVec3::X;
     e.dispatch(Command::Preview(p)).unwrap();
     let moved = e.scene.item(first).unwrap().transform.clone();
     e.dispatch(Command::NewMesh).unwrap();
     assert_eq!(tool(&e), Some(Tool::Move));
-    assert_eq!(e.live.as_ref().unwrap().params.delta, DVec3::ZERO);
+    assert_eq!(e.session.live.as_ref().unwrap().params.delta, DVec3::ZERO);
     // The move is one step, the new mesh the next.
     assert_eq!(e.history.undo.len(), start + 2);
     assert_eq!(e.scene.item(first).unwrap().transform, moved);
@@ -85,7 +85,7 @@ fn a_component_tool_settles_for_new_mesh_and_rests_on_the_empty_mesh() {
     // and the tool stays dropped, the edit kept (provisional, UIC-307).
     let mut e = fixture();
     e.dispatch(Command::Activate(Tool::Move)).unwrap();
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     p.delta = DVec3::X;
     e.dispatch(Command::Preview(p)).unwrap();
     let moved = points(&e);

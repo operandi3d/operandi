@@ -172,9 +172,9 @@ fn state(e: &Editor) -> State {
     let labels = |h: &[std::sync::Arc<Checkpoint>]| h.iter().map(|c| c.label.clone()).collect();
     State {
         scene: e.scene.clone(),
-        cone: e.cone.clone(),
+        cone: e.session.cone.clone(),
         preset: e.presets.get::<operandi_core::ConePreset>().clone(),
-        live: e.live.is_some(),
+        live: e.session.live.is_some(),
         undo: labels(&e.history.undo),
         redo: labels(&e.history.redo),
     }
@@ -216,7 +216,7 @@ fn snapshot(step: &str, e: &Editor) {
             .iter()
             .map(|(k, v)| (k, v.len()))
             .collect::<Vec<_>>(),
-        e.cone.as_ref().map(|c| (
+        e.session.cone.as_ref().map(|c| (
             c.target,
             c.requested.sides,
             c.preview.as_ref().map(|p| p.vertices.len()),
@@ -298,7 +298,12 @@ fn ca_con_025_026_actual_panel_two_applies_menu_history_and_reopen() {
     // Arm through the toolbox Cone button.
     click(&mut a, &ctx, Role::Button, "Cone", None);
     oracle.dispatch(Command::ArmCone).unwrap();
-    let session = a.editor.cone.as_ref().expect("Cone armed by its button");
+    let session = a
+        .editor
+        .session
+        .cone
+        .as_ref()
+        .expect("Cone armed by its button");
     assert_eq!(session.target, baseline.active().unwrap().id);
     assert_eq!(session.requested, ConeParameters::default());
     assert_eq!(a.editor.scene, baseline, "arming commits nothing");
@@ -339,7 +344,7 @@ fn ca_con_025_026_actual_panel_two_applies_menu_history_and_reopen() {
     assert_eq!(want.polygon, PolygonRepresentation::Face);
     assert_eq!(want.bottom_cap, ConeCap::Single);
     assert!(want.make_uvs && !want.compensation && want.gaps == 0.);
-    assert_eq!(a.editor.cone.as_ref().unwrap().requested, want);
+    assert_eq!(a.editor.session.cone.as_ref().unwrap().requested, want);
     let nodes = frame(&mut a, &ctx, vec![]);
     let toggled = |label| node(&nodes, Role::CheckBox, label, None).toggled();
     assert_eq!(toggled("Make UVs"), Some(Toggled::True));
@@ -348,7 +353,7 @@ fn ca_con_025_026_actual_panel_two_applies_menu_history_and_reopen() {
     oracle
         .dispatch(Command::ConfigureCone(want.clone()))
         .unwrap();
-    assert!(a.editor.cone.as_ref().unwrap().preview.is_some());
+    assert!(a.editor.session.cone.as_ref().unwrap().preview.is_some());
     assert_eq!(counts(&a.editor.scene), (0, 0), "preview is not committed");
     assert!(!a.dirty());
     assert_matches(&a, &oracle, "configured");
@@ -359,7 +364,7 @@ fn ca_con_025_026_actual_panel_two_applies_menu_history_and_reopen() {
     oracle.dispatch(Command::Apply).unwrap();
     assert_eq!(counts(&a.editor.scene), (25, 25), "CA-CON-025 first Apply");
     assert_eq!(
-        a.editor.cone.as_ref().unwrap().requested,
+        a.editor.session.cone.as_ref().unwrap().requested,
         want,
         "still armed"
     );
@@ -372,7 +377,15 @@ fn ca_con_025_026_actual_panel_two_applies_menu_history_and_reopen() {
         .dispatch(Command::ConfigureCone(requested(10)))
         .unwrap();
     assert_eq!(a.editor.scene, first, "Sides edit leaves the first scene");
-    let preview = a.editor.cone.as_ref().unwrap().preview.as_ref().unwrap();
+    let preview = a
+        .editor
+        .session
+        .cone
+        .as_ref()
+        .unwrap()
+        .preview
+        .as_ref()
+        .unwrap();
     assert_eq!(preview.vertices.len(), 31, "distinct Sides 10 preview");
     assert_matches(&a, &oracle, "Sides 10");
 
@@ -382,14 +395,19 @@ fn ca_con_025_026_actual_panel_two_applies_menu_history_and_reopen() {
     assert_eq!(counts(&a.editor.scene), (56, 56), "CA-CON-025 second Apply");
     assert_matches(&a, &oracle, "second Apply");
     let second = a.editor.scene.clone();
-    let armed = a.editor.cone.clone().expect("armed after second Apply");
+    let armed = a
+        .editor
+        .session
+        .cone
+        .clone()
+        .expect("armed after second Apply");
     assert_eq!(armed.requested, requested(10));
     assert!(armed.preview.is_none());
 
     // Drop through the panel button keeps the geometry.
     click(&mut a, &ctx, Role::Button, "Drop", sides);
     oracle.dispatch(Command::Drop).unwrap();
-    assert!(a.editor.cone.is_none(), "dropped: {}", a.status);
+    assert!(a.editor.session.cone.is_none(), "dropped: {}", a.status);
     assert_eq!(a.editor.scene, second);
     assert_eq!(
         *a.editor.presets.get::<operandi_core::ConePreset>(),
@@ -403,7 +421,7 @@ fn ca_con_025_026_actual_panel_two_applies_menu_history_and_reopen() {
     menu(&mut a, &ctx, app_menu::line_action("app.undo"));
     oracle.dispatch(Command::Undo).unwrap();
     assert_eq!(a.editor.scene, first, "Undo returns 25/25");
-    assert!(a.editor.cone.is_none(), "Undo doesn't reopen Cone");
+    assert!(a.editor.session.cone.is_none(), "Undo doesn't reopen Cone");
     assert_matches(&a, &oracle, "Undo second Apply");
 
     // Redo puts the second Cone back, still closed: the Drop state.
@@ -444,7 +462,7 @@ fn ca_con_025_026_actual_panel_two_applies_menu_history_and_reopen() {
     let (got, want) = (&a.editor.scene.items[0].mesh, &second.items[0].mesh);
     assert_eq!(got.uv_maps, want.uv_maps);
     assert_eq!(got.attributes, want.attributes);
-    assert!(!a.dirty() && a.editor.cone.is_none());
+    assert!(!a.dirty() && a.editor.session.cone.is_none());
     a.editor.scene.validate().unwrap();
     snapshot("reopened", &a.editor);
 }

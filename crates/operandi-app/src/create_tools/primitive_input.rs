@@ -128,6 +128,7 @@ impl Operandi {
                 }
                 if self
                     .editor
+                    .session
                     .live
                     .as_ref()
                     .is_some_and(|live| live.params != params)
@@ -287,7 +288,7 @@ impl Operandi {
                 return;
             }
             if cone {
-                let Some(session) = &self.editor.cone else {
+                let Some(session) = &self.editor.session.cone else {
                     return;
                 };
                 let mut p = session.requested.clone();
@@ -296,7 +297,7 @@ impl Operandi {
                 p.axis = normal;
                 self.run(Command::ConfigureCone(p));
             } else {
-                let Some(session) = &self.editor.ellipsoid else {
+                let Some(session) = &self.editor.session.ellipsoid else {
                     return;
                 };
                 let mut p = session.requested.clone();
@@ -309,7 +310,7 @@ impl Operandi {
             return;
         }
         if cone {
-            let Some(session) = &self.editor.cone else {
+            let Some(session) = &self.editor.session.cone else {
                 return;
             };
             let mut p = session.requested.clone();
@@ -322,7 +323,7 @@ impl Operandi {
             p.axis = normal;
             self.run(Command::ConfigureCone(p));
         } else {
-            let Some(session) = &self.editor.ellipsoid else {
+            let Some(session) = &self.editor.session.ellipsoid else {
                 return;
             };
             let mut p = session.requested.clone();
@@ -391,7 +392,12 @@ impl Operandi {
         }
         self.editor = staged;
         self.clear_fields();
-        let next = self.editor.live.clone().expect("Activate opened the tool");
+        let next = self
+            .editor
+            .session
+            .live
+            .clone()
+            .expect("Activate opened the tool");
         self.begin_primitive(next, pos, r, Modifiers::NONE)
     }
     pub(super) fn begin_primitive(
@@ -422,7 +428,12 @@ impl Operandi {
             }
             self.editor = staged;
             self.clear_fields();
-            let next = self.editor.live.clone().expect("Activate opened the tool");
+            let next = self
+                .editor
+                .session
+                .live
+                .clone()
+                .expect("Activate opened the tool");
             let modifiers = Modifiers {
                 shift: false,
                 ..modifiers

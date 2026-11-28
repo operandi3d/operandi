@@ -45,7 +45,7 @@ fn click(a: &mut Operandi, ctx: &Context, at: Pos2, button: PointerButton) {
 }
 
 fn tool_on(a: &Operandi) -> bool {
-    a.editor.has_active_task() || a.utility.is_some() || a.draw.is_some()
+    a.editor.session.has_active_task() || a.utility.is_some() || a.draw.is_some()
 }
 
 /// The box scene on its first frames, with the Cube button drawn.

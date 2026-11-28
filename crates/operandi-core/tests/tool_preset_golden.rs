@@ -33,7 +33,7 @@ fn column(mode: Mode, select: &[u32]) -> Editor {
 }
 
 fn live(e: &Editor) -> Parameters {
-    e.live.as_ref().unwrap().params.clone()
+    e.session.live.as_ref().unwrap().params.clone()
 }
 
 fn record(out: &mut String, e: &Editor, what: &str) {
@@ -70,7 +70,7 @@ fn case(preset: DeformPreset, mode: Mode, select: &[u32], user_falloff: bool) ->
     let _ = writeln!(
         out,
         "  tool {:?} label {:?}",
-        e.live.as_ref().map(|l| l.tool),
+        e.session.live.as_ref().map(|l| l.tool),
         e.live_tool_label()
     );
     let _ = writeln!(out, "  open falloff {:?}", e.spatial_falloff);
@@ -90,7 +90,11 @@ fn case(preset: DeformPreset, mode: Mode, select: &[u32], user_falloff: bool) ->
         record(&mut out, &e, &format!("after drag {i}"));
     }
     e.dispatch(Command::Drop).unwrap();
-    let _ = writeln!(out, "  dropped live {:?}", e.live.as_ref().map(|l| l.tool));
+    let _ = writeln!(
+        out,
+        "  dropped live {:?}",
+        e.session.live.as_ref().map(|l| l.tool)
+    );
     let _ = writeln!(out, "  dropped falloff {:?}", e.spatial_falloff);
     let _ = writeln!(out, "  dropped linear {:?}", e.linear_falloff_preset);
     let _ = writeln!(out, "  dropped radial {:?}", e.radial_falloff_preset);

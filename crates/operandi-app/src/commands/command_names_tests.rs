@@ -151,6 +151,7 @@ fn old_argument_names_still_bind() {
     );
     assert!(
         b.editor
+            .session
             .live
             .as_ref()
             .unwrap()
@@ -208,7 +209,7 @@ fn tool_reset_follows_names_not_rows() {
     a.execute("tool.reset");
     // MN-05: every tool resets now.
     assert_ne!(a.status, "Reset is unsupported for this tool");
-    assert!(a.editor.live.is_some(), "{}", a.status);
+    assert!(a.editor.session.live.is_some(), "{}", a.status);
 }
 
 /// Scripts give percents as 0–1 and angles in radians, as in the name map
@@ -229,7 +230,7 @@ fn script_percent_and_angle_arguments_take_the_maps_units() {
         let mut a = Box::new(edge_app());
         a.execute(&format!("tool.set {tool} on"));
         a.execute(&format!("tool.attr {tool} depth 0.25"));
-        let depth = |a: &Operandi| a.editor.live.as_ref().unwrap().params.chamfer.depth;
+        let depth = |a: &Operandi| a.editor.session.live.as_ref().unwrap().params.chamfer.depth;
         assert_eq!(depth(&a), 25., "{tool}: {}", a.status);
         a.execute(&format!("tool.attr {tool} depth 40%"));
         assert_eq!(depth(&a), 40., "{tool}");
@@ -239,7 +240,16 @@ fn script_percent_and_angle_arguments_take_the_maps_units() {
     let mut a = Box::new(box_app());
     a.editor.scene.selection.faces = vec![0];
     a.execute("tool.set poly.smshift on");
-    let angle = |a: &Operandi| a.editor.live.as_ref().unwrap().params.smooth_shift.angle;
+    let angle = |a: &Operandi| {
+        a.editor
+            .session
+            .live
+            .as_ref()
+            .unwrap()
+            .params
+            .smooth_shift
+            .angle
+    };
     a.execute(&format!(
         "tool.attr poly.smshift maxAngle {}",
         std::f64::consts::FRAC_PI_4

@@ -29,11 +29,11 @@ fn editor() -> Editor {
 
 fn run(e: &mut Editor, tool: Tool, set: impl FnOnce(&mut DuplicateParameters)) -> Result<()> {
     e.dispatch(Command::Activate(tool))?;
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     p.duplicate.copier = Some(operandi_core::duplicate_copier::Copier::Replica);
     set(&mut p.duplicate);
     p.duplicate.placed = true;
-    e.tweak_held = true;
+    e.session.tweak_held = true;
     let r = e.dispatch(Command::Preview(p));
     e.end_tweak();
     e.dispatch(Command::Drop)?;
@@ -224,7 +224,7 @@ fn a_replica_tool_with_nothing_to_copy_is_refused() {
     e.dispatch(Command::Mode(Mode::Item)).unwrap();
     let r = e.dispatch(Command::Activate(Tool::Array));
     if r.is_ok() {
-        let mut p = e.live.as_ref().unwrap().params.clone();
+        let mut p = e.session.live.as_ref().unwrap().params.clone();
         p.duplicate.copier = Some(operandi_core::duplicate_copier::Copier::Replica);
         p.duplicate.placed = true;
         let err = e.dispatch(Command::Preview(p)).unwrap_err();

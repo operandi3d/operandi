@@ -424,12 +424,12 @@ fn parked_extrude_redo_survives_zero_and_refusal_and_branches_on_edit() {
         "active Extrude stage owns input"
     );
     assert!(e == active);
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     p.extent = DVec3::Z * 0.5;
     e.dispatch(Command::ConfigureExtrude(p)).unwrap();
     e.dispatch(Command::Undo).unwrap();
     e.dispatch(Command::Undo).unwrap();
-    assert!(!e.i2_active() && e.live.is_none() && e.i2_can_redo());
+    assert!(!e.i2_active() && e.session.live.is_none() && e.i2_can_redo());
     assert_eq!(e.scene.items[0].mesh, source.items[0].mesh);
     let parked = e.clone();
     offset(&mut e, 0.).unwrap();
@@ -551,16 +551,16 @@ fn live_tool_and_pen_owners_refuse_without_consuming_their_state() {
     let square_mesh = || plain(square(), vec![vec![0, 1, 2, 3]]);
     let mut e = editor_with(square_mesh(), vec![0]);
     e.dispatch(Command::Activate(Tool::Bevel)).unwrap();
-    assert!(e.live.is_some());
+    assert!(e.session.live.is_some());
     // UIC-307: a live tool no longer refuses; it settles, the offset runs,
     // and the tool starts again.
     offset(&mut e, 0.25).unwrap();
-    assert_eq!(e.live.as_ref().map(|l| l.tool), Some(Tool::Bevel));
+    assert_eq!(e.session.live.as_ref().map(|l| l.tool), Some(Tool::Bevel));
     // Pen drafts on an empty second mesh; the square stays selected data.
     let mut e = editor_with(square_mesh(), vec![0]);
     e.dispatch(Command::NewMesh).unwrap();
     e.dispatch(Command::PenStart).unwrap();
-    assert!(e.pen_draft.is_some());
+    assert!(e.session.pen_draft.is_some());
     assert_refused(e, 0.25, "Pen");
 }
 

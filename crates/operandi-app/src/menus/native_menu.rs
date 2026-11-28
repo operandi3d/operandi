@@ -13,6 +13,7 @@ mod mac {
     use objc2_foundation::{MainThreadMarker, NSObject, NSObjectProtocol, NSString};
     use std::{
         cell::RefCell,
+        collections::HashMap,
         sync::{
             Mutex, OnceLock,
             atomic::{AtomicUsize, Ordering},
@@ -77,8 +78,11 @@ mod mac {
         /// The menu bar, to rebuild the model's menus in when their shape
         /// changes (menus as forms: live lists, edited forms).
         main: Retained<NSMenu>,
-        /// Leaves of the app menu (About), which a rebuild keeps.
+        /// Leaves of the app menu (About, Preferences…), which a rebuild keeps.
         app_leaves: usize,
+        /// What each app-menu command entry (by tag) was last set to:
+        /// enabled, tooltip, key equivalent.
+        app_items: HashMap<isize, (bool, Option<String>, String)>,
     }
     thread_local! {static STATE:RefCell<Option<State>>=const{RefCell::new(None)};}
     pub fn installed() -> bool {
@@ -195,6 +199,7 @@ mod mac {
             });
             if let Some(item) = application_item {
                 if let Some(menu) = item.submenu() {
+                    let mut about_at = None;
                     for entry in menu.itemArray().iter() {
                         let title = match entry.action() {
                             Some(action) if action == sel!(orderFrontStandardAboutPanel:) => {
@@ -205,6 +210,7 @@ mod mac {
                                 entry.setTarget(Some(&target));
                                 entry.setTag(leaves.len() as isize);
                                 leaves.push((entry.retain(), Action::About));
+                                about_at = Some(menu.indexOfItem(entry));
                                 Some("About Operandi")
                             }
                             Some(action) if action == sel!(hide:) => Some("Hide Operandi"),
@@ -215,6 +221,26 @@ mod mac {
                             entry.setTitle(&NSString::from_str(title));
                         }
                     }
+                    // #67: Preferences… in the Mac's usual place, About,
+                    // a separator, then Preferences (winit's own separator
+                    // follows, before Services). It runs the same line as
+                    // Edit > Preferences…, which stays. `sync` keeps its
+                    // greying and key equivalent current.
+                    let at = about_at.map_or(0, |at| at + 1);
+                    menu.insertItem_atIndex(&NSMenuItem::separatorItem(mtm), at);
+                    let preferences = NSMenuItem::initWithTitle_action_keyEquivalent(
+                        mtm.alloc(),
+                        &NSString::from_str("Preferences…"),
+                        Some(sel!(operandiMenuAction:)),
+                        &NSString::from_str(""),
+                    );
+                    preferences.setTarget(Some(&target));
+                    preferences.setTag(leaves.len() as isize);
+                    menu.insertItem_atIndex(&preferences, at + 1);
+                    leaves.push((
+                        preferences,
+                        crate::app_menu::line_action(crate::app_menu::PREFERENCES_LINE),
+                    ));
                 }
                 main.addItem(&item);
             } else {
@@ -244,11 +270,42 @@ mod mac {
                     model,
                     main,
                     app_leaves,
+                    app_items: HashMap::new(),
                 })
             });
         }
     }
-    pub fn sync(model: Vec<Menu>) {
+    /// Brings the app menu's command entries (Preferences…) up to date:
+    /// greyed when the same line is greyed in the model's menus, with
+    /// `preferences_key` as its key equivalent.
+    fn sync_app_leaves(state: &mut State, model: &[Menu], preferences_key: &str) {
+        for (native, action) in &state.leaves[..state.app_leaves] {
+            if !matches!(action, Action::Line(_)) {
+                continue;
+            }
+            let item = model
+                .iter()
+                .flat_map(Menu::leaves)
+                .find(|i| i.action == *action);
+            let enabled = item.is_some_and(|i| i.enabled);
+            let why = item.and_then(|i| i.why.clone());
+            let wanted = (enabled, why, preferences_key.to_owned());
+            // SAFETY: main-thread retained NSMenuItem and owned NSStrings,
+            // as in `apply`; the tag is a plain NSInteger.
+            let tag = unsafe { native.tag() };
+            if state.app_items.get(&tag) == Some(&wanted) {
+                continue;
+            }
+            // SAFETY: as above.
+            unsafe {
+                native.setEnabled(wanted.0);
+                native.setToolTip(wanted.1.as_deref().map(NSString::from_str).as_deref());
+                native.setKeyEquivalent(&NSString::from_str(&wanted.2));
+            }
+            state.app_items.insert(tag, wanted);
+        }
+    }
+    pub fn sync(model: Vec<Menu>, preferences_key: &str) {
         if tracking() {
             return;
         }
@@ -260,6 +317,7 @@ mod mac {
             let Some(state) = state.as_mut() else {
                 return;
             };
+            sync_app_leaves(state, &model, preferences_key);
             if state.model == model {
                 return;
             }
@@ -318,7 +376,7 @@ pub fn tracking() -> bool {
 #[cfg(not(target_os = "macos"))]
 pub fn install(_: eframe::egui::Context, _: Vec<crate::app_menu::Menu>) {}
 #[cfg(not(target_os = "macos"))]
-pub fn sync(_: Vec<crate::app_menu::Menu>) {}
+pub fn sync(_: Vec<crate::app_menu::Menu>, _: &str) {}
 #[cfg(not(target_os = "macos"))]
 pub fn take_actions() -> Vec<crate::app_menu::Action> {
     vec![]

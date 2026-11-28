@@ -307,7 +307,7 @@ fn grow_button_works_on_a_sphere() {
     let mut a = Operandi::empty();
     a.run(Command::NewMesh);
     a.activate(Tool::Sphere);
-    let params = a.editor.live.as_ref().unwrap().params.clone();
+    let params = a.editor.session.live.as_ref().unwrap().params.clone();
     a.run(Command::Preview(params));
     a.run(Command::Apply);
     a.run(Command::Drop);
@@ -346,7 +346,7 @@ fn next_and_previous_loop_rows_step_a_band() {
     let mut a = Operandi::empty();
     a.run(Command::NewMesh);
     a.activate(Tool::Sphere);
-    let params = a.editor.live.as_ref().unwrap().params.clone();
+    let params = a.editor.session.live.as_ref().unwrap().params.clone();
     a.run(Command::Preview(params));
     a.run(Command::Apply);
     a.run(Command::Drop);

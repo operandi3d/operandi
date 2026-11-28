@@ -11,7 +11,7 @@ fn add_cube(e: &mut Editor, x: f64) -> u64 {
     e.dispatch(Command::Preview(Parameters {
         position: DVec3::new(x, 0., 0.),
         size: DVec3::splat(2.),
-        ..e.live.as_ref().unwrap().params.clone()
+        ..e.session.live.as_ref().unwrap().params.clone()
     }))
     .unwrap();
     e.dispatch(Command::Drop).unwrap();
@@ -52,7 +52,7 @@ fn drag(e: &mut Editor, tool: Tool, delta: DVec3) {
     e.dispatch(Command::Activate(tool)).unwrap();
     e.dispatch(Command::Preview(Parameters {
         delta,
-        ..e.live.as_ref().unwrap().params.clone()
+        ..e.session.live.as_ref().unwrap().params.clone()
     }))
     .unwrap();
     e.dispatch(Command::Drop).unwrap();
@@ -76,7 +76,7 @@ fn move_moves_the_selection_on_every_mesh_in_one_step() {
     let steps = e.history.undo.len();
     e.dispatch(Command::Activate(Tool::Move)).unwrap();
     // One handle at the centre of both tops: x = 3, y = 1.
-    let frame = e.live.as_ref().unwrap().action_frame.unwrap();
+    let frame = e.session.live.as_ref().unwrap().action_frame.unwrap();
     assert!(
         frame.center.distance(DVec3::new(3., 1., 0.)) < 1e-9,
         "{:?}",
@@ -84,7 +84,7 @@ fn move_moves_the_selection_on_every_mesh_in_one_step() {
     );
     e.dispatch(Command::Preview(Parameters {
         delta: DVec3::Y,
-        ..e.live.as_ref().unwrap().params.clone()
+        ..e.session.live.as_ref().unwrap().params.clone()
     }))
     .unwrap();
     e.dispatch(Command::Drop).unwrap();
@@ -204,7 +204,7 @@ fn moved_items_move_their_points_in_world_space() {
     }
     e.dispatch(Command::Activate(Tool::Move)).unwrap();
     // Tops at world y = 1 and y = 6: centre y = 3.5.
-    let frame = e.live.as_ref().unwrap().action_frame.unwrap();
+    let frame = e.session.live.as_ref().unwrap().action_frame.unwrap();
     assert!((frame.center.y - 3.5).abs() < 1e-9, "{:?}", frame.center);
     e.dispatch(Command::Cancel).unwrap();
 }
@@ -221,7 +221,7 @@ fn item_mode_moves_rotates_and_scales_every_selected_item() {
     let steps = e.history.undo.len();
     e.dispatch(Command::Activate(Tool::Move)).unwrap();
     // The handle at the shared centre of the items' positions.
-    let frame = e.live.as_ref().unwrap().action_frame.unwrap();
+    let frame = e.session.live.as_ref().unwrap().action_frame.unwrap();
     assert!(frame.center.distance(DVec3::new(2., 0., 0.)) < 1e-9);
     e.dispatch(Command::Cancel).unwrap();
     drag(&mut e, Tool::Move, DVec3::Y);
@@ -305,7 +305,7 @@ fn item_mode_skips_locked_items_and_children_of_selected_parents() {
     assert!(
         e.dispatch(Command::Preview(Parameters {
             delta: DVec3::Y,
-            ..e.live.as_ref().unwrap().params.clone()
+            ..e.session.live.as_ref().unwrap().params.clone()
         }))
         .is_err()
     );

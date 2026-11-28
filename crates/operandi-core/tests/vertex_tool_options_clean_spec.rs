@@ -15,7 +15,7 @@ fn editor() -> Editor {
 }
 
 fn params(e: &Editor) -> &Parameters {
-    &e.live.as_ref().unwrap().params
+    &e.session.live.as_ref().unwrap().params
 }
 
 #[test]

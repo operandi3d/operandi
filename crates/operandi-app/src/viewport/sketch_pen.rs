@@ -34,6 +34,7 @@ impl Operandi {
             return points;
         }
         self.editor
+            .session
             .live
             .as_ref()
             .filter(|l| l.tool == Tool::SketchExtrude)
@@ -54,7 +55,7 @@ impl Operandi {
             stroke.plane_normal,
         ) else {
             self.status = "Sketch Extrude cannot project this pointer onto its frozen plane".into();
-            if let Some(live) = &mut self.editor.live {
+            if let Some(live) = &mut self.editor.session.live {
                 live.preview_error = Some(self.status.clone());
             }
             return;
@@ -75,13 +76,14 @@ impl Operandi {
         }
         if path.len() > 257 {
             self.status = "Sketch Extrude path exceeds 257 points".into();
-            if let Some(live) = &mut self.editor.live {
+            if let Some(live) = &mut self.editor.session.live {
                 live.preview_error = Some(self.status.clone());
             }
             return;
         }
         let Some(live) = self
             .editor
+            .session
             .live
             .as_ref()
             .filter(|l| l.tool == Tool::SketchExtrude)
@@ -107,7 +109,7 @@ impl Operandi {
             }
             Err(error) => {
                 self.status = error.clone();
-                if let Some(live) = &mut self.editor.live {
+                if let Some(live) = &mut self.editor.session.live {
                     live.preview_error = Some(error);
                 }
             }
@@ -116,7 +118,7 @@ impl Operandi {
     /// The Pen draft's construction plane: fixed by its first point, so
     /// orbiting mid-draft cannot put points on different planes.
     pub(super) fn pen_plane_point(&self, pos: Pos2, r: Rect) -> Option<DVec3> {
-        let (plane, center) = match (&self.editor.pen_draft, self.pen_plane) {
+        let (plane, center) = match (&self.editor.session.pen_draft, self.pen_plane) {
             (Some(d), Some(fixed)) if !d.points().is_empty() => fixed,
             _ => (self.actual_plane(), self.workplane_center()),
         };
@@ -128,7 +130,7 @@ impl Operandi {
     /// strip with a triangle.
     /// The Pen draft point under `pos`, if any (nearest within 8 px).
     pub(crate) fn pen_hit(&self, pos: Pos2, r: Rect) -> Option<usize> {
-        let draft = self.editor.pen_draft.as_ref()?;
+        let draft = self.editor.session.pen_draft.as_ref()?;
         draft
             .points()
             .iter()
@@ -157,7 +159,7 @@ impl Operandi {
         if mode != crate::draw_tools::DrawMode::Add {
             return None;
         }
-        let draft = self.editor.pen_draft.as_ref()?;
+        let draft = self.editor.session.pen_draft.as_ref()?;
         let first = draft.points().is_empty();
         let before = draft.points().len();
         let Some(point) = self.pen_plane_point(pos, r) else {
@@ -176,7 +178,7 @@ impl Operandi {
             Command::PenCapture(point)
         });
         self.clear_fields();
-        let draft = self.editor.pen_draft.as_ref()?;
+        let draft = self.editor.session.pen_draft.as_ref()?;
         if draft.points().len() <= before {
             return None;
         }
@@ -192,7 +194,7 @@ impl Operandi {
     /// DPM-06: a middle-click on a Pen draft point or Tube path point
     /// removes it (`and_after`: it and every later one). One undo step.
     pub(super) fn point_delete_press(&mut self, pos: Pos2, r: Rect, and_after: bool) {
-        if self.editor.pen_draft.is_some() {
+        if self.editor.session.pen_draft.is_some() {
             if let Some(index) = self.pen_hit(pos, r) {
                 self.run(Command::PenDelete { index, and_after });
                 self.clear_fields();
@@ -205,7 +207,7 @@ impl Operandi {
     /// the draft's other points are targets too, `dragged` (being moved)
     /// isn't. Unchanged when snapping is off or nothing is in range.
     pub(super) fn pen_snap(&mut self, point: DVec3, dragged: Option<usize>, r: Rect) -> DVec3 {
-        let Some(draft) = self.editor.pen_draft.as_ref() else {
+        let Some(draft) = self.editor.session.pen_draft.as_ref() else {
             self.note_snap_drag();
             return point;
         };
@@ -285,7 +287,14 @@ impl Operandi {
         };
         let point = self.pen_snap(point, Some(index), r);
         let point = self.symmetry_seam_snap(point, r);
-        if self.editor.pen_draft.as_ref().and_then(|d| d.current()) != Some(index) {
+        if self
+            .editor
+            .session
+            .pen_draft
+            .as_ref()
+            .and_then(|d| d.current())
+            != Some(index)
+        {
             self.run(Command::PenSelect(index));
         }
         self.run(Command::PenRefine(point));

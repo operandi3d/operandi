@@ -1002,6 +1002,20 @@ pub fn matches_chord(text: &str, key: eframe::egui::Key, mods: Modifiers) -> boo
             && expected.mac_cmd == mods.mac_cmd
     })
 }
+/// The macOS app menu's Preferences… key equivalent (#67), from the input
+/// map's Preferences binding: "," (shown as ⌘, and handled by the menu)
+/// while it is Cmd+, as by default; none once it's remapped or cleared, so
+/// the menu never shadows the new chord or takes Cmd+, from another action.
+pub fn preferences_key_equivalent(binding: Option<&str>) -> &'static str {
+    let cmd_comma = binding.is_some_and(|b| {
+        matches_chord(
+            b,
+            eframe::egui::Key::Comma,
+            eframe::egui::Modifiers::MAC_CMD,
+        )
+    });
+    if cmd_comma { "," } else { "" }
+}
 /// Actions that keep a live Move, Rotate, Scale or Transform tool and
 /// re-target it instead of needing Drop first (UIC-306).
 pub fn keeps_transform(action: &str) -> bool {

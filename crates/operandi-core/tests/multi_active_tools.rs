@@ -11,7 +11,7 @@ fn add_cube(e: &mut Editor, x: f64) -> u64 {
     e.dispatch(Command::Preview(Parameters {
         position: DVec3::new(x, 0., 0.),
         size: DVec3::splat(2.),
-        ..e.live.as_ref().unwrap().params.clone()
+        ..e.session.live.as_ref().unwrap().params.clone()
     }))
     .unwrap();
     e.dispatch(Command::Drop).unwrap();
@@ -242,7 +242,7 @@ fn several_mesh_edits_save_and_reopen() {
 /// Activate `tool`, preview with `edit` applied to its parameters, Drop.
 fn run_tool(e: &mut Editor, tool: Tool, edit: impl FnOnce(&mut Parameters)) {
     e.dispatch(Command::Activate(tool)).unwrap();
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     edit(&mut p);
     e.dispatch(Command::Preview(p)).unwrap();
     e.dispatch(Command::Drop).unwrap();
@@ -254,13 +254,13 @@ fn bevel_has_one_handle_and_bevels_every_mesh_in_one_step() {
     let (a0, b0) = (mesh(&e, a), mesh(&e, b));
     let steps = e.history.undo.len();
     e.dispatch(Command::Activate(Tool::Bevel)).unwrap();
-    let frame = e.live.as_ref().unwrap().action_frame.unwrap();
+    let frame = e.session.live.as_ref().unwrap().action_frame.unwrap();
     assert!(
         frame.center.distance(DVec3::new(3., 1., 0.)) < 1e-9,
         "one handle at the combined centre: {:?}",
         frame.center
     );
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     p.shift = 0.5;
     e.dispatch(Command::Preview(p)).unwrap();
     e.dispatch(Command::Drop).unwrap();
@@ -279,7 +279,7 @@ fn cancel_restores_every_mesh() {
     let (mut e, a, b) = tops();
     let (a0, b0) = (mesh(&e, a), mesh(&e, b));
     e.dispatch(Command::Activate(Tool::Inset)).unwrap();
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     p.inset = 0.2;
     e.dispatch(Command::Preview(p)).unwrap();
     assert_ne!(mesh(&e, b), b0);
@@ -351,7 +351,7 @@ fn extrude_runs_on_every_mesh_and_selects_each_mesh_caps() {
 fn bevel_continue_works_on_every_mesh() {
     let (mut e, a, b) = tops();
     e.dispatch(Command::Activate(Tool::Bevel)).unwrap();
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     p.shift = 0.5;
     e.dispatch(Command::Preview(p.clone())).unwrap();
     e.dispatch(Command::Continue).unwrap();
@@ -439,7 +439,7 @@ fn tweak_edits_whichever_active_mesh_it_grabs() {
     let (mut e, a, b) = two_in(Mode::Vertex);
     let (a0, b0) = (mesh(&e, a), mesh(&e, b));
     e.dispatch(Command::Activate(Tool::Tweak)).unwrap();
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     p.tweak = Some(TweakGrab {
         item: b,
         element: TweakElement::Vertex(0),

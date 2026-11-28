@@ -294,7 +294,7 @@ impl Editor {
             let mut next = self.clone();
             next.selected_weight_map = name;
             if next.spatial_falloff.is_some()
-                && let Some(l) = next.live.as_ref().filter(|l| l.applied)
+                && let Some(l) = next.session.live.as_ref().filter(|l| l.applied)
             {
                 next.dispatch(Command::Preview(l.params.clone()))?;
             }
@@ -380,14 +380,14 @@ impl Editor {
             Command::InsertUnit { .. }
                 | Command::InsertEllipsoidUnit(_)
                 | Command::InsertShapeUnit(..)
-        ) && (self.has_active_task() || self.i2_active())
+        ) && (self.session.has_active_task() || self.i2_active())
         {
             if self.selection_start.is_some() {
                 return Err("Finish the selection gesture before unit insertion".into());
             }
             let mut staged = self.clone();
             staged.dispatch(Command::Drop)?;
-            if staged.has_active_task() || staged.i2_active() {
+            if staged.session.has_active_task() || staged.i2_active() {
                 return Err("Finish the current tool before unit insertion".into());
             }
             staged.dispatch(cmd)?;
@@ -400,7 +400,7 @@ impl Editor {
                 crate::active_task::ToolSwitch::Replace => {
                     let mut staged = self.clone();
                     staged.dispatch(Command::Drop)?;
-                    if staged.has_active_task() || staged.i2_active() {
+                    if staged.session.has_active_task() || staged.i2_active() {
                         return Err("Finish the current tool before starting another".into());
                     }
                     staged.dispatch(cmd)?;
@@ -427,7 +427,7 @@ impl Editor {
                 | Command::ToggleItemSelection(_)
                 | Command::SelectGroup(_)
         ) && self.selection_keeps_tool()
-            && let Some(live) = self.live.as_ref()
+            && let Some(live) = self.session.live.as_ref()
         {
             let tool = live.tool;
             return self.retarget_transform(tool, cmd);
@@ -439,7 +439,7 @@ impl Editor {
             Command::Selection(crate::SelectionOperation::Grow | crate::SelectionOperation::Shrink)
         ) && self.scene.selection.mode != Mode::Item
             && self.selection_keeps_tool()
-            && let Some(live) = self.live.as_ref()
+            && let Some(live) = self.session.live.as_ref()
         {
             let tool = live.tool;
             return self.retarget_transform(tool, cmd);
@@ -479,7 +479,7 @@ impl Editor {
         if let Command::SolidSketchStrip = &cmd {
             return self.strip_solid_sketch();
         }
-        if self.solid_sketch.is_some()
+        if self.session.solid_sketch.is_some()
             || matches!(
                 &cmd,
                 Command::SolidSketchStart { .. } | Command::SolidSketch { .. }
@@ -487,7 +487,7 @@ impl Editor {
         {
             return self.solid_sketch_command(cmd, report);
         }
-        if self.pen_draft.is_some()
+        if self.session.pen_draft.is_some()
             || matches!(
                 &cmd,
                 Command::PenStart
@@ -497,8 +497,8 @@ impl Editor {
                     | Command::PenRefine(_)
             )
         {
-            let point_undo = self.pen_draft.is_some() && matches!(&cmd, Command::Undo);
-            let cancel = self.pen_draft.is_some() && matches!(&cmd, Command::Cancel);
+            let point_undo = self.session.pen_draft.is_some() && matches!(&cmd, Command::Undo);
+            let cancel = self.session.pen_draft.is_some() && matches!(&cmd, Command::Cancel);
             let result = self.interactive_pen_command(cmd);
             if result.is_ok()
                 && let Some(report) = report
@@ -542,6 +542,7 @@ impl Editor {
             self.uv_symmetry = *s;
             // A live UV tool redoes its result with the new layer.
             if let Some(l) = self
+                .session
                 .live
                 .as_ref()
                 .filter(|l| l.applied && l.params.uv.is_some())
@@ -585,7 +586,7 @@ impl Editor {
         if matches!(cmd, Command::ResetToolAttributes) {
             return self.reset_tool_attributes();
         }
-        if self.bridge.is_some() && matches!(&cmd, Command::Pen(_)) {
+        if self.session.bridge.is_some() && matches!(&cmd, Command::Pen(_)) {
             return Err("Drop or Cancel Bridge before Pen".into());
         }
         if let Command::Pen(input) = &cmd {
@@ -597,7 +598,7 @@ impl Editor {
         }
         // RED-001: the Reduction session owns input until Drop or Cancel.
         // Picking another tool is handled by `tool_switch` above.
-        if self.reduction.is_some()
+        if self.session.reduction.is_some()
             && !matches!(
                 &cmd,
                 Command::InitializeReduction
@@ -613,7 +614,7 @@ impl Editor {
                 "Drop or Cancel Polygon Reduction before changing selection or context".into(),
             );
         }
-        if self.bridge.is_some()
+        if self.session.bridge.is_some()
             && !matches!(
                 &cmd,
                 Command::ConfigureBridge(_)
@@ -627,7 +628,7 @@ impl Editor {
         {
             return Err("Drop or Cancel Bridge before changing selection or context".into());
         }
-        if self.spike.is_some()
+        if self.session.spike.is_some()
             && !matches!(
                 &cmd,
                 Command::ConfigureSpike(_)
@@ -641,7 +642,7 @@ impl Editor {
         {
             return Err("Drop or Cancel Spike before changing selection or context".into());
         }
-        if self.ellipsoid.is_some()
+        if self.session.ellipsoid.is_some()
             && !matches!(
                 &cmd,
                 Command::ConfigureEllipsoid(_)
@@ -668,7 +669,7 @@ impl Editor {
         let shaped_by_falloff = |kind: crate::ShapeKind| {
             matches!(kind, crate::ShapeKind::Torus | crate::ShapeKind::Capsule)
         };
-        if let Some(active) = self.shape.as_ref().map(|s| s.kind())
+        if let Some(active) = self.session.shape.as_ref().map(|s| s.kind())
             && !(shaped_by_falloff(active)
                 && matches!(
                     &cmd,
@@ -695,7 +696,11 @@ impl Editor {
         }
         // Retargeting resolves the current surface stage through the existing
         // atomic Drop contract before selection can own it.
-        if self.live.as_ref().is_some_and(|l| l.tool.is_smooth_shift())
+        if self
+            .session
+            .live
+            .as_ref()
+            .is_some_and(|l| l.tool.is_smooth_shift())
             && matches!(
                 &cmd,
                 Command::SelectItem(_)
@@ -758,6 +763,7 @@ impl Editor {
             Command::BeginExtrude => unreachable!("handled by I2 boundary"),
             Command::StartExtrude => {
                 let live = self
+                    .session
                     .live
                     .as_ref()
                     .filter(|l| l.tool == Tool::Extrude && !l.applied)
@@ -782,6 +788,7 @@ impl Editor {
             Command::ResetPrimitive => self.reset_primitive()?,
             Command::PrimitiveUvs(on) => {
                 let live = self
+                    .session
                     .live
                     .as_ref()
                     .filter(|l| l.tool.is_primitive())
@@ -798,12 +805,12 @@ impl Editor {
             Command::ArmEllipsoid => self.arm_ellipsoid()?,
             Command::ConfigureEllipsoid(p) => self.configure_ellipsoid(p)?,
             Command::ResetEllipsoid => {
-                if self.live.is_some() || self.cone.is_some() {
+                if self.session.live.is_some() || self.session.cone.is_some() {
                     return Err("Drop or Cancel the other tool before Ellipsoid Reset".into());
                 }
                 let mut staged = self.clone();
                 staged.presets.forget::<crate::EllipsoidPreset>();
-                if staged.ellipsoid.is_none() {
+                if staged.session.ellipsoid.is_none() {
                     staged.arm_ellipsoid()?;
                 }
                 staged.configure_ellipsoid(Default::default())?;
@@ -814,10 +821,13 @@ impl Editor {
                 self.insert_shape_unit(shape, destination)?
             }
             Command::ArmShape(kind) => {
-                if self.shape.is_some() {
+                if self.session.shape.is_some() {
                     return self.dispatch(Command::Drop);
                 }
-                if self.live.is_some() || self.cone.is_some() || self.ellipsoid.is_some() {
+                if self.session.live.is_some()
+                    || self.session.cone.is_some()
+                    || self.session.ellipsoid.is_some()
+                {
                     let mut staged = self.clone();
                     staged.dispatch(Command::Drop)?;
                     staged.dispatch(Command::ArmShape(kind))?;
@@ -833,7 +843,11 @@ impl Editor {
             Command::InsertUnit { tool, destination } => self.insert_unit(tool, destination)?,
             Command::ActionContext(context) => self.handle_action_context(context)?,
             Command::SetActionCenter(point)
-                if self.live.as_ref().is_some_and(|l| l.tool == Tool::Bend) =>
+                if self
+                    .session
+                    .live
+                    .as_ref()
+                    .is_some_and(|l| l.tool == Tool::Bend) =>
             {
                 self.set_bend_center(point, None)?;
             }
@@ -841,14 +855,18 @@ impl Editor {
                 if plane > 2 {
                     return Err("The work plane must be 0, 1 or 2".into());
                 }
-                match self.live.as_ref().map(|l| l.tool) {
+                match self.session.live.as_ref().map(|l| l.tool) {
                     Some(Tool::Bend) => self.set_bend_center(point, Some(plane))?,
                     Some(_) => return Err("This tool has no click setup".into()),
                     None => return Err("No active tool".into()),
                 }
             }
             Command::SetActionCenter(point) => {
-                let live = self.live.as_mut().ok_or("No active transform tool")?;
+                let live = self
+                    .session
+                    .live
+                    .as_mut()
+                    .ok_or("No active transform tool")?;
                 // ACS-07: any tool that pivots through the pivot service
                 // takes a placed centre (the transforms, and Smooth Shift
                 // and Thicken, ACS-20; the polygon stage's side, ACS-21).
@@ -865,7 +883,7 @@ impl Editor {
                 // Selection axes under Symmetry follow the side the centre
                 // was placed on (S-02), so centre, axes and the side that
                 // drives the edit agree; other axes stay as they are.
-                let basis = match &self.live {
+                let basis = match &self.session.live {
                     Some(live)
                         if self.action_context.axis == crate::AxisOrientation::Selection
                             && live.params.uv.is_none() =>
@@ -879,7 +897,11 @@ impl Editor {
                     }
                     _ => frame.basis,
                 };
-                let live = self.live.as_mut().ok_or("No active transform tool")?;
+                let live = self
+                    .session
+                    .live
+                    .as_mut()
+                    .ok_or("No active transform tool")?;
                 live.action_frame = Some(crate::ActionFrame {
                     center: point,
                     basis,
@@ -887,7 +909,11 @@ impl Editor {
                 live.placed_centre = Some(point);
             }
             Command::ResetActionCenter => {
-                let live = self.live.as_ref().ok_or("No active transform tool")?;
+                let live = self
+                    .session
+                    .live
+                    .as_ref()
+                    .ok_or("No active transform tool")?;
                 let frame = live.action_frame.ok_or("This tool has no center to move")?;
                 // Resolved against the tool's base, so after a drag the
                 // handle (center + delta) still sits on the moved selection.
@@ -901,7 +927,7 @@ impl Editor {
                 } else {
                     frame.basis
                 };
-                if let Some(live) = &mut self.live {
+                if let Some(live) = &mut self.session.live {
                     live.action_frame = Some(crate::ActionFrame {
                         center: own.center,
                         basis,
@@ -914,6 +940,7 @@ impl Editor {
             Command::DuplicateSelectedPolygons => self.duplicate_selected_polygons()?,
             Command::ConfigureChamfer(parameters) => {
                 let live = self
+                    .session
                     .live
                     .as_ref()
                     .filter(|l| l.tool == Tool::Chamfer)
@@ -924,7 +951,7 @@ impl Editor {
                 *self.presets.get_mut::<crate::ChamferPreset>() = parameters;
             }
             Command::ChamferOnce(parameters) => {
-                if self.live.is_some() {
+                if self.session.live.is_some() {
                     return Err("Finish or Cancel the active tool first".into());
                 }
                 let mut staged = self.clone();
@@ -934,12 +961,12 @@ impl Editor {
                 *self = staged;
             }
             Command::PolyHaulOnce(offset) => {
-                if self.live.is_some() {
+                if self.session.live.is_some() {
                     return Err("Finish or Cancel the active tool first".into());
                 }
                 let mut staged = self.clone();
                 staged.dispatch(Command::Activate(Tool::PolyHaul))?;
-                let mut params = staged.live.as_ref().unwrap().params.clone();
+                let mut params = staged.session.live.as_ref().unwrap().params.clone();
                 params.poly_haul_offset = offset;
                 staged.dispatch(Command::Preview(params))?;
                 staged.dispatch(Command::Drop)?;
@@ -965,6 +992,7 @@ impl Editor {
             Command::ConfigureExtrude(p) => self.handle_configure_extrude(p)?,
             Command::ResetPolyHaul => {
                 let live = self
+                    .session
                     .live
                     .as_ref()
                     .filter(|l| l.tool == Tool::PolyHaul)
@@ -975,6 +1003,7 @@ impl Editor {
             }
             Command::ResetSketchExtrude => {
                 let live = self
+                    .session
                     .live
                     .as_ref()
                     .filter(|l| l.tool == Tool::SketchExtrude)
@@ -985,6 +1014,7 @@ impl Editor {
             }
             Command::ResetBend => {
                 let live = self
+                    .session
                     .live
                     .as_ref()
                     .filter(|l| l.tool == Tool::Bend)
@@ -995,6 +1025,7 @@ impl Editor {
             }
             Command::ResetVertexMerge => {
                 let live = self
+                    .session
                     .live
                     .as_ref()
                     .filter(|l| l.tool == Tool::VertexMerge)
@@ -1005,13 +1036,13 @@ impl Editor {
             }
             Command::ResetExtrude => {
                 let mut p = Parameters::default();
-                if let Some(l) = &self.live {
+                if let Some(l) = &self.session.live {
                     p.extrude_uv_map = l.params.extrude_uv_map.clone();
                     p.extrude_uv_selected = l.params.extrude_uv_selected;
                 }
                 // Reset is atomic and can restore U while setters are unavailable.
                 let mut staged = self.clone();
-                if let Some(l) = &mut staged.live {
+                if let Some(l) = &mut staged.session.live {
                     l.params.extrude_uvs = p.extrude_uvs;
                 }
                 staged.dispatch(Command::ConfigureExtrude(p))?;
@@ -1022,12 +1053,16 @@ impl Editor {
             // Automatic centre and Auto axis are in place for the life of
             // the tool and go back on drop (TP-12).
             Command::Activate(Tool::Bend)
-                if !self.preset.as_ref().is_some_and(|p| p.tool == Tool::Bend) =>
+                if !self
+                    .session
+                    .preset
+                    .as_ref()
+                    .is_some_and(|p| p.tool == Tool::Bend) =>
             {
                 self.activate_preset(crate::tool_preset::BEND_ROW)?;
                 // BN-47: a remembered Angle shows on the mesh at once, so
                 // the panel and the preview agree.
-                if let Some(l) = self.live.as_ref().filter(|l| l.tool == Tool::Bend)
+                if let Some(l) = self.session.live.as_ref().filter(|l| l.tool == Tool::Bend)
                     && l.params.bend.angle != 0.
                 {
                     let p = l.params.clone();
@@ -1048,7 +1083,7 @@ impl Editor {
             Command::ActivatePreset(name) => self.activate_preset(&name)?,
             Command::Preview(p) => {
                 if let Err(error) = self.preview(p, false) {
-                    if let Some(live) = self.live.as_mut()
+                    if let Some(live) = self.session.live.as_mut()
                         && (matches!(live.tool, Tool::Bevel | Tool::TwistBevel | Tool::Extrude)
                             || live.tool.is_smooth_shift())
                     {
@@ -1080,7 +1115,7 @@ impl Editor {
                 }
             }
             Command::EndSelection { cancel } => {
-                let partners = std::mem::take(&mut self.gesture_partners);
+                let partners = std::mem::take(&mut self.session.gesture_partners);
                 if !cancel {
                     self.scene.partners_last(&partners);
                 }
@@ -1111,7 +1146,7 @@ impl Editor {
                 {
                     self.scene.select_component(item, mirror, false, remove)?;
                     if self.selection_start.is_some() && !remove {
-                        self.gesture_partners.push((item, mirror));
+                        self.session.gesture_partners.push((item, mirror));
                     }
                 }
                 if let Some(before) = before

@@ -6138,7 +6138,7 @@ mod tests {
         let mut e = Editor::default();
         e.scene.new_mesh().unwrap();
         e.dispatch(Command::Activate(Tool::Sphere)).unwrap();
-        let mut p = e.live.as_ref().unwrap().params.clone();
+        let mut p = e.session.live.as_ref().unwrap().params.clone();
         p.radial = Some(RadialParameters {
             radius: DVec3::splat(0.5),
             sides: 24,

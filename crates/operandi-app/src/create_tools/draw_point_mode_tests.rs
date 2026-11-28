@@ -389,9 +389,9 @@ fn dpm_t10_deleting_a_bezier_anchor_takes_its_handles() {
 fn pen(points: &[DVec3], quads: bool) -> (Operandi, Context) {
     let (mut a, ctx) = empty_app();
     a.start_interactive_pen();
-    assert!(a.editor.pen_draft.is_some(), "{}", a.status);
+    assert!(a.editor.session.pen_draft.is_some(), "{}", a.status);
     if quads {
-        let mut o = a.editor.pen_draft.as_ref().unwrap().options();
+        let mut o = a.editor.session.pen_draft.as_ref().unwrap().options();
         o.make_quads = true;
         assert!(a.run_ok(Command::PenOptions(o)), "{}", a.status);
     }
@@ -402,7 +402,13 @@ fn pen(points: &[DVec3], quads: bool) -> (Operandi, Context) {
     (a, ctx)
 }
 fn pen_points(a: &Operandi) -> Vec<DVec3> {
-    a.editor.pen_draft.as_ref().unwrap().points().to_vec()
+    a.editor
+        .session
+        .pen_draft
+        .as_ref()
+        .unwrap()
+        .points()
+        .to_vec()
 }
 
 #[test]
@@ -413,7 +419,10 @@ fn dpm_t12_pen_delete_mode_removes_a_point_and_add_goes_after_current() {
     click(&mut a, &ctx, p);
     let f = four();
     assert_eq!(pen_points(&a), vec![f[0], f[1], f[3]], "{}", a.status);
-    assert_eq!(a.editor.pen_draft.as_ref().unwrap().current(), Some(1));
+    assert_eq!(
+        a.editor.session.pen_draft.as_ref().unwrap().current(),
+        Some(1)
+    );
     a.point_modes.pen = DrawMode::Add;
     let q = DVec3::new(1.5, -1., 0.);
     let s = screen(&a, q);
@@ -496,7 +505,7 @@ fn d2_deleting_a_make_quads_point_removes_its_pair() {
 fn tube(points: Vec<DVec3>) -> (Operandi, Context) {
     let (mut a, ctx) = empty_app();
     a.arm_shape(operandi_core::ShapeKind::Tube);
-    let mut p = a.editor.shape.as_ref().unwrap().requested.clone();
+    let mut p = a.editor.session.shape.as_ref().unwrap().requested.clone();
     if let operandi_core::ShapeParameters::Tube(t) = &mut p {
         t.points = points;
     }
@@ -505,7 +514,7 @@ fn tube(points: Vec<DVec3>) -> (Operandi, Context) {
     (a, ctx)
 }
 fn tube_params(a: &Operandi) -> operandi_core::TubeParameters {
-    match &a.editor.shape.as_ref().unwrap().requested {
+    match &a.editor.session.shape.as_ref().unwrap().requested {
         operandi_core::ShapeParameters::Tube(t) => t.clone(),
         _ => panic!("not a tube"),
     }
@@ -812,7 +821,7 @@ fn dsn_tube_point_stays_snapped_while_the_pointer_moves_within_range() {
         curve_kind(),
     );
     a.arm_shape(operandi_core::ShapeKind::Tube);
-    let mut p = a.editor.shape.as_ref().unwrap().requested.clone();
+    let mut p = a.editor.session.shape.as_ref().unwrap().requested.clone();
     if let operandi_core::ShapeParameters::Tube(t) = &mut p {
         t.points = pts.clone();
     }

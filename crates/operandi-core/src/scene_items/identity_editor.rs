@@ -53,7 +53,11 @@ impl Editor {
         if selected != self.scene.selection.faces {
             return Err("Stable target selection changed".into());
         }
-        if let Some(live) = self.live.as_ref().filter(|l| l.tool == Tool::Extrude)
+        if let Some(live) = self
+            .session
+            .live
+            .as_ref()
+            .filter(|l| l.tool == Tool::Extrude)
             && (matches!(&cmd, Command::Preview(_))
                 || matches!(&cmd, Command::Apply) && !live.applied)
         {
@@ -112,7 +116,7 @@ impl Editor {
     ) -> Result<()> {
         // UIC-307: a top-level command an open tool would refuse settles
         // the tool, runs, and starts the tool again (tool_yield.rs).
-        if self.dispatch_depth == 0
+        if self.session.dispatch_depth == 0
             && let Some(restart) = self.restart_command()
         {
             let retry = cmd.clone();
@@ -146,17 +150,17 @@ impl Editor {
         // would make it live or change the mesh; picking a tool flagged
         // off arms it. Only for top-level commands, so staged one-shots
         // and the tools' own inner commands run as before.
-        let top = self.dispatch_depth == 0;
+        let top = self.session.dispatch_depth == 0;
         if top && let Some(result) = self.armed_command(&cmd) {
             return result;
         }
         let arms = top && crate::click_start::may_arm(&cmd);
-        self.dispatch_depth += 1;
-        let task_before = self.active_task();
+        self.session.dispatch_depth += 1;
+        let task_before = self.session.active_task();
         let unadopted = self.adopt_last_mesh_for(&cmd);
         let adopted = unadopted.as_ref().map(|_| self.scene.clone());
         let result = self.dispatch_selected(cmd, report);
-        self.dispatch_depth = self.dispatch_depth.saturating_sub(1);
+        self.session.dispatch_depth = self.session.dispatch_depth.saturating_sub(1);
         if arms && result.is_ok() {
             self.arm_if_flagged();
         }
@@ -210,7 +214,7 @@ impl Editor {
         // Invalidate even a byte-identical replacement, rather than infer that
         // coincident/recreated components survived. Selection/context-only routes
         // do not enter this category. Changed unported meshes also rebind in sync.
-        let topology_tool = self.live.as_ref().is_some_and(|l| {
+        let topology_tool = self.session.live.as_ref().is_some_and(|l| {
             matches!(
                 l.tool,
                 Tool::Box
@@ -239,11 +243,11 @@ impl Editor {
         let unported_topology = match &cmd {
             Command::Apply => {
                 topology_tool
-                    || self.spike.is_some()
-                    || self.bridge.is_some()
-                    || self.cone.is_some()
-                    || self.ellipsoid.is_some()
-                    || self.shape.is_some()
+                    || self.session.spike.is_some()
+                    || self.session.bridge.is_some()
+                    || self.session.cone.is_some()
+                    || self.session.ellipsoid.is_some()
+                    || self.session.shape.is_some()
             }
             // Live Drop publishes session/history only: its preview was
             // already rebound. Numeric constructors append at Drop, which is
@@ -253,7 +257,7 @@ impl Editor {
             Command::ConfigureBevel(_)
             | Command::ConfigureSmoothShift(_)
             | Command::ConfigureChamfer(_) => {
-                topology_tool && self.live.as_ref().is_some_and(|l| l.applied)
+                topology_tool && self.session.live.as_ref().is_some_and(|l| l.applied)
             }
             _ => false,
         };
@@ -412,7 +416,7 @@ impl Editor {
                     }
                 }
             }
-            if staged.live.is_none() {
+            if staged.session.live.is_none() {
                 staged.multi_fresh.clear();
             }
             for c in staged
@@ -453,14 +457,14 @@ impl Editor {
                 // Allocation marks belong to the shared document bank, not
                 // staged snapshots. Err cannot rewind their consumed ranges.
                 if preserve_numeric_draft {
-                    self.ellipsoid = staged.ellipsoid;
-                    self.shape = staged.shape;
-                    self.cone = staged.cone;
-                    self.spike = staged.spike;
+                    self.session.ellipsoid = staged.session.ellipsoid;
+                    self.session.shape = staged.session.shape;
+                    self.session.cone = staged.session.cone;
+                    self.session.spike = staged.session.spike;
                 }
                 // Existing invalid-preview diagnostics are UI/session state. They do
                 // not publish the failed geometry or replace accepted history.
-                if let (Some(l), Some(s)) = (&mut self.live, &staged.live) {
+                if let (Some(l), Some(s)) = (&mut self.session.live, &staged.session.live) {
                     if let Some(report) = report {
                         report.live_diagnostic_changed = l.preview_error != s.preview_error;
                     }

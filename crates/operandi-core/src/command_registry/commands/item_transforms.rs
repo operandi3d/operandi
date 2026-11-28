@@ -133,6 +133,11 @@ pub(super) const COMMANDS: &[Entry] = &[
             &[jreq("item", "integer", "The texture layer's id.")],
         )
         .example("texture.delete item:4294967298"),
+    script("operandi.texture.loadImage", Shading, "Browse… on an Image Map layer: the picture filename: becomes layer:'s image. One undo step. Without a filename opens the file panel.")
+        .operandi()
+        .args(&[arg("layer", INT, N), opt("filename", ArgType::Path, N, None)])
+        .undo()
+        .example("operandi.texture.loadImage layer:4294967298 filename:/textures/wood.png"),
     script("operandi.environment.loadImage", Shading, "Load Image…: the picture filename: becomes environment item:'s image (default the top environment, made when there is none); it replaces the picture of the environment's image layer, keeping its rotation and opacity, or adds an Image Map layer above the Environment Material. One undo step. Without a filename opens the file panel.")
         .operandi()
         .args(&[opt("filename", ArgType::Path, N, None), opt("item", INT, N, None)])

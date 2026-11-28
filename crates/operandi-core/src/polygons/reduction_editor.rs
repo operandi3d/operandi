@@ -68,7 +68,7 @@ impl Editor {
     }
     pub(crate) fn arm_reduction(&mut self) -> Result<()> {
         self.numeric_arm_guard("Polygon Reduction")?;
-        self.reduction = Some(NumericReduction::default());
+        self.session.reduction = Some(NumericReduction::default());
         Ok(())
     }
     /// RED-002 stationary initialization: captures the source and shows its
@@ -76,6 +76,7 @@ impl Editor {
     /// initialized keeps the current session.
     pub(crate) fn initialize_reduction(&mut self) -> Result<()> {
         let session = self
+            .session
             .reduction
             .as_ref()
             .ok_or("Arm Polygon Reduction first")?;
@@ -105,6 +106,7 @@ impl Editor {
             count,
         };
         let session = self
+            .session
             .reduction
             .as_mut()
             .ok_or("Arm Polygon Reduction first")?;
@@ -116,12 +118,13 @@ impl Editor {
     pub(crate) fn configure_reduction(&mut self, p: ReductionParameters) -> Result<()> {
         p.validate_basic()?;
         let session = self
+            .session
             .reduction
             .as_ref()
             .ok_or("Arm Polygon Reduction first")?;
         let Some(count) = session.current_count() else {
             // Armed: retain the target for Apply; 0 remains the status.
-            self.reduction.as_mut().unwrap().parameters = p;
+            self.session.reduction.as_mut().unwrap().parameters = p;
             return Ok(());
         };
         // Number 0 (the default) or at least the current count changes
@@ -132,13 +135,14 @@ impl Editor {
             p.number
         };
         self.publish_reduction(requested, &p)?;
-        self.reduction.as_mut().unwrap().parameters = p;
+        self.session.reduction.as_mut().unwrap().parameters = p;
         Ok(())
     }
     /// Replace the displayed preview with the reduction of the immutable
     /// source. The requested source count restores source scene/identities.
     fn publish_reduction(&mut self, requested: u32, p: &ReductionParameters) -> Result<()> {
         let source = self
+            .session
             .reduction
             .as_ref()
             .and_then(|s| s.source.clone())
@@ -204,7 +208,8 @@ impl Editor {
             (self.scene, self.identities.current) = previous;
             return Err(e);
         }
-        self.reduction
+        self.session
+            .reduction
             .as_mut()
             .ok_or("Arm Polygon Reduction first")?
             .achieved = Some(achieved);
@@ -221,6 +226,7 @@ impl Editor {
     /// armed target is initialized from the current scene first.
     pub(crate) fn apply_reduction(&mut self) -> Result<()> {
         let session = self
+            .session
             .reduction
             .as_ref()
             .ok_or("Arm Polygon Reduction first")?;
@@ -234,6 +240,7 @@ impl Editor {
             self.configure_reduction(p)?;
         }
         let session = self
+            .session
             .reduction
             .as_mut()
             .ok_or("Arm Polygon Reduction first")?;
@@ -249,7 +256,11 @@ impl Editor {
     /// RED-004 Drop: publish a changed preview and exit. Armed Drop records
     /// nothing.
     pub(crate) fn drop_reduction(&mut self) -> Result<()> {
-        let session = self.reduction.take().ok_or("Arm Polygon Reduction first")?;
+        let session = self
+            .session
+            .reduction
+            .take()
+            .ok_or("Arm Polygon Reduction first")?;
         if let Some(source) = session.source {
             self.record_reduction(source);
         }
@@ -258,7 +269,11 @@ impl Editor {
     /// RED-004 explicit Cancel: discard only the uncommitted preview. History,
     /// redo and earlier Applied edits are untouched.
     pub(crate) fn cancel_reduction(&mut self) -> Result<()> {
-        let session = self.reduction.take().ok_or("Arm Polygon Reduction first")?;
+        let session = self
+            .session
+            .reduction
+            .take()
+            .ok_or("Arm Polygon Reduction first")?;
         if let Some(source) = session.source {
             self.scene = source.scene;
             self.identities.current = source.identities;

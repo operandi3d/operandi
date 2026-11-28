@@ -72,7 +72,7 @@ fn empty_mesh_item_takes_the_transform_tool() {
         delta: DVec3::new(0., 1., 0.),
         rotation_delta: DVec3::new(0., 0., 90.),
         scale_delta: DVec3::splat(3.),
-        ..e.live.as_ref().unwrap().params.clone()
+        ..e.session.live.as_ref().unwrap().params.clone()
     }))
     .unwrap();
     e.dispatch(Command::Drop).unwrap();
@@ -95,7 +95,7 @@ fn empty_mesh_moves_with_other_selected_items() {
     e.dispatch(Command::Activate(Tool::Move)).unwrap();
     e.dispatch(Command::Preview(Parameters {
         delta: DVec3::new(0., 0., 2.),
-        ..e.live.as_ref().unwrap().params.clone()
+        ..e.session.live.as_ref().unwrap().params.clone()
     }))
     .unwrap();
     e.dispatch(Command::Drop).unwrap();

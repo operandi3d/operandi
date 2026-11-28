@@ -415,11 +415,14 @@ impl crate::Editor {
     /// Whether a shape (primitive) tool or numeric constructor is open:
     /// those add geometry to the primary mesh whatever is selected.
     pub(crate) fn creating_shape(&self) -> bool {
-        self.live.as_ref().is_some_and(|l| l.tool.is_primitive())
-            || self.ellipsoid.is_some()
-            || self.shape.is_some()
-            || self.cone.is_some()
-            || self.pen_draft.is_some()
+        self.session
+            .live
+            .as_ref()
+            .is_some_and(|l| l.tool.is_primitive())
+            || self.session.ellipsoid.is_some()
+            || self.session.shape.is_some()
+            || self.session.cone.is_some()
+            || self.session.pen_draft.is_some()
     }
 }
 

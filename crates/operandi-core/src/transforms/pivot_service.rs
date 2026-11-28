@@ -10,10 +10,14 @@
 //! Symmetry setting (axis, offset, topology); and a centre placed by a
 //! viewport click or typed into the tool (ACS-07).
 //!
-//! Outputs: a list of [`Pivot`]s, each a world frame, the points it drives
-//! and whether it is the primary pivot or its mirror image. Without
-//! Symmetry there is one pivot (one per island under Local); with Symmetry
-//! there is the primary pivot and its mirror.
+//! Outputs ([`Resolved`], AC-RULES v6): the handle's frame and, for each
+//! mesh the tool moves, its *groups*: one group for a centre rule with one
+//! centre, one per cluster under Local. A group has a stable identity, the
+//! world frame its points take the values in, and its targets: every
+//! point it drives with that point's Symmetry role and side. The transform
+//! tools' preview (drag and typed values), their handle and their fields
+//! all read this one answer; none of them works out targets, clusters,
+//! mirror roles or frames for itself.
 //!
 //! Every tool that pivots or picks a Symmetry side asks this module:
 //! Move, Rotate, Scale, Transform (and Stretch, Scale's non-uniform use),
@@ -22,27 +26,81 @@
 //! side, Twist Bevel's and the two-pass phase 2 tools. Nothing else
 //! computes a handle centre under Symmetry or picks a side.
 use crate::symmetry::{Side, Symmetry, match_tolerance};
-use crate::{ActionContext, ActionFrame, CenterMode, Mesh, Mode, Result, Scene, Tool};
+use crate::{ActionContext, ActionFrame, AxisOrientation, CenterMode, LocalPiece};
+use crate::{Mesh, Mode, Result, Scene, Selection, Shared, Tool};
 use glam::{DMat3, DMat4, DVec3};
 use std::collections::BTreeSet;
+use std::sync::{Arc, Mutex};
 
-/// One pivot: a world frame, the item's points it drives and whether it is
-/// the mirror image of the primary pivot (ACS-04).
+/// The service's whole answer for one tool on one base scene.
 #[derive(Clone, Debug, PartialEq)]
-pub struct Pivot {
-    pub frame: ActionFrame,
-    pub points: Vec<u32>,
-    pub mirrored: bool,
-}
-
-/// Everything a tool needs to apply its values once per pivot.
-#[derive(Clone, Debug, PartialEq)]
-pub struct Pivots {
-    pub pivots: Vec<Pivot>,
+pub struct Resolved {
+    /// Where the handle sits and how its arrows point (world). The primary
+    /// frame, or under Local the frame of the cluster holding the
+    /// last-selected element (AC-75).
+    pub handle: ActionFrame,
     /// The primary side under Symmetry (Positive or Negative, never
     /// Plane); `None` with Symmetry off or not applying (Item mode,
     /// several active meshes).
     pub primary: Option<Side>,
+    /// One entry per mesh the tool moves; empty in Item mode.
+    pub items: Vec<ItemPivots>,
+}
+
+/// The groups of one mesh item.
+#[derive(Clone, Debug, PartialEq)]
+pub struct ItemPivots {
+    pub item: u64,
+    /// The mirror rules for this mesh (its world matrix, its Symmetry
+    /// plane and the primary side).
+    pub map: MirrorMap,
+    pub groups: Vec<Group>,
+}
+
+/// Which group this is, the same for the same selection however it was
+/// made.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
+pub enum GroupId {
+    /// Every point the tool moves on this mesh (a centre rule with one
+    /// centre).
+    Whole,
+    /// A Local cluster, numbered in the order of the clusters' lowest
+    /// points.
+    Cluster(u32),
+}
+
+/// One pivot and the points it drives.
+#[derive(Clone, Debug, PartialEq)]
+pub struct Group {
+    pub id: GroupId,
+    /// The world frame its points take the tool's values in.
+    pub frame: ActionFrame,
+    /// The frame a point from the other side of the Symmetry plane is
+    /// edited in once it has been mirrored over (it is mirrored back
+    /// afterwards, S-04): `frame` itself for one shared centre; a Local
+    /// cluster's mirror image, which is its twin's frame (S-09).
+    pub twin: ActionFrame,
+    pub targets: Vec<Target>,
+}
+
+/// One point a group drives.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct Target {
+    pub point: u32,
+    /// How it follows the primary pivot (S-03..S-05).
+    pub role: Role,
+    /// The side of the Symmetry plane it starts on; `None` with Symmetry
+    /// off.
+    pub side: Option<Side>,
+}
+
+impl Resolved {
+    /// Every group with the mesh it belongs to.
+    pub fn groups(&self) -> impl Iterator<Item = (&ItemPivots, &Group)> {
+        self.items
+            .iter()
+            .flat_map(|item| item.groups.iter().map(move |g| (item, g)))
+    }
 }
 
 /// A question to the service.
@@ -176,9 +234,10 @@ impl PivotRequest<'_> {
     pub fn frame(&self) -> Result<ActionFrame> {
         let plain = self.plain_frame()?;
         let Some(symmetry) = self.mesh_symmetry() else {
+            let center = self.placed.unwrap_or(plain.center);
             return Ok(ActionFrame {
-                center: self.placed.unwrap_or(plain.center),
-                ..plain
+                center,
+                basis: self.single_centre_local_axes(center).unwrap_or(plain.basis),
             });
         };
         let item = self.scene.active().ok_or("Select a mesh")?;
@@ -225,7 +284,7 @@ impl PivotRequest<'_> {
                 }
             }
         };
-        let basis = if self.context.axis == crate::AxisOrientation::Selection {
+        let basis = if self.context.axis == AxisOrientation::Selection {
             // S-02: the + side's points; with a placed centre, the side it
             // was placed on (provisional, ACR-Q03). None there gives World.
             let side = match self.placed {
@@ -240,46 +299,60 @@ impl PivotRequest<'_> {
                 Some(&|p| symmetry.side(p, tolerance) == Some(side)),
             )
         } else {
-            plain.basis
+            self.single_centre_local_axes(center).unwrap_or(plain.basis)
         };
         Ok(ActionFrame { center, basis })
     }
 
-    /// AC-75: under Local, the one handle's axes (world): the frame of the
-    /// cluster holding the last selected element (polygon, edge or point,
-    /// in pick order), so the handle's arrows match what that cluster
-    /// does. `None` for other centre rules, in Item mode or with nothing
-    /// selected (the handle keeps the tool's axes then).
-    pub fn local_handle_basis(&self) -> Option<DMat3> {
-        self.local_handle_frame().map(|f| f.basis)
-    }
-
-    /// AC-75 / AC-Q2 (Jason, 2026-11-21): the Local handle sits on the last
-    /// selected element's cluster, at its centre (box middle), with its
-    /// axes; not between the clusters.
-    pub fn local_handle_frame(&self) -> Option<ActionFrame> {
-        if self.context.center != CenterMode::Local {
+    /// The mixing rule for Local axes with a centre rule that has one
+    /// centre (AC-RULES v6, section 3): the axes of the cluster holding the
+    /// last-selected element. `centre` is the primary centre (world): with
+    /// Symmetry, a cluster on the other side of the plane gives its mirror
+    /// image, the frame its twin has (provisional, ACR-Q21). `None` when
+    /// the axes aren't Local, the centre is Local too (each cluster then
+    /// has its own frame), or nothing is selected (the tool's own axes).
+    fn single_centre_local_axes(&self, centre: DVec3) -> Option<DMat3> {
+        if self.context.axis != AxisOrientation::Local || self.context.center == CenterMode::Local {
             return None;
         }
+        let item = self.scene.active()?;
+        let world = self.scene.world_matrix(item.id).ok()?;
+        let last = self.last_selected_point()?;
+        let moved: BTreeSet<u32> = crate::transform_vertices(self.scene).ok()?;
+        let clusters = crate::local_clusters(&item.mesh, &moved, &self.scene.selection);
+        let piece = clusters.pieces[*clusters.of.get(&last)?];
+        let piece = match self.mesh_symmetry() {
+            Some(symmetry) => {
+                let map = MirrorMap::new(self.scene, item.id, symmetry, centre).ok()?;
+                match map.role(*item.mesh.vertices.get(last as usize)?) {
+                    Role::Other => piece.mirrored(symmetry),
+                    _ => piece,
+                }
+            }
+            None => piece,
+        };
+        Some(piece.frame(world, DMat3::IDENTITY).basis)
+    }
+
+    /// A point of the element selected last (the polygon's first corner,
+    /// the edge's first end, the point), in pick order: it names the
+    /// cluster the Local handle sits on (AC-75). `None` in Item mode or
+    /// with nothing selected.
+    fn last_selected_point(&self) -> Option<u32> {
         let selection = &self.scene.selection;
         let item = self.scene.active()?;
-        let last = match selection.mode {
+        match selection.mode {
             Mode::Polygon => item
                 .mesh
                 .faces
                 .get(*selection.faces.last()? as usize)?
                 .vertices
                 .first()
-                .copied()?,
-            Mode::Edge => selection.edges.last()?.0,
-            Mode::Vertex => *selection.vertices.last()?,
-            Mode::Item => return None,
-        };
-        let tool_axes = self.plain_frame().ok()?.basis;
-        let points: BTreeSet<u32> = crate::transform_vertices(self.scene).ok()?;
-        let pieces = crate::local_piece_frames(&item.mesh, &points, selection);
-        let world = self.scene.world_matrix(item.id).ok()?;
-        Some(pieces.get(&last)?.frame(world, tool_axes))
+                .copied(),
+            Mode::Edge => Some(selection.edges.last()?.0),
+            Mode::Vertex => selection.vertices.last().copied(),
+            Mode::Item => None,
+        }
     }
 
     /// The frame without the Symmetry rules: the centre rule and axis rule
@@ -296,72 +369,128 @@ impl PivotRequest<'_> {
         Some(side_of_world(self.scene, symmetry, frame.center))
     }
 
-    /// The full answer: the primary pivot and, with Symmetry, its mirror
-    /// image, each with the selected points it drives. Under Local, one
-    /// pivot per island (each mirrored island's own pivot, ACS-10/11).
-    pub fn pivots(&self) -> Result<Pivots> {
-        let frame = self.frame()?;
-        let item = self.scene.active().ok_or("Select a mesh")?;
-        let points: Vec<u32> = if self.scene.selection.mode == Mode::Item {
-            Vec::new()
-        } else {
-            crate::transform_vertices(self.scene)?.into_iter().collect()
+    /// The full answer about the primary frame the rules give
+    /// ([`Self::frame`]): the handle and every group.
+    pub fn resolve(&self) -> Result<Resolved> {
+        self.resolve_about(self.frame()?, &|_| Ok(Vec::new()))
+    }
+
+    /// The full answer about `primary`, the frame the tool holds (the
+    /// rules' frame, or one a Move step carried along with the selection).
+    /// `reach` names the points of a mesh that the falloff moves beyond the
+    /// selection (FO-45/47/48); they join the groups like selected points.
+    ///
+    /// Groups: with a Local centre, one per cluster, each about its own
+    /// centre, with its own axes under Local axes or `primary`'s axes
+    /// under any other axis rule (the mixing rule); otherwise one group
+    /// about `primary`. Every target carries its Symmetry role and side,
+    /// worked out once here from the base scene.
+    pub fn resolve_about(
+        &self,
+        primary: ActionFrame,
+        reach: &dyn Fn(u64) -> Result<Vec<u32>>,
+    ) -> Result<Resolved> {
+        let scene = self.scene;
+        let mut resolved = Resolved {
+            handle: primary,
+            primary: self
+                .mesh_symmetry()
+                .map(|s| side_of_world(scene, s, primary.center)),
+            items: Vec::new(),
         };
-        let world = self.scene.world_matrix(item.id)?;
-        if self.context.center == CenterMode::Local && !points.is_empty() {
-            let moved: BTreeSet<u32> = points.iter().copied().collect();
-            let pieces = crate::local_piece_frames(&item.mesh, &moved, &self.scene.selection);
-            let mut out: Vec<Pivot> = Vec::new();
-            for (&v, piece) in &pieces {
-                let f = piece.frame(world, frame.basis);
-                match out.iter_mut().find(|p| p.frame == f) {
-                    Some(p) => p.points.push(v),
-                    None => out.push(Pivot {
-                        frame: f,
-                        points: vec![v],
-                        mirrored: false,
-                    }),
+        if scene.selection.mode == Mode::Item {
+            return Ok(resolved);
+        }
+        // Every active mesh with a selection moves about the one shared
+        // frame (multi_transform.rs); just the primary when it is the only
+        // one.
+        let meshes: Vec<(u64, BTreeSet<u32>)> = match scene.component_transform_meshes() {
+            Some(ids) => ids
+                .into_iter()
+                .map(|id| Ok((id, scene.mesh_transform_vertices(id)?)))
+                .collect::<Result<_>>()?,
+            None => vec![(
+                scene.active().ok_or("Select a mesh")?.id,
+                crate::transform_vertices(scene)?,
+            )],
+        };
+        let local_centres = self.context.center == CenterMode::Local;
+        let local_axes = self.context.axis == AxisOrientation::Local;
+        let last = self.last_selected_point();
+        for (id, mut points) in meshes {
+            points.extend(reach(id)?);
+            let item = scene.item(id).ok_or("Select a mesh")?;
+            // The frames are in world space: each point goes there, takes
+            // the transform, and comes back to the item's own space.
+            let world = scene.world_matrix(id)?;
+            if world.determinant() == 0. || !world.determinant().is_finite() {
+                return Err("Component tools need an invertible item transform".into());
+            }
+            // Several meshes share one frame and each mirrors in its own
+            // space (MAM-Q09).
+            let map = MirrorMap::new(scene, id, self.symmetry, primary.center)?;
+            let target = |v: u32| {
+                let p = item.mesh.vertices[v as usize];
+                Target {
+                    point: v,
+                    role: map.role(p),
+                    side: map.symmetry.side(p, map.tolerance),
                 }
-            }
-            return Ok(Pivots {
-                pivots: out,
-                primary: self
-                    .mesh_symmetry()
-                    .map(|s| side_of_world(self.scene, s, frame.center)),
+            };
+            let groups = if local_centres {
+                let selection = if scene.selection.item == Some(id) {
+                    std::borrow::Cow::Borrowed(&scene.selection)
+                } else {
+                    std::borrow::Cow::Owned(scene.selection.sole(id))
+                };
+                let clusters = crate::local_clusters(&item.mesh, &points, &selection);
+                let frame = |piece: LocalPiece| {
+                    if local_axes {
+                        piece.frame(world, primary.basis)
+                    } else {
+                        ActionFrame {
+                            center: world.transform_point3(piece.center),
+                            basis: primary.basis,
+                        }
+                    }
+                };
+                let mut groups: Vec<Group> = clusters
+                    .pieces
+                    .iter()
+                    .enumerate()
+                    .map(|(i, &piece)| Group {
+                        id: GroupId::Cluster(i as u32),
+                        frame: frame(piece),
+                        twin: frame(piece.mirrored(self.symmetry)),
+                        targets: Vec::new(),
+                    })
+                    .collect();
+                for (&v, &cluster) in &clusters.of {
+                    groups[cluster].targets.push(target(v));
+                }
+                // AC-75 / AC-Q2: the one handle sits on the cluster holding
+                // the last-selected element and shows that cluster's frame.
+                if scene.selection.item == Some(id)
+                    && let Some(&cluster) = last.and_then(|v| clusters.of.get(&v))
+                {
+                    resolved.handle = groups[cluster].frame;
+                }
+                groups
+            } else {
+                vec![Group {
+                    id: GroupId::Whole,
+                    frame: primary,
+                    twin: primary,
+                    targets: points.iter().map(|&v| target(v)).collect(),
+                }]
+            };
+            resolved.items.push(ItemPivots {
+                item: id,
+                map,
+                groups,
             });
         }
-        let Some(symmetry) = self.mesh_symmetry() else {
-            return Ok(Pivots {
-                pivots: vec![Pivot {
-                    frame,
-                    points,
-                    mirrored: false,
-                }],
-                primary: None,
-            });
-        };
-        let map = MirrorMap::new(self.scene, item.id, symmetry, frame.center)?;
-        let (mut primary_points, mut mirrored_points) = (Vec::new(), Vec::new());
-        for &v in &points {
-            match map.role(item.mesh.vertices[v as usize]) {
-                Role::Other => mirrored_points.push(v),
-                _ => primary_points.push(v),
-            }
-        }
-        let mut pivots = vec![Pivot {
-            frame,
-            points: primary_points,
-            mirrored: false,
-        }];
-        pivots.push(Pivot {
-            frame: map.mirror_frame(frame),
-            points: mirrored_points,
-            mirrored: true,
-        });
-        Ok(Pivots {
-            pivots,
-            primary: Some(map.primary),
-        })
+        Ok(resolved)
     }
 }
 
@@ -433,7 +562,7 @@ pub enum Role {
 
 /// The mirror rules for one mesh: applies a primary-pivot edit to any of
 /// its points (ACS-04..06). Without Symmetry every point is `Primary`.
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub struct MirrorMap {
     pub symmetry: Symmetry,
     pub primary: Side,
@@ -494,7 +623,12 @@ impl MirrorMap {
     /// mirrored back on the other side; edited and put back onto the plane
     /// on the seam.
     pub fn apply(&self, p: DVec3, edit: impl Fn(DVec3) -> DVec3) -> DVec3 {
-        match self.role(p) {
+        self.apply_as(self.role(p), p, edit)
+    }
+    /// [`Self::apply`] for a point whose role is already known (a
+    /// [`Target`]'s).
+    pub fn apply_as(&self, role: Role, p: DVec3, edit: impl Fn(DVec3) -> DVec3) -> DVec3 {
+        match role {
             Role::Primary => self
                 .local
                 .transform_point3(edit(self.world.transform_point3(p))),
@@ -519,14 +653,160 @@ impl MirrorMap {
     /// check had the handle on +, where this is "the mirror position" for
     /// the other side.
     pub fn falloff_sample(&self, p: DVec3) -> DVec3 {
-        match self.symmetry.side(p, self.tolerance) {
+        self.falloff_sample_on(self.symmetry.side(p, self.tolerance), p)
+    }
+    /// [`Self::falloff_sample`] for a point whose side is already known (a
+    /// [`Target`]'s).
+    pub fn falloff_sample_on(&self, side: Option<Side>, p: DVec3) -> DVec3 {
+        match side {
             Some(Side::Negative) => self.symmetry.mirror(p),
             _ => p,
         }
     }
 }
 
+/// The live tool's [`Resolved`] answer, kept beside what it was worked out
+/// from so a drag resolves its base once and every later frame, the handle
+/// and the fields read the same answer. Derived data: it never takes part
+/// in comparing editors, and it is checked against its inputs on every
+/// read, so a stale copy can't be used.
+#[derive(Default)]
+pub struct PivotCache(Mutex<Option<Arc<Cached>>>);
+
+/// What a cached answer was resolved from: everything the service reads.
+struct Cached {
+    tool: Tool,
+    context: ActionContext,
+    symmetry: Symmetry,
+    frame: ActionFrame,
+    /// The falloff, when it reaches past the selection: its settings then
+    /// choose which points move (FO-45/47/48).
+    reaching: Option<crate::ActiveFalloff>,
+    /// The base scene's selection, and each moved mesh with its world
+    /// matrix (the same allocation is the same mesh).
+    selection: Selection,
+    meshes: Vec<(u64, Shared<Mesh>, DMat4)>,
+    resolved: Arc<Resolved>,
+}
+
+impl Cached {
+    /// Whether `request` about `frame` would resolve to this same answer:
+    /// the Action Center, Symmetry, the frame (a placed centre is in it),
+    /// the selection, and the moved meshes and where their items are (the
+    /// hierarchy) are all as they were.
+    fn answers(
+        &self,
+        request: &PivotRequest<'_>,
+        frame: ActionFrame,
+        reaching: &Option<crate::ActiveFalloff>,
+    ) -> bool {
+        let scene = request.scene;
+        self.tool == request.tool
+            && self.context == request.context
+            && self.symmetry == request.symmetry
+            && self.frame == frame
+            && self.reaching == *reaching
+            && self.selection == scene.selection
+            && self.meshes.iter().all(|(id, mesh, world)| {
+                scene
+                    .item(*id)
+                    .is_some_and(|item| Shared::same(item.mesh.shared(), mesh))
+                    && scene.world_matrix(*id).ok() == Some(*world)
+            })
+    }
+}
+
+impl Clone for PivotCache {
+    fn clone(&self) -> Self {
+        Self(Mutex::new(self.get()))
+    }
+}
+impl PartialEq for PivotCache {
+    fn eq(&self, _: &Self) -> bool {
+        true
+    }
+}
+impl std::fmt::Debug for PivotCache {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str("PivotCache")
+    }
+}
+impl PivotCache {
+    fn get(&self) -> Option<Arc<Cached>> {
+        self.0.lock().unwrap_or_else(|e| e.into_inner()).clone()
+    }
+    fn set(&self, cached: Cached) {
+        *self.0.lock().unwrap_or_else(|e| e.into_inner()) = Some(Arc::new(cached));
+    }
+}
+
 impl crate::Editor {
+    /// The live transform tool's pivots (Move, Rotate, Scale, Transform):
+    /// the one answer its preview, its handle and its fields read. Resolved
+    /// once per drag base and again whenever the selection, the Action
+    /// Center, a placed centre, Symmetry, the item hierarchy or the work
+    /// plane (through Symmetry's plane) changes. `None` without such a
+    /// tool. (A tool in a UV view runs on a stand-in scene built for each
+    /// preview, `uv_pipe.rs`; its answer is about that scene.)
+    pub fn live_pivots(&self) -> Option<Result<Arc<Resolved>>> {
+        let live = self.session.live.as_ref()?;
+        let frame = live.action_frame?;
+        if !matches!(
+            live.tool,
+            Tool::Move | Tool::Rotate | Tool::Scale | Tool::Transform
+        ) {
+            return None;
+        }
+        let request = self.pivot_request(&live.base, live.tool);
+        // A falloff that reaches past the selection also moves the points
+        // its own settings choose (FO-45/47/48).
+        let reaching = self.active_falloff().filter(|f| f.reaches());
+        if let Some(cached) = live
+            .pivots
+            .get()
+            .filter(|c| c.answers(&request, frame, &reaching))
+        {
+            return Some(Ok(cached.resolved.clone()));
+        }
+        let reach = |id: u64| match &reaching {
+            Some(falloff) => falloff.reach(&live.base, id),
+            None => Ok(Vec::new()),
+        };
+        Some(request.resolve_about(frame, &reach).map(|r| {
+            let resolved = Arc::new(r);
+            live.pivots.set(Cached {
+                tool: request.tool,
+                context: request.context,
+                symmetry: request.symmetry,
+                frame,
+                reaching: reaching.clone(),
+                selection: live.base.selection.clone(),
+                meshes: resolved
+                    .items
+                    .iter()
+                    .filter_map(|i| {
+                        let item = live.base.item(i.item)?;
+                        Some((i.item, item.mesh.shared().clone(), i.map.world))
+                    })
+                    .collect(),
+                resolved: resolved.clone(),
+            });
+            resolved
+        }))
+    }
+
+    /// Where the live transform tool's handle sits and how its arrows
+    /// point: the pivot service's answer ([`Resolved::handle`]), the frame
+    /// the tool's values are entered in. `None` without such a tool, when
+    /// its pivots can't be resolved, or for a tool in a UV view, whose
+    /// handle is its UV frame (`Live::action_frame`).
+    pub fn handle_frame(&self) -> Option<ActionFrame> {
+        if self.session.live.as_ref()?.params.uv.is_some() {
+            return None;
+        }
+        Some(self.live_pivots()?.ok()?.handle)
+    }
+
     /// The pivot service's request for `tool` on `scene` with the current
     /// Action Center and Symmetry.
     pub fn pivot_request<'a>(&self, scene: &'a Scene, tool: Tool) -> PivotRequest<'a> {
@@ -544,12 +824,12 @@ impl crate::Editor {
     /// the selection-based centre (ACS-01). Positive or Negative.
     pub fn symmetry_primary(&self, scene: &Scene) -> Side {
         let symmetry = self.active_symmetry();
-        if let Some(frame) = self.live.as_ref().and_then(|l| l.action_frame)
+        if let Some(frame) = self.session.live.as_ref().and_then(|l| l.action_frame)
             && scene.active().is_some()
         {
             return side_of_world(scene, symmetry, frame.center);
         }
-        let tool = self.live.as_ref().map_or(Tool::Move, |l| l.tool);
+        let tool = self.session.live.as_ref().map_or(Tool::Move, |l| l.tool);
         self.pivot_request(scene, tool)
             .primary()
             .unwrap_or(Side::Negative)
@@ -563,7 +843,7 @@ impl crate::Editor {
     /// several meshes, or nothing to show.
     pub fn symmetry_handle_centre(&self) -> Option<DVec3> {
         use crate::tool_card::HandleAnchor;
-        let live = self.live.as_ref()?;
+        let live = self.session.live.as_ref()?;
         let request = self.pivot_request(&live.base, live.tool);
         let symmetry = request.mesh_symmetry()?;
         let frame = live.action_frame?;

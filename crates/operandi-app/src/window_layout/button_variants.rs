@@ -367,7 +367,7 @@ impl Operandi {
     /// Why a button action is greyed now (`None` = it can run).
     pub(super) fn action_unavailable(&self, action: ButtonAction) -> Option<&'static str> {
         use crate::unavailable::{TOOL_ACTIVE, first, unless};
-        let idle = unless(self.editor.live.is_none(), TOOL_ACTIVE);
+        let idle = unless(self.editor.session.live.is_none(), TOOL_ACTIVE);
         match action {
             ButtonAction::Selection(
                 SelectionOperation::Boundary | SelectionOperation::BoundaryAdd,

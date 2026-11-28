@@ -37,9 +37,9 @@ fn cases() -> Vec<Value> {
     doc["cases"].as_array().unwrap().clone()
 }
 
-const Q3: &str = "ACS-Q3: the custom axis frame (reference: tool Z along the axis, tool X world X made perpendicular; Operandi: Local ACS-12)";
 const Q4: &str = "ACS-Q4: moved item, the reference picked the primary side from the centre's world X; Operandi tests it against the item's plane (ACS-08)";
 const Q5: &str = "ACR-Q09: AC-RULES v6 has every tool's typed values in the one A-SEL frame (the + side's, S-02), which the nine Selection / Selection Border Scale cases now match; this Rotate case was recorded turning about world Y instead";
+const Q7: &str = "ACR-Q29: AC-RULES v6 A-LOCAL puts Z on the cluster's normal for every tool (the Local Scale case ACS-H-local-x-pair-scale was recorded that way); this typed Rotate Y 30 was recorded turning each island about its normal, which is Rotate Z under the sheet";
 const Q6: &str = "ACR-Q10: A-SEL under Symmetry with a selected polygon lying across the plane: which of its points and whether its normal count (AC-RULES v6 S-02 doesn't say)";
 /// Cases that depend on an open question (case id, question). A listed
 /// case that passes still counts as a pass.
@@ -48,8 +48,12 @@ const Q6: &str = "ACR-Q10: A-SEL under Symmetry with a selected polygon lying ac
 /// cases off this list: A-SEL from the + side's points gives the frame
 /// they were recorded with. Step 2 took the two Element Scale cases off:
 /// A-ELEM's frame (Z the normal, X world X laid square) is theirs.
+///
+/// A-LOCAL (2026-11-28, Z the normal) took the Local Scale case off (it
+/// was recorded with Z along the normal) and put the typed Local Rotate
+/// case on (recorded with Y along it).
 const KNOWN_GAPS: &[(&str, &str)] = &[
-    ("ACS-H-local-x-pair-scale", Q3),
+    ("ACS-HL-rotate-local-typedRY30", Q7),
     ("ACS-H-select-x-pair-rotate", Q5),
     ("ACS-H-select-x-PC-scale", Q6),
     ("ACS-H-select-x-pairstraddle-scale", Q6),
@@ -189,7 +193,7 @@ fn same_set(got: &[DVec3], want: &[DVec3], tolerance: f64) -> std::result::Resul
 
 /// The typed transform of a Move/Rotate/Scale case.
 fn transform_params(e: &Editor, tool: Tool, values: &Value) -> Parameters {
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     p.delta = match tool {
         Tool::Move => dvec3(
             num(values, "Move X", 0.),
@@ -289,18 +293,18 @@ fn run_typed(case: &Value) -> std::result::Result<(), String> {
             e.dispatch(Command::Preview(p)).map_err(|x| x.to_string())?;
         }
         Tool::Bevel => {
-            let mut p = e.live.as_ref().unwrap().params.clone();
+            let mut p = e.session.live.as_ref().unwrap().params.clone();
             p.shift = num(values, "Shift", 0.);
             p.inset = num(values, "Inset", 0.);
             e.dispatch(Command::Preview(p)).map_err(|x| x.to_string())?;
         }
         Tool::Extrude => {
-            let mut p = e.live.as_ref().unwrap().params.clone();
+            let mut p = e.session.live.as_ref().unwrap().params.clone();
             p.extent = dvec3(num(values, "Shift X", 0.), num(values, "Shift Y", 0.), 0.);
             e.dispatch(Command::Preview(p)).map_err(|x| x.to_string())?;
         }
         _ => {
-            let mut p = e.live.as_ref().unwrap().params.clone();
+            let mut p = e.session.live.as_ref().unwrap().params.clone();
             p.smooth_shift.offset = num(values, "Shift", 0.);
             p.smooth_shift.scale = num(values, "Scale", 1.);
             e.dispatch(Command::Preview(p)).map_err(|x| x.to_string())?;
@@ -359,7 +363,7 @@ fn run_hands_on(case: &Value) -> std::result::Result<(), String> {
             axis: AxisOrientation::Selection,
         },
         "Origin" => world(CenterMode::Origin),
-        "Local" => world(CenterMode::Local),
+        "Local" => ActionContext::LOCAL,
         "Parent" => ActionContext {
             center: CenterMode::Parent,
             axis: AxisOrientation::Parent,
@@ -391,7 +395,14 @@ fn run_hands_on(case: &Value) -> std::result::Result<(), String> {
             .map_err(|x| x.to_string())?;
     }
     if let Some(want) = shown {
-        let got = e.live.as_ref().unwrap().action_frame.unwrap().center;
+        let got = e
+            .session
+            .live
+            .as_ref()
+            .unwrap()
+            .action_frame
+            .unwrap()
+            .center;
         if got.distance(want) > 1e-3 {
             return Err(format!("centre {got} want {want}"));
         }
@@ -409,22 +420,22 @@ fn run_local(case: &Value) -> std::result::Result<(), String> {
     let mut e = editor(case);
     e.dispatch(Command::ActionContext(ActionContext {
         center: CenterMode::Local,
-        axis: AxisOrientation::World,
+        axis: AxisOrientation::Local,
     }))
     .map_err(|x| x.to_string())?;
     e.dispatch(Command::Activate(tool))
         .map_err(|x| x.to_string())?;
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     p.delta = if id.ends_with("dragX") {
         dvec3(6.08, 1., 1.)
     } else if id.ends_with("typedRY30") {
         dvec3(0., 30., 0.)
     } else {
         // "About 113.8 degrees in all": a free turn whose axis the case
-        // doesn't record. Island A (flat, square, local frame = world:
-        // Y its normal, X the item's X laid into it) shows the turn; it is
-        // taken from A's points and every other island must take the same
-        // turn in its own frame (ACS-11).
+        // doesn't record. Island A (flat, square; its A-LOCAL frame is Z
+        // up its normal, X the item's X laid into it, Y = Z × X) shows the
+        // turn; it is taken from A's points, read in A's frame, and every
+        // other island must take the same turn in its own frame (ACS-11).
         let before = list(&case["input"]["points"]);
         let after = list(&case["expected_points"]);
         let frame = |p: &[DVec3]| {
@@ -433,6 +444,8 @@ fn run_local(case: &Value) -> std::result::Result<(), String> {
             glam::DMat3::from_cols(u, w, u.cross(w))
         };
         let turn = frame(&after[0..4]) * frame(&before[0..4]).transpose();
+        let a_axes = glam::DMat3::from_cols(DVec3::X, -DVec3::Z, DVec3::Y);
+        let turn = a_axes.transpose() * turn * a_axes;
         let (x, y, z) = glam::DQuat::from_mat3(&turn).to_euler(glam::EulerRot::XYZ);
         let angle = glam::DQuat::from_mat3(&turn).to_axis_angle().1.to_degrees();
         let angle = angle.min(360. - angle);
@@ -506,30 +519,53 @@ fn pair_editor(symmetry: Symmetry) -> Editor {
     e
 }
 
-/// Rulebook §1: the service's answer is a list of pivots. Off: one pivot
-/// driving every selected point. Symmetry X: the primary pivot on the +
-/// half (ACS-01) driving the + quad, and its mirror image driving the −
-/// quad (ACS-04).
+/// The service's answer is the handle plus the groups (AC-RULES v6). Off:
+/// one group driving every selected point as entered. Symmetry X: still
+/// one group, about the primary pivot on the + half (S-01); its targets
+/// carry their role, the + quad's points primary and the − quad's the
+/// other side, which are edited through the mirror (S-04), so their pivot
+/// is the mirror image of the primary one.
 #[test]
 #[cfg(operandi_specs)]
-fn the_service_lists_a_primary_and_a_mirrored_pivot() {
+fn the_service_lists_one_group_with_each_points_role() {
+    use operandi_core::pivot_service::{GroupId, Role};
     let e = pair_editor(Symmetry::OFF);
-    let off = e.pivot_request(&e.scene, Tool::Scale).pivots().unwrap();
-    assert_eq!(off.pivots.len(), 1);
-    assert_eq!(off.pivots[0].points.len(), 8);
+    let off = e.pivot_request(&e.scene, Tool::Scale).resolve().unwrap();
     assert!(off.primary.is_none());
-    assert!(off.pivots[0].frame.center.distance(dvec3(0., 0.25, 0.5)) < 1e-9);
+    assert_eq!(off.items.len(), 1);
+    let group = &off.items[0].groups[0];
+    assert_eq!((off.items[0].groups.len(), group.id), (1, GroupId::Whole));
+    assert_eq!(group.targets.len(), 8);
+    assert!(
+        group
+            .targets
+            .iter()
+            .all(|t| t.role == Role::Primary && t.side.is_none())
+    );
+    assert!(group.frame.center.distance(dvec3(0., 0.25, 0.5)) < 1e-9);
+    assert_eq!(off.handle, group.frame);
 
     let e = pair_editor(Symmetry::x());
-    let on = e.pivot_request(&e.scene, Tool::Scale).pivots().unwrap();
+    let on = e.pivot_request(&e.scene, Tool::Scale).resolve().unwrap();
     assert_eq!(on.primary, Some(Side::Positive));
-    assert_eq!(on.pivots.len(), 2);
-    let (primary, mirrored) = (&on.pivots[0], &on.pivots[1]);
-    assert!(!primary.mirrored && mirrored.mirrored);
-    assert!(primary.frame.center.distance(dvec3(1.5, 0.25, 0.5)) < 1e-9);
-    assert!(mirrored.frame.center.distance(dvec3(-1.5, 0.25, 0.5)) < 1e-9);
-    assert_eq!(primary.points, [0, 1, 2, 3]);
-    assert_eq!(mirrored.points, [4, 5, 6, 7]);
+    let item = &on.items[0];
+    let group = &item.groups[0];
+    assert_eq!((item.groups.len(), group.id), (1, GroupId::Whole));
+    assert!(group.frame.center.distance(dvec3(1.5, 0.25, 0.5)) < 1e-9);
+    assert_eq!(group.twin, group.frame);
+    assert_eq!(on.handle, group.frame);
+    let mirrored = item.map.mirror_frame(group.frame);
+    assert!(mirrored.center.distance(dvec3(-1.5, 0.25, 0.5)) < 1e-9);
+    let with = |role: Role, side: Side| -> Vec<u32> {
+        group
+            .targets
+            .iter()
+            .filter(|t| t.role == role && t.side == Some(side))
+            .map(|t| t.point)
+            .collect()
+    };
+    assert_eq!(with(Role::Primary, Side::Positive), [0, 1, 2, 3]);
+    assert_eq!(with(Role::Other, Side::Negative), [4, 5, 6, 7]);
 }
 
 /// ACS-20 with Symmetry and no placed centre: Smooth Shift's Scale works
@@ -542,7 +578,7 @@ fn smooth_shift_scales_each_side_about_its_own_pivot() {
     let mut e = pair_editor(Symmetry::x());
     let before = e.scene.clone();
     e.dispatch(Command::Activate(Tool::SmoothShift)).unwrap();
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     p.smooth_shift.scale = 0.5;
     e.dispatch(Command::Preview(p.clone())).unwrap();
     e.dispatch(Command::Cancel).unwrap();
@@ -600,7 +636,14 @@ fn selection_border_takes_the_plus_halfs_border() {
     .unwrap();
     e.dispatch(Command::Symmetry(Symmetry::x())).unwrap();
     e.dispatch(Command::Activate(Tool::Rotate)).unwrap();
-    let c = e.live.as_ref().unwrap().action_frame.unwrap().center;
+    let c = e
+        .session
+        .live
+        .as_ref()
+        .unwrap()
+        .action_frame
+        .unwrap()
+        .center;
     // The + half's border points: x = 1 and 2 on both rows.
     assert!(c.distance(dvec3(1.5, 1., 0.5)) < 1e-9, "{c}");
 }
@@ -616,7 +659,7 @@ fn a_placed_centre_picks_the_extrude_side() {
         e.dispatch(Command::Activate(Tool::Extrude)).unwrap();
         e.dispatch(Command::SetActionCenter(dvec3(at, 0.25, 0.5)))
             .unwrap();
-        let mut p = e.live.as_ref().unwrap().params.clone();
+        let mut p = e.session.live.as_ref().unwrap().params.clone();
         p.extent = dvec3(0.3, 0.2, 0.);
         e.dispatch(Command::Preview(p)).unwrap();
         e.dispatch(Command::Drop).unwrap();

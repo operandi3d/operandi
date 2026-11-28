@@ -199,7 +199,7 @@ impl Editor {
     /// children can't keep their place are skipped; the reasons go to
     /// `transform_note`.
     pub(crate) fn freeze_transform(&mut self, items: Vec<u64>, part: TransformReset) -> Result<()> {
-        if self.live.is_some() {
+        if self.session.live.is_some() {
             return Err("Drop the active tool before Freeze".into());
         }
         if items.is_empty() {

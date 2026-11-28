@@ -51,7 +51,7 @@ fn switching_commits_each_stage_once_and_cancel_restores_new_base() {
     let b = e.scene.clone();
     e.dispatch(Command::Activate(Tool::Extrude)).unwrap();
     assert_eq!(e.history.undo.len(), history + 2);
-    assert_eq!(e.live.as_ref().unwrap().base, b);
+    assert_eq!(e.session.live.as_ref().unwrap().base, b);
     for extent in [0.2, 0.1, 0.2] {
         e.dispatch(Command::Preview(Parameters {
             extent: DVec3::Y * extent,
@@ -62,7 +62,7 @@ fn switching_commits_each_stage_once_and_cancel_restores_new_base() {
     let c = e.scene.clone();
     e.dispatch(Command::Activate(Tool::Move)).unwrap();
     assert_eq!(e.history.undo.len(), history + 3);
-    assert_eq!(e.live.as_ref().unwrap().base, c);
+    assert_eq!(e.session.live.as_ref().unwrap().base, c);
     e.dispatch(Command::Preview(Parameters {
         delta: DVec3::X,
         ..Default::default()
@@ -83,7 +83,7 @@ fn switching_commits_each_stage_once_and_cancel_restores_new_base() {
         e.dispatch(Command::Redo).unwrap();
         assert_eq!(&e.scene, expected);
         e.scene.validate().unwrap();
-        assert!(e.live.is_none());
+        assert!(e.session.live.is_none());
     }
     let path = std::env::temp_dir().join(format!(
         "operandi-tool-switch-{}.opscene",
@@ -114,7 +114,7 @@ fn every_tool_can_switch_to_another_eligible_tool() {
             }
             let mut e = fixture();
             e.dispatch(Command::Activate(from)).unwrap();
-            let mut p = e.live.as_ref().unwrap().params.clone();
+            let mut p = e.session.live.as_ref().unwrap().params.clone();
             p.position = DVec3::X * 2.;
             p.inset = 0.05;
             p.extent = DVec3::Y * 0.1;
@@ -132,7 +132,7 @@ fn every_tool_can_switch_to_another_eligible_tool() {
             e.dispatch(Command::Activate(to))
                 .unwrap_or_else(|error| panic!("{from:?} -> {to:?}: {error}"));
             assert_eq!(e.scene, scene);
-            let live = e.live.as_ref().unwrap();
+            let live = e.session.live.as_ref().unwrap();
             assert_eq!(live.tool, to);
             assert_eq!(live.base, scene);
             assert_eq!(e.history.undo.len(), history + 1);
@@ -162,7 +162,7 @@ fn invalid_target_preserves_task_history_and_parameters() {
     assert!(e.dispatch(Command::Activate(Tool::EdgeBevel)).is_err());
     assert!(e == before);
     e.dispatch(Command::Cancel).unwrap();
-    assert_eq!(e.scene, before.live.unwrap().base);
+    assert_eq!(e.scene, before.session.live.unwrap().base);
 }
 
 #[test]
@@ -173,7 +173,7 @@ fn neutral_flat_and_same_tool_keep_drop_semantics() {
     e.dispatch(Command::Activate(Tool::Move)).unwrap();
     e.dispatch(Command::Activate(Tool::Sphere)).unwrap();
     assert_eq!(e.history.undo.len(), history);
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     p.radial.as_mut().unwrap().radius.y = 0.;
     p.radial.as_mut().unwrap().sides = 16;
     e.dispatch(Command::Preview(p)).unwrap();
@@ -184,6 +184,6 @@ fn neutral_flat_and_same_tool_keep_drop_semantics() {
     assert_eq!(e.history.undo.len(), history + 1);
     let history = history + 1;
     e.dispatch(Command::Activate(Tool::Cylinder)).unwrap();
-    assert!(e.live.is_none());
+    assert!(e.session.live.is_none());
     assert_eq!(e.history.undo.len(), history);
 }

@@ -436,7 +436,7 @@ fn col_b03_active_tool_and_fields_survive_every_route() {
     let ctx = context();
     let mut a = app(&source);
     a.execute("spike");
-    assert!(a.editor.spike.is_some(), "{}", a.status);
+    assert!(a.editor.session.spike.is_some(), "{}", a.status);
     a.fields
         .insert("spi_strength".into(), "not a number".into());
     let editor = a.editor.clone();

@@ -108,6 +108,10 @@ impl HandlePreferences {
     pub fn small_point_size(&self) -> f32 {
         self.small_points * self.scale * self.small_scale as f32 / 100.
     }
+    /// Whether the active tool's primary handles draw and take clicks.
+    pub fn selected_shown(&self) -> bool {
+        self.selected != HandleDetail::Invisible
+    }
     /// Whether secondary handles draw and take clicks.
     pub fn unselected_shown(&self) -> bool {
         self.unselected != HandleDetail::Invisible

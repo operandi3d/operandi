@@ -1,531 +1,541 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="625" height="645" viewBox="0 0 625 645" font-family="Helvetica, Arial, sans-serif" font-size="10">
+<svg xmlns="http://www.w3.org/2000/svg" width="638" height="658" viewBox="0 0 638 658" font-family="Helvetica, Arial, sans-serif" font-size="10">
 <style>.l{fill:#222}.g{stroke:#ddd;stroke-width:0.5}@media (prefers-color-scheme: dark){.l{fill:#ddd}.bg{fill:#1e1e1e}.g{stroke:#444}}</style>
-<rect class="bg" width="625" height="645" fill="#fff"/>
+<rect class="bg" width="638" height="658" fill="#fff"/>
 <text class="l" x="8" y="16" font-size="12" font-weight="bold">operandi-core: row uses column. Grey = with the flow, red = against it (part of a cycle).</text>
 <text class="l" x="146" y="160" text-anchor="end">meshblend_spike ●</text>
 <text class="l" x="160" y="146" transform="rotate(-60 160 146)">meshblend_spike</text>
 <text class="l" x="146" y="173" text-anchor="end">meshblend ●</text>
 <text class="l" x="173" y="146" transform="rotate(-60 173 146)">meshblend</text>
-<text class="l" x="146" y="186" text-anchor="end">command_registry ●</text>
-<text class="l" x="186" y="146" transform="rotate(-60 186 146)">command_registry</text>
-<text class="l" x="146" y="199" text-anchor="end">painting ●</text>
-<text class="l" x="199" y="146" transform="rotate(-60 199 146)">painting</text>
-<text class="l" x="146" y="212" text-anchor="end">materialx ●</text>
-<text class="l" x="212" y="146" transform="rotate(-60 212 146)">materialx</text>
-<text class="l" x="146" y="225" text-anchor="end">preset ●</text>
-<text class="l" x="225" y="146" transform="rotate(-60 225 146)">preset</text>
-<text class="l" x="146" y="238" text-anchor="end">meshops ●</text>
-<text class="l" x="238" y="146" transform="rotate(-60 238 146)">meshops</text>
-<text class="l" x="146" y="251" text-anchor="end">slicing ●</text>
-<text class="l" x="251" y="146" transform="rotate(-60 251 146)">slicing</text>
-<text class="l" x="146" y="264" text-anchor="end">duplication ●</text>
-<text class="l" x="264" y="146" transform="rotate(-60 264 146)">duplication</text>
-<text class="l" x="146" y="277" text-anchor="end">lxo ●</text>
-<text class="l" x="277" y="146" transform="rotate(-60 277 146)">lxo</text>
-<text class="l" x="146" y="290" text-anchor="end">rigging ●</text>
-<text class="l" x="290" y="146" transform="rotate(-60 290 146)">rigging</text>
-<text class="l" x="146" y="303" text-anchor="end">curve_tools ●</text>
-<text class="l" x="303" y="146" transform="rotate(-60 303 146)">curve_tools</text>
-<text class="l" x="146" y="316" text-anchor="end">primitives ●</text>
-<text class="l" x="316" y="146" transform="rotate(-60 316 146)">primitives</text>
+<text class="l" x="146" y="186" text-anchor="end">painting ●</text>
+<text class="l" x="186" y="146" transform="rotate(-60 186 146)">painting</text>
+<text class="l" x="146" y="199" text-anchor="end">materialx ●</text>
+<text class="l" x="199" y="146" transform="rotate(-60 199 146)">materialx</text>
+<text class="l" x="146" y="212" text-anchor="end">preset ●</text>
+<text class="l" x="212" y="146" transform="rotate(-60 212 146)">preset</text>
+<text class="l" x="146" y="225" text-anchor="end">kits</text>
+<text class="l" x="225" y="146" transform="rotate(-60 225 146)">kits</text>
+<text class="l" x="146" y="238" text-anchor="end">command_registry ●</text>
+<text class="l" x="238" y="146" transform="rotate(-60 238 146)">command_registry</text>
+<text class="l" x="146" y="251" text-anchor="end">meshops ●</text>
+<text class="l" x="251" y="146" transform="rotate(-60 251 146)">meshops</text>
+<text class="l" x="146" y="264" text-anchor="end">slicing ●</text>
+<text class="l" x="264" y="146" transform="rotate(-60 264 146)">slicing</text>
+<text class="l" x="146" y="277" text-anchor="end">primitives ●</text>
+<text class="l" x="277" y="146" transform="rotate(-60 277 146)">primitives</text>
+<text class="l" x="146" y="290" text-anchor="end">lxo ●</text>
+<text class="l" x="290" y="146" transform="rotate(-60 290 146)">lxo</text>
+<text class="l" x="146" y="303" text-anchor="end">rigging ●</text>
+<text class="l" x="303" y="146" transform="rotate(-60 303 146)">rigging</text>
+<text class="l" x="146" y="316" text-anchor="end">anim ●</text>
+<text class="l" x="316" y="146" transform="rotate(-60 316 146)">anim</text>
 <text class="l" x="146" y="329" text-anchor="end">bake ●</text>
 <text class="l" x="329" y="146" transform="rotate(-60 329 146)">bake</text>
-<text class="l" x="146" y="342" text-anchor="end">anim ●</text>
-<text class="l" x="342" y="146" transform="rotate(-60 342 146)">anim</text>
+<text class="l" x="146" y="342" text-anchor="end">duplication ●</text>
+<text class="l" x="342" y="146" transform="rotate(-60 342 146)">duplication</text>
 <text class="l" x="146" y="355" text-anchor="end">commands ●</text>
 <text class="l" x="355" y="146" transform="rotate(-60 355 146)">commands</text>
-<text class="l" x="146" y="368" text-anchor="end">edges ●</text>
-<text class="l" x="368" y="146" transform="rotate(-60 368 146)">edges</text>
-<text class="l" x="146" y="381" text-anchor="end">sculpting ●</text>
-<text class="l" x="381" y="146" transform="rotate(-60 381 146)">sculpting</text>
-<text class="l" x="146" y="394" text-anchor="end">nodes ●</text>
-<text class="l" x="394" y="146" transform="rotate(-60 394 146)">nodes</text>
-<text class="l" x="146" y="407" text-anchor="end">polygons ●</text>
-<text class="l" x="407" y="146" transform="rotate(-60 407 146)">polygons</text>
-<text class="l" x="146" y="420" text-anchor="end">uv ●</text>
-<text class="l" x="420" y="146" transform="rotate(-60 420 146)">uv</text>
-<text class="l" x="146" y="433" text-anchor="end">selections ●</text>
-<text class="l" x="433" y="146" transform="rotate(-60 433 146)">selections</text>
-<text class="l" x="146" y="446" text-anchor="end">tools ●</text>
-<text class="l" x="446" y="146" transform="rotate(-60 446 146)">tools</text>
-<text class="l" x="146" y="459" text-anchor="end">editor ●</text>
-<text class="l" x="459" y="146" transform="rotate(-60 459 146)">editor</text>
-<text class="l" x="146" y="472" text-anchor="end">render ●</text>
-<text class="l" x="472" y="146" transform="rotate(-60 472 146)">render</text>
-<text class="l" x="146" y="485" text-anchor="end">solid_sketch ●</text>
-<text class="l" x="485" y="146" transform="rotate(-60 485 146)">solid_sketch</text>
-<text class="l" x="146" y="498" text-anchor="end">deformers ●</text>
-<text class="l" x="498" y="146" transform="rotate(-60 498 146)">deformers</text>
-<text class="l" x="146" y="511" text-anchor="end">transforms ●</text>
-<text class="l" x="511" y="146" transform="rotate(-60 511 146)">transforms</text>
-<text class="l" x="146" y="524" text-anchor="end">interchange ●</text>
-<text class="l" x="524" y="146" transform="rotate(-60 524 146)">interchange</text>
-<text class="l" x="146" y="537" text-anchor="end">materials ●</text>
-<text class="l" x="537" y="146" transform="rotate(-60 537 146)">materials</text>
-<text class="l" x="146" y="550" text-anchor="end">scene_items ●</text>
-<text class="l" x="550" y="146" transform="rotate(-60 550 146)">scene_items</text>
-<text class="l" x="146" y="563" text-anchor="end">openpbr ●</text>
-<text class="l" x="563" y="146" transform="rotate(-60 563 146)">openpbr</text>
-<text class="l" x="146" y="576" text-anchor="end">subdivision ●</text>
-<text class="l" x="576" y="146" transform="rotate(-60 576 146)">subdivision</text>
-<text class="l" x="146" y="589" text-anchor="end">geometry ●</text>
-<text class="l" x="589" y="146" transform="rotate(-60 589 146)">geometry</text>
-<text class="l" x="146" y="602" text-anchor="end">(root)</text>
-<text class="l" x="602" y="146" transform="rotate(-60 602 146)">(root)</text>
-<line class="g" x1="150" y1="150" x2="605" y2="150"/>
-<line class="g" x1="150" y1="150" x2="150" y2="605"/>
-<line class="g" x1="150" y1="163" x2="605" y2="163"/>
-<line class="g" x1="163" y1="150" x2="163" y2="605"/>
-<line class="g" x1="150" y1="176" x2="605" y2="176"/>
-<line class="g" x1="176" y1="150" x2="176" y2="605"/>
-<line class="g" x1="150" y1="189" x2="605" y2="189"/>
-<line class="g" x1="189" y1="150" x2="189" y2="605"/>
-<line class="g" x1="150" y1="202" x2="605" y2="202"/>
-<line class="g" x1="202" y1="150" x2="202" y2="605"/>
-<line class="g" x1="150" y1="215" x2="605" y2="215"/>
-<line class="g" x1="215" y1="150" x2="215" y2="605"/>
-<line class="g" x1="150" y1="228" x2="605" y2="228"/>
-<line class="g" x1="228" y1="150" x2="228" y2="605"/>
-<line class="g" x1="150" y1="241" x2="605" y2="241"/>
-<line class="g" x1="241" y1="150" x2="241" y2="605"/>
-<line class="g" x1="150" y1="254" x2="605" y2="254"/>
-<line class="g" x1="254" y1="150" x2="254" y2="605"/>
-<line class="g" x1="150" y1="267" x2="605" y2="267"/>
-<line class="g" x1="267" y1="150" x2="267" y2="605"/>
-<line class="g" x1="150" y1="280" x2="605" y2="280"/>
-<line class="g" x1="280" y1="150" x2="280" y2="605"/>
-<line class="g" x1="150" y1="293" x2="605" y2="293"/>
-<line class="g" x1="293" y1="150" x2="293" y2="605"/>
-<line class="g" x1="150" y1="306" x2="605" y2="306"/>
-<line class="g" x1="306" y1="150" x2="306" y2="605"/>
-<line class="g" x1="150" y1="319" x2="605" y2="319"/>
-<line class="g" x1="319" y1="150" x2="319" y2="605"/>
-<line class="g" x1="150" y1="332" x2="605" y2="332"/>
-<line class="g" x1="332" y1="150" x2="332" y2="605"/>
-<line class="g" x1="150" y1="345" x2="605" y2="345"/>
-<line class="g" x1="345" y1="150" x2="345" y2="605"/>
-<line class="g" x1="150" y1="358" x2="605" y2="358"/>
-<line class="g" x1="358" y1="150" x2="358" y2="605"/>
-<line class="g" x1="150" y1="371" x2="605" y2="371"/>
-<line class="g" x1="371" y1="150" x2="371" y2="605"/>
-<line class="g" x1="150" y1="384" x2="605" y2="384"/>
-<line class="g" x1="384" y1="150" x2="384" y2="605"/>
-<line class="g" x1="150" y1="397" x2="605" y2="397"/>
-<line class="g" x1="397" y1="150" x2="397" y2="605"/>
-<line class="g" x1="150" y1="410" x2="605" y2="410"/>
-<line class="g" x1="410" y1="150" x2="410" y2="605"/>
-<line class="g" x1="150" y1="423" x2="605" y2="423"/>
-<line class="g" x1="423" y1="150" x2="423" y2="605"/>
-<line class="g" x1="150" y1="436" x2="605" y2="436"/>
-<line class="g" x1="436" y1="150" x2="436" y2="605"/>
-<line class="g" x1="150" y1="449" x2="605" y2="449"/>
-<line class="g" x1="449" y1="150" x2="449" y2="605"/>
-<line class="g" x1="150" y1="462" x2="605" y2="462"/>
-<line class="g" x1="462" y1="150" x2="462" y2="605"/>
-<line class="g" x1="150" y1="475" x2="605" y2="475"/>
-<line class="g" x1="475" y1="150" x2="475" y2="605"/>
-<line class="g" x1="150" y1="488" x2="605" y2="488"/>
-<line class="g" x1="488" y1="150" x2="488" y2="605"/>
-<line class="g" x1="150" y1="501" x2="605" y2="501"/>
-<line class="g" x1="501" y1="150" x2="501" y2="605"/>
-<line class="g" x1="150" y1="514" x2="605" y2="514"/>
-<line class="g" x1="514" y1="150" x2="514" y2="605"/>
-<line class="g" x1="150" y1="527" x2="605" y2="527"/>
-<line class="g" x1="527" y1="150" x2="527" y2="605"/>
-<line class="g" x1="150" y1="540" x2="605" y2="540"/>
-<line class="g" x1="540" y1="150" x2="540" y2="605"/>
-<line class="g" x1="150" y1="553" x2="605" y2="553"/>
-<line class="g" x1="553" y1="150" x2="553" y2="605"/>
-<line class="g" x1="150" y1="566" x2="605" y2="566"/>
-<line class="g" x1="566" y1="150" x2="566" y2="605"/>
-<line class="g" x1="150" y1="579" x2="605" y2="579"/>
-<line class="g" x1="579" y1="150" x2="579" y2="605"/>
-<line class="g" x1="150" y1="592" x2="605" y2="592"/>
-<line class="g" x1="592" y1="150" x2="592" y2="605"/>
-<line class="g" x1="150" y1="605" x2="605" y2="605"/>
-<line class="g" x1="605" y1="150" x2="605" y2="605"/>
-<rect x="450" y="541" width="11" height="11" fill="#d62728" fill-opacity="0.60"><title>scene_items uses editor: 9 files</title></rect>
-<rect x="580" y="541" width="11" height="11" fill="#555" fill-opacity="0.60"><title>scene_items uses geometry: 9 files</title></rect>
-<rect x="593" y="541" width="11" height="11" fill="#555" fill-opacity="0.72"><title>scene_items uses (root): 16 files</title></rect>
-<rect x="528" y="541" width="11" height="11" fill="#d62728" fill-opacity="0.48"><title>scene_items uses materials: 4 files</title></rect>
-<rect x="346" y="541" width="11" height="11" fill="#d62728" fill-opacity="0.48"><title>scene_items uses commands: 4 files</title></rect>
-<rect x="424" y="541" width="11" height="11" fill="#d62728" fill-opacity="0.48"><title>scene_items uses selections: 4 files</title></rect>
-<rect x="294" y="541" width="11" height="11" fill="#d62728" fill-opacity="0.37"><title>scene_items uses curve_tools: 1 files</title></rect>
-<rect x="411" y="541" width="11" height="11" fill="#d62728" fill-opacity="0.42"><title>scene_items uses uv: 2 files</title></rect>
-<rect x="398" y="541" width="11" height="11" fill="#d62728" fill-opacity="0.42"><title>scene_items uses polygons: 2 files</title></rect>
-<rect x="593" y="294" width="11" height="11" fill="#555" fill-opacity="0.75"><title>curve_tools uses (root): 18 files</title></rect>
-<rect x="476" y="294" width="11" height="11" fill="#555" fill-opacity="0.45"><title>curve_tools uses solid_sketch: 3 files</title></rect>
-<rect x="502" y="294" width="11" height="11" fill="#555" fill-opacity="0.48"><title>curve_tools uses transforms: 4 files</title></rect>
-<rect x="450" y="294" width="11" height="11" fill="#555" fill-opacity="0.60"><title>curve_tools uses editor: 9 files</title></rect>
-<rect x="580" y="294" width="11" height="11" fill="#555" fill-opacity="0.75"><title>curve_tools uses geometry: 18 files</title></rect>
-<rect x="541" y="294" width="11" height="11" fill="#555" fill-opacity="0.51"><title>curve_tools uses scene_items: 5 files</title></rect>
-<rect x="346" y="294" width="11" height="11" fill="#555" fill-opacity="0.42"><title>curve_tools uses commands: 2 files</title></rect>
-<rect x="307" y="294" width="11" height="11" fill="#555" fill-opacity="0.45"><title>curve_tools uses primitives: 3 files</title></rect>
-<rect x="580" y="476" width="11" height="11" fill="#555" fill-opacity="0.37"><title>solid_sketch uses geometry: 1 files</title></rect>
-<rect x="593" y="476" width="11" height="11" fill="#555" fill-opacity="0.37"><title>solid_sketch uses (root): 1 files</title></rect>
-<rect x="567" y="476" width="11" height="11" fill="#555" fill-opacity="0.37"><title>solid_sketch uses subdivision: 1 files</title></rect>
-<rect x="294" y="476" width="11" height="11" fill="#d62728" fill-opacity="0.37"><title>solid_sketch uses curve_tools: 1 files</title></rect>
-<rect x="398" y="294" width="11" height="11" fill="#555" fill-opacity="0.56"><title>curve_tools uses polygons: 7 files</title></rect>
-<rect x="398" y="489" width="11" height="11" fill="#d62728" fill-opacity="0.37"><title>deformers uses polygons: 1 files</title></rect>
-<rect x="580" y="489" width="11" height="11" fill="#555" fill-opacity="0.64"><title>deformers uses geometry: 11 files</title></rect>
-<rect x="593" y="489" width="11" height="11" fill="#555" fill-opacity="0.64"><title>deformers uses (root): 11 files</title></rect>
-<rect x="359" y="489" width="11" height="11" fill="#d62728" fill-opacity="0.37"><title>deformers uses edges: 1 files</title></rect>
-<rect x="411" y="359" width="11" height="11" fill="#555" fill-opacity="0.54"><title>edges uses uv: 6 files</title></rect>
-<rect x="580" y="359" width="11" height="11" fill="#555" fill-opacity="0.69"><title>edges uses geometry: 14 files</title></rect>
-<rect x="593" y="359" width="11" height="11" fill="#555" fill-opacity="0.70"><title>edges uses (root): 15 files</title></rect>
-<rect x="398" y="359" width="11" height="11" fill="#555" fill-opacity="0.56"><title>edges uses polygons: 7 files</title></rect>
-<rect x="541" y="398" width="11" height="11" fill="#555" fill-opacity="0.73"><title>polygons uses scene_items: 17 files</title></rect>
-<rect x="450" y="398" width="11" height="11" fill="#555" fill-opacity="0.87"><title>polygons uses editor: 28 files</title></rect>
-<rect x="593" y="398" width="11" height="11" fill="#555" fill-opacity="1.00"><title>polygons uses (root): 41 files</title></rect>
-<rect x="580" y="398" width="11" height="11" fill="#555" fill-opacity="0.99"><title>polygons uses geometry: 40 files</title></rect>
-<rect x="502" y="398" width="11" height="11" fill="#555" fill-opacity="0.56"><title>polygons uses transforms: 7 files</title></rect>
-<rect x="424" y="398" width="11" height="11" fill="#555" fill-opacity="0.48"><title>polygons uses selections: 4 files</title></rect>
-<rect x="528" y="398" width="11" height="11" fill="#555" fill-opacity="0.45"><title>polygons uses materials: 3 files</title></rect>
-<rect x="255" y="398" width="11" height="11" fill="#d62728" fill-opacity="0.37"><title>polygons uses duplication: 1 files</title></rect>
-<rect x="229" y="398" width="11" height="11" fill="#d62728" fill-opacity="0.37"><title>polygons uses meshops: 1 files</title></rect>
-<rect x="541" y="255" width="11" height="11" fill="#555" fill-opacity="0.58"><title>duplication uses scene_items: 8 files</title></rect>
-<rect x="580" y="255" width="11" height="11" fill="#555" fill-opacity="0.58"><title>duplication uses geometry: 8 files</title></rect>
-<rect x="593" y="255" width="11" height="11" fill="#555" fill-opacity="0.58"><title>duplication uses (root): 8 files</title></rect>
-<rect x="294" y="255" width="11" height="11" fill="#555" fill-opacity="0.51"><title>duplication uses curve_tools: 5 files</title></rect>
-<rect x="463" y="255" width="11" height="11" fill="#555" fill-opacity="0.42"><title>duplication uses render: 2 files</title></rect>
-<rect x="502" y="255" width="11" height="11" fill="#555" fill-opacity="0.45"><title>duplication uses transforms: 3 files</title></rect>
-<rect x="450" y="255" width="11" height="11" fill="#555" fill-opacity="0.54"><title>duplication uses editor: 6 files</title></rect>
-<rect x="580" y="372" width="11" height="11" fill="#555" fill-opacity="0.48"><title>sculpting uses geometry: 4 files</title></rect>
-<rect x="593" y="372" width="11" height="11" fill="#555" fill-opacity="0.45"><title>sculpting uses (root): 3 files</title></rect>
-<rect x="346" y="372" width="11" height="11" fill="#d62728" fill-opacity="0.37"><title>sculpting uses commands: 1 files</title></rect>
-<rect x="450" y="372" width="11" height="11" fill="#555" fill-opacity="0.48"><title>sculpting uses editor: 4 files</title></rect>
-<rect x="541" y="372" width="11" height="11" fill="#555" fill-opacity="0.45"><title>sculpting uses scene_items: 3 files</title></rect>
-<rect x="463" y="294" width="11" height="11" fill="#555" fill-opacity="0.37"><title>curve_tools uses render: 1 files</title></rect>
-<rect x="541" y="359" width="11" height="11" fill="#555" fill-opacity="0.42"><title>edges uses scene_items: 2 files</title></rect>
-<rect x="502" y="359" width="11" height="11" fill="#555" fill-opacity="0.48"><title>edges uses transforms: 4 files</title></rect>
-<rect x="450" y="359" width="11" height="11" fill="#555" fill-opacity="0.54"><title>edges uses editor: 6 files</title></rect>
-<rect x="437" y="359" width="11" height="11" fill="#555" fill-opacity="0.37"><title>edges uses tools: 1 files</title></rect>
-<rect x="450" y="424" width="11" height="11" fill="#555" fill-opacity="0.56"><title>selections uses editor: 7 files</title></rect>
-<rect x="580" y="424" width="11" height="11" fill="#555" fill-opacity="0.64"><title>selections uses geometry: 11 files</title></rect>
-<rect x="593" y="424" width="11" height="11" fill="#555" fill-opacity="0.64"><title>selections uses (root): 11 files</title></rect>
-<rect x="450" y="346" width="11" height="11" fill="#555" fill-opacity="0.62"><title>commands uses editor: 10 files</title></rect>
-<rect x="398" y="346" width="11" height="11" fill="#555" fill-opacity="0.48"><title>commands uses polygons: 4 files</title></rect>
-<rect x="437" y="346" width="11" height="11" fill="#555" fill-opacity="0.51"><title>commands uses tools: 5 files</title></rect>
-<rect x="541" y="346" width="11" height="11" fill="#555" fill-opacity="0.56"><title>commands uses scene_items: 7 files</title></rect>
-<rect x="450" y="437" width="11" height="11" fill="#555" fill-opacity="0.60"><title>tools uses editor: 9 files</title></rect>
-<rect x="541" y="437" width="11" height="11" fill="#555" fill-opacity="0.48"><title>tools uses scene_items: 4 files</title></rect>
-<rect x="593" y="437" width="11" height="11" fill="#555" fill-opacity="0.56"><title>tools uses (root): 7 files</title></rect>
-<rect x="346" y="437" width="11" height="11" fill="#d62728" fill-opacity="0.42"><title>tools uses commands: 2 files</title></rect>
-<rect x="593" y="346" width="11" height="11" fill="#555" fill-opacity="0.51"><title>commands uses (root): 5 files</title></rect>
-<rect x="346" y="398" width="11" height="11" fill="#d62728" fill-opacity="0.37"><title>polygons uses commands: 1 files</title></rect>
-<rect x="437" y="541" width="11" height="11" fill="#d62728" fill-opacity="0.51"><title>scene_items uses tools: 5 files</title></rect>
-<rect x="489" y="398" width="11" height="11" fill="#555" fill-opacity="0.37"><title>polygons uses deformers: 1 files</title></rect>
-<rect x="411" y="398" width="11" height="11" fill="#555" fill-opacity="0.48"><title>polygons uses uv: 4 files</title></rect>
-<rect x="437" y="398" width="11" height="11" fill="#555" fill-opacity="0.51"><title>polygons uses tools: 5 files</title></rect>
-<rect x="541" y="307" width="11" height="11" fill="#555" fill-opacity="0.48"><title>primitives uses scene_items: 4 files</title></rect>
-<rect x="346" y="307" width="11" height="11" fill="#555" fill-opacity="0.56"><title>primitives uses commands: 7 files</title></rect>
-<rect x="450" y="307" width="11" height="11" fill="#555" fill-opacity="0.48"><title>primitives uses editor: 4 files</title></rect>
-<rect x="593" y="307" width="11" height="11" fill="#555" fill-opacity="0.60"><title>primitives uses (root): 9 files</title></rect>
-<rect x="502" y="307" width="11" height="11" fill="#555" fill-opacity="0.42"><title>primitives uses transforms: 2 files</title></rect>
-<rect x="437" y="307" width="11" height="11" fill="#555" fill-opacity="0.45"><title>primitives uses tools: 3 files</title></rect>
-<rect x="580" y="307" width="11" height="11" fill="#555" fill-opacity="0.64"><title>primitives uses geometry: 11 files</title></rect>
-<rect x="541" y="424" width="11" height="11" fill="#555" fill-opacity="0.60"><title>selections uses scene_items: 9 files</title></rect>
-<rect x="294" y="307" width="11" height="11" fill="#d62728" fill-opacity="0.37"><title>primitives uses curve_tools: 1 files</title></rect>
-<rect x="411" y="307" width="11" height="11" fill="#555" fill-opacity="0.48"><title>primitives uses uv: 4 files</title></rect>
-<rect x="255" y="307" width="11" height="11" fill="#d62728" fill-opacity="0.42"><title>primitives uses duplication: 2 files</title></rect>
-<rect x="307" y="437" width="11" height="11" fill="#d62728" fill-opacity="0.42"><title>tools uses primitives: 2 files</title></rect>
-<rect x="580" y="437" width="11" height="11" fill="#555" fill-opacity="0.45"><title>tools uses geometry: 3 files</title></rect>
-<rect x="359" y="437" width="11" height="11" fill="#d62728" fill-opacity="0.37"><title>tools uses edges: 1 files</title></rect>
-<rect x="593" y="580" width="11" height="11" fill="#555" fill-opacity="0.51"><title>geometry uses (root): 5 files</title></rect>
-<rect x="294" y="580" width="11" height="11" fill="#d62728" fill-opacity="0.37"><title>geometry uses curve_tools: 1 files</title></rect>
-<rect x="502" y="437" width="11" height="11" fill="#555" fill-opacity="0.48"><title>tools uses transforms: 4 files</title></rect>
-<rect x="450" y="502" width="11" height="11" fill="#d62728" fill-opacity="0.62"><title>transforms uses editor: 10 files</title></rect>
-<rect x="437" y="502" width="11" height="11" fill="#d62728" fill-opacity="0.42"><title>transforms uses tools: 2 files</title></rect>
-<rect x="580" y="502" width="11" height="11" fill="#555" fill-opacity="0.69"><title>transforms uses geometry: 14 files</title></rect>
-<rect x="489" y="502" width="11" height="11" fill="#d62728" fill-opacity="0.37"><title>transforms uses deformers: 1 files</title></rect>
-<rect x="541" y="502" width="11" height="11" fill="#555" fill-opacity="0.64"><title>transforms uses scene_items: 11 files</title></rect>
-<rect x="593" y="502" width="11" height="11" fill="#555" fill-opacity="0.67"><title>transforms uses (root): 13 files</title></rect>
-<rect x="398" y="502" width="11" height="11" fill="#d62728" fill-opacity="0.48"><title>transforms uses polygons: 4 files</title></rect>
-<rect x="242" y="502" width="11" height="11" fill="#d62728" fill-opacity="0.37"><title>transforms uses slicing: 1 files</title></rect>
-<rect x="502" y="372" width="11" height="11" fill="#555" fill-opacity="0.37"><title>sculpting uses transforms: 1 files</title></rect>
-<rect x="489" y="372" width="11" height="11" fill="#555" fill-opacity="0.37"><title>sculpting uses deformers: 1 files</title></rect>
-<rect x="190" y="372" width="11" height="11" fill="#d62728" fill-opacity="0.37"><title>sculpting uses painting: 1 files</title></rect>
-<rect x="424" y="372" width="11" height="11" fill="#555" fill-opacity="0.37"><title>sculpting uses selections: 1 files</title></rect>
-<rect x="281" y="372" width="11" height="11" fill="#d62728" fill-opacity="0.37"><title>sculpting uses rigging: 1 files</title></rect>
-<rect x="541" y="489" width="11" height="11" fill="#555" fill-opacity="0.51"><title>deformers uses scene_items: 5 files</title></rect>
-<rect x="502" y="489" width="11" height="11" fill="#555" fill-opacity="0.48"><title>deformers uses transforms: 4 files</title></rect>
-<rect x="489" y="437" width="11" height="11" fill="#555" fill-opacity="0.37"><title>tools uses deformers: 1 files</title></rect>
-<rect x="398" y="437" width="11" height="11" fill="#d62728" fill-opacity="0.37"><title>tools uses polygons: 1 files</title></rect>
-<rect x="255" y="437" width="11" height="11" fill="#d62728" fill-opacity="0.37"><title>tools uses duplication: 1 files</title></rect>
-<rect x="411" y="437" width="11" height="11" fill="#d62728" fill-opacity="0.37"><title>tools uses uv: 1 files</title></rect>
-<rect x="294" y="437" width="11" height="11" fill="#d62728" fill-opacity="0.37"><title>tools uses curve_tools: 1 files</title></rect>
-<rect x="359" y="294" width="11" height="11" fill="#555" fill-opacity="0.42"><title>curve_tools uses edges: 2 files</title></rect>
-<rect x="489" y="294" width="11" height="11" fill="#555" fill-opacity="0.37"><title>curve_tools uses deformers: 1 files</title></rect>
-<rect x="424" y="294" width="11" height="11" fill="#555" fill-opacity="0.37"><title>curve_tools uses selections: 1 files</title></rect>
-<rect x="359" y="398" width="11" height="11" fill="#d62728" fill-opacity="0.54"><title>polygons uses edges: 6 files</title></rect>
-<rect x="398" y="424" width="11" height="11" fill="#d62728" fill-opacity="0.45"><title>selections uses polygons: 3 files</title></rect>
-<rect x="489" y="229" width="11" height="11" fill="#555" fill-opacity="0.42"><title>meshops uses deformers: 2 files</title></rect>
-<rect x="580" y="229" width="11" height="11" fill="#555" fill-opacity="0.64"><title>meshops uses geometry: 11 files</title></rect>
-<rect x="593" y="229" width="11" height="11" fill="#555" fill-opacity="0.66"><title>meshops uses (root): 12 files</title></rect>
-<rect x="541" y="229" width="11" height="11" fill="#555" fill-opacity="0.60"><title>meshops uses scene_items: 9 files</title></rect>
-<rect x="450" y="489" width="11" height="11" fill="#d62728" fill-opacity="0.42"><title>deformers uses editor: 2 files</title></rect>
-<rect x="437" y="489" width="11" height="11" fill="#d62728" fill-opacity="0.37"><title>deformers uses tools: 1 files</title></rect>
-<rect x="502" y="424" width="11" height="11" fill="#555" fill-opacity="0.37"><title>selections uses transforms: 1 files</title></rect>
-<rect x="411" y="424" width="11" height="11" fill="#d62728" fill-opacity="0.37"><title>selections uses uv: 1 files</title></rect>
-<rect x="567" y="541" width="11" height="11" fill="#555" fill-opacity="0.42"><title>scene_items uses subdivision: 2 files</title></rect>
-<rect x="463" y="541" width="11" height="11" fill="#d62728" fill-opacity="0.48"><title>scene_items uses render: 4 files</title></rect>
-<rect x="229" y="541" width="11" height="11" fill="#d62728" fill-opacity="0.37"><title>scene_items uses meshops: 1 files</title></rect>
-<rect x="255" y="541" width="11" height="11" fill="#d62728" fill-opacity="0.42"><title>scene_items uses duplication: 2 files</title></rect>
-<rect x="372" y="541" width="11" height="11" fill="#d62728" fill-opacity="0.37"><title>scene_items uses sculpting: 1 files</title></rect>
-<rect x="190" y="541" width="11" height="11" fill="#d62728" fill-opacity="0.37"><title>scene_items uses painting: 1 files</title></rect>
-<rect x="333" y="541" width="11" height="11" fill="#d62728" fill-opacity="0.48"><title>scene_items uses anim: 4 files</title></rect>
-<rect x="203" y="541" width="11" height="11" fill="#d62728" fill-opacity="0.37"><title>scene_items uses materialx: 1 files</title></rect>
-<rect x="359" y="502" width="11" height="11" fill="#d62728" fill-opacity="0.45"><title>transforms uses edges: 3 files</title></rect>
-<rect x="424" y="502" width="11" height="11" fill="#d62728" fill-opacity="0.37"><title>transforms uses selections: 1 files</title></rect>
-<rect x="593" y="463" width="11" height="11" fill="#555" fill-opacity="0.60"><title>render uses (root): 9 files</title></rect>
-<rect x="541" y="463" width="11" height="11" fill="#555" fill-opacity="0.58"><title>render uses scene_items: 8 files</title></rect>
-<rect x="346" y="463" width="11" height="11" fill="#d62728" fill-opacity="0.48"><title>render uses commands: 4 files</title></rect>
-<rect x="580" y="463" width="11" height="11" fill="#555" fill-opacity="0.48"><title>render uses geometry: 4 files</title></rect>
-<rect x="411" y="255" width="11" height="11" fill="#555" fill-opacity="0.37"><title>duplication uses uv: 1 files</title></rect>
-<rect x="307" y="255" width="11" height="11" fill="#555" fill-opacity="0.37"><title>duplication uses primitives: 1 files</title></rect>
-<rect x="580" y="411" width="11" height="11" fill="#555" fill-opacity="0.72"><title>uv uses geometry: 16 files</title></rect>
-<rect x="593" y="411" width="11" height="11" fill="#555" fill-opacity="0.72"><title>uv uses (root): 16 files</title></rect>
-<rect x="580" y="346" width="11" height="11" fill="#555" fill-opacity="0.54"><title>commands uses geometry: 6 files</title></rect>
-<rect x="346" y="502" width="11" height="11" fill="#d62728" fill-opacity="0.37"><title>transforms uses commands: 1 files</title></rect>
-<rect x="463" y="216" width="11" height="11" fill="#555" fill-opacity="0.37"><title>preset uses render: 1 files</title></rect>
-<rect x="528" y="216" width="11" height="11" fill="#555" fill-opacity="0.58"><title>preset uses materials: 8 files</title></rect>
-<rect x="450" y="216" width="11" height="11" fill="#555" fill-opacity="0.45"><title>preset uses editor: 3 files</title></rect>
-<rect x="541" y="216" width="11" height="11" fill="#555" fill-opacity="0.62"><title>preset uses scene_items: 10 files</title></rect>
-<rect x="593" y="216" width="11" height="11" fill="#555" fill-opacity="0.56"><title>preset uses (root): 7 files</title></rect>
-<rect x="385" y="216" width="11" height="11" fill="#555" fill-opacity="0.42"><title>preset uses nodes: 2 files</title></rect>
-<rect x="346" y="216" width="11" height="11" fill="#555" fill-opacity="0.45"><title>preset uses commands: 3 files</title></rect>
-<rect x="580" y="216" width="11" height="11" fill="#555" fill-opacity="0.45"><title>preset uses geometry: 3 files</title></rect>
-<rect x="411" y="216" width="11" height="11" fill="#555" fill-opacity="0.45"><title>preset uses uv: 3 files</title></rect>
-<rect x="515" y="216" width="11" height="11" fill="#555" fill-opacity="0.42"><title>preset uses interchange: 2 files</title></rect>
-<rect x="268" y="216" width="11" height="11" fill="#555" fill-opacity="0.42"><title>preset uses lxo: 2 files</title></rect>
-<rect x="554" y="216" width="11" height="11" fill="#555" fill-opacity="0.37"><title>preset uses openpbr: 1 files</title></rect>
-<rect x="229" y="216" width="11" height="11" fill="#555" fill-opacity="0.42"><title>preset uses meshops: 2 files</title></rect>
-<rect x="203" y="216" width="11" height="11" fill="#d62728" fill-opacity="0.37"><title>preset uses materialx: 1 files</title></rect>
-<rect x="333" y="216" width="11" height="11" fill="#555" fill-opacity="0.37"><title>preset uses anim: 1 files</title></rect>
-<rect x="281" y="216" width="11" height="11" fill="#555" fill-opacity="0.37"><title>preset uses rigging: 1 files</title></rect>
-<rect x="528" y="346" width="11" height="11" fill="#555" fill-opacity="0.45"><title>commands uses materials: 3 files</title></rect>
-<rect x="229" y="346" width="11" height="11" fill="#d62728" fill-opacity="0.42"><title>commands uses meshops: 2 files</title></rect>
-<rect x="463" y="346" width="11" height="11" fill="#555" fill-opacity="0.48"><title>commands uses render: 4 files</title></rect>
-<rect x="294" y="346" width="11" height="11" fill="#d62728" fill-opacity="0.42"><title>commands uses curve_tools: 2 files</title></rect>
-<rect x="216" y="346" width="11" height="11" fill="#d62728" fill-opacity="0.37"><title>commands uses preset: 1 files</title></rect>
-<rect x="203" y="346" width="11" height="11" fill="#d62728" fill-opacity="0.37"><title>commands uses materialx: 1 files</title></rect>
-<rect x="515" y="346" width="11" height="11" fill="#555" fill-opacity="0.42"><title>commands uses interchange: 2 files</title></rect>
-<rect x="333" y="346" width="11" height="11" fill="#d62728" fill-opacity="0.45"><title>commands uses anim: 3 files</title></rect>
-<rect x="593" y="385" width="11" height="11" fill="#555" fill-opacity="0.51"><title>nodes uses (root): 5 files</title></rect>
-<rect x="294" y="398" width="11" height="11" fill="#d62728" fill-opacity="0.37"><title>polygons uses curve_tools: 1 files</title></rect>
-<rect x="580" y="242" width="11" height="11" fill="#555" fill-opacity="0.56"><title>slicing uses geometry: 7 files</title></rect>
-<rect x="593" y="242" width="11" height="11" fill="#555" fill-opacity="0.56"><title>slicing uses (root): 7 files</title></rect>
-<rect x="541" y="242" width="11" height="11" fill="#555" fill-opacity="0.42"><title>slicing uses scene_items: 2 files</title></rect>
-<rect x="450" y="242" width="11" height="11" fill="#555" fill-opacity="0.48"><title>slicing uses editor: 4 files</title></rect>
-<rect x="437" y="242" width="11" height="11" fill="#555" fill-opacity="0.37"><title>slicing uses tools: 1 files</title></rect>
-<rect x="359" y="242" width="11" height="11" fill="#555" fill-opacity="0.45"><title>slicing uses edges: 3 files</title></rect>
-<rect x="398" y="242" width="11" height="11" fill="#555" fill-opacity="0.48"><title>slicing uses polygons: 4 files</title></rect>
-<rect x="502" y="242" width="11" height="11" fill="#555" fill-opacity="0.37"><title>slicing uses transforms: 1 files</title></rect>
-<rect x="294" y="242" width="11" height="11" fill="#555" fill-opacity="0.37"><title>slicing uses curve_tools: 1 files</title></rect>
-<rect x="398" y="255" width="11" height="11" fill="#555" fill-opacity="0.42"><title>duplication uses polygons: 2 files</title></rect>
-<rect x="359" y="255" width="11" height="11" fill="#555" fill-opacity="0.42"><title>duplication uses edges: 2 files</title></rect>
-<rect x="346" y="255" width="11" height="11" fill="#555" fill-opacity="0.42"><title>duplication uses commands: 2 files</title></rect>
-<rect x="229" y="255" width="11" height="11" fill="#d62728" fill-opacity="0.37"><title>duplication uses meshops: 1 files</title></rect>
-<rect x="437" y="255" width="11" height="11" fill="#555" fill-opacity="0.37"><title>duplication uses tools: 1 files</title></rect>
-<rect x="450" y="281" width="11" height="11" fill="#555" fill-opacity="0.69"><title>rigging uses editor: 14 files</title></rect>
-<rect x="580" y="281" width="11" height="11" fill="#555" fill-opacity="0.51"><title>rigging uses geometry: 5 files</title></rect>
-<rect x="593" y="281" width="11" height="11" fill="#555" fill-opacity="0.67"><title>rigging uses (root): 13 files</title></rect>
-<rect x="541" y="281" width="11" height="11" fill="#555" fill-opacity="0.75"><title>rigging uses scene_items: 18 files</title></rect>
-<rect x="346" y="281" width="11" height="11" fill="#555" fill-opacity="0.60"><title>rigging uses commands: 9 files</title></rect>
-<rect x="229" y="281" width="11" height="11" fill="#d62728" fill-opacity="0.45"><title>rigging uses meshops: 3 files</title></rect>
-<rect x="333" y="281" width="11" height="11" fill="#555" fill-opacity="0.60"><title>rigging uses anim: 9 files</title></rect>
-<rect x="320" y="281" width="11" height="11" fill="#555" fill-opacity="0.37"><title>rigging uses bake: 1 files</title></rect>
-<rect x="463" y="281" width="11" height="11" fill="#555" fill-opacity="0.51"><title>rigging uses render: 5 files</title></rect>
-<rect x="450" y="229" width="11" height="11" fill="#555" fill-opacity="0.54"><title>meshops uses editor: 6 files</title></rect>
-<rect x="528" y="229" width="11" height="11" fill="#555" fill-opacity="0.45"><title>meshops uses materials: 3 files</title></rect>
-<rect x="294" y="281" width="11" height="11" fill="#555" fill-opacity="0.37"><title>rigging uses curve_tools: 1 files</title></rect>
-<rect x="255" y="229" width="11" height="11" fill="#555" fill-opacity="0.51"><title>meshops uses duplication: 5 files</title></rect>
-<rect x="333" y="229" width="11" height="11" fill="#555" fill-opacity="0.48"><title>meshops uses anim: 4 files</title></rect>
-<rect x="398" y="229" width="11" height="11" fill="#555" fill-opacity="0.48"><title>meshops uses polygons: 4 files</title></rect>
-<rect x="164" y="151" width="11" height="11" fill="#555" fill-opacity="0.45"><title>meshblend_spike uses meshblend: 3 files</title></rect>
-<rect x="580" y="151" width="11" height="11" fill="#555" fill-opacity="0.51"><title>meshblend_spike uses geometry: 5 files</title></rect>
-<rect x="359" y="151" width="11" height="11" fill="#555" fill-opacity="0.37"><title>meshblend_spike uses edges: 1 files</title></rect>
-<rect x="593" y="151" width="11" height="11" fill="#555" fill-opacity="0.45"><title>meshblend_spike uses (root): 3 files</title></rect>
-<rect x="242" y="151" width="11" height="11" fill="#555" fill-opacity="0.42"><title>meshblend_spike uses slicing: 2 files</title></rect>
-<rect x="398" y="151" width="11" height="11" fill="#555" fill-opacity="0.37"><title>meshblend_spike uses polygons: 1 files</title></rect>
-<rect x="307" y="151" width="11" height="11" fill="#555" fill-opacity="0.37"><title>meshblend_spike uses primitives: 1 files</title></rect>
-<rect x="255" y="151" width="11" height="11" fill="#555" fill-opacity="0.37"><title>meshblend_spike uses duplication: 1 files</title></rect>
-<rect x="580" y="164" width="11" height="11" fill="#555" fill-opacity="0.51"><title>meshblend uses geometry: 5 files</title></rect>
-<rect x="242" y="164" width="11" height="11" fill="#555" fill-opacity="0.42"><title>meshblend uses slicing: 2 files</title></rect>
-<rect x="151" y="164" width="11" height="11" fill="#d62728" fill-opacity="0.37"><title>meshblend uses meshblend_spike: 1 files</title></rect>
-<rect x="398" y="164" width="11" height="11" fill="#555" fill-opacity="0.42"><title>meshblend uses polygons: 2 files</title></rect>
-<rect x="593" y="164" width="11" height="11" fill="#555" fill-opacity="0.48"><title>meshblend uses (root): 4 files</title></rect>
-<rect x="229" y="164" width="11" height="11" fill="#555" fill-opacity="0.42"><title>meshblend uses meshops: 2 files</title></rect>
-<rect x="541" y="164" width="11" height="11" fill="#555" fill-opacity="0.42"><title>meshblend uses scene_items: 2 files</title></rect>
-<rect x="567" y="164" width="11" height="11" fill="#555" fill-opacity="0.37"><title>meshblend uses subdivision: 1 files</title></rect>
-<rect x="502" y="164" width="11" height="11" fill="#555" fill-opacity="0.37"><title>meshblend uses transforms: 1 files</title></rect>
-<rect x="450" y="164" width="11" height="11" fill="#555" fill-opacity="0.37"><title>meshblend uses editor: 1 files</title></rect>
-<rect x="346" y="164" width="11" height="11" fill="#555" fill-opacity="0.37"><title>meshblend uses commands: 1 files</title></rect>
-<rect x="502" y="229" width="11" height="11" fill="#555" fill-opacity="0.37"><title>meshops uses transforms: 1 files</title></rect>
-<rect x="359" y="229" width="11" height="11" fill="#555" fill-opacity="0.37"><title>meshops uses edges: 1 files</title></rect>
-<rect x="242" y="229" width="11" height="11" fill="#555" fill-opacity="0.42"><title>meshops uses slicing: 2 files</title></rect>
-<rect x="411" y="229" width="11" height="11" fill="#555" fill-opacity="0.42"><title>meshops uses uv: 2 files</title></rect>
-<rect x="294" y="229" width="11" height="11" fill="#555" fill-opacity="0.45"><title>meshops uses curve_tools: 3 files</title></rect>
-<rect x="346" y="229" width="11" height="11" fill="#555" fill-opacity="0.37"><title>meshops uses commands: 1 files</title></rect>
-<rect x="281" y="229" width="11" height="11" fill="#555" fill-opacity="0.54"><title>meshops uses rigging: 6 files</title></rect>
-<rect x="307" y="229" width="11" height="11" fill="#555" fill-opacity="0.37"><title>meshops uses primitives: 1 files</title></rect>
-<rect x="164" y="229" width="11" height="11" fill="#d62728" fill-opacity="0.37"><title>meshops uses meshblend: 1 files</title></rect>
-<rect x="450" y="333" width="11" height="11" fill="#555" fill-opacity="0.56"><title>anim uses editor: 7 files</title></rect>
-<rect x="593" y="333" width="11" height="11" fill="#555" fill-opacity="0.51"><title>anim uses (root): 5 files</title></rect>
-<rect x="541" y="333" width="11" height="11" fill="#555" fill-opacity="0.56"><title>anim uses scene_items: 7 files</title></rect>
-<rect x="346" y="333" width="11" height="11" fill="#555" fill-opacity="0.48"><title>anim uses commands: 4 files</title></rect>
-<rect x="281" y="333" width="11" height="11" fill="#d62728" fill-opacity="0.37"><title>anim uses rigging: 1 files</title></rect>
-<rect x="463" y="333" width="11" height="11" fill="#555" fill-opacity="0.42"><title>anim uses render: 2 files</title></rect>
-<rect x="541" y="411" width="11" height="11" fill="#555" fill-opacity="0.62"><title>uv uses scene_items: 10 files</title></rect>
-<rect x="450" y="411" width="11" height="11" fill="#555" fill-opacity="0.66"><title>uv uses editor: 12 files</title></rect>
-<rect x="424" y="411" width="11" height="11" fill="#555" fill-opacity="0.56"><title>uv uses selections: 7 files</title></rect>
-<rect x="346" y="411" width="11" height="11" fill="#d62728" fill-opacity="0.45"><title>uv uses commands: 3 files</title></rect>
-<rect x="502" y="411" width="11" height="11" fill="#555" fill-opacity="0.42"><title>uv uses transforms: 2 files</title></rect>
-<rect x="489" y="411" width="11" height="11" fill="#555" fill-opacity="0.37"><title>uv uses deformers: 1 files</title></rect>
-<rect x="437" y="411" width="11" height="11" fill="#555" fill-opacity="0.37"><title>uv uses tools: 1 files</title></rect>
-<rect x="294" y="359" width="11" height="11" fill="#d62728" fill-opacity="0.37"><title>edges uses curve_tools: 1 files</title></rect>
-<rect x="515" y="359" width="11" height="11" fill="#555" fill-opacity="0.37"><title>edges uses interchange: 1 files</title></rect>
-<rect x="177" y="346" width="11" height="11" fill="#d62728" fill-opacity="0.48"><title>commands uses command_registry: 4 files</title></rect>
-<rect x="346" y="177" width="11" height="11" fill="#555" fill-opacity="0.42"><title>command_registry uses commands: 2 files</title></rect>
-<rect x="450" y="177" width="11" height="11" fill="#555" fill-opacity="0.37"><title>command_registry uses editor: 1 files</title></rect>
-<rect x="541" y="177" width="11" height="11" fill="#555" fill-opacity="0.37"><title>command_registry uses scene_items: 1 files</title></rect>
-<rect x="281" y="177" width="11" height="11" fill="#555" fill-opacity="0.42"><title>command_registry uses rigging: 2 files</title></rect>
-<rect x="229" y="177" width="11" height="11" fill="#555" fill-opacity="0.42"><title>command_registry uses meshops: 2 files</title></rect>
-<rect x="333" y="177" width="11" height="11" fill="#555" fill-opacity="0.45"><title>command_registry uses anim: 3 files</title></rect>
-<rect x="463" y="177" width="11" height="11" fill="#555" fill-opacity="0.37"><title>command_registry uses render: 1 files</title></rect>
-<rect x="372" y="177" width="11" height="11" fill="#555" fill-opacity="0.37"><title>command_registry uses sculpting: 1 files</title></rect>
-<rect x="502" y="346" width="11" height="11" fill="#555" fill-opacity="0.45"><title>commands uses transforms: 3 files</title></rect>
-<rect x="359" y="346" width="11" height="11" fill="#555" fill-opacity="0.42"><title>commands uses edges: 2 files</title></rect>
-<rect x="372" y="346" width="11" height="11" fill="#555" fill-opacity="0.42"><title>commands uses sculpting: 2 files</title></rect>
-<rect x="489" y="346" width="11" height="11" fill="#555" fill-opacity="0.37"><title>commands uses deformers: 1 files</title></rect>
-<rect x="424" y="346" width="11" height="11" fill="#555" fill-opacity="0.37"><title>commands uses selections: 1 files</title></rect>
-<rect x="164" y="346" width="11" height="11" fill="#d62728" fill-opacity="0.37"><title>commands uses meshblend: 1 files</title></rect>
-<rect x="411" y="346" width="11" height="11" fill="#555" fill-opacity="0.42"><title>commands uses uv: 2 files</title></rect>
-<rect x="385" y="346" width="11" height="11" fill="#555" fill-opacity="0.37"><title>commands uses nodes: 1 files</title></rect>
-<rect x="242" y="346" width="11" height="11" fill="#d62728" fill-opacity="0.37"><title>commands uses slicing: 1 files</title></rect>
-<rect x="320" y="346" width="11" height="11" fill="#d62728" fill-opacity="0.37"><title>commands uses bake: 1 files</title></rect>
-<rect x="281" y="346" width="11" height="11" fill="#d62728" fill-opacity="0.37"><title>commands uses rigging: 1 files</title></rect>
-<rect x="528" y="333" width="11" height="11" fill="#555" fill-opacity="0.37"><title>anim uses materials: 1 files</title></rect>
-<rect x="437" y="333" width="11" height="11" fill="#555" fill-opacity="0.37"><title>anim uses tools: 1 files</title></rect>
-<rect x="346" y="359" width="11" height="11" fill="#d62728" fill-opacity="0.37"><title>edges uses commands: 1 files</title></rect>
-<rect x="450" y="190" width="11" height="11" fill="#555" fill-opacity="0.42"><title>painting uses editor: 2 files</title></rect>
-<rect x="580" y="190" width="11" height="11" fill="#555" fill-opacity="0.48"><title>painting uses geometry: 4 files</title></rect>
-<rect x="593" y="190" width="11" height="11" fill="#555" fill-opacity="0.51"><title>painting uses (root): 5 files</title></rect>
-<rect x="541" y="190" width="11" height="11" fill="#555" fill-opacity="0.51"><title>painting uses scene_items: 5 files</title></rect>
-<rect x="255" y="190" width="11" height="11" fill="#555" fill-opacity="0.37"><title>painting uses duplication: 1 files</title></rect>
-<rect x="502" y="190" width="11" height="11" fill="#555" fill-opacity="0.42"><title>painting uses transforms: 2 files</title></rect>
-<rect x="398" y="190" width="11" height="11" fill="#555" fill-opacity="0.37"><title>painting uses polygons: 1 files</title></rect>
-<rect x="593" y="528" width="11" height="11" fill="#555" fill-opacity="0.58"><title>materials uses (root): 8 files</title></rect>
-<rect x="541" y="528" width="11" height="11" fill="#555" fill-opacity="0.54"><title>materials uses scene_items: 6 files</title></rect>
-<rect x="463" y="528" width="11" height="11" fill="#d62728" fill-opacity="0.45"><title>materials uses render: 3 files</title></rect>
-<rect x="229" y="528" width="11" height="11" fill="#d62728" fill-opacity="0.45"><title>materials uses meshops: 3 files</title></rect>
-<rect x="398" y="528" width="11" height="11" fill="#d62728" fill-opacity="0.45"><title>materials uses polygons: 3 files</title></rect>
-<rect x="385" y="528" width="11" height="11" fill="#d62728" fill-opacity="0.45"><title>materials uses nodes: 3 files</title></rect>
-<rect x="346" y="528" width="11" height="11" fill="#d62728" fill-opacity="0.42"><title>materials uses commands: 2 files</title></rect>
-<rect x="450" y="528" width="11" height="11" fill="#d62728" fill-opacity="0.42"><title>materials uses editor: 2 files</title></rect>
-<rect x="580" y="528" width="11" height="11" fill="#555" fill-opacity="0.42"><title>materials uses geometry: 2 files</title></rect>
-<rect x="424" y="528" width="11" height="11" fill="#d62728" fill-opacity="0.37"><title>materials uses selections: 1 files</title></rect>
-<rect x="554" y="528" width="11" height="11" fill="#555" fill-opacity="0.37"><title>materials uses openpbr: 1 files</title></rect>
-<rect x="528" y="463" width="11" height="11" fill="#555" fill-opacity="0.51"><title>render uses materials: 5 files</title></rect>
-<rect x="528" y="411" width="11" height="11" fill="#555" fill-opacity="0.37"><title>uv uses materials: 1 files</title></rect>
-<rect x="463" y="411" width="11" height="11" fill="#555" fill-opacity="0.37"><title>uv uses render: 1 files</title></rect>
-<rect x="450" y="463" width="11" height="11" fill="#d62728" fill-opacity="0.48"><title>render uses editor: 4 files</title></rect>
-<rect x="528" y="554" width="11" height="11" fill="#d62728" fill-opacity="0.37"><title>openpbr uses materials: 1 files</title></rect>
-<rect x="528" y="385" width="11" height="11" fill="#555" fill-opacity="0.54"><title>nodes uses materials: 6 files</title></rect>
-<rect x="398" y="385" width="11" height="11" fill="#555" fill-opacity="0.37"><title>nodes uses polygons: 1 files</title></rect>
-<rect x="450" y="385" width="11" height="11" fill="#555" fill-opacity="0.37"><title>nodes uses editor: 1 files</title></rect>
-<rect x="203" y="385" width="11" height="11" fill="#d62728" fill-opacity="0.42"><title>nodes uses materialx: 2 files</title></rect>
-<rect x="541" y="385" width="11" height="11" fill="#555" fill-opacity="0.37"><title>nodes uses scene_items: 1 files</title></rect>
-<rect x="346" y="385" width="11" height="11" fill="#d62728" fill-opacity="0.37"><title>nodes uses commands: 1 files</title></rect>
-<rect x="593" y="203" width="11" height="11" fill="#555" fill-opacity="0.60"><title>materialx uses (root): 9 files</title></rect>
-<rect x="216" y="203" width="11" height="11" fill="#555" fill-opacity="0.45"><title>materialx uses preset: 3 files</title></rect>
-<rect x="528" y="203" width="11" height="11" fill="#555" fill-opacity="0.60"><title>materialx uses materials: 9 files</title></rect>
-<rect x="541" y="203" width="11" height="11" fill="#555" fill-opacity="0.56"><title>materialx uses scene_items: 7 files</title></rect>
-<rect x="346" y="203" width="11" height="11" fill="#555" fill-opacity="0.42"><title>materialx uses commands: 2 files</title></rect>
-<rect x="385" y="203" width="11" height="11" fill="#555" fill-opacity="0.51"><title>materialx uses nodes: 5 files</title></rect>
-<rect x="554" y="203" width="11" height="11" fill="#555" fill-opacity="0.48"><title>materialx uses openpbr: 4 files</title></rect>
-<rect x="255" y="203" width="11" height="11" fill="#555" fill-opacity="0.37"><title>materialx uses duplication: 1 files</title></rect>
-<rect x="580" y="567" width="11" height="11" fill="#555" fill-opacity="0.45"><title>subdivision uses geometry: 3 files</title></rect>
-<rect x="593" y="567" width="11" height="11" fill="#555" fill-opacity="0.42"><title>subdivision uses (root): 2 files</title></rect>
-<rect x="294" y="567" width="11" height="11" fill="#d62728" fill-opacity="0.37"><title>subdivision uses curve_tools: 1 files</title></rect>
-<rect x="515" y="567" width="11" height="11" fill="#d62728" fill-opacity="0.37"><title>subdivision uses interchange: 1 files</title></rect>
-<rect x="450" y="567" width="11" height="11" fill="#d62728" fill-opacity="0.37"><title>subdivision uses editor: 1 files</title></rect>
-<rect x="398" y="567" width="11" height="11" fill="#d62728" fill-opacity="0.37"><title>subdivision uses polygons: 1 files</title></rect>
-<rect x="567" y="372" width="11" height="11" fill="#555" fill-opacity="0.37"><title>sculpting uses subdivision: 1 files</title></rect>
-<rect x="398" y="372" width="11" height="11" fill="#555" fill-opacity="0.37"><title>sculpting uses polygons: 1 files</title></rect>
-<rect x="541" y="268" width="11" height="11" fill="#555" fill-opacity="0.60"><title>lxo uses scene_items: 9 files</title></rect>
-<rect x="333" y="268" width="11" height="11" fill="#555" fill-opacity="0.51"><title>lxo uses anim: 5 files</title></rect>
-<rect x="281" y="268" width="11" height="11" fill="#555" fill-opacity="0.45"><title>lxo uses rigging: 3 files</title></rect>
-<rect x="580" y="268" width="11" height="11" fill="#555" fill-opacity="0.48"><title>lxo uses geometry: 4 files</title></rect>
-<rect x="294" y="268" width="11" height="11" fill="#555" fill-opacity="0.37"><title>lxo uses curve_tools: 1 files</title></rect>
-<rect x="463" y="268" width="11" height="11" fill="#555" fill-opacity="0.42"><title>lxo uses render: 2 files</title></rect>
-<rect x="346" y="268" width="11" height="11" fill="#555" fill-opacity="0.42"><title>lxo uses commands: 2 files</title></rect>
-<rect x="515" y="268" width="11" height="11" fill="#555" fill-opacity="0.42"><title>lxo uses interchange: 2 files</title></rect>
-<rect x="528" y="268" width="11" height="11" fill="#555" fill-opacity="0.42"><title>lxo uses materials: 2 files</title></rect>
-<rect x="593" y="268" width="11" height="11" fill="#555" fill-opacity="0.37"><title>lxo uses (root): 1 files</title></rect>
-<rect x="580" y="515" width="11" height="11" fill="#555" fill-opacity="0.45"><title>interchange uses geometry: 3 files</title></rect>
-<rect x="541" y="515" width="11" height="11" fill="#555" fill-opacity="0.42"><title>interchange uses scene_items: 2 files</title></rect>
-<rect x="593" y="515" width="11" height="11" fill="#555" fill-opacity="0.69"><title>interchange uses (root): 14 files</title></rect>
-<rect x="411" y="515" width="11" height="11" fill="#d62728" fill-opacity="0.37"><title>interchange uses uv: 1 files</title></rect>
-<rect x="177" y="515" width="11" height="11" fill="#d62728" fill-opacity="0.37"><title>interchange uses command_registry: 1 files</title></rect>
-<rect x="268" y="515" width="11" height="11" fill="#d62728" fill-opacity="0.37"><title>interchange uses lxo: 1 files</title></rect>
-<rect x="528" y="515" width="11" height="11" fill="#555" fill-opacity="0.48"><title>interchange uses materials: 4 files</title></rect>
-<rect x="567" y="515" width="11" height="11" fill="#555" fill-opacity="0.37"><title>interchange uses subdivision: 1 files</title></rect>
-<rect x="294" y="502" width="11" height="11" fill="#d62728" fill-opacity="0.37"><title>transforms uses curve_tools: 1 files</title></rect>
-<rect x="567" y="502" width="11" height="11" fill="#555" fill-opacity="0.37"><title>transforms uses subdivision: 1 files</title></rect>
-<rect x="515" y="502" width="11" height="11" fill="#555" fill-opacity="0.37"><title>transforms uses interchange: 1 files</title></rect>
-<rect x="567" y="346" width="11" height="11" fill="#555" fill-opacity="0.37"><title>commands uses subdivision: 1 files</title></rect>
-<rect x="580" y="450" width="11" height="11" fill="#555" fill-opacity="0.42"><title>editor uses geometry: 2 files</title></rect>
-<rect x="593" y="450" width="11" height="11" fill="#555" fill-opacity="0.37"><title>editor uses (root): 1 files</title></rect>
-<rect x="541" y="450" width="11" height="11" fill="#555" fill-opacity="0.54"><title>editor uses scene_items: 6 files</title></rect>
-<rect x="398" y="450" width="11" height="11" fill="#d62728" fill-opacity="0.54"><title>editor uses polygons: 6 files</title></rect>
-<rect x="502" y="450" width="11" height="11" fill="#555" fill-opacity="0.58"><title>editor uses transforms: 8 files</title></rect>
-<rect x="346" y="450" width="11" height="11" fill="#d62728" fill-opacity="0.56"><title>editor uses commands: 7 files</title></rect>
-<rect x="294" y="450" width="11" height="11" fill="#d62728" fill-opacity="0.54"><title>editor uses curve_tools: 6 files</title></rect>
-<rect x="424" y="450" width="11" height="11" fill="#d62728" fill-opacity="0.45"><title>editor uses selections: 3 files</title></rect>
-<rect x="476" y="450" width="11" height="11" fill="#555" fill-opacity="0.42"><title>editor uses solid_sketch: 2 files</title></rect>
-<rect x="489" y="450" width="11" height="11" fill="#555" fill-opacity="0.56"><title>editor uses deformers: 7 files</title></rect>
-<rect x="437" y="450" width="11" height="11" fill="#d62728" fill-opacity="0.54"><title>editor uses tools: 6 files</title></rect>
-<rect x="359" y="450" width="11" height="11" fill="#d62728" fill-opacity="0.54"><title>editor uses edges: 6 files</title></rect>
-<rect x="190" y="450" width="11" height="11" fill="#d62728" fill-opacity="0.45"><title>editor uses painting: 3 files</title></rect>
-<rect x="307" y="450" width="11" height="11" fill="#d62728" fill-opacity="0.51"><title>editor uses primitives: 5 files</title></rect>
-<rect x="333" y="450" width="11" height="11" fill="#d62728" fill-opacity="0.42"><title>editor uses anim: 2 files</title></rect>
-<rect x="255" y="450" width="11" height="11" fill="#d62728" fill-opacity="0.54"><title>editor uses duplication: 6 files</title></rect>
-<rect x="242" y="450" width="11" height="11" fill="#d62728" fill-opacity="0.54"><title>editor uses slicing: 6 files</title></rect>
-<rect x="411" y="450" width="11" height="11" fill="#d62728" fill-opacity="0.51"><title>editor uses uv: 5 files</title></rect>
-<rect x="372" y="450" width="11" height="11" fill="#d62728" fill-opacity="0.42"><title>editor uses sculpting: 2 files</title></rect>
-<rect x="229" y="450" width="11" height="11" fill="#d62728" fill-opacity="0.42"><title>editor uses meshops: 2 files</title></rect>
-<rect x="463" y="450" width="11" height="11" fill="#555" fill-opacity="0.51"><title>editor uses render: 5 files</title></rect>
-<rect x="528" y="450" width="11" height="11" fill="#555" fill-opacity="0.45"><title>editor uses materials: 3 files</title></rect>
-<rect x="281" y="450" width="11" height="11" fill="#d62728" fill-opacity="0.51"><title>editor uses rigging: 5 files</title></rect>
-<rect x="567" y="450" width="11" height="11" fill="#555" fill-opacity="0.37"><title>editor uses subdivision: 1 files</title></rect>
-<rect x="216" y="450" width="11" height="11" fill="#d62728" fill-opacity="0.37"><title>editor uses preset: 1 files</title></rect>
-<rect x="164" y="450" width="11" height="11" fill="#d62728" fill-opacity="0.37"><title>editor uses meshblend: 1 files</title></rect>
-<rect x="281" y="541" width="11" height="11" fill="#d62728" fill-opacity="0.37"><title>scene_items uses rigging: 1 files</title></rect>
-<rect x="333" y="463" width="11" height="11" fill="#d62728" fill-opacity="0.37"><title>render uses anim: 1 files</title></rect>
-<rect x="437" y="463" width="11" height="11" fill="#d62728" fill-opacity="0.37"><title>render uses tools: 1 files</title></rect>
-<rect x="411" y="294" width="11" height="11" fill="#555" fill-opacity="0.37"><title>curve_tools uses uv: 1 files</title></rect>
-<rect x="255" y="294" width="11" height="11" fill="#d62728" fill-opacity="0.42"><title>curve_tools uses duplication: 2 files</title></rect>
-<rect x="255" y="242" width="11" height="11" fill="#555" fill-opacity="0.37"><title>slicing uses duplication: 1 files</title></rect>
-<rect x="229" y="294" width="11" height="11" fill="#d62728" fill-opacity="0.37"><title>curve_tools uses meshops: 1 files</title></rect>
-<rect x="437" y="424" width="11" height="11" fill="#555" fill-opacity="0.37"><title>selections uses tools: 1 files</title></rect>
-<rect x="359" y="424" width="11" height="11" fill="#d62728" fill-opacity="0.37"><title>selections uses edges: 1 files</title></rect>
-<rect x="346" y="424" width="11" height="11" fill="#d62728" fill-opacity="0.37"><title>selections uses commands: 1 files</title></rect>
-<rect x="372" y="190" width="11" height="11" fill="#555" fill-opacity="0.48"><title>painting uses sculpting: 4 files</title></rect>
-<rect x="229" y="190" width="11" height="11" fill="#555" fill-opacity="0.37"><title>painting uses meshops: 1 files</title></rect>
-<rect x="528" y="190" width="11" height="11" fill="#555" fill-opacity="0.42"><title>painting uses materials: 2 files</title></rect>
-<rect x="320" y="190" width="11" height="11" fill="#555" fill-opacity="0.42"><title>painting uses bake: 2 files</title></rect>
-<rect x="489" y="190" width="11" height="11" fill="#555" fill-opacity="0.42"><title>painting uses deformers: 2 files</title></rect>
-<rect x="411" y="190" width="11" height="11" fill="#555" fill-opacity="0.37"><title>painting uses uv: 1 files</title></rect>
-<rect x="567" y="190" width="11" height="11" fill="#555" fill-opacity="0.37"><title>painting uses subdivision: 1 files</title></rect>
-<rect x="463" y="190" width="11" height="11" fill="#555" fill-opacity="0.42"><title>painting uses render: 2 files</title></rect>
-<rect x="294" y="190" width="11" height="11" fill="#555" fill-opacity="0.37"><title>painting uses curve_tools: 1 files</title></rect>
-<rect x="580" y="320" width="11" height="11" fill="#555" fill-opacity="0.37"><title>bake uses geometry: 1 files</title></rect>
-<rect x="593" y="320" width="11" height="11" fill="#555" fill-opacity="0.37"><title>bake uses (root): 1 files</title></rect>
-<rect x="541" y="320" width="11" height="11" fill="#555" fill-opacity="0.37"><title>bake uses scene_items: 1 files</title></rect>
-<rect x="528" y="320" width="11" height="11" fill="#555" fill-opacity="0.37"><title>bake uses materials: 1 files</title></rect>
-<rect x="411" y="320" width="11" height="11" fill="#555" fill-opacity="0.37"><title>bake uses uv: 1 files</title></rect>
-<rect x="515" y="320" width="11" height="11" fill="#555" fill-opacity="0.37"><title>bake uses interchange: 1 files</title></rect>
-<rect x="346" y="320" width="11" height="11" fill="#555" fill-opacity="0.37"><title>bake uses commands: 1 files</title></rect>
-<text class="l" x="8" y="631">● = in a cycle. Darker = more files. Hover a cell for the count. Generated by scripts/area-deps.py.</text>
+<text class="l" x="146" y="368" text-anchor="end">curve_tools ●</text>
+<text class="l" x="368" y="146" transform="rotate(-60 368 146)">curve_tools</text>
+<text class="l" x="146" y="381" text-anchor="end">edges ●</text>
+<text class="l" x="381" y="146" transform="rotate(-60 381 146)">edges</text>
+<text class="l" x="146" y="394" text-anchor="end">interchange ●</text>
+<text class="l" x="394" y="146" transform="rotate(-60 394 146)">interchange</text>
+<text class="l" x="146" y="407" text-anchor="end">sculpting ●</text>
+<text class="l" x="407" y="146" transform="rotate(-60 407 146)">sculpting</text>
+<text class="l" x="146" y="420" text-anchor="end">nodes ●</text>
+<text class="l" x="420" y="146" transform="rotate(-60 420 146)">nodes</text>
+<text class="l" x="146" y="433" text-anchor="end">polygons ●</text>
+<text class="l" x="433" y="146" transform="rotate(-60 433 146)">polygons</text>
+<text class="l" x="146" y="446" text-anchor="end">uv ●</text>
+<text class="l" x="446" y="146" transform="rotate(-60 446 146)">uv</text>
+<text class="l" x="146" y="459" text-anchor="end">render ●</text>
+<text class="l" x="459" y="146" transform="rotate(-60 459 146)">render</text>
+<text class="l" x="146" y="472" text-anchor="end">selections ●</text>
+<text class="l" x="472" y="146" transform="rotate(-60 472 146)">selections</text>
+<text class="l" x="146" y="485" text-anchor="end">tools ●</text>
+<text class="l" x="485" y="146" transform="rotate(-60 485 146)">tools</text>
+<text class="l" x="146" y="498" text-anchor="end">transforms ●</text>
+<text class="l" x="498" y="146" transform="rotate(-60 498 146)">transforms</text>
+<text class="l" x="146" y="511" text-anchor="end">editor ●</text>
+<text class="l" x="511" y="146" transform="rotate(-60 511 146)">editor</text>
+<text class="l" x="146" y="524" text-anchor="end">deformers ●</text>
+<text class="l" x="524" y="146" transform="rotate(-60 524 146)">deformers</text>
+<text class="l" x="146" y="537" text-anchor="end">solid_sketch ●</text>
+<text class="l" x="537" y="146" transform="rotate(-60 537 146)">solid_sketch</text>
+<text class="l" x="146" y="550" text-anchor="end">materials ●</text>
+<text class="l" x="550" y="146" transform="rotate(-60 550 146)">materials</text>
+<text class="l" x="146" y="563" text-anchor="end">scene_items ●</text>
+<text class="l" x="563" y="146" transform="rotate(-60 563 146)">scene_items</text>
+<text class="l" x="146" y="576" text-anchor="end">openpbr ●</text>
+<text class="l" x="576" y="146" transform="rotate(-60 576 146)">openpbr</text>
+<text class="l" x="146" y="589" text-anchor="end">subdivision ●</text>
+<text class="l" x="589" y="146" transform="rotate(-60 589 146)">subdivision</text>
+<text class="l" x="146" y="602" text-anchor="end">geometry ●</text>
+<text class="l" x="602" y="146" transform="rotate(-60 602 146)">geometry</text>
+<text class="l" x="146" y="615" text-anchor="end">(root)</text>
+<text class="l" x="615" y="146" transform="rotate(-60 615 146)">(root)</text>
+<line class="g" x1="150" y1="150" x2="618" y2="150"/>
+<line class="g" x1="150" y1="150" x2="150" y2="618"/>
+<line class="g" x1="150" y1="163" x2="618" y2="163"/>
+<line class="g" x1="163" y1="150" x2="163" y2="618"/>
+<line class="g" x1="150" y1="176" x2="618" y2="176"/>
+<line class="g" x1="176" y1="150" x2="176" y2="618"/>
+<line class="g" x1="150" y1="189" x2="618" y2="189"/>
+<line class="g" x1="189" y1="150" x2="189" y2="618"/>
+<line class="g" x1="150" y1="202" x2="618" y2="202"/>
+<line class="g" x1="202" y1="150" x2="202" y2="618"/>
+<line class="g" x1="150" y1="215" x2="618" y2="215"/>
+<line class="g" x1="215" y1="150" x2="215" y2="618"/>
+<line class="g" x1="150" y1="228" x2="618" y2="228"/>
+<line class="g" x1="228" y1="150" x2="228" y2="618"/>
+<line class="g" x1="150" y1="241" x2="618" y2="241"/>
+<line class="g" x1="241" y1="150" x2="241" y2="618"/>
+<line class="g" x1="150" y1="254" x2="618" y2="254"/>
+<line class="g" x1="254" y1="150" x2="254" y2="618"/>
+<line class="g" x1="150" y1="267" x2="618" y2="267"/>
+<line class="g" x1="267" y1="150" x2="267" y2="618"/>
+<line class="g" x1="150" y1="280" x2="618" y2="280"/>
+<line class="g" x1="280" y1="150" x2="280" y2="618"/>
+<line class="g" x1="150" y1="293" x2="618" y2="293"/>
+<line class="g" x1="293" y1="150" x2="293" y2="618"/>
+<line class="g" x1="150" y1="306" x2="618" y2="306"/>
+<line class="g" x1="306" y1="150" x2="306" y2="618"/>
+<line class="g" x1="150" y1="319" x2="618" y2="319"/>
+<line class="g" x1="319" y1="150" x2="319" y2="618"/>
+<line class="g" x1="150" y1="332" x2="618" y2="332"/>
+<line class="g" x1="332" y1="150" x2="332" y2="618"/>
+<line class="g" x1="150" y1="345" x2="618" y2="345"/>
+<line class="g" x1="345" y1="150" x2="345" y2="618"/>
+<line class="g" x1="150" y1="358" x2="618" y2="358"/>
+<line class="g" x1="358" y1="150" x2="358" y2="618"/>
+<line class="g" x1="150" y1="371" x2="618" y2="371"/>
+<line class="g" x1="371" y1="150" x2="371" y2="618"/>
+<line class="g" x1="150" y1="384" x2="618" y2="384"/>
+<line class="g" x1="384" y1="150" x2="384" y2="618"/>
+<line class="g" x1="150" y1="397" x2="618" y2="397"/>
+<line class="g" x1="397" y1="150" x2="397" y2="618"/>
+<line class="g" x1="150" y1="410" x2="618" y2="410"/>
+<line class="g" x1="410" y1="150" x2="410" y2="618"/>
+<line class="g" x1="150" y1="423" x2="618" y2="423"/>
+<line class="g" x1="423" y1="150" x2="423" y2="618"/>
+<line class="g" x1="150" y1="436" x2="618" y2="436"/>
+<line class="g" x1="436" y1="150" x2="436" y2="618"/>
+<line class="g" x1="150" y1="449" x2="618" y2="449"/>
+<line class="g" x1="449" y1="150" x2="449" y2="618"/>
+<line class="g" x1="150" y1="462" x2="618" y2="462"/>
+<line class="g" x1="462" y1="150" x2="462" y2="618"/>
+<line class="g" x1="150" y1="475" x2="618" y2="475"/>
+<line class="g" x1="475" y1="150" x2="475" y2="618"/>
+<line class="g" x1="150" y1="488" x2="618" y2="488"/>
+<line class="g" x1="488" y1="150" x2="488" y2="618"/>
+<line class="g" x1="150" y1="501" x2="618" y2="501"/>
+<line class="g" x1="501" y1="150" x2="501" y2="618"/>
+<line class="g" x1="150" y1="514" x2="618" y2="514"/>
+<line class="g" x1="514" y1="150" x2="514" y2="618"/>
+<line class="g" x1="150" y1="527" x2="618" y2="527"/>
+<line class="g" x1="527" y1="150" x2="527" y2="618"/>
+<line class="g" x1="150" y1="540" x2="618" y2="540"/>
+<line class="g" x1="540" y1="150" x2="540" y2="618"/>
+<line class="g" x1="150" y1="553" x2="618" y2="553"/>
+<line class="g" x1="553" y1="150" x2="553" y2="618"/>
+<line class="g" x1="150" y1="566" x2="618" y2="566"/>
+<line class="g" x1="566" y1="150" x2="566" y2="618"/>
+<line class="g" x1="150" y1="579" x2="618" y2="579"/>
+<line class="g" x1="579" y1="150" x2="579" y2="618"/>
+<line class="g" x1="150" y1="592" x2="618" y2="592"/>
+<line class="g" x1="592" y1="150" x2="592" y2="618"/>
+<line class="g" x1="150" y1="605" x2="618" y2="605"/>
+<line class="g" x1="605" y1="150" x2="605" y2="618"/>
+<line class="g" x1="150" y1="618" x2="618" y2="618"/>
+<line class="g" x1="618" y1="150" x2="618" y2="618"/>
+<rect x="502" y="554" width="11" height="11" fill="#d62728" fill-opacity="0.52"><title>scene_items uses editor: 9 files</title></rect>
+<rect x="593" y="554" width="11" height="11" fill="#555" fill-opacity="0.52"><title>scene_items uses geometry: 9 files</title></rect>
+<rect x="606" y="554" width="11" height="11" fill="#555" fill-opacity="0.60"><title>scene_items uses (root): 16 files</title></rect>
+<rect x="541" y="554" width="11" height="11" fill="#d62728" fill-opacity="0.43"><title>scene_items uses materials: 4 files</title></rect>
+<rect x="346" y="554" width="11" height="11" fill="#d62728" fill-opacity="0.43"><title>scene_items uses commands: 4 files</title></rect>
+<rect x="463" y="554" width="11" height="11" fill="#d62728" fill-opacity="0.43"><title>scene_items uses selections: 4 files</title></rect>
+<rect x="359" y="554" width="11" height="11" fill="#d62728" fill-opacity="0.34"><title>scene_items uses curve_tools: 1 files</title></rect>
+<rect x="437" y="554" width="11" height="11" fill="#d62728" fill-opacity="0.38"><title>scene_items uses uv: 2 files</title></rect>
+<rect x="424" y="554" width="11" height="11" fill="#d62728" fill-opacity="0.38"><title>scene_items uses polygons: 2 files</title></rect>
+<rect x="606" y="359" width="11" height="11" fill="#555" fill-opacity="0.62"><title>curve_tools uses (root): 18 files</title></rect>
+<rect x="528" y="359" width="11" height="11" fill="#555" fill-opacity="0.40"><title>curve_tools uses solid_sketch: 3 files</title></rect>
+<rect x="489" y="359" width="11" height="11" fill="#555" fill-opacity="0.43"><title>curve_tools uses transforms: 4 files</title></rect>
+<rect x="502" y="359" width="11" height="11" fill="#555" fill-opacity="0.52"><title>curve_tools uses editor: 9 files</title></rect>
+<rect x="593" y="359" width="11" height="11" fill="#555" fill-opacity="0.62"><title>curve_tools uses geometry: 18 files</title></rect>
+<rect x="554" y="359" width="11" height="11" fill="#555" fill-opacity="0.45"><title>curve_tools uses scene_items: 5 files</title></rect>
+<rect x="346" y="359" width="11" height="11" fill="#d62728" fill-opacity="0.38"><title>curve_tools uses commands: 2 files</title></rect>
+<rect x="268" y="359" width="11" height="11" fill="#d62728" fill-opacity="0.40"><title>curve_tools uses primitives: 3 files</title></rect>
+<rect x="593" y="528" width="11" height="11" fill="#555" fill-opacity="0.34"><title>solid_sketch uses geometry: 1 files</title></rect>
+<rect x="606" y="528" width="11" height="11" fill="#555" fill-opacity="0.34"><title>solid_sketch uses (root): 1 files</title></rect>
+<rect x="580" y="528" width="11" height="11" fill="#555" fill-opacity="0.34"><title>solid_sketch uses subdivision: 1 files</title></rect>
+<rect x="359" y="528" width="11" height="11" fill="#d62728" fill-opacity="0.34"><title>solid_sketch uses curve_tools: 1 files</title></rect>
+<rect x="424" y="359" width="11" height="11" fill="#555" fill-opacity="0.48"><title>curve_tools uses polygons: 7 files</title></rect>
+<rect x="424" y="515" width="11" height="11" fill="#d62728" fill-opacity="0.34"><title>deformers uses polygons: 1 files</title></rect>
+<rect x="593" y="515" width="11" height="11" fill="#555" fill-opacity="0.54"><title>deformers uses geometry: 11 files</title></rect>
+<rect x="606" y="515" width="11" height="11" fill="#555" fill-opacity="0.54"><title>deformers uses (root): 11 files</title></rect>
+<rect x="372" y="515" width="11" height="11" fill="#d62728" fill-opacity="0.34"><title>deformers uses edges: 1 files</title></rect>
+<rect x="437" y="372" width="11" height="11" fill="#555" fill-opacity="0.47"><title>edges uses uv: 6 files</title></rect>
+<rect x="593" y="372" width="11" height="11" fill="#555" fill-opacity="0.58"><title>edges uses geometry: 14 files</title></rect>
+<rect x="606" y="372" width="11" height="11" fill="#555" fill-opacity="0.59"><title>edges uses (root): 15 files</title></rect>
+<rect x="424" y="372" width="11" height="11" fill="#555" fill-opacity="0.48"><title>edges uses polygons: 7 files</title></rect>
+<rect x="476" y="372" width="11" height="11" fill="#555" fill-opacity="0.43"><title>edges uses tools: 4 files</title></rect>
+<rect x="554" y="424" width="11" height="11" fill="#555" fill-opacity="0.61"><title>polygons uses scene_items: 17 files</title></rect>
+<rect x="502" y="424" width="11" height="11" fill="#555" fill-opacity="0.72"><title>polygons uses editor: 28 files</title></rect>
+<rect x="606" y="424" width="11" height="11" fill="#555" fill-opacity="0.82"><title>polygons uses (root): 41 files</title></rect>
+<rect x="593" y="424" width="11" height="11" fill="#555" fill-opacity="0.81"><title>polygons uses geometry: 40 files</title></rect>
+<rect x="489" y="424" width="11" height="11" fill="#555" fill-opacity="0.48"><title>polygons uses transforms: 7 files</title></rect>
+<rect x="463" y="424" width="11" height="11" fill="#555" fill-opacity="0.43"><title>polygons uses selections: 4 files</title></rect>
+<rect x="541" y="424" width="11" height="11" fill="#555" fill-opacity="0.40"><title>polygons uses materials: 3 files</title></rect>
+<rect x="333" y="424" width="11" height="11" fill="#d62728" fill-opacity="0.34"><title>polygons uses duplication: 1 files</title></rect>
+<rect x="242" y="424" width="11" height="11" fill="#d62728" fill-opacity="0.34"><title>polygons uses meshops: 1 files</title></rect>
+<rect x="554" y="333" width="11" height="11" fill="#555" fill-opacity="0.50"><title>duplication uses scene_items: 8 files</title></rect>
+<rect x="593" y="333" width="11" height="11" fill="#555" fill-opacity="0.50"><title>duplication uses geometry: 8 files</title></rect>
+<rect x="606" y="333" width="11" height="11" fill="#555" fill-opacity="0.50"><title>duplication uses (root): 8 files</title></rect>
+<rect x="359" y="333" width="11" height="11" fill="#555" fill-opacity="0.45"><title>duplication uses curve_tools: 5 files</title></rect>
+<rect x="450" y="333" width="11" height="11" fill="#555" fill-opacity="0.38"><title>duplication uses render: 2 files</title></rect>
+<rect x="489" y="333" width="11" height="11" fill="#555" fill-opacity="0.40"><title>duplication uses transforms: 3 files</title></rect>
+<rect x="502" y="333" width="11" height="11" fill="#555" fill-opacity="0.47"><title>duplication uses editor: 6 files</title></rect>
+<rect x="593" y="398" width="11" height="11" fill="#555" fill-opacity="0.43"><title>sculpting uses geometry: 4 files</title></rect>
+<rect x="606" y="398" width="11" height="11" fill="#555" fill-opacity="0.40"><title>sculpting uses (root): 3 files</title></rect>
+<rect x="346" y="398" width="11" height="11" fill="#d62728" fill-opacity="0.34"><title>sculpting uses commands: 1 files</title></rect>
+<rect x="502" y="398" width="11" height="11" fill="#555" fill-opacity="0.43"><title>sculpting uses editor: 4 files</title></rect>
+<rect x="554" y="398" width="11" height="11" fill="#555" fill-opacity="0.40"><title>sculpting uses scene_items: 3 files</title></rect>
+<rect x="476" y="398" width="11" height="11" fill="#555" fill-opacity="0.34"><title>sculpting uses tools: 1 files</title></rect>
+<rect x="450" y="359" width="11" height="11" fill="#555" fill-opacity="0.34"><title>curve_tools uses render: 1 files</title></rect>
+<rect x="554" y="372" width="11" height="11" fill="#555" fill-opacity="0.38"><title>edges uses scene_items: 2 files</title></rect>
+<rect x="489" y="372" width="11" height="11" fill="#555" fill-opacity="0.43"><title>edges uses transforms: 4 files</title></rect>
+<rect x="502" y="372" width="11" height="11" fill="#555" fill-opacity="0.47"><title>edges uses editor: 6 files</title></rect>
+<rect x="502" y="463" width="11" height="11" fill="#555" fill-opacity="0.48"><title>selections uses editor: 7 files</title></rect>
+<rect x="593" y="463" width="11" height="11" fill="#555" fill-opacity="0.54"><title>selections uses geometry: 11 files</title></rect>
+<rect x="606" y="463" width="11" height="11" fill="#555" fill-opacity="0.54"><title>selections uses (root): 11 files</title></rect>
+<rect x="502" y="346" width="11" height="11" fill="#555" fill-opacity="0.54"><title>commands uses editor: 11 files</title></rect>
+<rect x="424" y="346" width="11" height="11" fill="#555" fill-opacity="0.43"><title>commands uses polygons: 4 files</title></rect>
+<rect x="476" y="346" width="11" height="11" fill="#555" fill-opacity="0.45"><title>commands uses tools: 5 files</title></rect>
+<rect x="554" y="346" width="11" height="11" fill="#555" fill-opacity="0.48"><title>commands uses scene_items: 7 files</title></rect>
+<rect x="502" y="476" width="11" height="11" fill="#555" fill-opacity="0.54"><title>tools uses editor: 11 files</title></rect>
+<rect x="554" y="476" width="11" height="11" fill="#555" fill-opacity="0.45"><title>tools uses scene_items: 5 files</title></rect>
+<rect x="606" y="476" width="11" height="11" fill="#555" fill-opacity="0.52"><title>tools uses (root): 9 files</title></rect>
+<rect x="346" y="476" width="11" height="11" fill="#d62728" fill-opacity="0.38"><title>tools uses commands: 2 files</title></rect>
+<rect x="606" y="346" width="11" height="11" fill="#555" fill-opacity="0.45"><title>commands uses (root): 5 files</title></rect>
+<rect x="346" y="424" width="11" height="11" fill="#d62728" fill-opacity="0.34"><title>polygons uses commands: 1 files</title></rect>
+<rect x="476" y="424" width="11" height="11" fill="#555" fill-opacity="0.53"><title>polygons uses tools: 10 files</title></rect>
+<rect x="476" y="554" width="11" height="11" fill="#d62728" fill-opacity="0.45"><title>scene_items uses tools: 5 files</title></rect>
+<rect x="515" y="424" width="11" height="11" fill="#555" fill-opacity="0.34"><title>polygons uses deformers: 1 files</title></rect>
+<rect x="437" y="424" width="11" height="11" fill="#555" fill-opacity="0.43"><title>polygons uses uv: 4 files</title></rect>
+<rect x="554" y="268" width="11" height="11" fill="#555" fill-opacity="0.43"><title>primitives uses scene_items: 4 files</title></rect>
+<rect x="346" y="268" width="11" height="11" fill="#555" fill-opacity="0.48"><title>primitives uses commands: 7 files</title></rect>
+<rect x="502" y="268" width="11" height="11" fill="#555" fill-opacity="0.45"><title>primitives uses editor: 5 files</title></rect>
+<rect x="606" y="268" width="11" height="11" fill="#555" fill-opacity="0.54"><title>primitives uses (root): 11 files</title></rect>
+<rect x="489" y="268" width="11" height="11" fill="#555" fill-opacity="0.38"><title>primitives uses transforms: 2 files</title></rect>
+<rect x="476" y="268" width="11" height="11" fill="#555" fill-opacity="0.48"><title>primitives uses tools: 7 files</title></rect>
+<rect x="593" y="268" width="11" height="11" fill="#555" fill-opacity="0.57"><title>primitives uses geometry: 13 files</title></rect>
+<rect x="554" y="463" width="11" height="11" fill="#555" fill-opacity="0.52"><title>selections uses scene_items: 9 files</title></rect>
+<rect x="359" y="268" width="11" height="11" fill="#555" fill-opacity="0.34"><title>primitives uses curve_tools: 1 files</title></rect>
+<rect x="437" y="268" width="11" height="11" fill="#555" fill-opacity="0.45"><title>primitives uses uv: 5 files</title></rect>
+<rect x="333" y="268" width="11" height="11" fill="#555" fill-opacity="0.40"><title>primitives uses duplication: 3 files</title></rect>
+<rect x="268" y="476" width="11" height="11" fill="#d62728" fill-opacity="0.40"><title>tools uses primitives: 3 files</title></rect>
+<rect x="593" y="476" width="11" height="11" fill="#555" fill-opacity="0.40"><title>tools uses geometry: 3 files</title></rect>
+<rect x="372" y="476" width="11" height="11" fill="#d62728" fill-opacity="0.34"><title>tools uses edges: 1 files</title></rect>
+<rect x="606" y="593" width="11" height="11" fill="#555" fill-opacity="0.47"><title>geometry uses (root): 6 files</title></rect>
+<rect x="359" y="593" width="11" height="11" fill="#d62728" fill-opacity="0.34"><title>geometry uses curve_tools: 1 files</title></rect>
+<rect x="489" y="476" width="11" height="11" fill="#555" fill-opacity="0.43"><title>tools uses transforms: 4 files</title></rect>
+<rect x="502" y="489" width="11" height="11" fill="#555" fill-opacity="0.53"><title>transforms uses editor: 10 files</title></rect>
+<rect x="476" y="489" width="11" height="11" fill="#d62728" fill-opacity="0.40"><title>transforms uses tools: 3 files</title></rect>
+<rect x="593" y="489" width="11" height="11" fill="#555" fill-opacity="0.60"><title>transforms uses geometry: 16 files</title></rect>
+<rect x="515" y="489" width="11" height="11" fill="#555" fill-opacity="0.38"><title>transforms uses deformers: 2 files</title></rect>
+<rect x="554" y="489" width="11" height="11" fill="#555" fill-opacity="0.57"><title>transforms uses scene_items: 13 files</title></rect>
+<rect x="606" y="489" width="11" height="11" fill="#555" fill-opacity="0.58"><title>transforms uses (root): 14 files</title></rect>
+<rect x="424" y="489" width="11" height="11" fill="#d62728" fill-opacity="0.43"><title>transforms uses polygons: 4 files</title></rect>
+<rect x="255" y="489" width="11" height="11" fill="#d62728" fill-opacity="0.34"><title>transforms uses slicing: 1 files</title></rect>
+<rect x="489" y="398" width="11" height="11" fill="#555" fill-opacity="0.34"><title>sculpting uses transforms: 1 files</title></rect>
+<rect x="515" y="398" width="11" height="11" fill="#555" fill-opacity="0.34"><title>sculpting uses deformers: 1 files</title></rect>
+<rect x="177" y="398" width="11" height="11" fill="#d62728" fill-opacity="0.34"><title>sculpting uses painting: 1 files</title></rect>
+<rect x="463" y="398" width="11" height="11" fill="#555" fill-opacity="0.34"><title>sculpting uses selections: 1 files</title></rect>
+<rect x="294" y="398" width="11" height="11" fill="#d62728" fill-opacity="0.34"><title>sculpting uses rigging: 1 files</title></rect>
+<rect x="554" y="515" width="11" height="11" fill="#555" fill-opacity="0.45"><title>deformers uses scene_items: 5 files</title></rect>
+<rect x="489" y="515" width="11" height="11" fill="#d62728" fill-opacity="0.43"><title>deformers uses transforms: 4 files</title></rect>
+<rect x="515" y="476" width="11" height="11" fill="#555" fill-opacity="0.34"><title>tools uses deformers: 1 files</title></rect>
+<rect x="424" y="476" width="11" height="11" fill="#d62728" fill-opacity="0.34"><title>tools uses polygons: 1 files</title></rect>
+<rect x="333" y="476" width="11" height="11" fill="#d62728" fill-opacity="0.34"><title>tools uses duplication: 1 files</title></rect>
+<rect x="437" y="476" width="11" height="11" fill="#d62728" fill-opacity="0.34"><title>tools uses uv: 1 files</title></rect>
+<rect x="359" y="476" width="11" height="11" fill="#d62728" fill-opacity="0.34"><title>tools uses curve_tools: 1 files</title></rect>
+<rect x="372" y="359" width="11" height="11" fill="#555" fill-opacity="0.38"><title>curve_tools uses edges: 2 files</title></rect>
+<rect x="515" y="359" width="11" height="11" fill="#555" fill-opacity="0.34"><title>curve_tools uses deformers: 1 files</title></rect>
+<rect x="463" y="359" width="11" height="11" fill="#555" fill-opacity="0.34"><title>curve_tools uses selections: 1 files</title></rect>
+<rect x="372" y="424" width="11" height="11" fill="#d62728" fill-opacity="0.47"><title>polygons uses edges: 6 files</title></rect>
+<rect x="424" y="463" width="11" height="11" fill="#d62728" fill-opacity="0.40"><title>selections uses polygons: 3 files</title></rect>
+<rect x="515" y="242" width="11" height="11" fill="#555" fill-opacity="0.40"><title>meshops uses deformers: 3 files</title></rect>
+<rect x="593" y="242" width="11" height="11" fill="#555" fill-opacity="1.00"><title>meshops uses geometry: 72 files</title></rect>
+<rect x="606" y="242" width="11" height="11" fill="#555" fill-opacity="0.99"><title>meshops uses (root): 71 files</title></rect>
+<rect x="554" y="242" width="11" height="11" fill="#555" fill-opacity="0.57"><title>meshops uses scene_items: 13 files</title></rect>
+<rect x="502" y="515" width="11" height="11" fill="#d62728" fill-opacity="0.38"><title>deformers uses editor: 2 files</title></rect>
+<rect x="476" y="515" width="11" height="11" fill="#d62728" fill-opacity="0.40"><title>deformers uses tools: 3 files</title></rect>
+<rect x="489" y="463" width="11" height="11" fill="#555" fill-opacity="0.34"><title>selections uses transforms: 1 files</title></rect>
+<rect x="437" y="463" width="11" height="11" fill="#d62728" fill-opacity="0.34"><title>selections uses uv: 1 files</title></rect>
+<rect x="580" y="554" width="11" height="11" fill="#555" fill-opacity="0.38"><title>scene_items uses subdivision: 2 files</title></rect>
+<rect x="450" y="554" width="11" height="11" fill="#d62728" fill-opacity="0.43"><title>scene_items uses render: 4 files</title></rect>
+<rect x="242" y="554" width="11" height="11" fill="#d62728" fill-opacity="0.34"><title>scene_items uses meshops: 1 files</title></rect>
+<rect x="333" y="554" width="11" height="11" fill="#d62728" fill-opacity="0.38"><title>scene_items uses duplication: 2 files</title></rect>
+<rect x="398" y="554" width="11" height="11" fill="#d62728" fill-opacity="0.34"><title>scene_items uses sculpting: 1 files</title></rect>
+<rect x="177" y="554" width="11" height="11" fill="#d62728" fill-opacity="0.34"><title>scene_items uses painting: 1 files</title></rect>
+<rect x="307" y="554" width="11" height="11" fill="#d62728" fill-opacity="0.43"><title>scene_items uses anim: 4 files</title></rect>
+<rect x="190" y="554" width="11" height="11" fill="#d62728" fill-opacity="0.34"><title>scene_items uses materialx: 1 files</title></rect>
+<rect x="372" y="489" width="11" height="11" fill="#d62728" fill-opacity="0.40"><title>transforms uses edges: 3 files</title></rect>
+<rect x="463" y="489" width="11" height="11" fill="#d62728" fill-opacity="0.34"><title>transforms uses selections: 1 files</title></rect>
+<rect x="606" y="450" width="11" height="11" fill="#555" fill-opacity="0.53"><title>render uses (root): 10 files</title></rect>
+<rect x="554" y="450" width="11" height="11" fill="#555" fill-opacity="0.52"><title>render uses scene_items: 9 files</title></rect>
+<rect x="346" y="450" width="11" height="11" fill="#d62728" fill-opacity="0.43"><title>render uses commands: 4 files</title></rect>
+<rect x="593" y="450" width="11" height="11" fill="#555" fill-opacity="0.43"><title>render uses geometry: 4 files</title></rect>
+<rect x="437" y="333" width="11" height="11" fill="#555" fill-opacity="0.34"><title>duplication uses uv: 1 files</title></rect>
+<rect x="268" y="333" width="11" height="11" fill="#d62728" fill-opacity="0.34"><title>duplication uses primitives: 1 files</title></rect>
+<rect x="593" y="437" width="11" height="11" fill="#555" fill-opacity="0.60"><title>uv uses geometry: 16 files</title></rect>
+<rect x="606" y="437" width="11" height="11" fill="#555" fill-opacity="0.60"><title>uv uses (root): 16 files</title></rect>
+<rect x="593" y="346" width="11" height="11" fill="#555" fill-opacity="0.47"><title>commands uses geometry: 6 files</title></rect>
+<rect x="346" y="489" width="11" height="11" fill="#d62728" fill-opacity="0.34"><title>transforms uses commands: 1 files</title></rect>
+<rect x="515" y="268" width="11" height="11" fill="#555" fill-opacity="0.34"><title>primitives uses deformers: 1 files</title></rect>
+<rect x="268" y="242" width="11" height="11" fill="#555" fill-opacity="0.45"><title>meshops uses primitives: 5 files</title></rect>
+<rect x="333" y="242" width="11" height="11" fill="#555" fill-opacity="0.48"><title>meshops uses duplication: 7 files</title></rect>
+<rect x="450" y="203" width="11" height="11" fill="#555" fill-opacity="0.34"><title>preset uses render: 1 files</title></rect>
+<rect x="541" y="203" width="11" height="11" fill="#555" fill-opacity="0.50"><title>preset uses materials: 8 files</title></rect>
+<rect x="502" y="203" width="11" height="11" fill="#555" fill-opacity="0.40"><title>preset uses editor: 3 files</title></rect>
+<rect x="554" y="203" width="11" height="11" fill="#555" fill-opacity="0.53"><title>preset uses scene_items: 10 files</title></rect>
+<rect x="606" y="203" width="11" height="11" fill="#555" fill-opacity="0.48"><title>preset uses (root): 7 files</title></rect>
+<rect x="411" y="203" width="11" height="11" fill="#555" fill-opacity="0.38"><title>preset uses nodes: 2 files</title></rect>
+<rect x="346" y="203" width="11" height="11" fill="#555" fill-opacity="0.40"><title>preset uses commands: 3 files</title></rect>
+<rect x="593" y="203" width="11" height="11" fill="#555" fill-opacity="0.40"><title>preset uses geometry: 3 files</title></rect>
+<rect x="437" y="203" width="11" height="11" fill="#555" fill-opacity="0.40"><title>preset uses uv: 3 files</title></rect>
+<rect x="385" y="203" width="11" height="11" fill="#555" fill-opacity="0.38"><title>preset uses interchange: 2 files</title></rect>
+<rect x="281" y="203" width="11" height="11" fill="#555" fill-opacity="0.38"><title>preset uses lxo: 2 files</title></rect>
+<rect x="567" y="203" width="11" height="11" fill="#555" fill-opacity="0.34"><title>preset uses openpbr: 1 files</title></rect>
+<rect x="242" y="203" width="11" height="11" fill="#555" fill-opacity="0.38"><title>preset uses meshops: 2 files</title></rect>
+<rect x="190" y="203" width="11" height="11" fill="#d62728" fill-opacity="0.34"><title>preset uses materialx: 1 files</title></rect>
+<rect x="307" y="203" width="11" height="11" fill="#555" fill-opacity="0.34"><title>preset uses anim: 1 files</title></rect>
+<rect x="294" y="203" width="11" height="11" fill="#555" fill-opacity="0.34"><title>preset uses rigging: 1 files</title></rect>
+<rect x="541" y="346" width="11" height="11" fill="#555" fill-opacity="0.40"><title>commands uses materials: 3 files</title></rect>
+<rect x="242" y="346" width="11" height="11" fill="#d62728" fill-opacity="0.38"><title>commands uses meshops: 2 files</title></rect>
+<rect x="450" y="346" width="11" height="11" fill="#555" fill-opacity="0.43"><title>commands uses render: 4 files</title></rect>
+<rect x="359" y="346" width="11" height="11" fill="#555" fill-opacity="0.38"><title>commands uses curve_tools: 2 files</title></rect>
+<rect x="203" y="346" width="11" height="11" fill="#d62728" fill-opacity="0.34"><title>commands uses preset: 1 files</title></rect>
+<rect x="190" y="346" width="11" height="11" fill="#d62728" fill-opacity="0.34"><title>commands uses materialx: 1 files</title></rect>
+<rect x="385" y="346" width="11" height="11" fill="#555" fill-opacity="0.38"><title>commands uses interchange: 2 files</title></rect>
+<rect x="307" y="346" width="11" height="11" fill="#d62728" fill-opacity="0.40"><title>commands uses anim: 3 files</title></rect>
+<rect x="606" y="411" width="11" height="11" fill="#555" fill-opacity="0.45"><title>nodes uses (root): 5 files</title></rect>
+<rect x="359" y="424" width="11" height="11" fill="#d62728" fill-opacity="0.34"><title>polygons uses curve_tools: 1 files</title></rect>
+<rect x="593" y="255" width="11" height="11" fill="#555" fill-opacity="0.48"><title>slicing uses geometry: 7 files</title></rect>
+<rect x="606" y="255" width="11" height="11" fill="#555" fill-opacity="0.47"><title>slicing uses (root): 6 files</title></rect>
+<rect x="554" y="255" width="11" height="11" fill="#555" fill-opacity="0.38"><title>slicing uses scene_items: 2 files</title></rect>
+<rect x="502" y="255" width="11" height="11" fill="#555" fill-opacity="0.43"><title>slicing uses editor: 4 files</title></rect>
+<rect x="476" y="255" width="11" height="11" fill="#555" fill-opacity="0.40"><title>slicing uses tools: 3 files</title></rect>
+<rect x="372" y="255" width="11" height="11" fill="#555" fill-opacity="0.40"><title>slicing uses edges: 3 files</title></rect>
+<rect x="424" y="255" width="11" height="11" fill="#555" fill-opacity="0.43"><title>slicing uses polygons: 4 files</title></rect>
+<rect x="489" y="255" width="11" height="11" fill="#555" fill-opacity="0.34"><title>slicing uses transforms: 1 files</title></rect>
+<rect x="359" y="255" width="11" height="11" fill="#555" fill-opacity="0.34"><title>slicing uses curve_tools: 1 files</title></rect>
+<rect x="424" y="333" width="11" height="11" fill="#555" fill-opacity="0.38"><title>duplication uses polygons: 2 files</title></rect>
+<rect x="372" y="333" width="11" height="11" fill="#555" fill-opacity="0.38"><title>duplication uses edges: 2 files</title></rect>
+<rect x="346" y="333" width="11" height="11" fill="#555" fill-opacity="0.38"><title>duplication uses commands: 2 files</title></rect>
+<rect x="242" y="333" width="11" height="11" fill="#d62728" fill-opacity="0.34"><title>duplication uses meshops: 1 files</title></rect>
+<rect x="476" y="333" width="11" height="11" fill="#555" fill-opacity="0.34"><title>duplication uses tools: 1 files</title></rect>
+<rect x="502" y="294" width="11" height="11" fill="#555" fill-opacity="0.59"><title>rigging uses editor: 15 files</title></rect>
+<rect x="593" y="294" width="11" height="11" fill="#555" fill-opacity="0.45"><title>rigging uses geometry: 5 files</title></rect>
+<rect x="606" y="294" width="11" height="11" fill="#555" fill-opacity="0.57"><title>rigging uses (root): 13 files</title></rect>
+<rect x="554" y="294" width="11" height="11" fill="#555" fill-opacity="0.64"><title>rigging uses scene_items: 19 files</title></rect>
+<rect x="346" y="294" width="11" height="11" fill="#555" fill-opacity="0.53"><title>rigging uses commands: 10 files</title></rect>
+<rect x="242" y="294" width="11" height="11" fill="#d62728" fill-opacity="0.40"><title>rigging uses meshops: 3 files</title></rect>
+<rect x="307" y="294" width="11" height="11" fill="#555" fill-opacity="0.52"><title>rigging uses anim: 9 files</title></rect>
+<rect x="320" y="294" width="11" height="11" fill="#555" fill-opacity="0.34"><title>rigging uses bake: 1 files</title></rect>
+<rect x="450" y="294" width="11" height="11" fill="#555" fill-opacity="0.45"><title>rigging uses render: 5 files</title></rect>
+<rect x="502" y="242" width="11" height="11" fill="#555" fill-opacity="0.47"><title>meshops uses editor: 6 files</title></rect>
+<rect x="541" y="242" width="11" height="11" fill="#555" fill-opacity="0.43"><title>meshops uses materials: 4 files</title></rect>
+<rect x="359" y="294" width="11" height="11" fill="#555" fill-opacity="0.34"><title>rigging uses curve_tools: 1 files</title></rect>
+<rect x="437" y="242" width="11" height="11" fill="#555" fill-opacity="0.53"><title>meshops uses uv: 10 files</title></rect>
+<rect x="307" y="242" width="11" height="11" fill="#555" fill-opacity="0.43"><title>meshops uses anim: 4 files</title></rect>
+<rect x="359" y="242" width="11" height="11" fill="#555" fill-opacity="0.60"><title>meshops uses curve_tools: 16 files</title></rect>
+<rect x="424" y="242" width="11" height="11" fill="#555" fill-opacity="0.50"><title>meshops uses polygons: 8 files</title></rect>
+<rect x="372" y="242" width="11" height="11" fill="#555" fill-opacity="0.47"><title>meshops uses edges: 6 files</title></rect>
+<rect x="255" y="242" width="11" height="11" fill="#555" fill-opacity="0.48"><title>meshops uses slicing: 7 files</title></rect>
+<rect x="346" y="242" width="11" height="11" fill="#555" fill-opacity="0.38"><title>meshops uses commands: 2 files</title></rect>
+<rect x="164" y="151" width="11" height="11" fill="#555" fill-opacity="0.40"><title>meshblend_spike uses meshblend: 3 files</title></rect>
+<rect x="593" y="151" width="11" height="11" fill="#555" fill-opacity="0.45"><title>meshblend_spike uses geometry: 5 files</title></rect>
+<rect x="372" y="151" width="11" height="11" fill="#555" fill-opacity="0.34"><title>meshblend_spike uses edges: 1 files</title></rect>
+<rect x="606" y="151" width="11" height="11" fill="#555" fill-opacity="0.40"><title>meshblend_spike uses (root): 3 files</title></rect>
+<rect x="255" y="151" width="11" height="11" fill="#555" fill-opacity="0.38"><title>meshblend_spike uses slicing: 2 files</title></rect>
+<rect x="424" y="151" width="11" height="11" fill="#555" fill-opacity="0.34"><title>meshblend_spike uses polygons: 1 files</title></rect>
+<rect x="268" y="151" width="11" height="11" fill="#555" fill-opacity="0.34"><title>meshblend_spike uses primitives: 1 files</title></rect>
+<rect x="333" y="151" width="11" height="11" fill="#555" fill-opacity="0.34"><title>meshblend_spike uses duplication: 1 files</title></rect>
+<rect x="593" y="164" width="11" height="11" fill="#555" fill-opacity="0.45"><title>meshblend uses geometry: 5 files</title></rect>
+<rect x="255" y="164" width="11" height="11" fill="#555" fill-opacity="0.38"><title>meshblend uses slicing: 2 files</title></rect>
+<rect x="151" y="164" width="11" height="11" fill="#d62728" fill-opacity="0.34"><title>meshblend uses meshblend_spike: 1 files</title></rect>
+<rect x="424" y="164" width="11" height="11" fill="#555" fill-opacity="0.38"><title>meshblend uses polygons: 2 files</title></rect>
+<rect x="606" y="164" width="11" height="11" fill="#555" fill-opacity="0.43"><title>meshblend uses (root): 4 files</title></rect>
+<rect x="242" y="164" width="11" height="11" fill="#555" fill-opacity="0.38"><title>meshblend uses meshops: 2 files</title></rect>
+<rect x="554" y="164" width="11" height="11" fill="#555" fill-opacity="0.38"><title>meshblend uses scene_items: 2 files</title></rect>
+<rect x="580" y="164" width="11" height="11" fill="#555" fill-opacity="0.34"><title>meshblend uses subdivision: 1 files</title></rect>
+<rect x="489" y="164" width="11" height="11" fill="#555" fill-opacity="0.34"><title>meshblend uses transforms: 1 files</title></rect>
+<rect x="502" y="164" width="11" height="11" fill="#555" fill-opacity="0.34"><title>meshblend uses editor: 1 files</title></rect>
+<rect x="346" y="164" width="11" height="11" fill="#555" fill-opacity="0.34"><title>meshblend uses commands: 1 files</title></rect>
+<rect x="489" y="242" width="11" height="11" fill="#555" fill-opacity="0.34"><title>meshops uses transforms: 1 files</title></rect>
+<rect x="294" y="242" width="11" height="11" fill="#555" fill-opacity="0.47"><title>meshops uses rigging: 6 files</title></rect>
+<rect x="164" y="242" width="11" height="11" fill="#d62728" fill-opacity="0.34"><title>meshops uses meshblend: 1 files</title></rect>
+<rect x="606" y="216" width="11" height="11" fill="#555" fill-opacity="0.40"><title>kits uses (root): 3 files</title></rect>
+<rect x="346" y="216" width="11" height="11" fill="#555" fill-opacity="0.34"><title>kits uses commands: 1 files</title></rect>
+<rect x="229" y="216" width="11" height="11" fill="#555" fill-opacity="0.34"><title>kits uses command_registry: 1 files</title></rect>
+<rect x="385" y="216" width="11" height="11" fill="#555" fill-opacity="0.40"><title>kits uses interchange: 3 files</title></rect>
+<rect x="502" y="307" width="11" height="11" fill="#555" fill-opacity="0.48"><title>anim uses editor: 7 files</title></rect>
+<rect x="606" y="307" width="11" height="11" fill="#555" fill-opacity="0.45"><title>anim uses (root): 5 files</title></rect>
+<rect x="554" y="307" width="11" height="11" fill="#555" fill-opacity="0.48"><title>anim uses scene_items: 7 files</title></rect>
+<rect x="346" y="307" width="11" height="11" fill="#555" fill-opacity="0.43"><title>anim uses commands: 4 files</title></rect>
+<rect x="294" y="307" width="11" height="11" fill="#d62728" fill-opacity="0.34"><title>anim uses rigging: 1 files</title></rect>
+<rect x="450" y="307" width="11" height="11" fill="#555" fill-opacity="0.38"><title>anim uses render: 2 files</title></rect>
+<rect x="554" y="437" width="11" height="11" fill="#555" fill-opacity="0.53"><title>uv uses scene_items: 10 files</title></rect>
+<rect x="502" y="437" width="11" height="11" fill="#555" fill-opacity="0.56"><title>uv uses editor: 12 files</title></rect>
+<rect x="463" y="437" width="11" height="11" fill="#555" fill-opacity="0.48"><title>uv uses selections: 7 files</title></rect>
+<rect x="346" y="437" width="11" height="11" fill="#d62728" fill-opacity="0.40"><title>uv uses commands: 3 files</title></rect>
+<rect x="476" y="437" width="11" height="11" fill="#555" fill-opacity="0.40"><title>uv uses tools: 3 files</title></rect>
+<rect x="489" y="437" width="11" height="11" fill="#555" fill-opacity="0.38"><title>uv uses transforms: 2 files</title></rect>
+<rect x="515" y="437" width="11" height="11" fill="#555" fill-opacity="0.34"><title>uv uses deformers: 1 files</title></rect>
+<rect x="359" y="372" width="11" height="11" fill="#d62728" fill-opacity="0.34"><title>edges uses curve_tools: 1 files</title></rect>
+<rect x="385" y="372" width="11" height="11" fill="#555" fill-opacity="0.34"><title>edges uses interchange: 1 files</title></rect>
+<rect x="229" y="346" width="11" height="11" fill="#d62728" fill-opacity="0.43"><title>commands uses command_registry: 4 files</title></rect>
+<rect x="346" y="229" width="11" height="11" fill="#555" fill-opacity="0.38"><title>command_registry uses commands: 2 files</title></rect>
+<rect x="502" y="229" width="11" height="11" fill="#555" fill-opacity="0.34"><title>command_registry uses editor: 1 files</title></rect>
+<rect x="554" y="229" width="11" height="11" fill="#555" fill-opacity="0.34"><title>command_registry uses scene_items: 1 files</title></rect>
+<rect x="294" y="229" width="11" height="11" fill="#555" fill-opacity="0.38"><title>command_registry uses rigging: 2 files</title></rect>
+<rect x="242" y="229" width="11" height="11" fill="#555" fill-opacity="0.38"><title>command_registry uses meshops: 2 files</title></rect>
+<rect x="307" y="229" width="11" height="11" fill="#555" fill-opacity="0.40"><title>command_registry uses anim: 3 files</title></rect>
+<rect x="450" y="229" width="11" height="11" fill="#555" fill-opacity="0.34"><title>command_registry uses render: 1 files</title></rect>
+<rect x="398" y="229" width="11" height="11" fill="#555" fill-opacity="0.34"><title>command_registry uses sculpting: 1 files</title></rect>
+<rect x="489" y="346" width="11" height="11" fill="#555" fill-opacity="0.40"><title>commands uses transforms: 3 files</title></rect>
+<rect x="372" y="346" width="11" height="11" fill="#555" fill-opacity="0.38"><title>commands uses edges: 2 files</title></rect>
+<rect x="398" y="346" width="11" height="11" fill="#555" fill-opacity="0.38"><title>commands uses sculpting: 2 files</title></rect>
+<rect x="515" y="346" width="11" height="11" fill="#555" fill-opacity="0.34"><title>commands uses deformers: 1 files</title></rect>
+<rect x="463" y="346" width="11" height="11" fill="#555" fill-opacity="0.34"><title>commands uses selections: 1 files</title></rect>
+<rect x="164" y="346" width="11" height="11" fill="#d62728" fill-opacity="0.34"><title>commands uses meshblend: 1 files</title></rect>
+<rect x="437" y="346" width="11" height="11" fill="#555" fill-opacity="0.38"><title>commands uses uv: 2 files</title></rect>
+<rect x="411" y="346" width="11" height="11" fill="#555" fill-opacity="0.34"><title>commands uses nodes: 1 files</title></rect>
+<rect x="255" y="346" width="11" height="11" fill="#d62728" fill-opacity="0.34"><title>commands uses slicing: 1 files</title></rect>
+<rect x="320" y="346" width="11" height="11" fill="#d62728" fill-opacity="0.34"><title>commands uses bake: 1 files</title></rect>
+<rect x="294" y="346" width="11" height="11" fill="#d62728" fill-opacity="0.34"><title>commands uses rigging: 1 files</title></rect>
+<rect x="541" y="307" width="11" height="11" fill="#555" fill-opacity="0.34"><title>anim uses materials: 1 files</title></rect>
+<rect x="476" y="307" width="11" height="11" fill="#555" fill-opacity="0.34"><title>anim uses tools: 1 files</title></rect>
+<rect x="346" y="372" width="11" height="11" fill="#d62728" fill-opacity="0.34"><title>edges uses commands: 1 files</title></rect>
+<rect x="502" y="177" width="11" height="11" fill="#555" fill-opacity="0.38"><title>painting uses editor: 2 files</title></rect>
+<rect x="593" y="177" width="11" height="11" fill="#555" fill-opacity="0.43"><title>painting uses geometry: 4 files</title></rect>
+<rect x="606" y="177" width="11" height="11" fill="#555" fill-opacity="0.45"><title>painting uses (root): 5 files</title></rect>
+<rect x="554" y="177" width="11" height="11" fill="#555" fill-opacity="0.45"><title>painting uses scene_items: 5 files</title></rect>
+<rect x="333" y="177" width="11" height="11" fill="#555" fill-opacity="0.34"><title>painting uses duplication: 1 files</title></rect>
+<rect x="489" y="177" width="11" height="11" fill="#555" fill-opacity="0.38"><title>painting uses transforms: 2 files</title></rect>
+<rect x="424" y="177" width="11" height="11" fill="#555" fill-opacity="0.34"><title>painting uses polygons: 1 files</title></rect>
+<rect x="606" y="541" width="11" height="11" fill="#555" fill-opacity="0.50"><title>materials uses (root): 8 files</title></rect>
+<rect x="554" y="541" width="11" height="11" fill="#555" fill-opacity="0.47"><title>materials uses scene_items: 6 files</title></rect>
+<rect x="450" y="541" width="11" height="11" fill="#d62728" fill-opacity="0.40"><title>materials uses render: 3 files</title></rect>
+<rect x="242" y="541" width="11" height="11" fill="#d62728" fill-opacity="0.40"><title>materials uses meshops: 3 files</title></rect>
+<rect x="424" y="541" width="11" height="11" fill="#d62728" fill-opacity="0.40"><title>materials uses polygons: 3 files</title></rect>
+<rect x="411" y="541" width="11" height="11" fill="#d62728" fill-opacity="0.40"><title>materials uses nodes: 3 files</title></rect>
+<rect x="346" y="541" width="11" height="11" fill="#d62728" fill-opacity="0.38"><title>materials uses commands: 2 files</title></rect>
+<rect x="502" y="541" width="11" height="11" fill="#d62728" fill-opacity="0.38"><title>materials uses editor: 2 files</title></rect>
+<rect x="593" y="541" width="11" height="11" fill="#555" fill-opacity="0.38"><title>materials uses geometry: 2 files</title></rect>
+<rect x="463" y="541" width="11" height="11" fill="#d62728" fill-opacity="0.34"><title>materials uses selections: 1 files</title></rect>
+<rect x="567" y="541" width="11" height="11" fill="#555" fill-opacity="0.34"><title>materials uses openpbr: 1 files</title></rect>
+<rect x="541" y="450" width="11" height="11" fill="#555" fill-opacity="0.47"><title>render uses materials: 6 files</title></rect>
+<rect x="541" y="437" width="11" height="11" fill="#555" fill-opacity="0.34"><title>uv uses materials: 1 files</title></rect>
+<rect x="450" y="437" width="11" height="11" fill="#555" fill-opacity="0.34"><title>uv uses render: 1 files</title></rect>
+<rect x="502" y="450" width="11" height="11" fill="#555" fill-opacity="0.43"><title>render uses editor: 4 files</title></rect>
+<rect x="541" y="567" width="11" height="11" fill="#d62728" fill-opacity="0.34"><title>openpbr uses materials: 1 files</title></rect>
+<rect x="541" y="411" width="11" height="11" fill="#555" fill-opacity="0.47"><title>nodes uses materials: 6 files</title></rect>
+<rect x="424" y="411" width="11" height="11" fill="#555" fill-opacity="0.34"><title>nodes uses polygons: 1 files</title></rect>
+<rect x="502" y="411" width="11" height="11" fill="#555" fill-opacity="0.34"><title>nodes uses editor: 1 files</title></rect>
+<rect x="190" y="411" width="11" height="11" fill="#d62728" fill-opacity="0.38"><title>nodes uses materialx: 2 files</title></rect>
+<rect x="554" y="411" width="11" height="11" fill="#555" fill-opacity="0.34"><title>nodes uses scene_items: 1 files</title></rect>
+<rect x="346" y="411" width="11" height="11" fill="#d62728" fill-opacity="0.34"><title>nodes uses commands: 1 files</title></rect>
+<rect x="606" y="190" width="11" height="11" fill="#555" fill-opacity="0.52"><title>materialx uses (root): 9 files</title></rect>
+<rect x="203" y="190" width="11" height="11" fill="#555" fill-opacity="0.40"><title>materialx uses preset: 3 files</title></rect>
+<rect x="541" y="190" width="11" height="11" fill="#555" fill-opacity="0.52"><title>materialx uses materials: 9 files</title></rect>
+<rect x="554" y="190" width="11" height="11" fill="#555" fill-opacity="0.48"><title>materialx uses scene_items: 7 files</title></rect>
+<rect x="346" y="190" width="11" height="11" fill="#555" fill-opacity="0.38"><title>materialx uses commands: 2 files</title></rect>
+<rect x="411" y="190" width="11" height="11" fill="#555" fill-opacity="0.45"><title>materialx uses nodes: 5 files</title></rect>
+<rect x="567" y="190" width="11" height="11" fill="#555" fill-opacity="0.43"><title>materialx uses openpbr: 4 files</title></rect>
+<rect x="333" y="190" width="11" height="11" fill="#555" fill-opacity="0.34"><title>materialx uses duplication: 1 files</title></rect>
+<rect x="593" y="580" width="11" height="11" fill="#555" fill-opacity="0.40"><title>subdivision uses geometry: 3 files</title></rect>
+<rect x="606" y="580" width="11" height="11" fill="#555" fill-opacity="0.38"><title>subdivision uses (root): 2 files</title></rect>
+<rect x="359" y="580" width="11" height="11" fill="#d62728" fill-opacity="0.34"><title>subdivision uses curve_tools: 1 files</title></rect>
+<rect x="385" y="580" width="11" height="11" fill="#d62728" fill-opacity="0.34"><title>subdivision uses interchange: 1 files</title></rect>
+<rect x="502" y="580" width="11" height="11" fill="#d62728" fill-opacity="0.34"><title>subdivision uses editor: 1 files</title></rect>
+<rect x="424" y="580" width="11" height="11" fill="#d62728" fill-opacity="0.34"><title>subdivision uses polygons: 1 files</title></rect>
+<rect x="580" y="398" width="11" height="11" fill="#555" fill-opacity="0.34"><title>sculpting uses subdivision: 1 files</title></rect>
+<rect x="424" y="398" width="11" height="11" fill="#555" fill-opacity="0.34"><title>sculpting uses polygons: 1 files</title></rect>
+<rect x="554" y="281" width="11" height="11" fill="#555" fill-opacity="0.53"><title>lxo uses scene_items: 10 files</title></rect>
+<rect x="307" y="281" width="11" height="11" fill="#555" fill-opacity="0.45"><title>lxo uses anim: 5 files</title></rect>
+<rect x="294" y="281" width="11" height="11" fill="#555" fill-opacity="0.43"><title>lxo uses rigging: 4 files</title></rect>
+<rect x="593" y="281" width="11" height="11" fill="#555" fill-opacity="0.43"><title>lxo uses geometry: 4 files</title></rect>
+<rect x="359" y="281" width="11" height="11" fill="#555" fill-opacity="0.34"><title>lxo uses curve_tools: 1 files</title></rect>
+<rect x="450" y="281" width="11" height="11" fill="#555" fill-opacity="0.38"><title>lxo uses render: 2 files</title></rect>
+<rect x="346" y="281" width="11" height="11" fill="#555" fill-opacity="0.38"><title>lxo uses commands: 2 files</title></rect>
+<rect x="385" y="281" width="11" height="11" fill="#555" fill-opacity="0.38"><title>lxo uses interchange: 2 files</title></rect>
+<rect x="541" y="281" width="11" height="11" fill="#555" fill-opacity="0.38"><title>lxo uses materials: 2 files</title></rect>
+<rect x="606" y="281" width="11" height="11" fill="#555" fill-opacity="0.34"><title>lxo uses (root): 1 files</title></rect>
+<rect x="593" y="385" width="11" height="11" fill="#555" fill-opacity="0.40"><title>interchange uses geometry: 3 files</title></rect>
+<rect x="554" y="385" width="11" height="11" fill="#555" fill-opacity="0.38"><title>interchange uses scene_items: 2 files</title></rect>
+<rect x="606" y="385" width="11" height="11" fill="#555" fill-opacity="0.58"><title>interchange uses (root): 14 files</title></rect>
+<rect x="437" y="385" width="11" height="11" fill="#555" fill-opacity="0.34"><title>interchange uses uv: 1 files</title></rect>
+<rect x="229" y="385" width="11" height="11" fill="#d62728" fill-opacity="0.34"><title>interchange uses command_registry: 1 files</title></rect>
+<rect x="281" y="385" width="11" height="11" fill="#d62728" fill-opacity="0.34"><title>interchange uses lxo: 1 files</title></rect>
+<rect x="541" y="385" width="11" height="11" fill="#555" fill-opacity="0.43"><title>interchange uses materials: 4 files</title></rect>
+<rect x="580" y="385" width="11" height="11" fill="#555" fill-opacity="0.34"><title>interchange uses subdivision: 1 files</title></rect>
+<rect x="359" y="489" width="11" height="11" fill="#d62728" fill-opacity="0.34"><title>transforms uses curve_tools: 1 files</title></rect>
+<rect x="580" y="489" width="11" height="11" fill="#555" fill-opacity="0.34"><title>transforms uses subdivision: 1 files</title></rect>
+<rect x="385" y="489" width="11" height="11" fill="#d62728" fill-opacity="0.34"><title>transforms uses interchange: 1 files</title></rect>
+<rect x="580" y="346" width="11" height="11" fill="#555" fill-opacity="0.34"><title>commands uses subdivision: 1 files</title></rect>
+<rect x="593" y="502" width="11" height="11" fill="#555" fill-opacity="0.40"><title>editor uses geometry: 3 files</title></rect>
+<rect x="606" y="502" width="11" height="11" fill="#555" fill-opacity="0.34"><title>editor uses (root): 1 files</title></rect>
+<rect x="554" y="502" width="11" height="11" fill="#555" fill-opacity="0.47"><title>editor uses scene_items: 6 files</title></rect>
+<rect x="424" y="502" width="11" height="11" fill="#d62728" fill-opacity="0.50"><title>editor uses polygons: 8 files</title></rect>
+<rect x="489" y="502" width="11" height="11" fill="#d62728" fill-opacity="0.50"><title>editor uses transforms: 8 files</title></rect>
+<rect x="346" y="502" width="11" height="11" fill="#d62728" fill-opacity="0.48"><title>editor uses commands: 7 files</title></rect>
+<rect x="476" y="502" width="11" height="11" fill="#d62728" fill-opacity="0.47"><title>editor uses tools: 6 files</title></rect>
+<rect x="359" y="502" width="11" height="11" fill="#d62728" fill-opacity="0.47"><title>editor uses curve_tools: 6 files</title></rect>
+<rect x="463" y="502" width="11" height="11" fill="#d62728" fill-opacity="0.43"><title>editor uses selections: 4 files</title></rect>
+<rect x="528" y="502" width="11" height="11" fill="#555" fill-opacity="0.38"><title>editor uses solid_sketch: 2 files</title></rect>
+<rect x="515" y="502" width="11" height="11" fill="#555" fill-opacity="0.50"><title>editor uses deformers: 8 files</title></rect>
+<rect x="177" y="502" width="11" height="11" fill="#d62728" fill-opacity="0.40"><title>editor uses painting: 3 files</title></rect>
+<rect x="307" y="502" width="11" height="11" fill="#d62728" fill-opacity="0.38"><title>editor uses anim: 2 files</title></rect>
+<rect x="333" y="502" width="11" height="11" fill="#d62728" fill-opacity="0.50"><title>editor uses duplication: 8 files</title></rect>
+<rect x="437" y="502" width="11" height="11" fill="#d62728" fill-opacity="0.45"><title>editor uses uv: 5 files</title></rect>
+<rect x="398" y="502" width="11" height="11" fill="#d62728" fill-opacity="0.38"><title>editor uses sculpting: 2 files</title></rect>
+<rect x="242" y="502" width="11" height="11" fill="#d62728" fill-opacity="0.38"><title>editor uses meshops: 2 files</title></rect>
+<rect x="450" y="502" width="11" height="11" fill="#d62728" fill-opacity="0.45"><title>editor uses render: 5 files</title></rect>
+<rect x="268" y="502" width="11" height="11" fill="#d62728" fill-opacity="0.52"><title>editor uses primitives: 9 files</title></rect>
+<rect x="372" y="502" width="11" height="11" fill="#d62728" fill-opacity="0.47"><title>editor uses edges: 6 files</title></rect>
+<rect x="255" y="502" width="11" height="11" fill="#d62728" fill-opacity="0.47"><title>editor uses slicing: 6 files</title></rect>
+<rect x="541" y="502" width="11" height="11" fill="#555" fill-opacity="0.40"><title>editor uses materials: 3 files</title></rect>
+<rect x="294" y="502" width="11" height="11" fill="#d62728" fill-opacity="0.45"><title>editor uses rigging: 5 files</title></rect>
+<rect x="580" y="502" width="11" height="11" fill="#555" fill-opacity="0.34"><title>editor uses subdivision: 1 files</title></rect>
+<rect x="203" y="502" width="11" height="11" fill="#d62728" fill-opacity="0.34"><title>editor uses preset: 1 files</title></rect>
+<rect x="164" y="502" width="11" height="11" fill="#d62728" fill-opacity="0.34"><title>editor uses meshblend: 1 files</title></rect>
+<rect x="294" y="554" width="11" height="11" fill="#d62728" fill-opacity="0.34"><title>scene_items uses rigging: 1 files</title></rect>
+<rect x="307" y="450" width="11" height="11" fill="#d62728" fill-opacity="0.34"><title>render uses anim: 1 files</title></rect>
+<rect x="476" y="450" width="11" height="11" fill="#555" fill-opacity="0.34"><title>render uses tools: 1 files</title></rect>
+<rect x="437" y="359" width="11" height="11" fill="#555" fill-opacity="0.34"><title>curve_tools uses uv: 1 files</title></rect>
+<rect x="333" y="359" width="11" height="11" fill="#d62728" fill-opacity="0.38"><title>curve_tools uses duplication: 2 files</title></rect>
+<rect x="333" y="255" width="11" height="11" fill="#555" fill-opacity="0.34"><title>slicing uses duplication: 1 files</title></rect>
+<rect x="242" y="359" width="11" height="11" fill="#d62728" fill-opacity="0.34"><title>curve_tools uses meshops: 1 files</title></rect>
+<rect x="476" y="463" width="11" height="11" fill="#555" fill-opacity="0.34"><title>selections uses tools: 1 files</title></rect>
+<rect x="372" y="463" width="11" height="11" fill="#d62728" fill-opacity="0.34"><title>selections uses edges: 1 files</title></rect>
+<rect x="346" y="463" width="11" height="11" fill="#d62728" fill-opacity="0.34"><title>selections uses commands: 1 files</title></rect>
+<rect x="398" y="177" width="11" height="11" fill="#555" fill-opacity="0.43"><title>painting uses sculpting: 4 files</title></rect>
+<rect x="242" y="177" width="11" height="11" fill="#555" fill-opacity="0.34"><title>painting uses meshops: 1 files</title></rect>
+<rect x="541" y="177" width="11" height="11" fill="#555" fill-opacity="0.38"><title>painting uses materials: 2 files</title></rect>
+<rect x="320" y="177" width="11" height="11" fill="#555" fill-opacity="0.38"><title>painting uses bake: 2 files</title></rect>
+<rect x="515" y="177" width="11" height="11" fill="#555" fill-opacity="0.38"><title>painting uses deformers: 2 files</title></rect>
+<rect x="437" y="177" width="11" height="11" fill="#555" fill-opacity="0.34"><title>painting uses uv: 1 files</title></rect>
+<rect x="580" y="177" width="11" height="11" fill="#555" fill-opacity="0.34"><title>painting uses subdivision: 1 files</title></rect>
+<rect x="450" y="177" width="11" height="11" fill="#555" fill-opacity="0.38"><title>painting uses render: 2 files</title></rect>
+<rect x="359" y="177" width="11" height="11" fill="#555" fill-opacity="0.34"><title>painting uses curve_tools: 1 files</title></rect>
+<rect x="593" y="320" width="11" height="11" fill="#555" fill-opacity="0.34"><title>bake uses geometry: 1 files</title></rect>
+<rect x="606" y="320" width="11" height="11" fill="#555" fill-opacity="0.34"><title>bake uses (root): 1 files</title></rect>
+<rect x="554" y="320" width="11" height="11" fill="#555" fill-opacity="0.34"><title>bake uses scene_items: 1 files</title></rect>
+<rect x="541" y="320" width="11" height="11" fill="#555" fill-opacity="0.34"><title>bake uses materials: 1 files</title></rect>
+<rect x="437" y="320" width="11" height="11" fill="#555" fill-opacity="0.34"><title>bake uses uv: 1 files</title></rect>
+<rect x="385" y="320" width="11" height="11" fill="#555" fill-opacity="0.34"><title>bake uses interchange: 1 files</title></rect>
+<rect x="346" y="320" width="11" height="11" fill="#555" fill-opacity="0.34"><title>bake uses commands: 1 files</title></rect>
+<text class="l" x="8" y="644">● = in a cycle. Darker = more files. Hover a cell for the count. Generated by scripts/area-deps.py.</text>
 </svg>

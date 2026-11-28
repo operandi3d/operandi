@@ -41,7 +41,7 @@ fn tilted(context: ActionContext) -> Editor {
 
 fn frame(e: &mut Editor, tool: Tool) -> ActionFrame {
     e.dispatch(Command::Activate(tool)).unwrap();
-    let f = e.live.as_ref().unwrap().action_frame.unwrap();
+    let f = e.session.live.as_ref().unwrap().action_frame.unwrap();
     e.dispatch(Command::Cancel).unwrap();
     f
 }
@@ -95,7 +95,7 @@ fn ac_t40_screen_moves_along_the_views_axes() {
     });
     let before = e.scene.active().unwrap().mesh.vertices.clone();
     e.dispatch(Command::Activate(Tool::Move)).unwrap();
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     p.delta = DVec3::new(1., 0., 0.);
     e.dispatch(Command::Preview(p)).unwrap();
     e.dispatch(Command::Drop).unwrap();

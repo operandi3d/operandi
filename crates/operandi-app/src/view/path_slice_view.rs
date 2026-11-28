@@ -233,7 +233,7 @@ impl Operandi {
     /// Polygon Axis Slice's box: the world bounds of the base scene's
     /// selected polygons (all when none).
     fn axis_slice_box(&self) -> Option<(DVec3, DVec3)> {
-        let live = self.editor.live.as_ref()?;
+        let live = self.editor.session.live.as_ref()?;
         let item = live.base.active()?;
         let world = live.base.world_matrix(item.id).ok()?;
         let faces = if live.base.selection.mode == Mode::Polygon {

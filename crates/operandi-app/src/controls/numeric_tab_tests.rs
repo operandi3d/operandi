@@ -26,7 +26,7 @@ fn bevel(ctx: &Context) -> (Operandi, Vec<String>) {
     a.editor.scene.selection.faces = vec![5];
     a.activate(Tool::Bevel);
     a.run(Command::Preview(
-        a.editor.live.as_ref().unwrap().params.clone(),
+        a.editor.session.live.as_ref().unwrap().params.clone(),
     ));
     for _ in 0..2 {
         let _ = draw(&mut a, ctx, SIZE, vec![]);
@@ -87,7 +87,7 @@ fn tab_accepts_and_moves_to_next_field_shift_tab_back() {
     assert_eq!(a.confirmed_fields[&first], "0.1 m");
     assert_eq!(focused_field(&a, &ctx).as_deref(), Some(second.as_str()));
     // The tool stays live: Tab is not a tool shortcut or a drop here.
-    assert_eq!(a.editor.live.as_ref().unwrap().tool, Tool::Bevel);
+    assert_eq!(a.editor.session.live.as_ref().unwrap().tool, Tool::Bevel);
     assert_eq!(a.editor.history.undo.len(), history);
     // The arriving field has its whole value selected, so typing replaces it.
     let _ = draw(&mut a, &ctx, SIZE, vec![]);

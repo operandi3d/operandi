@@ -177,6 +177,7 @@ impl Operandi {
         let (_, f) = self.screen_layer()?;
         let tool_ok = self
             .editor
+            .session
             .live
             .as_ref()
             .is_none_or(|l| l.tool.card().layers.falloff);
@@ -304,7 +305,7 @@ impl Operandi {
         pos: Pos2,
         r: Rect,
     ) -> Option<input::GestureKind> {
-        let tool = self.editor.live.as_ref()?.tool;
+        let tool = self.editor.session.live.as_ref()?.tool;
         if !tool.transforms_items()
             || !tool.card().layers.falloff
             || operandi_core::haul::claims(tool, operandi_core::haul::Button::Right)
@@ -332,7 +333,7 @@ impl Operandi {
     /// rule: a plain drag starts fresh, Shift continues the edit. False
     /// when the rule doesn't apply (no Screen falloff, or another tool).
     pub(crate) fn screen_fresh_rule(&self) -> bool {
-        self.editor.live.as_ref().is_some_and(|live| {
+        self.editor.session.live.as_ref().is_some_and(|live| {
             let card = live.tool.card();
             card.continues && card.layers.falloff && !live.tool.transforms_items()
         }) && matches!(self.screen_layer(), Some((_, Falloff::Screen(_))))
@@ -340,7 +341,7 @@ impl Operandi {
 
     /// Whether the open tool preset is Soft Drag (Move + Screen falloff).
     pub(crate) fn soft_drag_open(&self) -> bool {
-        self.editor.preset.as_ref().is_some_and(|p| {
+        self.editor.session.preset.as_ref().is_some_and(|p| {
             p.row().falloff_kind() == Some(operandi_core::tool_preset::FalloffKind::Screen)
         })
     }

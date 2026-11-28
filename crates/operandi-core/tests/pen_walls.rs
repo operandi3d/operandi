@@ -128,5 +128,8 @@ fn walls_need_polygon_type_and_an_offset() {
         e.dispatch(Command::PenCapture(*p)).unwrap();
     }
     assert!(e.dispatch(Command::Drop).is_err());
-    assert!(e.pen_draft.is_some(), "the draft stays to fix the Offset");
+    assert!(
+        e.session.pen_draft.is_some(),
+        "the draft stays to fix the Offset"
+    );
 }

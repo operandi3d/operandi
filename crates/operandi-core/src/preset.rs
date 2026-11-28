@@ -1084,7 +1084,7 @@ impl Editor {
         center_on_ground: bool,
     ) -> Result<Vec<String>> {
         self.require_idle()?;
-        if self.pen_draft.is_some() {
+        if self.session.pen_draft.is_some() {
             return Err("Finish or Cancel Pen before saving a preset".into());
         }
         let mut built = source.build(&self.scene)?;
@@ -1130,7 +1130,7 @@ impl Editor {
     /// Load `preset` into the scene as one undo step (PB-31, PB-35).
     /// `group` is the Material Group a material preset goes into.
     pub(crate) fn load_preset(&mut self, preset: Preset, group: Option<NodeId>) -> Result<()> {
-        if self.pen_draft.is_some() {
+        if self.session.pen_draft.is_some() {
             return Err("Finish or Cancel Pen before loading a preset".into());
         }
         if self.i2_active() {
@@ -1157,7 +1157,7 @@ impl Editor {
         mode: ApplyMode,
         name: &str,
     ) -> Result<Option<u64>> {
-        if self.pen_draft.is_some() {
+        if self.session.pen_draft.is_some() {
             return Err("Finish or Cancel Pen before loading a preset".into());
         }
         if self.i2_active() {
@@ -1192,7 +1192,7 @@ impl Editor {
         preset: Preset,
         beside: Option<NodeId>,
     ) -> Result<()> {
-        if self.pen_draft.is_some() {
+        if self.session.pen_draft.is_some() {
             return Err("Finish or Cancel Pen before loading a preset".into());
         }
         if self.i2_active() {
@@ -1447,7 +1447,7 @@ impl Editor {
         if preset.header.kind != PresetKind::Material {
             return Err("Only a material preset can be dropped onto geometry".into());
         }
-        if self.pen_draft.is_some() || self.i2_active() {
+        if self.session.pen_draft.is_some() || self.i2_active() {
             return Err("Finish or Cancel the current tool before applying a material".into());
         }
         self.require_idle()?;

@@ -38,7 +38,7 @@ fn component_move_on_a_rotated_item_moves_along_world_axes() {
         .map(|&v| world.transform_point3(e.scene.active().unwrap().mesh.vertices[v as usize]))
         .collect();
     e.dispatch(Command::Activate(Tool::Move)).unwrap();
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     p.delta = DVec3::new(1., 0., 0.);
     e.dispatch(Command::Preview(p)).unwrap();
     e.dispatch(Command::Drop).unwrap();

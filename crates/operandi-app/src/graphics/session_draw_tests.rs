@@ -12,15 +12,15 @@ fn rect() -> Rect {
 
 /// The session's (size along the normal, an in-plane size, preview built).
 fn state(a: &Operandi) -> (f64, f64, bool) {
-    if let Some(s) = &a.editor.cone {
+    if let Some(s) = &a.editor.session.cone {
         let p = &s.requested;
         return (p.size[p.axis], p.size.x, s.preview.is_some());
     }
-    if let Some(s) = &a.editor.ellipsoid {
+    if let Some(s) = &a.editor.session.ellipsoid {
         let p = &s.requested;
         return (p.radius[p.axis], p.radius.x, s.preview.is_some());
     }
-    let s = a.editor.shape.as_ref().unwrap();
+    let s = a.editor.session.shape.as_ref().unwrap();
     let built = s.preview.is_some();
     match &s.requested {
         ShapeParameters::Torus(t) => (t.height, t.ring_radius, built),
@@ -113,7 +113,7 @@ fn capsule_height_drag_grows_rounded_ends_then_sides() {
     else {
         panic!("the handle didn't grab");
     };
-    let capsule = |a: &Operandi| match &a.editor.shape.as_ref().unwrap().requested {
+    let capsule = |a: &Operandi| match &a.editor.session.shape.as_ref().unwrap().requested {
         ShapeParameters::Capsule(c) => c.clone(),
         _ => unreachable!(),
     };
@@ -134,5 +134,5 @@ fn capsule_height_drag_grows_rounded_ends_then_sides() {
     let c = capsule(&a);
     assert!(c.radius[axis] > across, "{c:?}");
     assert_eq!(c.end_size, across, "ends grew back to hemispheres");
-    assert!(a.editor.shape.as_ref().unwrap().preview.is_some());
+    assert!(a.editor.session.shape.as_ref().unwrap().preview.is_some());
 }

@@ -1449,6 +1449,10 @@ fn control_command(context: &str, surface: &str, label: &str) -> Option<String> 
     if shading && shading_claims(label) {
         return Some("item.channel".to_owned());
     }
+    // An Image Map's Browse… (#56) runs its own command.
+    if surface == "properties/Texture" && label == "Browse…" {
+        return Some("operandi.texture.loadImage".into());
+    }
     // An item tab's Name row runs item.name (rename_active).
     let shading_tab = |t: &str| {
         [

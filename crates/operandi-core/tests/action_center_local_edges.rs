@@ -60,7 +60,12 @@ fn tapered_mug(center: CenterMode, taper: f64) -> Editor {
     e.scene.selection.edges = vec![(SIDES, 2 * SIDES), (SIDES + 4, 2 * SIDES + 4)];
     e.dispatch(Command::ActionContext(ActionContext {
         center,
-        axis: AxisOrientation::World,
+        // Local by name is Local's centre with Local's axes.
+        axis: if center == CenterMode::Local {
+            AxisOrientation::Local
+        } else {
+            AxisOrientation::World
+        },
     }))
     .unwrap();
     e
@@ -74,7 +79,7 @@ fn points(e: &Editor) -> Vec<DVec3> {
 /// points during the preview; the caller drops or cancels.
 fn preview(e: &mut Editor, tool: Tool, delta: DVec3) -> Vec<DVec3> {
     e.dispatch(Command::Activate(tool)).unwrap();
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     p.delta = delta;
     e.dispatch(Command::Preview(p)).unwrap();
     points(e)
@@ -275,32 +280,30 @@ fn ac_t75_local_handle_follows_the_last_selected_polygon() {
     e.dispatch(Command::Mode(Mode::Polygon)).unwrap();
     e.dispatch(Command::ActionContext(ActionContext {
         center: CenterMode::Local,
-        axis: AxisOrientation::World,
+        axis: AxisOrientation::Local,
     }))
     .unwrap();
-    let handle_y = |e: &Editor| {
+    // The pivot service's handle: the frame of the cluster holding the
+    // last-selected element.
+    let handle = |e: &Editor| {
         e.pivot_request(&e.scene, Tool::Move)
-            .local_handle_basis()
-            .expect("a Local handle frame")
-            .y_axis
-    };
-    let handle_at = |e: &Editor| {
-        e.pivot_request(&e.scene, Tool::Move)
-            .local_handle_frame()
+            .resolve()
             .unwrap()
-            .center
+            .handle
     };
+    let handle_z = |e: &Editor| handle(e).basis.z_axis;
+    let handle_at = |e: &Editor| handle(e).center;
     e.scene.selection.faces = vec![0, 1];
-    close(handle_y(&e), DVec3::Y, "F last: level handle");
+    close(handle_z(&e), DVec3::Y, "F last: level handle");
     // The handle sits on F's centre, not between the two (Jason 11-21).
     close(handle_at(&e), DVec3::new(5.5, 0., 0.5), "F last: on F");
     e.scene.selection.faces = vec![1, 0];
     close(handle_at(&e), DVec3::splat(0.5), "P last: on P");
-    let tilted = handle_y(&e);
+    let tilted = handle_z(&e);
     let normal = DVec3::new(0., 1., -1.).normalize();
     assert!(
         (tilted.dot(normal).abs() - 1.).abs() < 1e-9,
-        "P last: handle Y along P's normal, got {tilted:?}"
+        "P last: handle Z along P's normal, got {tilted:?}"
     );
     // Not Local: no special handle frame.
     e.dispatch(Command::ActionContext(ActionContext {
@@ -308,11 +311,8 @@ fn ac_t75_local_handle_follows_the_last_selected_polygon() {
         axis: AxisOrientation::World,
     }))
     .unwrap();
-    assert!(
-        e.pivot_request(&e.scene, Tool::Move)
-            .local_handle_basis()
-            .is_none()
-    );
+    let request = e.pivot_request(&e.scene, Tool::Move);
+    assert_eq!(request.resolve().unwrap().handle, request.frame().unwrap());
 }
 
 /// AC-03: two polygons on the wall with an unselected row between them are

@@ -91,6 +91,7 @@ impl Operandi {
             // edits, as the tool reads them (worked out once per drag).
             let base = self
                 .editor
+                .session
                 .live
                 .as_ref()
                 .filter(|l| l.base.item(item.id).is_some())

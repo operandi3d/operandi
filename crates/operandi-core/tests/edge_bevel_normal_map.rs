@@ -73,7 +73,7 @@ fn editor(mesh: &Mesh, edges: &[(u32, u32)], tool: Tool) -> Editor {
     e.dispatch(Command::Mode(Mode::Edge)).unwrap();
     e.scene.selection.edges = edges.to_vec();
     e.dispatch(Command::Activate(tool)).unwrap();
-    let mut p = e.live.as_ref().unwrap().params.clone();
+    let mut p = e.session.live.as_ref().unwrap().params.clone();
     p.chamfer.offset = 0.05;
     e.dispatch(Command::Preview(p)).unwrap();
     e
@@ -89,7 +89,7 @@ fn edge_bevel_and_chamfer_work_on_a_mesh_with_a_normal_map() {
     for tool in [Tool::EdgeBevel, Tool::EdgeChamfer] {
         for (what, edges) in [("rim loop", &rim), ("ring", &ring)] {
             let e = editor(&t, edges, tool);
-            let live = e.live.as_ref().unwrap();
+            let live = e.session.live.as_ref().unwrap();
             assert_eq!(live.preview_error, None, "{tool:?} {what}");
             let out = mesh(&e);
             assert!(out.faces.len() > t.faces.len(), "{tool:?} {what}: no bevel");

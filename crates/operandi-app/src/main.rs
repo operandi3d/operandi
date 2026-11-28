@@ -69,11 +69,17 @@ mod symmetry_ui;
 use crate::prefs_file::PrefsFile;
 use snaps_panel::SnapPreset;
 #[cfg(test)]
+#[path = "view/ac_local_walls_tests.rs"]
+mod ac_local_walls_tests;
+#[cfg(test)]
 #[path = "view/ac_press_tests.rs"]
 mod ac_press_tests;
 #[cfg(test)]
 #[path = "view/ac_rules_step1_tests.rs"]
 mod ac_rules_step1_tests;
+#[cfg(test)]
+#[path = "view/ac_rules_step3_tests.rs"]
+mod ac_rules_step3_tests;
 #[path = "view/action_center_click.rs"]
 mod action_center_click;
 #[path = "files/app_environment.rs"]
@@ -447,6 +453,8 @@ mod polygon_part_dialog;
 mod polygon_unify_dialog;
 #[path = "rigging/pose_tool_ui.rs"]
 mod pose_tool_ui;
+#[path = "render/post_effects_ui.rs"]
+mod post_effects_ui;
 #[path = "settings/preferences.rs"]
 mod preferences;
 #[cfg(test)]
@@ -832,11 +840,6 @@ struct Operandi {
     twist_bevel_turn: Option<f64>,
     /// The base mesh's spanning points for `whole_mesh_drag`, once per drag.
     whole_mesh_basis_memo: viewport::BaseMemo<Option<[usize; 3]>>,
-    /// AC-75: the Local handle's axes for the drag's base and context.
-    local_handle_memo: viewport::BaseMemo<(
-        operandi_core::ActionContext,
-        Option<operandi_core::ActionFrame>,
-    )>,
     /// Take the resident path without a GPU (benchmarks and tests).
     force_resident: bool,
     environment: app_environment::AppEnvironment,
@@ -1297,6 +1300,13 @@ struct Operandi {
     gpu: String,
     viewport_gpu: Option<gpu::ViewportGpu>,
     last_drawable: [u32; 2],
+    /// When the one-time Trackball Rotation offer appeared (egui time), while
+    /// it shows (trackball_offer.rs).
+    trackball_offer: Option<f64>,
+    /// UIC-189: floating windows are on top this frame (an Operandi window
+    /// has the keyboard), and when one last had it (floating_level.rs).
+    floating_on_top: bool,
+    floating_focused_at: Option<f64>,
     viewport_rect: Rect,
     /// The views (views.rs): their layout, each view's camera and rect, the
     /// active one (whose camera is `camera`), and the one being drawn.
@@ -1760,7 +1770,6 @@ impl Operandi {
             twist_bevel_frame_memo: Default::default(),
             twist_bevel_turn: None,
             whole_mesh_basis_memo: Default::default(),
-            local_handle_memo: Default::default(),
             force_resident: false,
             online: online_library::OnlineLibrary::new(environment.paths().online_libraries()),
             environment,
@@ -2035,6 +2044,9 @@ impl Operandi {
             gpu: "GPU unavailable".into(),
             viewport_gpu: None,
             last_drawable: [0, 0],
+            trackball_offer: None,
+            floating_on_top: false,
+            floating_focused_at: None,
             viewport_rect: Rect::NOTHING,
             views: operandi_layout::Layout::single_viewport(),
             cameras: BTreeMap::new(),
@@ -2307,7 +2319,7 @@ impl Operandi {
     /// Whether an editor tool session (live tool, primitive, Bridge, Spike,
     /// Pen or Reduction) is open.
     fn editor_tool_active(&self) -> bool {
-        self.editor.has_active_task()
+        self.editor.session.has_active_task()
     }
 
     /// A viewport press began a gesture: everything it changes until the
@@ -2317,7 +2329,7 @@ impl Operandi {
     /// `editor.dispatch`); no tool or button sets this on its own.
     fn hold_pointer(&mut self) {
         self.pointer_held = true;
-        self.editor.tweak_held = true;
+        self.editor.session.tweak_held = true;
     }
 
     /// The press is over: the next change starts a new step.
@@ -2386,7 +2398,7 @@ impl Operandi {
         // A dropped Pen polygon faces the viewer whichever way it was
         // clicked (a Flip Polygon option would invert that).
         if matches!(c, Command::Drop)
-            && let Some(draft) = &self.editor.pen_draft
+            && let Some(draft) = &self.editor.session.pen_draft
             && draft.points().len() >= 3
             && draft.options().output == PenType::Polygon
         {
@@ -2520,7 +2532,7 @@ impl Operandi {
             _ => None,
         };
         let continuing = matches!(c, Command::Continue);
-        let was_live = self.editor.has_active_task();
+        let was_live = self.editor.session.has_active_task();
         // A tree click re-targets a live transform tool (editor.rs): its
         // fields restart at zero like after Undo/Redo.
         let item_select = matches!(
@@ -2542,7 +2554,7 @@ impl Operandi {
                 | Command::ResetToolAttributes
         );
         let discard_draft = matches!(c, Command::Drop)
-            && self.editor.live.as_ref().is_some_and(|l| {
+            && self.editor.session.live.as_ref().is_some_and(|l| {
                 l.params
                     .radial
                     .is_some_and(|p| p.radius.min_element() == 0.)
@@ -2565,7 +2577,7 @@ impl Operandi {
             // A held viewport drag or field scrub makes one tweak of the
             // active tool, however many previews it sends (mid-tool undo).
             let held = std::mem::replace(
-                &mut self.editor.tweak_held,
+                &mut self.editor.session.tweak_held,
                 self.pointer_held || self.scrub.is_some(),
             );
             // A colour field's drag or pick is one undo step across frames
@@ -2582,7 +2594,7 @@ impl Operandi {
             ));
             let result = self.editor.dispatch(c).map(|()| None);
             self.editor.history.undo_fold = outer;
-            self.editor.tweak_held = held;
+            self.editor.session.tweak_held = held;
             result
         };
         match completion {
@@ -2597,7 +2609,7 @@ impl Operandi {
                     self.i2_gesture_ticket = None;
                 }
                 let foreground_closed = completion.as_ref().map_or_else(
-                    || was_live && !self.editor.has_active_task(),
+                    || was_live && !self.editor.session.has_active_task(),
                     |completion| completion.foreground_closed,
                 );
                 if completion.as_ref().is_some_and(|c| {
@@ -2609,10 +2621,10 @@ impl Operandi {
                     // Undo/Redo restart a live transform tool at zero, and
                     // the fields of a tool that keeps running through
                     // history (the primitives) show its current values.
-                    || (completion.is_some() && self.editor.has_active_task())
+                    || (completion.is_some() && self.editor.session.has_active_task())
                 {
                     self.clear_fields();
-                    if self.editor.live.is_none() {
+                    if self.editor.session.live.is_none() {
                         self.surface_mini_properties = false;
                     }
                 }
@@ -2644,6 +2656,7 @@ impl Operandi {
                     "Flat draft discarded; preceding geometry retained".into()
                 } else if self
                     .editor
+                    .session
                     .live
                     .as_ref()
                     .is_some_and(|l| l.tool == Tool::Tweak)
@@ -2668,9 +2681,9 @@ impl Operandi {
         }
     }
     fn activate(&mut self, t: Tool) {
-        let before = self.editor.live.as_ref().map(|l| l.tool);
+        let before = self.editor.session.live.as_ref().map(|l| l.tool);
         self.run(Command::Activate(t));
-        if self.editor.live.as_ref().map(|l| l.tool) != before {
+        if self.editor.session.live.as_ref().map(|l| l.tool) != before {
             self.clear_fields();
         }
     }
@@ -2729,15 +2742,17 @@ impl Operandi {
                 overwrite: false,
             });
         } else if self.dirty()
-            || self.editor.live.is_some()
-            || self.editor.pen_draft.is_some()
+            || self.editor.session.live.is_some()
+            || self.editor.session.pen_draft.is_some()
             || self
                 .editor
+                .session
                 .ellipsoid
                 .as_ref()
                 .is_some_and(|s| s.preview.is_some())
             || self
                 .editor
+                .session
                 .shape
                 .as_ref()
                 .is_some_and(|s| s.preview.is_some())
@@ -2758,6 +2773,7 @@ impl Operandi {
         // names a map of the old document, so it keeps its New default.
         let current = self
             .editor
+            .session
             .cone
             .as_ref()
             .filter(|s| s.error.is_none())
@@ -3394,6 +3410,7 @@ impl Operandi {
         // cancels them, as its panel says ("Esc cancels").
         let create_escape_owner = self
             .editor
+            .session
             .live
             .as_ref()
             .is_some_and(|l| l.tool == Tool::VertexCreate);
@@ -3514,6 +3531,7 @@ impl Operandi {
         let smooth_shift_default_drop = (viewport_hovered
             && self
                 .editor
+                .session
                 .live
                 .as_ref()
                 .is_some_and(|l| l.tool.is_smooth_shift()))
@@ -3550,7 +3568,7 @@ impl Operandi {
                         if (action != "Drop Cube"
                             || self
                                 .editor
-                                .live
+                                .session.live
                                 .as_ref()
                                 .is_some_and(|live| live.tool == Tool::Box))
                             && input::available(
@@ -3571,7 +3589,7 @@ impl Operandi {
                                 || (!scene_focused
                                     && self
                                         .editor
-                                        .live
+                                        .session.live
                                         .as_ref()
                                         .is_some_and(|l| l.tool.is_smooth_shift())))
                             && (!action.starts_with("Delete Item")
@@ -3659,7 +3677,7 @@ impl Operandi {
             if pointer_over_view && viewport_buttons::hovered_view_action(&c) {
                 self.activate_view(hovered_view);
             }
-            let before = self.editor.active_task();
+            let before = self.editor.session.active_task();
             self.execute_from(operandi_core::Source::Key, &c);
             if let Some(&(_, key)) = command_keys.iter().find(|(a, _)| *a == c) {
                 self.note_key_hold(key, before);
@@ -3752,6 +3770,7 @@ impl Operandi {
             }
             let Some(l) = self
                 .editor
+                .session
                 .live
                 .as_ref()
                 .filter(|l| l.tool.is_smooth_shift())
@@ -3813,10 +3832,10 @@ impl Operandi {
             match numeric::parse_quantity(value, numeric::Quantity::Scalar) {
                 Ok(value) => {
                     self.run(Command::ConfigureSpike(value));
-                    if self.editor.spike.is_some() {
+                    if self.editor.session.spike.is_some() {
                         self.sync_numeric_value(
                             "spi_strength",
-                            self.editor.spike.as_ref().unwrap().requested,
+                            self.editor.session.spike.as_ref().unwrap().requested,
                             "",
                         );
                     }
@@ -3916,6 +3935,7 @@ impl Operandi {
         if self.surface_mini_properties
             && self
                 .editor
+                .session
                 .live
                 .as_ref()
                 .is_some_and(|l| l.tool.is_smooth_shift())
@@ -4072,6 +4092,7 @@ impl eframe::App for Operandi {
     fn update(&mut self, ctx: &Context, _frame: &mut eframe::Frame) {
         self.frame_stats.begin();
         self.frame_ctx = Some(ctx.clone());
+        self.update_floating_level(ctx);
         if let Some(text) = self.copy_next.take() {
             ctx.copy_text(text);
         }
@@ -4151,7 +4172,14 @@ impl eframe::App for Operandi {
             self.status = note;
         }
         self.keyboard(ctx);
-        native_menu::sync(self.menu_model(ctx));
+        native_menu::sync(
+            self.menu_model(ctx),
+            input::preferences_key_equivalent(
+                self.bindings
+                    .get(app_menu::PREFERENCES_LINE)
+                    .map(String::as_str),
+            ),
+        );
         self.persist_layout(ctx);
         self.journal_when_due(ctx);
         identity_audit::capture(self, ctx);
@@ -4181,6 +4209,8 @@ pub(crate) fn same_document(a: &Scene, b: &Scene) -> bool {
 mod drag_readout;
 #[path = "window_layout/floating.rs"]
 mod floating;
+#[path = "window_layout/floating_level.rs"]
+mod floating_level;
 #[path = "window_layout/form_editor.rs"]
 mod form_editor;
 #[cfg(test)]
@@ -4231,6 +4261,8 @@ mod primitive_panel;
 mod render_ui;
 #[path = "anim/timeline.rs"]
 mod timeline;
+#[path = "view/trackball_offer.rs"]
+mod trackball_offer;
 #[path = "items/vertex_normal_ui.rs"]
 mod vertex_normal_ui;
 #[path = "view/view_display.rs"]
@@ -4257,10 +4289,15 @@ mod views;
 fn needs_saving(editor: &Editor, saved: &Scene, same: fn(&Scene, &Scene) -> bool) -> bool {
     !same(&editor.scene, saved)
         || editor
+            .session
             .ellipsoid
             .as_ref()
             .is_some_and(|s| s.preview.is_some())
-        || editor.shape.as_ref().is_some_and(|s| s.preview.is_some())
+        || editor
+            .session
+            .shape
+            .as_ref()
+            .is_some_and(|s| s.preview.is_some())
 }
 
 /// The launch arguments as text, for the command-line modes below. A
@@ -4524,6 +4561,9 @@ mod inset_shift_tests;
 #[path = "items/item_list_header_tests.rs"]
 mod item_list_header_tests;
 #[cfg(test)]
+#[path = "viewport/item_rollover_tests.rs"]
+mod item_rollover_tests;
+#[cfg(test)]
 #[path = "input_devices/key_toggles_tests.rs"]
 mod key_toggles_tests;
 #[cfg(test)]
@@ -4578,11 +4618,17 @@ mod perf_drags_tests;
 #[path = "view/perf_view_tests.rs"]
 mod perf_view_tests;
 #[cfg(test)]
+#[path = "render/perspective_camera_key_tests.rs"]
+mod perspective_camera_key_tests;
+#[cfg(test)]
 #[path = "render/picture_capture_tests.rs"]
 mod picture_capture_tests;
 #[cfg(test)]
 #[path = "view/placement_snap_tests.rs"]
 mod placement_snap_tests;
+#[cfg(test)]
+#[path = "render/post_effects_ui_tests.rs"]
+mod post_effects_ui_tests;
 #[cfg(test)]
 #[path = "presets/preset_drop_tests.rs"]
 mod preset_drop_tests;

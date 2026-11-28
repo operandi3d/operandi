@@ -166,8 +166,8 @@ impl HistoryReport {
 }
 fn foreground(editor: &Editor) -> bool {
     let owner = editor.session_ownership();
-    editor.pen_draft.is_some()
-        || editor.solid_sketch.is_some()
+    editor.session.pen_draft.is_some()
+        || editor.session.solid_sketch.is_some()
         || owner.bridge
         || owner.live.is_some()
         || owner.cone.is_some()
