@@ -52,6 +52,9 @@ fn picture_with_representation(
     theme::install(&ctx);
     let mut a = Operandi::empty();
     a.viewport_gpu = Some(gpu::ViewportGpu::new(state));
+    // The surfaces are compared, not the selection seen through them
+    // (on by default since #69).
+    a.selection_preferences.selection_xray = 0;
     a.run(Command::NewMesh);
     a.editor.scene.active_mut().unwrap().mesh = mesh.into();
     a.run(Command::ToggleSubdivision(
@@ -370,6 +373,8 @@ fn selecting_polygons_patches_only_their_looks() {
     theme::install(&ctx);
     let mut a = Operandi::empty();
     a.viewport_gpu = Some(gpu::ViewportGpu::new(state));
+    // As `picture`: the surfaces, not the selection seen through (#69).
+    a.selection_preferences.selection_xray = 0;
     a.run(Command::NewMesh);
     a.editor.scene.active_mut().unwrap().mesh = wavy(16).into();
     a.run(Command::ToggleSubdivision(

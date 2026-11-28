@@ -2564,7 +2564,8 @@ defined; most keep Operandi's behaviour so far. Readings to confirm:
   just it (one undo step for the mode, one for the pick). Off, the click
   still opens the selection menu. Does the reference also select it?
 - **PREF-Q13 X-ray transparency.** Transparency: Selection is the hidden
-  selection's opacity, 0 % (today: hidden) by default; drawn on the
+  selection's opacity, 50 % by default (#69, 2026-11-28; it was 0 %, hidden,
+  which read as missing); drawn on the
   graphics card for selected points, edges and polygon wire. Handles: the
   hidden handle's opacity, 100 % (today: always drawn) by default; judged
   at each handle's middle, not while a drag changes the scene. Which way
