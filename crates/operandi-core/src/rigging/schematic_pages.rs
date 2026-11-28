@@ -44,6 +44,10 @@ pub struct Placement {
     /// unless asked for it by name (SC-60).
     #[serde(default, skip_serializing_if = "std::ops::Not::not")]
     pub pinned: bool,
+    /// An item node's channels shown as ports even when nothing is wired
+    /// to them yet: channels dragged onto the page (#54).
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub channels: Vec<String>,
 }
 
 /// Which page a view shows.
@@ -245,7 +249,20 @@ pub fn page(scene: &Scene, id: PageId, m: &Metrics) -> PageView {
             for (piece, _, _) in &suggested {
                 keys.insert(piece.clone());
             }
-            let (s, stubs) = subset(&full, scene, &keys);
+            let (mut s, stubs) = subset(&full, scene, &keys);
+            // #54: channels dragged onto the page show as ports, both sides,
+            // wired or not.
+            for p in w.nodes.iter().filter(|p| !p.channels.is_empty()) {
+                if let Some(n) = s.nodes.iter_mut().find(|n| n.key == p.key) {
+                    for c in &p.channels {
+                        for list in [&mut n.inputs, &mut n.outputs] {
+                            if !list.contains(c) {
+                                list.push(c.clone());
+                            }
+                        }
+                    }
+                }
+            }
             let height = |k: &str| {
                 s.nodes
                     .iter()
@@ -387,13 +404,19 @@ fn places(e: &Editor, a: &Args) -> Result<Vec<(String, [f32; 2])>, String> {
 fn put(w: &mut Workspace, places: &[(String, [f32; 2])], pinned: bool) -> bool {
     let mut changed = false;
     for (key, [x, y]) in places {
-        let p = Placement {
+        let mut p = Placement {
             key: key.clone(),
             x: *x,
             y: *y,
             pinned,
+            channels: Vec::new(),
         };
-        match w.nodes.iter_mut().find(|n| &n.key == key) {
+        let old = w.nodes.iter_mut().find(|n| &n.key == key);
+        // Moving a node keeps the channels shown on it (#54).
+        if let Some(old) = &old {
+            p.channels = old.channels.clone();
+        }
+        match old {
             Some(old) if *old == p => {}
             Some(old) => {
                 *old = p;
@@ -524,6 +547,88 @@ pub fn run(e: &mut Editor, name: &str, a: &Args) -> Result<Option<Command>, Stri
             placed.dedup_by(|a, b| a.0 == b.0);
             e.anim_step("Move Nodes", |e| {
                 Ok(put(workspace_mut(&mut e.scene, ws), &placed, pinned))
+            })?;
+        }
+        "operandi.rig.schematicChannels" => {
+            let ws = workspace_arg(e, a)?;
+            let list = text(a, "channels")?.ok_or("Give channels:item:name,...")?;
+            let mut by_item: Vec<(u64, Vec<String>)> = Vec::new();
+            for k in list.split(',').map(str::trim).filter(|s| !s.is_empty()) {
+                let key = crate::animation::ChannelKey::parse(k)?;
+                if crate::animation::read(&e.scene, &key).is_none() {
+                    return Err(format!("{k} isn't a channel of an item in the scene"));
+                }
+                match by_item.iter_mut().find(|(i, _)| *i == key.item) {
+                    Some((_, names)) if names.contains(&key.channel) => {}
+                    Some((_, names)) => names.push(key.channel),
+                    None => by_item.push((key.item, vec![key.channel])),
+                }
+            }
+            if by_item.is_empty() {
+                return Err("Give channels:item:name,...".into());
+            }
+            let at = match text(a, "at")? {
+                None => None,
+                Some(t) => {
+                    let bad = || format!("at is x/y, such as 40/60, not {t}");
+                    let (x, y) = t.split_once('/').ok_or_else(bad)?;
+                    let (x, y): (f32, f32) = (
+                        x.trim().parse().map_err(|_| bad())?,
+                        y.trim().parse().map_err(|_| bad())?,
+                    );
+                    if !x.is_finite() || !y.is_finite() {
+                        return Err(bad());
+                    }
+                    Some([x, y])
+                }
+            };
+            // Items not on the page yet: at the drop (one below another),
+            // or arranged below what is there.
+            let w = e
+                .scene
+                .animation
+                .rig
+                .workspaces
+                .iter()
+                .find(|w| w.id == ws)
+                .expect("checked");
+            let new: Vec<String> = by_item
+                .iter()
+                .map(|(i, _)| format!("item:{i}"))
+                .filter(|k| !w.nodes.iter().any(|n| &n.key == k))
+                .collect();
+            let placed: Vec<(String, [f32; 2])> = match at {
+                Some([x, y]) => new
+                    .iter()
+                    .enumerate()
+                    .map(|(k, key)| (key.clone(), [x, y + k as f32 * m.row_h * 4.]))
+                    .collect(),
+                None => {
+                    let keep: BTreeMap<String, [f32; 2]> = w
+                        .nodes
+                        .iter()
+                        .map(|n| (n.key.clone(), [n.x, n.y]))
+                        .collect();
+                    let set: BTreeSet<String> = new.iter().cloned().collect();
+                    block(&e.scene, &set, &keep, &m)
+                }
+            };
+            e.anim_step("Add Channels to Workspace", |e| {
+                let w = workspace_mut(&mut e.scene, ws);
+                let mut changed = put(w, &placed, at.is_some());
+                for (item, names) in &by_item {
+                    let key = format!("item:{item}");
+                    let Some(node) = w.nodes.iter_mut().find(|n| n.key == key) else {
+                        continue;
+                    };
+                    for n in names {
+                        if !node.channels.contains(n) {
+                            node.channels.push(n.clone());
+                            changed = true;
+                        }
+                    }
+                }
+                Ok(changed)
             })?;
         }
         "operandi.rig.schematicRemove" => {

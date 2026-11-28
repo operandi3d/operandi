@@ -43,7 +43,7 @@ pub(crate) struct SchematicView {
     naming: Option<(Option<u64>, String)>,
     /// Lines that need the workspace a page save just made: `{ws}` in
     /// them is replaced by its id.
-    after_save: Vec<String>,
+    pub(crate) after_save: Vec<String>,
     /// Fit on the next frame: all nodes, or only the selected (SC-66).
     pub(crate) fit: Option<bool>,
     /// View navigation in progress: what the press started (from the
@@ -275,6 +275,40 @@ impl Operandi {
         }
     }
 
+    /// `operandi.rig.schematicChannels` for a channel drop at page point
+    /// `at` (#54), on the page's workspace (`{ws}`). The label's own
+    /// channels, or every selected channel when it was one of them.
+    pub(crate) fn schematic_channels_line(
+        &mut self,
+        drag: &crate::form::rows::ChannelDrag,
+        at: Pos2,
+    ) -> Option<String> {
+        let channels: Vec<String> = if drag.selected {
+            self.editor
+                .anim
+                .selected_channels
+                .iter()
+                .map(|k| k.text())
+                .collect()
+        } else {
+            drag.channels.clone()
+        };
+        if channels.is_empty() {
+            return None;
+        }
+        self.schematic.note = Some(format!(
+            "Added {} channel{} to this page",
+            channels.len(),
+            if channels.len() == 1 { "" } else { "s" }
+        ));
+        Some(format!(
+            "operandi.rig.schematicChannels workspace:{{ws}} channels:{} at:{}/{}",
+            channels.join(","),
+            at.x.round(),
+            at.y.round()
+        ))
+    }
+
     /// Runs `line` on the page's workspace (`{ws}`), saving an unsaved
     /// page first.
     fn schematic_on_page(
@@ -424,6 +458,13 @@ impl Operandi {
         let painter = ui.painter_at(rect);
         painter.rect_filled(rect, 0., ui.visuals().extreme_bg_color);
         let Some(page) = page else {
+            // #54: channels dropped on an empty Schematic start a workspace.
+            if let Some(drag) = response.dnd_release_payload::<crate::form::rows::ChannelDrag>()
+                && let Some(line) = self.schematic_channels_line(&drag, Pos2::ZERO)
+            {
+                lines.push("operandi.rig.workspaceAdd name:Workspace".into());
+                self.schematic.after_save.push(line);
+            }
             painter.text(
                 rect.center(),
                 egui::Align2::CENTER_CENTER,
@@ -486,6 +527,16 @@ impl Operandi {
         }
         let to_screen = move |p: [f32; 2]| origin + pan + vec2(p[0], p[1]) * zoom;
         let to_page = move |p: Pos2| ((p - origin - pan) / zoom).to_pos2();
+        // #54: channels dragged from Properties and let go here show as
+        // ports of their items, which come onto the page at the drop.
+        if let Some(drag) = response.dnd_release_payload::<crate::form::rows::ChannelDrag>()
+            && let Some(p) = ui.input(|i| i.pointer.interact_pos())
+        {
+            let at = to_page(p);
+            if let Some(line) = self.schematic_channels_line(&drag, at) {
+                self.schematic_on_page(page, &view, line, &mut lines);
+            }
+        }
 
         // Node rectangles: saved or shown places, then a drag in progress.
         let mut at: BTreeMap<String, Rect> = BTreeMap::new();
