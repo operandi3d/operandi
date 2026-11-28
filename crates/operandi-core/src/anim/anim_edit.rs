@@ -517,7 +517,8 @@ impl Editor {
     /// #54: pastes the copied values onto `targets`, one undo step. A target
     /// takes the copied channel of its own name; when no target's name was
     /// copied, they take the copied values in order. With no targets, the
-    /// selected items' channels of the copied names.
+    /// selected items' channels of the copied names. Targets that don't
+    /// have the channel are skipped.
     pub fn paste_channels(&mut self, targets: &[ChannelKey]) -> Result<()> {
         let copied = self.anim.channel_clipboard.clone();
         if copied.is_empty() {
@@ -553,6 +554,15 @@ impl Editor {
                 .map(|(t, (_, v))| (t.clone(), *v))
                 .collect()
         };
+        // A target without that channel (a copied light Intensity pasted
+        // onto a mesh, say) is skipped, so the rest still paste.
+        let pairs: Vec<(ChannelKey, f64)> = pairs
+            .into_iter()
+            .filter(|(k, _)| animation::read(&self.scene, k).is_some())
+            .collect();
+        if pairs.is_empty() {
+            return Err("None of the copied channels are on those items".into());
+        }
         self.anim_step("Paste Channels", move |e| {
             let mut changed = false;
             for (k, v) in &pairs {

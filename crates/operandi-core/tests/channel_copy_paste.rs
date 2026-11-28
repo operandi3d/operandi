@@ -2,6 +2,7 @@
 //! channels, or onto other selected channels, as one undo step.
 use glam::DVec3;
 use operandi_core::animation::{self, ChannelKey};
+use operandi_core::camera_light::LightKind;
 use operandi_core::*;
 
 fn line(e: &mut Editor, text: &str) -> Result<Option<String>> {
@@ -72,4 +73,35 @@ fn pasting_onto_other_names_goes_in_order_and_nothing_copied_says_so() {
     e.anim.selected_channels.clear();
     ok(&mut e, "operandi.channel.paste");
     assert_eq!(read(&e, b, "pos.Z"), 3.);
+}
+
+/// Pasting onto selected items skips a copied channel an item doesn't
+/// have (a light's Intensity onto a mesh) instead of failing the whole
+/// paste.
+#[test]
+fn pasting_onto_items_skips_channels_they_lack() {
+    let mut e = Editor::default();
+    e.dispatch(Command::NewLight(LightKind::Point)).unwrap();
+    let light = e.scene.active().unwrap().id;
+    e.scene.item_mut(light).unwrap().transform.translation = DVec3::new(4., 0., 0.);
+    ok(
+        &mut e,
+        &format!("operandi.channel.copy channels:{light}:pos.X,{light}:intensity"),
+    );
+    e.dispatch(Command::NewMesh).unwrap();
+    let mesh = e.scene.active().unwrap().id;
+    assert!(
+        animation::read(&e.scene, &ChannelKey::new(mesh, "intensity")).is_none(),
+        "a mesh has no Intensity"
+    );
+    e.anim.selected_channels.clear();
+    ok(&mut e, "operandi.channel.paste");
+    assert_eq!(read(&e, mesh, "pos.X"), 4.);
+    // Nothing that fits: says so.
+    ok(
+        &mut e,
+        &format!("operandi.channel.copy channels:{light}:intensity"),
+    );
+    let err = line(&mut e, "operandi.channel.paste").unwrap_err();
+    assert!(err.contains("None of the copied"), "{err}");
 }
