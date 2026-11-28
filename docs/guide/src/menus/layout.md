@@ -21,6 +21,7 @@ The entries of the **Layout** menu, in order. A **▸** opens a submenu. Keys in
 - **Windows/Palettes ▸**
   - **Toolbox** · `layout.window hash:toolbox`
   - **Items** (**5**) · `layout.window hash:items`
+  - **Items + Properties** · `layout.window hash:itemsProperties`
   - **Properties** · `layout.window hash:properties`
   - **Shading** · `layout.window hash:shading`
   - **Groups** · `layout.window hash:groups`
@@ -32,6 +33,8 @@ The entries of the **Layout** menu, in order. A **▸** opens a submenu. Keys in
   - **Form Editor** · `layout.window hash:formEditor`
   - **Vertex Normal Tools** · `layout.window hash:vertexNormalTools`
   - **Statistics** · `layout.window hash:statistics`
+  - **Timeline** · `layout.window hash:timeline`
+  - **Graph Editor** · `layout.window hash:graphEditor`
   - **Node View** (**Ctrl+Shift+N**) · `operandi.window.nodeView`
   - **Toggle Palettes** (**` (backtick)**) · `operandi.layout.togglePalettes`
 - **Workbench** · `operandi.toolbox.tab workbench`
