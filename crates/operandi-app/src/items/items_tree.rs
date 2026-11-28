@@ -127,6 +127,7 @@ impl Operandi {
             }
         }
         self.items_tree = state;
+        self.items_drawn_rows = rows.clone();
         let order: Vec<u64> = rows
             .iter()
             .filter_map(|r| match r.key {
@@ -750,6 +751,43 @@ impl Operandi {
             });
         }
         self.item_solo = Some((id, others));
+    }
+
+    /// #55 (UIC-75): items dragged from the 3D view and let go over the
+    /// Items list land as a drag inside the list would: on a row they're
+    /// parented to it, between rows they're put there. True when `pos` was
+    /// over a row and the selected items moved.
+    pub(super) fn drop_items_from_view(&mut self, pos: Pos2) -> bool {
+        let here = self.scenes.active_tab().id;
+        let keys: Vec<ItemKey> = self
+            .editor
+            .scene
+            .selected_items()
+            .into_iter()
+            .map(|id| ItemKey::Item(here, id))
+            .collect();
+        if keys.is_empty() {
+            return false;
+        }
+        let Some((key, rect)) = self
+            .items_tree
+            .rects
+            .iter()
+            .find(|(_, r)| r.contains(pos))
+            .copied()
+        else {
+            return false;
+        };
+        let Some(index) = self.items_drawn_rows.iter().position(|r| r.key == key) else {
+            return false;
+        };
+        let t = ((pos.y - rect.top()) / rect.height().max(1.)).clamp(0., 1.);
+        let Some((at, _)) = tree_list::drop_zone(&self.items_drawn_rows, index, t, &keys) else {
+            self.status = "Can't drop an item into itself".into();
+            return true;
+        };
+        self.item_drop(&keys, at, false);
+        true
     }
 
     /// UIC-143: dropping on a row parents the items to it (as its last

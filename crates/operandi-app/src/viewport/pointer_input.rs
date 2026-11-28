@@ -1700,6 +1700,14 @@ impl Operandi {
                         }
                         if matches!(g.kind, input::GestureKind::Select) {
                             self.run(Command::EndSelection { cancel: false });
+                            // #55: an item press let go over the Items list
+                            // drops the selected items there.
+                            if self.editor.scene.selection.mode == Mode::Item
+                                && !r.contains(pos)
+                                && self.editor.session.live.is_none()
+                            {
+                                self.drop_items_from_view(pos);
+                            }
                         }
                         // Each transform drag is its own undo step; the tool
                         // stays active (Jason, 2026-11-03).
