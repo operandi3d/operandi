@@ -430,7 +430,7 @@ impl Operandi {
     /// bottom, and the list, graph and strip in what's left. Nothing asks
     /// for more than it was given, so the window never grows by itself and
     /// a resize sticks.
-    fn graph_editor_ui(&mut self, ui: &mut Ui) {
+    pub(crate) fn graph_editor_ui(&mut self, ui: &mut Ui) {
         // The shown channels, worked out once a frame (GE-X7).
         self.graph.shown_keys = self.graph_shown().iter().map(|s| s.key.text()).collect();
         let full = ui.available_rect_before_wrap();

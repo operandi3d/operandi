@@ -1,7 +1,7 @@
 //! The Form Editor's pie editing (UIC-308..313): a ring-shaped preview of
 //! the selected pie, its eight slots placed as the pie opens them. Click a
 //! slot to edit it below (command line typed or from the Command History,
-//! label, icon, sub-pie, a floating window, or empty); drag a slot onto
+//! label, icon, sub-pie, a panel popover, or empty); drag a slot onto
 //! another to swap them.
 //! Assign Key opens the Input Map on the pie's line (UIC-311), Export Pie
 //! writes it with its sub-pies (UIC-312). Every edit is an
@@ -28,26 +28,22 @@ const PLACES: [&str; SLOTS] = [
 pub(super) enum Kind {
     Command,
     SubPie,
-    /// Opens a panel as a floating window: `layout.window hash:<id>` (the
-    /// Panels pie; Jason, 2026-11-28).
-    Window,
+    /// Opens a panel on its own as a popover: `operandi.panel.popover
+    /// panel:<id>` (the Panels pie; Jason, 2026-11-28).
+    Popover,
     Empty,
-}
-
-/// The window a slot's line opens, when it is just `layout.window
-/// hash:<id>`.
-fn window_hash(line: &str) -> Option<&str> {
-    let line = line.trim();
-    let rest = line
-        .get(..19)
-        .filter(|head| head.eq_ignore_ascii_case("layout.window hash:"))
-        .map(|_| &line[19..])?;
-    (!rest.is_empty() && !rest.contains(char::is_whitespace)).then_some(rest)
 }
 
 fn kind_of(c: Option<&Control>) -> Kind {
     match c {
-        Some(c) if c.command.as_deref().and_then(window_hash).is_some() => Kind::Window,
+        Some(c)
+            if c.command
+                .as_deref()
+                .and_then(crate::panel_popover::line_panel)
+                .is_some() =>
+        {
+            Kind::Popover
+        }
         Some(c) if c.command.is_some() => Kind::Command,
         Some(c) if c.form.is_some() => Kind::SubPie,
         _ => Kind::Empty,
@@ -237,13 +233,13 @@ impl Operandi {
             let label = |k: Kind| match k {
                 Kind::Command => "Command",
                 Kind::SubPie => "Sub-pie",
-                Kind::Window => "Floating window",
+                Kind::Popover => "Panel popover",
                 Kind::Empty => "Empty",
             };
             egui::ComboBox::from_id_salt(("pie-slot-kind", &id, i))
                 .selected_text(label(showing))
                 .show_ui(ui, |ui| {
-                    for k in [Kind::Command, Kind::SubPie, Kind::Window, Kind::Empty] {
+                    for k in [Kind::Command, Kind::SubPie, Kind::Popover, Kind::Empty] {
                         if ui.selectable_label(k == showing, label(k)).clicked() {
                             picked = Some(k);
                         }
@@ -262,8 +258,8 @@ impl Operandi {
         });
         let shows_sub = showing == Kind::SubPie;
         let shows_line = showing == Kind::Command;
-        if showing == Kind::Window {
-            self.pie_window_pick(ui, &id, i, control.as_ref());
+        if showing == Kind::Popover {
+            self.pie_popover_pick(ui, &id, i, control.as_ref());
         }
         let label = control
             .as_ref()
@@ -333,54 +329,40 @@ impl Operandi {
         }
     }
 
-    /// A floating-window slot's choice: every window `layout.window` opens
-    /// (the palettes). Choosing one sets the slot's line, and its label
-    /// when it had none or the old window's name.
-    fn pie_window_pick(&mut self, ui: &mut Ui, id: &str, i: usize, control: Option<&Control>) {
+    /// A panel-popover slot's choice: every panel a popover can show.
+    /// Choosing one sets the slot's line, and its label when it had none
+    /// or the old panel's name.
+    fn pie_popover_pick(&mut self, ui: &mut Ui, id: &str, i: usize, control: Option<&Control>) {
+        use crate::panel_popover::{PopPanel, line_panel};
         let current = control
             .and_then(|c| c.command.as_deref())
-            .and_then(window_hash)
-            .map(str::to_owned);
-        let windows: Vec<(String, String)> = self
-            .palettes
-            .list
-            .iter()
-            .map(|p| (p.hash.clone(), p.name.clone()))
-            .collect();
-        let name_of = |hash: &str| {
-            windows
-                .iter()
-                .find(|(h, _)| h.eq_ignore_ascii_case(hash))
-                .map(|(_, n)| n.clone())
-        };
-        let shown = current
-            .as_deref()
-            .map(|h| name_of(h).unwrap_or_else(|| h.to_owned()))
-            .unwrap_or_else(|| "Choose a window…".to_owned());
+            .and_then(line_panel);
         let mut picked = None;
         ui.horizontal(|ui| {
-            ui.add_sized([96., 18.], egui::Label::new("Window"));
-            egui::ComboBox::from_id_salt(("pie-slot-window", id, i))
-                .selected_text(shown)
+            ui.add_sized([96., 18.], egui::Label::new("Panel"));
+            egui::ComboBox::from_id_salt(("pie-slot-panel", id, i))
+                .selected_text(current.map_or("Choose a panel…", PopPanel::name))
                 .show_ui(ui, |ui| {
-                    for (hash, name) in &windows {
-                        let on = current.as_deref() == Some(hash.as_str());
-                        if ui.selectable_label(on, name).clicked() {
-                            picked = Some((hash.clone(), name.clone()));
+                    for panel in PopPanel::all() {
+                        if ui
+                            .selectable_label(current == Some(panel), panel.name())
+                            .clicked()
+                        {
+                            picked = Some(panel);
                         }
                     }
                 });
         });
-        if let Some((hash, name)) = picked
-            && current.as_deref() != Some(hash.as_str())
+        if let Some(panel) = picked
+            && current != Some(panel)
         {
             let old = control.map(|c| c.label.clone()).unwrap_or_default();
-            let keep = !old.is_empty() && current.as_deref().and_then(name_of) != Some(old.clone());
-            let label = if keep { old } else { name };
+            let keep = !old.is_empty() && current.map(PopPanel::name) != Some(old.as_str());
+            let label = if keep { old } else { panel.name().to_owned() };
             self.form_editor.pie_kind = None;
             self.execute(&format!(
                 "operandi.form.slot index:{i} line:{} label:{} form:{id}",
-                word(&format!("layout.window hash:{hash}")),
+                word(&panel.line()),
                 word(&label)
             ));
         }
@@ -644,25 +626,21 @@ impl Operandi {
 mod tests {
     use super::*;
 
-    /// A slot holds a floating window when its line is just `layout.window
-    /// hash:<id>`; anything more is a plain command.
+    /// A slot holds a panel popover when its line is `operandi.panel.popover
+    /// panel:<id>` naming a panel; anything else is a plain command.
     #[test]
-    fn window_slots_are_bare_layout_window_lines() {
-        assert_eq!(window_hash("layout.window hash:toolbox"), Some("toolbox"));
-        assert_eq!(
-            window_hash(" Layout.Window HASH:timeline "),
-            Some("timeline")
-        );
-        assert_eq!(window_hash("layout.window hash:groups open:true"), None);
-        assert_eq!(window_hash("layout.window hash:"), None);
-        assert_eq!(window_hash("Toggle Grid"), None);
+    fn popover_slots_are_panel_popover_lines() {
         let control = |line: &str| Control {
             command: Some(line.into()),
             ..Default::default()
         };
         assert_eq!(
-            kind_of(Some(&control("layout.window hash:itemsProperties"))),
-            Kind::Window
+            kind_of(Some(&control("operandi.panel.popover panel:items"))),
+            Kind::Popover
+        );
+        assert_eq!(
+            kind_of(Some(&control("operandi.panel.popover panel:nothing"))),
+            Kind::Command
         );
         assert_eq!(kind_of(Some(&control("Toggle Grid"))), Kind::Command);
         assert_eq!(kind_of(None), Kind::Empty);

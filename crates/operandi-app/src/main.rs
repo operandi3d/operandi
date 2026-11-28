@@ -404,6 +404,11 @@ mod panel_maximize;
 #[cfg(test)]
 #[path = "window_layout/panel_maximize_tests.rs"]
 mod panel_maximize_tests;
+#[path = "window_layout/panel_popover.rs"]
+mod panel_popover;
+#[cfg(test)]
+#[path = "window_layout/panel_popover_tests.rs"]
+mod panel_popover_tests;
 #[path = "window_layout/panel_registry.rs"]
 mod panel_registry;
 #[path = "window_layout/panels.rs"]
@@ -1238,6 +1243,8 @@ struct Operandi {
     mesh_constraint_entered: bool,
     /// Snapping Options window, open at this position (SN-04).
     snapping_options: Option<Pos2>,
+    /// The Panels pie's panel popover (panel_popover.rs).
+    panel_popover: Option<panel_popover::PanelPopover>,
     /// The Snapping popover is pinned (UIC-64), and the pointer has been
     /// over it since it opened (rolling off closes it only after that).
     snapping_pinned: bool,
@@ -1991,6 +1998,7 @@ impl Operandi {
             drop_drag: None,
             snapping: Default::default(),
             snapping_options: None,
+            panel_popover: None,
             snapping_pinned: false,
             snapping_entered: false,
             snapping_opening: false,
@@ -3932,6 +3940,7 @@ impl Operandi {
         }
         overlay_rects.extend(self.channel_panel(ctx));
         overlay_rects.extend(self.mini_properties_window(ctx));
+        overlay_rects.extend(self.panel_popover_frame(ctx));
         self.overlay_rects = overlay_rects;
         self.workspace_dialogs(ctx);
         self.backdrop_clip_chooser(ctx);

@@ -357,7 +357,9 @@ impl Operandi {
                 crate::typography::standard_font(),
                 theme::disabled_text(),
             );
-        } else {
+        } else if kind == PanelKind::Properties
+            || !self.docked_while_popped(ui, body, crate::panel_popover::PopPanel::Kind(kind))
+        {
             let mut inner = ui.new_child(UiBuilder::new().max_rect(body));
             (panel_registry::panel_type(kind).draw)(self, &mut inner, body);
         }

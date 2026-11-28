@@ -5,7 +5,7 @@ pub(super) const COMMANDS: &[Entry] = &[
     // ------------------------------------------------------ preset browser
     // Names from the registry thread (2026-11-11), Stage 1 PB-100..122.
     // Layouts stage 6 (LAY-50, UIC-205): every palette.
-    script("layout.window", Presets, "Opens or closes a palette (its own window): presetBrowser, uvEditor, uvView, toolbox, items, properties, itemsProperties, shading, groups, vertexMaps, commandHistory, vertexNormalTools, timeline or graphEditor. Bare open: toggles; open:true on an open one brings it forward (LAY-50).")
+    script("layout.window", Presets, "Opens or closes a palette (its own window): presetBrowser, uvEditor, uvView, toolbox, items, properties, shading, groups, vertexMaps, commandHistory or vertexNormalTools. Bare open: toggles; open:true on an open one brings it forward (LAY-50).")
         .args(&[
             arg(
                 "hash",

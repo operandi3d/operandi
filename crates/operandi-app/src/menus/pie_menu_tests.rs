@@ -631,11 +631,12 @@ fn wireframe_toggle_works_in_item_mode() {
 }
 
 /// The Panels pie (Jason, 2026-11-27/28): Ctrl+3 opens the Graph
-/// Editor, Items + Properties, the Timeline or the Toolbox as a floating
-/// window, each slot ticked while its window is open. Alt+Space stays free
-/// for the quick-access popover (UIC-63).
+/// Editor, Items, Properties, the Timeline or the Toolbox on its own as a
+/// popover, each slot ticked while its popover is open. Alt+Space stays
+/// free for the quick-access popover (UIC-63).
 #[test]
-fn panels_pie_opens_panels_as_floating_windows() {
+fn panels_pie_opens_panels_as_popovers() {
+    use crate::panel_popover::PopPanel;
     let d = input::default_bindings();
     assert_eq!(d[pie_menu::PANELS_LINE], "Ctrl+3");
     let pie = built_in(pie_menu::PANELS);
@@ -647,8 +648,8 @@ fn panels_pie_opens_panels_as_floating_windows() {
         [
             Some("Graph Editor"),
             None,
-            Some("Items + Properties"),
-            None,
+            Some("Items"),
+            Some("Properties"),
             Some("Timeline"),
             None,
             Some("Toolbox"),
@@ -656,25 +657,18 @@ fn panels_pie_opens_panels_as_floating_windows() {
         ]
     );
     let mut a = box_app();
-    for i in [0, 2, 4, 6] {
+    for i in [0, 2, 3, 4, 6] {
         let entry = pie.slot(i).unwrap();
-        assert_eq!(
-            a.pie_status(&entry.command).mark,
-            Mark::Toggle(false),
-            "{} starts closed",
-            entry.label
-        );
-        a.execute(&entry.command);
-        assert_eq!(
-            a.pie_status(&entry.command).mark,
-            Mark::Toggle(true),
-            "{}: {}",
-            entry.label,
-            a.status
-        );
-        a.execute(&entry.command);
+        let panel = crate::panel_popover::line_panel(&entry.command).expect("a popover line");
+        assert_eq!(panel.name(), entry.label);
         assert_eq!(a.pie_status(&entry.command).mark, Mark::Toggle(false));
+        a.execute(&entry.command);
+        assert!(a.panel_popover_open(panel), "{}: {}", entry.label, a.status);
+        assert_eq!(a.pie_status(&entry.command).mark, Mark::Toggle(true));
+        a.execute(&entry.command);
+        assert!(!a.panel_popover_open(panel));
     }
+    assert!(!a.panel_popover_open(PopPanel::Toolbox));
 }
 
 /// Leonard (2026-11-27): with Ctrl still held, pressing another pie's number
@@ -722,15 +716,16 @@ fn another_pies_key_while_one_is_open_swaps_to_it() {
         vec![key_event(Key::Num1, false, Modifiers::CTRL)],
     );
     assert!(a.pie.is_some());
-    // ...the new key's release, pointing west, floats the Toolbox.
+    // ...the new key's release, pointing west, pops out the Toolbox.
+    let toolbox = crate::panel_popover::PopPanel::Toolbox;
     let left = a.pie.as_ref().unwrap().rect(6).center();
     frame(&mut a, &ctx, vec![Event::PointerMoved(left)]);
-    assert!(!a.palette_open("toolbox"));
+    assert!(!a.panel_popover_open(toolbox));
     frame(
         &mut a,
         &ctx,
         vec![key_event(Key::Num3, false, Modifiers::CTRL)],
     );
     assert!(a.pie.is_none());
-    assert!(a.palette_open("toolbox"), "{}", a.status);
+    assert!(a.panel_popover_open(toolbox), "{}", a.status);
 }

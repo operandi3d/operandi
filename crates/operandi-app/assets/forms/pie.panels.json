@@ -6,28 +6,29 @@
   "icons": "text",
   "controls": [
     {
-      "command": "layout.window hash:graphEditor",
+      "command": "operandi.panel.popover panel:graphEditor",
       "label": "Graph Editor"
     },
     {
       "space": 0
     },
     {
-      "command": "layout.window hash:itemsProperties",
-      "label": "Items + Properties"
+      "command": "operandi.panel.popover panel:items",
+      "label": "Items"
     },
     {
-      "space": 0
+      "command": "operandi.panel.popover panel:properties",
+      "label": "Properties"
     },
     {
-      "command": "layout.window hash:timeline",
+      "command": "operandi.panel.popover panel:timeline",
       "label": "Timeline"
     },
     {
       "space": 0
     },
     {
-      "command": "layout.window hash:toolbox",
+      "command": "operandi.panel.popover panel:toolbox",
       "label": "Toolbox"
     },
     {

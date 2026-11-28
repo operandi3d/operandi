@@ -119,17 +119,20 @@ still don't select while a tool is on: select first, then pick the tool.
    where it will land.
 2. Let go to dock it, or press **Esc** to cancel.
 
-### Open a panel in its own window
+### Pop out a panel
 
 1. Hold **Control+3**. The **Panels** pie opens round the pointer.
-2. Point at **Toolbox**, **Items + Properties**, **Timeline** or
-   **Graph Editor** and let go. The panel opens as a floating window over
-   the 3D view, with its title bar and its usual contents.
+2. Point at **Graph Editor**, **Items**, **Properties**, **Timeline** or
+   **Toolbox** and let go. That panel, on its own, pops up next to the
+   pointer. The docked panels stay where they are. (If the same panel is
+   showing in the side column, it says "open in a popover" there until the
+   popover closes.)
+3. Make your change, then move the pointer away: the popover closes.
 
-A tick marks the windows that are open. Choose one again to close it. While
-**Items + Properties** is open, the right-hand column leaves those panels
-to it. You can change the pie, or put the same entries in your own pies, in
-the **Form Editor** (see [Pie menus](pie-menus.md)).
+To keep it open, click the circle at the right of its title strip, or drag
+it by the strip. Click the circle again to close it. A tick in the pie marks
+the panel that is open. To pop out other panels, or to put these in your own
+pies, use the **Form Editor** (see [Pie menus](pie-menus.md)).
 
 ### Split the 3D view
 

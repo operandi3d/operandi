@@ -48,7 +48,7 @@ A pie can never hold itself, not even through one of its sub-pies.
 | Falloffs | none |
 | Action Centers | none |
 | Modeling | none |
-| Panels (floating Toolbox, Items + Properties, Timeline, Graph Editor) | **Control+3** |
+| Panels (pops out the Graph Editor, Items, Properties, Timeline or Toolbox) | **Control+3** |
 | Layouts (one slot per layout) | **Control+` (backtick)** |
 
 ## Editing a pie
@@ -63,6 +63,8 @@ Pies are edited in the **Form Editor** (**System > Form Editor**), under
      pick one you ran recently from **History**, or use **Pick** (below).
    - **Sub-pie**: choose the pie it opens. Only pies that don't lead back
      to this one are listed.
+   - **Panel popover**: choose a panel in **Panel**. The slot pops that
+     panel out on its own next to the pointer, as the **Panels** pie does.
    - **Empty**: the slot stays blank and keeps its place.
 3. Give the slot a **Label**, and an **Icon** if you like (below).
 4. To move a slot, drag it onto another slot: the two swap places and the

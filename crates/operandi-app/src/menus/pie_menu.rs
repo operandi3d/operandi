@@ -40,8 +40,8 @@ pub const TOGGLES: &str = "pie.toggles";
 pub const FALLOFFS: &str = "pie.falloffs";
 pub const ACTION_CENTERS: &str = "pie.actionCenters";
 pub const MODELING: &str = "pie.modeling";
-/// Opens panels as floating windows: Toolbox, Items + Properties,
-/// Timeline, Graph Editor (Jason, 2026-11-27/28).
+/// Opens panels as popovers, beside the docked ones: Graph Editor, Items,
+/// Properties, Timeline, Toolbox (Jason, 2026-11-27/28).
 pub const PANELS: &str = "pie.panels";
 /// The Layouts pie (layouts stage 2, UIC-18): its slots are the layouts,
 /// so it has no file (`Operandi::layouts_pie`).
@@ -695,8 +695,12 @@ impl Operandi {
         {
             return (None, Mark::Toggle(on));
         }
-        // A slot that opens a floating window (any pie's, the Panels pie
-        // first) is ticked while that window is open.
+        // A slot that opens a panel popover (any pie's, the Panels pie
+        // first) is ticked while that popover is open.
+        if let Some(panel) = crate::panel_popover::line_panel(command) {
+            return (None, Mark::Toggle(self.panel_popover_open(panel)));
+        }
+        // A slot that opens a floating window is ticked while it is open.
         if let Some(hash) = lowered
             .strip_prefix("layout.window hash:")
             .filter(|h| !h.contains(char::is_whitespace))

@@ -155,7 +155,7 @@ pub(super) const COMMANDS: &[Entry] = &[
         .operandi().ui(),
     action("Pie: Modeling", Tools, "Opens the Modeling pie.")
         .operandi().ui(),
-    action("Pie: Panels", View, "Opens the Panels pie: opens the Toolbox, Items + Properties, the Timeline or the Graph Editor as a floating window (Ctrl+3).")
+    action("Pie: Panels", View, "Opens the Panels pie: pops out the Graph Editor, Items, Properties, the Timeline or the Toolbox on its own as a popover (Ctrl+3).")
         .operandi().ui(),
     // Layouts stage 2 (UIC-18, LAY-32): the real Ctrl key on a Mac.
     action("Pie: Layouts", View, "Opens the Layouts pie: each slot shows a layout (Ctrl+`).")
