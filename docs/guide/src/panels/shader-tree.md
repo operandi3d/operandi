@@ -35,6 +35,13 @@ Color Output**, a **Base Shader** and a **Base Material**, plus the
 - **Right-click** a layer for its menu (instance, duplicate, delete and
   more).
 
+## In the 3D view
+
+Set a view's shading to **Texture** or **Advanced** to see the layers on
+the meshes. Image maps and procedural textures (such as **Checker** or
+**Noise**) are drawn pixel by pixel, so a pattern shows on a mesh with few
+polygons too, and on subdivision surfaces.
+
 ## Related
 
 - [Set Part and Set Material](../polygon/part-material.md)
