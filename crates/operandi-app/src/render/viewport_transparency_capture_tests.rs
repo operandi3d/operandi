@@ -436,3 +436,173 @@ fn faded_grid_visibly_fades_the_default_view() {
         "only {changed} of {total} pixels differ"
     );
 }
+
+/// Leo (2026-11-28): procedural textures draw per pixel in the viewport.
+/// A Checker on a plain cube (8 points) in the Texture style: one face
+/// shows both squares, dark and light; before, the colour was sampled at
+/// the corners only and the face was one smear. Skips without a graphics
+/// device.
+#[test]
+fn a_checker_on_a_cube_shows_its_squares() {
+    checker_cube(false);
+}
+
+/// The same on a Tab subdivision surface drawn as patches on the card
+/// (where a procedural pattern used to draw only its base colour).
+#[test]
+fn a_checker_on_a_subdivided_cube_shows_its_squares() {
+    checker_cube(true);
+}
+
+fn checker_cube(subdivided: bool) {
+    use crate::view_display::{Overlay, Style};
+    use operandi_core::procedural::{Pattern, ProceduralKind};
+    use operandi_core::shader_tree::{NewLayer, NodeKind, ShaderTreeEdit, TextureSource};
+    let Some(state) = super::performance_tests::headless_gpu() else {
+        return;
+    };
+    let mut a = Operandi::empty();
+    a.viewport_gpu = Some(gpu::ViewportGpu::new(state));
+    a.editor.scene.new_mesh().unwrap();
+    a.editor.scene.items[0].mesh = operandi_core::Mesh::box_mesh(DVec3::ZERO, DVec3::splat(2.), 1)
+        .unwrap()
+        .into();
+    a.run(Command::ShaderTree(ShaderTreeEdit::Add {
+        layer: NewLayer::Procedural(ProceduralKind::Checker),
+        selected: None,
+    }));
+    let mut node = a
+        .editor
+        .scene
+        .shader_tree
+        .nodes
+        .iter()
+        .find(|n| matches!(&n.kind, NodeKind::Texture(_)))
+        .unwrap()
+        .clone();
+    if let NodeKind::Texture(t) = &mut node.kind
+        && let TextureSource::Procedural(p) = &mut t.source
+        && let Pattern::Checker { transition, .. } = &mut p.pattern
+    {
+        *transition = 0.;
+    }
+    let NodeKind::Texture(t) = &node.kind else {
+        unreachable!()
+    };
+    let locator = t.locator.unwrap();
+    a.run(Command::ShaderTree(ShaderTreeEdit::Replace {
+        node,
+        continuing: false,
+    }));
+    // Squares of 1 m facing the front: four on the 2 m face.
+    let item = a.editor.scene.item(locator).unwrap();
+    let mut settings = item.texture_locator().unwrap().clone();
+    settings.axis = 2;
+    let mut transform = item.transform.clone();
+    transform.scale = DVec3::ONE;
+    a.run(Command::ShaderTree(ShaderTreeEdit::SetLocator {
+        locator,
+        settings: Box::new(settings),
+        transform,
+        continuing: false,
+    }));
+    for group in [
+        &mut a.display.settings.active,
+        &mut a.display.settings.inactive,
+    ] {
+        group.style = Style::Texture;
+        group.overlay = Overlay::None;
+    }
+    if subdivided {
+        crate::subd_gpu::set_min_pieces(0);
+        a.run(Command::ToggleSubdivision(
+            operandi_core::subdivision::Toggle::Subdivision,
+        ));
+    }
+    a.run(Command::Mode(Mode::Item));
+    a.editor.scene.select_item(None);
+    a.camera.view = crate::camera::View::Front;
+    a.frame(false);
+    let ctx = Context::default();
+    theme::install(&ctx);
+    for _ in 0..3 {
+        super::tests::draw(&mut a, &ctx, vec2(1200., 800.), vec![]);
+    }
+    let (_, [w, h], rgba) = a.viewport_gpu.as_ref().unwrap().read_views().remove(0);
+    if let Ok(dir) = std::env::var("OPERANDI_CAPTURE_DIR") {
+        let _ = image::save_buffer(
+            std::path::Path::new(&dir).join(format!("checker-cube-{subdivided}.png")),
+            &rgba,
+            w,
+            h,
+            image::ColorType::Rgba8,
+        );
+    }
+    // Over the whole view: the black squares (near black: plain shading
+    // never gets that dark), and the lit ones (shaded, so anything
+    // between dark and the white background). The grid's thin lines are
+    // far under the 1 % each square colour needs. Before, the face was one
+    // even grey.
+    let (mut dark, mut light) = (0usize, 0usize);
+    // Only drawn pixels: the background is clear (alpha 0).
+    for p in rgba.chunks(4).filter(|p| p[3] > 0) {
+        let v = u32::from(p[0]) + u32::from(p[1]) + u32::from(p[2]);
+        if v < 45 {
+            dark += 1;
+        } else if (250..700).contains(&v) {
+            light += 1;
+        }
+    }
+    let all = (w * h) as usize;
+    assert!(
+        dark * 100 > all && light * 100 > all,
+        "subdivided {subdivided}: both squares: {dark} dark, {light} light of {all}"
+    );
+}
+
+/// Leo (2026-11-28): a new texture's shader compiles on a background
+/// thread, so the frame after adding it doesn't wait for the compile; the
+/// view draws the plain colour meanwhile and the pattern once it's ready.
+/// Skips without a graphics device.
+#[test]
+fn a_new_textures_shader_compiles_without_holding_up_frames() {
+    use operandi_core::procedural::ProceduralKind;
+    use operandi_core::shader_tree::{NewLayer, ShaderTreeEdit};
+    let Some(state) = super::performance_tests::headless_gpu() else {
+        return;
+    };
+    let mut a = Operandi::empty();
+    let mut gpu = gpu::ViewportGpu::new(state);
+    gpu.set_background_compile(true);
+    a.viewport_gpu = Some(gpu);
+    a.editor.scene.new_mesh().unwrap();
+    a.editor.scene.items[0].mesh = operandi_core::Mesh::box_mesh(DVec3::ZERO, DVec3::splat(2.), 1)
+        .unwrap()
+        .into();
+    for group in [
+        &mut a.display.settings.active,
+        &mut a.display.settings.inactive,
+    ] {
+        group.style = crate::view_display::Style::Texture;
+    }
+    let ctx = Context::default();
+    theme::install(&ctx);
+    let size = vec2(1200., 800.);
+    for _ in 0..2 {
+        super::tests::draw(&mut a, &ctx, size, vec![]);
+    }
+    a.run(Command::ShaderTree(ShaderTreeEdit::Add {
+        layer: NewLayer::Procedural(ProceduralKind::Noise),
+        selected: None,
+    }));
+    super::tests::draw(&mut a, &ctx, size, vec![]);
+    let gpu = a.viewport_gpu.as_ref().unwrap();
+    assert!(gpu.compiling(), "the module compiles in the background");
+    // It arrives within a while, and the views stop waiting.
+    let start = std::time::Instant::now();
+    while a.viewport_gpu.as_ref().unwrap().compiling() {
+        assert!(start.elapsed().as_secs() < 30, "the compile never arrived");
+        std::thread::sleep(std::time::Duration::from_millis(20));
+        super::tests::draw(&mut a, &ctx, size, vec![]);
+    }
+}

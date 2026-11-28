@@ -119,6 +119,17 @@ pub struct MaterialGpu {
     current: Option<Arc<FillSet>>,
     /// Shader compiles so far (speed guards: a drag compiles nothing).
     pub compiles: u64,
+    /// A module being compiled on a background thread (Leo, 2026-11-28:
+    /// a new texture's first compile took over a second and froze the
+    /// app): its source and where the pipelines arrive. Until then the
+    /// programs' polygons draw in their vertex colour.
+    pending: Option<(String, std::sync::mpsc::Receiver<Option<FillSet>>)>,
+    /// The current materials' instance rows as generated, so they can be
+    /// written again with their codes once a pending module arrives.
+    raw_instances: Vec<[u32; 4]>,
+    /// Compile new modules on a background thread (false: at once, as
+    /// tests that read pixels on the next frame need).
+    pub background: bool,
     /// Image uploads so far.
     pub uploads: u64,
     /// Painted images (`GpuMaterials::painted`): their texture and every
@@ -189,6 +200,9 @@ impl MaterialGpu {
             pipelines: Vec::new(),
             current: None,
             compiles: 0,
+            pending: None,
+            raw_instances: Vec::new(),
+            background: !cfg!(test),
             uploads: 0,
             painted: HashMap::new(),
             patches: 0,
@@ -278,6 +292,68 @@ impl MaterialGpu {
         self.current.as_deref()
     }
 
+    /// A module is compiling in the background (the view keeps drawing
+    /// frames so it shows once it arrives).
+    pub fn compiling(&self) -> bool {
+        self.pending.is_some()
+    }
+
+    /// Takes a background compile that has finished: caches it, makes it
+    /// current and writes the instance codes again. True when the scene
+    /// bind group must be rebuilt.
+    pub fn poll(&mut self, device: &wgpu::Device, queue: &wgpu::Queue) -> bool {
+        let Some((source, rx)) = &self.pending else {
+            return false;
+        };
+        let made = match rx.try_recv() {
+            Ok(made) => made.map(Arc::new),
+            Err(std::sync::mpsc::TryRecvError::Empty) => return false,
+            Err(std::sync::mpsc::TryRecvError::Disconnected) => None,
+        };
+        let source = source.clone();
+        self.pending = None;
+        let Some(p) = made else {
+            // It didn't compile: the vertex colours stay.
+            return false;
+        };
+        self.pipelines.push((source, p.clone()));
+        if self.pipelines.len() > KEEP_PIPELINES {
+            self.pipelines.remove(0);
+        }
+        self.current = Some(p);
+        self.write_instances(device, queue);
+        true
+    }
+
+    /// The instance table from `raw_instances`: their codes when a module
+    /// is current, else code 0 (the vertex colour) and no lists.
+    fn write_instances(&mut self, device: &wgpu::Device, queue: &wgpu::Queue) {
+        let shift = LUT_ROWS as u32;
+        let ready = self.current.is_some();
+        let instances: Vec<[u32; 4]> = self
+            .raw_instances
+            .iter()
+            .map(|&[code, b, s, has]| {
+                let code = if ready { code } else { 0 };
+                // Without the module the lists go too (bit 0 stays).
+                let has = if ready { has } else { has & 1 };
+                [code, b + shift, if has != 0 { s + shift } else { 0 }, has]
+            })
+            .collect();
+        let bytes: Vec<u8> = instances
+            .iter()
+            .flatten()
+            .flat_map(|v| v.to_le_bytes())
+            .collect();
+        write_storage(
+            device,
+            queue,
+            &mut self.instances,
+            "Operandi material instances",
+            &bytes,
+        );
+    }
+
     /// The see-through table's scene group entry (gpu.rs `CLEAR_BINDING`).
     pub fn clear_entry(&self, binding: u32) -> wgpu::BindGroupEntry<'_> {
         wgpu::BindGroupEntry {
@@ -304,6 +380,7 @@ impl MaterialGpu {
         queue: &wgpu::Queue,
         materials: Option<&GpuMaterials>,
         compile: &dyn Fn(&str) -> Option<FillSet>,
+        spawn: &dyn Fn(String) -> std::sync::mpsc::Receiver<Option<FillSet>>,
     ) -> bool {
         let generation = materials.map_or(0, |m| m.generation);
         if generation == self.generation {
@@ -312,6 +389,7 @@ impl MaterialGpu {
         self.generation = generation;
         let Some(m) = materials else {
             self.current = None;
+            self.pending = None;
             self.slots.clear();
             self.textures.clear();
             // The plain pipeline still reads the reflection table.
@@ -345,8 +423,16 @@ impl MaterialGpu {
                 self.pipelines.push(entry);
                 self.pipelines.last().map(|(_, p)| p.clone())
             }
+            // Already on its way: keep waiting for it.
+            None if self.pending.as_ref().is_some_and(|(s, _)| *s == m.source) => None,
+            None if self.background => {
+                self.compiles += 1;
+                self.pending = Some((m.source.clone(), spawn(m.source.clone())));
+                None
+            }
             None => {
                 self.compiles += 1;
+                self.pending = None;
                 let made = compile(&m.source).map(Arc::new);
                 if let Some(p) = &made {
                     self.pipelines.push((m.source.clone(), p.clone()));
@@ -357,39 +443,23 @@ impl MaterialGpu {
                 made
             }
         };
-        // A module that didn't compile draws every program's polygons in
-        // their vertex colour (code 0), never black. The parameters sit
-        // after the reflection table (`param_bytes`).
-        let shift = LUT_ROWS as u32;
-        let instances: Vec<[u32; 4]> = m
-            .instances
-            .iter()
-            .map(|&[code, b, s, has]| {
-                let code = if pipeline.is_some() { code } else { 0 };
-                // Without the module the lists go too (bit 0 stays).
-                let has = if pipeline.is_some() { has } else { has & 1 };
-                [code, b + shift, if has != 0 { s + shift } else { 0 }, has]
-            })
-            .collect();
+        if pipeline.is_some() {
+            // A cached module: anything still compiling is for older
+            // materials.
+            self.pending = None;
+        }
+        // A module that didn't compile (or is still compiling) draws every
+        // program's polygons in their vertex colour (code 0), never black.
+        // The parameters sit after the reflection table (`param_bytes`).
+        self.raw_instances = m.instances.clone();
         self.current = pipeline;
+        self.write_instances(device, queue);
         write_storage(
             device,
             queue,
             &mut self.params,
             "Operandi material parameters",
             &param_bytes(&m.params),
-        );
-        let bytes: Vec<u8> = instances
-            .iter()
-            .flatten()
-            .flat_map(|v| v.to_le_bytes())
-            .collect();
-        write_storage(
-            device,
-            queue,
-            &mut self.instances,
-            "Operandi material instances",
-            &bytes,
         );
         // See-through rows don't need the module: without it the glass
         // passes run the plain pipelines.

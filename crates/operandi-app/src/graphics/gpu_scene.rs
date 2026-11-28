@@ -4552,7 +4552,7 @@ mod tests {
     }
 
     #[test]
-    fn procedural_layers_colour_the_viewport_at_mesh_points() {
+    fn procedural_layers_colour_the_viewport_per_pixel() {
         use operandi_core::procedural::{Pattern, ProceduralKind};
         use operandi_core::shader_tree::{NewLayer, NodeKind, ShaderTreeEdit, TextureSource};
         let mut e = operandi_core::Editor {
@@ -4616,14 +4616,17 @@ mod tests {
                 &SmoothingSettings::default(),
             )
             .0;
-        // Black and white squares (× Diffuse Amount 80 %): a polygon's
-        // corners differ.
-        let (black, white) = (linear([0., 0., 0.]), linear([0.8, 0.8, 0.8]));
-        let mixed = g.fill_ranges.iter().any(|r| {
-            let vs = &g.fill[r.clone()];
-            vs.iter().any(|v| v.color == black) && vs.iter().any(|v| v.color == white)
-        });
-        assert!(mixed, "no polygon shows both squares");
+        // The checker is drawn per pixel by a material program (it used to
+        // be sampled at the mesh corners only, so a cube barely showed it),
+        // and the generated shader validates.
+        assert!(
+            !g.fill.is_empty() && g.fill.iter().all(|v| v.program != 0),
+            "the checker isn't drawn per pixel"
+        );
+        let m = resident.gpu_materials().unwrap();
+        assert!(m.source.contains("op_pat"), "the pattern runs on the card");
+        let source = crate::gpu::world_shader_for_tests(&m.source);
+        crate::material_gpu::valid(&source).unwrap();
     }
 
     #[test]

@@ -63,11 +63,15 @@ pub struct Program {
     /// positions, normals and procedural textures that change across a
     /// polygon, so they draw per pixel too (MaterialX stage 5).
     pub reads_graph: bool,
+    /// Whether it evaluates a procedural pattern (pattern.wgsl): the
+    /// pattern changes across a polygon, so per pixel shows it where the
+    /// per-corner colour smears it (a low-poly mesh showed next to nothing).
+    pub reads_pattern: bool,
 }
 impl Program {
     /// Whether the GPU program is worth running instead of the CPU colour.
     pub fn per_pixel(&self) -> bool {
-        self.reads_images || self.reads_view || self.reads_graph
+        self.reads_images || self.reads_view || self.reads_graph || self.reads_pattern
     }
 }
 
@@ -87,6 +91,7 @@ pub fn translate(e: &Expr, image: &mut dyn FnMut(u64) -> Option<u32>) -> Option<
         reads_images: false,
         reads_view: false,
         reads_graph: false,
+        reads_pattern: false,
     };
     let out = g.emit(e, 0);
     if g.failed || g.lines.len() > MAX_STATEMENTS {
@@ -105,6 +110,7 @@ pub fn translate(e: &Expr, image: &mut dyn FnMut(u64) -> Option<u32>) -> Option<
         reads_images: g.reads_images,
         reads_view: g.reads_view,
         reads_graph: g.reads_graph,
+        reads_pattern: g.reads_pattern,
     })
 }
 
@@ -139,6 +145,7 @@ pub fn translate_list(
         reads_images: false,
         reads_view: false,
         reads_graph: false,
+        reads_pattern: false,
     };
     let outs: Vec<String> = items.iter().map(|(e, s)| g.emit(e, (*s).min(2))).collect();
     if g.failed || g.slot.is_some() || g.lines.len() > MAX_STATEMENTS {
@@ -163,6 +170,7 @@ pub fn translate_list(
         reads_images: g.reads_images,
         reads_view: g.reads_view,
         reads_graph: g.reads_graph,
+        reads_pattern: g.reads_pattern,
     })
 }
 
@@ -238,6 +246,7 @@ struct Gen<'a> {
     reads_images: bool,
     reads_view: bool,
     reads_graph: bool,
+    reads_pattern: bool,
 }
 
 const AXES: [&str; 3] = ["x", "y", "z"];
@@ -465,6 +474,7 @@ impl Gen<'_> {
             }
             // Per pixel (VM-Q11): pattern.wgsl, from Pattern::packed.
             Expr::Pattern(l) | Expr::CellRandom(l) => {
+                self.reads_pattern = true;
                 let v = self.emit(&l.vector, s);
                 let (mode, k) = l.pattern.packed(l.axis);
                 let k = k.map(f64::from);
