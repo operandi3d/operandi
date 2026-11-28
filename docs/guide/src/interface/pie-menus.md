@@ -48,7 +48,7 @@ A pie can never hold itself, not even through one of its sub-pies.
 | Falloffs | none |
 | Action Centers | none |
 | Modeling | none |
-| Panels (top bar, side panels, timeline) | **Control+3** |
+| Panels (floating Toolbox, Items + Properties, Timeline, Graph Editor) | **Control+3** |
 | Layouts (one slot per layout) | **Control+` (backtick)** |
 
 ## Editing a pie

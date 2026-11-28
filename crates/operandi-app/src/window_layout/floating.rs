@@ -105,6 +105,13 @@ impl Operandi {
     /// the old floating panels are the toolbox, items and properties
     /// palettes, palettes.rs).
     pub(super) fn is_floating(&self, panel: Panel) -> bool {
+        self.side_palette_open(panel)
+            || (panel != Panel::Toolbox && self.palette_open(crate::palettes::ITEMS_PROPERTIES))
+    }
+
+    /// The panel's own palette is open (its own window, not the Items +
+    /// Properties one).
+    fn side_palette_open(&self, panel: Panel) -> bool {
         self.palettes
             .side_hash(panel)
             .is_some_and(|h| self.palettes.open.contains(h))
@@ -128,7 +135,7 @@ impl Operandi {
         }
         let panels: Vec<(Panel, String)> = Panel::ALL
             .into_iter()
-            .filter(|&p| self.is_floating(p) && self.views.window_of(p.pane()).is_none())
+            .filter(|&p| self.side_palette_open(p) && self.views.window_of(p.pane()).is_none())
             .filter_map(|p| Some((p, self.palettes.side_hash(p)?.to_owned())))
             .collect();
         for (panel, hash) in panels {

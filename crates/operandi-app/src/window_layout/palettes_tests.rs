@@ -497,3 +497,41 @@ fn floating_views_reopen_after_a_restart_and_leave_the_layout_file() {
     let [view]: [u32; 1] = a.views.group_views(Some(window.id)).try_into().unwrap();
     assert_eq!(a.cameras[&view], camera);
 }
+
+/// The Panels pie's windows (Jason, 2026-11-28): Items + Properties in one
+/// window (the side column gives both up), the Timeline floating instead
+/// of above the bottom bar, and the Graph Editor's window as a palette.
+#[test]
+fn panels_pie_windows_are_palettes() {
+    let root = data_root();
+    let (mut a, ctx) = app(&root);
+    // Items + Properties: one window, not the two separate ones.
+    a.execute("layout.window hash:itemsProperties");
+    assert!(a.palette_open("itemsProperties"), "{}", a.status);
+    assert!(a.is_floating(Panel::Items) && a.is_floating(Panel::Properties));
+    assert!(!a.is_floating(Panel::Toolbox));
+    assert!(!a.palette_open("items") && !a.palette_open("properties"));
+    frames(&mut a, &ctx, 2);
+    a.execute("layout.window hash:itemsProperties");
+    assert!(!a.is_floating(Panel::Items));
+    // The Timeline leaves the bottom of the window while it floats.
+    a.timeline.open = true;
+    frames(&mut a, &ctx, 2);
+    let docked = a.viewport_rect;
+    a.execute("layout.window hash:timeline");
+    frames(&mut a, &ctx, 2);
+    assert!(
+        a.viewport_rect.bottom() > docked.bottom() + 20.,
+        "{docked:?} → {:?}",
+        a.viewport_rect
+    );
+    a.execute("layout.window hash:timeline");
+    frames(&mut a, &ctx, 2);
+    assert_eq!(a.viewport_rect, docked);
+    // The Graph Editor: the same open state its menu item uses.
+    assert!(!a.graph.open);
+    a.execute("layout.window hash:graphEditor");
+    assert!(a.graph.open && a.palette_open("graphEditor"));
+    a.execute("operandi.graph.open");
+    assert!(!a.palette_open("graphEditor"));
+}

@@ -119,13 +119,17 @@ still don't select while a tool is on: select first, then pick the tool.
    where it will land.
 2. Let go to dock it, or press **Esc** to cancel.
 
-### Show or hide panels quickly
+### Open a panel in its own window
 
 1. Hold **Control+3**. The **Panels** pie opens round the pointer.
-2. Point at **Top Bar**, **Left Panel**, **Right Panel** or **Timeline**
-   and let go. Each one sits in the pie where it sits in the window.
+2. Point at **Toolbox**, **Items + Properties**, **Timeline** or
+   **Graph Editor** and let go. The panel opens as a floating window over
+   the 3D view, with its title bar and its usual contents.
 
-A tick marks the panels that show now. Choose one again to bring it back.
+A tick marks the windows that are open. Choose one again to close it. While
+**Items + Properties** is open, the right-hand column leaves those panels
+to it. You can change the pie, or put the same entries in your own pies, in
+the **Form Editor** (see [Pie menus](pie-menus.md)).
 
 ### Split the 3D view
 

@@ -6,29 +6,29 @@
   "icons": "text",
   "controls": [
     {
-      "command": "operandi.bar.collapse bar:top",
-      "label": "Top Bar"
+      "command": "layout.window hash:graphEditor",
+      "label": "Graph Editor"
     },
     {
       "space": 0
     },
     {
-      "command": "operandi.bar.collapse bar:right",
-      "label": "Right Panel"
+      "command": "layout.window hash:itemsProperties",
+      "label": "Items + Properties"
     },
     {
       "space": 0
     },
     {
-      "command": "operandi.anim.timeline",
+      "command": "layout.window hash:timeline",
       "label": "Timeline"
     },
     {
       "space": 0
     },
     {
-      "command": "operandi.bar.collapse bar:left",
-      "label": "Left Panel"
+      "command": "layout.window hash:toolbox",
+      "label": "Toolbox"
     },
     {
       "space": 0

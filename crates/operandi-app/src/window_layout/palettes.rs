@@ -41,6 +41,10 @@ pub(super) const SHIPPED: &[(&str, &str)] =
 /// The state file's version.
 const STATE_VERSION: u32 = 1;
 
+/// The Items + Properties palette's hash (the Panels pie).
+pub(crate) const ITEMS_PROPERTIES: &str = "itemsProperties";
+/// The floating timeline palette's hash.
+pub(crate) const TIMELINE: &str = "timeline";
 /// The UV Editor palette's hash (LAY-54).
 pub(super) const UV_EDITOR: &str = "uvEditor";
 /// The Preset Browser palette's hash (its window keeps its own state,
@@ -61,6 +65,13 @@ pub(super) enum Content {
     UvView { tools: bool },
     /// The Form Editor (layouts stage 7, form_editor.rs).
     FormEditor,
+    /// Items with Properties under it in one window (the Panels pie;
+    /// Jason, 2026-11-28). The side column gives both up while it shows.
+    ItemsProperties,
+    /// The time strip in its own window instead of above the bottom bar.
+    Timeline,
+    /// The Graph Editor's window (graph_editor.rs keeps its open state).
+    GraphEditor,
 }
 
 /// One palette the app offers.
@@ -160,6 +171,9 @@ pub(super) fn palette_from(doc: &WindowLayout) -> Option<Palette> {
         "Properties" => Content::Side(Panel::Properties),
         "Preset Browser" => Content::PresetBrowser,
         "Form Editor" => Content::FormEditor,
+        "Items + Properties" => Content::ItemsProperties,
+        "Timeline" => Content::Timeline,
+        "Graph Editor" => Content::GraphEditor,
         UV_VIEW => Content::UvView {
             tools: slot.settings["tools"].as_bool().unwrap_or(false),
         },
@@ -355,14 +369,17 @@ impl Operandi {
         };
         match p.content {
             Content::PresetBrowser => self.preset_browser.window_open,
+            Content::GraphEditor => self.graph.open,
             Content::UvView { .. } => self
                 .palettes
                 .views
                 .get(&p.hash)
                 .is_some_and(|k| self.views.views().contains(k)),
-            Content::Side(_) | Content::Panel(_) | Content::FormEditor => {
-                self.palettes.open.contains(&p.hash)
-            }
+            Content::Side(_)
+            | Content::Panel(_)
+            | Content::FormEditor
+            | Content::ItemsProperties
+            | Content::Timeline => self.palettes.open.contains(&p.hash),
         }
     }
 
@@ -405,6 +422,7 @@ impl Operandi {
         }
         match p.content {
             Content::PresetBrowser => self.set_preset_browser_window(open),
+            Content::GraphEditor => self.graph.open = open,
             Content::Side(panel) => {
                 if open {
                     self.palettes.open.insert(p.hash.clone());
@@ -413,7 +431,10 @@ impl Operandi {
                     self.dots.side_positions.remove(&panel);
                 }
             }
-            Content::Panel(_) | Content::FormEditor => {
+            Content::Panel(_)
+            | Content::FormEditor
+            | Content::ItemsProperties
+            | Content::Timeline => {
                 if open {
                     self.palettes.open.insert(p.hash.clone());
                 } else {
@@ -555,9 +576,11 @@ impl Operandi {
             Content::PresetBrowser => {
                 egui::ViewportId::from_hash_of(("operandi-palette-window", "preset-browser"))
             }
-            Content::Panel(_) | Content::FormEditor => {
-                egui::ViewportId::from_hash_of(("operandi-palette", &p.hash))
-            }
+            Content::Panel(_)
+            | Content::FormEditor
+            | Content::ItemsProperties
+            | Content::Timeline => egui::ViewportId::from_hash_of(("operandi-palette", &p.hash)),
+            Content::GraphEditor => egui::ViewportId::from_hash_of("operandi-graph-editor"),
             Content::UvView { .. } => {
                 let key = self.palettes.views.get(&p.hash)?;
                 let window = self.views.window_of(Pane::Uv(*key))?;
@@ -611,17 +634,18 @@ impl Operandi {
             .list
             .iter()
             .filter(|p| {
-                matches!(p.content, Content::Panel(_) | Content::FormEditor)
-                    && self.palettes.open.contains(&p.hash)
+                matches!(
+                    p.content,
+                    Content::Panel(_)
+                        | Content::FormEditor
+                        | Content::ItemsProperties
+                        | Content::Timeline
+                ) && self.palettes.open.contains(&p.hash)
             })
             .cloned()
             .collect();
         for p in open {
-            let kind = match p.content {
-                Content::Panel(kind) => Some(kind),
-                Content::FormEditor => None,
-                _ => continue,
-            };
+            let content = p.content.clone();
             let place = self.palettes.place(&p.hash);
             let spec = floating::OsWindow {
                 id: egui::ViewportId::from_hash_of(("operandi-palette", &p.hash)),
@@ -640,13 +664,29 @@ impl Operandi {
                     )
                     .show(ctx, |ui| {
                         let rect = ui.available_rect_before_wrap();
-                        match kind {
-                            Some(kind) => {
+                        match content {
+                            Content::Panel(kind) => {
                                 ui.push_id(("palette", kind), |ui| {
                                     (crate::panel_registry::panel_type(kind).draw)(app, ui, rect)
                                 });
                             }
-                            None => app.form_editor_ui(ui),
+                            Content::ItemsProperties => {
+                                // Items on top, Properties under it.
+                                let (top, bottom) = rect.split_top_bottom_at_fraction(0.45);
+                                ui.push_id("palette-items", |ui| {
+                                    ui.scope_builder(egui::UiBuilder::new().max_rect(top), |ui| {
+                                        app.items_section(ui, top)
+                                    })
+                                });
+                                ui.push_id("palette-properties", |ui| {
+                                    ui.scope_builder(
+                                        egui::UiBuilder::new().max_rect(bottom),
+                                        |ui| app.properties_section(ui, bottom),
+                                    )
+                                });
+                            }
+                            Content::Timeline => app.timeline_ui(ui),
+                            _ => app.form_editor_ui(ui),
                         }
                     });
             });
@@ -685,7 +725,11 @@ impl Operandi {
             .palettes
             .list
             .iter()
-            .filter(|p| p.content != Content::PresetBrowser && self.palette_open(&p.hash))
+            // These two keep their own open state.
+            .filter(|p| {
+                !matches!(p.content, Content::PresetBrowser | Content::GraphEditor)
+                    && self.palette_open(&p.hash)
+            })
             .map(|p| p.hash.clone())
             .collect();
         let state = StateFile {

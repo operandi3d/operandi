@@ -1,7 +1,8 @@
 //! The Form Editor's pie editing (UIC-308..313): a ring-shaped preview of
 //! the selected pie, its eight slots placed as the pie opens them. Click a
 //! slot to edit it below (command line typed or from the Command History,
-//! label, icon, sub-pie, or empty); drag a slot onto another to swap them.
+//! label, icon, sub-pie, a floating window, or empty); drag a slot onto
+//! another to swap them.
 //! Assign Key opens the Input Map on the pie's line (UIC-311), Export Pie
 //! writes it with its sub-pies (UIC-312). Every edit is an
 //! `operandi.form.*` or `operandi.pie.*` line (UIC-160, UIC-220).
@@ -24,14 +25,29 @@ const PLACES: [&str; SLOTS] = [
 
 /// What a pie slot holds, for its editor.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-enum Kind {
+pub(super) enum Kind {
     Command,
     SubPie,
+    /// Opens a panel as a floating window: `layout.window hash:<id>` (the
+    /// Panels pie; Jason, 2026-11-28).
+    Window,
     Empty,
+}
+
+/// The window a slot's line opens, when it is just `layout.window
+/// hash:<id>`.
+fn window_hash(line: &str) -> Option<&str> {
+    let line = line.trim();
+    let rest = line
+        .get(..19)
+        .filter(|head| head.eq_ignore_ascii_case("layout.window hash:"))
+        .map(|_| &line[19..])?;
+    (!rest.is_empty() && !rest.contains(char::is_whitespace)).then_some(rest)
 }
 
 fn kind_of(c: Option<&Control>) -> Kind {
     match c {
+        Some(c) if c.command.as_deref().and_then(window_hash).is_some() => Kind::Window,
         Some(c) if c.command.is_some() => Kind::Command,
         Some(c) if c.form.is_some() => Kind::SubPie,
         _ => Kind::Empty,
@@ -213,6 +229,7 @@ impl Operandi {
         let control = form.controls.get(i).cloned();
         let kind = kind_of(control.as_ref());
         ui.label(RichText::new(format!("Slot {} · {}", i + 1, PLACES[i])).strong());
+        let showing = self.pie_slot_showing(&id, i, kind);
         // What the slot holds.
         ui.horizontal(|ui| {
             ui.add_sized([96., 18.], egui::Label::new("Holds"));
@@ -220,35 +237,34 @@ impl Operandi {
             let label = |k: Kind| match k {
                 Kind::Command => "Command",
                 Kind::SubPie => "Sub-pie",
+                Kind::Window => "Floating window",
                 Kind::Empty => "Empty",
             };
             egui::ComboBox::from_id_salt(("pie-slot-kind", &id, i))
-                .selected_text(label(kind))
+                .selected_text(label(showing))
                 .show_ui(ui, |ui| {
-                    for k in [Kind::Command, Kind::SubPie, Kind::Empty] {
-                        if ui.selectable_label(k == kind, label(k)).clicked() {
+                    for k in [Kind::Command, Kind::SubPie, Kind::Window, Kind::Empty] {
+                        if ui.selectable_label(k == showing, label(k)).clicked() {
                             picked = Some(k);
                         }
                     }
                 });
             match picked {
                 Some(Kind::Empty) if kind != Kind::Empty => {
+                    self.form_editor.pie_kind = None;
                     self.execute(&format!("operandi.form.slot index:{i} form:{id}"));
                 }
-                // A command slot starts from the typed line below; a
-                // sub-pie from the pick below.
-                Some(k) if k != kind => {
-                    self.form_editor.pie_kind = Some((id.clone(), i, k == Kind::SubPie))
-                }
+                // A command slot starts from the typed line below, a
+                // sub-pie or a window from the pick below.
+                Some(k) if k != showing => self.form_editor.pie_kind = Some((id.clone(), i, k)),
                 _ => {}
             }
         });
-        let wanted = match &self.form_editor.pie_kind {
-            Some((f, at, sub)) if *f == id && *at == i => Some(*sub),
-            _ => None,
-        };
-        let shows_sub = wanted.unwrap_or(kind == Kind::SubPie);
-        let shows_line = wanted.map_or(kind == Kind::Command, |sub| !sub);
+        let shows_sub = showing == Kind::SubPie;
+        let shows_line = showing == Kind::Command;
+        if showing == Kind::Window {
+            self.pie_window_pick(ui, &id, i, control.as_ref());
+        }
         let label = control
             .as_ref()
             .map(|c| c.label.clone())
@@ -305,6 +321,68 @@ impl Operandi {
             if let Some(c) = &control {
                 self.icon_picker(ui, &id, i, c);
             }
+        }
+    }
+
+    /// What slot `i` of pie `id` shows its editor for: what it holds, or
+    /// the kind just chosen for it before it holds one.
+    fn pie_slot_showing(&self, id: &str, i: usize, kind: Kind) -> Kind {
+        match &self.form_editor.pie_kind {
+            Some((f, at, k)) if f == id && *at == i => *k,
+            _ => kind,
+        }
+    }
+
+    /// A floating-window slot's choice: every window `layout.window` opens
+    /// (the palettes). Choosing one sets the slot's line, and its label
+    /// when it had none or the old window's name.
+    fn pie_window_pick(&mut self, ui: &mut Ui, id: &str, i: usize, control: Option<&Control>) {
+        let current = control
+            .and_then(|c| c.command.as_deref())
+            .and_then(window_hash)
+            .map(str::to_owned);
+        let windows: Vec<(String, String)> = self
+            .palettes
+            .list
+            .iter()
+            .map(|p| (p.hash.clone(), p.name.clone()))
+            .collect();
+        let name_of = |hash: &str| {
+            windows
+                .iter()
+                .find(|(h, _)| h.eq_ignore_ascii_case(hash))
+                .map(|(_, n)| n.clone())
+        };
+        let shown = current
+            .as_deref()
+            .map(|h| name_of(h).unwrap_or_else(|| h.to_owned()))
+            .unwrap_or_else(|| "Choose a window…".to_owned());
+        let mut picked = None;
+        ui.horizontal(|ui| {
+            ui.add_sized([96., 18.], egui::Label::new("Window"));
+            egui::ComboBox::from_id_salt(("pie-slot-window", id, i))
+                .selected_text(shown)
+                .show_ui(ui, |ui| {
+                    for (hash, name) in &windows {
+                        let on = current.as_deref() == Some(hash.as_str());
+                        if ui.selectable_label(on, name).clicked() {
+                            picked = Some((hash.clone(), name.clone()));
+                        }
+                    }
+                });
+        });
+        if let Some((hash, name)) = picked
+            && current.as_deref() != Some(hash.as_str())
+        {
+            let old = control.map(|c| c.label.clone()).unwrap_or_default();
+            let keep = !old.is_empty() && current.as_deref().and_then(name_of) != Some(old.clone());
+            let label = if keep { old } else { name };
+            self.form_editor.pie_kind = None;
+            self.execute(&format!(
+                "operandi.form.slot index:{i} line:{} label:{} form:{id}",
+                word(&format!("layout.window hash:{hash}")),
+                word(&label)
+            ));
         }
     }
 
@@ -559,5 +637,34 @@ impl Operandi {
                 }
                 v
             })
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// A slot holds a floating window when its line is just `layout.window
+    /// hash:<id>`; anything more is a plain command.
+    #[test]
+    fn window_slots_are_bare_layout_window_lines() {
+        assert_eq!(window_hash("layout.window hash:toolbox"), Some("toolbox"));
+        assert_eq!(
+            window_hash(" Layout.Window HASH:timeline "),
+            Some("timeline")
+        );
+        assert_eq!(window_hash("layout.window hash:groups open:true"), None);
+        assert_eq!(window_hash("layout.window hash:"), None);
+        assert_eq!(window_hash("Toggle Grid"), None);
+        let control = |line: &str| Control {
+            command: Some(line.into()),
+            ..Default::default()
+        };
+        assert_eq!(
+            kind_of(Some(&control("layout.window hash:itemsProperties"))),
+            Kind::Window
+        );
+        assert_eq!(kind_of(Some(&control("Toggle Grid"))), Kind::Command);
+        assert_eq!(kind_of(None), Kind::Empty);
     }
 }

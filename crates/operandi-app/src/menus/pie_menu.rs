@@ -40,7 +40,8 @@ pub const TOGGLES: &str = "pie.toggles";
 pub const FALLOFFS: &str = "pie.falloffs";
 pub const ACTION_CENTERS: &str = "pie.actionCenters";
 pub const MODELING: &str = "pie.modeling";
-/// Shows or hides the window's bars and the timeline (Jason, 2026-11-27).
+/// Opens panels as floating windows: Toolbox, Items + Properties,
+/// Timeline, Graph Editor (Jason, 2026-11-27/28).
 pub const PANELS: &str = "pie.panels";
 /// The Layouts pie (layouts stage 2, UIC-18): its slots are the layouts,
 /// so it has no file (`Operandi::layouts_pie`).
@@ -694,15 +695,14 @@ impl Operandi {
         {
             return (None, Mark::Toggle(on));
         }
-        // The Panels pie: marked while the panel shows.
-        if let Some(bar) = lowered
-            .strip_prefix("operandi.bar.collapse bar:")
-            .and_then(crate::collapse_line::Bar::parse)
+        // A slot that opens a floating window (any pie's, the Panels pie
+        // first) is ticked while that window is open.
+        if let Some(hash) = lowered
+            .strip_prefix("layout.window hash:")
+            .filter(|h| !h.contains(char::is_whitespace))
+            && self.palettes.find(hash).is_some()
         {
-            return (None, Mark::Toggle(!self.layouts.is_collapsed(bar)));
-        }
-        if lowered == "operandi.anim.timeline" {
-            return (None, Mark::Toggle(self.timeline.open));
+            return (None, Mark::Toggle(self.palette_open(hash)));
         }
         if let Some(rest) = lowered.strip_prefix("action center ") {
             let current = self.editor.action_context;

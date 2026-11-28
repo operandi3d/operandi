@@ -194,6 +194,10 @@ impl Operandi {
 
     /// The strip, as a bottom panel above the bottom bar.
     pub(super) fn timeline_panel(&mut self, ctx: &Context) {
+        // Floating (the timeline palette): its window draws it instead.
+        if self.palette_open(crate::palettes::TIMELINE) {
+            return;
+        }
         if !self.timeline.open || !crate::anim_switch::enabled() {
             self.timeline.rect = Rect::NOTHING;
             return;
@@ -226,7 +230,9 @@ impl Operandi {
         }
     }
 
-    fn timeline_ui(&mut self, ui: &mut Ui) {
+    /// The strip itself: above the bottom bar, or in the timeline
+    /// palette's window.
+    pub(crate) fn timeline_ui(&mut self, ui: &mut Ui) {
         let full = ui.max_rect();
         self.timeline.rect = full;
         let rate = self.editor.scene.time.rate;

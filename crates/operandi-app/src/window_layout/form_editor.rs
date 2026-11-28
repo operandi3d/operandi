@@ -83,9 +83,9 @@ pub(super) struct State {
     pie_drag: Option<(String, usize)>,
     /// Browse Icons' search text (UIC-314).
     icon_search: String,
-    /// A pie slot whose editor shows a command field (`false`) or the
-    /// sub-pie pick (`true`) before it holds one.
-    pie_kind: Option<(String, usize, bool)>,
+    /// A pie slot whose editor shows a command field, the sub-pie pick or
+    /// the window pick before it holds one.
+    pie_kind: Option<(String, usize, pie_editor::Kind)>,
 }
 
 /// The group a form's id puts it in when no user group holds it.
