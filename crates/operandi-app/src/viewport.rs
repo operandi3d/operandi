@@ -8,6 +8,7 @@ mod gesture;
 mod handle_drag;
 mod handles;
 mod lasso_select;
+mod nav_cursor;
 mod numeric_drag;
 mod pick;
 pub(super) mod plane_handles;

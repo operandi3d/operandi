@@ -102,6 +102,10 @@ You move around with the **Alt** key held down and a mouse drag in the
 | Pan up and down only | **Alt+Shift** + right drag |
 | Zoom to a box | **Alt+Control** + right drag a rectangle |
 
+While you drag, the pointer turns into a sign for what the drag does: a
+circling arrow to orbit, arrows in four directions to pan, a magnifier to
+zoom.
+
 You can also drag the **Navigation buttons** at the right of the
 **View header** to pan, orbit and zoom without a key held.
 

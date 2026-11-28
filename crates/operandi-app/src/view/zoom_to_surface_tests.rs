@@ -405,3 +405,37 @@ fn ortho_zoom_at_cursor_keeps_the_point_under_the_pointer() {
         );
     }
 }
+
+/// Leo (2026-11-28): while a view is navigated the system pointer hides
+/// and the drawn sign shows at the pointer; afterwards the pointer is back.
+#[test]
+fn navigating_shows_its_sign_in_place_of_the_pointer() {
+    let mut a = box_app();
+    let ctx = Context::default();
+    theme::install(&ctx);
+    let size = vec2(1200., 800.);
+    let _ = super::tests::draw(&mut a, &ctx, size, vec![]);
+    let at = a.viewport_rect.center();
+    for kind in [
+        NavigationKind::Orbit,
+        NavigationKind::Pan,
+        NavigationKind::Zoom,
+    ] {
+        a.navigation = Some(crate::input::Navigation {
+            kind: crate::input::GestureKind::Navigate(kind),
+            start: at,
+            last: at,
+            modifiers: Default::default(),
+            button: egui::PointerButton::Primary,
+        });
+        let out = super::tests::draw(&mut a, &ctx, size, vec![Event::PointerMoved(at)]);
+        assert_eq!(
+            out.platform_output.cursor_icon,
+            egui::CursorIcon::None,
+            "{kind:?}: the system pointer hides"
+        );
+    }
+    a.navigation = None;
+    let out = super::tests::draw(&mut a, &ctx, size, vec![Event::PointerMoved(at)]);
+    assert_ne!(out.platform_output.cursor_icon, egui::CursorIcon::None);
+}

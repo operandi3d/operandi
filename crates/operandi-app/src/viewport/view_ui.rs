@@ -2537,6 +2537,15 @@ impl Operandi {
                     egui::StrokeKind::Middle,
                 );
             }
+            // The pointer shows what the navigation drag does (Leo,
+            // 2026-11-28): a drawn sign in place of the system pointer.
+            if let Some(g) = &self.navigation
+                && let input::GestureKind::Navigate(kind) = g.kind
+                && r.contains(g.last)
+            {
+                ui.ctx().set_cursor_icon(egui::CursorIcon::None);
+                nav_cursor::draw(&painter, g.last, kind);
+            }
             self.paint_weld_drag(&painter, r);
             if self.status.starts_with("Help:") {
                 egui::ScrollArea::vertical()
