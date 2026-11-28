@@ -2475,23 +2475,57 @@ impl Operandi {
                 dragging.set(true);
             }
         };
+        // UIC-56 (#78): each group has a link button on its first row, as
+        // the item transform's; `mode` is the group's, a click cycles it.
+        let link_rects: std::cell::RefCell<Vec<(String, egui::Rect)>> = Default::default();
         let vector = |ui: &mut Ui,
                       label: &str,
                       v: &mut glam::DVec3,
                       range: std::ops::RangeInclusive<f64>,
                       scale: f64,
-                      suffix: &str| {
+                      suffix: &str,
+                      mode: &mut crate::link_mode::LinkMode| {
             // UIC-114: one row per component (issue #6: three fields on one
             // row ran past the panel's edge).
             crate::option_row::vector(ui, label, &["X", "Y", "Z"], "", |ui, k| {
                 let mut x = v[k] * scale;
-                drag(ui, &mut x, range.clone(), 0.01, suffix);
+                if k == 0 {
+                    let (link, rest) =
+                        crate::link_mode::LinkMode::split(ui.available_rect_before_wrap());
+                    link_rects
+                        .borrow_mut()
+                        .push((format!("locator-{}-link", label.to_lowercase()), link));
+                    if crate::link_mode::button(ui, link, *mode).clicked() {
+                        *mode = mode.next();
+                    }
+                    ui.scope_builder(egui::UiBuilder::new().max_rect(rest), |ui| {
+                        drag(ui, &mut x, range.clone(), 0.01, suffix);
+                    });
+                } else {
+                    drag(ui, &mut x, range.clone(), 0.01, suffix);
+                }
                 if (x / scale - v[k]).abs() > 1e-12 {
-                    v[k] = x / scale;
+                    let new = mode.apply(v.to_array(), k, x / scale);
+                    *v = glam::DVec3::from_array(new);
                 }
             });
         };
-        vector(ui, "Position", &mut tr.translation, -1e9..=1e9, 1., " m");
+        let link = |key: &str| {
+            self.link_modes
+                .get(&format!("locator-{key}"))
+                .copied()
+                .unwrap_or_default()
+        };
+        let (mut lp, mut lr, mut ls) = (link("position"), link("rotation"), link("size"));
+        vector(
+            ui,
+            "Position",
+            &mut tr.translation,
+            -1e9..=1e9,
+            1.,
+            " m",
+            &mut lp,
+        );
         vector(
             ui,
             "Rotation",
@@ -2499,6 +2533,7 @@ impl Operandi {
             -1e6..=1e6,
             180. / std::f64::consts::PI,
             "°",
+            &mut lr,
         );
         rotation_order_row(ui, "locator-rotation-order", &mut tr);
         // Planar spec: Size stops at 0.001 m.
@@ -2509,7 +2544,13 @@ impl Operandi {
             operandi_core::texture_locator::MIN_SIZE..=1e8,
             1.,
             " m",
+            &mut ls,
         );
+        for (key, mode) in [("position", lp), ("rotation", lr), ("size", ls)] {
+            self.link_modes.insert(format!("locator-{key}"), mode);
+        }
+        // For tests and the help pointer, as other fields' rects.
+        self.field_rects.extend(link_rects.into_inner());
         crate::option_row::row(ui, "", |ui| {
             if ui
                 .button("Auto Size")

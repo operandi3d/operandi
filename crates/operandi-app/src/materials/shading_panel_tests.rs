@@ -598,3 +598,32 @@ fn adding_an_image_map_asks_for_its_picture() {
     a.shading_add(NewLayer::Gradient);
     assert!(a.choosing.is_none());
 }
+
+/// #78 (Leo): a texture's Texture Locator tab has the item transform's
+/// link buttons (UIC-56) on Position, Rotation and Size, and a click
+/// cycles that group's mode.
+#[test]
+fn texture_locator_groups_have_link_buttons() {
+    let (mut a, ctx) = shading_app();
+    a.shading_add(NewLayer::ImageMap);
+    a.shading.layer_tab = crate::shading_panel::LayerTab::TextureLocator;
+    for _ in 0..2 {
+        draw(&mut a, &ctx, SIZE, vec![]);
+    }
+    for key in ["position", "rotation", "size"] {
+        let rect = a
+            .field_rects
+            .get(&format!("locator-{key}-link"))
+            .copied()
+            .unwrap_or_else(|| panic!("{key}: no link button"));
+        let mode = |a: &Operandi| {
+            a.link_modes
+                .get(&format!("locator-{key}"))
+                .copied()
+                .unwrap_or_default()
+        };
+        assert_eq!(mode(&a), crate::link_mode::LinkMode::Independent);
+        click(&mut a, &ctx, rect.center());
+        assert_eq!(mode(&a), crate::link_mode::LinkMode::Copy, "{key}");
+    }
+}

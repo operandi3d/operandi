@@ -34,6 +34,10 @@ Color Output**, a **Base Shader** and a **Base Material**, plus the
 - **Reorder**: drag a layer up or down.
 - **Right-click** a layer for its menu (instance, duplicate, delete and
   more).
+- **Place a texture**: on its **Texture Locator** tab, set **Position**,
+  **Rotation** and **Size**. The chain button on each group's first row
+  links X, Y and Z, as on an item's transform: off, same value, scale
+  together or add together.
 
 ## Related
 
